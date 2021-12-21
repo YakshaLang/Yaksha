@@ -18,6 +18,21 @@ TEST_CASE("interpreter: 1 + 2 * 3 + 4 / (2 + 2) * 10 - 2 --> 15") {
     FAIL("Must parse the expression");
   }
 }
+TEST_CASE("interpreter: 10 / 0 (div by zero)") {
+  tokenizer t{"code.py", "10 / 0"};
+  t.tokenize();
+  parser p{t.tokens_};
+  auto expression = p.parse();
+  if (!expression.empty()) {
+    interpreter ip{};
+    auto result = ip.calculate(expression);
+    REQUIRE(result.string_val_.find("Integer division by zero") !=
+            std::string::npos);
+    REQUIRE(result.object_type_ == yaksha::object_type::RUNTIME_ERROR);
+  } else {
+    FAIL("Must parse the expression");
+  }
+}
 TEST_CASE("interpreter: 1 + 2 != 3") {
   tokenizer t{"code.py", "1 + 2 != 3"};
   t.tokenize();
@@ -28,6 +43,21 @@ TEST_CASE("interpreter: 1 + 2 != 3") {
     auto result = ip.calculate(expression);
     REQUIRE(!result.bool_val_);
     REQUIRE(result.object_type_ == yaksha::object_type::BOOL);
+  } else {
+    FAIL("Must parse the expression");
+  }
+}
+TEST_CASE("interpreter: 1.0 + 2 (different data types cannot be added)") {
+  tokenizer t{"code.py", "1.0 + 2"};
+  t.tokenize();
+  parser p{t.tokens_};
+  auto expression = p.parse();
+  if (!expression.empty()) {
+    interpreter ip{};
+    auto result = ip.calculate(expression);
+    REQUIRE(result.string_val_.find("Different data types..?") !=
+            std::string::npos);
+    REQUIRE(result.object_type_ == yaksha::object_type::RUNTIME_ERROR);
   } else {
     FAIL("Must parse the expression");
   }
@@ -113,7 +143,7 @@ TEST_CASE("interpreter: if and pass") {
               "    print(\"\\n\")\n"
               "else:\n"
               "    pass\n"
-              "1 + 2\n"; // If this line is removed, result is 10
+              "1 + 2\n";// If this line is removed, result is 10
   tokenizer t{"code.py", code};
   t.tokenize();
   // Why? this is needed as we got blocks here
@@ -133,10 +163,10 @@ TEST_CASE("interpreter: if and pass") {
 }
 TEST_CASE("interpreter: count to 10") {
   auto code = "a: int = 1\n"
-         "while a != 11:\n"
-         "    print(a)\n"
-         "    print(\"\\n\")\n"
-         "    a = a + 1\n";
+              "while a != 11:\n"
+              "    print(a)\n"
+              "    print(\"\\n\")\n"
+              "    a = a + 1\n";
   tokenizer t{"code.py", code};
   t.tokenize();
   block_analyzer b{t.tokens_};
