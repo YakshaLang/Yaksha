@@ -316,7 +316,7 @@ void interpreter::visit_while_stmt(while_stmt *obj) {
         break;
       } else if (peek().flow_ == control_flow_change::CONTINUE) {
         pop();
-      } else { // Normal runtime error!
+      } else {// Normal runtime error!
         return;
       }
     }

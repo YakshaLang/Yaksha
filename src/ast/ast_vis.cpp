@@ -140,7 +140,7 @@ void ast_vis::visit_assign_expr(assign_expr *obj) {
 }
 void ast_vis::visit_block_stmt(block_stmt *obj) {
   begin_block("block-statement");
-  for (auto st: obj->statements_) {
+  for (auto st : obj->statements_) {
     st->accept(this);
     text_ << "\n<br />";
   }
@@ -151,9 +151,7 @@ void ast_vis::visit_if_stmt(if_stmt *obj) {
   field("condition", obj->expression_);
   text_ << "\n<br />";
   field("if-branch", obj->if_branch_);
-  if (obj->else_branch_ != nullptr) {
-    field("else-branch", obj->else_branch_);
-  }
+  if (obj->else_branch_ != nullptr) { field("else-branch", obj->else_branch_); }
   end_block();
 }
 void ast_vis::visit_pass_stmt(pass_stmt *obj) {
