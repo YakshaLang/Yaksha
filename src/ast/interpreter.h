@@ -1,0 +1,46 @@
+// interpreter.h
+#ifndef INTERPRETER_H
+#define INTERPRETER_H
+#include "ast/ast.h"
+#include "ast/environment.h"
+#include "utilities/ykobject.h"
+namespace yaksha {
+  /**
+   * AST navigating Interpreter, uses a stack for returns & errors
+   */
+  struct interpreter : expr_visitor, stmt_visitor {
+    interpreter();
+    ~interpreter() override;
+    /**
+     * Interpret given statements return last object in stack
+     * @param statements statements to execute
+     * @return last object in stack, can be an error
+     */
+    const ykobject &calculate(const std::vector<stmt *> &statements);
+    void visit_binary_expr(binary_expr *obj) override;
+    void visit_grouping_expr(grouping_expr *obj) override;
+    void visit_literal_expr(literal_expr *obj) override;
+    void visit_unary_expr(unary_expr *obj) override;
+    void visit_return_stmt(return_stmt *obj) override;
+    void visit_expression_stmt(expression_stmt *obj) override;
+    void visit_print_stmt(print_stmt *obj) override;
+    void visit_variable_expr(variable_expr *obj) override;
+    void visit_let_stmt(let_stmt *obj) override;
+    void visit_assign_expr(assign_expr *obj) override;
+    void visit_block_stmt(block_stmt *obj) override;
+    void visit_if_stmt(if_stmt *obj) override;
+    void visit_pass_stmt(pass_stmt *obj) override;
+    void visit_logical_expr(logical_expr *obj) override;
+    void visit_while_stmt(while_stmt *obj) override;
+
+private:
+    environment globals_{};
+    std::vector<ykobject> object_stack_{};
+    bool has_error();
+    const ykobject &peek();
+    ykobject pop();
+    void push(ykobject obj);
+    const ykobject &evaluate(expr *exp);
+  };
+}// namespace yaksha
+#endif

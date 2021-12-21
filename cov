@@ -1,0 +1,7 @@
+#!/bin/bash
+# Run coverage & generate html report using Docker & gcovr
+echo "running coverage script..."
+docker build -t yaksha .
+export COV=$(realpath "./bin/coverage")
+echo "coverage path is $COV"
+docker run -v "$COV:/coverage" --rm -it --entrypoint /app/scripts/code-coverage.sh yaksha

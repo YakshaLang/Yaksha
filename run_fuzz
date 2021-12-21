@@ -1,0 +1,4 @@
+#!/bin/bash
+# run sample1.yaka with YakshaFuzz
+set -e
+./bin/YakshaFuzz ./test_data/sample1.yaka

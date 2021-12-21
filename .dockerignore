@@ -1,0 +1,16 @@
+*.exe
+.vscode
+.idea
+*.gprof
+*.out
+*.svg
+*.gcda
+*.o
+*.obj
+bin/*.obj
+bin/*.ini
+build
+cmake-build-debug
+cmake-build-debug-visual-studio
+cmake-build-debug-debug-visual-studio
+cmake-build-debug-release
