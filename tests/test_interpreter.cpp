@@ -11,9 +11,10 @@ TEST_CASE("interpreter: 1 + 2 * 3 + 4 / (2 + 2) * 10 - 2 --> 15") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
-    REQUIRE(result.integer_val_ == 15);
-    REQUIRE(result.object_type_ == yaksha::object_type::INTEGER);
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(result->integer_val_ == 15);
+    REQUIRE(result->object_type_ == yaksha::object_type::INTEGER);
   } else {
     FAIL("Must parse the expression");
   }
@@ -25,10 +26,11 @@ TEST_CASE("interpreter: 10 / 0 (div by zero)") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
-    REQUIRE(result.string_val_.find("Integer division by zero") !=
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(result->string_val_.find("Integer division by zero") !=
             std::string::npos);
-    REQUIRE(result.object_type_ == yaksha::object_type::RUNTIME_ERROR);
+    REQUIRE(result->object_type_ == yaksha::object_type::RUNTIME_ERROR);
   } else {
     FAIL("Must parse the expression");
   }
@@ -40,9 +42,10 @@ TEST_CASE("interpreter: 1 + 2 != 3") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
-    REQUIRE(!result.bool_val_);
-    REQUIRE(result.object_type_ == yaksha::object_type::BOOL);
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(!result->bool_val_);
+    REQUIRE(result->object_type_ == yaksha::object_type::BOOL);
   } else {
     FAIL("Must parse the expression");
   }
@@ -54,10 +57,11 @@ TEST_CASE("interpreter: 1.0 + 2 (different data types cannot be added)") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
-    REQUIRE(result.string_val_.find("Different data types..?") !=
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(result->string_val_.find("Different data types..?") !=
             std::string::npos);
-    REQUIRE(result.object_type_ == yaksha::object_type::RUNTIME_ERROR);
+    REQUIRE(result->object_type_ == yaksha::object_type::RUNTIME_ERROR);
   } else {
     FAIL("Must parse the expression");
   }
@@ -69,9 +73,10 @@ TEST_CASE("interpreter: None != None is False") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
-    REQUIRE(!result.bool_val_);
-    REQUIRE(result.object_type_ == yaksha::object_type::BOOL);
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(!result->bool_val_);
+    REQUIRE(result->object_type_ == yaksha::object_type::BOOL);
   } else {
     FAIL("Must parse the expression");
   }
@@ -83,9 +88,10 @@ TEST_CASE("interpreter: None == None is True") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
-    REQUIRE(result.bool_val_);
-    REQUIRE(result.object_type_ == yaksha::object_type::BOOL);
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(result->bool_val_);
+    REQUIRE(result->object_type_ == yaksha::object_type::BOOL);
   } else {
     FAIL("Must parse the expression");
   }
@@ -97,11 +103,12 @@ TEST_CASE("interpreter: Too big a float") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
+    ip.calculate(expression);
+    auto result = ip.result();
     REQUIRE(
-        result.string_val_ ==
+        result->string_val_ ==
         "\ncode.py:1:1 at \"3213211e32132\" --> Double number out of range");
-    REQUIRE(result.object_type_ == object_type::RUNTIME_ERROR);
+    REQUIRE(result->object_type_ == object_type::RUNTIME_ERROR);
   } else {
     FAIL("Must parse the expression");
   }
@@ -113,9 +120,10 @@ TEST_CASE("interpreter: a == 1 and a == 2 is False") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
-    REQUIRE(!result.bool_val_);
-    REQUIRE(result.object_type_ == object_type::BOOL);
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(!result->bool_val_);
+    REQUIRE(result->object_type_ == object_type::BOOL);
   } else {
     FAIL("Must parse the expression");
   }
@@ -127,9 +135,10 @@ TEST_CASE("interpreter: a == 1 or a == 2 is True") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
-    REQUIRE(result.bool_val_);
-    REQUIRE(result.object_type_ == object_type::BOOL);
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(result->bool_val_);
+    REQUIRE(result->object_type_ == object_type::BOOL);
   } else {
     FAIL("Must parse the expression");
   }
@@ -154,9 +163,10 @@ TEST_CASE("interpreter: if and pass") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
-    REQUIRE(result.integer_val_ == 3);
-    REQUIRE(result.object_type_ == object_type::INTEGER);
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(result->integer_val_ == 3);
+    REQUIRE(result->object_type_ == object_type::INTEGER);
   } else {
     FAIL("Must parse the expression");
   }
@@ -175,11 +185,12 @@ TEST_CASE("interpreter: count to 10") {
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{};
-    auto result = ip.calculate(expression);
+    ip.calculate(expression);
+    auto result = ip.result();
     // Why? Last thing that is in the stack is false
     //  before interpreter exits from the loop
-    REQUIRE(!result.bool_val_);
-    REQUIRE(result.object_type_ == object_type::BOOL);
+    REQUIRE(!result->bool_val_);
+    REQUIRE(result->object_type_ == object_type::BOOL);
   } else {
     FAIL("Must parse the expression");
   }

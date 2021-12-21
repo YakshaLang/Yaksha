@@ -186,13 +186,12 @@ bool interpreter::has_error() {
   return !object_stack_.empty() &&
          peek().object_type_ == object_type::RUNTIME_ERROR;
 }
-const ykobject &interpreter::calculate(const std::vector<stmt *> &statements) {
-  if (has_error()) { return peek(); }
+void interpreter::calculate(const std::vector<stmt *> &statements) {
+  if (has_error()) { return; }
   for (auto statement : statements) {
-    if (has_error()) { return peek(); }
+    if (has_error()) { return; }
     statement->accept(this);
   }
-  return peek();
 }
 const ykobject &interpreter::evaluate(expr *exp) {
   // exp cannot be null here?
@@ -225,7 +224,7 @@ void interpreter::visit_let_stmt(let_stmt *obj) {
     return;
   }
   evaluate(obj->expression_);
-  if (has_error()) return;
+  if (has_error()) { return; }
   // TODO look at the data type here
   if (globals_.is_defined(obj->name_->token_)) {
     push(ykobject("Redefining variable", obj->name_));
@@ -308,12 +307,14 @@ void interpreter::visit_while_stmt(while_stmt *obj) {
       return;
     }
     // Break from this loop! because condition is now False
-    if (!condition.bool_val_) {
-      return;
-    }
+    if (!condition.bool_val_) { return; }
     // Execute the body of the loop.
     obj->while_body_->accept(this);
     // Execute the condition again, so we can peek at it in line 303
     obj->expression_->accept(this);
   }
+}
+const ykobject *interpreter::result() {
+  if (object_stack_.empty()) { return nullptr; }
+  return &peek();
 }

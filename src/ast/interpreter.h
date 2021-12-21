@@ -16,7 +16,8 @@ namespace yaksha {
      * @param statements statements to execute
      * @return last object in stack, can be an error
      */
-    const ykobject &calculate(const std::vector<stmt *> &statements);
+    void calculate(const std::vector<stmt *> &statements);
+    const ykobject* result();
     void visit_binary_expr(binary_expr *obj) override;
     void visit_grouping_expr(grouping_expr *obj) override;
     void visit_literal_expr(literal_expr *obj) override;

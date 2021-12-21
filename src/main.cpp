@@ -33,9 +33,12 @@ int main(int argc, char *argv[]) {
     auto tree = p.parse();
     if (!tree.empty() && p.errors_.empty()) {
       interpreter ip{};
-      auto final_outcome = ip.calculate(tree);
-      if (final_outcome.object_type_ == yaksha::object_type::RUNTIME_ERROR) {
-        std::cerr << final_outcome.string_val_ << "\n";
+      ip.calculate(tree);
+      auto final_outcome = ip.result();
+      if (final_outcome != nullptr) {
+        if (final_outcome->object_type_ == yaksha::object_type::RUNTIME_ERROR) {
+          std::cerr << final_outcome->string_val_ << "\n";
+        }
       }
       std::cout << "\n\n============================\n";
       ast_printer pr{};
