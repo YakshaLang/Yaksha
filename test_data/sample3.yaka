@@ -1,0 +1,11 @@
+# Sample 3 - comparisons, pass statement
+a: float = 1.2
+b: float = 3.1
+print("a >= b is ")
+print(a >= b)
+pass
+print("\n")
+print("a < b is ")
+print(a < b)
+print("\n")
+pass

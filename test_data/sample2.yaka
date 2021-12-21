@@ -1,0 +1,6 @@
+# Sample 2 while loops - count down to 1 from 10
+a: int = 10
+while a != 0:
+    print(a)
+    print("\n")
+    a = a - 1
