@@ -47,7 +47,6 @@ private:
     token *advance();
     token *recede();
     token *peek();
-    token *look_ahead();
     token *previous();
     token *consume(token_type t, const std::string &message);
     token *consume_or_eof(token_type t, const std::string &message);

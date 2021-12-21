@@ -19,10 +19,6 @@ token *parser::previous() {
   assert(current_ > 0);
   return &tokens_[current_ - 1];
 }
-token *parser::look_ahead() {
-  if (is_at_end()) { return peek(); }
-  return &tokens_[current_ + 1];
-}
 bool parser::match(std::initializer_list<token_type> types) {
   return std::any_of(types.begin(), types.end(), [this](token_type t) {
     if (this->check(t)) {
