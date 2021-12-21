@@ -95,3 +95,7 @@ void ast_printer::visit_while_stmt(while_stmt *obj) {
   obj->while_body_->accept(this);
   text_ << ")";
 }
+void ast_printer::visit_break_stmt(break_stmt *obj) { text_ << "(break)"; }
+void ast_printer::visit_continue_stmt(continue_stmt *obj) {
+  text_ << "(continue)";
+}

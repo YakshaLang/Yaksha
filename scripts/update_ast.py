@@ -47,6 +47,9 @@ STMTS = sorted([
     ("block", (("std::vector<stmt*>", "statements"),)),
     # Pass statement is needed to allow for empty blocks
     ("pass", (("token*", "pass_token"),)),
+    # Control flow change -> break and continue support for while loops
+    ("continue", (("token*", "continue_token"),)),
+    ("break", (("token*", "break_token"),)),
     # Let statements
     # TODO we use both declare and let in the code, stick to one terminology
     ("let", (("token*", "name"), ("token*", "data_type"), ("expr*", "expression"))),

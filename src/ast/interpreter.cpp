@@ -310,6 +310,16 @@ void interpreter::visit_while_stmt(while_stmt *obj) {
     if (!condition.bool_val_) { return; }
     // Execute the body of the loop.
     obj->while_body_->accept(this);
+    if (has_error()) {
+      if (peek().flow_ == control_flow_change::BREAK) {
+        pop();
+        break;
+      } else if (peek().flow_ == control_flow_change::CONTINUE) {
+        pop();
+      } else { // Normal runtime error!
+        return;
+      }
+    }
     // Execute the condition again, so we can peek at it in line 303
     obj->expression_->accept(this);
   }
@@ -317,4 +327,10 @@ void interpreter::visit_while_stmt(while_stmt *obj) {
 const ykobject *interpreter::result() {
   if (object_stack_.empty()) { return nullptr; }
   return &peek();
+}
+void interpreter::visit_break_stmt(break_stmt *obj) {
+  push(ykobject(control_flow_change::BREAK));
+}
+void interpreter::visit_continue_stmt(continue_stmt *obj) {
+  push(ykobject(control_flow_change::CONTINUE));
 }

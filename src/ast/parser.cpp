@@ -4,7 +4,7 @@
 #include <cassert>
 using namespace yaksha;
 parser::parser(std::vector<token> &tokens)
-    : pool_{}, tokens_{tokens}, current_{0} {}
+    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0} {}
 token *parser::advance() {
   if (!is_at_end()) { current_++; }
   return previous();
@@ -141,12 +141,14 @@ stmt *parser::statement() {
   if (match({token_type::KEYWORD_IF})) { return if_statement(); }
   if (match({token_type::KEYWORD_PASS})) { return pass_statement(); }
   if (match({token_type::KEYWORD_WHILE})) { return while_statement(); }
+  if (match({token_type::KEYWORD_CONTINUE})) { return continue_statement(); }
+  if (match({token_type::KEYWORD_BREAK})) { return break_statement(); }
   return expression_statement();
 }
 stmt *parser::pass_statement() {
   auto pass_tok = previous();
   consume_or_eof(token_type::NEW_LINE,
-                 "Expect new line after value for expression.");
+                 "Expect new line after 'pass' statement.");
   return pool_.c_pass_stmt(pass_tok);
 }
 stmt *parser::if_statement() {
@@ -177,8 +179,10 @@ stmt *parser::block_statement() {
     statements.emplace_back(decl);
     if (peek()->type_ == token_type::BA_DEDENT) { break; }
   }
-  if (statements.empty()) { throw error(colon, "Block cannot be empty."); }
-  // TODO double check if we really to check of EOF here
+  if (statements.empty()) {
+    throw error(colon, "Block cannot be empty. Use 'pass'"
+                       " statement for an empty block.");
+  }
   consume(token_type::BA_DEDENT, "Expected dedent");
   return pool_.c_block_stmt(statements);
 }
@@ -258,9 +262,31 @@ expr *parser::and_op() {
 }
 stmt *parser::while_statement() {
   // while_stmt   -> KEYWORD_WHILE EXPRESSION block_stmt
+  // TODO control flow change must happen,
+  //  Currently if we throw an error somewhere we do not reduce this?
+  //  Should we set this to zero in panic mode? parsing?
+  //  (We won't compile/run) those anyway.
+  //  Perhaps we should get rid of exceptions in parser.cpp
+  //  Which I think is better for the longer term.
+  control_flow_++;
   auto while_keyword = previous();
   auto exp = expression();
   stmt *while_body = block_statement();
+  control_flow_--;
   return pool_.c_while_stmt(while_keyword, exp, while_body);
+}
+stmt *parser::continue_statement() {
+  auto tok = previous();
+  if (control_flow_ <= 0) { throw error(tok, "Invalid assignment target!"); }
+  consume_or_eof(token_type::NEW_LINE,
+                 "Expect new line after 'continue' statement.");
+  return pool_.c_continue_stmt(tok);
+}
+stmt *parser::break_statement() {
+  auto tok = previous();
+  if (control_flow_ <= 0) { throw error(tok, "Invalid assignment target!"); }
+  consume_or_eof(token_type::NEW_LINE,
+                 "Expect new line after 'break' statement.");
+  return pool_.c_break_stmt(tok);
 }
 parser::~parser() = default;

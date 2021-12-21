@@ -16,6 +16,8 @@ struct logical_expr;
 struct unary_expr;
 struct variable_expr;
 struct block_stmt;
+struct break_stmt;
+struct continue_stmt;
 struct expression_stmt;
 struct if_stmt;
 struct let_stmt;
@@ -33,6 +35,8 @@ enum class ast_type {
   EXPR_UNARY,
   EXPR_VARIABLE,
   STMT_BLOCK,
+  STMT_BREAK,
+  STMT_CONTINUE,
   STMT_EXPRESSION,
   STMT_IF,
   STMT_LET,
@@ -55,6 +59,8 @@ struct expr_visitor {
 // ------ statement visitor ------
 struct stmt_visitor {
   virtual void visit_block_stmt(block_stmt *obj) = 0;
+  virtual void visit_break_stmt(break_stmt *obj) = 0;
+  virtual void visit_continue_stmt(continue_stmt *obj) = 0;
   virtual void visit_expression_stmt(expression_stmt *obj) = 0;
   virtual void visit_if_stmt(if_stmt *obj) = 0;
   virtual void visit_let_stmt(let_stmt *obj) = 0;
@@ -133,6 +139,18 @@ struct block_stmt : stmt {
   ast_type get_type() override;
   std::vector<stmt*> statements_;
 };
+struct break_stmt : stmt {
+  explicit break_stmt(token* break_token);
+  void accept(stmt_visitor *v) override;
+  ast_type get_type() override;
+  token* break_token_;
+};
+struct continue_stmt : stmt {
+  explicit continue_stmt(token* continue_token);
+  void accept(stmt_visitor *v) override;
+  ast_type get_type() override;
+  token* continue_token_;
+};
 struct expression_stmt : stmt {
   explicit expression_stmt(expr* expression);
   void accept(stmt_visitor *v) override;
@@ -197,6 +215,8 @@ struct ast_pool {
   expr *c_unary_expr(token* opr, expr* right);
   expr *c_variable_expr(token* name);
   stmt *c_block_stmt(std::vector<stmt*> statements);
+  stmt *c_break_stmt(token* break_token);
+  stmt *c_continue_stmt(token* continue_token);
   stmt *c_expression_stmt(expr* expression);
   stmt *c_if_stmt(token* if_keyword, expr* expression, stmt* if_branch, token* else_keyword, stmt* else_branch);
   stmt *c_let_stmt(token* name, token* data_type, expr* expression);

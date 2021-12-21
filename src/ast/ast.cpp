@@ -108,6 +108,32 @@ stmt *ast_pool::c_block_stmt(std::vector<stmt*> statements) {
   cleanup_stmt_.push_back(o);
   return o;
 }
+break_stmt::break_stmt(token* break_token)
+    : break_token_(break_token) {}
+void break_stmt::accept(stmt_visitor *v) {
+  v->visit_break_stmt(this);
+}
+ast_type break_stmt::get_type() {
+  return ast_type::STMT_BREAK;
+}
+stmt *ast_pool::c_break_stmt(token* break_token) {
+  auto o = new break_stmt(break_token);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
+continue_stmt::continue_stmt(token* continue_token)
+    : continue_token_(continue_token) {}
+void continue_stmt::accept(stmt_visitor *v) {
+  v->visit_continue_stmt(this);
+}
+ast_type continue_stmt::get_type() {
+  return ast_type::STMT_CONTINUE;
+}
+stmt *ast_pool::c_continue_stmt(token* continue_token) {
+  auto o = new continue_stmt(continue_token);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
 expression_stmt::expression_stmt(expr* expression)
     : expression_(expression) {}
 void expression_stmt::accept(stmt_visitor *v) {

@@ -174,3 +174,11 @@ void ast_vis::visit_while_stmt(while_stmt *obj) {
   field("body", obj->while_body_);
   end_block();
 }
+void ast_vis::visit_break_stmt(break_stmt *obj) {
+  begin_block("break");
+  end_block();
+}
+void ast_vis::visit_continue_stmt(continue_stmt *obj) {
+  begin_block("continue");
+  end_block();
+}

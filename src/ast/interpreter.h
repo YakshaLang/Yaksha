@@ -33,6 +33,8 @@ namespace yaksha {
     void visit_pass_stmt(pass_stmt *obj) override;
     void visit_logical_expr(logical_expr *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
+    void visit_break_stmt(break_stmt *obj) override;
+    void visit_continue_stmt(continue_stmt *obj) override;
 
 private:
     environment globals_{};

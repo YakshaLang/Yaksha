@@ -38,6 +38,9 @@ private:
     stmt *if_statement();
     stmt *while_statement();
     stmt *block_statement();
+    stmt *pass_statement();
+    stmt *continue_statement();
+    stmt *break_statement();
     stmt *expression_statement();
     stmt *declaration_statement();
     // utilities
@@ -57,7 +60,10 @@ private:
     std::size_t current_;
     ast_pool pool_;
     std::vector<token> &tokens_;
-    stmt *pass_statement();
+    // Increase when we allow control, flow.
+    // Decrease after parsing.
+    // If this is <= zero do not allow `continue` or `break`
+    int control_flow_;
   };
 }// namespace yaksha
 #endif
