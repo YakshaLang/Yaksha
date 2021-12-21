@@ -21,7 +21,6 @@ import subprocess
 import traceback
 from typing import List
 
-
 class Colors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -64,6 +63,7 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 PROCESSES = max(1, multiprocessing.cpu_count() - 1)
 INPUT_FILES = glob.glob(os.path.join(ROOT, 'test_data/**/*'), recursive=True)
 TEMP = os.path.join(ROOT, "bin/fuzz")
+OUTPUT_PATH = "/fuzz"
 if os.name == 'nt':
     BINARY = os.path.join(ROOT, "bin\\YakshaFuzz.exe")
 else:
@@ -296,14 +296,14 @@ if __name__ == "__main__":
         r, f, d = run_fuzz("non_mutant." + str(int_id), non_mutant)
         if r == FAILED:
             print(Colors.fail("Crashed on - "), Colors.cyan(os.path.basename(f)))
-            shutil.copyfile(f, os.path.join("/coverage", os.path.basename(f)))
+            shutil.copyfile(f, os.path.join(OUTPUT_PATH, os.path.basename(f)))
     with multiprocessing.Pool(PROCESSES) as p:
         for outer in range(100):
             to_append = []
             for r, f, d in p.imap_unordered(run_mutant, [str(outer) + "_" + str(x) for x in range(100)]):
                 if r == FAILED:
                     print(Colors.fail("Crashed on - "), Colors.cyan(os.path.basename(f)))
-                    shutil.copyfile(f, os.path.join("/coverage", os.path.basename(f)))
+                    shutil.copyfile(f, os.path.join(OUTPUT_PATH, os.path.basename(f)))
                 if r != EXCEPTION:
                     to_append.append(d)
             INPUT_DATA += to_append
