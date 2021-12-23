@@ -18,8 +18,10 @@ include_directories(src)
 include_directories(tests)
 include_directories(${UTF8_DIR})
 
-set(YAKSHA_SOURCE_FILES )
-set(YAKSHA_TEST_FILES tests/test_tokenizer.cpp)
+set(YAKSHA_SOURCE_FILES
+        src/tokenizer/token.h)
+set(YAKSHA_TEST_FILES
+        tests/test_tokenizer.cpp)
 
 # -- Main binary --
 add_executable(Yaksha ${YAKSHA_SOURCE_FILES} src/main.cpp)
