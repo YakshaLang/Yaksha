@@ -24,7 +24,11 @@ EXPRS = sorted([
     # -x
     ("unary", (("token*", "opr"), ("expr*", "right"))),
     # Reference a variable
-    ("variable", (("token*", "name"),))
+    ("variable", (("token*", "name"),)),
+    # Function call
+    # Can be abc(), abc(1), abc(1, 2, 3), etc
+    #        name->`abc` args->`1, 2, 3` paren_token->`)`
+    ("fncall", (("expr*", "name"), ("token*", "paren_token"), ("std::vector<expr*>", "args")))
 ], key=lambda x: x[0])
 # Different kinds of statements
 STMTS = sorted([
@@ -53,6 +57,11 @@ STMTS = sorted([
     # Let statements
     # TODO we use both declare and let in the code, stick to one terminology
     ("let", (("token*", "name"), ("token*", "data_type"), ("expr*", "expression"))),
+    # Function declarations
+    # Make sure we always say the return type
+    # `def abc(a: int) -> None:`
+    ("def", (("token*", "name"), ("std::vector<parameter>", "params"),
+             ("stmt*", "function_body"), ("token*", "return_type")))
 ], key=lambda x: x[0])
 
 # EXPR CODE GEN
@@ -125,6 +134,7 @@ namespace yaksha {
 // ------ forward declarations ------
 struct expr;
 struct stmt;
+struct parameter;
 $FORWARD_DECLS$
 // Types of expressions and statements
 $AST_TYPES$
@@ -150,6 +160,13 @@ $EXPRESSIONS$
 $STATEMENTS$
 // ------- utils ------
 $AST_POOL$
+/**
+* Parameter for a user defined function declaration
+*/
+struct parameter {
+    token* name_;
+    token* data_type_;
+};
 } // namespace yaksha
 #endif
 """.strip()
@@ -188,12 +205,18 @@ def c_state(x) -> str:
     return "\n".join(["  " + y[0] + " " + y[1] + "_;" for y in x[1]])
 
 
+def c_single_param(y):
+    if y[0].startswith("std::"):
+        return "std::move(" + y[1] + ")"
+    return y[1]
+
+
 def c_params_no_types(x) -> str:
-    return ", ".join([y[1] for y in x[1]])
+    return ", ".join([c_single_param(y) for y in x[1]])
 
 
 def c_fill_state_params(x) -> str:
-    return ", ".join([y[1] + "_(" + y[1] + ")" for y in x[1]])
+    return ", ".join([y[1] + "_(" + c_single_param(y) + ")" for y in x[1]])
 
 
 def c_r(x) -> str:

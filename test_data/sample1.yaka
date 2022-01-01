@@ -1,4 +1,14 @@
 # Hello World 123
+def some_fn() -> int:
+    print("Hello From function")
+    print("\n")
+
+
+x: int = 5
+while x != 0:
+    some_fn()
+    x = x - 1
+
 print("Hello" + " World\n")
 print(123)
 a: int = 1 + 2 + 3 + 4

@@ -5,6 +5,7 @@
 #include "tokenizer/token.h"
 #include <string>
 namespace yaksha {
+  struct ykfunction;
   enum class control_flow_change {
     BREAK,
     RETURN [[maybe_unused]],
@@ -18,6 +19,7 @@ namespace yaksha {
     STRING,
     NONE_OBJ,
     BOOL,
+    FUNCTION,
     RUNTIME_ERROR
   };
   struct ykobject {
@@ -26,6 +28,7 @@ namespace yaksha {
     explicit ykobject(std::string str);
     explicit ykobject(const std::string &str, token *bad_token);
     explicit ykobject(double dbl);
+    explicit ykobject(ykfunction *fun);
     explicit ykobject(control_flow_change flow_change);
     explicit ykobject();
     int integer_val_{0};
@@ -34,6 +37,7 @@ namespace yaksha {
     bool bool_val_{};
     control_flow_change flow_ = control_flow_change::NO_CHANGE;
     object_type object_type_{object_type::NONE_OBJ};
+    ykfunction *fn_val_{};
     // TODO convert errors to our friendly parsing errors for syntax errors
     // TODO Keep string errors for runtime errors?
     // TODO change error data type later on after we introduce maybe an actual,

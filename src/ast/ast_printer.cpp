@@ -99,3 +99,24 @@ void ast_printer::visit_break_stmt(break_stmt *obj) { text_ << "(break)"; }
 void ast_printer::visit_continue_stmt(continue_stmt *obj) {
   text_ << "(continue)";
 }
+void ast_printer::visit_fncall_expr(fncall_expr *obj) {
+  text_ << "(fncall ";
+  obj->name_->accept(this);
+  for (auto st : obj->args_) {
+    text_ << " ";
+    st->accept(this);
+  }
+  text_ << ")";
+}
+void ast_printer::visit_def_stmt(def_stmt *obj) {
+  text_ << "(def ";
+  text_ << obj->name_->token_;
+  text_ << " (";
+  for (auto st : obj->params_) {
+    text_ << " ";
+    text_ << st.name_;
+  }
+  text_ << ") ";
+  obj->function_body_->accept(this);
+  text_ << ")";
+}

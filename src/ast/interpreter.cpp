@@ -1,9 +1,9 @@
 // interpreter.cpp
 #include "ast/interpreter.h"
 #include "tokenizer/string_utils.h"
+#include "utilities/udfunction.h"
+#include "utilities/ykfunction.h"
 using namespace yaksha;
-interpreter::interpreter() = default;
-interpreter::~interpreter() = default;
 #define NUMBER_OPERATION(operator)                                             \
   do {                                                                         \
     if (left_val.object_type_ == object_type::INTEGER) {                       \
@@ -54,6 +54,15 @@ interpreter::~interpreter() = default;
       return;                                                                  \
     }                                                                          \
   } while (0)
+interpreter::interpreter() {
+  samplefn_ = new samplefn();
+  // Register sample function
+  globals_.define("samplefn", ykobject(samplefn_));
+}
+interpreter::~interpreter() {
+  delete samplefn_;
+  for (auto fn : func_pool_) { delete fn; }
+}
 void interpreter::visit_binary_expr(binary_expr *obj) {
   if (has_error()) { return; }
   obj->left_->accept(this);
@@ -333,4 +342,45 @@ void interpreter::visit_break_stmt(break_stmt *obj) {
 }
 void interpreter::visit_continue_stmt(continue_stmt *obj) {
   push(ykobject(control_flow_change::CONTINUE));
+}
+void interpreter::visit_fncall_expr(fncall_expr *obj) {
+  if (has_error()) return;
+  // TODO only allow function calls from variables..
+  //  TODO (ex: do not allow to return functions?)
+  // get the name of the function by evaluating name expression
+  // So we can perhaps have something like return_function()(1, 2, 3)
+  // But perhaps, this should be disallowed, would be a bit hard to compile these hmm
+  obj->name_->accept(this);
+  if (has_error()) return;
+  ykobject fn = pop();
+  if (fn.object_type_ != object_type::FUNCTION) {
+    push(ykobject("Not a callable", obj->paren_token_));
+    return;
+  }
+  // Evaluate all args and convert them to objects that function can understand
+  std::vector<ykobject> arguments{};
+  for (auto arg : obj->args_) {
+    arg->accept(this);
+    if (has_error()) return;
+    arguments.emplace_back(pop());
+  }
+  // Verify arguments before we call the function
+  ykobject verification = fn.fn_val_->verify(arguments);
+  if (verification.object_type_ != object_type::NONE_OBJ) {
+    // error with verification of given arguments
+    push(verification);
+    return;
+  }
+  // Actually call the function
+  globals_.push();// scope of the function
+  push(fn.fn_val_->call(arguments));
+  globals_.pop();
+}
+void interpreter::visit_def_stmt(def_stmt *obj) {
+  // TODO handle return type as well
+  auto ud = new udfunction(&globals_, this, obj->function_body_, &obj->params_,
+                           obj->name_);
+  // Add the function to the global scope
+  globals_.define_global(obj->name_->token_, ykobject(ud));
+  func_pool_.emplace_back(ud);
 }

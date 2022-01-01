@@ -180,3 +180,17 @@ void ast_vis::visit_continue_stmt(continue_stmt *obj) {
   begin_block("continue");
   end_block();
 }
+void ast_vis::visit_fncall_expr(fncall_expr *obj) {
+  begin_block("fncall");
+  field("name", obj->name_);
+  for (auto st : obj->args_) { field("arg", st); }
+  end_block();
+}
+void ast_vis::visit_def_stmt(def_stmt *obj) {
+  begin_block("def-statement");
+  field("name", obj->name_->token_);
+  for (auto st : obj->params_) { field("param", st.name_->token_); }
+  text_ << "\n<br />";
+  field("body", obj->function_body_);
+  end_block();
+}

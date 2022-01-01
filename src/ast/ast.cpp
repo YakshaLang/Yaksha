@@ -21,6 +21,17 @@ expr *ast_pool::c_binary_expr(expr *left, token *opr, expr *right) {
   cleanup_expr_.push_back(o);
   return o;
 }
+fncall_expr::fncall_expr(expr *name, token *paren_token,
+                         std::vector<expr *> args)
+    : name_(name), paren_token_(paren_token), args_(std::move(args)) {}
+void fncall_expr::accept(expr_visitor *v) { v->visit_fncall_expr(this); }
+ast_type fncall_expr::get_type() { return ast_type::EXPR_FNCALL; }
+expr *ast_pool::c_fncall_expr(expr *name, token *paren_token,
+                              std::vector<expr *> args) {
+  auto o = new fncall_expr(name, paren_token, std::move(args));
+  cleanup_expr_.push_back(o);
+  return o;
+}
 grouping_expr::grouping_expr(expr *expression) : expression_(expression) {}
 void grouping_expr::accept(expr_visitor *v) { v->visit_grouping_expr(this); }
 ast_type grouping_expr::get_type() { return ast_type::EXPR_GROUPING; }
@@ -65,11 +76,11 @@ expr *ast_pool::c_variable_expr(token *name) {
 }
 // ------- statements -----
 block_stmt::block_stmt(std::vector<stmt *> statements)
-    : statements_(statements) {}
+    : statements_(std::move(statements)) {}
 void block_stmt::accept(stmt_visitor *v) { v->visit_block_stmt(this); }
 ast_type block_stmt::get_type() { return ast_type::STMT_BLOCK; }
 stmt *ast_pool::c_block_stmt(std::vector<stmt *> statements) {
-  auto o = new block_stmt(statements);
+  auto o = new block_stmt(std::move(statements));
   cleanup_stmt_.push_back(o);
   return o;
 }
@@ -87,6 +98,18 @@ void continue_stmt::accept(stmt_visitor *v) { v->visit_continue_stmt(this); }
 ast_type continue_stmt::get_type() { return ast_type::STMT_CONTINUE; }
 stmt *ast_pool::c_continue_stmt(token *continue_token) {
   auto o = new continue_stmt(continue_token);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
+def_stmt::def_stmt(token *name, std::vector<parameter> params,
+                   stmt *function_body, token *return_type)
+    : name_(name), params_(std::move(params)), function_body_(function_body),
+      return_type_(return_type) {}
+void def_stmt::accept(stmt_visitor *v) { v->visit_def_stmt(this); }
+ast_type def_stmt::get_type() { return ast_type::STMT_DEF; }
+stmt *ast_pool::c_def_stmt(token *name, std::vector<parameter> params,
+                           stmt *function_body, token *return_type) {
+  auto o = new def_stmt(name, std::move(params), function_body, return_type);
   cleanup_stmt_.push_back(o);
   return o;
 }

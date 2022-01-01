@@ -2,7 +2,9 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 #include "ast/ast.h"
-#include "ast/environment.h"
+#include "ast/environment_stack.h"
+#include "utilities/samplefn.h"
+#include "utilities/ykfunction.h"
 #include "utilities/ykobject.h"
 namespace yaksha {
   /**
@@ -35,13 +37,18 @@ namespace yaksha {
     void visit_while_stmt(while_stmt *obj) override;
     void visit_break_stmt(break_stmt *obj) override;
     void visit_continue_stmt(continue_stmt *obj) override;
+    void visit_fncall_expr(fncall_expr *obj) override;
+    void visit_def_stmt(def_stmt *obj) override;
+    // TODO think of a better design for this
+    ykobject pop();
 
 private:
-    environment globals_{};
+    ykfunction *samplefn_;
+    environment_stack globals_{};
     std::vector<ykobject> object_stack_{};
+    std::vector<ykfunction *> func_pool_{};
     bool has_error();
     const ykobject &peek();
-    ykobject pop();
     void push(ykobject obj);
     const ykobject &evaluate(expr *exp);
   };

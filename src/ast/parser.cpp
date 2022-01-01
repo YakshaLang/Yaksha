@@ -75,7 +75,21 @@ expr *parser::unary() {
     expr *right = unary();
     return pool_.c_unary_expr(opr, right);
   }
-  return primary();
+  return fncall();
+}
+expr *parser::fncall() {
+  auto expr = primary();
+  while (match({token_type::PAREN_OPEN})) { expr = match_rest_of_fncall(expr); }
+  return expr;
+}
+expr *parser::match_rest_of_fncall(expr *name) {
+  std::vector<expr *> args{};
+  if (!check(token_type::PAREN_CLOSE)) {
+    do { args.emplace_back(expression()); } while (match({token_type::COMMA}));
+  }
+  auto paren_close =
+      consume(token_type::PAREN_CLOSE, "Function call must end with ')'");
+  return pool_.c_fncall_expr(name, paren_close, args);
 }
 expr *parser::primary() {
   if (match({token_type::KEYWORD_FALSE, token_type::KEYWORD_TRUE,
@@ -208,6 +222,7 @@ stmt *parser::declaration_statement() {
   expr *exp = nullptr;
   token *data_type = nullptr;
   try {
+    if (match({token_type::KEYWORD_DEF})) { return def_statement(); }
     if (!match({token_type::NAME})) { return statement(); }
     var_name = previous();
     // Colon should come after name for a variable declaration
@@ -288,5 +303,25 @@ stmt *parser::break_statement() {
   consume_or_eof(token_type::NEW_LINE,
                  "Expect new line after 'break' statement.");
   return pool_.c_break_stmt(tok);
+}
+stmt *parser::def_statement() {
+  // def_statement -> KEYWORD_DEF NAME PAREN_OPEN [[NAME COLON DATA_TYPE]*] PAREN_CLOSE ARROW DATA_TYPE BLOCK
+  auto name = consume(token_type::NAME, "Function name must be present");
+  consume(token_type::PAREN_OPEN, "Opening '(' must be present");
+  std::vector<parameter> params{};
+  if (!check(token_type::PAREN_CLOSE)) {
+    do {
+      auto param_name =
+          consume(token_type::NAME, "Parameter name must be present");
+      auto param_type =
+          consume(token_type::NAME, "Data type name must be present");
+      params.emplace_back(parameter{param_name, param_type});
+    } while (match({token_type::COMMA}));
+  }
+  consume(token_type::PAREN_CLOSE, "Function call must end with ')'");
+  consume(token_type::ARROW, "'->' operator must be present");
+  auto return_type = consume(token_type::NAME, "Return type must be present");
+  auto body = block_statement();
+  return pool_.c_def_stmt(name, params, body, return_type);
 }
 parser::~parser() = default;
