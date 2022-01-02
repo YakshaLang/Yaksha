@@ -403,3 +403,9 @@ void interpreter::visit_def_stmt(def_stmt *obj) {
   globals_.define_global(obj->name_->token_, ykobject(ud));
   func_pool_.emplace_back(ud);
 }
+void interpreter::debug_print_stack() {
+  for (auto a : object_stack_) {
+    std::cout << a;
+    std::cout << "\n";
+  }
+}

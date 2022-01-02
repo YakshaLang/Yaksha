@@ -41,6 +41,8 @@ int main(int argc, char *argv[]) {
         }
       }
       std::cout << "\n\n============================\n";
+      ip.debug_print_stack();
+      std::cout << "\n\n============================\n";
       ast_printer pr{};
       pr.print(tree);
     } else {
