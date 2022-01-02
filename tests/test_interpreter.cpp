@@ -171,6 +171,34 @@ TEST_CASE("interpreter: if and pass") {
     FAIL("Must parse the expression");
   }
 }
+TEST_CASE("interpreter: call a function") {
+  auto code = "# Comment here\n"
+              "def my_fun(p: int) -> int:\n"
+              "    return p * 2 + 10\n"
+              "\n"
+              "\n"
+              "a: int = 4\n"
+              "while a > 0:\n"
+              "    print(my_fun(a))\n"
+              "    a = a - 1";
+  tokenizer t{"code.py", code};
+  t.tokenize();
+  // Why? this is needed as we got blocks here
+  // Blocks need to be analyzed before parsing!
+  block_analyzer b{t.tokens_};
+  b.analyze();
+  parser p{b.tokens_};
+  auto expression = p.parse();
+  if (!expression.empty()) {
+    interpreter ip{};
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(result->bool_val_ == false);
+    REQUIRE(result->object_type_ == object_type::BOOL);
+  } else {
+    FAIL("Must parse the expression");
+  }
+}
 TEST_CASE("interpreter: count to 10") {
   auto code = "a: int = 1\n"
               "while a != 11:\n"
