@@ -233,6 +233,11 @@ void block_analyzer::create_dedents(std::vector<std::size_t> &indents,
   indents.pop_back();
   // we may dedent more than 1 level at one go
   std::size_t dedent_count = prev_level - current_level;
+  // Create a new line when it is not present before a chain of dedents
+  if (!tokens_.empty() && tokens_.back().type_ != token_type::NEW_LINE) {
+    tokens_.emplace_back(
+        token{tok.file_, tok.line_, tok.pos_, "\n", token_type::NEW_LINE});
+  }
   for (std::size_t x = 0; x < dedent_count; x++) {
     tokens_.emplace_back(
         token{tok.file_, tok.line_, tok.pos_, "", token_type::BA_DEDENT});
