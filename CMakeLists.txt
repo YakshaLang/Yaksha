@@ -23,19 +23,22 @@ set(YAKSHA_SOURCE_FILES
 set(YAKSHA_TEST_FILES
         tests/btest.h tests/test_block_analyzer.cpp tests/test_interpreter.cpp tests/test_string_utils.cpp tests/test_tokenizer.cpp) # update_makefile.py TESTS
 
-add_executable(Yaksha ${YAKSHA_SOURCE_FILES} src/main.cpp)
+add_library(yaksha ${YAKSHA_SOURCE_FILES})
+add_executable(Yaksha src/main.cpp)
 
-target_link_libraries(Yaksha ${LIBS})
+target_link_libraries(Yaksha PUBLIC ${LIBS})
+target_link_libraries(Yaksha PUBLIC yaksha)
 
 # Adding Tests
 # -----------------------
 add_subdirectory(3rd/Catch2) # Add the Catch2 library
 # Test executable
-add_executable(YakshaTests ${YAKSHA_SOURCE_FILES} ${YAKSHA_TEST_FILES} tests/test_main.cpp)
+add_executable(YakshaTests ${YAKSHA_TEST_FILES} tests/test_main.cpp)
 # #define TESTING
 target_compile_definitions(YakshaTests PUBLIC TESTING)
 target_link_libraries(YakshaTests PRIVATE Catch2::Catch2)
 target_link_libraries(YakshaTests PUBLIC ${LIBS})
+target_link_libraries(YakshaTests PUBLIC yaksha)
 # Add to CTest
 include(CTest)
 include(3rd/Catch2/contrib/Catch.cmake)
@@ -43,5 +46,6 @@ catch_discover_tests(YakshaTests)
 
 # Adding Fuzzer Binary
 # ---------------------
-add_executable(YakshaFuzz ${YAKSHA_SOURCE_FILES} tests/fuzz_main.cpp)
+add_executable(YakshaFuzz tests/fuzz_main.cpp)
 target_link_libraries(YakshaFuzz ${LIBS})
+target_link_libraries(YakshaFuzz PUBLIC yaksha)
