@@ -6,13 +6,7 @@
 #include <string>
 namespace yaksha {
   struct ykfunction;
-  enum class control_flow_change {
-    BREAK,
-    RETURN [[maybe_unused]],
-    CONTINUE,
-    NO_CHANGE,
-    ERROR
-  };
+  enum class control_flow_change { BREAK, RETURN, CONTINUE, NO_CHANGE, ERROR };
   enum class object_type {
     INTEGER,
     DOUBLE,

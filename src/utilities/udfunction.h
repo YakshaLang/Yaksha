@@ -15,7 +15,6 @@ namespace yaksha {
      * @param scope Pointer to the environment stack/scope
      *  that this function will read variables from
      * @param interpreter Pointer to current running interpreter?
-     * // TODO this can be a visitor maybe?
      * @param code code to execute (this is a block)
      * @param parameters List of parameters in function definition
      * @param token token to chuck errors
@@ -25,7 +24,8 @@ namespace yaksha {
                         token *token);
     ~udfunction() override;
     ykobject verify(const std::vector<ykobject> &args) override;
-    ykobject call(const std::vector<ykobject> &args) override;
+    std::pair<func_control_flow, ykobject>
+    call(const std::vector<ykobject> &args) override;
 
 private:
     environment *scope_;

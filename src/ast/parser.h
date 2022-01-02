@@ -43,6 +43,7 @@ private:
     stmt *pass_statement();
     stmt *continue_statement();
     stmt *break_statement();
+    stmt *return_statement();
     stmt *def_statement();
     stmt *expression_statement();
     stmt *declaration_statement();

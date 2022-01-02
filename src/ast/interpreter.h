@@ -39,8 +39,6 @@ namespace yaksha {
     void visit_continue_stmt(continue_stmt *obj) override;
     void visit_fncall_expr(fncall_expr *obj) override;
     void visit_def_stmt(def_stmt *obj) override;
-    // TODO think of a better design for this
-    ykobject pop();
 
 private:
     ykfunction *samplefn_;
@@ -51,6 +49,7 @@ private:
     const ykobject &peek();
     void push(ykobject obj);
     const ykobject &evaluate(expr *exp);
+    ykobject pop();
   };
 }// namespace yaksha
 #endif

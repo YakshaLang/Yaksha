@@ -157,6 +157,7 @@ stmt *parser::statement() {
   if (match({token_type::KEYWORD_WHILE})) { return while_statement(); }
   if (match({token_type::KEYWORD_CONTINUE})) { return continue_statement(); }
   if (match({token_type::KEYWORD_BREAK})) { return break_statement(); }
+  if (match({token_type::KEYWORD_RETURN})) { return return_statement(); }
   return expression_statement();
 }
 stmt *parser::pass_statement() {
@@ -304,6 +305,19 @@ stmt *parser::break_statement() {
                  "Expect new line after 'break' statement.");
   return pool_.c_break_stmt(tok);
 }
+stmt *parser::return_statement() {
+  auto tok = previous();
+  expr *exp;
+  if (check(token_type::NEW_LINE) || is_at_end()) {
+    // Return without an expression
+    exp = nullptr;
+  } else {
+    exp = expression();
+  }
+  consume_or_eof(token_type::NEW_LINE,
+                 "Expect new line after 'return' statement.");
+  return pool_.c_return_stmt(tok, exp);
+}
 stmt *parser::def_statement() {
   // def_statement -> KEYWORD_DEF NAME PAREN_OPEN [[NAME COLON DATA_TYPE]*] PAREN_CLOSE ARROW DATA_TYPE BLOCK
   auto name = consume(token_type::NAME, "Function name must be present");
@@ -313,6 +327,8 @@ stmt *parser::def_statement() {
     do {
       auto param_name =
           consume(token_type::NAME, "Parameter name must be present");
+      consume(token_type::COLON,
+              "Colon must be present between parameter name and data type");
       auto param_type =
           consume(token_type::NAME, "Data type name must be present");
       params.emplace_back(parameter{param_name, param_type});

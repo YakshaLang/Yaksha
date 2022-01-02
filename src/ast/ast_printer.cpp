@@ -21,7 +21,13 @@ void ast_printer::visit_literal_expr(literal_expr *obj) {
 void ast_printer::visit_unary_expr(unary_expr *obj) {
   parenthesize(obj->opr_->token_, {obj->right_});
 }
-void ast_printer::visit_return_stmt(return_stmt *obj) {}
+void ast_printer::visit_return_stmt(return_stmt *obj) {
+  if (obj->expression_ != nullptr) {
+    this->parenthesize("return", {obj->expression_});
+    return;
+  }
+  text_ << "(return None)";
+}
 void ast_printer::parenthesize(const std::string &name,
                                std::initializer_list<expr *> exprs) {
   text_ << "(" << name;

@@ -4,6 +4,7 @@
 #include "utilities/ykobject.h"
 #include <vector>
 namespace yaksha {
+  enum class func_control_flow { EXPECT_RETURN, NATIVE };
   struct ykfunction {
     ykfunction();
     virtual ~ykfunction() = default;
@@ -19,7 +20,8 @@ namespace yaksha {
      * @param args arguments that this function is called with
      * @return result
      */
-    virtual ykobject call(const std::vector<ykobject> &args) = 0;
+    virtual std::pair<func_control_flow, ykobject>
+    call(const std::vector<ykobject> &args) = 0;
 
 private:
   };

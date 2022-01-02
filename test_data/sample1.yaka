@@ -2,13 +2,20 @@
 def some_fn() -> int:
     print("Hello From function")
     print("\n")
+    # this returns None
 
 
-x: int = 5
-while x != 0:
-    some_fn()
-    x = x - 1
+def add_ten(param1: int) -> int:
+    return param1 + 10
 
+
+print("calling some_fn()")
+print("\n")
+print(some_fn())
+print("\n")
+print("add_ten(20) --> ")
+print(add_ten(20))
+print("\n")
 print("Hello" + " World\n")
 print(123)
 a: int = 1 + 2 + 3 + 4

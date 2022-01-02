@@ -74,7 +74,11 @@ void ast_vis::visit_unary_expr(unary_expr *obj) {
   field("right", obj->right_);
   end_block();
 }
-void ast_vis::visit_return_stmt(return_stmt *obj) {}
+void ast_vis::visit_return_stmt(return_stmt *obj) {
+  begin_block("return-statement");
+  if (obj->expression_ != nullptr) { field("value", obj->expression_); }
+  end_block();
+}
 void ast_vis::field(const std::string &name, expr *expr) {
   text_ << R"(<div class="field"><div class="field_title">)"
         << ::string_utils::html_escape(name) << "</div>";
@@ -173,11 +177,11 @@ void ast_vis::visit_while_stmt(while_stmt *obj) {
   end_block();
 }
 void ast_vis::visit_break_stmt(break_stmt *obj) {
-  begin_block("break");
+  begin_block("break-statement");
   end_block();
 }
 void ast_vis::visit_continue_stmt(continue_stmt *obj) {
-  begin_block("continue");
+  begin_block("continue-statement");
   end_block();
 }
 void ast_vis::visit_fncall_expr(fncall_expr *obj) {

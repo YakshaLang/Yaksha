@@ -10,7 +10,8 @@ namespace yaksha {
   struct samplefn : ykfunction {
     samplefn();
     ~samplefn() override;
-    ykobject call(const std::vector<ykobject> &args) override;
+    std::pair<func_control_flow, ykobject>
+    call(const std::vector<ykobject> &args) override;
 
 private:
   };

@@ -181,7 +181,15 @@ void interpreter::visit_unary_expr(unary_expr *obj) {
     push(ykobject("Invalid unary operator", obj->opr_));
   }
 }
-void interpreter::visit_return_stmt(return_stmt *obj) {}
+void interpreter::visit_return_stmt(return_stmt *obj) {
+  if (obj->expression_ == nullptr) {
+    push(ykobject());// None
+  } else {
+    obj->expression_->accept(this);
+  }
+  // If it's an error we will just return that..
+  push(ykobject(control_flow_change::RETURN));
+}
 void interpreter::push(ykobject obj) {
   object_stack_.emplace_back(std::move(obj));
 }
@@ -325,7 +333,7 @@ void interpreter::visit_while_stmt(while_stmt *obj) {
         break;
       } else if (peek().flow_ == control_flow_change::CONTINUE) {
         pop();
-      } else {// Normal runtime error!
+      } else {// Normal runtime error or a return
         return;
       }
     }
@@ -373,11 +381,22 @@ void interpreter::visit_fncall_expr(fncall_expr *obj) {
   }
   // Actually call the function
   globals_.push();// scope of the function
-  push(fn.fn_val_->call(arguments));
+  auto val = fn.fn_val_->call(arguments);
+  if (val.first == func_control_flow::EXPECT_RETURN) {
+    if (peek().flow_ == control_flow_change::RETURN) {
+      pop();
+    } else if (has_error()) {
+      // Got an error -> do nothing so that is kept there.
+    } else {
+      push(ykobject());// Default to returning None
+    }
+  } else {
+    // We were calling a native function that returns a value, just push that
+    push(val.second);
+  }
   globals_.pop();
 }
 void interpreter::visit_def_stmt(def_stmt *obj) {
-  // TODO handle return type as well
   auto ud = new udfunction(&globals_, this, obj->function_body_, &obj->params_,
                            obj->name_);
   // Add the function to the global scope

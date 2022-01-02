@@ -3,6 +3,7 @@
 using namespace yaksha;
 samplefn::samplefn() = default;
 samplefn::~samplefn() = default;
-ykobject samplefn::call(const std::vector<ykobject> &args) {
-  return ykobject(1);
+std::pair<func_control_flow, ykobject>
+samplefn::call(const std::vector<ykobject> &args) {
+  return std::make_pair(func_control_flow::NATIVE, ykobject(1));
 }
