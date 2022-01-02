@@ -66,17 +66,15 @@ interpreter::~interpreter() {
 void interpreter::visit_binary_expr(binary_expr *obj) {
   if (has_error()) { return; }
   obj->left_->accept(this);
+  if (has_error()) { return; }
+  auto left_val = pop();
   obj->right_->accept(this);
   if (has_error()) { return; }
   auto right_val = pop();
-  if (has_error()) { return; }
-  auto left_val = pop();
   switch (obj->opr_->type_) {
     case token_type::PLUS:
       VALIDATE_NON_NULL_SAME_DATA_TYPE;
       if (left_val.object_type_ == object_type::STRING) {
-        // String concat
-        // TODO rvalue copied?
         push(ykobject(left_val.string_val_ + right_val.string_val_));
         return;
       }
