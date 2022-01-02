@@ -116,6 +116,9 @@ void block_analyzer::analyze() {
       // Don't start with new lines, Don't add a newline after a new line
       if (cleaned.empty() || cleaned.back().type_ == token_type::NEW_LINE) {
         continue;
+      } else if (cleaned.back().type_ == token_type::INDENT) {
+        // get rid of empty indents that just follows by a new line
+        cleaned.pop_back();
       }
     }
     cleaned.emplace_back(tok);
@@ -197,7 +200,10 @@ void block_analyzer::analyze() {
       indents.push_back(current_level);
       continue;
     } else if (tok.type_ == token_type::NEW_LINE) {
-      if (inside_bracket_block) { continue; }
+      if (inside_bracket_block || tokens_.empty() ||
+          tokens_.back().type_ == token_type::BA_DEDENT) {
+        continue;
+      }
       if (iterator != end && iterator->type_ != token_type::INDENT) {
         std::size_t prev_level = indents.empty() ? 0 : indents.back();
         std::size_t current_level = 0;
