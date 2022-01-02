@@ -199,6 +199,27 @@ TEST_CASE("interpreter: call a function") {
     FAIL("Must parse the expression");
   }
 }
+TEST_CASE("interpreter: not a callable") {
+  auto code = "# Bad function call\n"
+              "\"Hello\"(123)\n";
+  tokenizer t{"code.py", code};
+  t.tokenize();
+  // Why? this is needed as we got blocks here
+  // Blocks need to be analyzed before parsing!
+  block_analyzer b{t.tokens_};
+  b.analyze();
+  parser p{b.tokens_};
+  auto expression = p.parse();
+  if (!expression.empty()) {
+    interpreter ip{};
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(result->string_val_ == "\ncode.py:2:12 at \")\" --> Not a callable");
+    REQUIRE(result->object_type_ == object_type::RUNTIME_ERROR);
+  } else {
+    FAIL("Must parse the expression");
+  }
+}
 TEST_CASE("interpreter: count to 10") {
   auto code = "a: int = 1\n"
               "while a != 11:\n"
