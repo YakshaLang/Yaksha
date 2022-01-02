@@ -199,6 +199,33 @@ TEST_CASE("interpreter: call a function") {
     FAIL("Must parse the expression");
   }
 }
+TEST_CASE("interpreter: call a function recursive") {
+  auto code = "# Recursion\n"
+              "def f(v: int) -> int:\n"
+              "    if v <= 0:\n"
+              "        return 1\n"
+              "    return v * f(v - 1)\n"
+              "\n"
+              "\n"
+              "print(f(5))";
+  tokenizer t{"code.py", code};
+  t.tokenize();
+  // Why? this is needed as we got blocks here
+  // Blocks need to be analyzed before parsing!
+  block_analyzer b{t.tokens_};
+  b.analyze();
+  parser p{b.tokens_};
+  auto expression = p.parse();
+  if (!expression.empty()) {
+    interpreter ip{};
+    ip.calculate(expression);
+    auto result = ip.result();
+    REQUIRE(result->integer_val_ == 120); // 5!
+    REQUIRE(result->object_type_ == object_type::INTEGER);
+  } else {
+    FAIL("Must parse the expression");
+  }
+}
 TEST_CASE("interpreter: not a callable") {
   auto code = "# Bad function call\n"
               "\"Hello\"(123)\n";
