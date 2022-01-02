@@ -2,9 +2,9 @@
 #include "udfunction.h"
 #include <utility>
 using namespace yaksha;
-udfunction::udfunction(environment *scope, interpreter *interpreter, stmt *code,
+udfunction::udfunction(environment *scope, stmt_visitor *statement_visitor, stmt *code,
                        std::vector<parameter> *parameters, token *token)
-    : scope_(scope), interpreter_(interpreter), code_(code),
+    : scope_(scope), statement_visitor_(statement_visitor), code_(code),
       parameters_(parameters), token_(token) {}
 udfunction::~udfunction() = default;
 ykobject udfunction::verify(const std::vector<ykobject> &args) {
@@ -24,6 +24,6 @@ udfunction::call(const std::vector<ykobject> &args) {
     scope_->define(param.name_->token_, arg);
   }
   // Actually call the code block
-  code_->accept(interpreter_);
+  code_->accept(statement_visitor_);
   return std::make_pair(func_control_flow::EXPECT_RETURN, ykobject());
 }
