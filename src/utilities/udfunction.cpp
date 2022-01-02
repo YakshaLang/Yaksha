@@ -2,8 +2,9 @@
 #include "udfunction.h"
 #include <utility>
 using namespace yaksha;
-udfunction::udfunction(environment *scope, stmt_visitor *statement_visitor, stmt *code,
-                       std::vector<parameter> *parameters, token *token)
+udfunction::udfunction(environment *scope, stmt_visitor *statement_visitor,
+                       stmt *code, std::vector<parameter> *parameters,
+                       token *token)
     : scope_(scope), statement_visitor_(statement_visitor), code_(code),
       parameters_(parameters), token_(token) {}
 udfunction::~udfunction() = default;
