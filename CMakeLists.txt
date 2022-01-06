@@ -19,16 +19,22 @@ include_directories(tests)
 include_directories(${UTF8_DIR})
 
 set(YAKSHA_SOURCE_FILES
-        src/tokenizer/token.h)
+        src/tokenizer/token.h
+        src/tokenizer/parsing_error.cpp)
 set(YAKSHA_TEST_FILES
         tests/test_tokenizer.cpp)
 
+# -- Main library --
+add_library(yaksha ${YAKSHA_SOURCE_FILES})
+
 # -- Main binary --
-add_executable(Yaksha ${YAKSHA_SOURCE_FILES} src/main.cpp)
+add_executable(Yaksha src/main.cpp)
+target_link_libraries(Yaksha PUBLIC yaksha)
 
 # -- Test binary --
 add_subdirectory(3rd/Catch2)
-add_executable(YakshaTests ${YAKSHA_SOURCE_FILES} ${YAKSHA_TEST_FILES} tests/test_main.cpp)
+add_executable(YakshaTests ${YAKSHA_TEST_FILES} tests/test_main.cpp)
+target_link_libraries(YakshaTests PUBLIC yaksha)
 target_compile_definitions(YakshaTests PUBLIC TESTING)
 target_link_libraries(YakshaTests PRIVATE Catch2::Catch2)
 # Adding tests to CTest
@@ -37,7 +43,8 @@ include(3rd/Catch2/contrib/Catch.cmake) # This is needed to discover
 catch_discover_tests(YakshaTests)
 
 # -- Fuzz binary --
-add_executable(YakshaFuzz ${YAKSHA_SOURCE_FILES} tests/fuzz_main.cpp)
+add_executable(YakshaFuzz tests/fuzz_main.cpp)
+target_link_libraries(YakshaFuzz PUBLIC yaksha)
 
 
 
