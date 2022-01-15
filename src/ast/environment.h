@@ -31,7 +31,7 @@ namespace yaksha {
      * @param name name of the variable
      * @return mutable object
      */
-    virtual ykobject &get(const std::string &name);
+    virtual ykobject get(const std::string &name);
     environment();
     virtual ~environment();
 

@@ -96,7 +96,7 @@ expr *parser::primary() {
              token_type::KEYWORD_NONE, token_type::FLOAT_NUMBER,
              token_type::INTEGER_DECIMAL, token_type::INTEGER_BIN,
              token_type::INTEGER_OCT, token_type::INTEGER_HEX,
-             token_type::STRING})) {
+             token_type::STRING, token_type::THREE_QUOTE_STRING})) {
     return pool_.c_literal_expr(previous());
   }
   if (match({token_type::NAME})) { return pool_.c_variable_expr(previous()); }

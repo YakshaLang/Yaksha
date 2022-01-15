@@ -37,7 +37,7 @@ namespace yaksha {
      * @param name name of the variable
      * @return mutable object
      */
-    ykobject &get(const std::string &name) override;
+    ykobject get(const std::string &name) override;
     /**
      * Go to a deeper level of scope
      */

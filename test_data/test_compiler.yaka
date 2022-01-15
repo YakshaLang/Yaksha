@@ -1,0 +1,18 @@
+# Compiler sample
+def factorial(x: int) -> int:
+    if x <= 0:
+        return 1
+    return x * factorial(x - 1)
+
+
+def main() -> int:
+    a: int = 10
+    b: str = "b"
+    while a > 0:
+        print(factorial(a))
+        print("\n")
+        a = a - 1
+        b = "a" + b
+    print(b)
+    print("\n")
+    return 0
