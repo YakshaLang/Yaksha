@@ -37,6 +37,7 @@ private:
     // statements
     stmt *statement();
     stmt *print_statement();
+    stmt *defer_statement();
     stmt *if_statement();
     stmt *while_statement();
     stmt *block_statement();

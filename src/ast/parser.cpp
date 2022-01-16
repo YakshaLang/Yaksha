@@ -158,6 +158,7 @@ stmt *parser::statement() {
   if (match({token_type::KEYWORD_CONTINUE})) { return continue_statement(); }
   if (match({token_type::KEYWORD_BREAK})) { return break_statement(); }
   if (match({token_type::KEYWORD_RETURN})) { return return_statement(); }
+  if (match({token_type::KEYWORD_DEFER})) { return defer_statement(); }
   return expression_statement();
 }
 stmt *parser::pass_statement() {
@@ -206,6 +207,12 @@ stmt *parser::print_statement() {
   consume_or_eof(token_type::NEW_LINE,
                  "Expect new line after value for print statement.");
   return pool_.c_print_stmt(previous(), exp);
+}
+stmt *parser::defer_statement() {
+  expr *exp = expression();
+  consume_or_eof(token_type::NEW_LINE,
+                 "Expect new line after value for defer statement.");
+  return pool_.c_defer_stmt(previous(), exp);
 }
 stmt *parser::expression_statement() {
   expr *exp = expression();

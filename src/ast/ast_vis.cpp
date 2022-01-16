@@ -198,3 +198,8 @@ void ast_vis::visit_def_stmt(def_stmt *obj) {
   field("body", obj->function_body_);
   end_block();
 }
+void ast_vis::visit_defer_stmt(defer_stmt *obj) {
+  begin_block("defer-statement");
+  field("expression", obj->expression_);
+  end_block();
+}

@@ -32,8 +32,9 @@ EXPRS = sorted([
 ], key=lambda x: x[0])
 # Different kinds of statements
 STMTS = sorted([
-    # Return statement we can use when we add functions
     ("return", (("token*", "return_keyword"), ("expr*", "expression"))),
+    # defer statement works just like how we use string, deletions.
+    ("defer", (("token*", "defer_keyword"), ("expr*", "expression"))),
     # TODO: Hmm need to think if we allow this? as this will allow arbitrary statements as expressions
     ("expression", (("expr*", "expression"),)),
     # TODO: Convert print statement to a function once we add it

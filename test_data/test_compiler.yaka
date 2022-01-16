@@ -5,7 +5,15 @@ def factorial(x: int) -> int:
     return x * factorial(x - 1)
 
 
+def on_end(n: int) -> int:
+    print(n)
+    print(" From defer --> Program Completed\n")
+    return 0
+
+
 def main() -> int:
+    defer(on_end(1))
+    defer(on_end(2))
     a: int = 10
     b: str = "b"
     while a > 0:

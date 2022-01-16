@@ -321,3 +321,7 @@ void type_checker::pop_function() {
   if (this->function_name_stack_.empty()) { return; }
   this->function_name_stack_.pop_back();
 }
+void type_checker::visit_defer_stmt(defer_stmt *obj) {
+  auto st = expression_stmt{obj->expression_};
+  this->visit_expression_stmt(&st);
+}

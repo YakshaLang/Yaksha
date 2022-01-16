@@ -164,6 +164,7 @@ void compiler::visit_block_stmt(block_stmt *obj) {
   // For defs, deletion happen before return
   if (peek_scope_type() == ast_type::STMT_WHILE ||
       peek_scope_type() == ast_type::STMT_IF) {
+    defers_.write_one(this);
     deletions_.write_one(body_, indent_);
   }
   write_prev_indent(body_);
@@ -221,6 +222,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   // visit block_stmt
   push_scope_type(ast_type::STMT_DEF);
   deletions_.push_delete_stack();
+  defers_.push_defer_stack();
   // Delete all arg strings
   for (auto param : function_def->params_) {
     auto param_dt = convert_data_type(param.data_type_);
@@ -230,6 +232,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     }
   }
   obj->function_body_->accept(this);
+  defers_.pop_defer_stack();
   deletions_.pop_delete_stack();
   dedent();
   scope_.pop();
@@ -252,21 +255,25 @@ void compiler::visit_if_stmt(if_stmt *obj) {
   body_ << "if (" << if_expr.first << ")";
   scope_.push();
   deletions_.push_delete_stack();
+  defers_.push_defer_stack();
   push_scope_type(ast_type::STMT_IF);
   indent();
   obj->if_branch_->accept(this);
   dedent();
   pop_scope_type();
+  defers_.pop_defer_stack();
   deletions_.pop_delete_stack();
   scope_.pop();
   if (obj->else_branch_ != nullptr) {
     scope_.push();
     deletions_.push_delete_stack();
+    defers_.push_defer_stack();
     push_scope_type(ast_type::STMT_IF);
     indent();
     obj->if_branch_->accept(this);
     dedent();
     pop_scope_type();
+    defers_.pop_defer_stack();
     deletions_.pop_delete_stack();
     scope_.pop();
   }
@@ -327,6 +334,7 @@ void compiler::visit_return_stmt(return_stmt *obj) {
   // TODO check if expression is present.
   obj->expression_->accept(this);
   auto rhs = pop();
+  defers_.write_one(this);
   deletions_.write(body_, indent_, rhs.first);
   write_indent(body_);
   body_ << "return " << rhs.first;
@@ -345,6 +353,7 @@ void compiler::visit_while_stmt(while_stmt *obj) {
   push_scope_type(ast_type::STMT_WHILE);
   scope_.push();
   deletions_.push_delete_stack();
+  defers_.push_defer_stack();
   indent();
   indent();
   write_prev_indent(body_);
@@ -360,6 +369,7 @@ void compiler::visit_while_stmt(while_stmt *obj) {
   body_ << "}\n";
   pop_scope_type();
   scope_.pop();
+  defers_.pop_defer_stack();
   deletions_.pop_delete_stack();
 }
 void compiler::write_indent(std::stringstream &where) const {
@@ -434,4 +444,7 @@ ast_type compiler::peek_scope_type() {
 void compiler::pop_scope_type() {
   if (this->scope_type_stack_.empty()) { return; }
   this->scope_type_stack_.pop_back();
+}
+void compiler::visit_defer_stmt(defer_stmt *obj) {
+  defers_.push(obj->expression_);
 }

@@ -126,3 +126,6 @@ void ast_printer::visit_def_stmt(def_stmt *obj) {
   obj->function_body_->accept(this);
   text_ << ")";
 }
+void ast_printer::visit_defer_stmt(defer_stmt *obj) {
+  parenthesize("defer_statement", {obj->expression_});
+}

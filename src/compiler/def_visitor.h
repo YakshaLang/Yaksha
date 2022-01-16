@@ -36,6 +36,7 @@ namespace yaksha {
     void visit_while_stmt(while_stmt *obj) override;
     bool has(const std::string &prefixed_name);
     def_stmt *get(const std::string &prefixed_name);
+    void visit_defer_stmt(defer_stmt *obj) override;
     std::vector<std::string> function_names_{};
     std::vector<parsing_error> errors_{};
 

@@ -74,6 +74,7 @@ namespace yaksha {
     KEYWORD_CLASS,
     KEYWORD_CONTINUE,
     KEYWORD_DEF,
+    KEYWORD_DEFER,
     KEYWORD_DEL,
     KEYWORD_ELIF,
     KEYWORD_ELSE,
@@ -162,6 +163,7 @@ namespace yaksha {
     if (t == token_type::KEYWORD_CLASS) return "KEYWORD_CLASS";
     if (t == token_type::KEYWORD_CONTINUE) return "KEYWORD_CONTINUE";
     if (t == token_type::KEYWORD_DEF) return "KEYWORD_DEF";
+    if (t == token_type::KEYWORD_DEFER) return "KEYWORD_DEFER";
     if (t == token_type::KEYWORD_DEL) return "KEYWORD_DEL";
     if (t == token_type::KEYWORD_ELIF) return "KEYWORD_ELIF";
     if (t == token_type::KEYWORD_ELSE) return "KEYWORD_ELSE";
@@ -245,6 +247,7 @@ namespace yaksha {
     if (t == "KEYWORD_CLASS") return token_type::KEYWORD_CLASS;
     if (t == "KEYWORD_CONTINUE") return token_type::KEYWORD_CONTINUE;
     if (t == "KEYWORD_DEF") return token_type::KEYWORD_DEF;
+    if (t == "KEYWORD_DEFER") return token_type::KEYWORD_DEFER;
     if (t == "KEYWORD_DEL") return token_type::KEYWORD_DEL;
     if (t == "KEYWORD_ELIF") return token_type::KEYWORD_ELIF;
     if (t == "KEYWORD_ELSE") return token_type::KEYWORD_ELSE;
@@ -272,6 +275,7 @@ namespace yaksha {
     if (t == "class") return token_type::KEYWORD_CLASS;
     if (t == "continue") return token_type::KEYWORD_CONTINUE;
     if (t == "def") return token_type::KEYWORD_DEF;
+    if (t == "defer") return token_type::KEYWORD_DEFER;
     if (t == "del") return token_type::KEYWORD_DEL;
     if (t == "elif") return token_type::KEYWORD_ELIF;
     if (t == "else") return token_type::KEYWORD_ELSE;

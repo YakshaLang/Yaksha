@@ -407,3 +407,4 @@ void interpreter::debug_print_stack() {
     std::cout << "\n";
   }
 }
+void interpreter::visit_defer_stmt(defer_stmt *obj) {}

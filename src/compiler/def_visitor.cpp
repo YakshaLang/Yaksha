@@ -45,3 +45,4 @@ void def_visitor::error(token *tok, const std::string &message) {
   auto err = parsing_error{message, tok};
   errors_.emplace_back(err);
 }
+void def_visitor::visit_defer_stmt(defer_stmt *obj) {}

@@ -19,7 +19,7 @@ KEYWORDS = sorted(["False", "else", "import", "pass",
                    "and", "continue", "for", "try",
                    "as", "def", "from", "while",
                    "assert", "del", "not",
-                   "elif", "if", "or", "print"])
+                   "elif", "if", "or", "print", "defer"])
 TOKENS = sorted([
     "NAME", "AT", "INTEGER_DECIMAL", "INTEGER_OCT", "INTEGER_HEX", "INTEGER_BIN", "FLOAT_NUMBER", "INDENT",
     "BA_INDENT", "BA_DEDENT", "NEW_LINE", "COLON", "COMMENT", "THREE_QUOTE_STRING", "STRING", "PAREN_OPEN",

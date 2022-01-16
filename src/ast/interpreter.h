@@ -40,6 +40,7 @@ namespace yaksha {
     void visit_fncall_expr(fncall_expr *obj) override;
     void visit_def_stmt(def_stmt *obj) override;
     void debug_print_stack();
+    void visit_defer_stmt(defer_stmt *obj) override;
 
 private:
     ykfunction *samplefn_;

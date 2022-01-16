@@ -45,6 +45,7 @@ namespace yaksha {
     void visit_continue_stmt(continue_stmt *obj) override;
     void visit_fncall_expr(fncall_expr *obj) override;
     void visit_def_stmt(def_stmt *obj) override;
+    void visit_defer_stmt(defer_stmt *obj) override;
 
 private:
     std::stringstream text_{};
