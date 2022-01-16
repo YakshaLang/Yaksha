@@ -28,5 +28,7 @@ bin/rg1
 !3rd/WinICD/libOpenCL.dll.a
 bin/coverage/*.html
 bin/Yaksha
+bin/yakshac
 bin/YakshaFuzz
 bin/YakshaTests
+comp_output_test

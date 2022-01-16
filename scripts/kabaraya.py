@@ -21,6 +21,7 @@ import subprocess
 import traceback
 from typing import List
 
+
 class Colors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -248,9 +249,11 @@ MUTATORS = [
 
 def execute(arg: str):
     args = [os.path.abspath(BINARY), os.path.abspath(arg)]
-    fuzz_process = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    fuzz_process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8",
+                                    universal_newlines=True)
+    so, se = "", ""
     try:
-        fuzz_process.communicate(timeout=MAX_EXECUTION_TIME_SEC)
+        so, se = fuzz_process.communicate(timeout=MAX_EXECUTION_TIME_SEC)
         return_value = fuzz_process.returncode
     except subprocess.TimeoutExpired:
         fuzz_process.kill()
@@ -259,6 +262,7 @@ def execute(arg: str):
         return -1
     if return_value != 0:
         print("Found fuzz error", Colors.fail(arg))
+        print(se)
     return return_value
 
 

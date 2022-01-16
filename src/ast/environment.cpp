@@ -9,7 +9,9 @@ bool environment::is_defined(const std::string &name) {
 void environment::define(const std::string &name, ykobject data) {
   variables_.emplace(name, std::move(data));
 }
-ykobject &environment::get(const std::string &name) { return variables_[name]; }
+ykobject environment::get(const std::string &name) {
+  return variables_[name];
+}
 void environment::assign(const std::string &name, ykobject data) {
   variables_[name] = std::move(data);
 }
