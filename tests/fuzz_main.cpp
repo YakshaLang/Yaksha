@@ -52,7 +52,7 @@ void test_compiler(const std::string& data, const std::string& file_name) {
   try {
     parser p{b.tokens_};
     auto tree = p.parse();
-    if (tree.empty()) {
+    if (tree.empty() || !p.errors_.empty()) {
       errors::print_errors(p.errors_);
       return;
     }

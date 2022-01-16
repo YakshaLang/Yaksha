@@ -2,6 +2,7 @@
 #include "type_checker.h"
 #include "compiler_utils.h"
 #include "utilities/ykfunction.h"
+#include "return_checker.h"
 using namespace yaksha;
 type_checker::type_checker() = default;
 type_checker::~type_checker() = default;
@@ -262,6 +263,11 @@ void type_checker::check(const std::vector<stmt *> &statements) {
     auto function_placeholder_object = ykobject();
     function_placeholder_object.object_type_ = object_type::FUNCTION;
     scope_.define_global(name, function_placeholder_object);
+  }
+  return_checker rc{};
+  rc.check(functions_);
+  for (const auto& err: rc.errors_) {
+    this->errors_.emplace_back(err);
   }
 }
 void type_checker::error(token *tok, const std::string &message) {
