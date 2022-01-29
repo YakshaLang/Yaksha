@@ -24,6 +24,6 @@ void defer_stack_stack::write(stmt_visitor *statement_visitor) {
   }
 }
 void defer_stack_stack::write_one(stmt_visitor *statement_visitor) {
-  if (defer_levels_.empty()) {return;}
+  if (defer_levels_.empty()) { return; }
   defer_levels_.back().write(statement_visitor);
 }

@@ -11,13 +11,9 @@ bool environment_stack::is_defined(const std::string &name) {
   // If defined in global, return that
   if (scope_stack_.front().is_defined(name)) { return true; }
   if (!has_inner_scope()) { return false; }
-  if (peek().is_defined(name)) {
-    return true;
-  }
-  for (auto stack: scope_stack_) {
-    if (stack.is_defined(name)) {
-      return true;
-    }
+  if (peek().is_defined(name)) { return true; }
+  for (auto stack : scope_stack_) {
+    if (stack.is_defined(name)) { return true; }
   }
   return false;
 }
@@ -32,7 +28,7 @@ void environment_stack::assign(const std::string &name, ykobject data) {
     peek().assign(name, data);
     return;
   }
-  for (auto stack: scope_stack_) {
+  for (auto stack : scope_stack_) {
     if (stack.is_defined(name)) {
       stack.assign(name, data);
       return;
@@ -43,13 +39,9 @@ ykobject environment_stack::get(const std::string &name) {
   if (scope_stack_.front().is_defined(name)) {
     return scope_stack_.front().get(name);
   }
-  if (peek().is_defined(name)) {
-    return peek().get(name);
-  }
-  for (auto stack: scope_stack_) {
-    if (stack.is_defined(name)) {
-      return stack.get(name);
-    }
+  if (peek().is_defined(name)) { return peek().get(name); }
+  for (auto stack : scope_stack_) {
+    if (stack.is_defined(name)) { return stack.get(name); }
   }
   return ykobject();
 }

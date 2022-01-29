@@ -1,12 +1,12 @@
 #include "ast/ast_printer.h"
 #include "ast/interpreter.h"
 #include "ast/parser.h"
+#include "compiler/compiler.h"
+#include "compiler/type_checker.h"
 #include "file_formats/tokens_file.h"
 #include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
 #include "utilities/error_printer.h"
-#include "compiler/compiler.h"
-#include "compiler/type_checker.h"
 using namespace yaksha;
 // Simple main function to run a script and print the ast.
 int main(int argc, char *argv[]) {
@@ -38,7 +38,6 @@ int main(int argc, char *argv[]) {
       write_token_dump(std::cerr, b.tokens_);
       return EXIT_FAILURE;
     }
-
     type_checker tc{};
     tc.check(tree);
     if (!tc.errors_.empty()) {
@@ -47,7 +46,6 @@ int main(int argc, char *argv[]) {
     }
     compiler comp{tc.functions_};
     std::cout << comp.compile(tree);
-
   } catch (parsing_error &p) {
     std::cout << "Parsing error --> " << p.message_ << "\n";
     write_token_dump(std::cerr, b.tokens_);

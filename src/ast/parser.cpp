@@ -238,15 +238,12 @@ stmt *parser::declaration_statement() {
       recede();
       return statement();
     }
-    if (!match({token_type::NAME})) {
-      throw error(peek(), "Must have a data type for variable declaration.");
-    }
-    data_type = previous();
+    auto dt = parse_datatype();
     // `= expression` bit is optional
     if (match({token_type::EQ})) { exp = expression(); }
     consume_or_eof(token_type::NEW_LINE,
                    "Expect new line after value for variable declaration.");
-    return pool_.c_let_stmt(var_name, data_type, exp);
+    return pool_.c_let_stmt(var_name, dt, exp);
   } catch (parsing_error &err) {
     synchronize_parser();
     return nullptr;
@@ -336,15 +333,37 @@ stmt *parser::def_statement() {
           consume(token_type::NAME, "Parameter name must be present");
       consume(token_type::COLON,
               "Colon must be present between parameter name and data type");
-      auto param_type =
-          consume(token_type::NAME, "Data type name must be present");
-      params.emplace_back(parameter{param_name, param_type});
+      auto dt = parse_datatype();
+      params.emplace_back(parameter{param_name, dt});
     } while (match({token_type::COMMA}));
   }
   consume(token_type::PAREN_CLOSE, "Function call must end with ')'");
   consume(token_type::ARROW, "'->' operator must be present");
-  auto return_type = consume(token_type::NAME, "Return type must be present");
+  auto return_dt = parse_datatype();
   auto body = block_statement();
-  return pool_.c_def_stmt(name, params, body, return_type);
+  return pool_.c_def_stmt(name, params, body, return_dt);
+}
+ykdatatype *parser::parse_datatype() {
+  auto dt = dtpool_.create();
+  if (!match({token_type::NAME, token_type::KEYWORD_NONE})) {
+    throw error(peek(), "Must have a data type.");
+  }
+  dt->name_ = previous();
+  if (match({token_type::SQUARE_BRACKET_OPEN})) {
+    if (dt->is_primitive()) {
+      throw error(dt->name_,
+                  "Primitive data types cannot have internal data types.");
+    }
+    do {
+      auto arg = parse_datatype();
+      if (arg->is_none()) {
+        throw error(dt->name_,
+                    "None cannot be used as an argument for a data type.");
+      }
+      dt->args_.push_back(arg);
+    } while (match({token_type::COMMA}));
+    consume(token_type::SQUARE_BRACKET_CLOSE, "Must have a closing ']'");
+  }
+  return dt;
 }
 parser::~parser() = default;

@@ -4,6 +4,7 @@
 #include "ast/ast.h"
 #include "tokenizer/string_utils.h"
 #include "tokenizer/token.h"
+#include "utilities/ykdt_pool.h"
 #include <sstream>
 #include <vector>
 namespace yaksha {
@@ -48,6 +49,8 @@ private:
     stmt *def_statement();
     stmt *expression_statement();
     stmt *declaration_statement();
+    // parsing data types
+    ykdatatype *parse_datatype();
     // utilities
     bool match(std::initializer_list<token_type> types);
     bool check(token_type t);
@@ -64,6 +67,7 @@ private:
     // state
     std::size_t current_;
     ast_pool pool_;
+    ykdt_pool dtpool_;
     std::vector<token> &tokens_;
     // Increase when we allow control, flow.
     // Decrease after parsing.

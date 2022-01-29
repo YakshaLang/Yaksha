@@ -57,12 +57,12 @@ STMTS = sorted([
     ("break", (("token*", "break_token"),)),
     # Let statements
     # TODO we use both declare and let in the code, stick to one terminology
-    ("let", (("token*", "name"), ("token*", "data_type"), ("expr*", "expression"))),
+    ("let", (("token*", "name"), ("ykdatatype*", "data_type"), ("expr*", "expression"))),
     # Function declarations
     # Make sure we always say the return type
     # `def abc(a: int) -> None:`
     ("def", (("token*", "name"), ("std::vector<parameter>", "params"),
-             ("stmt*", "function_body"), ("token*", "return_type")))
+             ("stmt*", "function_body"), ("ykdatatype*", "return_type")))
 ], key=lambda x: x[0])
 
 # EXPR CODE GEN
@@ -130,6 +130,7 @@ HEADER = """
 #ifndef AST_H
 #define AST_H
 #include "tokenizer/token.h"
+#include "utilities/ykdatatype.h"
 #include <vector>
 namespace yaksha {
 // ------ forward declarations ------
@@ -166,7 +167,7 @@ $AST_POOL$
 */
 struct parameter {
     token* name_;
-    token* data_type_;
+    ykdatatype* data_type_;
 };
 } // namespace yaksha
 #endif

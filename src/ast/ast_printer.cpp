@@ -61,7 +61,7 @@ void ast_printer::visit_variable_expr(variable_expr *obj) {
 }
 void ast_printer::visit_let_stmt(let_stmt *obj) {
   text_ << "(let " << obj->name_->token_;
-  text_ << " " << obj->data_type_->token_ << " ";
+  text_ << " " << obj->data_type_->as_string() << " ";
   if (obj->expression_ != nullptr) { obj->expression_->accept(this); }
   text_ << ")";
 }

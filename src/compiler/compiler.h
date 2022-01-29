@@ -3,14 +3,14 @@
 #define COMPILER_H
 #include "ast/ast.h"
 #include "ast/environment_stack.h"
-#include "compiler/delete_stack_stack.h"
 #include "compiler/compiler_utils.h"
+#include "compiler/delete_stack_stack.h"
 #include "def_visitor.h"
 #include "utilities/defer_stack_stack.h"
 #include <sstream>
 namespace yaksha {
   struct compiler : expr_visitor, stmt_visitor {
-    explicit compiler(def_visitor& functions);
+    explicit compiler(def_visitor &functions);
     ~compiler() override;
     std::string compile(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -48,7 +48,7 @@ private:
      */
     static std::string convert_dt(token *basic_dt);
     // TODO use the one in type checker
-    static object_type convert_data_type(token* type_in_code);
+    static object_type convert_data_type(token *type_in_code);
     void push_scope_type(ast_type scope_type);
     ast_type peek_scope_type();
     void pop_scope_type();
@@ -82,7 +82,7 @@ private:
     // Delete stack for strings
     delete_stack_stack deletions_{};
     // Access functions by name
-    def_visitor& functions_;
+    def_visitor &functions_;
     // Different types of scopes stack, -> are we in function body, if or while
     std::vector<ast_type> scope_type_stack_{};
     // Defer stack

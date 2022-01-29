@@ -88,7 +88,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   }
   code << ")";
   // TODO: If return type is a string, assign it to a temp, that will be deleted.
-  auto return_type = convert_data_type(fn_def->return_type_);
+  auto return_type = convert_data_type(fn_def->return_type_->name_);
   if (return_type == object_type::STRING) {
     auto temp_name = temp();
     write_indent(body_);
@@ -183,7 +183,7 @@ void compiler::visit_continue_stmt(continue_stmt *obj) {
 void compiler::visit_def_stmt(def_stmt *obj) {
   // Create declaration in header section
   auto name = prefix(obj->name_->token_);
-  auto return_type = convert_dt(obj->return_type_);
+  auto return_type = convert_dt(obj->return_type_->name_);
   header_ << return_type << " " << name << "(";
   bool first = true;
   for (auto para : obj->params_) {
@@ -192,7 +192,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     } else {
       first = false;
     }
-    header_ << convert_dt(para.data_type_);
+    header_ << convert_dt(para.data_type_->name_);
   }
   header_ << ")";
   write_end_statement(header_);
@@ -205,7 +205,8 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     } else {
       first = false;
     }
-    body_ << convert_dt(para.data_type_) << " " << prefix(para.name_->token_);
+    body_ << convert_dt(para.data_type_->name_) << " "
+          << prefix(para.name_->token_);
   }
   body_ << ") ";
   ykobject func_placeholder{};
@@ -215,7 +216,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   auto function_def = functions_.get(name);
   for (auto param : function_def->params_) {
     auto placeholder = ykobject();
-    placeholder.object_type_ = convert_data_type(param.data_type_);
+    placeholder.object_type_ = convert_data_type(param.data_type_->name_);
     scope_.define(prefix(param.name_->token_), placeholder);
   }
   indent();
@@ -225,7 +226,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   defers_.push_defer_stack();
   // Delete all arg strings
   for (auto param : function_def->params_) {
-    auto param_dt = convert_data_type(param.data_type_);
+    auto param_dt = convert_data_type(param.data_type_->name_);
     if (param_dt == object_type::STRING) {
       auto to_delete = prefix(param.name_->token_);
       deletions_.push(to_delete, "yk__sdsfree(" + to_delete + ")");
@@ -250,7 +251,6 @@ void compiler::visit_if_stmt(if_stmt *obj) {
   // if () -> block
   obj->expression_->accept(this);
   auto if_expr = pop();
-
   write_indent(body_);
   body_ << "if (" << if_expr.first << ")";
   scope_.push();
@@ -281,7 +281,7 @@ void compiler::visit_if_stmt(if_stmt *obj) {
 void compiler::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_);
   auto object = ykobject();
-  if (obj->data_type_->token_ == "str") {
+  if (obj->data_type_->name_->token_ == "str") {
     object.object_type_ = object_type::STRING;
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
@@ -301,7 +301,7 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   } else {// TODO assumed to be int, handle other types.
     write_indent(body_);
     object.object_type_ = object_type::INTEGER;
-    body_ << convert_dt(obj->data_type_) << " " << name;
+    body_ << convert_dt(obj->data_type_->name_) << " " << name;
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
       auto exp = pop();

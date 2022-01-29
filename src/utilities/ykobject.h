@@ -9,7 +9,7 @@ namespace yaksha {
   enum class control_flow_change { BREAK, RETURN, CONTINUE, NO_CHANGE, ERROR };
   enum class object_type {
     INTEGER,
-    DOUBLE, // TODO Create different integer types and float types
+    DOUBLE,// TODO Create different integer types and float types
     STRING,
     NONE_OBJ,
     BOOL,

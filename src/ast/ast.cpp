@@ -102,13 +102,13 @@ stmt *ast_pool::c_continue_stmt(token *continue_token) {
   return o;
 }
 def_stmt::def_stmt(token *name, std::vector<parameter> params,
-                   stmt *function_body, token *return_type)
+                   stmt *function_body, ykdatatype *return_type)
     : name_(name), params_(std::move(params)), function_body_(function_body),
       return_type_(return_type) {}
 void def_stmt::accept(stmt_visitor *v) { v->visit_def_stmt(this); }
 ast_type def_stmt::get_type() { return ast_type::STMT_DEF; }
 stmt *ast_pool::c_def_stmt(token *name, std::vector<parameter> params,
-                           stmt *function_body, token *return_type) {
+                           stmt *function_body, ykdatatype *return_type) {
   auto o = new def_stmt(name, std::move(params), function_body, return_type);
   cleanup_stmt_.push_back(o);
   return o;
@@ -145,11 +145,12 @@ stmt *ast_pool::c_if_stmt(token *if_keyword, expr *expression, stmt *if_branch,
   cleanup_stmt_.push_back(o);
   return o;
 }
-let_stmt::let_stmt(token *name, token *data_type, expr *expression)
+let_stmt::let_stmt(token *name, ykdatatype *data_type, expr *expression)
     : name_(name), data_type_(data_type), expression_(expression) {}
 void let_stmt::accept(stmt_visitor *v) { v->visit_let_stmt(this); }
 ast_type let_stmt::get_type() { return ast_type::STMT_LET; }
-stmt *ast_pool::c_let_stmt(token *name, token *data_type, expr *expression) {
+stmt *ast_pool::c_let_stmt(token *name, ykdatatype *data_type,
+                           expr *expression) {
   auto o = new let_stmt(name, data_type, expression);
   cleanup_stmt_.push_back(o);
   return o;

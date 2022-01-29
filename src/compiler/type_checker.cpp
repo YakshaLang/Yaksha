@@ -68,14 +68,14 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   for (auto i = 0; i < funct->params_.size(); i++) {
     auto param = funct->params_[i];
     auto arg = arguments[i];
-    if (!match_data_type(param.data_type_, arg)) {
+    if (!match_data_type(param.data_type_->name_, arg)) {
       std::stringstream message{};
       message << "Parameter & argument " << (i + 1) << " mismatches";
       error(obj->paren_token_, message.str());
     }
   }
   auto data = ykobject();
-  data.object_type_ = convert_data_type(funct->return_type_);
+  data.object_type_ = convert_data_type(funct->return_type_->name_);
   push(data);
 }
 void type_checker::visit_grouping_expr(grouping_expr *obj) {
@@ -161,7 +161,7 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
       error(param.name_, "Parameter shadows outer scope name.");
     } else {
       auto data = ykobject();
-      data.object_type_ = convert_data_type(param.data_type_);
+      data.object_type_ = convert_data_type(param.data_type_->name_);
       scope_.define(name, data);
     }
   }
@@ -191,7 +191,7 @@ void type_checker::visit_if_stmt(if_stmt *obj) {
 void type_checker::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_);
   auto placeholder = ykobject();
-  placeholder.object_type_ = convert_data_type(obj->data_type_);
+  placeholder.object_type_ = convert_data_type(obj->data_type_->name_);
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto expression_data = pop();
@@ -217,7 +217,7 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
   } else {
     // func cannot be null here.
     auto func = this->functions_.get(function_name);
-    if (convert_data_type(func->return_type_) !=
+    if (convert_data_type(func->return_type_->name_) !=
         return_data_type.object_type_) {
       error(obj->return_keyword_, "Invalid return data type");
     }
@@ -238,9 +238,7 @@ void type_checker::visit_while_stmt(while_stmt *obj) {
 }
 void type_checker::check(const std::vector<stmt *> &statements) {
   functions_.extract(statements);
-  for (const auto& err: functions_.errors_) {
-    errors_.emplace_back(err);
-  }
+  for (const auto &err : functions_.errors_) { errors_.emplace_back(err); }
   auto main_function_name = prefix("main");
   if (!functions_.has(main_function_name)) {
     error("Critical !! main() function must be present");
@@ -249,7 +247,8 @@ void type_checker::check(const std::vector<stmt *> &statements) {
     if (!main_function->params_.empty()) {
       error("Critical !! main() function must not have parameters");
     }
-    if (convert_data_type(main_function->return_type_) != object_type::INTEGER) {
+    if (convert_data_type(main_function->return_type_->name_) !=
+        object_type::INTEGER) {
       error("Critical !! main() function must return an integer");
     }
   }

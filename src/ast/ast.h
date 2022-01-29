@@ -3,6 +3,7 @@
 #ifndef AST_H
 #define AST_H
 #include "tokenizer/token.h"
+#include "utilities/ykdatatype.h"
 #include <vector>
 namespace yaksha {
   // ------ forward declarations ------
@@ -171,13 +172,13 @@ namespace yaksha {
   };
   struct def_stmt : stmt {
     def_stmt(token *name, std::vector<parameter> params, stmt *function_body,
-             token *return_type);
+             ykdatatype *return_type);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *name_;
     std::vector<parameter> params_;
     stmt *function_body_;
-    token *return_type_;
+    ykdatatype *return_type_;
   };
   struct defer_stmt : stmt {
     defer_stmt(token *defer_keyword, expr *expression);
@@ -204,11 +205,11 @@ namespace yaksha {
     stmt *else_branch_;
   };
   struct let_stmt : stmt {
-    let_stmt(token *name, token *data_type, expr *expression);
+    let_stmt(token *name, ykdatatype *data_type, expr *expression);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *name_;
-    token *data_type_;
+    ykdatatype *data_type_;
     expr *expression_;
   };
   struct pass_stmt : stmt {
@@ -256,12 +257,12 @@ namespace yaksha {
     stmt *c_break_stmt(token *break_token);
     stmt *c_continue_stmt(token *continue_token);
     stmt *c_def_stmt(token *name, std::vector<parameter> params,
-                     stmt *function_body, token *return_type);
+                     stmt *function_body, ykdatatype *return_type);
     stmt *c_defer_stmt(token *defer_keyword, expr *expression);
     stmt *c_expression_stmt(expr *expression);
     stmt *c_if_stmt(token *if_keyword, expr *expression, stmt *if_branch,
                     token *else_keyword, stmt *else_branch);
-    stmt *c_let_stmt(token *name, token *data_type, expr *expression);
+    stmt *c_let_stmt(token *name, ykdatatype *data_type, expr *expression);
     stmt *c_pass_stmt(token *pass_token);
     stmt *c_print_stmt(token *print_keyword, expr *expression);
     stmt *c_return_stmt(token *return_keyword, expr *expression);
@@ -277,7 +278,7 @@ private:
 */
   struct parameter {
     token *name_;
-    token *data_type_;
+    ykdatatype *data_type_;
   };
 }// namespace yaksha
 #endif
