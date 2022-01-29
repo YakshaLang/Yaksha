@@ -1,0 +1,26 @@
+# Compiler sample
+def factorial(x: int) -> int:
+    if x <= 0:
+        return 1
+    return x * factorial(x - 1)
+
+
+def on_end(n: int) -> int:
+    print(n)
+    print(" From defer --> Program Completed\n")
+    return 0
+
+
+def main() -> int:
+    defer(on_end(1))
+    defer(on_end(2))
+    a: int = 10
+    b: str = "b"
+    while a > 0:
+        print(factorial(a))
+        print("\n")
+        a = a - 1
+        b = "a" + b
+    print(b)
+    print("\n")
+    return 0
