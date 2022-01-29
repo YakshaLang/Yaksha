@@ -90,8 +90,9 @@ OPERATORS = "+ - * ** / // % @ << >> & | ^ ~ := < > <= >= == != ( ) " \
 
 INPUT_DATA = []
 for i in INPUT_FILES:
-    with open(i, encoding="utf-8") as h:
-        INPUT_DATA.append(h.read().splitlines())
+    if os.path.isfile(i):
+        with open(i, encoding="utf-8") as h:
+            INPUT_DATA.append(h.read().splitlines())
 
 
 def random_pos(item, must_have_content=False, max_iterations=100) -> int:
