@@ -6,9 +6,9 @@
 using namespace yaksha;
 #define NUMBER_OPERATION(operator)                                             \
   do {                                                                         \
-    if (left_val.object_type_ == object_type::INTEGER) {                       \
+    if (left_val.is_primitive() && left_val.datatype_->is_int()) {             \
       push(ykobject(left_val.integer_val_ operator right_val.integer_val_));   \
-    } else if (left_val.object_type_ == object_type::DOUBLE) {                 \
+    } else if (left_val.is_primitive() && left_val.datatype_->is_f64()) {      \
       push(ykobject(left_val.double_val_ operator right_val.double_val_));     \
     } else {                                                                   \
       push(ykobject{"Unsupported binary operation for strings", obj->opr_});   \
@@ -18,24 +18,24 @@ using namespace yaksha;
   do {                                                                         \
     bool found_val = false;                                                    \
     if ((tk) == token_type::EQ_EQ) {                                           \
-      if (left_val.object_type_ != right_val.object_type_) {                   \
+      if (!left_val.is_same_datatype(right_val)) {                             \
         found_val = true;                                                      \
         push(ykobject(false));                                                 \
       }                                                                        \
     } else if ((tk) == token_type::NOT_EQ) {                                   \
-      if (left_val.object_type_ != right_val.object_type_) {                   \
+      if (!left_val.is_same_datatype(right_val)) {                             \
         found_val = true;                                                      \
-        push(ykobject(false));                                                 \
+        push(ykobject(true));                                                  \
       }                                                                        \
     }                                                                          \
     if (!found_val) {                                                          \
-      if (left_val.object_type_ == object_type::INTEGER) {                     \
+      if (left_val.is_primitive() && left_val.datatype_->is_int()) {           \
         push(ykobject(left_val.integer_val_ operator right_val.integer_val_)); \
-      } else if (left_val.object_type_ == object_type::DOUBLE) {               \
+      } else if (left_val.is_primitive() && left_val.datatype_->is_f64()) {    \
         push(ykobject(left_val.double_val_ operator right_val.double_val_));   \
-      } else if (left_val.object_type_ == object_type::STRING) {               \
+      } else if (left_val.is_primitive() && left_val.datatype_->is_str()) {    \
         push(ykobject(left_val.string_val_ operator right_val.string_val_));   \
-      } else if (left_val.object_type_ == object_type::NONE_OBJ) {             \
+      } else if (left_val.is_primitive() && left_val.datatype_->is_none()) {   \
         push(ykobject((tk) == token_type::EQ_EQ));                             \
       } else {                                                                 \
         push(ykobject{"Unsupported binary operation", obj->opr_});             \
@@ -44,12 +44,12 @@ using namespace yaksha;
   } while (0)
 #define VALIDATE_NON_NULL_SAME_DATA_TYPE                                       \
   do {                                                                         \
-    if (left_val.object_type_ != right_val.object_type_) {                     \
+    if (!left_val.is_same_datatype(right_val)) {                               \
       push(ykobject{"Different data types..?", obj->opr_});                    \
       return;                                                                  \
     }                                                                          \
-    if (left_val.object_type_ == object_type::NONE_OBJ ||                      \
-        right_val.object_type_ == object_type::NONE_OBJ) {                     \
+    if ((left_val.is_primitive() && left_val.datatype_->is_none()) ||          \
+        (right_val.is_primitive() && right_val.datatype_->is_none())) {        \
       push(ykobject{"Cannot operate on None", obj->opr_});                     \
       return;                                                                  \
     }                                                                          \
@@ -74,7 +74,7 @@ void interpreter::visit_binary_expr(binary_expr *obj) {
   switch (obj->opr_->type_) {
     case token_type::PLUS:
       VALIDATE_NON_NULL_SAME_DATA_TYPE;
-      if (left_val.object_type_ == object_type::STRING) {
+      if (left_val.is_primitive() && left_val.datatype_->is_str()) {
         push(ykobject(left_val.string_val_ + right_val.string_val_));
         return;
       }
@@ -86,7 +86,7 @@ void interpreter::visit_binary_expr(binary_expr *obj) {
       break;
     case token_type::DIV:
       VALIDATE_NON_NULL_SAME_DATA_TYPE;
-      if (right_val.object_type_ == object_type::INTEGER) {
+      if (left_val.is_primitive() && left_val.datatype_->is_int()) {
         if (right_val.integer_val_ == 0) {
           push(ykobject{"Integer division by zero", obj->opr_});
           return;
@@ -168,9 +168,9 @@ void interpreter::visit_unary_expr(unary_expr *obj) {
   if (has_error()) return;
   auto ex = pop();
   if (obj->opr_->type_ == token_type::SUB) {
-    if (ex.object_type_ == object_type::DOUBLE) {
+    if (ex.is_primitive() && ex.datatype_->is_f64()) {
       push(ykobject(-ex.double_val_));
-    } else if (ex.object_type_ == object_type::INTEGER) {
+    } else if (ex.is_primitive() && ex.datatype_->is_int()) {
       push(ykobject(-ex.integer_val_));
     } else {
       push(ykobject("Invalid data type", obj->opr_));
@@ -269,7 +269,7 @@ void interpreter::visit_if_stmt(if_stmt *obj) {
   obj->expression_->accept(this);
   if (has_error()) return;
   auto bool_val = peek();
-  if (bool_val.object_type_ != object_type::BOOL) {
+  if (!bool_val.is_primitive() || !bool_val.datatype_->is_bool()) {
     push(ykobject("A boolean is needed for if statement", obj->if_keyword_));
     return;
   }
@@ -288,7 +288,7 @@ void interpreter::visit_logical_expr(logical_expr *obj) {
   obj->left_->accept(this);
   if (has_error()) { return; }
   auto left_val = pop();
-  if (left_val.object_type_ != object_type::BOOL) {
+  if (!left_val.is_primitive() || !left_val.datatype_->is_bool()) {
     // We are not using truthy stuff in our language
     // such as "" being false for example I may change my mind later though :)
     push(ykobject("Only boolean expressions can be used on LHS", obj->opr_));
@@ -316,7 +316,7 @@ void interpreter::visit_while_stmt(while_stmt *obj) {
     if (has_error()) { return; }
     auto condition = peek();
     // Type checking for a valid bool type!
-    if (condition.object_type_ != object_type::BOOL) {
+    if (!condition.is_primitive() || !condition.datatype_->is_bool()) {
       push(ykobject("Only boolean expressions can be used in a while",
                     obj->while_keyword_));
       return;
@@ -372,7 +372,7 @@ void interpreter::visit_fncall_expr(fncall_expr *obj) {
   }
   // Verify arguments before we call the function
   ykobject verification = fn.fn_val_->verify(arguments);
-  if (verification.object_type_ != object_type::NONE_OBJ) {
+  if (!verification.is_primitive() || !verification.datatype_->is_none()) {
     // error with verification of given arguments
     push(verification);
     return;
@@ -402,7 +402,7 @@ void interpreter::visit_def_stmt(def_stmt *obj) {
   func_pool_.emplace_back(ud);
 }
 void interpreter::debug_print_stack() {
-  for (auto a : object_stack_) {
+  for (const auto &a : object_stack_) {
     std::cout << a;
     std::cout << "\n";
   }

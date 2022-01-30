@@ -344,20 +344,19 @@ stmt *parser::def_statement() {
   return pool_.c_def_stmt(name, params, body, return_dt);
 }
 ykdatatype *parser::parse_datatype() {
-  auto dt = dtpool_.create();
   if (!match({token_type::NAME, token_type::KEYWORD_NONE})) {
     throw error(peek(), "Must have a data type.");
   }
-  dt->name_ = previous();
+  auto dt = dtpool_.create(previous());
   if (match({token_type::SQUARE_BRACKET_OPEN})) {
     if (dt->is_primitive()) {
-      throw error(dt->name_,
+      throw error(dt->token_,
                   "Primitive data types cannot have internal data types.");
     }
     do {
       auto arg = parse_datatype();
       if (arg->is_none()) {
-        throw error(dt->name_,
+        throw error(dt->token_,
                     "None cannot be used as an argument for a data type.");
       }
       dt->args_.push_back(arg);

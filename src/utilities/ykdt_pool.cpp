@@ -6,8 +6,8 @@ ykdt_pool::~ykdt_pool() {
   for (auto item : pool_) { delete (item); }
   pool_.clear();
 }
-ykdatatype *ykdt_pool::create() {
-  auto dt = new ykdatatype();
+ykdatatype *ykdt_pool::create(token *tok) {
+  auto dt = new ykdatatype(tok);
   pool_.emplace_back(dt);
   return dt;
 }

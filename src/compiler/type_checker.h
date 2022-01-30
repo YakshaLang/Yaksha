@@ -41,9 +41,6 @@ namespace yaksha {
     def_visitor functions_{};
 
 private:
-    static bool match_data_type(token *type_in_code,
-                                const ykobject &type_in_checker);
-    static object_type convert_data_type(token *type_in_code);
     ykobject pop();
     void push(const ykobject &data_type);
     void error(token *tok, const std::string &message);

@@ -28,17 +28,15 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
     error(obj->opr_,
           "Binary operation between two different data types is not supported");
   }
-  if ((oper == token_type::PLUS) && (rhs.object_type_ != object_type::DOUBLE &&
-                                     rhs.object_type_ != object_type::INTEGER &&
-                                     rhs.object_type_ != object_type::STRING)) {
+  if ((oper == token_type::PLUS) &&
+      (rhs.is_primitive() && rhs.datatype_->support_plus())) {
     error(obj->opr_, "Unsupported operation");
   }
   if ((oper == token_type::SUB || oper == token_type::MUL ||
        oper == token_type::DIV || oper == token_type::GREAT ||
        oper == token_type::GREAT_EQ || oper == token_type::LESS ||
        oper == token_type::LESS_EQ) &&
-      (rhs.object_type_ != object_type::DOUBLE &&
-       rhs.object_type_ != object_type::INTEGER)) {
+      (!rhs.is_primitive() || !rhs.datatype_->is_a_number())) {
     error(obj->opr_, "Unsupported operation");
   }
   push(rhs);
@@ -68,14 +66,13 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   for (auto i = 0; i < funct->params_.size(); i++) {
     auto param = funct->params_[i];
     auto arg = arguments[i];
-    if (!match_data_type(param.data_type_->name_, arg)) {
+    if (!(arg.is_primitive() && *arg.datatype_ == *param.data_type_)) {
       std::stringstream message{};
       message << "Parameter & argument " << (i + 1) << " mismatches";
       error(obj->paren_token_, message.str());
     }
   }
-  auto data = ykobject();
-  data.object_type_ = convert_data_type(funct->return_type_->name_);
+  auto data = ykobject(funct->return_type_);
   push(data);
 }
 void type_checker::visit_grouping_expr(grouping_expr *obj) {
@@ -88,17 +85,17 @@ void type_checker::visit_literal_expr(literal_expr *obj) {
   auto literal_type = obj->literal_token_->type_;
   if (literal_type == token_type::STRING ||
       literal_type == token_type::THREE_QUOTE_STRING) {
-    data.object_type_ = object_type::STRING;
+    data = ykobject(std::string{"str"});
   } else if (literal_type == token_type::KEYWORD_TRUE ||
              literal_type == token_type::KEYWORD_FALSE) {
-    data.object_type_ = object_type::BOOL;
+    data = ykobject(true);
   } else if (literal_type == token_type::INTEGER_BIN ||
              literal_type == token_type::INTEGER_OCT ||
              literal_type == token_type::INTEGER_DECIMAL ||
              literal_type == token_type::INTEGER_HEX) {
-    data.object_type_ = object_type::INTEGER;
+    data = ykobject(1);
   } else if (literal_type == token_type::FLOAT_NUMBER) {
-    data.object_type_ = object_type::DOUBLE;
+    data = ykobject(1.2);
   }// else - none data type by default
   push(data);
 }
@@ -107,8 +104,8 @@ void type_checker::visit_logical_expr(logical_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
-  if (rhs.object_type_ != object_type::BOOL ||
-      lhs.object_type_ != object_type::BOOL) {
+  if (!(lhs.is_primitive() && lhs.datatype_->is_bool() && lhs.is_primitive() &&
+        lhs.datatype_->is_bool())) {
     error(obj->opr_, "Both LHS and RHS of logical"
                      " operator need to be boolean");
   }
@@ -117,8 +114,7 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
   // -5 - correct, -"some string" is not
   obj->right_->accept(this);
   auto rhs = pop();
-  if (rhs.object_type_ != object_type::INTEGER &&
-      rhs.object_type_ != object_type::DOUBLE) {
+  if (!rhs.is_primitive() || !rhs.datatype_->is_a_number()) {
     error(obj->opr_, "Invalid unary operation");
   }
   push(rhs);
@@ -160,8 +156,7 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
     if (scope_.is_defined(name)) {
       error(param.name_, "Parameter shadows outer scope name.");
     } else {
-      auto data = ykobject();
-      data.object_type_ = convert_data_type(param.data_type_->name_);
+      auto data = ykobject(param.data_type_);
       scope_.define(name, data);
     }
   }
@@ -176,7 +171,8 @@ void type_checker::visit_expression_stmt(expression_stmt *obj) {
 void type_checker::visit_if_stmt(if_stmt *obj) {
   obj->expression_->accept(this);
   auto bool_expression = pop();
-  if (bool_expression.object_type_ != object_type::BOOL) {
+  if (!bool_expression.is_primitive() ||
+      !bool_expression.datatype_->is_bool()) {
     error(obj->if_keyword_, "Invalid boolean expression used");
   }
   scope_.push();
@@ -190,8 +186,7 @@ void type_checker::visit_if_stmt(if_stmt *obj) {
 }
 void type_checker::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_);
-  auto placeholder = ykobject();
-  placeholder.object_type_ = convert_data_type(obj->data_type_->name_);
+  auto placeholder = ykobject(obj->data_type_);
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto expression_data = pop();
@@ -217,8 +212,8 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
   } else {
     // func cannot be null here.
     auto func = this->functions_.get(function_name);
-    if (convert_data_type(func->return_type_->name_) !=
-        return_data_type.object_type_) {
+    if (!(return_data_type.is_primitive() &&
+          *return_data_type.datatype_ == *func->return_type_)) {
       error(obj->return_keyword_, "Invalid return data type");
     }
   }
@@ -226,7 +221,7 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
 void type_checker::visit_while_stmt(while_stmt *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
-  if (exp.object_type_ != object_type::BOOL) {
+  if (!exp.is_primitive() || !exp.datatype_->is_bool()) {
     error(obj->while_keyword_,
           "While statement expression need to be a boolean");
   }
@@ -247,8 +242,7 @@ void type_checker::check(const std::vector<stmt *> &statements) {
     if (!main_function->params_.empty()) {
       error("Critical !! main() function must not have parameters");
     }
-    if (convert_data_type(main_function->return_type_->name_) !=
-        object_type::INTEGER) {
+    if (!main_function->return_type_->is_int()) {
       error("Critical !! main() function must return an integer");
     }
   }
@@ -280,21 +274,6 @@ ykobject type_checker::pop() {
   auto back = object_stack_.back();
   object_stack_.pop_back();
   return back;
-}
-bool type_checker::match_data_type(token *type_in_code,
-                                   const ykobject &type_in_checker) {
-  return convert_data_type(type_in_code) == type_in_checker.object_type_;
-}
-object_type type_checker::convert_data_type(token *basic_dt) {
-  auto dt = basic_dt->token_;
-  if (dt == "str") {
-    return object_type::STRING;
-  } else if (dt == "int" || dt == "i32") {
-    return object_type::INTEGER;
-  } else if (dt == "float") {
-    return object_type::DOUBLE;
-  }
-  return object_type::NONE_OBJ;
 }
 void type_checker::push_scope_type(ast_type scope_type) {
   this->scope_type_stack_.emplace_back(scope_type);
