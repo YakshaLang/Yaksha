@@ -7,7 +7,7 @@ namespace yaksha {
   struct ykdt_pool {
     ykdt_pool();
     ~ykdt_pool();
-    ykdatatype *create();
+    ykdatatype *create(token *tok);
 
 private:
     std::vector<ykdatatype *> pool_;

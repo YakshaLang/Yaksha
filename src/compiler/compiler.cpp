@@ -12,7 +12,7 @@ void compiler::visit_assign_expr(assign_expr *obj) {
   auto name = prefix(obj->name_->token_);
   auto rhs = pop();
   write_indent(body_);
-  if (rhs.second == object_type::STRING) {
+  if (rhs.second.is_primitive() && rhs.second.datatype_->is_str()) {
     // free current value.
     body_ << "yk__sdsfree(" << name << ")";
     write_end_statement(body_);
@@ -35,7 +35,7 @@ void compiler::visit_binary_expr(binary_expr *obj) {
   // Note: we are assuming data type to be same as first,
   // Since this will be type checked using type_checker.
   auto data_type = lhs.second;
-  if (data_type == object_type::STRING) {
+  if (data_type.is_primitive() && data_type.datatype_->is_str()) {
     if (obj->opr_->type_ == token_type::EQ_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") == 0)",
            data_type);
@@ -80,7 +80,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     } else {
       first = false;
     }
-    if (arg_val.second == object_type::STRING) {
+    if (arg_val.second.is_primitive() && arg_val.second.datatype_->is_str()) {
       code << "yk__sdsdup(" << arg_val.first << ")";
     } else {
       code << arg_val.first;
@@ -88,16 +88,16 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   }
   code << ")";
   // TODO: If return type is a string, assign it to a temp, that will be deleted.
-  auto return_type = convert_data_type(fn_def->return_type_->name_);
-  if (return_type == object_type::STRING) {
+  auto return_type = fn_def->return_type_;
+  if (return_type->is_str()) {
     auto temp_name = temp();
     write_indent(body_);
     body_ << "yk__sds " << temp_name << " = " << code.str();
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
-    push("(" + temp_name + ")", return_type);
+    push("(" + temp_name + ")", ykobject(return_type));
   } else {
-    push(code.str(), return_type);
+    push(code.str(), ykobject(return_type));
   }
 }
 void compiler::visit_grouping_expr(grouping_expr *obj) {
@@ -120,10 +120,12 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     }
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
-    push(temp_name, object_type::STRING);
-  } else {// Assume this is int for now
+    push(temp_name,
+         ykobject(std::string{"str"}));// Note: dummy value for ykobject
+  } else {                             // Assume this is int for now
     // TODO support for other data types
-    push(obj->literal_token_->token_, object_type::INTEGER);
+    push(obj->literal_token_->token_,
+         ykobject(0));// Note dummy value for ykobject
   }
 }
 void compiler::visit_logical_expr(logical_expr *obj) {
@@ -137,7 +139,8 @@ void compiler::visit_logical_expr(logical_expr *obj) {
   } else {
     operator_token = " || ";
   }
-  push("(" + lhs.first + operator_token + rhs.first + ")", object_type::BOOL);
+  // Note: dummy value is placed inside ykobject
+  push("(" + lhs.first + operator_token + rhs.first + ")", ykobject(true));
 }
 void compiler::visit_unary_expr(unary_expr *obj) {
   // Note: this is not supported by strings only numbers/floats
@@ -152,8 +155,7 @@ void compiler::visit_variable_expr(variable_expr *obj) {
   // Compiler is visiting a variable, can get data type from scope_
   auto name = prefix(obj->name_->token_);
   auto object = scope_.get(name);
-  auto data_type = object.object_type_;
-  push(name, data_type);
+  push(name, object);
 }
 void compiler::visit_block_stmt(block_stmt *obj) {
   // block will be compiled to '{' + statements + '}'
@@ -183,7 +185,7 @@ void compiler::visit_continue_stmt(continue_stmt *obj) {
 void compiler::visit_def_stmt(def_stmt *obj) {
   // Create declaration in header section
   auto name = prefix(obj->name_->token_);
-  auto return_type = convert_dt(obj->return_type_->name_);
+  auto return_type = convert_dt(obj->return_type_->token_);
   header_ << return_type << " " << name << "(";
   bool first = true;
   for (auto para : obj->params_) {
@@ -192,7 +194,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     } else {
       first = false;
     }
-    header_ << convert_dt(para.data_type_->name_);
+    header_ << convert_dt(para.data_type_->token_);
   }
   header_ << ")";
   write_end_statement(header_);
@@ -205,7 +207,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     } else {
       first = false;
     }
-    body_ << convert_dt(para.data_type_->name_) << " "
+    body_ << convert_dt(para.data_type_->token_) << " "
           << prefix(para.name_->token_);
   }
   body_ << ") ";
@@ -215,8 +217,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   scope_.push();
   auto function_def = functions_.get(name);
   for (auto param : function_def->params_) {
-    auto placeholder = ykobject();
-    placeholder.object_type_ = convert_data_type(param.data_type_->name_);
+    auto placeholder = ykobject(param.data_type_);
     scope_.define(prefix(param.name_->token_), placeholder);
   }
   indent();
@@ -226,8 +227,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   defers_.push_defer_stack();
   // Delete all arg strings
   for (auto param : function_def->params_) {
-    auto param_dt = convert_data_type(param.data_type_->name_);
-    if (param_dt == object_type::STRING) {
+    if (param.data_type_->is_str()) {
       auto to_delete = prefix(param.name_->token_);
       deletions_.push(to_delete, "yk__sdsfree(" + to_delete + ")");
     }
@@ -281,8 +281,8 @@ void compiler::visit_if_stmt(if_stmt *obj) {
 void compiler::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_);
   auto object = ykobject();
-  if (obj->data_type_->name_->token_ == "str") {
-    object.object_type_ = object_type::STRING;
+  if (obj->data_type_->token_->token_ == "str") {
+    object = ykobject(std::string{"str"});
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
       auto exp = pop();
@@ -300,8 +300,8 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     deletions_.push(name, "yk__sdsfree(" + name + ")");
   } else {// TODO assumed to be int, handle other types.
     write_indent(body_);
-    object.object_type_ = object_type::INTEGER;
-    body_ << convert_dt(obj->data_type_->name_) << " " << name;
+    object = ykobject(1);
+    body_ << convert_dt(obj->data_type_->token_) << " " << name;
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
       auto exp = pop();
@@ -319,11 +319,11 @@ void compiler::visit_pass_stmt(pass_stmt *obj) {
 void compiler::visit_print_stmt(print_stmt *obj) {
   obj->expression_->accept(this);
   auto rhs = pop();
-  if (rhs.second == object_type::INTEGER) {
+  if (rhs.second.is_primitive() && rhs.second.datatype_->is_int()) {
     write_indent(body_);
     body_ << "printf(\"%d\", (" << rhs.first << "))";
     write_end_statement(body_);
-  } else if (rhs.second == object_type::STRING) {
+  } else if (rhs.second.is_primitive() && rhs.second.datatype_->is_str()) {
     // TODO do not assume it's all ascii, and works fine :p
     write_indent(body_);
     body_ << "printf(\"%s\", (" << rhs.first << "))";
@@ -407,11 +407,11 @@ std::string compiler::compile(const std::vector<stmt *> &statements) {
   code << "int main(void) { return yy__main(); }";
   return code.str();
 }
-void compiler::push(const std::string &expr, object_type data_type) {
+void compiler::push(const std::string &expr, const ykobject &data_type) {
   expr_stack_.push_back(expr);
   type_stack_.push_back(data_type);
 }
-std::pair<std::string, object_type> compiler::pop() {
+std::pair<std::string, ykobject> compiler::pop() {
   auto p = std::make_pair(expr_stack_.back(), type_stack_.back());
   expr_stack_.pop_back();
   type_stack_.pop_back();
@@ -420,17 +420,6 @@ std::pair<std::string, object_type> compiler::pop() {
 void compiler::write_prev_indent(std::stringstream &where) const {
   auto indent = indent_ - 1;
   ::write_indent(where, indent);
-}
-object_type compiler::convert_data_type(token *type_in_code) {
-  auto dt = type_in_code->token_;
-  if (dt == "str") {
-    return object_type::STRING;
-  } else if (dt == "int" || dt == "i32") {
-    return object_type::INTEGER;
-  } else if (dt == "float") {
-    return object_type::DOUBLE;
-  }
-  return object_type::NONE_OBJ;
 }
 void compiler::push_scope_type(ast_type scope_type) {
   this->scope_type_stack_.emplace_back(scope_type);

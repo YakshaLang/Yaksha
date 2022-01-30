@@ -5,8 +5,25 @@
 #include <sstream>
 #include <vector>
 namespace yaksha {
+  enum class ykprimitive {
+    I8,
+    I16,
+    I32,
+    I64,
+    F32,
+    F64,
+    U8,
+    U16,
+    U32,
+    U64,
+    STR,
+    BOOL,
+    NONE,
+    NOT_A_PRIMITIVE,
+  };
   struct ykdatatype {
-    ykdatatype();
+    explicit ykdatatype(token *primitive_dt);
+    explicit ykdatatype(std::string primitive_dt);
     ~ykdatatype();
     // Quick Checks for Primitive Data Types
     [[nodiscard]] bool is_int() const;
@@ -27,11 +44,17 @@ namespace yaksha {
     [[nodiscard]] bool is_f64() const;
     [[nodiscard]] bool is_none() const;
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
-    token *name_{};
+    token *token_{};
+    std::string type_{};
+    bool delete_token_{false};
     std::vector<ykdatatype *> args_;
+    ykprimitive primitive_type_{ykprimitive::NOT_A_PRIMITIVE};
+    [[nodiscard]] bool support_plus() const;
+    [[nodiscard]] bool is_a_number() const;
 
 private:
     void write_to_str(std::stringstream &s) const;
+    void find_primitive_type();
   };
   inline bool operator==(const yaksha::ykdatatype &lhs,
                          const yaksha::ykdatatype &rhs) {

@@ -47,8 +47,6 @@ private:
      * @return converted data type.
      */
     static std::string convert_dt(token *basic_dt);
-    // TODO use the one in type checker
-    static object_type convert_data_type(token *type_in_code);
     void push_scope_type(ast_type scope_type);
     ast_type peek_scope_type();
     void pop_scope_type();
@@ -57,8 +55,8 @@ private:
     static void write_end_statement(std::stringstream &where);
     void indent();
     void dedent();
-    void push(const std::string &expr, object_type data_type);
-    std::pair<std::string, object_type> pop();
+    void push(const std::string &expr, const ykobject &data_type);
+    std::pair<std::string, ykobject> pop();
     // Indentation to generate
     int indent_{0};
     // Counter for temp variables.
@@ -78,7 +76,7 @@ private:
     // Note this does not check for types.
     // This is just to place current type.
     // type_checker round should do the type checking, before compiler.
-    std::vector<object_type> type_stack_{};
+    std::vector<ykobject> type_stack_{};
     // Delete stack for strings
     delete_stack_stack deletions_{};
     // Access functions by name
