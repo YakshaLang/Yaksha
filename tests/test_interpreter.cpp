@@ -220,7 +220,7 @@ TEST_CASE("interpreter: call a function recursive") {
     interpreter ip{};
     ip.calculate(expression);
     auto result = ip.result();
-    REQUIRE(result->integer_val_ == 120); // 5!
+    REQUIRE(result->integer_val_ == 120);// 5!
     REQUIRE(result->object_type_ == object_type::INTEGER);
   } else {
     FAIL("Must parse the expression");
@@ -241,7 +241,8 @@ TEST_CASE("interpreter: not a callable") {
     interpreter ip{};
     ip.calculate(expression);
     auto result = ip.result();
-    REQUIRE(result->string_val_ == "\ncode.py:2:12 at \")\" --> Not a callable");
+    REQUIRE(result->string_val_ ==
+            "\ncode.py:2:12 at \")\" --> Not a callable");
     REQUIRE(result->object_type_ == object_type::RUNTIME_ERROR);
   } else {
     FAIL("Must parse the expression");

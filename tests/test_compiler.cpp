@@ -49,11 +49,11 @@ using namespace yaksha;
       REQUIRE(false);                                                          \
     }                                                                          \
   } while (0)
-TEST_CASE("compiler Test: Hello World") {
+TEST_CASE("compiler: Hello World") {
   TEST_FILE("../test_data/compiler_tests/test1.yaka", "test1.yaka",
             "../test_data/compiler_tests/test1.tokens");
 }
-TEST_CASE("compiler Test: Defer") {
+TEST_CASE("compiler: Defer") {
   TEST_FILE("../test_data/compiler_tests/test2.yaka", "test2.yaka",
             "../test_data/compiler_tests/test2.tokens");
 }

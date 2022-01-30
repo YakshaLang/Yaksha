@@ -2,14 +2,14 @@
 #include "ast/ast_vis.h"
 #include "ast/interpreter.h"
 #include "ast/parser.h"
+#include "compiler/compiler.h"
+#include "compiler/type_checker.h"
 #include "file_formats/tokens_file.h"
 #include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
 #include "utilities/error_printer.h"
-#include "compiler/type_checker.h"
-#include "compiler/compiler.h"
 using namespace yaksha;
-void test_interpreter(const std::string& data, const std::string& file_name) {
+void test_interpreter(const std::string &data, const std::string &file_name) {
   tokenizer t{file_name, data};
   t.tokenize();
   if (!t.errors_.empty()) {
@@ -40,7 +40,7 @@ void test_interpreter(const std::string& data, const std::string& file_name) {
     return;
   }
 }
-void test_compiler(const std::string& data, const std::string& file_name) {
+void test_compiler(const std::string &data, const std::string &file_name) {
   tokenizer t{file_name, data};
   t.tokenize();
   if (!t.errors_.empty()) {
