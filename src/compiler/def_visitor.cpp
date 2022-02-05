@@ -46,3 +46,4 @@ void def_visitor::error(token *tok, const std::string &message) {
   errors_.emplace_back(err);
 }
 void def_visitor::visit_defer_stmt(defer_stmt *obj) {}
+void def_visitor::visit_class_stmt(class_stmt *obj) {}

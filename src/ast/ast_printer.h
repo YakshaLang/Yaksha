@@ -11,6 +11,7 @@ namespace yaksha {
   struct ast_printer : stmt_visitor, expr_visitor {
     explicit ast_printer() = default;
     ~ast_printer() override = default;
+    void visit_class_stmt(class_stmt *obj) override;
     /**
      * Print a given expression
      * @param st expression

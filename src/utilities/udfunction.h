@@ -23,9 +23,10 @@ namespace yaksha {
                         stmt *code, std::vector<parameter> *parameters,
                         token *token);
     ~udfunction() override;
-    ykobject verify(const std::vector<ykobject> &args, ykdt_pool* pool) override;
+    ykobject verify(const std::vector<ykobject> &args,
+                    ykdt_pool *pool) override;
     std::pair<func_control_flow, ykobject>
-    call(const std::vector<ykobject> &args, ykdt_pool* pool) override;
+    call(const std::vector<ykobject> &args, ykdt_pool *pool) override;
 
 private:
     environment *scope_;

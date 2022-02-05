@@ -10,7 +10,7 @@ namespace yaksha {
    * AST navigating Interpreter, uses a stack for returns & errors
    */
   struct interpreter : expr_visitor, stmt_visitor {
-    explicit interpreter(ykdt_pool* pool);
+    explicit interpreter(ykdt_pool *pool);
     ~interpreter() override;
     /**
      * Interpret given statements return last object in stack
@@ -18,6 +18,7 @@ namespace yaksha {
      * @return last object in stack, can be an error
      */
     void calculate(const std::vector<stmt *> &statements);
+    void visit_class_stmt(class_stmt *obj) override;
     const ykobject *result();
     void visit_binary_expr(binary_expr *obj) override;
     void visit_grouping_expr(grouping_expr *obj) override;
@@ -45,7 +46,7 @@ private:
     environment_stack globals_;
     std::vector<ykobject> object_stack_{};
     std::vector<ykfunction *> func_pool_{};
-    ykdt_pool* dt_pool_;
+    ykdt_pool *dt_pool_;
     bool has_error();
     const ykobject &peek();
     void push(ykobject obj);

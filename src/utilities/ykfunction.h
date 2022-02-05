@@ -14,14 +14,15 @@ namespace yaksha {
      * @param args args to consider
      * @return ykobject, if this is NONE_OBJ no issues, else it's a runtime error
      */
-    virtual ykobject verify(const std::vector<ykobject> &args, ykdt_pool* dt_pool);
+    virtual ykobject verify(const std::vector<ykobject> &args,
+                            ykdt_pool *dt_pool);
     /**
      * Call a function with given arguments
      * @param args arguments that this function is called with
      * @return result
      */
     virtual std::pair<func_control_flow, ykobject>
-    call(const std::vector<ykobject> &args, ykdt_pool* pool) = 0;
+    call(const std::vector<ykobject> &args, ykdt_pool *pool) = 0;
 
 private:
   };

@@ -13,6 +13,7 @@ namespace yaksha {
    */
   struct def_visitor : expr_visitor, stmt_visitor {
     def_visitor();
+    void visit_class_stmt(class_stmt *obj) override;
     ~def_visitor() override;
     void extract(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;

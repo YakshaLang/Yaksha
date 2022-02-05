@@ -13,14 +13,14 @@ namespace yaksha {
   struct ykobject {
     ykobject();
     explicit ykobject(ykdatatype *dt);
-    explicit ykobject(int i, ykdt_pool* pool);
-    explicit ykobject(bool b, ykdt_pool* pool);
-    explicit ykobject(std::string str, ykdt_pool* pool);
+    explicit ykobject(int i, ykdt_pool *pool);
+    explicit ykobject(bool b, ykdt_pool *pool);
+    explicit ykobject(std::string str, ykdt_pool *pool);
     explicit ykobject(const std::string &str, token *bad_token);
-    explicit ykobject(double dbl, ykdt_pool* pool);
+    explicit ykobject(double dbl, ykdt_pool *pool);
     explicit ykobject(ykfunction *fun);
     explicit ykobject(control_flow_change flow_change);
-    explicit ykobject(ykdt_pool* pool);
+    explicit ykobject(ykdt_pool *pool);
     [[nodiscard]] bool is_primitive() const;
     bool is_same_datatype(ykobject &other) const;
     int integer_val_{0};

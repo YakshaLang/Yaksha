@@ -49,6 +49,11 @@ ast_vis::ast_vis() {
            "            padding-right: 1px;\n"
            "            margin-bottom: 1px;\n"
            "        }\n"
+           "        code {\n"
+           "            background: #1F3C1F;\n"
+           "            color: #29ff29;\n"
+           "            padding: 0 3px;\n"
+           "        }\n"
            "    </style>\n"
            "</head>\n"
            "<body>";
@@ -193,7 +198,9 @@ void ast_vis::visit_fncall_expr(fncall_expr *obj) {
 void ast_vis::visit_def_stmt(def_stmt *obj) {
   begin_block("def-statement");
   field("name", obj->name_->token_);
-  for (auto st : obj->params_) { field("param", st.name_->token_); }
+  for (auto st : obj->params_) {
+    field("param", st.name_->token_, st.data_type_);
+  }
   text_ << "\n<br />";
   field("body", obj->function_body_);
   end_block();
@@ -202,4 +209,21 @@ void ast_vis::visit_defer_stmt(defer_stmt *obj) {
   begin_block("defer-statement");
   field("expression", obj->expression_);
   end_block();
+}
+void ast_vis::visit_class_stmt(class_stmt *obj) {
+  begin_block("class-statement");
+  field("name", obj->name_->token_);
+  for (auto st : obj->members_) {
+    field("member", st.name_->token_, st.data_type_);
+  }
+  text_ << "\n<br />";
+  end_block();
+}
+void ast_vis::field(const std::string &name, const std::string &literal_obj,
+                    ykdatatype *dt) {
+  text_ << R"(<div class="field"><div class="field_title">)"
+        << ::string_utils::html_escape(name) << "</div>";
+  text_ << ::string_utils::html_escape(literal_obj) << ": <code>";
+  text_ << ::string_utils::html_escape(dt->as_string());
+  text_ << "</code></div>";
 }

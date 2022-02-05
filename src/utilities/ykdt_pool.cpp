@@ -1,6 +1,5 @@
 // ykdt_pool.cpp
 #include "ykdt_pool.h"
-
 #include <utility>
 using namespace yaksha;
 ykdt_pool::ykdt_pool() { pool_.reserve(1000); }

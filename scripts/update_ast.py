@@ -62,7 +62,8 @@ STMTS = sorted([
     # Make sure we always say the return type
     # `def abc(a: int) -> None:`
     ("def", (("token*", "name"), ("std::vector<parameter>", "params"),
-             ("stmt*", "function_body"), ("ykdatatype*", "return_type")))
+             ("stmt*", "function_body"), ("ykdatatype*", "return_type"))),
+    ("class", (("token*", "name"), ("std::vector<parameter>", "members")))
 ], key=lambda x: x[0])
 
 # EXPR CODE GEN

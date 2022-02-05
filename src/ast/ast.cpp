@@ -92,6 +92,15 @@ stmt *ast_pool::c_break_stmt(token *break_token) {
   cleanup_stmt_.push_back(o);
   return o;
 }
+class_stmt::class_stmt(token *name, std::vector<parameter> members)
+    : name_(name), members_(std::move(members)) {}
+void class_stmt::accept(stmt_visitor *v) { v->visit_class_stmt(this); }
+ast_type class_stmt::get_type() { return ast_type::STMT_CLASS; }
+stmt *ast_pool::c_class_stmt(token *name, std::vector<parameter> members) {
+  auto o = new class_stmt(name, std::move(members));
+  cleanup_stmt_.push_back(o);
+  return o;
+}
 continue_stmt::continue_stmt(token *continue_token)
     : continue_token_(continue_token) {}
 void continue_stmt::accept(stmt_visitor *v) { v->visit_continue_stmt(this); }

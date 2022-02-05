@@ -7,9 +7,11 @@ using namespace yaksha;
 #define NUMBER_OPERATION(operator)                                             \
   do {                                                                         \
     if (left_val.is_primitive() && left_val.datatype_->is_int()) {             \
-      push(ykobject(left_val.integer_val_ operator right_val.integer_val_, dt_pool_));   \
+      push(ykobject(left_val.integer_val_ operator right_val.integer_val_,     \
+                    dt_pool_));                                                \
     } else if (left_val.is_primitive() && left_val.datatype_->is_f64()) {      \
-      push(ykobject(left_val.double_val_ operator right_val.double_val_, dt_pool_));     \
+      push(ykobject(left_val.double_val_ operator right_val.double_val_,       \
+                    dt_pool_));                                                \
     } else {                                                                   \
       push(ykobject{"Unsupported binary operation for strings", obj->opr_});   \
     }                                                                          \
@@ -20,23 +22,26 @@ using namespace yaksha;
     if ((tk) == token_type::EQ_EQ) {                                           \
       if (!left_val.is_same_datatype(right_val)) {                             \
         found_val = true;                                                      \
-        push(ykobject(false, dt_pool_));                                                 \
+        push(ykobject(false, dt_pool_));                                       \
       }                                                                        \
     } else if ((tk) == token_type::NOT_EQ) {                                   \
       if (!left_val.is_same_datatype(right_val)) {                             \
         found_val = true;                                                      \
-        push(ykobject(true, dt_pool_));                                                  \
+        push(ykobject(true, dt_pool_));                                        \
       }                                                                        \
     }                                                                          \
     if (!found_val) {                                                          \
       if (left_val.is_primitive() && left_val.datatype_->is_int()) {           \
-        push(ykobject(left_val.integer_val_ operator right_val.integer_val_, dt_pool_)); \
+        push(ykobject(left_val.integer_val_ operator right_val.integer_val_,   \
+                      dt_pool_));                                              \
       } else if (left_val.is_primitive() && left_val.datatype_->is_f64()) {    \
-        push(ykobject(left_val.double_val_ operator right_val.double_val_, dt_pool_));   \
+        push(ykobject(left_val.double_val_ operator right_val.double_val_,     \
+                      dt_pool_));                                              \
       } else if (left_val.is_primitive() && left_val.datatype_->is_str()) {    \
-        push(ykobject(left_val.string_val_ operator right_val.string_val_, dt_pool_));   \
+        push(ykobject(left_val.string_val_ operator right_val.string_val_,     \
+                      dt_pool_));                                              \
       } else if (left_val.is_primitive() && left_val.datatype_->is_none()) {   \
-        push(ykobject((tk) == token_type::EQ_EQ, dt_pool_));                             \
+        push(ykobject((tk) == token_type::EQ_EQ, dt_pool_));                   \
       } else {                                                                 \
         push(ykobject{"Unsupported binary operation", obj->opr_});             \
       }                                                                        \
@@ -128,7 +133,8 @@ void interpreter::visit_literal_expr(literal_expr *obj) {
   if (has_error()) { return; }
   if (obj->literal_token_->type_ == token_type::STRING ||
       obj->literal_token_->type_ == token_type::THREE_QUOTE_STRING) {
-    push(ykobject(string_utils::unescape(obj->literal_token_->token_), dt_pool_));
+    push(ykobject(string_utils::unescape(obj->literal_token_->token_),
+                  dt_pool_));
   } else if (obj->literal_token_->type_ == token_type::INTEGER_DECIMAL) {
     int val;
     try {
@@ -403,3 +409,4 @@ void interpreter::debug_print_stack() {
   }
 }
 void interpreter::visit_defer_stmt(defer_stmt *obj) {}
+void interpreter::visit_class_stmt(class_stmt *obj) {}

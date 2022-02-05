@@ -2,7 +2,7 @@
 #include "environment_stack.h"
 #include <utility>
 using namespace yaksha;
-environment_stack::environment_stack(ykdt_pool* pool): pool_(pool) {
+environment_stack::environment_stack(ykdt_pool *pool) : pool_(pool) {
   // Create global environment
   scope_stack_.emplace_back(environment());
 };

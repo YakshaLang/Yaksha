@@ -121,8 +121,8 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     }
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
-    push(temp_name,
-         ykobject(std::string{"str"}, dt_pool));// Note: dummy value for ykobject
+    push(temp_name, ykobject(std::string{"str"},
+                             dt_pool));// Note: dummy value for ykobject
   } else {                             // Assume this is int for now
     // TODO support for other data types
     push(obj->literal_token_->token_,
@@ -141,7 +141,8 @@ void compiler::visit_logical_expr(logical_expr *obj) {
     operator_token = " || ";
   }
   // Note: dummy value is placed inside ykobject
-  push("(" + lhs.first + operator_token + rhs.first + ")", ykobject(true, dt_pool));
+  push("(" + lhs.first + operator_token + rhs.first + ")",
+       ykobject(true, dt_pool));
 }
 void compiler::visit_unary_expr(unary_expr *obj) {
   // Note: this is not supported by strings only numbers/floats
@@ -438,3 +439,4 @@ void compiler::pop_scope_type() {
 void compiler::visit_defer_stmt(defer_stmt *obj) {
   defers_.push(obj->expression_);
 }
+void compiler::visit_class_stmt(class_stmt *obj) {}

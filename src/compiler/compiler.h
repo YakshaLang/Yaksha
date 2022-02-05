@@ -33,6 +33,7 @@ namespace yaksha {
     void visit_return_stmt(return_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
     void visit_defer_stmt(defer_stmt *obj) override;
+    void visit_class_stmt(class_stmt *obj) override;
 
 private:
     /**
@@ -85,7 +86,7 @@ private:
     std::vector<ast_type> scope_type_stack_{};
     // Defer stack
     defer_stack_stack defers_{};
-    ykdt_pool* dt_pool;
+    ykdt_pool *dt_pool;
   };
 }// namespace yaksha
 #endif

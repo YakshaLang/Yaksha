@@ -234,6 +234,7 @@ stmt *parser::declaration_statement() {
   token *data_type = nullptr;
   try {
     if (match({token_type::KEYWORD_DEF})) { return def_statement(); }
+    if (match({token_type::KEYWORD_CLASS})) { return class_statement(); }
     if (!match({token_type::NAME})) { return statement(); }
     var_name = previous();
     // Colon should come after name for a variable declaration
@@ -369,7 +370,31 @@ ykdatatype *parser::parse_datatype() {
   return dt;
 }
 parser::~parser() {
-  if (delete_dt_pool_) {
-    delete dt_pool_;
+  if (delete_dt_pool_) { delete dt_pool_; }
+}
+stmt *parser::class_statement() {
+  auto name = consume(token_type::NAME, "Class name must be present");
+  consume(token_type::COLON, "Colon must be present after class name");
+  consume(token_type::NEW_LINE, "Class block must start with a new line");
+  consume(token_type::BA_INDENT,
+          "Class block must start with an indentation increase");
+  std::vector<parameter> members = parse_class_members(name);
+  return pool_.c_class_stmt(name, members);
+}
+std::vector<parameter> parser::parse_class_members(token *name) {
+  std::vector<parameter> members{};
+  while (!is_at_end()) {
+    auto param_name = consume(token_type::NAME, "Member name must be present");
+    consume(token_type::COLON,
+            "Colon must be present between member name and data type");
+    auto dt = parse_datatype();
+    members.emplace_back(parameter{param_name, dt});
+    consume(token_type::NEW_LINE, "New line should separate members");
+    if (peek()->type_ == token_type::BA_DEDENT) { break; }
   }
+  if (members.empty()) {
+    throw error(name, "Class statement cannot have an empty block");
+  }
+  consume(token_type::BA_DEDENT, "Expected dedent");
+  return members;
 };

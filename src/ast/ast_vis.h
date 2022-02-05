@@ -11,6 +11,7 @@ namespace yaksha {
   struct ast_vis : stmt_visitor, expr_visitor {
     explicit ast_vis();
     ~ast_vis() override = default;
+    void visit_class_stmt(class_stmt *obj) override;
     void visit_binary_expr(binary_expr *obj) override;
     void visit_grouping_expr(grouping_expr *obj) override;
     void visit_literal_expr(literal_expr *obj) override;
@@ -19,6 +20,8 @@ namespace yaksha {
     void field(const std::string &name, expr *expr);
     void field(const std::string &name, stmt *stmt);
     void field(const std::string &name, const std::string &literal_obj);
+    void field(const std::string &name, const std::string &literal_obj,
+               ykdatatype *dt);
     void begin_block(const std::string &name);
     void end_block();
     /**
