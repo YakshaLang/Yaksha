@@ -7,7 +7,8 @@
 #include "utilities/ykobject.h"
 namespace yaksha {
   struct type_checker : expr_visitor, stmt_visitor {
-    explicit type_checker(ykdt_pool* pool);
+    explicit type_checker(ykdt_pool *pool);
+    void visit_class_stmt(class_stmt *obj) override;
     ~type_checker() override;
     void check(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -52,7 +53,7 @@ private:
     std::string peek_function();
     void pop_function();
     environment_stack scope_;
-    ykdt_pool* dt_pool_;
+    ykdt_pool *dt_pool_;
     std::vector<ykobject> object_stack_{};
     // Different types of scopes stack, -> are we in function body, if or while
     std::vector<ast_type> scope_type_stack_{};
