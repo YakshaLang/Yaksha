@@ -8,15 +8,14 @@ udfunction::udfunction(environment *scope, stmt_visitor *statement_visitor,
     : scope_(scope), statement_visitor_(statement_visitor), code_(code),
       parameters_(parameters), token_(token) {}
 udfunction::~udfunction() = default;
-ykobject udfunction::verify(const std::vector<ykobject> &args) {
+ykobject udfunction::verify(const std::vector<ykobject> &args, ykdt_pool* pool) {
   if (args.size() != parameters_->size()) {
     return ykobject("Too few or much arguments for function call", token_);
   }
-  // TODO Actually check data type
-  return ykfunction::verify(args);
+  return ykfunction::verify(args, pool);
 }
 std::pair<func_control_flow, ykobject>
-udfunction::call(const std::vector<ykobject> &args) {
+udfunction::call(const std::vector<ykobject> &args, ykdt_pool* pool) {
   // Map parameters and arguments in current scope
   for (size_t i = 0; i < args.size(); i++) {
     auto param = (*parameters_)[i];
@@ -26,5 +25,5 @@ udfunction::call(const std::vector<ykobject> &args) {
   }
   // Actually call the code block
   code_->accept(statement_visitor_);
-  return std::make_pair(func_control_flow::EXPECT_RETURN, ykobject());
+  return std::make_pair(func_control_flow::EXPECT_RETURN, ykobject(pool));
 }

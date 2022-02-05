@@ -9,7 +9,7 @@ namespace yaksha {
    *    - Call pop afterwards
    */
   struct environment_stack : environment {
-    environment_stack();
+    explicit environment_stack(ykdt_pool* pool);
     ~environment_stack() override;
     /**
      * See if this variable is defined
@@ -51,6 +51,7 @@ private:
     bool has_inner_scope();
     environment &peek();
     std::vector<environment> scope_stack_{};
+    ykdt_pool* pool_;
   };
 }// namespace yaksha
 #endif

@@ -7,9 +7,9 @@ using namespace yaksha;
 #define NUMBER_OPERATION(operator)                                             \
   do {                                                                         \
     if (left_val.is_primitive() && left_val.datatype_->is_int()) {             \
-      push(ykobject(left_val.integer_val_ operator right_val.integer_val_));   \
+      push(ykobject(left_val.integer_val_ operator right_val.integer_val_, dt_pool_));   \
     } else if (left_val.is_primitive() && left_val.datatype_->is_f64()) {      \
-      push(ykobject(left_val.double_val_ operator right_val.double_val_));     \
+      push(ykobject(left_val.double_val_ operator right_val.double_val_, dt_pool_));     \
     } else {                                                                   \
       push(ykobject{"Unsupported binary operation for strings", obj->opr_});   \
     }                                                                          \
@@ -20,23 +20,23 @@ using namespace yaksha;
     if ((tk) == token_type::EQ_EQ) {                                           \
       if (!left_val.is_same_datatype(right_val)) {                             \
         found_val = true;                                                      \
-        push(ykobject(false));                                                 \
+        push(ykobject(false, dt_pool_));                                                 \
       }                                                                        \
     } else if ((tk) == token_type::NOT_EQ) {                                   \
       if (!left_val.is_same_datatype(right_val)) {                             \
         found_val = true;                                                      \
-        push(ykobject(true));                                                  \
+        push(ykobject(true, dt_pool_));                                                  \
       }                                                                        \
     }                                                                          \
     if (!found_val) {                                                          \
       if (left_val.is_primitive() && left_val.datatype_->is_int()) {           \
-        push(ykobject(left_val.integer_val_ operator right_val.integer_val_)); \
+        push(ykobject(left_val.integer_val_ operator right_val.integer_val_, dt_pool_)); \
       } else if (left_val.is_primitive() && left_val.datatype_->is_f64()) {    \
-        push(ykobject(left_val.double_val_ operator right_val.double_val_));   \
+        push(ykobject(left_val.double_val_ operator right_val.double_val_, dt_pool_));   \
       } else if (left_val.is_primitive() && left_val.datatype_->is_str()) {    \
-        push(ykobject(left_val.string_val_ operator right_val.string_val_));   \
+        push(ykobject(left_val.string_val_ operator right_val.string_val_, dt_pool_));   \
       } else if (left_val.is_primitive() && left_val.datatype_->is_none()) {   \
-        push(ykobject((tk) == token_type::EQ_EQ));                             \
+        push(ykobject((tk) == token_type::EQ_EQ, dt_pool_));                             \
       } else {                                                                 \
         push(ykobject{"Unsupported binary operation", obj->opr_});             \
       }                                                                        \
@@ -54,13 +54,8 @@ using namespace yaksha;
       return;                                                                  \
     }                                                                          \
   } while (0)
-interpreter::interpreter() {
-  samplefn_ = new samplefn();
-  // Register sample function
-  globals_.define("samplefn", ykobject(samplefn_));
-}
+interpreter::interpreter(ykdt_pool *pool) : dt_pool_(pool), globals_(pool) {}
 interpreter::~interpreter() {
-  delete samplefn_;
   for (auto fn : func_pool_) { delete fn; }
 }
 void interpreter::visit_binary_expr(binary_expr *obj) {
@@ -75,7 +70,7 @@ void interpreter::visit_binary_expr(binary_expr *obj) {
     case token_type::PLUS:
       VALIDATE_NON_NULL_SAME_DATA_TYPE;
       if (left_val.is_primitive() && left_val.datatype_->is_str()) {
-        push(ykobject(left_val.string_val_ + right_val.string_val_));
+        push(ykobject(left_val.string_val_ + right_val.string_val_, dt_pool_));
         return;
       }
       NUMBER_OPERATION(+);
@@ -133,7 +128,7 @@ void interpreter::visit_literal_expr(literal_expr *obj) {
   if (has_error()) { return; }
   if (obj->literal_token_->type_ == token_type::STRING ||
       obj->literal_token_->type_ == token_type::THREE_QUOTE_STRING) {
-    push(ykobject(string_utils::unescape(obj->literal_token_->token_)));
+    push(ykobject(string_utils::unescape(obj->literal_token_->token_), dt_pool_));
   } else if (obj->literal_token_->type_ == token_type::INTEGER_DECIMAL) {
     int val;
     try {
@@ -142,7 +137,7 @@ void interpreter::visit_literal_expr(literal_expr *obj) {
       push(ykobject("Integer number out of range", obj->literal_token_));
       return;
     }
-    push(ykobject(val));
+    push(ykobject(val, dt_pool_));
   } else if (obj->literal_token_->type_ == token_type::FLOAT_NUMBER) {
     double val;
     try {
@@ -151,13 +146,13 @@ void interpreter::visit_literal_expr(literal_expr *obj) {
       push(ykobject("Double number out of range", obj->literal_token_));
       return;
     }
-    push(ykobject(val));
+    push(ykobject(val, dt_pool_));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_NONE) {
-    push(ykobject());
+    push(ykobject(dt_pool_));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_TRUE) {
-    push(ykobject(true));
+    push(ykobject(true, dt_pool_));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_FALSE) {
-    push(ykobject(false));
+    push(ykobject(false, dt_pool_));
   } else {
     push(ykobject("Invalid literal data type", obj->literal_token_));
   }
@@ -169,9 +164,9 @@ void interpreter::visit_unary_expr(unary_expr *obj) {
   auto ex = pop();
   if (obj->opr_->type_ == token_type::SUB) {
     if (ex.is_primitive() && ex.datatype_->is_f64()) {
-      push(ykobject(-ex.double_val_));
+      push(ykobject(-ex.double_val_, dt_pool_));
     } else if (ex.is_primitive() && ex.datatype_->is_int()) {
-      push(ykobject(-ex.integer_val_));
+      push(ykobject(-ex.integer_val_, dt_pool_));
     } else {
       push(ykobject("Invalid data type", obj->opr_));
     }
@@ -181,7 +176,7 @@ void interpreter::visit_unary_expr(unary_expr *obj) {
 }
 void interpreter::visit_return_stmt(return_stmt *obj) {
   if (obj->expression_ == nullptr) {
-    push(ykobject());// None
+    push(ykobject(dt_pool_));// None
   } else {
     obj->expression_->accept(this);
   }
@@ -235,7 +230,7 @@ void interpreter::visit_let_stmt(let_stmt *obj) {
       push(ykobject("Redefining variable", obj->name_));
       return;
     }
-    globals_.define(obj->name_->token_, ykobject{});
+    globals_.define(obj->name_->token_, ykobject(dt_pool_));
     return;
   }
   evaluate(obj->expression_);
@@ -371,7 +366,7 @@ void interpreter::visit_fncall_expr(fncall_expr *obj) {
     arguments.emplace_back(pop());
   }
   // Verify arguments before we call the function
-  ykobject verification = fn.fn_val_->verify(arguments);
+  ykobject verification = fn.fn_val_->verify(arguments, dt_pool_);
   if (!verification.is_primitive() || !verification.datatype_->is_none()) {
     // error with verification of given arguments
     push(verification);
@@ -379,14 +374,14 @@ void interpreter::visit_fncall_expr(fncall_expr *obj) {
   }
   // Actually call the function
   globals_.push();// scope of the function
-  auto val = fn.fn_val_->call(arguments);
+  auto val = fn.fn_val_->call(arguments, dt_pool_);
   if (val.first == func_control_flow::EXPECT_RETURN) {
     if (peek().flow_ == control_flow_change::RETURN) {
       pop();
     } else if (has_error()) {
       // Got an error -> do nothing so that is kept there.
     } else {
-      push(ykobject());// Default to returning None
+      push(ykobject(dt_pool_));// Default to returning None
     }
   } else {
     // We were calling a native function that returns a value, just push that

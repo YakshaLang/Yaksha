@@ -10,7 +10,7 @@
 #include <sstream>
 namespace yaksha {
   struct compiler : expr_visitor, stmt_visitor {
-    explicit compiler(def_visitor &functions);
+    compiler(def_visitor &functions, ykdt_pool *pool);
     ~compiler() override;
     std::string compile(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -69,7 +69,7 @@ private:
      * Function bodies, etc
      */
     std::stringstream body_{};
-    environment_stack scope_{};
+    environment_stack scope_;
     // Expr + Type
     // This is to hold expressions.
     std::vector<std::string> expr_stack_{};
@@ -85,6 +85,7 @@ private:
     std::vector<ast_type> scope_type_stack_{};
     // Defer stack
     defer_stack_stack defers_{};
+    ykdt_pool* dt_pool;
   };
 }// namespace yaksha
 #endif

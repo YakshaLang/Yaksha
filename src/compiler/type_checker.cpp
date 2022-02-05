@@ -3,7 +3,7 @@
 #include "compiler_utils.h"
 #include "utilities/ykfunction.h"
 using namespace yaksha;
-type_checker::type_checker() = default;
+type_checker::type_checker(ykdt_pool *pool) : dt_pool_(pool), scope_(pool) {}
 type_checker::~type_checker() = default;
 void type_checker::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
@@ -47,7 +47,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   if (name.object_type_ != object_type::FUNCTION) {
     error(obj->paren_token_, "Calling a non callable "
                              "or a non existing function");
-    push(ykobject());// Push None here
+    push(ykobject(dt_pool_));// Push None here
     return;
   }
   std::vector<ykobject> arguments{};
@@ -60,7 +60,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   if (funct->params_.size() != arguments.size()) {
     error(obj->paren_token_, "Too few or too "
                              "much arguments for function call");
-    push(ykobject());// Push None here
+    push(ykobject(dt_pool_));// Push None here
     return;
   }
   for (auto i = 0; i < funct->params_.size(); i++) {
@@ -81,21 +81,21 @@ void type_checker::visit_grouping_expr(grouping_expr *obj) {
   push(inside);
 }
 void type_checker::visit_literal_expr(literal_expr *obj) {
-  auto data = ykobject();
+  auto data = ykobject(dt_pool_);
   auto literal_type = obj->literal_token_->type_;
   if (literal_type == token_type::STRING ||
       literal_type == token_type::THREE_QUOTE_STRING) {
-    data = ykobject(std::string{"str"});
+    data = ykobject(std::string{"str"}, dt_pool_);
   } else if (literal_type == token_type::KEYWORD_TRUE ||
              literal_type == token_type::KEYWORD_FALSE) {
-    data = ykobject(true);
+    data = ykobject(true, dt_pool_);
   } else if (literal_type == token_type::INTEGER_BIN ||
              literal_type == token_type::INTEGER_OCT ||
              literal_type == token_type::INTEGER_DECIMAL ||
              literal_type == token_type::INTEGER_HEX) {
-    data = ykobject(1);
+    data = ykobject(1, dt_pool_);
   } else if (literal_type == token_type::FLOAT_NUMBER) {
-    data = ykobject(1.2);
+    data = ykobject(1.2, dt_pool_);
   }// else - none data type by default
   push(data);
 }
@@ -123,7 +123,7 @@ void type_checker::visit_variable_expr(variable_expr *obj) {
   auto name = prefix(obj->name_->token_);
   if (!scope_.is_defined(name)) {
     error(obj->name_, "Undefined name");
-    push(ykobject());
+    push(ykobject(dt_pool_));
     return;
   }
   auto value = scope_.get(name);
@@ -252,7 +252,7 @@ void type_checker::check(const std::vector<stmt *> &statements) {
       error(function_definition->name_,
             "Number of parameters cannot be larger than 100.");
     }
-    auto function_placeholder_object = ykobject();
+    auto function_placeholder_object = ykobject(dt_pool_);
     function_placeholder_object.object_type_ = object_type::FUNCTION;
     scope_.define_global(name, function_placeholder_object);
   }
@@ -270,7 +270,7 @@ void type_checker::push(const ykobject &data_type) {
   this->object_stack_.push_back(data_type);
 }
 ykobject type_checker::pop() {
-  if (this->object_stack_.empty()) { return ykobject(); }
+  if (this->object_stack_.empty()) { return ykobject(dt_pool_); }
   auto back = object_stack_.back();
   object_stack_.pop_back();
   return back;

@@ -3,7 +3,6 @@
 #define INTERPRETER_H
 #include "ast/ast.h"
 #include "ast/environment_stack.h"
-#include "utilities/samplefn.h"
 #include "utilities/ykfunction.h"
 #include "utilities/ykobject.h"
 namespace yaksha {
@@ -11,7 +10,7 @@ namespace yaksha {
    * AST navigating Interpreter, uses a stack for returns & errors
    */
   struct interpreter : expr_visitor, stmt_visitor {
-    interpreter();
+    explicit interpreter(ykdt_pool* pool);
     ~interpreter() override;
     /**
      * Interpret given statements return last object in stack
@@ -43,10 +42,10 @@ namespace yaksha {
     void visit_defer_stmt(defer_stmt *obj) override;
 
 private:
-    ykfunction *samplefn_;
-    environment_stack globals_{};
+    environment_stack globals_;
     std::vector<ykobject> object_stack_{};
     std::vector<ykfunction *> func_pool_{};
+    ykdt_pool* dt_pool_;
     bool has_error();
     const ykobject &peek();
     void push(ykobject obj);

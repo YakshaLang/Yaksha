@@ -4,22 +4,24 @@
 #include "tokenizer/string_utils.h"
 #include "tokenizer/token.h"
 #include "ykdatatype.h"
+#include "ykdt_pool.h"
 #include <string>
 namespace yaksha {
   struct ykfunction;
   enum class control_flow_change { BREAK, RETURN, CONTINUE, NO_CHANGE, ERROR };
-  enum class object_type { PRIMITIVE, FUNCTION, RUNTIME_ERROR };
+  enum class object_type { PRIMITIVE, FUNCTION, RUNTIME_ERROR, UNKNOWN_OBJECT };
   struct ykobject {
+    ykobject();
     explicit ykobject(ykdatatype *dt);
-    explicit ykobject(int i);
-    explicit ykobject(bool b);
-    explicit ykobject(std::string str);
+    explicit ykobject(int i, ykdt_pool* pool);
+    explicit ykobject(bool b, ykdt_pool* pool);
+    explicit ykobject(std::string str, ykdt_pool* pool);
     explicit ykobject(const std::string &str, token *bad_token);
-    explicit ykobject(double dbl);
+    explicit ykobject(double dbl, ykdt_pool* pool);
     explicit ykobject(ykfunction *fun);
     explicit ykobject(control_flow_change flow_change);
-    explicit ykobject();
-    bool is_primitive() const;
+    explicit ykobject(ykdt_pool* pool);
+    [[nodiscard]] bool is_primitive() const;
     bool is_same_datatype(ykobject &other) const;
     int integer_val_{0};
     std::string string_val_{};

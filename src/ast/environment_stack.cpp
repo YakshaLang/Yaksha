@@ -2,7 +2,7 @@
 #include "environment_stack.h"
 #include <utility>
 using namespace yaksha;
-environment_stack::environment_stack() {
+environment_stack::environment_stack(ykdt_pool* pool): pool_(pool) {
   // Create global environment
   scope_stack_.emplace_back(environment());
 };
@@ -43,7 +43,7 @@ ykobject environment_stack::get(const std::string &name) {
   for (auto stack : scope_stack_) {
     if (stack.is_defined(name)) { return stack.get(name); }
   }
-  return ykobject();
+  return ykobject(pool_);
 }
 void environment_stack::push() { scope_stack_.emplace_back(environment()); }
 void environment_stack::pop() {

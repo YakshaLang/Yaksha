@@ -1,7 +1,8 @@
 // compiler.cpp
 #include "compiler.h"
 using namespace yaksha;
-compiler::compiler(def_visitor &functions) : functions_(functions) {
+compiler::compiler(def_visitor &functions, ykdt_pool *pool)
+    : functions_(functions), scope_(pool), dt_pool(pool) {
   header_ << "#include \"yk__lib.h\"\n";
   header_ << "// --header section-- \n";
   body_ << "// --body section-- \n";
@@ -121,11 +122,11 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
     push(temp_name,
-         ykobject(std::string{"str"}));// Note: dummy value for ykobject
+         ykobject(std::string{"str"}, dt_pool));// Note: dummy value for ykobject
   } else {                             // Assume this is int for now
     // TODO support for other data types
     push(obj->literal_token_->token_,
-         ykobject(0));// Note dummy value for ykobject
+         ykobject(0, dt_pool));// Note dummy value for ykobject
   }
 }
 void compiler::visit_logical_expr(logical_expr *obj) {
@@ -140,7 +141,7 @@ void compiler::visit_logical_expr(logical_expr *obj) {
     operator_token = " || ";
   }
   // Note: dummy value is placed inside ykobject
-  push("(" + lhs.first + operator_token + rhs.first + ")", ykobject(true));
+  push("(" + lhs.first + operator_token + rhs.first + ")", ykobject(true, dt_pool));
 }
 void compiler::visit_unary_expr(unary_expr *obj) {
   // Note: this is not supported by strings only numbers/floats
@@ -211,7 +212,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
           << prefix(para.name_->token_);
   }
   body_ << ") ";
-  ykobject func_placeholder{};
+  ykobject func_placeholder{dt_pool};
   func_placeholder.object_type_ = object_type::FUNCTION;
   scope_.define_global(name, func_placeholder);
   scope_.push();
@@ -280,9 +281,9 @@ void compiler::visit_if_stmt(if_stmt *obj) {
 }
 void compiler::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_);
-  auto object = ykobject();
+  auto object = ykobject(dt_pool);
   if (obj->data_type_->token_->token_ == "str") {
-    object = ykobject(std::string{"str"});
+    object = ykobject(std::string("str"), dt_pool);
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
       auto exp = pop();
@@ -300,7 +301,7 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     deletions_.push(name, "yk__sdsfree(" + name + ")");
   } else {// TODO assumed to be int, handle other types.
     write_indent(body_);
-    object = ykobject(1);
+    object = ykobject(1, dt_pool);
     body_ << convert_dt(obj->data_type_->token_) << " " << name;
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);

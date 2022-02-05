@@ -11,6 +11,7 @@
 using namespace yaksha;
 void test_interpreter(const std::string &data, const std::string &file_name) {
   tokenizer t{file_name, data};
+  ykdt_pool dt_pool{};
   t.tokenize();
   if (!t.errors_.empty()) {
     errors::print_errors(t.errors_);
@@ -19,10 +20,10 @@ void test_interpreter(const std::string &data, const std::string &file_name) {
   block_analyzer b{t.tokens_};
   b.analyze();
   try {
-    parser p{b.tokens_};
+    parser p{b.tokens_, &dt_pool};
     auto tree = p.parse();
     if (!tree.empty()) {
-      interpreter ip{};
+      interpreter ip{&dt_pool};
       ip.calculate(tree);
       std::cout << "\n\n============================\n";
       ast_printer pr{};
@@ -42,6 +43,7 @@ void test_interpreter(const std::string &data, const std::string &file_name) {
 }
 void test_compiler(const std::string &data, const std::string &file_name) {
   tokenizer t{file_name, data};
+  ykdt_pool dt_pool{};
   t.tokenize();
   if (!t.errors_.empty()) {
     errors::print_errors(t.errors_);
@@ -50,19 +52,19 @@ void test_compiler(const std::string &data, const std::string &file_name) {
   block_analyzer b{t.tokens_};
   b.analyze();
   try {
-    parser p{b.tokens_};
+    parser p{b.tokens_, &dt_pool};
     auto tree = p.parse();
     if (tree.empty()) {
       errors::print_errors(p.errors_);
       return;
     }
-    type_checker tc{};
+    type_checker tc{&dt_pool};
     tc.check(tree);
     if (!tc.errors_.empty()) {
       errors::print_errors(tc.errors_);
       return;
     }
-    compiler c{tc.functions_};
+    compiler c{tc.functions_, &dt_pool};
     std::cout << c.compile(tree);
   } catch (parsing_error &p) {
     std::cout << "Parsing error --> " << p.message_ << "\n";

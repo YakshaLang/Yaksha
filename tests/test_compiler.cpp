@@ -19,14 +19,15 @@ using namespace yaksha;
         REQUIRE(t.errors_.empty());                                            \
         block_analyzer b{t.tokens_};                                           \
         b.analyze();                                                           \
-        parser p{b.tokens_};                                                   \
+        ykdt_pool dt_pool{};                                                   \
+        parser p{b.tokens_, &dt_pool};                                         \
         auto tree = p.parse();                                                 \
         REQUIRE(!tree.empty());                                                \
         REQUIRE(p.errors_.empty());                                            \
-        type_checker tc{};                                                     \
+        type_checker tc{&dt_pool};                                             \
         tc.check(tree);                                                        \
         REQUIRE(tc.errors_.empty());                                           \
-        compiler comp{tc.functions_};                                          \
+        compiler comp{tc.functions_, &dt_pool};                                \
         auto compiler_output = comp.compile(tree);                             \
         tokenizer c_code{"output.c", compiler_output};                         \
         c_code.tokenize();                                                     \

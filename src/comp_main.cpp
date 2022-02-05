@@ -30,21 +30,22 @@ int main(int argc, char *argv[]) {
   }
   block_analyzer b{t.tokens_};
   b.analyze();
+  ykdt_pool dt_pool{};
   try {
-    parser p{b.tokens_};
+    parser p{b.tokens_, &dt_pool};
     auto tree = p.parse();
     if (tree.empty() || !p.errors_.empty()) {
       errors::print_errors(p.errors_);
       write_token_dump(std::cerr, b.tokens_);
       return EXIT_FAILURE;
     }
-    type_checker tc{};
+    type_checker tc{&dt_pool};
     tc.check(tree);
     if (!tc.errors_.empty()) {
       errors::print_errors(tc.errors_);
       return EXIT_FAILURE;
     }
-    compiler comp{tc.functions_};
+    compiler comp{tc.functions_, &dt_pool};
     std::cout << comp.compile(tree);
   } catch (parsing_error &p) {
     std::cout << "Parsing error --> " << p.message_ << "\n";

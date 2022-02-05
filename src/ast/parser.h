@@ -10,6 +10,7 @@
 namespace yaksha {
   struct parser {
     explicit parser(std::vector<token> &tokens);
+    explicit parser(std::vector<token> &tokens, ykdt_pool* pool);
     ~parser();
     /**
    * parse and return a vector of statements
@@ -67,8 +68,9 @@ private:
     // state
     std::size_t current_;
     ast_pool pool_;
-    ykdt_pool dtpool_;
+    ykdt_pool* dt_pool_;
     std::vector<token> &tokens_;
+    bool delete_dt_pool_{false};
     // Increase when we allow control, flow.
     // Decrease after parsing.
     // If this is <= zero do not allow `continue` or `break`

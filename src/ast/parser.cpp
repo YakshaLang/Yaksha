@@ -3,8 +3,11 @@
 #include <algorithm>
 #include <cassert>
 using namespace yaksha;
+parser::parser(std::vector<token> &tokens, ykdt_pool *pool)
+    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0}, dt_pool_(pool) {}
 parser::parser(std::vector<token> &tokens)
-    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0} {}
+    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0},
+      dt_pool_(new ykdt_pool()) {}
 token *parser::advance() {
   if (!is_at_end()) { current_++; }
   return previous();
@@ -347,7 +350,7 @@ ykdatatype *parser::parse_datatype() {
   if (!match({token_type::NAME, token_type::KEYWORD_NONE})) {
     throw error(peek(), "Must have a data type.");
   }
-  auto dt = dtpool_.create(previous());
+  auto dt = dt_pool_->create(previous());
   if (match({token_type::SQUARE_BRACKET_OPEN})) {
     if (dt->is_primitive()) {
       throw error(dt->token_,
@@ -365,4 +368,8 @@ ykdatatype *parser::parse_datatype() {
   }
   return dt;
 }
-parser::~parser() = default;
+parser::~parser() {
+  if (delete_dt_pool_) {
+    delete dt_pool_;
+  }
+};

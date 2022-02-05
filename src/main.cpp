@@ -28,11 +28,12 @@ int main(int argc, char *argv[]) {
   }
   block_analyzer b{t.tokens_};
   b.analyze();
+  ykdt_pool dt_pool{};
   try {
-    parser p{b.tokens_};
+    parser p{b.tokens_, &dt_pool};
     auto tree = p.parse();
     if (!tree.empty() && p.errors_.empty()) {
-      interpreter ip{};
+      interpreter ip{&dt_pool};
       ip.calculate(tree);
       auto final_outcome = ip.result();
       if (final_outcome != nullptr) {
