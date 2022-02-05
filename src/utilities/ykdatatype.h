@@ -58,6 +58,9 @@ private:
   };
   inline bool operator==(const yaksha::ykdatatype &lhs,
                          const yaksha::ykdatatype &rhs) {
+    if (lhs.is_primitive() && rhs.is_primitive()) {
+      return lhs.primitive_type_ == rhs.primitive_type_;
+    }
     return lhs.as_string() == rhs.as_string();
   }
   inline bool operator!=(const ykdatatype &lhs, const ykdatatype &rhs) {

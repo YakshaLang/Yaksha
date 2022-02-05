@@ -26,10 +26,10 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
   auto rhs = pop();
   if (lhs.object_type_ != rhs.object_type_) {
     error(obj->opr_,
-          "Binary operation between two different data types is not supported");
+          "Binary operation between two different data types are not supported");
   }
   if ((oper == token_type::PLUS) &&
-      (rhs.is_primitive() && rhs.datatype_->support_plus())) {
+      !(rhs.is_primitive() && rhs.datatype_->support_plus())) {
     error(obj->opr_, "Unsupported operation");
   }
   if ((oper == token_type::SUB || oper == token_type::MUL ||
@@ -39,7 +39,14 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
       (!rhs.is_primitive() || !rhs.datatype_->is_a_number())) {
     error(obj->opr_, "Unsupported operation");
   }
-  push(rhs);
+  if (oper == token_type::EQ_EQ
+      || oper == token_type::LESS_EQ
+      || oper == token_type::GREAT_EQ
+      || oper == token_type::LESS || oper == token_type::GREAT) {
+    push(ykobject(true, dt_pool_));
+  } else {
+    push(rhs);
+  }
 }
 void type_checker::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
@@ -255,6 +262,9 @@ void type_checker::check(const std::vector<stmt *> &statements) {
     auto function_placeholder_object = ykobject(dt_pool_);
     function_placeholder_object.object_type_ = object_type::FUNCTION;
     scope_.define_global(name, function_placeholder_object);
+  }
+  for (auto st: statements) {
+    st->accept(this);
   }
 }
 void type_checker::error(token *tok, const std::string &message) {
