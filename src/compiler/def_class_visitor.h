@@ -1,20 +1,22 @@
-// def_visitor.h
+// def_class_visitor.h
 #ifndef DEF_VISITOR_H
 #define DEF_VISITOR_H
 #include "../ast/ast.h"
 #include <unordered_map>
 namespace yaksha {
   /**
-   * Visits def-s and find out type information related to functions
+   * Visits def-s and class-es and find out type information
    *
    * This phase need to happen before type_checker
    * Once we know what kind of arguments functions take then
    * we can match the function and args in type_checker
+   *
+   * We also extract classes in this phase
    */
-  struct def_visitor : expr_visitor, stmt_visitor {
-    def_visitor();
+  struct def_class_visitor : expr_visitor, stmt_visitor {
+    def_class_visitor();
     void visit_class_stmt(class_stmt *obj) override;
-    ~def_visitor() override;
+    ~def_class_visitor() override;
     void extract(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
     void visit_binary_expr(binary_expr *obj) override;
@@ -35,14 +37,18 @@ namespace yaksha {
     void visit_print_stmt(print_stmt *obj) override;
     void visit_return_stmt(return_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
+    void visit_defer_stmt(defer_stmt *obj) override;
     bool has(const std::string &prefixed_name);
     def_stmt *get(const std::string &prefixed_name);
-    void visit_defer_stmt(defer_stmt *obj) override;
+    bool has_class(const std::string &prefixed_name);
+    class_stmt *get_class(const std::string &prefixed_name);
     std::vector<std::string> function_names_{};
+    std::vector<std::string> class_names_{};
     std::vector<parsing_error> errors_{};
 
 private:
     std::unordered_map<std::string, def_stmt *> functions_{};
+    std::unordered_map<std::string, class_stmt *> classes_{};
     void error(token *tok, const std::string &message);
   };
 }// namespace yaksha

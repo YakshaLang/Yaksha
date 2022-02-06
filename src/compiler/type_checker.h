@@ -3,7 +3,7 @@
 #define TYPE_CHECKER_H
 #include "ast/ast.h"
 #include "ast/environment_stack.h"
-#include "compiler/def_visitor.h"
+#include "compiler/def_class_visitor.h"
 #include "utilities/ykobject.h"
 namespace yaksha {
   struct type_checker : expr_visitor, stmt_visitor {
@@ -39,7 +39,7 @@ namespace yaksha {
     /**
      * Get function information
      */
-    def_visitor functions_{};
+    def_class_visitor functions_{};
 
 private:
     ykobject pop();

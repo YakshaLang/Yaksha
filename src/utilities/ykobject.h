@@ -9,7 +9,7 @@
 namespace yaksha {
   struct ykfunction;
   enum class control_flow_change { BREAK, RETURN, CONTINUE, NO_CHANGE, ERROR };
-  enum class object_type { PRIMITIVE, FUNCTION, RUNTIME_ERROR, UNKNOWN_OBJECT };
+  enum class object_type { PRIMITIVE, FUNCTION, RUNTIME_ERROR, UNKNOWN_OBJECT, CLASS_ITSELF };
   struct ykobject {
     ykobject();
     explicit ykobject(ykdatatype *dt);

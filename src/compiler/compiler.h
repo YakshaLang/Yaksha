@@ -5,12 +5,12 @@
 #include "ast/environment_stack.h"
 #include "compiler/compiler_utils.h"
 #include "compiler/delete_stack_stack.h"
-#include "def_visitor.h"
+#include "def_class_visitor.h"
 #include "utilities/defer_stack_stack.h"
 #include <sstream>
 namespace yaksha {
   struct compiler : expr_visitor, stmt_visitor {
-    compiler(def_visitor &functions, ykdt_pool *pool);
+    compiler(def_class_visitor &functions, ykdt_pool *pool);
     ~compiler() override;
     std::string compile(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -81,7 +81,7 @@ private:
     // Delete stack for strings
     delete_stack_stack deletions_{};
     // Access functions by name
-    def_visitor &functions_;
+    def_class_visitor &functions_;
     // Different types of scopes stack, -> are we in function body, if or while
     std::vector<ast_type> scope_type_stack_{};
     // Defer stack

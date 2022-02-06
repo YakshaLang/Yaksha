@@ -1,7 +1,7 @@
 // compiler.cpp
 #include "compiler.h"
 using namespace yaksha;
-compiler::compiler(def_visitor &functions, ykdt_pool *pool)
+compiler::compiler(def_class_visitor &functions, ykdt_pool *pool)
     : functions_(functions), scope_(pool), dt_pool(pool) {
   header_ << "#include \"yk__lib.h\"\n";
   header_ << "// --header section-- \n";
@@ -68,7 +68,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
   auto name_pair = pop();
   auto name = name_pair.first;
-  // Note: no need to check here as type_checker & def_visitor ensure this is present.
+  // Note: no need to check here as type_checker & def_class_visitor ensure this is present.
   auto fn_def = functions_.get(name);
   std::stringstream code{};
   code << name << "(";
