@@ -227,3 +227,4 @@ void ast_vis::field(const std::string &name, const std::string &literal_obj,
   text_ << ::string_utils::html_escape(dt->as_string());
   text_ << "</code></div>";
 }
+void ast_vis::visit_del_stmt(del_stmt *obj) {}

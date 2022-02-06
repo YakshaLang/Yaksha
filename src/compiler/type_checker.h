@@ -31,6 +31,7 @@ namespace yaksha {
     void visit_return_stmt(return_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
     void visit_defer_stmt(defer_stmt *obj) override;
+    void visit_del_stmt(del_stmt *obj) override;
     /**
      * Errors vector, type checker will try and identify as much errors as possible
      * but after first error, everything else is best guess

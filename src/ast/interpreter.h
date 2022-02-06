@@ -41,6 +41,7 @@ namespace yaksha {
     void visit_def_stmt(def_stmt *obj) override;
     void debug_print_stack();
     void visit_defer_stmt(defer_stmt *obj) override;
+    void visit_del_stmt(del_stmt *obj) override;
 
 private:
     environment_stack globals_;

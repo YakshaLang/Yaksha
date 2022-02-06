@@ -162,6 +162,7 @@ stmt *parser::statement() {
   if (match({token_type::KEYWORD_BREAK})) { return break_statement(); }
   if (match({token_type::KEYWORD_RETURN})) { return return_statement(); }
   if (match({token_type::KEYWORD_DEFER})) { return defer_statement(); }
+  if (match({token_type::KEYWORD_DEL})) { return del_statement(); }
   return expression_statement();
 }
 stmt *parser::pass_statement() {
@@ -206,16 +207,24 @@ stmt *parser::block_statement() {
   return pool_.c_block_stmt(statements);
 }
 stmt *parser::print_statement() {
+  auto print_keyword = previous();
   expr *exp = expression();
   consume_or_eof(token_type::NEW_LINE,
                  "Expect new line after value for print statement.");
-  return pool_.c_print_stmt(previous(), exp);
+  return pool_.c_print_stmt(print_keyword, exp);
 }
 stmt *parser::defer_statement() {
-  expr *exp = expression();
+  auto defer_keyword = previous();
+  expr *exp = nullptr;
+  stmt *st = nullptr;
+  if (match({token_type::KEYWORD_DEL})) {
+    st = del_statement_base();
+  } else {
+    exp = expression();
+  }
   consume_or_eof(token_type::NEW_LINE,
                  "Expect new line after value for defer statement.");
-  return pool_.c_defer_stmt(previous(), exp);
+  return pool_.c_defer_stmt(defer_keyword, exp, st);
 }
 stmt *parser::expression_statement() {
   expr *exp = expression();
@@ -397,4 +406,15 @@ std::vector<parameter> parser::parse_class_members(token *name) {
   }
   consume(token_type::BA_DEDENT, "Expected dedent");
   return members;
-};
+}
+stmt *parser::del_statement() {
+  stmt *st = del_statement_base();
+  consume_or_eof(token_type::NEW_LINE,
+                 "Expect new line after value for del statement.");
+  return st;
+}
+stmt *parser::del_statement_base() {
+  auto del_keyword = previous();
+  expr *exp = expression();
+  return pool_.c_del_stmt(del_keyword, exp);
+}

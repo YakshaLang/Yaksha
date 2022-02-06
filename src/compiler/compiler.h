@@ -34,6 +34,7 @@ namespace yaksha {
     void visit_while_stmt(while_stmt *obj) override;
     void visit_defer_stmt(defer_stmt *obj) override;
     void visit_class_stmt(class_stmt *obj) override;
+    void visit_del_stmt(del_stmt *obj) override;
 
 private:
     /**

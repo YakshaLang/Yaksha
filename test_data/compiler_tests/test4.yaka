@@ -11,6 +11,7 @@ class Spaceship:
 
 def main() -> int:
     myship: Spaceship = Spaceship()
+    defer del myship
     a: int = 10
     while a != 0:
         print(a)

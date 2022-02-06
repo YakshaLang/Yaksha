@@ -11,9 +11,7 @@ void defer_stack_stack::push_defer_stack() {
 void defer_stack_stack::pop_defer_stack() {
   if (defer_levels_.size() > 1) { defer_levels_.pop_back(); }
 }
-void defer_stack_stack::push(expr *expression) {
-  defer_levels_.back().push(expression);
-}
+void defer_stack_stack::push(defer_stmt *df) { defer_levels_.back().push(df); }
 void defer_stack_stack::write(stmt_visitor *statement_visitor) {
   auto size = defer_levels_.size();
   if (size == 0) { return; }

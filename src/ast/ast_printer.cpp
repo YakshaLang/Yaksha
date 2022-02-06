@@ -130,3 +130,4 @@ void ast_printer::visit_defer_stmt(defer_stmt *obj) {
   parenthesize("defer_statement", {obj->expression_});
 }
 void ast_printer::visit_class_stmt(class_stmt *obj) {}
+void ast_printer::visit_del_stmt(del_stmt *obj) {}

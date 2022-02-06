@@ -122,12 +122,24 @@ stmt *ast_pool::c_def_stmt(token *name, std::vector<parameter> params,
   cleanup_stmt_.push_back(o);
   return o;
 }
-defer_stmt::defer_stmt(token *defer_keyword, expr *expression)
-    : defer_keyword_(defer_keyword), expression_(expression) {}
+defer_stmt::defer_stmt(token *defer_keyword, expr *expression,
+                       stmt *del_statement)
+    : defer_keyword_(defer_keyword), expression_(expression),
+      del_statement_(del_statement) {}
 void defer_stmt::accept(stmt_visitor *v) { v->visit_defer_stmt(this); }
 ast_type defer_stmt::get_type() { return ast_type::STMT_DEFER; }
-stmt *ast_pool::c_defer_stmt(token *defer_keyword, expr *expression) {
-  auto o = new defer_stmt(defer_keyword, expression);
+stmt *ast_pool::c_defer_stmt(token *defer_keyword, expr *expression,
+                             stmt *del_statement) {
+  auto o = new defer_stmt(defer_keyword, expression, del_statement);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
+del_stmt::del_stmt(token *del_keyword, expr *expression)
+    : del_keyword_(del_keyword), expression_(expression) {}
+void del_stmt::accept(stmt_visitor *v) { v->visit_del_stmt(this); }
+ast_type del_stmt::get_type() { return ast_type::STMT_DEL; }
+stmt *ast_pool::c_del_stmt(token *del_keyword, expr *expression) {
+  auto o = new del_stmt(del_keyword, expression);
   cleanup_stmt_.push_back(o);
   return o;
 }

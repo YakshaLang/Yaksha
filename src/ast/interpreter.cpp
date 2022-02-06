@@ -415,3 +415,4 @@ void interpreter::debug_print_stack() {
 }
 void interpreter::visit_defer_stmt(defer_stmt *obj) {}
 void interpreter::visit_class_stmt(class_stmt *obj) {}
+void interpreter::visit_del_stmt(del_stmt *obj) {}

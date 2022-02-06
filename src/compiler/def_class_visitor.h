@@ -42,6 +42,7 @@ namespace yaksha {
     def_stmt *get_function(const std::string &prefixed_name);
     bool has_class(const std::string &prefixed_name);
     class_stmt *get_class(const std::string &prefixed_name);
+    void visit_del_stmt(del_stmt *obj) override;
     std::vector<std::string> function_names_{};
     std::vector<std::string> class_names_{};
     std::vector<parsing_error> errors_{};

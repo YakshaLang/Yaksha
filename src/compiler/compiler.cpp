@@ -311,9 +311,9 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     // If there is not an expression, assign yk__sdsempty()
     // Add to deletions
     deletions_.push(name, "yk__sdsfree(" + name + ")");
-  } else {// TODO assumed to be int, handle other types.
+  } else {
     write_indent(body_);
-    object = ykobject(1, dt_pool);
+    object = ykobject(obj->data_type_);
     body_ << convert_dt(obj->data_type_->token_) << " " << name;
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
@@ -332,6 +332,7 @@ void compiler::visit_pass_stmt(pass_stmt *obj) {
 void compiler::visit_print_stmt(print_stmt *obj) {
   obj->expression_->accept(this);
   auto rhs = pop();
+  // TODO check in type checker since we only support printing primitives
   if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_int()) {
     write_indent(body_);
     body_ << "printf(\"%d\", (" << rhs.first << "))";
@@ -450,9 +451,7 @@ void compiler::pop_scope_type() {
   if (this->scope_type_stack_.empty()) { return; }
   this->scope_type_stack_.pop_back();
 }
-void compiler::visit_defer_stmt(defer_stmt *obj) {
-  defers_.push(obj->expression_);
-}
+void compiler::visit_defer_stmt(defer_stmt *obj) { defers_.push(obj); }
 void compiler::visit_class_stmt(class_stmt *obj) {
   /**
    *    struct foo {
@@ -475,5 +474,21 @@ void compiler::visit_class_stmt(class_stmt *obj) {
   dedent();
   write_indent(body_);
   body_ << "}";
+  write_end_statement(body_);
+}
+void compiler::visit_del_stmt(del_stmt *obj) {
+  obj->expression_->accept(this);
+  auto name = pop();
+  if (name.second.is_primitive_or_obj() &&
+      name.second.datatype_->is_primitive() &&
+      !name.second.datatype_->is_str()) {
+    return;
+  }
+  write_indent(body_);
+  if (name.second.is_primitive_or_obj() && name.second.datatype_->is_str()) {
+    body_ << "yk__sdsfree(" << name.first << ")";
+  } else {
+    body_ << "free(" << name.first << ")";
+  }
   write_end_statement(body_);
 }

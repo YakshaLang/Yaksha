@@ -24,6 +24,7 @@ namespace yaksha {
   struct continue_stmt;
   struct def_stmt;
   struct defer_stmt;
+  struct del_stmt;
   struct expression_stmt;
   struct if_stmt;
   struct let_stmt;
@@ -47,6 +48,7 @@ namespace yaksha {
     STMT_CONTINUE,
     STMT_DEF,
     STMT_DEFER,
+    STMT_DEL,
     STMT_EXPRESSION,
     STMT_IF,
     STMT_LET,
@@ -75,6 +77,7 @@ namespace yaksha {
     virtual void visit_continue_stmt(continue_stmt *obj) = 0;
     virtual void visit_def_stmt(def_stmt *obj) = 0;
     virtual void visit_defer_stmt(defer_stmt *obj) = 0;
+    virtual void visit_del_stmt(del_stmt *obj) = 0;
     virtual void visit_expression_stmt(expression_stmt *obj) = 0;
     virtual void visit_if_stmt(if_stmt *obj) = 0;
     virtual void visit_let_stmt(let_stmt *obj) = 0;
@@ -191,10 +194,18 @@ namespace yaksha {
     ykdatatype *return_type_;
   };
   struct defer_stmt : stmt {
-    defer_stmt(token *defer_keyword, expr *expression);
+    defer_stmt(token *defer_keyword, expr *expression, stmt *del_statement);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *defer_keyword_;
+    expr *expression_;
+    stmt *del_statement_;
+  };
+  struct del_stmt : stmt {
+    del_stmt(token *del_keyword, expr *expression);
+    void accept(stmt_visitor *v) override;
+    ast_type get_type() override;
+    token *del_keyword_;
     expr *expression_;
   };
   struct expression_stmt : stmt {
@@ -269,7 +280,9 @@ namespace yaksha {
     stmt *c_continue_stmt(token *continue_token);
     stmt *c_def_stmt(token *name, std::vector<parameter> params,
                      stmt *function_body, ykdatatype *return_type);
-    stmt *c_defer_stmt(token *defer_keyword, expr *expression);
+    stmt *c_defer_stmt(token *defer_keyword, expr *expression,
+                       stmt *del_statement);
+    stmt *c_del_stmt(token *del_keyword, expr *expression);
     stmt *c_expression_stmt(expr *expression);
     stmt *c_if_stmt(token *if_keyword, expr *expression, stmt *if_branch,
                     token *else_keyword, stmt *else_branch);

@@ -34,8 +34,9 @@ EXPRS = sorted([
 STMTS = sorted([
     ("return", (("token*", "return_keyword"), ("expr*", "expression"))),
     # defer statement works just like how we use string, deletions.
-    ("defer", (("token*", "defer_keyword"), ("expr*", "expression"))),
-    # TODO: Hmm need to think if we allow this? as this will allow arbitrary statements as expressions
+    ("defer", (("token*", "defer_keyword"), ("expr*", "expression"), ("stmt*", "del_statement"))),
+    # del statement
+    ("del", (("token*", "del_keyword"), ("expr*", "expression"))),
     ("expression", (("expr*", "expression"),)),
     # TODO: Convert print statement to a function once we add it
     # TODO: Create a println function so we can separate prints with newline and not

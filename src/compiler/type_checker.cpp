@@ -326,7 +326,17 @@ void type_checker::pop_function() {
   this->function_name_stack_.pop_back();
 }
 void type_checker::visit_defer_stmt(defer_stmt *obj) {
+  if (obj->expression_ != nullptr) {
+    auto st = expression_stmt{obj->expression_};
+    this->visit_expression_stmt(&st);
+  } else {
+    obj->del_statement_->accept(this);
+  }
+}
+void type_checker::visit_class_stmt(class_stmt *obj) {
+  // TODO check validity of types
+}
+void type_checker::visit_del_stmt(del_stmt *obj) {
   auto st = expression_stmt{obj->expression_};
   this->visit_expression_stmt(&st);
 }
-void type_checker::visit_class_stmt(class_stmt *obj) {}

@@ -70,3 +70,4 @@ class_stmt *def_class_visitor::get_class(const std::string &prefixed_name) {
 bool def_class_visitor::has_class(const std::string &prefixed_name) {
   return classes_.find(prefixed_name) != classes_.end();
 }
+void def_class_visitor::visit_del_stmt(del_stmt *obj) {}

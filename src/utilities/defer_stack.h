@@ -11,11 +11,11 @@ namespace yaksha {
   struct defer_stack {
     defer_stack();
     virtual ~defer_stack();
-    virtual void push(expr *expression);
+    virtual void push(defer_stmt *df);
     virtual void write(stmt_visitor *statement_visitor);
 
 private:
-    std::vector<expr *> del_stack_{};
+    std::vector<defer_stmt *> del_stack_{};
   };
 }// namespace yaksha
 #endif

@@ -8,7 +8,7 @@ namespace yaksha {
     void push_defer_stack();
     void pop_defer_stack();
     ~defer_stack_stack() override;
-    void push(expr *expression) override;
+    void push(defer_stmt *df) override;
     void write(stmt_visitor *statement_visitor) override;
     void write_one(stmt_visitor *statement_visitor);
 

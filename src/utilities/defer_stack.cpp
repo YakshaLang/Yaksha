@@ -9,8 +9,12 @@ void defer_stack::write(stmt_visitor *visitor) {
   for (auto i = 0; i < size; i++) {
     auto index = size - 1 - i;
     auto expression_to_write = del_stack_[index];
-    auto st = expression_stmt{expression_to_write};
-    visitor->visit_expression_stmt(&st);
+    if (expression_to_write->expression_ != nullptr) {
+      auto st = expression_stmt{expression_to_write->expression_};
+      visitor->visit_expression_stmt(&st);
+    } else {
+      expression_to_write->del_statement_->accept(visitor);
+    }
   }
 }
-void defer_stack::push(expr *expression) { del_stack_.push_back(expression); }
+void defer_stack::push(defer_stmt *df) { del_stack_.push_back(df); }
