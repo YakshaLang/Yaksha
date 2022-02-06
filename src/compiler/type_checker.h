@@ -39,7 +39,7 @@ namespace yaksha {
     /**
      * Get function information
      */
-    def_class_visitor functions_{};
+    def_class_visitor defs_classes_{};
 
 private:
     ykobject pop();

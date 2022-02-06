@@ -27,7 +27,7 @@ using namespace yaksha;
         type_checker tc{&dt_pool};                                             \
         tc.check(tree);                                                        \
         REQUIRE(tc.errors_.empty());                                           \
-        compiler comp{tc.functions_, &dt_pool};                                \
+        compiler comp{tc.defs_classes_, &dt_pool};                             \
         auto compiler_output = comp.compile(tree);                             \
         tokenizer c_code{"output.c", compiler_output};                         \
         c_code.tokenize();                                                     \
@@ -58,7 +58,11 @@ TEST_CASE("compiler: Defer") {
   TEST_FILE("../test_data/compiler_tests/test2.yaka", "test2.yaka",
             "../test_data/compiler_tests/test2.tokens");
 }
-TEST_CASE("compiler: Structure support") {
+TEST_CASE("compiler: Class support") {
   TEST_FILE("../test_data/compiler_tests/test3.yaka", "test3.yaka",
             "../test_data/compiler_tests/test3.tokens");
+}
+TEST_CASE("compiler: Create object from class") {
+  TEST_FILE("../test_data/compiler_tests/test4.yaka", "test4.yaka",
+            "../test_data/compiler_tests/test4.tokens");
 }

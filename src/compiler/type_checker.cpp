@@ -30,14 +30,14 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
         "Binary operation between two different data types are not supported");
   }
   if ((oper == token_type::PLUS) &&
-      !(rhs.is_primitive() && rhs.datatype_->support_plus())) {
+      !(rhs.is_primitive_or_obj() && rhs.datatype_->support_plus())) {
     error(obj->opr_, "Unsupported operation");
   }
   if ((oper == token_type::SUB || oper == token_type::MUL ||
        oper == token_type::DIV || oper == token_type::GREAT ||
        oper == token_type::GREAT_EQ || oper == token_type::LESS ||
        oper == token_type::LESS_EQ) &&
-      (!rhs.is_primitive() || !rhs.datatype_->is_a_number())) {
+      (!rhs.is_primitive_or_obj() || !rhs.datatype_->is_a_number())) {
     error(obj->opr_, "Unsupported operation");
   }
   if (oper == token_type::EQ_EQ || oper == token_type::NOT_EQ ||
@@ -51,6 +51,13 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
 void type_checker::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
   auto name = pop();
+  if (name.object_type_ == object_type::CLASS_ITSELF) {
+    auto class_name = name.string_val_;
+    auto data = ykobject(dt_pool_->create(class_name));
+    push(data);
+    // Creating a custom object from user defined type / class;
+    return;
+  }
   if (name.object_type_ != object_type::FUNCTION) {
     error(obj->paren_token_, "Calling a non callable "
                              "or a non existing function");
@@ -63,7 +70,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     arguments.push_back(pop());
   }
   // check if it's same size
-  auto funct = functions_.get(name.string_val_);
+  auto funct = defs_classes_.get_function(name.string_val_);
   if (funct->params_.size() != arguments.size()) {
     error(obj->paren_token_, "Too few or too "
                              "much arguments for function call");
@@ -73,7 +80,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   for (auto i = 0; i < funct->params_.size(); i++) {
     auto param = funct->params_[i];
     auto arg = arguments[i];
-    if (!(arg.is_primitive() && *arg.datatype_ == *param.data_type_)) {
+    if (!(arg.is_primitive_or_obj() && *arg.datatype_ == *param.data_type_)) {
       std::stringstream message{};
       message << "Parameter & argument " << (i + 1) << " mismatches";
       error(obj->paren_token_, message.str());
@@ -111,8 +118,8 @@ void type_checker::visit_logical_expr(logical_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
-  if (!(lhs.is_primitive() && lhs.datatype_->is_bool() && lhs.is_primitive() &&
-        lhs.datatype_->is_bool())) {
+  if (!(lhs.is_primitive_or_obj() && lhs.datatype_->is_bool() &&
+        lhs.is_primitive_or_obj() && lhs.datatype_->is_bool())) {
     error(obj->opr_, "Both LHS and RHS of logical"
                      " operator need to be boolean");
   }
@@ -121,7 +128,7 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
   // -5 - correct, -"some string" is not
   obj->right_->accept(this);
   auto rhs = pop();
-  if (!rhs.is_primitive() || !rhs.datatype_->is_a_number()) {
+  if (!rhs.is_primitive_or_obj() || !rhs.datatype_->is_a_number()) {
     error(obj->opr_, "Invalid unary operation");
   }
   push(rhs);
@@ -135,7 +142,10 @@ void type_checker::visit_variable_expr(variable_expr *obj) {
   }
   auto value = scope_.get(name);
   // Preserve function name so we can access it
-  if (value.object_type_ == object_type::FUNCTION) { value.string_val_ = name; }
+  if (value.object_type_ == object_type::FUNCTION ||
+      value.object_type_ == object_type::CLASS_ITSELF) {
+    value.string_val_ = name;
+  }
   push(value);
 }
 void type_checker::visit_block_stmt(block_stmt *obj) {
@@ -178,7 +188,7 @@ void type_checker::visit_expression_stmt(expression_stmt *obj) {
 void type_checker::visit_if_stmt(if_stmt *obj) {
   obj->expression_->accept(this);
   auto bool_expression = pop();
-  if (!bool_expression.is_primitive() ||
+  if (!bool_expression.is_primitive_or_obj() ||
       !bool_expression.datatype_->is_bool()) {
     error(obj->if_keyword_, "Invalid boolean expression used");
   }
@@ -214,12 +224,13 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
   auto function_name = peek_function();
   obj->expression_->accept(this);
   auto return_data_type = pop();
-  if (function_name.empty() || !this->functions_.has(function_name)) {
+  if (function_name.empty() ||
+      !this->defs_classes_.has_function(function_name)) {
     error(obj->return_keyword_, "Invalid use of return statement");
   } else {
     // func cannot be null here.
-    auto func = this->functions_.get(function_name);
-    if (!(return_data_type.is_primitive() &&
+    auto func = this->defs_classes_.get_function(function_name);
+    if (!(return_data_type.is_primitive_or_obj() &&
           *return_data_type.datatype_ == *func->return_type_)) {
       error(obj->return_keyword_, "Invalid return data type");
     }
@@ -228,7 +239,7 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
 void type_checker::visit_while_stmt(while_stmt *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
-  if (!exp.is_primitive() || !exp.datatype_->is_bool()) {
+  if (!exp.is_primitive_or_obj() || !exp.datatype_->is_bool()) {
     error(obj->while_keyword_,
           "While statement expression need to be a boolean");
   }
@@ -239,13 +250,13 @@ void type_checker::visit_while_stmt(while_stmt *obj) {
   pop_scope_type();
 }
 void type_checker::check(const std::vector<stmt *> &statements) {
-  functions_.extract(statements);
-  for (const auto &err : functions_.errors_) { errors_.emplace_back(err); }
+  defs_classes_.extract(statements);
+  for (const auto &err : defs_classes_.errors_) { errors_.emplace_back(err); }
   auto main_function_name = prefix("main");
-  if (!functions_.has(main_function_name)) {
+  if (!defs_classes_.has_function(main_function_name)) {
     error("Critical !! main() function must be present");
   } else {
-    auto main_function = functions_.get(main_function_name);
+    auto main_function = defs_classes_.get_function(main_function_name);
     if (!main_function->params_.empty()) {
       error("Critical !! main() function must not have parameters");
     }
@@ -253,8 +264,8 @@ void type_checker::check(const std::vector<stmt *> &statements) {
       error("Critical !! main() function must return an integer");
     }
   }
-  for (const auto &name : functions_.function_names_) {
-    auto function_definition = functions_.get(name);
+  for (const auto &name : defs_classes_.function_names_) {
+    auto function_definition = defs_classes_.get_function(name);
     if (function_definition->params_.size() > 100) {
       error(function_definition->name_,
             "Number of parameters cannot be larger than 100.");
@@ -263,6 +274,13 @@ void type_checker::check(const std::vector<stmt *> &statements) {
     function_placeholder_object.object_type_ = object_type::FUNCTION;
     scope_.define_global(name, function_placeholder_object);
   }
+  // Define classes
+  for (const auto &class_name : defs_classes_.class_names_) {
+    auto class_placeholder_object = ykobject(dt_pool_);
+    class_placeholder_object.object_type_ = object_type::CLASS_ITSELF;
+    scope_.define_global(class_name, class_placeholder_object);
+  }
+  // Visit all statements
   for (auto st : statements) { st->accept(this); }
 }
 void type_checker::error(token *tok, const std::string &message) {

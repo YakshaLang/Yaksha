@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
       errors::print_errors(tc.errors_);
       return EXIT_FAILURE;
     }
-    compiler comp{tc.functions_, &dt_pool};
+    compiler comp{tc.defs_classes_, &dt_pool};
     std::cout << comp.compile(tree);
   } catch (parsing_error &p) {
     std::cout << "Parsing error --> " << p.message_ << "\n";

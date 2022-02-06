@@ -64,7 +64,7 @@ void test_compiler(const std::string &data, const std::string &file_name) {
       errors::print_errors(tc.errors_);
       return;
     }
-    compiler c{tc.functions_, &dt_pool};
+    compiler c{tc.defs_classes_, &dt_pool};
     std::cout << c.compile(tree);
   } catch (parsing_error &p) {
     std::cout << "Parsing error --> " << p.message_ << "\n";

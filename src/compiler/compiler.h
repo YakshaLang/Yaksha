@@ -47,7 +47,7 @@ private:
      * @param basic_dt data type as a token.
      * @return converted data type.
      */
-    static std::string convert_dt(token *basic_dt);
+    std::string convert_dt(token *basic_dt);
     void push_scope_type(ast_type scope_type);
     ast_type peek_scope_type();
     void pop_scope_type();

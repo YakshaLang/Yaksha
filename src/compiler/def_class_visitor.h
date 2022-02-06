@@ -15,7 +15,6 @@ namespace yaksha {
    */
   struct def_class_visitor : expr_visitor, stmt_visitor {
     def_class_visitor();
-    void visit_class_stmt(class_stmt *obj) override;
     ~def_class_visitor() override;
     void extract(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -38,8 +37,9 @@ namespace yaksha {
     void visit_return_stmt(return_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
     void visit_defer_stmt(defer_stmt *obj) override;
-    bool has(const std::string &prefixed_name);
-    def_stmt *get(const std::string &prefixed_name);
+    void visit_class_stmt(class_stmt *obj) override;
+    bool has_function(const std::string &prefixed_name);
+    def_stmt *get_function(const std::string &prefixed_name);
     bool has_class(const std::string &prefixed_name);
     class_stmt *get_class(const std::string &prefixed_name);
     std::vector<std::string> function_names_{};

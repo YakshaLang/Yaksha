@@ -6,7 +6,7 @@ compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool)
   forward_declarations_ << "#include \"yk__lib.h\"\n";
   forward_declarations_ << "// --forward declaration section-- \n";
   body_ << "// --body section-- \n";
-  for (const auto& name: defs_classes.class_names_) {
+  for (const auto &name : defs_classes.class_names_) {
     forward_declarations_ << "struct " << name << ";\n";
   }
 };
@@ -16,7 +16,7 @@ void compiler::visit_assign_expr(assign_expr *obj) {
   auto name = prefix(obj->name_->token_);
   auto rhs = pop();
   write_indent(body_);
-  if (rhs.second.is_primitive() && rhs.second.datatype_->is_str()) {
+  if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str()) {
     // free current value.
     body_ << "yk__sdsfree(" << name << ")";
     write_end_statement(body_);
@@ -39,7 +39,7 @@ void compiler::visit_binary_expr(binary_expr *obj) {
   // Note: we are assuming data type to be same as first,
   // Since this will be type checked using type_checker.
   auto data_type = lhs.second;
-  if (data_type.is_primitive() && data_type.datatype_->is_str()) {
+  if (data_type.is_primitive_or_obj() && data_type.datatype_->is_str()) {
     if (obj->opr_->type_ == token_type::EQ_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") == 0)",
            data_type);
@@ -71,37 +71,45 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
   auto name_pair = pop();
   auto name = name_pair.first;
-  // Note: no need to check here as type_checker & def_class_visitor ensure this is present.
-  auto fn_def = defs_classes_.get(name);
   std::stringstream code{};
-  code << name << "(";
-  bool first = true;
-  for (auto arg : obj->args_) {
-    arg->accept(this);
-    auto arg_val = pop();
-    if (!first) {
-      code << ", ";
-    } else {
-      first = false;
+  // Depending on the fact that this is a function or class, we will call or create object
+  if (defs_classes_.has_function(name)) {
+    // Note: no need to check here as type_checker & def_class_visitor ensure this is present.
+    auto fn_def = defs_classes_.get_function(name);
+    code << name << "(";
+    bool first = true;
+    for (auto arg : obj->args_) {
+      arg->accept(this);
+      auto arg_val = pop();
+      if (!first) {
+        code << ", ";
+      } else {
+        first = false;
+      }
+      if (arg_val.second.is_primitive_or_obj() &&
+          arg_val.second.datatype_->is_str()) {
+        code << "yk__sdsdup(" << arg_val.first << ")";
+      } else {
+        code << arg_val.first;
+      }
     }
-    if (arg_val.second.is_primitive() && arg_val.second.datatype_->is_str()) {
-      code << "yk__sdsdup(" << arg_val.first << ")";
+    code << ")";
+    // TODO: If return type is a string, assign it to a temp, that will be deleted.
+    auto return_type = fn_def->return_type_;
+    if (return_type->is_str()) {
+      auto temp_name = temp();
+      write_indent(body_);
+      body_ << "yk__sds " << temp_name << " = " << code.str();
+      write_end_statement(body_);
+      deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
+      push("(" + temp_name + ")", ykobject(return_type));
     } else {
-      code << arg_val.first;
+      push(code.str(), ykobject(return_type));
     }
-  }
-  code << ")";
-  // TODO: If return type is a string, assign it to a temp, that will be deleted.
-  auto return_type = fn_def->return_type_;
-  if (return_type->is_str()) {
-    auto temp_name = temp();
-    write_indent(body_);
-    body_ << "yk__sds " << temp_name << " = " << code.str();
-    write_end_statement(body_);
-    deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
-    push("(" + temp_name + ")", ykobject(return_type));
-  } else {
-    push(code.str(), ykobject(return_type));
+  } else if (defs_classes_.has_class(name)) {
+    code << "malloc(sizeof(struct " << name << "))";
+    auto data = ykobject(dt_pool->create(name));
+    push(code.str(), data);
   }
 }
 void compiler::visit_grouping_expr(grouping_expr *obj) {
@@ -220,7 +228,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   func_placeholder.object_type_ = object_type::FUNCTION;
   scope_.define_global(name, func_placeholder);
   scope_.push();
-  auto function_def = defs_classes_.get(name);
+  auto function_def = defs_classes_.get_function(name);
   for (auto param : function_def->params_) {
     auto placeholder = ykobject(param.data_type_);
     scope_.define(prefix(param.name_->token_), placeholder);
@@ -324,11 +332,12 @@ void compiler::visit_pass_stmt(pass_stmt *obj) {
 void compiler::visit_print_stmt(print_stmt *obj) {
   obj->expression_->accept(this);
   auto rhs = pop();
-  if (rhs.second.is_primitive() && rhs.second.datatype_->is_int()) {
+  if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_int()) {
     write_indent(body_);
     body_ << "printf(\"%d\", (" << rhs.first << "))";
     write_end_statement(body_);
-  } else if (rhs.second.is_primitive() && rhs.second.datatype_->is_str()) {
+  } else if (rhs.second.is_primitive_or_obj() &&
+             rhs.second.datatype_->is_str()) {
     // TODO do not assume it's all ascii, and works fine :p
     write_indent(body_);
     body_ << "printf(\"%s\", (" << rhs.first << "))";
@@ -395,6 +404,8 @@ std::string compiler::temp() {
 }
 std::string compiler::convert_dt(token *basic_dt) {
   auto dt = basic_dt->token_;
+  auto prefixed = prefix(dt);
+  if (defs_classes_.has_class(prefixed)) { return "struct " + prefixed + "*"; }
   if (dt == "str") {
     return "yk__sds";
   } else if (dt == "int" || dt == "i32") {
@@ -453,7 +464,7 @@ void compiler::visit_class_stmt(class_stmt *obj) {
   body_ << "struct " << name << " {\n";
   indent();
   //
-  for (auto member: obj->members_) {
+  for (auto member : obj->members_) {
     write_indent(body_);
     auto member_name = prefix(member.name_->token_);
     auto dt = convert_dt(member.data_type_->token_);

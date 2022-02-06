@@ -9,7 +9,13 @@
 namespace yaksha {
   struct ykfunction;
   enum class control_flow_change { BREAK, RETURN, CONTINUE, NO_CHANGE, ERROR };
-  enum class object_type { PRIMITIVE, FUNCTION, RUNTIME_ERROR, UNKNOWN_OBJECT, CLASS_ITSELF };
+  enum class object_type {
+    PRIMITIVE_OR_OBJ,
+    FUNCTION,
+    RUNTIME_ERROR,
+    UNKNOWN_OBJECT,
+    CLASS_ITSELF
+  };
   struct ykobject {
     ykobject();
     explicit ykobject(ykdatatype *dt);
@@ -21,14 +27,14 @@ namespace yaksha {
     explicit ykobject(ykfunction *fun);
     explicit ykobject(control_flow_change flow_change);
     explicit ykobject(ykdt_pool *pool);
-    [[nodiscard]] bool is_primitive() const;
+    [[nodiscard]] bool is_primitive_or_obj() const;
     bool is_same_datatype(ykobject &other) const;
     int integer_val_{0};
     std::string string_val_{};
     double double_val_{};
     bool bool_val_{};
     control_flow_change flow_ = control_flow_change::NO_CHANGE;
-    object_type object_type_{object_type::PRIMITIVE};
+    object_type object_type_{object_type::PRIMITIVE_OR_OBJ};
     ykdatatype *datatype_{nullptr};
     ykfunction *fn_val_{};
     // TODO convert errors to our friendly parsing errors for syntax errors
@@ -45,7 +51,7 @@ namespace yaksha {
                                            const ykobject &s) {
       if (s.object_type_ == object_type::RUNTIME_ERROR) {
         out << "[Error]::" << s.string_val_;
-      } else if (s.object_type_ == object_type::PRIMITIVE) {
+      } else if (s.object_type_ == object_type::PRIMITIVE_OR_OBJ) {
         if (s.datatype_->is_str()) {
           out << string_utils::repr_string(s.string_val_);
         } else if (s.datatype_->is_f64()) {

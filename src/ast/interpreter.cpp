@@ -6,10 +6,11 @@
 using namespace yaksha;
 #define NUMBER_OPERATION(operator)                                             \
   do {                                                                         \
-    if (left_val.is_primitive() && left_val.datatype_->is_int()) {             \
+    if (left_val.is_primitive_or_obj() && left_val.datatype_->is_int()) {      \
       push(ykobject(left_val.integer_val_ operator right_val.integer_val_,     \
                     dt_pool_));                                                \
-    } else if (left_val.is_primitive() && left_val.datatype_->is_f64()) {      \
+    } else if (left_val.is_primitive_or_obj() &&                               \
+               left_val.datatype_->is_f64()) {                                 \
       push(ykobject(left_val.double_val_ operator right_val.double_val_,       \
                     dt_pool_));                                                \
     } else {                                                                   \
@@ -31,16 +32,19 @@ using namespace yaksha;
       }                                                                        \
     }                                                                          \
     if (!found_val) {                                                          \
-      if (left_val.is_primitive() && left_val.datatype_->is_int()) {           \
+      if (left_val.is_primitive_or_obj() && left_val.datatype_->is_int()) {    \
         push(ykobject(left_val.integer_val_ operator right_val.integer_val_,   \
                       dt_pool_));                                              \
-      } else if (left_val.is_primitive() && left_val.datatype_->is_f64()) {    \
+      } else if (left_val.is_primitive_or_obj() &&                             \
+                 left_val.datatype_->is_f64()) {                               \
         push(ykobject(left_val.double_val_ operator right_val.double_val_,     \
                       dt_pool_));                                              \
-      } else if (left_val.is_primitive() && left_val.datatype_->is_str()) {    \
+      } else if (left_val.is_primitive_or_obj() &&                             \
+                 left_val.datatype_->is_str()) {                               \
         push(ykobject(left_val.string_val_ operator right_val.string_val_,     \
                       dt_pool_));                                              \
-      } else if (left_val.is_primitive() && left_val.datatype_->is_none()) {   \
+      } else if (left_val.is_primitive_or_obj() &&                             \
+                 left_val.datatype_->is_none()) {                              \
         push(ykobject((tk) == token_type::EQ_EQ, dt_pool_));                   \
       } else {                                                                 \
         push(ykobject{"Unsupported binary operation", obj->opr_});             \
@@ -53,8 +57,8 @@ using namespace yaksha;
       push(ykobject{"Different data types..?", obj->opr_});                    \
       return;                                                                  \
     }                                                                          \
-    if ((left_val.is_primitive() && left_val.datatype_->is_none()) ||          \
-        (right_val.is_primitive() && right_val.datatype_->is_none())) {        \
+    if ((left_val.is_primitive_or_obj() && left_val.datatype_->is_none()) ||   \
+        (right_val.is_primitive_or_obj() && right_val.datatype_->is_none())) { \
       push(ykobject{"Cannot operate on None", obj->opr_});                     \
       return;                                                                  \
     }                                                                          \
@@ -74,7 +78,7 @@ void interpreter::visit_binary_expr(binary_expr *obj) {
   switch (obj->opr_->type_) {
     case token_type::PLUS:
       VALIDATE_NON_NULL_SAME_DATA_TYPE;
-      if (left_val.is_primitive() && left_val.datatype_->is_str()) {
+      if (left_val.is_primitive_or_obj() && left_val.datatype_->is_str()) {
         push(ykobject(left_val.string_val_ + right_val.string_val_, dt_pool_));
         return;
       }
@@ -86,7 +90,7 @@ void interpreter::visit_binary_expr(binary_expr *obj) {
       break;
     case token_type::DIV:
       VALIDATE_NON_NULL_SAME_DATA_TYPE;
-      if (left_val.is_primitive() && left_val.datatype_->is_int()) {
+      if (left_val.is_primitive_or_obj() && left_val.datatype_->is_int()) {
         if (right_val.integer_val_ == 0) {
           push(ykobject{"Integer division by zero", obj->opr_});
           return;
@@ -169,9 +173,9 @@ void interpreter::visit_unary_expr(unary_expr *obj) {
   if (has_error()) return;
   auto ex = pop();
   if (obj->opr_->type_ == token_type::SUB) {
-    if (ex.is_primitive() && ex.datatype_->is_f64()) {
+    if (ex.is_primitive_or_obj() && ex.datatype_->is_f64()) {
       push(ykobject(-ex.double_val_, dt_pool_));
-    } else if (ex.is_primitive() && ex.datatype_->is_int()) {
+    } else if (ex.is_primitive_or_obj() && ex.datatype_->is_int()) {
       push(ykobject(-ex.integer_val_, dt_pool_));
     } else {
       push(ykobject("Invalid data type", obj->opr_));
@@ -270,7 +274,7 @@ void interpreter::visit_if_stmt(if_stmt *obj) {
   obj->expression_->accept(this);
   if (has_error()) return;
   auto bool_val = peek();
-  if (!bool_val.is_primitive() || !bool_val.datatype_->is_bool()) {
+  if (!bool_val.is_primitive_or_obj() || !bool_val.datatype_->is_bool()) {
     push(ykobject("A boolean is needed for if statement", obj->if_keyword_));
     return;
   }
@@ -289,7 +293,7 @@ void interpreter::visit_logical_expr(logical_expr *obj) {
   obj->left_->accept(this);
   if (has_error()) { return; }
   auto left_val = pop();
-  if (!left_val.is_primitive() || !left_val.datatype_->is_bool()) {
+  if (!left_val.is_primitive_or_obj() || !left_val.datatype_->is_bool()) {
     // We are not using truthy stuff in our language
     // such as "" being false for example I may change my mind later though :)
     push(ykobject("Only boolean expressions can be used on LHS", obj->opr_));
@@ -317,7 +321,7 @@ void interpreter::visit_while_stmt(while_stmt *obj) {
     if (has_error()) { return; }
     auto condition = peek();
     // Type checking for a valid bool type!
-    if (!condition.is_primitive() || !condition.datatype_->is_bool()) {
+    if (!condition.is_primitive_or_obj() || !condition.datatype_->is_bool()) {
       push(ykobject("Only boolean expressions can be used in a while",
                     obj->while_keyword_));
       return;
@@ -373,7 +377,8 @@ void interpreter::visit_fncall_expr(fncall_expr *obj) {
   }
   // Verify arguments before we call the function
   ykobject verification = fn.fn_val_->verify(arguments, dt_pool_);
-  if (!verification.is_primitive() || !verification.datatype_->is_none()) {
+  if (!verification.is_primitive_or_obj() ||
+      !verification.datatype_->is_none()) {
     // error with verification of given arguments
     push(verification);
     return;

@@ -15,7 +15,7 @@ TEST_CASE("interpreter: 1 + 2 * 3 + 4 / (2 + 2) * 10 - 2 --> 15") {
     ip.calculate(expression);
     auto result = ip.result();
     REQUIRE(result->integer_val_ == 15);
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_int());
   } else {
     FAIL("Must parse the expression");
@@ -49,7 +49,7 @@ TEST_CASE("interpreter: 1 + 2 != 3") {
     ip.calculate(expression);
     auto result = ip.result();
     REQUIRE(!result->bool_val_);
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_bool());
   } else {
     FAIL("Must parse the expression");
@@ -83,7 +83,7 @@ TEST_CASE("interpreter: None != None is False") {
     ip.calculate(expression);
     auto result = ip.result();
     REQUIRE(!result->bool_val_);
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_bool());
   } else {
     FAIL("Must parse the expression");
@@ -100,7 +100,7 @@ TEST_CASE("interpreter: None == None is True") {
     ip.calculate(expression);
     auto result = ip.result();
     REQUIRE(result->bool_val_);
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_bool());
   } else {
     FAIL("Must parse the expression");
@@ -135,7 +135,7 @@ TEST_CASE("interpreter: a == 1 and a == 2 is False") {
     ip.calculate(expression);
     auto result = ip.result();
     REQUIRE(!result->bool_val_);
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_bool());
   } else {
     FAIL("Must parse the expression");
@@ -152,7 +152,7 @@ TEST_CASE("interpreter: a == 1 or a == 2 is True") {
     ip.calculate(expression);
     auto result = ip.result();
     REQUIRE(result->bool_val_);
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_bool());
   } else {
     FAIL("Must parse the expression");
@@ -182,7 +182,7 @@ TEST_CASE("interpreter: if and pass") {
     ip.calculate(expression);
     auto result = ip.result();
     REQUIRE(result->integer_val_ == 3);
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_int());
   } else {
     FAIL("Must parse the expression");
@@ -212,7 +212,7 @@ TEST_CASE("interpreter: call a function") {
     ip.calculate(expression);
     auto result = ip.result();
     REQUIRE(result->bool_val_ == false);
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_bool());
   } else {
     FAIL("Must parse the expression");
@@ -241,7 +241,7 @@ TEST_CASE("interpreter: call a function recursive") {
     ip.calculate(expression);
     auto result = ip.result();
     REQUIRE(result->integer_val_ == 120);// 5!
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_int());
   } else {
     FAIL("Must parse the expression");
@@ -290,7 +290,7 @@ TEST_CASE("interpreter: count to 10") {
     // Why? Last thing that is in the stack is false
     //  before interpreter exits from the loop
     REQUIRE(!result->bool_val_);
-    REQUIRE(result->is_primitive());
+    REQUIRE(result->is_primitive_or_obj());
     REQUIRE(result->datatype_->is_bool());
   } else {
     FAIL("Must parse the expression");

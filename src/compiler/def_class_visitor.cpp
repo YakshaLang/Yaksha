@@ -17,7 +17,7 @@ void def_class_visitor::visit_break_stmt(break_stmt *obj) {}
 void def_class_visitor::visit_continue_stmt(continue_stmt *obj) {}
 void def_class_visitor::visit_def_stmt(def_stmt *obj) {
   auto name = prefix(obj->name_->token_);
-  if (has(name)) {
+  if (has_function(name)) {
     error(obj->name_, "Critical!! Redefinition of function");
     return;
   }
@@ -43,11 +43,11 @@ void def_class_visitor::error(token *tok, const std::string &message) {
   auto err = parsing_error{message, tok};
   errors_.emplace_back(err);
 }
-def_stmt *def_class_visitor::get(const std::string &prefixed_name) {
-  if (has(prefixed_name)) { return functions_[prefixed_name]; }
+def_stmt *def_class_visitor::get_function(const std::string &prefixed_name) {
+  if (has_function(prefixed_name)) { return functions_[prefixed_name]; }
   return nullptr;
 }
-bool def_class_visitor::has(const std::string &prefixed_name) {
+bool def_class_visitor::has_function(const std::string &prefixed_name) {
   return functions_.find(prefixed_name) != functions_.end();
 }
 void def_class_visitor::visit_class_stmt(class_stmt *obj) {
@@ -56,7 +56,7 @@ void def_class_visitor::visit_class_stmt(class_stmt *obj) {
     error(obj->name_, "Critical!! Redefinition of class");
     return;
   }
-  if (has(name)) {
+  if (has_function(name)) {
     error(obj->name_, "Critical!! Redefinition of function as a class");
     return;
   }
