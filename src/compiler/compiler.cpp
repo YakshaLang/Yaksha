@@ -1,11 +1,14 @@
 // compiler.cpp
 #include "compiler.h"
 using namespace yaksha;
-compiler::compiler(def_class_visitor &functions, ykdt_pool *pool)
-    : functions_(functions), scope_(pool), dt_pool(pool) {
-  header_ << "#include \"yk__lib.h\"\n";
-  header_ << "// --header section-- \n";
+compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool)
+    : defs_classes_(defs_classes), scope_(pool), dt_pool(pool) {
+  forward_declarations_ << "#include \"yk__lib.h\"\n";
+  forward_declarations_ << "// --forward declaration section-- \n";
   body_ << "// --body section-- \n";
+  for (const auto& name: defs_classes.class_names_) {
+    forward_declarations_ << "struct " << name << ";\n";
+  }
 };
 compiler::~compiler() = default;
 void compiler::visit_assign_expr(assign_expr *obj) {
@@ -69,7 +72,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   auto name_pair = pop();
   auto name = name_pair.first;
   // Note: no need to check here as type_checker & def_class_visitor ensure this is present.
-  auto fn_def = functions_.get(name);
+  auto fn_def = defs_classes_.get(name);
   std::stringstream code{};
   code << name << "(";
   bool first = true;
@@ -188,18 +191,18 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   // Create declaration in header section
   auto name = prefix(obj->name_->token_);
   auto return_type = convert_dt(obj->return_type_->token_);
-  header_ << return_type << " " << name << "(";
+  forward_declarations_ << return_type << " " << name << "(";
   bool first = true;
   for (auto para : obj->params_) {
     if (!first) {
-      header_ << ", ";
+      forward_declarations_ << ", ";
     } else {
       first = false;
     }
-    header_ << convert_dt(para.data_type_->token_);
+    forward_declarations_ << convert_dt(para.data_type_->token_);
   }
-  header_ << ")";
-  write_end_statement(header_);
+  forward_declarations_ << ")";
+  write_end_statement(forward_declarations_);
   // Create body.
   body_ << return_type << " " << name << "(";
   first = true;
@@ -217,7 +220,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   func_placeholder.object_type_ = object_type::FUNCTION;
   scope_.define_global(name, func_placeholder);
   scope_.push();
-  auto function_def = functions_.get(name);
+  auto function_def = defs_classes_.get(name);
   for (auto param : function_def->params_) {
     auto placeholder = ykobject(param.data_type_);
     scope_.define(prefix(param.name_->token_), placeholder);
@@ -402,7 +405,7 @@ std::string compiler::convert_dt(token *basic_dt) {
 std::string compiler::compile(const std::vector<stmt *> &statements) {
   for (auto st : statements) { st->accept(this); }
   std::stringstream code{};
-  code << header_.str();
+  code << forward_declarations_.str();
   code << body_.str();
   // Need to call yy__main from `C` main.
   // TODO Handle arguments
@@ -439,4 +442,27 @@ void compiler::pop_scope_type() {
 void compiler::visit_defer_stmt(defer_stmt *obj) {
   defers_.push(obj->expression_);
 }
-void compiler::visit_class_stmt(class_stmt *obj) {}
+void compiler::visit_class_stmt(class_stmt *obj) {
+  /**
+   *    struct foo {
+   *       int abc;
+   *    };
+   */
+  auto name = prefix(obj->name_->token_);
+  write_indent(body_);
+  body_ << "struct " << name << " {\n";
+  indent();
+  //
+  for (auto member: obj->members_) {
+    write_indent(body_);
+    auto member_name = prefix(member.name_->token_);
+    auto dt = convert_dt(member.data_type_->token_);
+    body_ << dt << " " << member_name;
+    write_end_statement(body_);
+  }
+  //
+  dedent();
+  write_indent(body_);
+  body_ << "}";
+  write_end_statement(body_);
+}

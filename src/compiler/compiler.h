@@ -10,7 +10,7 @@
 #include <sstream>
 namespace yaksha {
   struct compiler : expr_visitor, stmt_visitor {
-    compiler(def_class_visitor &functions, ykdt_pool *pool);
+    compiler(def_class_visitor &defs_classes, ykdt_pool *pool);
     ~compiler() override;
     std::string compile(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -65,7 +65,7 @@ private:
     /**
      * Function declarations, etc
      */
-    std::stringstream header_{};
+    std::stringstream forward_declarations_{};
     /**
      * Function bodies, etc
      */
@@ -80,8 +80,8 @@ private:
     std::vector<ykobject> type_stack_{};
     // Delete stack for strings
     delete_stack_stack deletions_{};
-    // Access functions by name
-    def_class_visitor &functions_;
+    // Access functions and classes by name
+    def_class_visitor &defs_classes_;
     // Different types of scopes stack, -> are we in function body, if or while
     std::vector<ast_type> scope_type_stack_{};
     // Defer stack
