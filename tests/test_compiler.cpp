@@ -58,3 +58,7 @@ TEST_CASE("compiler: Defer") {
   TEST_FILE("../test_data/compiler_tests/test2.yaka", "test2.yaka",
             "../test_data/compiler_tests/test2.tokens");
 }
+TEST_CASE("compiler: Structure support") {
+  TEST_FILE("../test_data/compiler_tests/test3.yaka", "test3.yaka",
+            "../test_data/compiler_tests/test3.tokens");
+}
