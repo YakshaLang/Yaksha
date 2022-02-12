@@ -82,7 +82,17 @@ expr *parser::unary() {
 }
 expr *parser::fncall() {
   auto expr = primary();
-  while (match({token_type::PAREN_OPEN})) { expr = match_rest_of_fncall(expr); }
+  while (true) {
+    if (match({token_type::PAREN_OPEN})) {
+      expr = match_rest_of_fncall(expr);
+    } else if (match({token_type::DOT})) {
+      auto dot_oper = previous();
+      auto rhs = consume(token_type::NAME, "An identifier is expected");
+      expr = pool_.c_get_expr(expr, dot_oper, rhs);
+    } else {
+      break;
+    }
+  }
   return expr;
 }
 expr *parser::match_rest_of_fncall(expr *name) {
@@ -264,12 +274,17 @@ stmt *parser::declaration_statement() {
 }
 expr *parser::assignment() {
   auto exp = or_op();
+  // a = b = 1
   if (match({token_type::EQ})) {
     auto equals = previous();
     auto val = assignment();
     if (exp->get_type() == ast_type::EXPR_VARIABLE) {
       auto name = (dynamic_cast<variable_expr *>(exp))->name_;
       return pool_.c_assign_expr(name, equals, val);
+    } else if (exp->get_type() == ast_type::EXPR_GET) {
+      auto get = (dynamic_cast<get_expr *>(exp));
+      auto set_expr = pool_.c_set_expr(get->lhs_, get->dot_, get->item_);
+      return pool_.c_assign_member_expr(set_expr, equals, val);
     }
     throw error(equals, "Invalid assignment target!");
   }

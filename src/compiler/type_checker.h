@@ -32,6 +32,9 @@ namespace yaksha {
     void visit_while_stmt(while_stmt *obj) override;
     void visit_defer_stmt(defer_stmt *obj) override;
     void visit_del_stmt(del_stmt *obj) override;
+    void visit_get_expr(get_expr *obj) override;
+    void visit_set_expr(set_expr *obj) override;
+    void visit_assign_member_expr(assign_member_expr *obj) override;
     /**
      * Errors vector, type checker will try and identify as much errors as possible
      * but after first error, everything else is best guess
@@ -60,6 +63,7 @@ private:
     std::vector<ast_type> scope_type_stack_{};
     // Function stack
     std::vector<std::string> function_name_stack_{};
+    void handle_dot_operator(expr *lhs_expr, token *dot, token *member_item);
   };
 }// namespace yaksha
 #endif

@@ -71,3 +71,6 @@ bool def_class_visitor::has_class(const std::string &prefixed_name) {
   return classes_.find(prefixed_name) != classes_.end();
 }
 void def_class_visitor::visit_del_stmt(del_stmt *obj) {}
+void def_class_visitor::visit_get_expr(get_expr *obj) {}
+void def_class_visitor::visit_set_expr(set_expr *obj) {}
+void def_class_visitor::visit_assign_member_expr(assign_member_expr *obj) {}

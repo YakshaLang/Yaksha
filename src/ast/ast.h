@@ -11,11 +11,14 @@ namespace yaksha {
   struct stmt;
   struct parameter;
   struct assign_expr;
+  struct assign_member_expr;
   struct binary_expr;
   struct fncall_expr;
+  struct get_expr;
   struct grouping_expr;
   struct literal_expr;
   struct logical_expr;
+  struct set_expr;
   struct unary_expr;
   struct variable_expr;
   struct block_stmt;
@@ -35,11 +38,14 @@ namespace yaksha {
   // Types of expressions and statements
   enum class ast_type {
     EXPR_ASSIGN,
+    EXPR_ASSIGN_MEMBER,
     EXPR_BINARY,
     EXPR_FNCALL,
+    EXPR_GET,
     EXPR_GROUPING,
     EXPR_LITERAL,
     EXPR_LOGICAL,
+    EXPR_SET,
     EXPR_UNARY,
     EXPR_VARIABLE,
     STMT_BLOCK,
@@ -60,11 +66,14 @@ namespace yaksha {
   // ------ expression visitor ------
   struct expr_visitor {
     virtual void visit_assign_expr(assign_expr *obj) = 0;
+    virtual void visit_assign_member_expr(assign_member_expr *obj) = 0;
     virtual void visit_binary_expr(binary_expr *obj) = 0;
     virtual void visit_fncall_expr(fncall_expr *obj) = 0;
+    virtual void visit_get_expr(get_expr *obj) = 0;
     virtual void visit_grouping_expr(grouping_expr *obj) = 0;
     virtual void visit_literal_expr(literal_expr *obj) = 0;
     virtual void visit_logical_expr(logical_expr *obj) = 0;
+    virtual void visit_set_expr(set_expr *obj) = 0;
     virtual void visit_unary_expr(unary_expr *obj) = 0;
     virtual void visit_variable_expr(variable_expr *obj) = 0;
     virtual ~expr_visitor() = default;
@@ -108,6 +117,14 @@ namespace yaksha {
     token *opr_;
     expr *right_;
   };
+  struct assign_member_expr : expr {
+    assign_member_expr(expr *set_oper, token *opr, expr *right);
+    void accept(expr_visitor *v) override;
+    ast_type get_type() override;
+    expr *set_oper_;
+    token *opr_;
+    expr *right_;
+  };
   struct binary_expr : expr {
     binary_expr(expr *left, token *opr, expr *right);
     void accept(expr_visitor *v) override;
@@ -123,6 +140,14 @@ namespace yaksha {
     expr *name_;
     token *paren_token_;
     std::vector<expr *> args_;
+  };
+  struct get_expr : expr {
+    get_expr(expr *lhs, token *dot, token *item);
+    void accept(expr_visitor *v) override;
+    ast_type get_type() override;
+    expr *lhs_;
+    token *dot_;
+    token *item_;
   };
   struct grouping_expr : expr {
     explicit grouping_expr(expr *expression);
@@ -143,6 +168,14 @@ namespace yaksha {
     expr *left_;
     token *opr_;
     expr *right_;
+  };
+  struct set_expr : expr {
+    set_expr(expr *lhs, token *dot, token *item);
+    void accept(expr_visitor *v) override;
+    ast_type get_type() override;
+    expr *lhs_;
+    token *dot_;
+    token *item_;
   };
   struct unary_expr : expr {
     unary_expr(token *opr, expr *right);
@@ -266,12 +299,15 @@ namespace yaksha {
     ast_pool();
     ~ast_pool();
     expr *c_assign_expr(token *name, token *opr, expr *right);
+    expr *c_assign_member_expr(expr *set_oper, token *opr, expr *right);
     expr *c_binary_expr(expr *left, token *opr, expr *right);
     expr *c_fncall_expr(expr *name, token *paren_token,
                         std::vector<expr *> args);
+    expr *c_get_expr(expr *lhs, token *dot, token *item);
     expr *c_grouping_expr(expr *expression);
     expr *c_literal_expr(token *literal_token);
     expr *c_logical_expr(expr *left, token *opr, expr *right);
+    expr *c_set_expr(expr *lhs, token *dot, token *item);
     expr *c_unary_expr(token *opr, expr *right);
     expr *c_variable_expr(token *name);
     stmt *c_block_stmt(std::vector<stmt *> statements);

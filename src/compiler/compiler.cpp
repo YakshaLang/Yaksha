@@ -107,7 +107,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
       push(code.str(), ykobject(return_type));
     }
   } else if (defs_classes_.has_class(name)) {
-    code << "malloc(sizeof(struct " << name << "))";
+    code << "calloc(1, sizeof(struct " << name << "))";
     auto data = ykobject(dt_pool->create(name));
     push(code.str(), data);
   }
@@ -489,6 +489,55 @@ void compiler::visit_del_stmt(del_stmt *obj) {
     body_ << "yk__sdsfree(" << name.first << ")";
   } else {
     body_ << "free(" << name.first << ")";
+  }
+  write_end_statement(body_);
+}
+void compiler::visit_get_expr(get_expr *obj) {
+  obj->lhs_->accept(this);
+  auto lhs = pop();
+  auto item = prefix(obj->item_->token_);
+  auto user_defined_type = prefix(lhs.second.datatype_->type_);
+  auto class_ = defs_classes_.get_class(user_defined_type);
+  for (const auto &member : class_->members_) {
+    if (item == prefix(member.name_->token_)) {
+      auto placeholder = ykobject(dt_pool);
+      placeholder.datatype_ = member.data_type_;
+      push(lhs.first + "->" + item, placeholder);
+      return;
+    }
+  }
+}
+void compiler::visit_set_expr(set_expr *obj) {
+  obj->lhs_->accept(this);
+  auto lhs = pop();
+  auto item = prefix(obj->item_->token_);
+  auto user_defined_type = prefix(lhs.second.datatype_->type_);
+  auto class_ = defs_classes_.get_class(user_defined_type);
+  for (const auto &member : class_->members_) {
+    if (item == prefix(member.name_->token_)) {
+      auto placeholder = ykobject(dt_pool);
+      placeholder.datatype_ = member.data_type_;
+      push(lhs.first + "->" + item, placeholder);
+      return;
+    }
+  }
+}
+void compiler::visit_assign_member_expr(assign_member_expr *obj) {
+  obj->set_oper_->accept(this);// before  a.b, after a->b
+  auto lhs = pop();
+  obj->right_->accept(this);
+  auto rhs = pop();
+  write_indent(body_);
+  if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str()) {
+    // free current value.
+    body_ << "yk__sdsfree(" << lhs.first << ")";
+    write_end_statement(body_);
+    // duplicate the input.
+    // do assignment of the duplicate
+    write_indent(body_);
+    body_ << lhs.first << " = yk__sdsdup(" << rhs.first << ")";
+  } else {
+    body_ << lhs.first << " = " << rhs.first;
   }
   write_end_statement(body_);
 }

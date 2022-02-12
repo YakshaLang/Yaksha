@@ -340,3 +340,44 @@ void type_checker::visit_del_stmt(del_stmt *obj) {
   auto st = expression_stmt{obj->expression_};
   this->visit_expression_stmt(&st);
 }
+void type_checker::visit_get_expr(get_expr *obj) {
+  handle_dot_operator(obj->lhs_, obj->dot_, obj->item_);
+}
+void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
+                                       token *member_item) {
+  lhs_expr->accept(this);
+  auto lhs = pop();
+  if (!lhs.is_primitive_or_obj() || lhs.datatype_->is_primitive()) {
+    error(dot, "Invalid dot operator, LHS need to be an object");
+    push(ykobject(dt_pool_));
+    return;
+  }
+  auto item = prefix(member_item->token_);
+  auto user_defined_type = prefix(lhs.datatype_->type_);
+  if (defs_classes_.has_class(user_defined_type)) {
+    auto class_ = defs_classes_.get_class(user_defined_type);
+    for (const auto &member : class_->members_) {
+      if (item == prefix(member.name_->token_)) {
+        // Found the member
+        auto placeholder = ykobject(dt_pool_);
+        placeholder.datatype_ = member.data_type_;
+        push(placeholder);
+        return;
+      }
+    }
+  }
+  error(dot, "Cannot find data type of LHS");
+  push(ykobject(dt_pool_));
+}
+void type_checker::visit_set_expr(set_expr *obj) {
+  handle_dot_operator(obj->lhs_, obj->dot_, obj->item_);
+}
+void type_checker::visit_assign_member_expr(assign_member_expr *obj) {
+  obj->set_oper_->accept(this);
+  auto lhs = pop();
+  obj->right_->accept(this);
+  auto rhs = pop();
+  if (*lhs.datatype_ != *rhs.datatype_) {
+    error(obj->opr_, "Cannot assign between 2 different data types.");
+  }
+}

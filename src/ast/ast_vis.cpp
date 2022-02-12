@@ -232,3 +232,6 @@ void ast_vis::field(const std::string &name, const std::string &literal_obj,
   text_ << "</code></div>";
 }
 void ast_vis::visit_del_stmt(del_stmt *obj) {}
+void ast_vis::visit_get_expr(get_expr *obj) {}
+void ast_vis::visit_set_expr(set_expr *obj) {}
+void ast_vis::visit_assign_member_expr(assign_member_expr *obj) {}

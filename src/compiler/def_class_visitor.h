@@ -43,6 +43,9 @@ namespace yaksha {
     bool has_class(const std::string &prefixed_name);
     class_stmt *get_class(const std::string &prefixed_name);
     void visit_del_stmt(del_stmt *obj) override;
+    void visit_get_expr(get_expr *obj) override;
+    void visit_set_expr(set_expr *obj) override;
+    void visit_assign_member_expr(assign_member_expr *obj) override;
     std::vector<std::string> function_names_{};
     std::vector<std::string> class_names_{};
     std::vector<parsing_error> errors_{};

@@ -13,6 +13,8 @@ import os
 EXPRS = sorted([
     # Assign to a variable
     ("assign", (("token*", "name"), ("token*", "opr"), ("expr*", "right"))),
+    # Assign to a member
+    ("assign_member", (("expr*", "set_oper"), ("token*", "opr"), ("expr*", "right"))),
     # Binary operator (+, -, /, etc)
     ("binary", (("expr*", "left"), ("token*", "opr"), ("expr*", "right"))),
     # Logical operator (and, or)
@@ -28,7 +30,10 @@ EXPRS = sorted([
     # Function call
     # Can be abc(), abc(1), abc(1, 2, 3), etc
     #        name->`abc` args->`1, 2, 3` paren_token->`)`
-    ("fncall", (("expr*", "name"), ("token*", "paren_token"), ("std::vector<expr*>", "args")))
+    ("fncall", (("expr*", "name"), ("token*", "paren_token"), ("std::vector<expr*>", "args"))),
+    # Dot operator is used as both set and get operations
+    ("set", (("expr*", "lhs"), ("token*", "dot"), ("token*", "item"))),
+    ("get", (("expr*", "lhs"), ("token*", "dot"), ("token*", "item"))),
 ], key=lambda x: x[0])
 # Different kinds of statements
 STMTS = sorted([

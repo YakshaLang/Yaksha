@@ -12,6 +12,17 @@ expr *ast_pool::c_assign_expr(token *name, token *opr, expr *right) {
   cleanup_expr_.push_back(o);
   return o;
 }
+assign_member_expr::assign_member_expr(expr *set_oper, token *opr, expr *right)
+    : set_oper_(set_oper), opr_(opr), right_(right) {}
+void assign_member_expr::accept(expr_visitor *v) {
+  v->visit_assign_member_expr(this);
+}
+ast_type assign_member_expr::get_type() { return ast_type::EXPR_ASSIGN_MEMBER; }
+expr *ast_pool::c_assign_member_expr(expr *set_oper, token *opr, expr *right) {
+  auto o = new assign_member_expr(set_oper, opr, right);
+  cleanup_expr_.push_back(o);
+  return o;
+}
 binary_expr::binary_expr(expr *left, token *opr, expr *right)
     : left_(left), opr_(opr), right_(right) {}
 void binary_expr::accept(expr_visitor *v) { v->visit_binary_expr(this); }
@@ -29,6 +40,15 @@ ast_type fncall_expr::get_type() { return ast_type::EXPR_FNCALL; }
 expr *ast_pool::c_fncall_expr(expr *name, token *paren_token,
                               std::vector<expr *> args) {
   auto o = new fncall_expr(name, paren_token, std::move(args));
+  cleanup_expr_.push_back(o);
+  return o;
+}
+get_expr::get_expr(expr *lhs, token *dot, token *item)
+    : lhs_(lhs), dot_(dot), item_(item) {}
+void get_expr::accept(expr_visitor *v) { v->visit_get_expr(this); }
+ast_type get_expr::get_type() { return ast_type::EXPR_GET; }
+expr *ast_pool::c_get_expr(expr *lhs, token *dot, token *item) {
+  auto o = new get_expr(lhs, dot, item);
   cleanup_expr_.push_back(o);
   return o;
 }
@@ -55,6 +75,15 @@ void logical_expr::accept(expr_visitor *v) { v->visit_logical_expr(this); }
 ast_type logical_expr::get_type() { return ast_type::EXPR_LOGICAL; }
 expr *ast_pool::c_logical_expr(expr *left, token *opr, expr *right) {
   auto o = new logical_expr(left, opr, right);
+  cleanup_expr_.push_back(o);
+  return o;
+}
+set_expr::set_expr(expr *lhs, token *dot, token *item)
+    : lhs_(lhs), dot_(dot), item_(item) {}
+void set_expr::accept(expr_visitor *v) { v->visit_set_expr(this); }
+ast_type set_expr::get_type() { return ast_type::EXPR_SET; }
+expr *ast_pool::c_set_expr(expr *lhs, token *dot, token *item) {
+  auto o = new set_expr(lhs, dot, item);
   cleanup_expr_.push_back(o);
   return o;
 }

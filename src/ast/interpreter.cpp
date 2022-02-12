@@ -416,3 +416,6 @@ void interpreter::debug_print_stack() {
 void interpreter::visit_defer_stmt(defer_stmt *obj) {}
 void interpreter::visit_class_stmt(class_stmt *obj) {}
 void interpreter::visit_del_stmt(del_stmt *obj) {}
+void interpreter::visit_get_expr(get_expr *obj) {}
+void interpreter::visit_set_expr(set_expr *obj) {}
+void interpreter::visit_assign_member_expr(assign_member_expr *obj) {}
