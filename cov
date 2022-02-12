@@ -2,6 +2,9 @@
 # Run coverage & generate html report using Docker & gcovr
 echo "running coverage script..."
 docker build -t yaksha .
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
 export COV=$(realpath "./bin/coverage")
 export FUZZ=$(realpath "./bin/fuzz")
 echo "coverage path is $COV"

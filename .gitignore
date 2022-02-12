@@ -3,14 +3,9 @@
 .idea
 *.gprof
 *.out
-*.svg
 *.gcda
-wallpaper-*
 *.dll
 *.o
-bin/ray
-bin/ray-analyze
-bin/analyze-ray
 bin/*.obj
 bin/*.ini
 cmake-build-debug
@@ -27,6 +22,7 @@ bin/rg1
 !3rd/WinICD/libOpenCL.dll
 !3rd/WinICD/libOpenCL.dll.a
 bin/coverage/*.html
+bin/fuzz/*.input
 bin/Yaksha
 bin/yakshac
 bin/YakshaFuzz

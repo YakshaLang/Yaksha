@@ -29,6 +29,7 @@ add_executable(Yaksha src/main.cpp)
 
 target_link_libraries(Yaksha PUBLIC ${LIBS})
 target_link_libraries(Yaksha PUBLIC yaksha)
+target_compile_features(Yaksha PRIVATE cxx_std_17)
 
 # -- yakshac - compiler --
 # -- Yaksha executable - interpreter --
@@ -36,6 +37,7 @@ add_executable(yakshac src/comp_main.cpp)
 
 target_link_libraries(yakshac PUBLIC ${LIBS})
 target_link_libraries(yakshac PUBLIC yaksha)
+target_compile_features(yakshac PRIVATE cxx_std_17)
 
 # Adding Tests
 # -----------------------
@@ -47,6 +49,7 @@ target_compile_definitions(YakshaTests PUBLIC TESTING)
 target_link_libraries(YakshaTests PRIVATE Catch2::Catch2)
 target_link_libraries(YakshaTests PUBLIC ${LIBS})
 target_link_libraries(YakshaTests PUBLIC yaksha)
+target_compile_features(YakshaTests PRIVATE cxx_std_17)
 # Add to CTest
 include(CTest)
 include(3rd/Catch2/contrib/Catch.cmake)
@@ -57,3 +60,4 @@ catch_discover_tests(YakshaTests)
 add_executable(YakshaFuzz tests/fuzz_main.cpp)
 target_link_libraries(YakshaFuzz ${LIBS})
 target_link_libraries(YakshaFuzz PUBLIC yaksha)
+target_compile_features(YakshaFuzz PRIVATE cxx_std_17)

@@ -2,6 +2,7 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 #include "utilities/ykobject.h"
+#include <unordered_map>
 #include <string>
 namespace yaksha {
   /**
