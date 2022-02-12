@@ -207,7 +207,11 @@ void ast_vis::visit_def_stmt(def_stmt *obj) {
 }
 void ast_vis::visit_defer_stmt(defer_stmt *obj) {
   begin_block("defer-statement");
-  field("expression", obj->expression_);
+  if (obj->expression_ != nullptr) {
+    field("expression", obj->expression_);
+  } else {
+    obj->del_statement_->accept(this);
+  }
   end_block();
 }
 void ast_vis::visit_class_stmt(class_stmt *obj) {
