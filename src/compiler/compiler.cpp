@@ -405,8 +405,7 @@ std::string compiler::temp() {
 }
 std::string compiler::convert_dt(token *basic_dt) {
   auto dt = basic_dt->token_;
-  auto prefixed = prefix(dt);
-  if (defs_classes_.has_class(prefixed)) { return "struct " + prefixed + "*"; }
+  if (defs_classes_.has_class(dt)) { return "struct " + dt + "*"; }
   if (dt == "str") {
     return "yk__sds";
   } else if (dt == "int" || dt == "i32") {
@@ -496,7 +495,7 @@ void compiler::visit_get_expr(get_expr *obj) {
   obj->lhs_->accept(this);
   auto lhs = pop();
   auto item = prefix(obj->item_->token_);
-  auto user_defined_type = prefix(lhs.second.datatype_->type_);
+  auto user_defined_type = lhs.second.datatype_->type_;
   auto class_ = defs_classes_.get_class(user_defined_type);
   for (const auto &member : class_->members_) {
     if (item == prefix(member.name_->token_)) {
@@ -511,7 +510,7 @@ void compiler::visit_set_expr(set_expr *obj) {
   obj->lhs_->accept(this);
   auto lhs = pop();
   auto item = prefix(obj->item_->token_);
-  auto user_defined_type = prefix(lhs.second.datatype_->type_);
+  auto user_defined_type = lhs.second.datatype_->type_;
   auto class_ = defs_classes_.get_class(user_defined_type);
   for (const auto &member : class_->members_) {
     if (item == prefix(member.name_->token_)) {

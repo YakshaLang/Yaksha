@@ -46,11 +46,11 @@ namespace yaksha {
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
     token *token_{};
     std::string type_{};
-    bool delete_token_{false};
     std::vector<ykdatatype *> args_;
     ykprimitive primitive_type_{ykprimitive::NOT_A_PRIMITIVE};
     [[nodiscard]] bool support_plus() const;
     [[nodiscard]] bool is_a_number() const;
+    void prefix();
 
 private:
     void write_to_str(std::stringstream &s) const;

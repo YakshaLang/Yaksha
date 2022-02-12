@@ -376,6 +376,7 @@ ykdatatype *parser::parse_datatype() {
     throw error(peek(), "Must have a data type.");
   }
   auto dt = dt_pool_->create(previous());
+  dt->prefix();
   if (match({token_type::SQUARE_BRACKET_OPEN})) {
     if (dt->is_primitive()) {
       throw error(dt->token_,
@@ -387,6 +388,7 @@ ykdatatype *parser::parse_datatype() {
         throw error(dt->token_,
                     "None cannot be used as an argument for a data type.");
       }
+      arg->prefix();
       dt->args_.push_back(arg);
     } while (match({token_type::COMMA}));
     consume(token_type::SQUARE_BRACKET_CLOSE, "Must have a closing ']'");

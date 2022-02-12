@@ -1,11 +1,16 @@
 // ykdatatype.cpp
 #include "ykdatatype.h"
+#include "compiler/compiler_utils.h"
 #include <utility>
 using namespace yaksha;
 ykdatatype::ykdatatype(token *primitive_dt) {
-  token_ = primitive_dt;
+  token_ = new token();
   type_ = primitive_dt->token_;
-  delete_token_ = false;
+  token_->token_ = primitive_dt->token_;
+  token_->type_ = primitive_dt->type_;
+  token_->pos_ = primitive_dt->pos_;
+  token_->line_ = primitive_dt->line_;
+  token_->file_ = primitive_dt->file_;
   find_primitive_type();
 }
 void ykdatatype::find_primitive_type() {
@@ -38,7 +43,7 @@ void ykdatatype::find_primitive_type() {
   }
 }
 ykdatatype::~ykdatatype() {
-  if (delete_token_) { delete (token_); }
+  delete (token_);
 }
 bool ykdatatype::is_int() const { return primitive_type_ == ykprimitive::I32; }
 bool ykdatatype::is_i8() const { return primitive_type_ == ykprimitive::I8; }
@@ -97,7 +102,6 @@ ykdatatype::ykdatatype(std::string primitive) : type_(std::move(primitive)) {
   token_->pos_ = -1;
   token_->line_ = -1;
   token_->file_ = "";
-  delete_token_ = true;
   find_primitive_type();
 }
 bool ykdatatype::support_plus() const {
@@ -109,4 +113,10 @@ bool ykdatatype::is_a_number() const {
   return is_int() || is_float() || is_f32() || is_f64() || is_i8() ||
          is_i16() || is_i32() || is_i64() || is_u8() || is_u16() || is_u32() ||
          is_u64();
+}
+void ykdatatype::prefix() {
+  if (!is_primitive()) {
+    type_ = ::prefix(type_);
+    token_->token_ = ::prefix(token_->token_);
+  }
 }

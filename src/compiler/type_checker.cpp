@@ -14,7 +14,7 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
     return;
   }
   auto object = scope_.get(name);
-  if (rhs.object_type_ != object.object_type_) {
+  if (rhs.object_type_ != object.object_type_ || *rhs.datatype_ != *object.datatype_) {
     error(obj->name_, "Cannot assign between 2 different data types.");
   }
 }
@@ -353,7 +353,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     return;
   }
   auto item = prefix(member_item->token_);
-  auto user_defined_type = prefix(lhs.datatype_->type_);
+  auto user_defined_type = lhs.datatype_->type_;
   if (defs_classes_.has_class(user_defined_type)) {
     auto class_ = defs_classes_.get_class(user_defined_type);
     for (const auto &member : class_->members_) {
