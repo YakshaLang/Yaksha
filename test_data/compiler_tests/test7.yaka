@@ -1,0 +1,13 @@
+def main() -> int:
+    a: List[List[int]]
+    b: List[int]
+    defer del a
+    defer del b
+    arrput(b, 1)
+    arrput(a, b)
+    print(a[0][0])
+    print("\n")
+    a[0][0] = 100
+    print(a[0][0])
+    print("\n")
+    return 0

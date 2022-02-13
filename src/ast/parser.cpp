@@ -401,7 +401,6 @@ ykdatatype *parser::parse_datatype() {
         throw error(dt->token_,
                     "None cannot be used as an argument for a data type.");
       }
-      arg->prefix();
       dt->args_.push_back(arg);
     } while (match({token_type::COMMA}));
     consume(token_type::SQUARE_BRACKET_CLOSE, "Must have a closing ']'");

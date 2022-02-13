@@ -74,3 +74,7 @@ TEST_CASE("compiler: Array access") {
   TEST_FILE("../test_data/compiler_tests/test6.yaka", "test6.yaka",
             "../test_data/compiler_tests/test6.tokens");
 }
+TEST_CASE("compiler: Nested array access") {
+  TEST_FILE("../test_data/compiler_tests/test7.yaka", "test7.yaka",
+            "../test_data/compiler_tests/test7.tokens");
+}
