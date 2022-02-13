@@ -1,0 +1,52 @@
+class Captain:
+    name: str
+    age: int
+
+
+class Spaceship:
+    name: str
+    class_: str
+    captain: Captain
+
+def print_str_item(item: str, value: str) -> int:
+    print(item)
+    print(":\t")
+    print(value)
+    print("\n")
+    return 0
+
+def print_int_item(item: str, value: int) -> int:
+    print(item)
+    print(":\t")
+    print(value)
+    print("\n")
+    return 0
+
+def print_captain(c: Captain) -> int:
+    print_str_item("Captain.Name", c.name)
+    print_int_item("Captain.Age", c.age)
+    return 0
+
+def print_ship(s: Spaceship) -> int:
+    print_str_item("Name", s.name)
+    print_str_item("Class", s.class_)
+    print_captain(s.captain)
+    return 0
+
+def main() -> int:
+    myship: Spaceship = Spaceship()
+    myship.name = "USS Enterprise"
+    myship.class_ = "Galaxy"
+    myship.captain = Captain()
+    myship.captain.name = "Picard"
+    myship.captain.age = 59
+
+    defer del myship
+    defer del myship.class_
+    defer del myship.name
+    defer del myship.captain
+    defer del myship.captain.name
+
+    print_ship(myship)
+
+    return 0

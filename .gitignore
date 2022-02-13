@@ -28,3 +28,4 @@ bin/yakshac
 bin/YakshaFuzz
 bin/YakshaTests
 comp_output_test
+cmake-build-debug-zigcc

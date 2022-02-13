@@ -66,3 +66,7 @@ TEST_CASE("compiler: Create object from class") {
   TEST_FILE("../test_data/compiler_tests/test4.yaka", "test4.yaka",
             "../test_data/compiler_tests/test4.tokens");
 }
+TEST_CASE("compiler: Object members") {
+  TEST_FILE("../test_data/compiler_tests/test5.yaka", "test5.yaka",
+            "../test_data/compiler_tests/test5.tokens");
+}
