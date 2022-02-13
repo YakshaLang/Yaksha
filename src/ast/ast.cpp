@@ -12,6 +12,17 @@ expr *ast_pool::c_assign_expr(token *name, token *opr, expr *right) {
   cleanup_expr_.push_back(o);
   return o;
 }
+assign_arr_expr::assign_arr_expr(expr *assign_oper, token *opr, expr *right)
+    : assign_oper_(assign_oper), opr_(opr), right_(right) {}
+void assign_arr_expr::accept(expr_visitor *v) {
+  v->visit_assign_arr_expr(this);
+}
+ast_type assign_arr_expr::get_type() { return ast_type::EXPR_ASSIGN_ARR; }
+expr *ast_pool::c_assign_arr_expr(expr *assign_oper, token *opr, expr *right) {
+  auto o = new assign_arr_expr(assign_oper, opr, right);
+  cleanup_expr_.push_back(o);
+  return o;
+}
 assign_member_expr::assign_member_expr(expr *set_oper, token *opr, expr *right)
     : set_oper_(set_oper), opr_(opr), right_(right) {}
 void assign_member_expr::accept(expr_visitor *v) {
@@ -84,6 +95,37 @@ void set_expr::accept(expr_visitor *v) { v->visit_set_expr(this); }
 ast_type set_expr::get_type() { return ast_type::EXPR_SET; }
 expr *ast_pool::c_set_expr(expr *lhs, token *dot, token *item) {
   auto o = new set_expr(lhs, dot, item);
+  cleanup_expr_.push_back(o);
+  return o;
+}
+square_bracket_access_expr::square_bracket_access_expr(expr *name,
+                                                       token *sqb_token,
+                                                       expr *index_expr)
+    : name_(name), sqb_token_(sqb_token), index_expr_(index_expr) {}
+void square_bracket_access_expr::accept(expr_visitor *v) {
+  v->visit_square_bracket_access_expr(this);
+}
+ast_type square_bracket_access_expr::get_type() {
+  return ast_type::EXPR_SQUARE_BRACKET_ACCESS;
+}
+expr *ast_pool::c_square_bracket_access_expr(expr *name, token *sqb_token,
+                                             expr *index_expr) {
+  auto o = new square_bracket_access_expr(name, sqb_token, index_expr);
+  cleanup_expr_.push_back(o);
+  return o;
+}
+square_bracket_set_expr::square_bracket_set_expr(expr *name, token *sqb_token,
+                                                 expr *index_expr)
+    : name_(name), sqb_token_(sqb_token), index_expr_(index_expr) {}
+void square_bracket_set_expr::accept(expr_visitor *v) {
+  v->visit_square_bracket_set_expr(this);
+}
+ast_type square_bracket_set_expr::get_type() {
+  return ast_type::EXPR_SQUARE_BRACKET_SET;
+}
+expr *ast_pool::c_square_bracket_set_expr(expr *name, token *sqb_token,
+                                          expr *index_expr) {
+  auto o = new square_bracket_set_expr(name, sqb_token, index_expr);
   cleanup_expr_.push_back(o);
   return o;
 }

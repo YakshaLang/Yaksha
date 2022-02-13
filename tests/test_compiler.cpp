@@ -70,3 +70,7 @@ TEST_CASE("compiler: Object members") {
   TEST_FILE("../test_data/compiler_tests/test5.yaka", "test5.yaka",
             "../test_data/compiler_tests/test5.tokens");
 }
+TEST_CASE("compiler: Array access") {
+  TEST_FILE("../test_data/compiler_tests/test6.yaka", "test6.yaka",
+            "../test_data/compiler_tests/test6.tokens");
+}

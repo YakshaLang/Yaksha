@@ -46,6 +46,10 @@ namespace yaksha {
     void visit_get_expr(get_expr *obj) override;
     void visit_set_expr(set_expr *obj) override;
     void visit_assign_member_expr(assign_member_expr *obj) override;
+    void
+    visit_square_bracket_access_expr(square_bracket_access_expr *obj) override;
+    void visit_assign_arr_expr(assign_arr_expr *obj) override;
+    void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
     std::vector<std::string> function_names_{};
     std::vector<std::string> class_names_{};
     std::vector<parsing_error> errors_{};

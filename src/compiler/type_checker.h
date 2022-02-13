@@ -3,6 +3,7 @@
 #define TYPE_CHECKER_H
 #include "ast/ast.h"
 #include "ast/environment_stack.h"
+#include "compiler/builtins.h"
 #include "compiler/def_class_visitor.h"
 #include "utilities/ykobject.h"
 namespace yaksha {
@@ -35,6 +36,10 @@ namespace yaksha {
     void visit_get_expr(get_expr *obj) override;
     void visit_set_expr(set_expr *obj) override;
     void visit_assign_member_expr(assign_member_expr *obj) override;
+    void
+    visit_square_bracket_access_expr(square_bracket_access_expr *obj) override;
+    void visit_assign_arr_expr(assign_arr_expr *obj) override;
+    void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
     /**
      * Errors vector, type checker will try and identify as much errors as possible
      * but after first error, everything else is best guess
@@ -64,6 +69,10 @@ private:
     // Function stack
     std::vector<std::string> function_name_stack_{};
     void handle_dot_operator(expr *lhs_expr, token *dot, token *member_item);
+    void handle_square_access(expr *index_expr, token *sqb_token,
+                              expr *name_expr);
+    void handle_assigns(token *oper, const ykobject &lhs, const ykobject &rhs);
+    builtins builtins_;
   };
 }// namespace yaksha
 #endif

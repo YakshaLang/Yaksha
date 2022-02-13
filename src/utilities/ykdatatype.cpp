@@ -11,9 +11,9 @@ ykdatatype::ykdatatype(token *primitive_dt) {
   token_->pos_ = primitive_dt->pos_;
   token_->line_ = primitive_dt->line_;
   token_->file_ = primitive_dt->file_;
-  find_primitive_type();
+  find_builtin_or_primitive();
 }
-void ykdatatype::find_primitive_type() {
+void ykdatatype::find_builtin_or_primitive() {
   if (token_->token_ == "i8") {
     primitive_type_ = ykprimitive::I8;
   } else if (token_->token_ == "i16") {
@@ -40,11 +40,11 @@ void ykdatatype::find_primitive_type() {
     primitive_type_ = ykprimitive::BOOL;
   } else if (token_->token_ == "None") {
     primitive_type_ = ykprimitive::NONE;
+  } else if (token_->token_ == "List") {
+    builtin_type_ = ykbuiltin::ARRAY;
   }
 }
-ykdatatype::~ykdatatype() {
-  delete (token_);
-}
+ykdatatype::~ykdatatype() { delete (token_); }
 bool ykdatatype::is_int() const { return primitive_type_ == ykprimitive::I32; }
 bool ykdatatype::is_i8() const { return primitive_type_ == ykprimitive::I8; }
 bool ykdatatype::is_i16() const { return primitive_type_ == ykprimitive::I16; }
@@ -102,7 +102,7 @@ ykdatatype::ykdatatype(std::string primitive) : type_(std::move(primitive)) {
   token_->pos_ = -1;
   token_->line_ = -1;
   token_->file_ = "";
-  find_primitive_type();
+  find_builtin_or_primitive();
 }
 bool ykdatatype::support_plus() const {
   return is_str() || is_int() || is_float() || is_f32() || is_f64() ||
@@ -114,9 +114,16 @@ bool ykdatatype::is_a_number() const {
          is_i16() || is_i32() || is_i64() || is_u8() || is_u16() || is_u32() ||
          is_u64();
 }
+bool ykdatatype::is_an_integer() const {
+  return is_int() || is_i8() || is_i16() || is_i32() || is_i64() || is_u8() ||
+         is_u16() || is_u32() || is_u64();
+}
 void ykdatatype::prefix() {
   if (!is_primitive()) {
     type_ = ::prefix(type_);
     token_->token_ = ::prefix(token_->token_);
   }
+}
+bool ykdatatype::is_an_array() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::ARRAY;
 }

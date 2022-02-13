@@ -11,10 +11,14 @@ import os
 # Different kind of expressions
 # expression type name is followed by content of the class
 EXPRS = sorted([
+    # TODO Convert assignment to a statement
     # Assign to a variable
     ("assign", (("token*", "name"), ("token*", "opr"), ("expr*", "right"))),
     # Assign to a member
     ("assign_member", (("expr*", "set_oper"), ("token*", "opr"), ("expr*", "right"))),
+    # Assign to array object
+    # a[1] = 2 or a[2 + 3] = c
+    ("assign_arr", (("expr*", "assign_oper"), ("token*", "opr"), ("expr*", "right"))),
     # Binary operator (+, -, /, etc)
     ("binary", (("expr*", "left"), ("token*", "opr"), ("expr*", "right"))),
     # Logical operator (and, or)
@@ -31,6 +35,9 @@ EXPRS = sorted([
     # Can be abc(), abc(1), abc(1, 2, 3), etc
     #        name->`abc` args->`1, 2, 3` paren_token->`)`
     ("fncall", (("expr*", "name"), ("token*", "paren_token"), ("std::vector<expr*>", "args"))),
+    # Can be a[1], a[b[1]], etc
+    ("square_bracket_access", (("expr*", "name"), ("token*", "sqb_token"), ("expr*", "index_expr"))),
+    ("square_bracket_set", (("expr*", "name"), ("token*", "sqb_token"), ("expr*", "index_expr"))),
     # Dot operator is used as both set and get operations
     ("set", (("expr*", "lhs"), ("token*", "dot"), ("token*", "item"))),
     ("get", (("expr*", "lhs"), ("token*", "dot"), ("token*", "item"))),

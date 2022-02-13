@@ -3,6 +3,7 @@
 #define COMPILER_H
 #include "ast/ast.h"
 #include "ast/environment_stack.h"
+#include "builtins.h"
 #include "compiler/compiler_utils.h"
 #include "compiler/delete_stack_stack.h"
 #include "def_class_visitor.h"
@@ -38,6 +39,10 @@ namespace yaksha {
     void visit_get_expr(get_expr *obj) override;
     void visit_set_expr(set_expr *obj) override;
     void visit_assign_member_expr(assign_member_expr *obj) override;
+    void
+    visit_square_bracket_access_expr(square_bracket_access_expr *obj) override;
+    void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
+    void visit_assign_arr_expr(assign_arr_expr *obj) override;
 
 private:
     /**
@@ -46,12 +51,10 @@ private:
     std::string temp();
     /**
      * Convert Yaksha data type to appropriate C data type.
-     * TODO: This should support complex data types in future.
-     *  For now just int, str.
      * @param basic_dt data type as a token.
      * @return converted data type.
      */
-    std::string convert_dt(token *basic_dt);
+    std::string convert_dt(ykdatatype *basic_dt);
     void push_scope_type(ast_type scope_type);
     ast_type peek_scope_type();
     void pop_scope_type();
@@ -66,6 +69,7 @@ private:
     int indent_{0};
     // Counter for temp variables.
     long temp_{0};
+    builtins builtins_;
     /**
      * Function declarations, etc
      */

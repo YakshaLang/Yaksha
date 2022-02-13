@@ -14,7 +14,8 @@ namespace yaksha {
     FUNCTION,
     RUNTIME_ERROR,
     UNKNOWN_OBJECT,
-    CLASS_ITSELF
+    CLASS_ITSELF,
+    BUILTIN_FUNCTION
   };
   struct ykobject {
     ykobject();
@@ -37,10 +38,6 @@ namespace yaksha {
     object_type object_type_{object_type::PRIMITIVE_OR_OBJ};
     ykdatatype *datatype_{nullptr};
     ykfunction *fn_val_{};
-    // TODO convert errors to our friendly parsing errors for syntax errors
-    // TODO Keep string errors for runtime errors?
-    // TODO change error data type later on after we introduce maybe an actual,
-    //  err type.
     /**
      * Write ykobject representation
      * @param out output stream to write to

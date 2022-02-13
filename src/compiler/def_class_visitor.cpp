@@ -1,5 +1,6 @@
 // def_class_visitor.cpp
 #include "def_class_visitor.h"
+#include "builtins.h"
 #include "compiler_utils.h"
 using namespace yaksha;
 def_class_visitor::def_class_visitor() = default;
@@ -17,6 +18,10 @@ void def_class_visitor::visit_break_stmt(break_stmt *obj) {}
 void def_class_visitor::visit_continue_stmt(continue_stmt *obj) {}
 void def_class_visitor::visit_def_stmt(def_stmt *obj) {
   auto name = prefix(obj->name_->token_);
+  if (builtins::has_builtin(name)) {
+    error(obj->name_, "Critical!! Redefinition of builtin function");
+    return;
+  }
   if (has_function(name)) {
     error(obj->name_, "Critical!! Redefinition of function");
     return;
@@ -52,6 +57,10 @@ bool def_class_visitor::has_function(const std::string &prefixed_name) {
 }
 void def_class_visitor::visit_class_stmt(class_stmt *obj) {
   auto name = prefix(obj->name_->token_);
+  if (builtins::has_builtin(name)) {
+    error(obj->name_, "Critical!! Redefinition of builtin function");
+    return;
+  }
   if (has_class(name)) {
     error(obj->name_, "Critical!! Redefinition of class");
     return;
@@ -74,3 +83,8 @@ void def_class_visitor::visit_del_stmt(del_stmt *obj) {}
 void def_class_visitor::visit_get_expr(get_expr *obj) {}
 void def_class_visitor::visit_set_expr(set_expr *obj) {}
 void def_class_visitor::visit_assign_member_expr(assign_member_expr *obj) {}
+void def_class_visitor::visit_square_bracket_access_expr(
+    square_bracket_access_expr *obj) {}
+void def_class_visitor::visit_assign_arr_expr(assign_arr_expr *obj) {}
+void def_class_visitor::visit_square_bracket_set_expr(
+    square_bracket_set_expr *obj) {}

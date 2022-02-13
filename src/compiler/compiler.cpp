@@ -2,7 +2,8 @@
 #include "compiler.h"
 using namespace yaksha;
 compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool)
-    : defs_classes_(defs_classes), scope_(pool), dt_pool(pool) {
+    : defs_classes_(defs_classes), scope_(pool), dt_pool(pool),
+      builtins_(pool) {
   forward_declarations_ << "#include \"yk__lib.h\"\n";
   forward_declarations_ << "// --forward declaration section-- \n";
   body_ << "// --body section-- \n";
@@ -73,9 +74,16 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   auto name = name_pair.first;
   std::stringstream code{};
   // Depending on the fact that this is a function or class, we will call or create object
-  if (defs_classes_.has_function(name)) {
+  if (name_pair.second.object_type_ == object_type::BUILTIN_FUNCTION) {
+    std::vector<std::pair<std::string, ykobject>> args{};
+    for (auto arg : obj->args_) {
+      arg->accept(this);
+      args.emplace_back(pop());
+    }
+    auto result = builtins_.compile(name, args);
+    push(result.first, result.second);
+  } else if (defs_classes_.has_function(name)) {
     // Note: no need to check here as type_checker & def_class_visitor ensure this is present.
-    auto fn_def = defs_classes_.get_function(name);
     code << name << "(";
     bool first = true;
     for (auto arg : obj->args_) {
@@ -94,7 +102,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
       }
     }
     code << ")";
-    // TODO: If return type is a string, assign it to a temp, that will be deleted.
+    auto fn_def = defs_classes_.get_function(name);
     auto return_type = fn_def->return_type_;
     if (return_type->is_str()) {
       auto temp_name = temp();
@@ -167,6 +175,12 @@ void compiler::visit_unary_expr(unary_expr *obj) {
 void compiler::visit_variable_expr(variable_expr *obj) {
   // Compiler is visiting a variable, can get data type from scope_
   auto name = prefix(obj->name_->token_);
+  if (builtins::has_builtin(name)) {
+    auto b = ykobject(dt_pool);
+    b.object_type_ = object_type::BUILTIN_FUNCTION;
+    push(name, b);
+    return;
+  }
   auto object = scope_.get(name);
   push(name, object);
 }
@@ -198,7 +212,7 @@ void compiler::visit_continue_stmt(continue_stmt *obj) {
 void compiler::visit_def_stmt(def_stmt *obj) {
   // Create declaration in header section
   auto name = prefix(obj->name_->token_);
-  auto return_type = convert_dt(obj->return_type_->token_);
+  auto return_type = convert_dt(obj->return_type_);
   forward_declarations_ << return_type << " " << name << "(";
   bool first = true;
   for (auto para : obj->params_) {
@@ -207,7 +221,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     } else {
       first = false;
     }
-    forward_declarations_ << convert_dt(para.data_type_->token_);
+    forward_declarations_ << convert_dt(para.data_type_);
   }
   forward_declarations_ << ")";
   write_end_statement(forward_declarations_);
@@ -220,8 +234,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     } else {
       first = false;
     }
-    body_ << convert_dt(para.data_type_->token_) << " "
-          << prefix(para.name_->token_);
+    body_ << convert_dt(para.data_type_) << " " << prefix(para.name_->token_);
   }
   body_ << ") ";
   ykobject func_placeholder{dt_pool};
@@ -294,7 +307,7 @@ void compiler::visit_if_stmt(if_stmt *obj) {
 void compiler::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_);
   auto object = ykobject(dt_pool);
-  if (obj->data_type_->token_->token_ == "str") {
+  if (obj->data_type_->is_str()) {
     object = ykobject(std::string("str"), dt_pool);
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
@@ -311,10 +324,21 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     // If there is not an expression, assign yk__sdsempty()
     // Add to deletions
     deletions_.push(name, "yk__sdsfree(" + name + ")");
+  } else if (obj->data_type_->is_an_array()) {
+    write_indent(body_);
+    object = ykobject(obj->data_type_);
+    body_ << convert_dt(obj->data_type_) << " " << name;
+    if (obj->expression_ != nullptr) {
+      obj->expression_->accept(this);
+      auto exp = pop();
+      body_ << " = " << exp.first;
+    } else {
+      body_ << " = NULL";
+    }
   } else {
     write_indent(body_);
     object = ykobject(obj->data_type_);
-    body_ << convert_dt(obj->data_type_->token_) << " " << name;
+    body_ << convert_dt(obj->data_type_) << " " << name;
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
       auto exp = pop();
@@ -403,8 +427,12 @@ std::string compiler::temp() {
   temp_++;
   return name;
 }
-std::string compiler::convert_dt(token *basic_dt) {
-  auto dt = basic_dt->token_;
+std::string compiler::convert_dt(ykdatatype *basic_dt) {
+  if (basic_dt->is_an_array()) {
+    // int32_t*, yk__sds*, etc
+    return convert_dt(basic_dt->args_[0]) + "*";
+  }
+  auto dt = basic_dt->token_->token_;
   if (defs_classes_.has_class(dt)) { return "struct " + dt + "*"; }
   if (dt == "str") {
     return "yk__sds";
@@ -465,7 +493,7 @@ void compiler::visit_class_stmt(class_stmt *obj) {
   for (auto member : obj->members_) {
     write_indent(body_);
     auto member_name = prefix(member.name_->token_);
-    auto dt = convert_dt(member.data_type_->token_);
+    auto dt = convert_dt(member.data_type_);
     body_ << dt << " " << member_name;
     write_end_statement(body_);
   }
@@ -484,7 +512,10 @@ void compiler::visit_del_stmt(del_stmt *obj) {
     return;
   }
   write_indent(body_);
-  if (name.second.is_primitive_or_obj() && name.second.datatype_->is_str()) {
+  if (name.second.datatype_->is_an_array()) {
+    body_ << "yk__arrfree(" << name.first << ")";
+  } else if (name.second.is_primitive_or_obj() &&
+             name.second.datatype_->is_str()) {
     body_ << "yk__sdsfree(" << name.first << ")";
   } else {
     body_ << "free(" << name.first << ")";
@@ -523,6 +554,42 @@ void compiler::visit_set_expr(set_expr *obj) {
 }
 void compiler::visit_assign_member_expr(assign_member_expr *obj) {
   obj->set_oper_->accept(this);// before  a.b, after a->b
+  auto lhs = pop();
+  obj->right_->accept(this);
+  auto rhs = pop();
+  write_indent(body_);
+  if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str()) {
+    // free current value.
+    body_ << "yk__sdsfree(" << lhs.first << ")";
+    write_end_statement(body_);
+    // duplicate the input.
+    // do assignment of the duplicate
+    write_indent(body_);
+    body_ << lhs.first << " = yk__sdsdup(" << rhs.first << ")";
+  } else {
+    body_ << lhs.first << " = " << rhs.first;
+  }
+  write_end_statement(body_);
+}
+void compiler::visit_square_bracket_access_expr(
+    square_bracket_access_expr *obj) {
+  obj->name_->accept(this);
+  auto lhs = pop();
+  obj->index_expr_->accept(this);
+  auto rhs = pop();
+  auto b = ykobject(lhs.second.datatype_->args_[0]);
+  push(lhs.first + "[" + rhs.first + "]", b);
+}
+void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
+  obj->name_->accept(this);
+  auto lhs = pop();
+  obj->index_expr_->accept(this);
+  auto rhs = pop();
+  auto b = ykobject(lhs.second.datatype_->args_[0]);
+  push(lhs.first + "[" + rhs.first + "]", b);
+}
+void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
+  obj->assign_oper_->accept(this);
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();

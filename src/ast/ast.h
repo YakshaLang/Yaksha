@@ -11,6 +11,7 @@ namespace yaksha {
   struct stmt;
   struct parameter;
   struct assign_expr;
+  struct assign_arr_expr;
   struct assign_member_expr;
   struct binary_expr;
   struct fncall_expr;
@@ -19,6 +20,8 @@ namespace yaksha {
   struct literal_expr;
   struct logical_expr;
   struct set_expr;
+  struct square_bracket_access_expr;
+  struct square_bracket_set_expr;
   struct unary_expr;
   struct variable_expr;
   struct block_stmt;
@@ -38,6 +41,7 @@ namespace yaksha {
   // Types of expressions and statements
   enum class ast_type {
     EXPR_ASSIGN,
+    EXPR_ASSIGN_ARR,
     EXPR_ASSIGN_MEMBER,
     EXPR_BINARY,
     EXPR_FNCALL,
@@ -46,6 +50,8 @@ namespace yaksha {
     EXPR_LITERAL,
     EXPR_LOGICAL,
     EXPR_SET,
+    EXPR_SQUARE_BRACKET_ACCESS,
+    EXPR_SQUARE_BRACKET_SET,
     EXPR_UNARY,
     EXPR_VARIABLE,
     STMT_BLOCK,
@@ -66,6 +72,7 @@ namespace yaksha {
   // ------ expression visitor ------
   struct expr_visitor {
     virtual void visit_assign_expr(assign_expr *obj) = 0;
+    virtual void visit_assign_arr_expr(assign_arr_expr *obj) = 0;
     virtual void visit_assign_member_expr(assign_member_expr *obj) = 0;
     virtual void visit_binary_expr(binary_expr *obj) = 0;
     virtual void visit_fncall_expr(fncall_expr *obj) = 0;
@@ -74,6 +81,10 @@ namespace yaksha {
     virtual void visit_literal_expr(literal_expr *obj) = 0;
     virtual void visit_logical_expr(logical_expr *obj) = 0;
     virtual void visit_set_expr(set_expr *obj) = 0;
+    virtual void
+    visit_square_bracket_access_expr(square_bracket_access_expr *obj) = 0;
+    virtual void
+    visit_square_bracket_set_expr(square_bracket_set_expr *obj) = 0;
     virtual void visit_unary_expr(unary_expr *obj) = 0;
     virtual void visit_variable_expr(variable_expr *obj) = 0;
     virtual ~expr_visitor() = default;
@@ -114,6 +125,14 @@ namespace yaksha {
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
     token *name_;
+    token *opr_;
+    expr *right_;
+  };
+  struct assign_arr_expr : expr {
+    assign_arr_expr(expr *assign_oper, token *opr, expr *right);
+    void accept(expr_visitor *v) override;
+    ast_type get_type() override;
+    expr *assign_oper_;
     token *opr_;
     expr *right_;
   };
@@ -176,6 +195,22 @@ namespace yaksha {
     expr *lhs_;
     token *dot_;
     token *item_;
+  };
+  struct square_bracket_access_expr : expr {
+    square_bracket_access_expr(expr *name, token *sqb_token, expr *index_expr);
+    void accept(expr_visitor *v) override;
+    ast_type get_type() override;
+    expr *name_;
+    token *sqb_token_;
+    expr *index_expr_;
+  };
+  struct square_bracket_set_expr : expr {
+    square_bracket_set_expr(expr *name, token *sqb_token, expr *index_expr);
+    void accept(expr_visitor *v) override;
+    ast_type get_type() override;
+    expr *name_;
+    token *sqb_token_;
+    expr *index_expr_;
   };
   struct unary_expr : expr {
     unary_expr(token *opr, expr *right);
@@ -299,6 +334,7 @@ namespace yaksha {
     ast_pool();
     ~ast_pool();
     expr *c_assign_expr(token *name, token *opr, expr *right);
+    expr *c_assign_arr_expr(expr *assign_oper, token *opr, expr *right);
     expr *c_assign_member_expr(expr *set_oper, token *opr, expr *right);
     expr *c_binary_expr(expr *left, token *opr, expr *right);
     expr *c_fncall_expr(expr *name, token *paren_token,
@@ -308,6 +344,10 @@ namespace yaksha {
     expr *c_literal_expr(token *literal_token);
     expr *c_logical_expr(expr *left, token *opr, expr *right);
     expr *c_set_expr(expr *lhs, token *dot, token *item);
+    expr *c_square_bracket_access_expr(expr *name, token *sqb_token,
+                                       expr *index_expr);
+    expr *c_square_bracket_set_expr(expr *name, token *sqb_token,
+                                    expr *index_expr);
     expr *c_unary_expr(token *opr, expr *right);
     expr *c_variable_expr(token *name);
     stmt *c_block_stmt(std::vector<stmt *> statements);

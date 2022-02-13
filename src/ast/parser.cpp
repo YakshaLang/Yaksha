@@ -89,6 +89,8 @@ expr *parser::fncall() {
       auto dot_oper = previous();
       auto rhs = consume(token_type::NAME, "An identifier is expected");
       expr = pool_.c_get_expr(expr, dot_oper, rhs);
+    } else if (match({token_type::SQUARE_BRACKET_OPEN})) {
+      expr = match_array_access(expr);
     } else {
       break;
     }
@@ -103,6 +105,12 @@ expr *parser::match_rest_of_fncall(expr *name) {
   auto paren_close =
       consume(token_type::PAREN_CLOSE, "Function call must end with ')'");
   return pool_.c_fncall_expr(name, paren_close, args);
+}
+expr *parser::match_array_access(expr *name) {
+  auto arr_member = expression();
+  auto paren_close =
+      consume(token_type::SQUARE_BRACKET_CLOSE, "Must end with a ']'");
+  return pool_.c_square_bracket_access_expr(name, paren_close, arr_member);
 }
 expr *parser::primary() {
   if (match({token_type::KEYWORD_FALSE, token_type::KEYWORD_TRUE,
@@ -285,6 +293,11 @@ expr *parser::assignment() {
       auto get = (dynamic_cast<get_expr *>(exp));
       auto set_expr = pool_.c_set_expr(get->lhs_, get->dot_, get->item_);
       return pool_.c_assign_member_expr(set_expr, equals, val);
+    } else if (exp->get_type() == ast_type::EXPR_SQUARE_BRACKET_ACCESS) {
+      auto get = (dynamic_cast<square_bracket_access_expr *>(exp));
+      auto set_expr = pool_.c_square_bracket_set_expr(
+          get->name_, get->sqb_token_, get->index_expr_);
+      return pool_.c_assign_arr_expr(set_expr, equals, val);
     }
     throw error(equals, "Invalid assignment target!");
   }

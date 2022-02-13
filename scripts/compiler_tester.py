@@ -1,6 +1,7 @@
 import argparse
 import os
 import subprocess
+import sys
 
 from scripts.kabaraya import Colors
 
@@ -30,6 +31,10 @@ def execute(arg: str) -> (str, str, int):
     return so.strip(), se.strip(), return_value
 
 
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
 def main():
     parser = argparse.ArgumentParser(
         "compiler_tester.py",
@@ -42,9 +47,9 @@ def main():
     if ret != 0:
         print(Colors.cyan("--Yaksha Compiler--"))
         if code:
-            print(Colors.fail(code))
+            eprint(Colors.fail(code))
         if err:
-            print(Colors.fail(err))
+            eprint(Colors.fail(err))
         print(Colors.cyan("----"))
         quit(EXIT_FAILURE)
     os.chdir(TEST_DIR)
@@ -54,7 +59,7 @@ def main():
     if ret != 0:
         print(Colors.cyan("--GCC--"))
         if err:
-            print(Colors.fail(err))
+            eprint(Colors.fail(err))
         print(Colors.cyan("----"))
         quit(EXIT_FAILURE)
     print(Colors.cyan("<<------>>"))
@@ -62,7 +67,7 @@ def main():
     if out:
         print(out)
     if err:
-        print(err)
+        eprint(err)
     print(Colors.cyan("<<------>>"))
     if ret == 0:
         print(Colors.cyan("ret ="), Colors.green(ret))

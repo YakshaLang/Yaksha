@@ -3,7 +3,8 @@
 #include "compiler_utils.h"
 #include "utilities/ykfunction.h"
 using namespace yaksha;
-type_checker::type_checker(ykdt_pool *pool) : dt_pool_(pool), scope_(pool) {}
+type_checker::type_checker(ykdt_pool *pool)
+    : dt_pool_(pool), scope_(pool), builtins_(pool) {}
 type_checker::~type_checker() = default;
 void type_checker::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
@@ -14,9 +15,7 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
     return;
   }
   auto object = scope_.get(name);
-  if (rhs.object_type_ != object.object_type_ || *rhs.datatype_ != *object.datatype_) {
-    error(obj->name_, "Cannot assign between 2 different data types.");
-  }
+  handle_assigns(obj->opr_, object, rhs);
 }
 void type_checker::visit_binary_expr(binary_expr *obj) {
   auto oper = obj->opr_->type_;
@@ -58,36 +57,52 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     // Creating a custom object from user defined type / class;
     return;
   }
-  if (name.object_type_ != object_type::FUNCTION) {
-    error(obj->paren_token_, "Calling a non callable "
-                             "or a non existing function");
-    push(ykobject(dt_pool_));// Push None here
-    return;
-  }
-  std::vector<ykobject> arguments{};
-  for (auto arg : obj->args_) {
-    arg->accept(this);
-    arguments.push_back(pop());
-  }
-  // check if it's same size
-  auto funct = defs_classes_.get_function(name.string_val_);
-  if (funct->params_.size() != arguments.size()) {
-    error(obj->paren_token_, "Too few or too "
-                             "much arguments for function call");
-    push(ykobject(dt_pool_));// Push None here
-    return;
-  }
-  for (auto i = 0; i < funct->params_.size(); i++) {
-    auto param = funct->params_[i];
-    auto arg = arguments[i];
-    if (!(arg.is_primitive_or_obj() && *arg.datatype_ == *param.data_type_)) {
-      std::stringstream message{};
-      message << "Parameter & argument " << (i + 1) << " mismatches";
-      error(obj->paren_token_, message.str());
+  if (name.object_type_ == object_type::FUNCTION) {
+    std::vector<ykobject> arguments{};
+    for (auto arg : obj->args_) {
+      arg->accept(this);
+      arguments.push_back(pop());
     }
+    // check if it's same size
+    auto funct = defs_classes_.get_function(name.string_val_);
+    if (funct->params_.size() != arguments.size()) {
+      error(obj->paren_token_, "Too few or too "
+                               "much arguments for function call");
+      push(ykobject(dt_pool_));// Push None here
+      return;
+    }
+    for (auto i = 0; i < funct->params_.size(); i++) {
+      auto param = funct->params_[i];
+      auto arg = arguments[i];
+      if (!(arg.is_primitive_or_obj() && *arg.datatype_ == *param.data_type_)) {
+        std::stringstream message{};
+        message << "Parameter & argument " << (i + 1) << " mismatches";
+        error(obj->paren_token_, message.str());
+      }
+    }
+    auto data = ykobject(funct->return_type_);
+    push(data);
+    return;
   }
-  auto data = ykobject(funct->return_type_);
-  push(data);
+  if (name.object_type_ == object_type::BUILTIN_FUNCTION) {
+    std::vector<ykobject> arguments{};
+    for (auto arg : obj->args_) {
+      arg->accept(this);
+      arguments.push_back(pop());
+    }
+    auto result = builtins_.verify(name.string_val_, arguments);
+    // Error when calling builtin, if so return None as data type
+    if (result.object_type_ == object_type::RUNTIME_ERROR) {
+      error(obj->paren_token_, result.string_val_);
+      push(ykobject(dt_pool_));// Push None here
+      return;
+    }
+    push(result);
+    return;
+  }
+  error(obj->paren_token_, "Calling a non callable "
+                           "or a non existing function");
+  push(ykobject(dt_pool_));// Push None here
 }
 void type_checker::visit_grouping_expr(grouping_expr *obj) {
   obj->expression_->accept(this);
@@ -135,6 +150,13 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
 }
 void type_checker::visit_variable_expr(variable_expr *obj) {
   auto name = prefix(obj->name_->token_);
+  if (builtins::has_builtin(name)) {
+    auto b = ykobject(dt_pool_);
+    b.object_type_ = object_type::BUILTIN_FUNCTION;
+    b.string_val_ = name;
+    push(b);
+    return;
+  }
   if (!scope_.is_defined(name)) {
     error(obj->name_, "Undefined name");
     push(ykobject(dt_pool_));
@@ -377,7 +399,45 @@ void type_checker::visit_assign_member_expr(assign_member_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
-  if (*lhs.datatype_ != *rhs.datatype_) {
-    error(obj->opr_, "Cannot assign between 2 different data types.");
+  handle_assigns(obj->opr_, lhs, rhs);
+}
+void type_checker::visit_square_bracket_access_expr(
+    square_bracket_access_expr *obj) {
+  handle_square_access(obj->index_expr_, obj->sqb_token_, obj->name_);
+}
+void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
+                                        expr *name_expr) {
+  index_expr->accept(this);
+  auto index_exp = pop();
+  if (!index_exp.datatype_->is_an_integer()) {
+    push(ykobject(dt_pool_));
+    error(sqb_token, "Invalid index expression, must be of a valid integer");
   }
+  name_expr->accept(this);
+  auto arr_var = pop();
+  if (arr_var.datatype_->is_an_array()) {
+    auto placeholder = ykobject(dt_pool_);
+    placeholder.datatype_ = arr_var.datatype_->args_[0];
+    push(placeholder);
+    return;
+  }
+  push(ykobject(dt_pool_));
+  error(sqb_token, "Not an array");
+}
+void type_checker::visit_assign_arr_expr(assign_arr_expr *obj) {
+  obj->assign_oper_->accept(this);
+  auto lhs = pop();
+  obj->right_->accept(this);
+  auto rhs = pop();
+  handle_assigns(obj->opr_, lhs, rhs);
+}
+void type_checker::handle_assigns(token *oper, const ykobject &lhs,
+                                  const ykobject &rhs) {
+  if (lhs.object_type_ != rhs.object_type_ ||
+      *lhs.datatype_ != *rhs.datatype_) {
+    error(oper, "Cannot assign between 2 different data types.");
+  }
+}
+void type_checker::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
+  handle_square_access(obj->index_expr_, obj->sqb_token_, obj->name_);
 }

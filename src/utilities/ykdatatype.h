@@ -21,6 +21,7 @@ namespace yaksha {
     NONE,
     NOT_A_PRIMITIVE,
   };
+  enum class ykbuiltin { ARRAY, NOT_A_BUILTIN };
   struct ykdatatype {
     explicit ykdatatype(token *primitive_dt);
     explicit ykdatatype(std::string primitive_dt);
@@ -43,18 +44,21 @@ namespace yaksha {
     [[nodiscard]] bool is_f32() const;
     [[nodiscard]] bool is_f64() const;
     [[nodiscard]] bool is_none() const;
+    [[nodiscard]] bool support_plus() const;
+    [[nodiscard]] bool is_a_number() const;
+    [[nodiscard]] bool is_an_integer() const;
+    [[nodiscard]] bool is_an_array() const;
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
+    void prefix();
     token *token_{};
     std::string type_{};
     std::vector<ykdatatype *> args_;
     ykprimitive primitive_type_{ykprimitive::NOT_A_PRIMITIVE};
-    [[nodiscard]] bool support_plus() const;
-    [[nodiscard]] bool is_a_number() const;
-    void prefix();
+    ykbuiltin builtin_type_{ykbuiltin::NOT_A_BUILTIN};
 
 private:
     void write_to_str(std::stringstream &s) const;
-    void find_primitive_type();
+    void find_builtin_or_primitive();
   };
   inline bool operator==(const yaksha::ykdatatype &lhs,
                          const yaksha::ykdatatype &rhs) {

@@ -235,3 +235,7 @@ void ast_vis::visit_del_stmt(del_stmt *obj) {}
 void ast_vis::visit_get_expr(get_expr *obj) {}
 void ast_vis::visit_set_expr(set_expr *obj) {}
 void ast_vis::visit_assign_member_expr(assign_member_expr *obj) {}
+void ast_vis::visit_square_bracket_access_expr(
+    square_bracket_access_expr *obj) {}
+void ast_vis::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {}
+void ast_vis::visit_assign_arr_expr(assign_arr_expr *obj) {}
