@@ -1,6 +1,6 @@
 def main() -> int:
-    a: List[List[int]]
-    b: List[int]
+    a: Array[Array[int]]
+    b: Array[int]
     defer del a
     defer del b
     arrput(b, 1)

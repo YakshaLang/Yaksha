@@ -40,7 +40,7 @@ void ykdatatype::find_builtin_or_primitive() {
     primitive_type_ = ykprimitive::BOOL;
   } else if (token_->token_ == "None") {
     primitive_type_ = ykprimitive::NONE;
-  } else if (token_->token_ == "List") {
+  } else if (token_->token_ == "Array") {
     builtin_type_ = ykbuiltin::ARRAY;
   }
 }
