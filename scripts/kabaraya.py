@@ -293,24 +293,45 @@ def create_mutant():
     return mutated_data
 
 
+def prange(v):
+    try:
+        import tqdm
+        return tqdm.tqdm(v, leave=False)
+    except ImportError:
+        return v
+
+
+def progress(v: int):
+    try:
+        import tqdm
+        return tqdm.tqdm(total=v, leave=False)
+    except ImportError:
+        return None
+
+
 if __name__ == "__main__":
-    print(Colors.blue("Kabaraya is running.. watch-out!"))
+    print(Colors.blue("Kabaraya Fuzzer is running.. watch-out!"))
     os.chdir(ROOT)
     # Run without mutating as well.
-    for int_id, non_mutant in enumerate(INPUT_DATA):
+    for int_id, non_mutant in enumerate(prange(INPUT_DATA)):
         r, f, d = run_fuzz("non_mutant." + str(int_id), non_mutant)
         if r == FAILED:
             print(Colors.fail("Crashed on - "), Colors.cyan(os.path.basename(f)))
             shutil.copyfile(f, os.path.join(OUTPUT_PATH, os.path.basename(f)))
     with multiprocessing.Pool(PROCESSES) as p:
-        for outer in range(100):
+        for outer in prange(range(100)):
             to_append = []
-            for r, f, d in p.imap_unordered(run_mutant, [str(outer) + "_" + str(x) for x in range(100)]):
+            pr = progress(PROCESSES * 2)
+            for r, f, d in p.imap_unordered(run_mutant, [str(outer) + "_" + str(x) for x in range(PROCESSES * 2)]):
+                if pr:
+                    pr.update()
                 if r == FAILED:
                     print(Colors.fail("Crashed on - "), Colors.cyan(os.path.basename(f)))
                     shutil.copyfile(f, os.path.join(OUTPUT_PATH, os.path.basename(f)))
                 if r != EXCEPTION:
                     to_append.append(d)
+            if pr:
+                pr.close()
             INPUT_DATA += to_append
             if len(INPUT_DATA) > 1000:
                 INPUT_DATA = INPUT_DATA[-999:]
