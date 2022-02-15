@@ -370,14 +370,21 @@ void compiler::visit_print_stmt(print_stmt *obj) {
   }
 }
 void compiler::visit_return_stmt(return_stmt *obj) {
-  // TODO check if expression is present.
-  obj->expression_->accept(this);
-  auto rhs = pop();
-  defers_.write_one(this);
-  deletions_.write(body_, indent_, rhs.first);
-  write_indent(body_);
-  body_ << "return " << rhs.first;
-  write_end_statement(body_);
+  if (obj->expression_ != nullptr) {
+    obj->expression_->accept(this);
+    auto rhs = pop();
+    defers_.write_one(this);
+    deletions_.write(body_, indent_, rhs.first);
+    write_indent(body_);
+    body_ << "return " << rhs.first;
+    write_end_statement(body_);
+  } else {
+    defers_.write_one(this);
+    deletions_.write(body_, indent_, "");
+    write_indent(body_);
+    body_ << "return";
+    write_end_statement(body_);
+  }
 }
 void compiler::visit_while_stmt(while_stmt *obj) {
   //  while (1) {
@@ -434,10 +441,24 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   }
   auto dt = basic_dt->token_->token_;
   if (defs_classes_.has_class(dt)) { return "struct " + dt + "*"; }
-  if (dt == "str") {
+  if (basic_dt->is_str()) {
     return "yk__sds";
-  } else if (dt == "int" || dt == "i32") {
+  } else if (basic_dt->is_i8()) {
+    return "int8_t";
+  } else if (basic_dt->is_i16()) {
+    return "int16_t";
+  } else if (basic_dt->is_int() || basic_dt->is_i32()) {
     return "int32_t";
+  } else if (basic_dt->is_i64()) {
+    return "int64_t";
+  } else if (basic_dt->is_u8()) {
+    return "uint8_t";
+  } else if (basic_dt->is_u16()) {
+    return "uint16_t";
+  } else if (basic_dt->is_u32()) {
+    return "uint32_t";
+  } else if (basic_dt->is_u64()) {
+    return "uint64_t";
   }
   return "void";
 }

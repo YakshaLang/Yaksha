@@ -32,6 +32,7 @@ using namespace yaksha;
         tokenizer c_code{"output.c", compiler_output};                         \
         c_code.tokenize();                                                     \
         auto token_snapshot = yaksha::load_token_dump(C);                      \
+        yaksha::save_token_dump(C, c_code.tokens_);                            \
         REQUIRE(c_code.tokens_.size() == token_snapshot.size());               \
         for (int i = 0; i < token_snapshot.size(); i++) {                      \
           auto parsed = c_code.tokens_[i];                                     \
@@ -77,4 +78,8 @@ TEST_CASE("compiler: Array access") {
 TEST_CASE("compiler: Nested array access") {
   TEST_FILE("../test_data/compiler_tests/test7.yaka", "test7.yaka",
             "../test_data/compiler_tests/test7.tokens");
+}
+TEST_CASE("compiler: Void function") {
+  TEST_FILE("../test_data/compiler_tests/voidfunc.yaka", "voidfunc.yaka",
+            "../test_data/compiler_tests/voidfunc.tokens");
 }

@@ -244,8 +244,11 @@ void type_checker::visit_print_stmt(print_stmt *obj) {
 }
 void type_checker::visit_return_stmt(return_stmt *obj) {
   auto function_name = peek_function();
-  obj->expression_->accept(this);
-  auto return_data_type = pop();
+  ykobject return_data_type = ykobject(dt_pool_);
+  if (obj->expression_ != nullptr) {
+    obj->expression_->accept(this);
+    return_data_type = pop();
+  }
   if (function_name.empty() ||
       !this->defs_classes_.has_function(function_name)) {
     error(obj->return_keyword_, "Invalid use of return statement");

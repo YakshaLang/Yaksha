@@ -1,0 +1,5 @@
+def sample() -> None:
+    return
+
+def main() -> int:
+    return 0
