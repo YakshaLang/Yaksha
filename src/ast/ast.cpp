@@ -163,12 +163,23 @@ stmt *ast_pool::c_break_stmt(token *break_token) {
   cleanup_stmt_.push_back(o);
   return o;
 }
-class_stmt::class_stmt(token *name, std::vector<parameter> members)
-    : name_(name), members_(std::move(members)) {}
+ccode_stmt::ccode_stmt(token *ccode_keyword, token *code_str)
+    : ccode_keyword_(ccode_keyword), code_str_(code_str) {}
+void ccode_stmt::accept(stmt_visitor *v) { v->visit_ccode_stmt(this); }
+ast_type ccode_stmt::get_type() { return ast_type::STMT_CCODE; }
+stmt *ast_pool::c_ccode_stmt(token *ccode_keyword, token *code_str) {
+  auto o = new ccode_stmt(ccode_keyword, code_str);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
+class_stmt::class_stmt(token *name, std::vector<parameter> members,
+                       annotations annotations)
+    : name_(name), members_(std::move(members)), annotations_(annotations) {}
 void class_stmt::accept(stmt_visitor *v) { v->visit_class_stmt(this); }
 ast_type class_stmt::get_type() { return ast_type::STMT_CLASS; }
-stmt *ast_pool::c_class_stmt(token *name, std::vector<parameter> members) {
-  auto o = new class_stmt(name, std::move(members));
+stmt *ast_pool::c_class_stmt(token *name, std::vector<parameter> members,
+                             annotations annotations) {
+  auto o = new class_stmt(name, std::move(members), annotations);
   cleanup_stmt_.push_back(o);
   return o;
 }
@@ -182,14 +193,17 @@ stmt *ast_pool::c_continue_stmt(token *continue_token) {
   return o;
 }
 def_stmt::def_stmt(token *name, std::vector<parameter> params,
-                   stmt *function_body, ykdatatype *return_type)
+                   stmt *function_body, ykdatatype *return_type,
+                   annotations annotations)
     : name_(name), params_(std::move(params)), function_body_(function_body),
-      return_type_(return_type) {}
+      return_type_(return_type), annotations_(annotations) {}
 void def_stmt::accept(stmt_visitor *v) { v->visit_def_stmt(this); }
 ast_type def_stmt::get_type() { return ast_type::STMT_DEF; }
 stmt *ast_pool::c_def_stmt(token *name, std::vector<parameter> params,
-                           stmt *function_body, ykdatatype *return_type) {
-  auto o = new def_stmt(name, std::move(params), function_body, return_type);
+                           stmt *function_body, ykdatatype *return_type,
+                           annotations annotations) {
+  auto o = new def_stmt(name, std::move(params), function_body, return_type,
+                        annotations);
   cleanup_stmt_.push_back(o);
   return o;
 }

@@ -423,3 +423,4 @@ void interpreter::visit_square_bracket_access_expr(
     square_bracket_access_expr *obj) {}
 void interpreter::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {}
 void interpreter::visit_assign_arr_expr(assign_arr_expr *obj) {}
+void interpreter::visit_ccode_stmt(ccode_stmt *obj) {}

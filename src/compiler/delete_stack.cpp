@@ -31,7 +31,7 @@ void delete_stack::write(std::stringstream &target, int indent_level,
   }
 }
 void delete_stack::write_indent(std::stringstream &target, int indent_level) {
-  for (int i = 0; i < indent_level; i++) { target << "  "; }
+  for (int i = 0; i < indent_level; i++) { target << "    "; }
 }
 void delete_stack::write_end_statement(std::stringstream &target) {
   target << ";\n";

@@ -186,6 +186,7 @@ void compiler::visit_variable_expr(variable_expr *obj) {
 }
 void compiler::visit_block_stmt(block_stmt *obj) {
   // block will be compiled to '{' + statements + '}'
+  body_ << "\n";
   write_prev_indent(body_);
   body_ << "{\n";
   for (auto st : obj->statements_) { st->accept(this); }
@@ -210,11 +211,42 @@ void compiler::visit_continue_stmt(continue_stmt *obj) {
   write_end_statement(body_);
 }
 void compiler::visit_def_stmt(def_stmt *obj) {
-  // Create declaration in header section
   auto name = prefix(obj->name_->token_);
+  bool first = false;
+  // ::================================::
+  // Compile @nativemacro if present
+  // ::================================::
+  if (obj->annotations_.native_macro_) {
+    forward_declarations_ << "#define " << name << "(";
+    first = true;
+    for (auto para : obj->params_) {
+      if (!first) {
+        forward_declarations_ << ", ";
+      } else {
+        first = false;
+      }
+      forward_declarations_ << prefix(para.name_->token_);
+    }
+    forward_declarations_ << ") ";
+    if (obj->annotations_.native_macro_arg_.empty()) {
+      // #define yy__name ccode..
+      auto b = dynamic_cast<block_stmt *>(obj->function_body_);
+      auto st = b->statements_[0];
+      auto stn = dynamic_cast<ccode_stmt *>(st);
+      forward_declarations_ << ::string_utils::unescape(stn->code_str_->token_);
+    } else {
+      // #define yy__name arg
+      forward_declarations_ << obj->annotations_.native_macro_arg_;
+    }
+    forward_declarations_ << "\n";
+    return;
+  }
+  // ::================================::
+  // Create declaration in header section
+  // ::================================::
   auto return_type = convert_dt(obj->return_type_);
   forward_declarations_ << return_type << " " << name << "(";
-  bool first = true;
+  first = true;
   for (auto para : obj->params_) {
     if (!first) {
       forward_declarations_ << ", ";
@@ -225,7 +257,10 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   }
   forward_declarations_ << ")";
   write_end_statement(forward_declarations_);
-  // Create body.
+  // ::================================::
+  // Create first part of method body
+  //       datatype name (..params..)
+  // ::================================::
   body_ << return_type << " " << name << "(";
   first = true;
   for (auto para : obj->params_) {
@@ -237,6 +272,29 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     body_ << convert_dt(para.data_type_) << " " << prefix(para.name_->token_);
   }
   body_ << ") ";
+  // ::================================::
+  // Create @native code
+  // ::================================::
+  if (obj->annotations_.native_ && !obj->annotations_.native_arg_.empty()) {
+    body_ << "{ ";
+    if (!obj->return_type_->is_none()) { body_ << "return "; }
+    body_ << obj->annotations_.native_arg_ << "(";
+    first = true;
+    for (auto para : obj->params_) {
+      if (!first) {
+        body_ << ", ";
+      } else {
+        first = false;
+      }
+      body_ << prefix(para.name_->token_);
+    }
+    body_ << "); }\n";
+    return;
+  }
+  // ::================================::
+  // Create code body
+  // ::================================::
+  // Define parameters in nested scope for function
   ykobject func_placeholder{dt_pool};
   func_placeholder.object_type_ = object_type::FUNCTION;
   scope_.define_global(name, func_placeholder);
@@ -247,11 +305,16 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     scope_.define(prefix(param.name_->token_), placeholder);
   }
   indent();
-  // visit block_stmt
+  // ::================================::
+  // Visit function body
+  //       {
+  //            ..
+  //       }
+  // ::================================::
   push_scope_type(ast_type::STMT_DEF);
   deletions_.push_delete_stack();
   defers_.push_defer_stack();
-  // Delete all arg strings
+  // Schedule string argument deletions.
   for (auto param : function_def->params_) {
     if (param.data_type_->is_str()) {
       auto to_delete = prefix(param.name_->token_);
@@ -291,12 +354,14 @@ void compiler::visit_if_stmt(if_stmt *obj) {
   deletions_.pop_delete_stack();
   scope_.pop();
   if (obj->else_branch_ != nullptr) {
+    write_indent(body_);
+    body_ << "else";
     scope_.push();
     deletions_.push_delete_stack();
     defers_.push_defer_stack();
     push_scope_type(ast_type::STMT_IF);
     indent();
-    obj->if_branch_->accept(this);
+    obj->else_branch_->accept(this);
     dedent();
     pop_scope_type();
     defers_.pop_defer_stack();
@@ -459,6 +524,8 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "uint32_t";
   } else if (basic_dt->is_u64()) {
     return "uint64_t";
+  } else if (basic_dt->is_bool()) {
+    return "bool";
   }
   return "void";
 }
@@ -626,5 +693,10 @@ void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
   } else {
     body_ << lhs.first << " = " << rhs.first;
   }
+  write_end_statement(body_);
+}
+void compiler::visit_ccode_stmt(ccode_stmt *obj) {
+  write_indent(body_);
+  body_ << ::string_utils::unescape(obj->code_str_->token_);
   write_end_statement(body_);
 }

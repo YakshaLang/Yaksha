@@ -239,3 +239,4 @@ void ast_vis::visit_square_bracket_access_expr(
     square_bracket_access_expr *obj) {}
 void ast_vis::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {}
 void ast_vis::visit_assign_arr_expr(assign_arr_expr *obj) {}
+void ast_vis::visit_ccode_stmt(ccode_stmt *obj) {}

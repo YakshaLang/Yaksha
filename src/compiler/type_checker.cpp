@@ -199,7 +199,41 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
       scope_.define(name, data);
     }
   }
-  obj->function_body_->accept(this);
+  if (obj->annotations_.native_ || obj->annotations_.native_macro_) {
+    auto body = dynamic_cast<block_stmt *>(obj->function_body_);
+    if (body->statements_.size() != 1) {
+      error(obj->name_,
+            "@native or @nativemacro function must have only 1 statement");
+    } else {
+      auto st = body->statements_[0]->get_type();
+      if (st != ast_type::STMT_PASS && st != ast_type::STMT_CCODE) {
+        error(obj->name_,
+              "@native or @nativemacro function must have only 1 statement,"
+              " which must be of type ccode or pass.");
+      }
+      if (obj->annotations_.native_ && st == ast_type::STMT_PASS &&
+          obj->annotations_.native_arg_.empty()) {
+        error("@native function must have a valid argument if pass is used as "
+              "the statement");
+      }
+      if (obj->annotations_.native_macro_ && st == ast_type::STMT_PASS &&
+          obj->annotations_.native_macro_arg_.empty()) {
+        error("@nativemacro function must have a valid argument if pass is "
+              "used as the statement");
+      }
+      if (obj->annotations_.native_ && st == ast_type::STMT_CCODE &&
+          !obj->annotations_.native_arg_.empty()) {
+        error("@native function must not have an argument if ccode is used");
+      }
+      if (obj->annotations_.native_macro_ && st == ast_type::STMT_CCODE &&
+          !obj->annotations_.native_macro_arg_.empty()) {
+        error(
+            "@nativemacro function must not have an argument if ccode is used");
+      }
+    }
+  } else {
+    obj->function_body_->accept(this);
+  }
   scope_.pop();
   pop_scope_type();
   pop_function();
@@ -443,4 +477,12 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
 }
 void type_checker::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
   handle_square_access(obj->index_expr_, obj->sqb_token_, obj->name_);
+}
+void type_checker::visit_ccode_stmt(ccode_stmt *obj) {
+  auto fname = peek_function();
+  auto fn = defs_classes_.get_function(fname);
+  if (!fn->annotations_.native_ && !fn->annotations_.native_macro_) {
+    error(obj->ccode_keyword_,
+          "Invalid use of ccode statement outside non native function");
+  }
 }

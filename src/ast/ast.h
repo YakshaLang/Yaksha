@@ -3,6 +3,7 @@
 #ifndef AST_H
 #define AST_H
 #include "tokenizer/token.h"
+#include "utilities/annotations.h"
 #include "utilities/ykdatatype.h"
 #include <vector>
 namespace yaksha {
@@ -26,6 +27,7 @@ namespace yaksha {
   struct variable_expr;
   struct block_stmt;
   struct break_stmt;
+  struct ccode_stmt;
   struct class_stmt;
   struct continue_stmt;
   struct def_stmt;
@@ -56,6 +58,7 @@ namespace yaksha {
     EXPR_VARIABLE,
     STMT_BLOCK,
     STMT_BREAK,
+    STMT_CCODE,
     STMT_CLASS,
     STMT_CONTINUE,
     STMT_DEF,
@@ -93,6 +96,7 @@ namespace yaksha {
   struct stmt_visitor {
     virtual void visit_block_stmt(block_stmt *obj) = 0;
     virtual void visit_break_stmt(break_stmt *obj) = 0;
+    virtual void visit_ccode_stmt(ccode_stmt *obj) = 0;
     virtual void visit_class_stmt(class_stmt *obj) = 0;
     virtual void visit_continue_stmt(continue_stmt *obj) = 0;
     virtual void visit_def_stmt(def_stmt *obj) = 0;
@@ -238,12 +242,21 @@ namespace yaksha {
     ast_type get_type() override;
     token *break_token_;
   };
+  struct ccode_stmt : stmt {
+    ccode_stmt(token *ccode_keyword, token *code_str);
+    void accept(stmt_visitor *v) override;
+    ast_type get_type() override;
+    token *ccode_keyword_;
+    token *code_str_;
+  };
   struct class_stmt : stmt {
-    class_stmt(token *name, std::vector<parameter> members);
+    class_stmt(token *name, std::vector<parameter> members,
+               annotations annotations);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *name_;
     std::vector<parameter> members_;
+    annotations annotations_;
   };
   struct continue_stmt : stmt {
     explicit continue_stmt(token *continue_token);
@@ -253,13 +266,14 @@ namespace yaksha {
   };
   struct def_stmt : stmt {
     def_stmt(token *name, std::vector<parameter> params, stmt *function_body,
-             ykdatatype *return_type);
+             ykdatatype *return_type, annotations annotations);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *name_;
     std::vector<parameter> params_;
     stmt *function_body_;
     ykdatatype *return_type_;
+    annotations annotations_;
   };
   struct defer_stmt : stmt {
     defer_stmt(token *defer_keyword, expr *expression, stmt *del_statement);
@@ -352,10 +366,13 @@ namespace yaksha {
     expr *c_variable_expr(token *name);
     stmt *c_block_stmt(std::vector<stmt *> statements);
     stmt *c_break_stmt(token *break_token);
-    stmt *c_class_stmt(token *name, std::vector<parameter> members);
+    stmt *c_ccode_stmt(token *ccode_keyword, token *code_str);
+    stmt *c_class_stmt(token *name, std::vector<parameter> members,
+                       annotations annotations);
     stmt *c_continue_stmt(token *continue_token);
     stmt *c_def_stmt(token *name, std::vector<parameter> params,
-                     stmt *function_body, ykdatatype *return_type);
+                     stmt *function_body, ykdatatype *return_type,
+                     annotations annotations);
     stmt *c_defer_stmt(token *defer_keyword, expr *expression,
                        stmt *del_statement);
     stmt *c_del_stmt(token *del_keyword, expr *expression);

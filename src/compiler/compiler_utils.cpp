@@ -7,5 +7,5 @@ std::string yaksha::prefix(const std::string &input) {
   return "yy__" + input;
 }
 void yaksha::write_indent(std::stringstream &where_to, int level) {
-  for (auto i = 0; i < level; i++) { where_to << "  "; }
+  for (auto i = 0; i < level; i++) { where_to << "    "; }
 }

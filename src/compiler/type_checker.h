@@ -9,7 +9,6 @@
 namespace yaksha {
   struct type_checker : expr_visitor, stmt_visitor {
     explicit type_checker(ykdt_pool *pool);
-    void visit_class_stmt(class_stmt *obj) override;
     ~type_checker() override;
     void check(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -24,6 +23,7 @@ namespace yaksha {
     void visit_break_stmt(break_stmt *obj) override;
     void visit_continue_stmt(continue_stmt *obj) override;
     void visit_def_stmt(def_stmt *obj) override;
+    void visit_class_stmt(class_stmt *obj) override;
     void visit_expression_stmt(expression_stmt *obj) override;
     void visit_if_stmt(if_stmt *obj) override;
     void visit_let_stmt(let_stmt *obj) override;
@@ -40,6 +40,7 @@ namespace yaksha {
     visit_square_bracket_access_expr(square_bracket_access_expr *obj) override;
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
+    void visit_ccode_stmt(ccode_stmt *obj) override;
     /**
      * Errors vector, type checker will try and identify as much errors as possible
      * but after first error, everything else is best guess
@@ -61,17 +62,20 @@ private:
     void push_function(const std::string &prefixed_name);
     std::string peek_function();
     void pop_function();
+    void handle_dot_operator(expr *lhs_expr, token *dot, token *member_item);
+    void handle_square_access(expr *index_expr, token *sqb_token,
+                              expr *name_expr);
+    void handle_assigns(token *oper, const ykobject &lhs, const ykobject &rhs);
+    // Scope
     environment_stack scope_;
+    // Data type pool
     ykdt_pool *dt_pool_;
     std::vector<ykobject> object_stack_{};
     // Different types of scopes stack, -> are we in function body, if or while
     std::vector<ast_type> scope_type_stack_{};
     // Function stack
     std::vector<std::string> function_name_stack_{};
-    void handle_dot_operator(expr *lhs_expr, token *dot, token *member_item);
-    void handle_square_access(expr *index_expr, token *sqb_token,
-                              expr *name_expr);
-    void handle_assigns(token *oper, const ykobject &lhs, const ykobject &rhs);
+    // Builtin functions
     builtins builtins_;
   };
 }// namespace yaksha

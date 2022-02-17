@@ -83,3 +83,7 @@ TEST_CASE("compiler: Void function") {
   TEST_FILE("../test_data/compiler_tests/voidfunc.yaka", "voidfunc.yaka",
             "../test_data/compiler_tests/voidfunc.tokens");
 }
+TEST_CASE("compiler: Native functions") {
+  TEST_FILE("../test_data/compiler_tests/nativefunc.yaka", "nativefunc.yaka",
+            "../test_data/compiler_tests/nativefunc.tokens");
+}

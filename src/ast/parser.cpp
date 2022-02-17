@@ -2,6 +2,7 @@
 #include "ast/parser.h"
 #include <algorithm>
 #include <cassert>
+#include <utility>
 using namespace yaksha;
 parser::parser(std::vector<token> &tokens, ykdt_pool *pool)
     : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0}, dt_pool_(pool) {}
@@ -181,6 +182,7 @@ stmt *parser::statement() {
   if (match({token_type::KEYWORD_RETURN})) { return return_statement(); }
   if (match({token_type::KEYWORD_DEFER})) { return defer_statement(); }
   if (match({token_type::KEYWORD_DEL})) { return del_statement(); }
+  if (match({token_type::KEYWORD_CCODE})) { return ccode_statement(); }
   return expression_statement();
 }
 stmt *parser::pass_statement() {
@@ -260,8 +262,9 @@ stmt *parser::declaration_statement() {
   expr *exp = nullptr;
   token *data_type = nullptr;
   try {
-    if (match({token_type::KEYWORD_DEF})) { return def_statement(); }
-    if (match({token_type::KEYWORD_CLASS})) { return class_statement(); }
+    if (match({token_type::KEYWORD_DEF})) { return def_statement({}); }
+    if (match({token_type::KEYWORD_CLASS})) { return class_statement({}); }
+    if (match({token_type::AT})) { return attempt_parse_def_or_class(); }
     if (!match({token_type::NAME})) { return statement(); }
     var_name = previous();
     // Colon should come after name for a variable declaration
@@ -323,12 +326,6 @@ expr *parser::and_op() {
 }
 stmt *parser::while_statement() {
   // while_stmt   -> KEYWORD_WHILE EXPRESSION block_stmt
-  // TODO control flow change must happen,
-  //  Currently if we throw an error somewhere we do not reduce this?
-  //  Should we set this to zero in panic mode? parsing?
-  //  (We won't compile/run) those anyway.
-  //  Perhaps we should get rid of exceptions in parser.cpp
-  //  Which I think is better for the longer term.
   control_flow_++;
   auto while_keyword = previous();
   auto exp = expression();
@@ -363,7 +360,7 @@ stmt *parser::return_statement() {
                  "Expect new line after 'return' statement.");
   return pool_.c_return_stmt(tok, exp);
 }
-stmt *parser::def_statement() {
+stmt *parser::def_statement(annotations ants) {
   // def_statement -> KEYWORD_DEF NAME PAREN_OPEN [[NAME COLON DATA_TYPE]*] PAREN_CLOSE ARROW DATA_TYPE BLOCK
   auto name = consume(token_type::NAME, "Function name must be present");
   consume(token_type::PAREN_OPEN, "Opening '(' must be present");
@@ -382,7 +379,7 @@ stmt *parser::def_statement() {
   consume(token_type::ARROW, "'->' operator must be present");
   auto return_dt = parse_datatype();
   auto body = block_statement();
-  return pool_.c_def_stmt(name, params, body, return_dt);
+  return pool_.c_def_stmt(name, params, body, return_dt, std::move(ants));
 }
 ykdatatype *parser::parse_datatype() {
   if (!match({token_type::NAME, token_type::KEYWORD_NONE})) {
@@ -410,14 +407,14 @@ ykdatatype *parser::parse_datatype() {
 parser::~parser() {
   if (delete_dt_pool_) { delete dt_pool_; }
 }
-stmt *parser::class_statement() {
+stmt *parser::class_statement(annotations ants) {
   auto name = consume(token_type::NAME, "Class name must be present");
   consume(token_type::COLON, "Colon must be present after class name");
   consume(token_type::NEW_LINE, "Class block must start with a new line");
   consume(token_type::BA_INDENT,
           "Class block must start with an indentation increase");
   std::vector<parameter> members = parse_class_members(name);
-  return pool_.c_class_stmt(name, members);
+  return pool_.c_class_stmt(name, members, std::move(ants));
 }
 std::vector<parameter> parser::parse_class_members(token *name) {
   std::vector<parameter> members{};
@@ -446,4 +443,56 @@ stmt *parser::del_statement_base() {
   auto del_keyword = previous();
   expr *exp = expression();
   return pool_.c_del_stmt(del_keyword, exp);
+}
+stmt *parser::attempt_parse_def_or_class() {
+  auto at_sign = previous();
+  annotations ants;
+  ants.add(parse_annotation());
+  if (!ants.error_.empty()) { throw error(at_sign, ants.error_); }
+  while (!is_at_end()) {
+    if (match({token_type::AT})) {
+      ants.add(parse_annotation());
+      if (!ants.error_.empty()) { throw error(at_sign, ants.error_); }
+    } else if (match({token_type::KEYWORD_DEF})) {
+      return def_statement(ants);
+    } else if (match({token_type::KEYWORD_CLASS})) {
+      return class_statement(ants);
+    }
+  }
+  throw error(at_sign, "End of file reached when parsing annotations. def or "
+                       "class statement must come after annotations.");
+}
+annotation parser::parse_annotation() {
+  auto name = consume(token_type::NAME, "Annotation must have a valid name");
+  std::string argument{};
+  if (match({token_type::PAREN_OPEN})) {
+    auto nt = this->peek();
+    if (nt->type_ == token_type::STRING ||
+        nt->type_ == token_type::THREE_QUOTE_STRING) {
+      advance();
+      argument = nt->token_;
+    } else {
+      throw error(nt, "Invalid token as annotation argument. Only a single "
+                      "string must be present.");
+    }
+    consume(token_type::PAREN_CLOSE, "Expected ')'");
+  }
+  consume(token_type::NEW_LINE, "Annotation must end with a new line.");
+  annotation a{};
+  a.name_ = name->token_;
+  a.arg_ = argument;
+  return a;
+}
+stmt *parser::ccode_statement() {
+  auto ccode_keyword = previous();
+  auto cc = peek();
+  if (cc->type_ != token_type::STRING &&
+      cc->type_ != token_type::THREE_QUOTE_STRING) {
+    throw error(ccode_keyword,
+                "Expected ccode statement have a string literal.");
+  }
+  advance();
+  consume_or_eof(token_type::NEW_LINE,
+                 "Expect new line after value for ccode statement.");
+  return pool_.c_ccode_stmt(ccode_keyword, cc);
 }

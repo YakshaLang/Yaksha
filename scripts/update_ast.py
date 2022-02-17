@@ -11,7 +11,6 @@ import os
 # Different kind of expressions
 # expression type name is followed by content of the class
 EXPRS = sorted([
-    # TODO Convert assignment to a statement
     # Assign to a variable
     ("assign", (("token*", "name"), ("token*", "opr"), ("expr*", "right"))),
     # Assign to a member
@@ -54,9 +53,12 @@ STMTS = sorted([
     # TODO: Create a println function so we can separate prints with newline and not
     # Or keep it as print
     ("print", (("token*", "print_keyword"), ("expr*", "expression"))),
+    # ccode statement
+    ("ccode", (("token*", "ccode_keyword"), ("token*", "code_str"))),
     # TODO: Replace expression in while and if to condition later on as it make more sense
     # Note: else_branch is optional here.
     # Unlike python expression must be a boolean here
+    # TODO add support for elif blocks
     ("if", (("token*", "if_keyword"), ("expr*", "expression"), ("stmt*", "if_branch"),
             ("token*", "else_keyword"), ("stmt*", "else_branch"))),
     # While loop just got a condition and a body
@@ -75,8 +77,8 @@ STMTS = sorted([
     # Make sure we always say the return type
     # `def abc(a: int) -> None:`
     ("def", (("token*", "name"), ("std::vector<parameter>", "params"),
-             ("stmt*", "function_body"), ("ykdatatype*", "return_type"))),
-    ("class", (("token*", "name"), ("std::vector<parameter>", "members")))
+             ("stmt*", "function_body"), ("ykdatatype*", "return_type"), ("annotations", "annotations"))),
+    ("class", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations")))
 ], key=lambda x: x[0])
 
 # EXPR CODE GEN
@@ -145,6 +147,7 @@ HEADER = """
 #define AST_H
 #include "tokenizer/token.h"
 #include "utilities/ykdatatype.h"
+#include "utilities/annotations.h"
 #include <vector>
 namespace yaksha {
 // ------ forward declarations ------

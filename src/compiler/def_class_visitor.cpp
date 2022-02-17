@@ -88,3 +88,4 @@ void def_class_visitor::visit_square_bracket_access_expr(
 void def_class_visitor::visit_assign_arr_expr(assign_arr_expr *obj) {}
 void def_class_visitor::visit_square_bracket_set_expr(
     square_bracket_set_expr *obj) {}
+void def_class_visitor::visit_ccode_stmt(ccode_stmt *obj) {}

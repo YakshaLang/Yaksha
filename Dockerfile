@@ -18,6 +18,8 @@ RUN   ln -s /usr/bin/clang-12 /usr/bin/clang \
       && ln -s /usr/bin/clang++-12 /usr/bin/clang++
 
 
+RUN apt-get -y -q install python3-pip && pip3 install tqdm
+
 ADD src /app/src
 ADD 3rd /app/3rd
 ADD test_data /app/test_data

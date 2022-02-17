@@ -71,6 +71,7 @@ namespace yaksha {
     KEYWORD_AS,
     KEYWORD_ASSERT,
     KEYWORD_BREAK,
+    KEYWORD_CCODE,
     KEYWORD_CLASS,
     KEYWORD_CONTINUE,
     KEYWORD_DEF,
@@ -160,6 +161,7 @@ namespace yaksha {
     if (t == token_type::KEYWORD_AS) return "KEYWORD_AS";
     if (t == token_type::KEYWORD_ASSERT) return "KEYWORD_ASSERT";
     if (t == token_type::KEYWORD_BREAK) return "KEYWORD_BREAK";
+    if (t == token_type::KEYWORD_CCODE) return "KEYWORD_CCODE";
     if (t == token_type::KEYWORD_CLASS) return "KEYWORD_CLASS";
     if (t == token_type::KEYWORD_CONTINUE) return "KEYWORD_CONTINUE";
     if (t == token_type::KEYWORD_DEF) return "KEYWORD_DEF";
@@ -244,6 +246,7 @@ namespace yaksha {
     if (t == "KEYWORD_AS") return token_type::KEYWORD_AS;
     if (t == "KEYWORD_ASSERT") return token_type::KEYWORD_ASSERT;
     if (t == "KEYWORD_BREAK") return token_type::KEYWORD_BREAK;
+    if (t == "KEYWORD_CCODE") return token_type::KEYWORD_CCODE;
     if (t == "KEYWORD_CLASS") return token_type::KEYWORD_CLASS;
     if (t == "KEYWORD_CONTINUE") return token_type::KEYWORD_CONTINUE;
     if (t == "KEYWORD_DEF") return token_type::KEYWORD_DEF;
@@ -272,6 +275,7 @@ namespace yaksha {
     if (t == "as") return token_type::KEYWORD_AS;
     if (t == "assert") return token_type::KEYWORD_ASSERT;
     if (t == "break") return token_type::KEYWORD_BREAK;
+    if (t == "ccode") return token_type::KEYWORD_CCODE;
     if (t == "class") return token_type::KEYWORD_CLASS;
     if (t == "continue") return token_type::KEYWORD_CONTINUE;
     if (t == "def") return token_type::KEYWORD_DEF;

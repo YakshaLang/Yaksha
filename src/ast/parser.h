@@ -47,16 +47,20 @@ private:
     stmt *while_statement();
     stmt *block_statement();
     stmt *pass_statement();
+    stmt *ccode_statement();
     stmt *continue_statement();
     stmt *break_statement();
     stmt *return_statement();
-    stmt *def_statement();
-    stmt *class_statement();
+    stmt *attempt_parse_def_or_class();
+    stmt *def_statement(annotations ants);
+    stmt *class_statement(annotations ants);
     std::vector<parameter> parse_class_members(token *name);
     stmt *expression_statement();
     stmt *declaration_statement();
     // parsing data types
     ykdatatype *parse_datatype();
+    // parsing annotations
+    annotation parse_annotation();
     // utilities
     bool match(std::initializer_list<token_type> types);
     bool check(token_type t);
