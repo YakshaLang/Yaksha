@@ -272,10 +272,6 @@ void type_checker::visit_let_stmt(let_stmt *obj) {
 void type_checker::visit_pass_stmt(pass_stmt *obj) {
   // Nothing to do
 }
-void type_checker::visit_print_stmt(print_stmt *obj) {
-  obj->expression_->accept(this);
-  pop();
-}
 void type_checker::visit_return_stmt(return_stmt *obj) {
   auto function_name = peek_function();
   ykobject return_data_type = ykobject(dt_pool_);

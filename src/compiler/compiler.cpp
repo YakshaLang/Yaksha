@@ -418,22 +418,6 @@ void compiler::visit_pass_stmt(pass_stmt *obj) {
   body_ << "// pass";
   write_end_statement(body_);
 }
-void compiler::visit_print_stmt(print_stmt *obj) {
-  obj->expression_->accept(this);
-  auto rhs = pop();
-  // TODO check in type checker since we only support printing primitives
-  if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_int()) {
-    write_indent(body_);
-    body_ << "printf(\"%d\", (" << rhs.first << "))";
-    write_end_statement(body_);
-  } else if (rhs.second.is_primitive_or_obj() &&
-             rhs.second.datatype_->is_str()) {
-    // TODO do not assume it's all ascii, and works fine :p
-    write_indent(body_);
-    body_ << "printf(\"%s\", (" << rhs.first << "))";
-    write_end_statement(body_);
-  }
-}
 void compiler::visit_return_stmt(return_stmt *obj) {
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);

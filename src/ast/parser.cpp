@@ -173,7 +173,6 @@ stmt *parser::statement() {
   //             | pass
   //             | while
   //             | expression_statement
-  if (match({token_type::KEYWORD_PRINT})) { return print_statement(); }
   if (match({token_type::KEYWORD_IF})) { return if_statement(); }
   if (match({token_type::KEYWORD_PASS})) { return pass_statement(); }
   if (match({token_type::KEYWORD_WHILE})) { return while_statement(); }
@@ -225,13 +224,6 @@ stmt *parser::block_statement() {
   }
   consume(token_type::BA_DEDENT, "Expected dedent");
   return pool_.c_block_stmt(statements);
-}
-stmt *parser::print_statement() {
-  auto print_keyword = previous();
-  expr *exp = expression();
-  consume_or_eof(token_type::NEW_LINE,
-                 "Expect new line after value for print statement.");
-  return pool_.c_print_stmt(print_keyword, exp);
 }
 stmt *parser::defer_statement() {
   auto defer_keyword = previous();

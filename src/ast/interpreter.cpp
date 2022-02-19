@@ -221,16 +221,6 @@ const ykobject &interpreter::evaluate(expr *exp) {
 void interpreter::visit_expression_stmt(expression_stmt *obj) {
   evaluate(obj->expression_);
 }
-void interpreter::visit_print_stmt(print_stmt *obj) {
-  evaluate(obj->expression_);
-  if (!has_error()) {
-    if (!object_stack_.empty()) {
-      peek().stringify(std::cout);
-    } else {
-      push(ykobject("No value to print", obj->print_keyword_));
-    }
-  }
-}
 void interpreter::visit_variable_expr(variable_expr *obj) {
   if (globals_.is_defined(obj->name_->token_)) {
     push(globals_.get(obj->name_->token_));
@@ -362,6 +352,21 @@ void interpreter::visit_continue_stmt(continue_stmt *obj) {
 }
 void interpreter::visit_fncall_expr(fncall_expr *obj) {
   if (has_error()) return;
+  if (obj->name_->get_type() == ast_type::EXPR_VARIABLE) {
+    auto n = dynamic_cast<variable_expr *>(obj->name_);
+    if (n->name_->token_ == "print") {
+      // we are calling builtin "print" function.
+      for (auto arg : obj->args_) { arg->accept(this); }
+      if (!has_error()) {
+        if (!object_stack_.empty()) {
+          peek().stringify(std::cout);
+        } else {
+          push(ykobject("No value to print", n->name_));
+        }
+      }
+      return;
+    }
+  }
   // TODO only allow function calls from variables..
   //  TODO (ex: do not allow to return functions?)
   // get the name of the function by evaluating name expression

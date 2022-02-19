@@ -117,11 +117,6 @@ void ast_vis::visit_expression_stmt(expression_stmt *obj) {
   obj->expression_->accept(this);
   end_block();
 }
-void ast_vis::visit_print_stmt(print_stmt *obj) {
-  begin_block("print");
-  field("expression", obj->expression_);
-  end_block();
-}
 void ast_vis::print(const std::vector<stmt *> &statements) {
   for (auto statement : statements) {
     statement->accept(this);

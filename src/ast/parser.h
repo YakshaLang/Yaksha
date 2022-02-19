@@ -39,7 +39,6 @@ private:
     expr *and_op();
     // statements
     stmt *statement();
-    stmt *print_statement();
     stmt *defer_statement();
     stmt *del_statement();
     stmt *del_statement_base();

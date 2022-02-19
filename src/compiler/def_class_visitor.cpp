@@ -37,7 +37,6 @@ void def_class_visitor::visit_expression_stmt(expression_stmt *obj) {}
 void def_class_visitor::visit_if_stmt(if_stmt *obj) {}
 void def_class_visitor::visit_let_stmt(let_stmt *obj) {}
 void def_class_visitor::visit_pass_stmt(pass_stmt *obj) {}
-void def_class_visitor::visit_print_stmt(print_stmt *obj) {}
 void def_class_visitor::visit_return_stmt(return_stmt *obj) {}
 void def_class_visitor::visit_while_stmt(while_stmt *obj) {}
 void def_class_visitor::extract(const std::vector<stmt *> &statements) {

@@ -28,7 +28,6 @@ namespace yaksha {
     void visit_if_stmt(if_stmt *obj) override;
     void visit_let_stmt(let_stmt *obj) override;
     void visit_pass_stmt(pass_stmt *obj) override;
-    void visit_print_stmt(print_stmt *obj) override;
     void visit_return_stmt(return_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
     void visit_defer_stmt(defer_stmt *obj) override;
