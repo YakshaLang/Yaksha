@@ -14,11 +14,11 @@ cmake-build-debug-debug-visual-studio
 cmake-build-release
 cmake-build-debug-coverage
 cmake-build-debug-clang
+cmake-build-debug-zigcc
 bin/*.dll
 bin/*.pdb
 bin/*.ilk
 build
-bin/rg1
 !3rd/WinICD/libOpenCL.dll
 !3rd/WinICD/libOpenCL.dll.a
 bin/coverage/*.html
@@ -28,5 +28,4 @@ bin/yakshac
 bin/YakshaFuzz
 bin/YakshaTests
 comp_output_test
-cmake-build-debug-zigcc
 __pycache__
