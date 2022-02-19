@@ -13,11 +13,6 @@ namespace yaksha {
     ~ast_printer() override = default;
     void visit_class_stmt(class_stmt *obj) override;
     /**
-     * Print a given expression
-     * @param st expression
-     */
-    void print(expr *st);
-    /**
      * Print given vector of statements
      * @param statements vector of statements
      */
