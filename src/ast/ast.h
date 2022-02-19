@@ -37,7 +37,6 @@ namespace yaksha {
   struct if_stmt;
   struct let_stmt;
   struct pass_stmt;
-  struct print_stmt;
   struct return_stmt;
   struct while_stmt;
   // Types of expressions and statements
@@ -68,7 +67,6 @@ namespace yaksha {
     STMT_IF,
     STMT_LET,
     STMT_PASS,
-    STMT_PRINT,
     STMT_RETURN,
     STMT_WHILE
   };
@@ -106,7 +104,6 @@ namespace yaksha {
     virtual void visit_if_stmt(if_stmt *obj) = 0;
     virtual void visit_let_stmt(let_stmt *obj) = 0;
     virtual void visit_pass_stmt(pass_stmt *obj) = 0;
-    virtual void visit_print_stmt(print_stmt *obj) = 0;
     virtual void visit_return_stmt(return_stmt *obj) = 0;
     virtual void visit_while_stmt(while_stmt *obj) = 0;
     virtual ~stmt_visitor() = default;
@@ -321,13 +318,6 @@ namespace yaksha {
     ast_type get_type() override;
     token *pass_token_;
   };
-  struct print_stmt : stmt {
-    print_stmt(token *print_keyword, expr *expression);
-    void accept(stmt_visitor *v) override;
-    ast_type get_type() override;
-    token *print_keyword_;
-    expr *expression_;
-  };
   struct return_stmt : stmt {
     return_stmt(token *return_keyword, expr *expression);
     void accept(stmt_visitor *v) override;
@@ -381,7 +371,6 @@ namespace yaksha {
                     token *else_keyword, stmt *else_branch);
     stmt *c_let_stmt(token *name, ykdatatype *data_type, expr *expression);
     stmt *c_pass_stmt(token *pass_token);
-    stmt *c_print_stmt(token *print_keyword, expr *expression);
     stmt *c_return_stmt(token *return_keyword, expr *expression);
     stmt *c_while_stmt(token *while_keyword, expr *expression,
                        stmt *while_body);

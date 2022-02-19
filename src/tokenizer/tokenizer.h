@@ -1,9 +1,6 @@
 // tokenizer.h
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
-// TODO Stop using a vector and provide an iterator for tokens
-// TODO on error skip to next line and continue tokenizing, display all possible
-// errors
 #include "tokenizer/string_utils.h"
 #include "tokenizer/token.h"
 #include <fstream>

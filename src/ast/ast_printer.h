@@ -16,9 +16,8 @@ namespace yaksha {
      * @param statements vector of statements
      */
     void print(const std::vector<stmt *> &statements);
-    std::string print_to_str(const std::vector<stmt*> &statements);
+    std::string print_to_str(const std::vector<stmt *> &statements);
     void visit_expression_stmt(expression_stmt *obj) override;
-    void visit_print_stmt(print_stmt *obj) override;
     void visit_variable_expr(variable_expr *obj) override;
     void visit_let_stmt(let_stmt *obj) override;
     void visit_binary_expr(binary_expr *obj) override;

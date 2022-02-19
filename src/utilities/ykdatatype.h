@@ -47,6 +47,9 @@ namespace yaksha {
     [[nodiscard]] bool support_plus() const;
     [[nodiscard]] bool is_a_number() const;
     [[nodiscard]] bool is_an_integer() const;
+    [[nodiscard]] bool is_a_signed_integer() const;
+    [[nodiscard]] bool is_an_unsigned_integer() const;
+    [[nodiscard]] bool is_a_float() const;
     [[nodiscard]] bool is_an_array() const;
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
     void prefix();

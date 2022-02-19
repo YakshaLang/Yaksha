@@ -33,15 +33,10 @@ namespace yaksha {
     void visit_if_stmt(if_stmt *obj) override;
     void visit_let_stmt(let_stmt *obj) override;
     void visit_pass_stmt(pass_stmt *obj) override;
-    void visit_print_stmt(print_stmt *obj) override;
     void visit_return_stmt(return_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
     void visit_defer_stmt(defer_stmt *obj) override;
     void visit_class_stmt(class_stmt *obj) override;
-    bool has_function(const std::string &prefixed_name);
-    def_stmt *get_function(const std::string &prefixed_name);
-    bool has_class(const std::string &prefixed_name);
-    class_stmt *get_class(const std::string &prefixed_name);
     void visit_del_stmt(del_stmt *obj) override;
     void visit_get_expr(get_expr *obj) override;
     void visit_set_expr(set_expr *obj) override;
@@ -51,6 +46,10 @@ namespace yaksha {
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
     void visit_ccode_stmt(ccode_stmt *obj) override;
+    bool has_function(const std::string &prefixed_name);
+    def_stmt *get_function(const std::string &prefixed_name);
+    bool has_class(const std::string &prefixed_name);
+    class_stmt *get_class(const std::string &prefixed_name);
     std::vector<std::string> function_names_{};
     std::vector<std::string> class_names_{};
     std::vector<parsing_error> errors_{};

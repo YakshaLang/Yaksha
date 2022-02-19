@@ -127,3 +127,12 @@ void ykdatatype::prefix() {
 bool ykdatatype::is_an_array() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::ARRAY;
 }
+bool ykdatatype::is_a_signed_integer() const {
+  return is_int() || is_i8() || is_i16() || is_i32() || is_i64();
+}
+bool ykdatatype::is_an_unsigned_integer() const {
+  return is_u8() || is_u16() || is_u32() || is_u64();
+}
+bool ykdatatype::is_a_float() const {
+  return is_float() || is_f32() || is_f64();
+}

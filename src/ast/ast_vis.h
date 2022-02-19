@@ -11,12 +11,11 @@ namespace yaksha {
   struct ast_vis : stmt_visitor, expr_visitor {
     explicit ast_vis();
     ~ast_vis() override = default;
-    void visit_class_stmt(class_stmt *obj) override;
-    void visit_binary_expr(binary_expr *obj) override;
-    void visit_grouping_expr(grouping_expr *obj) override;
-    void visit_literal_expr(literal_expr *obj) override;
-    void visit_unary_expr(unary_expr *obj) override;
-    void visit_return_stmt(return_stmt *obj) override;
+    /**
+     * Print given vector of statement as HTML
+     * @param statements vector of statements
+     */
+    void print(const std::vector<stmt *> &statements);
     void field(const std::string &name, expr *expr);
     void field(const std::string &name, stmt *stmt);
     void field(const std::string &name, const std::string &literal_obj);
@@ -24,13 +23,7 @@ namespace yaksha {
                ykdatatype *dt);
     void begin_block(const std::string &name);
     void end_block();
-    /**
-     * Print given vector of statement as HTML
-     * @param statements vector of statements
-     */
-    void print(const std::vector<stmt *> &statements);
     void visit_expression_stmt(expression_stmt *obj) override;
-    void visit_print_stmt(print_stmt *obj) override;
     void visit_let_stmt(let_stmt *obj) override;
     void visit_block_stmt(block_stmt *obj) override;
     void visit_if_stmt(if_stmt *obj) override;
@@ -53,6 +46,12 @@ namespace yaksha {
     void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_ccode_stmt(ccode_stmt *obj) override;
+    void visit_class_stmt(class_stmt *obj) override;
+    void visit_binary_expr(binary_expr *obj) override;
+    void visit_grouping_expr(grouping_expr *obj) override;
+    void visit_literal_expr(literal_expr *obj) override;
+    void visit_unary_expr(unary_expr *obj) override;
+    void visit_return_stmt(return_stmt *obj) override;
 
 private:
     std::stringstream text_{};

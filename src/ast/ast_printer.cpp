@@ -40,21 +40,18 @@ void ast_printer::parenthesize(const std::string &name,
 void ast_printer::visit_expression_stmt(expression_stmt *obj) {
   parenthesize("expression", {obj->expression_});
 }
-void ast_printer::visit_print_stmt(print_stmt *obj) {
-  parenthesize("print_statement", {obj->expression_});
-}
 std::string ast_printer::print_to_str(const std::vector<stmt *> &statements) {
-    for (auto statement : statements) {
-        statement->accept(this);
-        text_ << "\n";
-    }
-    text_<< "\n";
-    auto st = text_.str();
-    text_.clear();
-    return st;
+  for (auto statement : statements) {
+    statement->accept(this);
+    text_ << "\n";
+  }
+  text_ << "\n";
+  auto st = text_.str();
+  text_.clear();
+  return st;
 }
 void ast_printer::print(const std::vector<stmt *> &statements) {
-    std::cout << print_to_str(statements);
+  std::cout << print_to_str(statements);
 }
 void ast_printer::visit_variable_expr(variable_expr *obj) {
   text_ << obj->name_->token_;

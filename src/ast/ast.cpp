@@ -269,15 +269,6 @@ stmt *ast_pool::c_pass_stmt(token *pass_token) {
   cleanup_stmt_.push_back(o);
   return o;
 }
-print_stmt::print_stmt(token *print_keyword, expr *expression)
-    : print_keyword_(print_keyword), expression_(expression) {}
-void print_stmt::accept(stmt_visitor *v) { v->visit_print_stmt(this); }
-ast_type print_stmt::get_type() { return ast_type::STMT_PRINT; }
-stmt *ast_pool::c_print_stmt(token *print_keyword, expr *expression) {
-  auto o = new print_stmt(print_keyword, expression);
-  cleanup_stmt_.push_back(o);
-  return o;
-}
 return_stmt::return_stmt(token *return_keyword, expr *expression)
     : return_keyword_(return_keyword), expression_(expression) {}
 void return_stmt::accept(stmt_visitor *v) { v->visit_return_stmt(this); }

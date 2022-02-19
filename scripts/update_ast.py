@@ -49,10 +49,6 @@ STMTS = sorted([
     # del statement
     ("del", (("token*", "del_keyword"), ("expr*", "expression"))),
     ("expression", (("expr*", "expression"),)),
-    # TODO: Convert print statement to a function once we add it
-    # TODO: Create a println function so we can separate prints with newline and not
-    # Or keep it as print
-    ("print", (("token*", "print_keyword"), ("expr*", "expression"))),
     # ccode statement
     ("ccode", (("token*", "ccode_keyword"), ("token*", "code_str"))),
     # TODO: Replace expression in while and if to condition later on as it make more sense
