@@ -1,5 +1,4 @@
 [
-    # file, line, pos, token-data, token-type
     ["bad_test.py",0,1,"def","KEYWORD_DEF"],
     ["bad_test.py",0,5,"a","NAME"],
     ["bad_test.py",0,6,"(","PAREN_OPEN"],
