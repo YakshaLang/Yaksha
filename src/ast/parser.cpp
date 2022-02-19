@@ -457,6 +457,8 @@ stmt *parser::attempt_parse_def_or_class() {
       return def_statement(ants);
     } else if (match({token_type::KEYWORD_CLASS})) {
       return class_statement(ants);
+    } else {
+      break;
     }
   }
   throw error(at_sign, "End of file reached when parsing annotations. def or "
