@@ -19,6 +19,7 @@ using namespace yaksha;
         yaksha::tokenizer t(B, code);                                          \
         t.tokenize();                                                          \
         auto token_snapshot = yaksha::load_token_dump(C);                      \
+        yaksha::save_token_dump(C, t.tokens_);                                 \
         REQUIRE(t.tokens_.size() == token_snapshot.size());                    \
         for (int i = 0; i < token_snapshot.size(); i++) {                      \
           auto parsed = t.tokens_[i];                                          \

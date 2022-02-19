@@ -11,12 +11,12 @@ namespace yaksha {
   struct ast_printer : stmt_visitor, expr_visitor {
     explicit ast_printer() = default;
     ~ast_printer() override = default;
-    void visit_class_stmt(class_stmt *obj) override;
     /**
      * Print given vector of statements
      * @param statements vector of statements
      */
     void print(const std::vector<stmt *> &statements);
+    std::string print_to_str(const std::vector<stmt*> &statements);
     void visit_expression_stmt(expression_stmt *obj) override;
     void visit_print_stmt(print_stmt *obj) override;
     void visit_variable_expr(variable_expr *obj) override;
@@ -48,6 +48,7 @@ namespace yaksha {
     void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_ccode_stmt(ccode_stmt *obj) override;
+    void visit_class_stmt(class_stmt *obj) override;
 
 private:
     std::stringstream text_{};
