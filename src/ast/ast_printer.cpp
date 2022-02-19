@@ -43,13 +43,18 @@ void ast_printer::visit_expression_stmt(expression_stmt *obj) {
 void ast_printer::visit_print_stmt(print_stmt *obj) {
   parenthesize("print_statement", {obj->expression_});
 }
+std::string ast_printer::print_to_str(const std::vector<stmt *> &statements) {
+    for (auto statement : statements) {
+        statement->accept(this);
+        text_ << "\n";
+    }
+    text_<< "\n";
+    auto st = text_.str();
+    text_.clear();
+    return st;
+}
 void ast_printer::print(const std::vector<stmt *> &statements) {
-  for (auto statement : statements) {
-    statement->accept(this);
-    text_ << "\n";
-  }
-  std::cout << text_.str() << "\n";
-  text_.clear();
+    std::cout << print_to_str(statements);
 }
 void ast_printer::visit_variable_expr(variable_expr *obj) {
   text_ << obj->name_->token_;
@@ -124,7 +129,7 @@ void ast_printer::visit_def_stmt(def_stmt *obj) {
   text_ << " (";
   for (auto st : obj->params_) {
     text_ << " ";
-    text_ << st.name_ << ":" << st.data_type_->as_string();
+    text_ << st.name_->token_ << ":" << st.data_type_->as_string();
   }
   text_ << ") ";
   obj->function_body_->accept(this);
@@ -145,7 +150,7 @@ void ast_printer::visit_class_stmt(class_stmt *obj) {
   text_ << " (";
   for (auto st : obj->members_) {
     text_ << " ";
-    text_ << st.name_ << ":" << st.data_type_->as_string();
+    text_ << st.name_->token_ << ":" << st.data_type_->as_string();
   }
   text_ << "))";
 }
@@ -153,12 +158,12 @@ void ast_printer::visit_del_stmt(del_stmt *obj) {
   parenthesize("del", {obj->expression_});
 }
 void ast_printer::visit_get_expr(get_expr *obj) {
-  text_ << "(get " << obj->item_;
+  text_ << "(get " << obj->item_->token_;
   obj->lhs_->accept(this);
   text_ << ")";
 }
 void ast_printer::visit_set_expr(set_expr *obj) {
-  text_ << "(set " << obj->item_;
+  text_ << "(set " << obj->item_->token_;
   obj->lhs_->accept(this);
   text_ << ")";
 }
