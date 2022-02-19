@@ -1,0 +1,8 @@
+# Sample 6 while loops - just exit
+a: int = 10
+while a > 0:
+    print(a)
+    print("\n")
+    a = a - 1
+    break
+    a = a - 1

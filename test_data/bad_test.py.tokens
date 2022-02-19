@@ -1,0 +1,20 @@
+[
+    # file, line, pos, token-data, token-type
+    ["bad_test.py",0,1,"def","KEYWORD_DEF"],
+    ["bad_test.py",0,5,"a","NAME"],
+    ["bad_test.py",0,6,"(","PAREN_OPEN"],
+    ["bad_test.py",0,7,")","PAREN_CLOSE"],
+    ["bad_test.py",0,8,":","COLON"],
+    ["bad_test.py",0,9,"\n","NEW_LINE"],
+    ["bad_test.py",1,1,"    ","INDENT"],
+    ["bad_test.py",1,5,"if","KEYWORD_IF"],
+    ["bad_test.py",1,8,"1","INTEGER_DECIMAL"],
+    ["bad_test.py",1,9,":","COLON"],
+    ["bad_test.py",1,10,"\n","NEW_LINE"],
+    ["bad_test.py",2,1,"        ","INDENT"],
+    ["bad_test.py",2,9,"ab","NAME"],
+    ["bad_test.py",2,12,"=","EQ"],
+    ["bad_test.py",2,14,"2","INTEGER_DECIMAL"],
+    ["bad_test.py",2,16,"s","NAME"],
+    ["bad_test.py",2,18,"","END_OF_FILE"]
+]

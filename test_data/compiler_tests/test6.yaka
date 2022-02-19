@@ -1,0 +1,11 @@
+def main() -> int:
+    a: Array[int]
+    defer del a
+    arrput(a, 1)
+    arrput(a, 2)
+    arrput(a, 3)
+    print(a[0])
+    a[0 + 0] = 0
+    print(a[0])
+    print("\n")
+    return 0

@@ -1,0 +1,4 @@
+def main() -> int:
+    a: Array[int]
+    b: HashMap[int, int]
+    return 0

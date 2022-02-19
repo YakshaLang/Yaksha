@@ -1,0 +1,89 @@
+#include "ast/parser.h"
+#include "btest.h"
+#include "catch2/catch.hpp"
+#include "compiler/compiler.h"
+#include "compiler/type_checker.h"
+#include "file_formats/tokens_file.h"
+#include "tokenizer/block_analyzer.h"
+#include "tokenizer/tokenizer.h"
+using namespace yaksha;
+#define TEST_FILE(A, B, C)                                                     \
+  do {                                                                         \
+    std::ifstream code_file(A);                                                \
+    if (code_file.good()) {                                                    \
+      std::string code((std::istreambuf_iterator<char>(code_file)),            \
+                       std::istreambuf_iterator<char>());                      \
+      try {                                                                    \
+        yaksha::tokenizer t(B, code);                                          \
+        t.tokenize();                                                          \
+        REQUIRE(t.errors_.empty());                                            \
+        block_analyzer b{t.tokens_};                                           \
+        b.analyze();                                                           \
+        ykdt_pool dt_pool{};                                                   \
+        parser p{b.tokens_, &dt_pool};                                         \
+        auto tree = p.parse();                                                 \
+        REQUIRE(!tree.empty());                                                \
+        REQUIRE(p.errors_.empty());                                            \
+        type_checker tc{&dt_pool};                                             \
+        tc.check(tree);                                                        \
+        REQUIRE(tc.errors_.empty());                                           \
+        compiler comp{tc.defs_classes_, &dt_pool};                             \
+        auto compiler_output = comp.compile(tree);                             \
+        tokenizer c_code{"output.c", compiler_output};                         \
+        c_code.tokenize();                                                     \
+        auto token_snapshot = yaksha::load_token_dump(C);                      \
+        yaksha::save_token_dump(C, c_code.tokens_);                            \
+        REQUIRE(c_code.tokens_.size() == token_snapshot.size());               \
+        for (int i = 0; i < token_snapshot.size(); i++) {                      \
+          auto parsed = c_code.tokens_[i];                                     \
+          auto snapshot = token_snapshot[i];                                   \
+          REQUIRE(parsed.file_ == snapshot.file_);                             \
+          REQUIRE(parsed.line_ == snapshot.line_);                             \
+          REQUIRE(parsed.pos_ == snapshot.pos_);                               \
+          REQUIRE(parsed.token_ == snapshot.token_);                           \
+          REQUIRE(parsed.type_ == snapshot.type_);                             \
+        }                                                                      \
+      } catch (parsing_error & e) {                                            \
+        DBGPRINT(e.message_);                                                  \
+        REQUIRE(false);                                                        \
+      }                                                                        \
+    } else {                                                                   \
+      REQUIRE(false);                                                          \
+    }                                                                          \
+  } while (0)
+TEST_CASE("compiler: Hello World") {
+  TEST_FILE("../test_data/compiler_tests/test1.yaka", "test1.yaka",
+            "../test_data/compiler_tests/test1.tokens");
+}
+TEST_CASE("compiler: Defer") {
+  TEST_FILE("../test_data/compiler_tests/test2.yaka", "test2.yaka",
+            "../test_data/compiler_tests/test2.tokens");
+}
+TEST_CASE("compiler: Class support") {
+  TEST_FILE("../test_data/compiler_tests/test3.yaka", "test3.yaka",
+            "../test_data/compiler_tests/test3.tokens");
+}
+TEST_CASE("compiler: Create object from class") {
+  TEST_FILE("../test_data/compiler_tests/test4.yaka", "test4.yaka",
+            "../test_data/compiler_tests/test4.tokens");
+}
+TEST_CASE("compiler: Object members") {
+  TEST_FILE("../test_data/compiler_tests/test5.yaka", "test5.yaka",
+            "../test_data/compiler_tests/test5.tokens");
+}
+TEST_CASE("compiler: Array access") {
+  TEST_FILE("../test_data/compiler_tests/test6.yaka", "test6.yaka",
+            "../test_data/compiler_tests/test6.tokens");
+}
+TEST_CASE("compiler: Nested array access") {
+  TEST_FILE("../test_data/compiler_tests/test7.yaka", "test7.yaka",
+            "../test_data/compiler_tests/test7.tokens");
+}
+TEST_CASE("compiler: Void function") {
+  TEST_FILE("../test_data/compiler_tests/voidfunc.yaka", "voidfunc.yaka",
+            "../test_data/compiler_tests/voidfunc.tokens");
+}
+TEST_CASE("compiler: Native functions") {
+  TEST_FILE("../test_data/compiler_tests/nativefunc.yaka", "nativefunc.yaka",
+            "../test_data/compiler_tests/nativefunc.tokens");
+}

@@ -1,0 +1,39 @@
+@native
+def readfile(fname: str) -> str:
+    ccode """size_t ln;
+    int err;
+    char *out = yk__bhalib_read_file(yy__fname, &ln, &err);
+    yk__sdsfree(yy__fname); // clean up filename as it will be copied
+    if (err == 0) { return yk__sdsnewlen(out, ln); }
+    return yk__sdsempty()"""
+
+@native
+def is_empty_str(s: str) -> bool:
+    ccode """bool x = yk__sdslen(yy__s) == 0;
+    yk__sdsfree(yy__s);
+    return x"""
+
+@nativemacro
+def min_int(a: int, b:int) -> int:
+    ccode "((yy__a < yy__b) ? yy__a : yy__b)"
+
+@nativemacro("((yy__a > yy__b) ? yy__a : yy__b)")
+def max_int(a: int, b:int) -> int:
+    pass
+
+@native("yy__max_int")
+def max_i(a: int, b: int) -> int:
+    pass
+
+@native("fopen")
+def leakme(a: str, b: str) -> None:
+    pass
+
+def main() -> int:
+    print("// ----->>> this is my code <<<<------\n")
+    a: str=  readfile("test.c")
+    if is_empty_str(a):
+        print("test.c is empty or not found")
+    else:
+        print(a)
+    return 0

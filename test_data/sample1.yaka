@@ -1,0 +1,37 @@
+# Hello World 123
+def some_fn() -> int:
+    print("Hello From function")
+    print("\n")
+    # this returns None
+
+
+def add_ten(param1: int) -> int:
+    return param1 + 10
+
+
+print("calling some_fn()")
+print("\n")
+print(some_fn())
+print("\n")
+print("add_ten(20) --> ")
+print(add_ten(20))
+print("\n")
+print("Hello" + " World\n")
+print(123)
+a: int = 1 + 2 + 3 + 4
+b: int = 2
+print("\n")
+print(a * 10)
+a = 10
+print("\n")
+if a == 5 or b == 2:
+    print("a is ")
+    print(a)
+    print("\n")
+    if b == 2:
+        print("b is 2")
+    else:
+        print("b is not 2")
+    print("\n")
+else:
+    print("did not go to if branch")
