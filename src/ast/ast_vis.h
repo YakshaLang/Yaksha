@@ -25,11 +25,6 @@ namespace yaksha {
     void begin_block(const std::string &name);
     void end_block();
     /**
-     * Print given expression as HTML
-     * @param st expression
-     */
-    void print(expr *st);
-    /**
      * Print given vector of statement as HTML
      * @param statements vector of statements
      */

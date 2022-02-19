@@ -25,6 +25,7 @@ bin/coverage/*.html
 bin/fuzz/*.input
 bin/Yaksha
 bin/yakshac
+bin/yakshavz
 bin/YakshaFuzz
 bin/YakshaTests
 comp_output_test

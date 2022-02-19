@@ -6,7 +6,7 @@ Update CMakeLists.txt with .cpp & .h files.
 import os.path
 from typing import List, Tuple
 
-IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp"]
+IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp"]
 
 
 def get_immediate_sub_dirs(directory: str) -> List[str]:

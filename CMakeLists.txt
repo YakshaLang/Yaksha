@@ -26,18 +26,21 @@ set(YAKSHA_TEST_FILES
 add_library(yaksha ${YAKSHA_SOURCE_FILES})
 # -- Yaksha executable - interpreter --
 add_executable(Yaksha src/main.cpp)
-
 target_link_libraries(Yaksha PUBLIC ${LIBS})
 target_link_libraries(Yaksha PUBLIC yaksha)
 target_compile_features(Yaksha PRIVATE cxx_std_17)
 
 # -- yakshac - compiler --
-# -- Yaksha executable - interpreter --
 add_executable(yakshac src/comp_main.cpp)
-
 target_link_libraries(yakshac PUBLIC ${LIBS})
 target_link_libraries(yakshac PUBLIC yaksha)
 target_compile_features(yakshac PRIVATE cxx_std_17)
+
+# -- yakshavz - visualizer --
+add_executable(yakshavz src/viz_main.cpp)
+target_link_libraries(yakshavz PUBLIC ${LIBS})
+target_link_libraries(yakshavz PUBLIC yaksha)
+target_compile_features(yakshavz PRIVATE cxx_std_17)
 
 # Adding Tests
 # -----------------------
