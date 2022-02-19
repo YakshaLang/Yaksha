@@ -223,7 +223,13 @@ void interpreter::visit_expression_stmt(expression_stmt *obj) {
 }
 void interpreter::visit_print_stmt(print_stmt *obj) {
   evaluate(obj->expression_);
-  if (!has_error()) { peek().stringify(std::cout); }
+  if (!has_error()) {
+    if (!object_stack_.empty()) {
+      peek().stringify(std::cout);
+    } else {
+      push(ykobject("No value to print", obj->print_keyword_));
+    }
+  }
 }
 void interpreter::visit_variable_expr(variable_expr *obj) {
   if (globals_.is_defined(obj->name_->token_)) {
