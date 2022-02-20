@@ -2,8 +2,8 @@ import argparse
 import os
 import webbrowser
 
-from scripts.kabaraya import Colors
-from scripts.compiler_tester import eprint, execute
+from compiler_tester import eprint, execute
+from kabaraya import Colors
 
 EXIT_FAILURE = 1
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -35,8 +35,11 @@ def main():
         h.write(code)
     fpath = os.path.abspath("out.html")
     if os.name == 'nt':
-        fpath = fpath.replace("\\", "/").replace(":", "/")
-    webbrowser.open_new_tab("file://" + fpath)
+        fpath = fpath.replace("\\", "/")
+        fpath += "/"
+    fpath = "file://" + fpath
+    print(fpath)
+    webbrowser.open_new_tab(fpath)
 
 
 if __name__ == "__main__":

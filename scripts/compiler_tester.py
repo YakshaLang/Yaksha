@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 
-from scripts.kabaraya import Colors
+from kabaraya import Colors
 
 EXIT_FAILURE = 1
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
