@@ -36,9 +36,9 @@ builtins::compile(const std::string &name,
   } else if (name == "yy__print") {
     auto rhs = args[0];
     if (rhs.second.datatype_->is_a_signed_integer()) {
-      code << "printf(\"%d\", (" << rhs.first << "))";
+      code << "printf(\"%jd\", ((intmax_t)" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_an_unsigned_integer()) {
-      code << "printf(\"%u\", (" << rhs.first << "))";
+      code << "printf(\"%ju\", ((uintmax_t)" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_str()) {
       // TODO do not assume it's all ascii, and works fine :p
       code << "printf(\"%s\", (" << rhs.first << "))";
@@ -48,9 +48,9 @@ builtins::compile(const std::string &name,
   } else if (name == "yy__println") {
     auto rhs = args[0];
     if (rhs.second.datatype_->is_a_signed_integer()) {
-      code << R"(printf("%d\n", ()" << rhs.first << "))";
+      code << R"(printf("%jd\n", ((intmax_t))" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_an_unsigned_integer()) {
-      code << R"(printf("%u\n", ()" << rhs.first << "))";
+      code << R"(printf("%ju\n", ((uintmax_t))" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_str()) {
       // TODO do not assume it's all ascii, and works fine :p
       code << R"(printf("%s\n", ()" << rhs.first << "))";
