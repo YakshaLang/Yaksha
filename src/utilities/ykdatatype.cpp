@@ -67,7 +67,7 @@ bool ykdatatype::is_none() const {
   return primitive_type_ == ykprimitive::NONE;
 }
 void ykdatatype::write_to_str(std::stringstream &s) const {
-  s << module_ << ":::";
+  if (!module_.empty()) { s << module_ << ":::"; }
   s << token_->token_;
   if (!args_.empty()) {
     s << "[";
@@ -145,6 +145,6 @@ bool ykdatatype::is_a_float() const {
   return is_float() || is_f32() || is_f64();
 }
 bool ykdatatype::is_builtin_or_primitive() const {
-  return this->primitive_type_ != ykprimitive::NOT_A_PRIMITIVE &&
+  return this->primitive_type_ != ykprimitive::NOT_A_PRIMITIVE ||
          this->builtin_type_ != ykbuiltin::NOT_A_BUILTIN;
 }

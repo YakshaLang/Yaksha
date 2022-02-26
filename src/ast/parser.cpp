@@ -7,8 +7,18 @@ using namespace yaksha;
 parser::parser(std::string filepath, std::vector<token> &tokens,
                ykdt_pool *pool)
     : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0}, dt_pool_(pool),
-      import_stmts_(), filepath_(std::move(filepath)) {}
-parser::~parser() = default;
+      import_stmts_(), filepath_(std::move(filepath)) {
+  // Create a fake return token to be injected at end of void functions.
+  // WHY?: This ensures that defer + string freeing work
+  magic_return_token_ = new token{};
+  magic_return_token_->token_ = "return";
+  magic_return_token_->file_ = "syntax-sugar";
+  magic_return_token_->original_ = "return";
+  magic_return_token_->line_ = 0;
+  magic_return_token_->pos_ = 0;
+  magic_return_token_->type_ = token_type::KEYWORD_RETURN;
+}
+parser::~parser() { delete (magic_return_token_); }
 token *parser::advance() {
   if (!is_at_end()) { current_++; }
   return previous();
@@ -370,7 +380,15 @@ stmt *parser::def_statement(annotations ants) {
   consume(token_type::PAREN_CLOSE, "Function call must end with ')'");
   consume(token_type::ARROW, "'->' operator must be present");
   auto return_dt = parse_datatype();
-  auto body = block_statement();
+  auto body = dynamic_cast<block_stmt *>(block_statement());
+  // Void function must have a return at the end to ensure strings are freed.
+  if (!ants.native_macro_ && !ants.native_ &&
+      return_dt->is_builtin_or_primitive() && return_dt->is_none()) {
+    if (body->statements_.back()->get_type() != ast_type::STMT_RETURN) {
+      body->statements_.emplace_back(
+          pool_.c_return_stmt(magic_return_token_, nullptr));
+    }
+  }
   return pool_.c_def_stmt(name, params, body, return_dt, std::move(ants));
 }
 ykdatatype *parser::parse_datatype() {
