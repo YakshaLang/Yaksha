@@ -1,0 +1,10 @@
+def main() -> int:
+    a: Array[int]
+    arrput(a, 1)
+    arrput(a, 2)
+    arrput(a, 3)
+
+    while len(a) > 0:
+        println(arrpop(a))
+
+    return 0

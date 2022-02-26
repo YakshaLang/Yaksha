@@ -73,3 +73,7 @@ TEST_CASE("compiler: Native functions in imports") {
   TEST_FILE("../test_data/compiler_tests/io_module_test/main.yaka", "main.yaka",
             "../test_data/compiler_tests/io_module_test/main.tokens");
 }
+TEST_CASE("compiler: Array methods") {
+  TEST_FILE("../test_data/compiler_tests/arrstack.yaka", "arrstack.yaka",
+            "../test_data/compiler_tests/arrstack.tokens");
+}

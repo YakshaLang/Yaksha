@@ -6,8 +6,10 @@ builtins::builtins(ykdt_pool *dt_pool) : dt_pool_(dt_pool) {}
 builtins::~builtins() = default;
 bool builtins::has_builtin(const std::string &name) {
   if (name == "arrput") { return true; }
+  if (name == "arrpop") { return true; }
   if (name == "print") { return true; }
   if (name == "println") { return true; }
+  if (name == "len") { return true; }
   return false;
 }
 ykobject builtins::verify(const std::string &name,
@@ -21,6 +23,13 @@ ykobject builtins::verify(const std::string &name,
              args[0].is_primitive_or_obj() &&
              args[0].datatype_->is_primitive()) {
     return o;
+  } else if (name == "len" && args.size() == 1 &&
+             (args[0].datatype_->is_an_array() ||
+              args[0].datatype_->is_str())) {
+    return ykobject(dt_pool_->create("int"));
+  } else if (name == "arrpop" && args.size() == 1 &&
+             args[0].datatype_->is_an_array()) {
+    return ykobject(args[0].datatype_->args_[0]);// Array[x] << access this x
   }
   o.object_type_ = object_type::RUNTIME_ERROR;
   o.string_val_ = "Invalid arguments for builtin function";
@@ -57,6 +66,16 @@ builtins::compile(const std::string &name,
     } else if (rhs.second.datatype_->is_a_float()) {
       code << R"(printf("%f\n", ()" << rhs.first << "))";
     }
+  } else if (name == "len") {
+    if (args[0].second.datatype_->is_str()) {
+      code << "yk__sdslen(" << args[0].first << ")";
+    } else {
+      code << "yk__arrlen(" << args[0].first << ")";
+    }
+    o = ykobject(dt_pool_->create("int"));
+  } else if (name == "arrpop") {
+    o = ykobject(args[0].second.datatype_->args_[0]);
+    code << "yk__arrpop(" << args[0].first << ")";
   }
   return {code.str(), o};
 }
