@@ -17,6 +17,7 @@ int32_t yy__main()
             printf("%jd\n", ((intmax_t)yk__arrpop(yy__a)));
         }
     }
+    yk__arrfree(yy__a);
     return 0;
 }
 int main(void) { return yy__main(); }

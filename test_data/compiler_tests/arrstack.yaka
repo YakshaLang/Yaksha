@@ -1,5 +1,6 @@
 def main() -> int:
     a: Array[int]
+    defer del a
     arrput(a, 1)
     arrput(a, 2)
     arrput(a, 3)
