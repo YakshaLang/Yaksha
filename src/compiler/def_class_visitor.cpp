@@ -17,7 +17,7 @@ void def_class_visitor::visit_block_stmt(block_stmt *obj) {}
 void def_class_visitor::visit_break_stmt(break_stmt *obj) {}
 void def_class_visitor::visit_continue_stmt(continue_stmt *obj) {}
 void def_class_visitor::visit_def_stmt(def_stmt *obj) {
-  auto name = prefix(obj->name_->token_);
+  auto name = obj->name_->token_;
   if (builtins::has_builtin(name)) {
     error(obj->name_, "Critical!! Redefinition of builtin function");
     return;
@@ -55,7 +55,7 @@ bool def_class_visitor::has_function(const std::string &prefixed_name) {
   return functions_.find(prefixed_name) != functions_.end();
 }
 void def_class_visitor::visit_class_stmt(class_stmt *obj) {
-  auto name = prefix(obj->name_->token_);
+  auto name = obj->name_->token_;
   if (builtins::has_builtin(name)) {
     error(obj->name_, "Critical!! Redefinition of builtin function");
     return;
@@ -88,3 +88,4 @@ void def_class_visitor::visit_assign_arr_expr(assign_arr_expr *obj) {}
 void def_class_visitor::visit_square_bracket_set_expr(
     square_bracket_set_expr *obj) {}
 void def_class_visitor::visit_ccode_stmt(ccode_stmt *obj) {}
+void def_class_visitor::visit_import_stmt(import_stmt *obj) {}

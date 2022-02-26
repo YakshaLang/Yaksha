@@ -67,6 +67,7 @@ bool ykdatatype::is_none() const {
   return primitive_type_ == ykprimitive::NONE;
 }
 void ykdatatype::write_to_str(std::stringstream &s) const {
+  s << module_ << ":::";
   s << token_->token_;
   if (!args_.empty()) {
     s << "[";
@@ -104,6 +105,19 @@ ykdatatype::ykdatatype(std::string primitive) : type_(std::move(primitive)) {
   token_->file_ = "";
   find_builtin_or_primitive();
 }
+ykdatatype::ykdatatype(std::string primitive_dt, std::string module)
+    : type_(std::move(primitive_dt)), module_(std::move(module)) {
+  token_ = new token();
+  token_->token_ = type_;
+  token_->type_ = token_type::NAME;
+  token_->pos_ = -1;
+  token_->line_ = -1;
+  token_->file_ = "";
+  find_builtin_or_primitive();
+  if (is_builtin_or_primitive()) {
+    module_ = "";// Do not store module if it's a primitive
+  }
+}
 bool ykdatatype::support_plus() const {
   return is_str() || is_int() || is_float() || is_f32() || is_f64() ||
          is_i8() || is_i16() || is_i32() || is_i64() || is_u8() || is_u16() ||
@@ -118,12 +132,6 @@ bool ykdatatype::is_an_integer() const {
   return is_int() || is_i8() || is_i16() || is_i32() || is_i64() || is_u8() ||
          is_u16() || is_u32() || is_u64();
 }
-void ykdatatype::prefix() {
-  if (!is_primitive()) {
-    type_ = ::prefix(type_);
-    token_->token_ = ::prefix(token_->token_);
-  }
-}
 bool ykdatatype::is_an_array() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::ARRAY;
 }
@@ -135,4 +143,8 @@ bool ykdatatype::is_an_unsigned_integer() const {
 }
 bool ykdatatype::is_a_float() const {
   return is_float() || is_f32() || is_f64();
+}
+bool ykdatatype::is_builtin_or_primitive() const {
+  return this->primitive_type_ != ykprimitive::NOT_A_PRIMITIVE &&
+         this->builtin_type_ != ykbuiltin::NOT_A_BUILTIN;
 }

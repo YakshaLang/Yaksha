@@ -15,7 +15,10 @@ namespace yaksha {
     RUNTIME_ERROR,
     UNKNOWN_OBJECT,
     CLASS_ITSELF,
-    BUILTIN_FUNCTION
+    BUILTIN_FUNCTION,
+    MODULE,
+    MODULE_CLASS,
+    MODULE_FUNCTION
   };
   struct ykobject {
     ykobject();
@@ -32,6 +35,8 @@ namespace yaksha {
     bool is_same_datatype(ykobject &other) const;
     int integer_val_{0};
     std::string string_val_{};
+    std::string module_file_{};
+    std::string module_name_{};
     double double_val_{};
     bool bool_val_{};
     control_flow_change flow_ = control_flow_change::NO_CHANGE;

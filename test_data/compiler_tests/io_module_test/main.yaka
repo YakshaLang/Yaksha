@@ -1,0 +1,12 @@
+import io
+import strings as s
+
+
+def main() -> int:
+    print("// ----->>> this is my code <<<<------\n")
+    a: str = io.readfile("test.c")
+    if s.is_empty_str(a):
+        print("test.c is empty or not found")
+    else:
+        print(a)
+    return 0

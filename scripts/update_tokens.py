@@ -34,6 +34,8 @@ TEMPLATE = r"""
 #ifndef TOKEN_H
 #define TOKEN_H
 #include <string>
+#include <filesystem>
+#include <vector>
 namespace yaksha {
 /**
  * Most simple types of tokens we can match with tokenizing
@@ -62,8 +64,9 @@ struct token {
   std::string file_;  // filename
   int line_;          // line in file
   int pos_;           // position in line
-  std::string token_; // token as a bunch of uint32_t characters
+  std::string token_;
   token_type type_;   // type of the token
+  std::string original_;
 };
 /**
  * Content of an error message
@@ -74,6 +77,23 @@ struct parsing_error {
   bool token_set_{};
   parsing_error(std::string message, token* at);
   parsing_error(std::string message, std::string file, int line, int pos);
+};
+struct parser;
+struct tokenizer;
+struct block_analyzer;
+struct type_checker;
+struct def_class_visitor;
+struct file_data {
+  parser* parser_{};
+  tokenizer* tokenizer_{};
+  block_analyzer* block_analyzer_{};
+  type_checker* type_checker_{nullptr};
+  def_class_visitor* dsv_{nullptr};
+};
+struct file_info {
+  std::filesystem::path filepath_;
+  std::string prefix_;
+  file_data* data_{nullptr};
 };
 } // namespace yaksha
 #endif

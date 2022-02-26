@@ -74,7 +74,10 @@ STMTS = sorted([
     # `def abc(a: int) -> None:`
     ("def", (("token*", "name"), ("std::vector<parameter>", "params"),
              ("stmt*", "function_body"), ("ykdatatype*", "return_type"), ("annotations", "annotations"))),
-    ("class", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations")))
+    ("class", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
+    # import io [as io]
+    ("import", (("token*", "import_token"), ("std::vector<token*>", "import_names"),
+                ("token*", "name"), ("file_info*", "data")))
 ], key=lambda x: x[0])
 
 # EXPR CODE GEN

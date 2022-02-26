@@ -535,6 +535,7 @@ void tokenizer::tokenize() {
       !tokens_.empty() && tokens_.back().type_ == token_type::NEW_LINE;
   tokens_.emplace_back(token{file_, line, pos + (last_new_ln ? 0 : 1), "",
                              token_type::END_OF_FILE});
+  for (auto &t : tokens_) { t.original_ = t.token_; }
 }
 void tokenizer::handle_error(const parsing_error &t) {
   errors_.emplace_back(t);
@@ -545,13 +546,17 @@ parsing_error::parsing_error(std::string message, token *token_)
     tok_ = {};
     token_set_ = false;
   } else {
-    tok_ = {token_->file_, token_->line_, token_->pos_, token_->token_,
-            token_->type_};
+    tok_ = {token_->file_,  token_->line_, token_->pos_,
+            token_->token_, token_->type_, token_->original_};
     token_set_ = true;
   }
 }
 parsing_error::parsing_error(std::string message, std::string file, int line,
                              int pos)
-    : message_{std::move(message)}, tok_{std::move(file), line, pos, "",
-                                         token_type::TK_UNKNOWN_TOKEN_DETECTED},
+    : message_{std::move(message)}, tok_{std::move(file),
+                                         line,
+                                         pos,
+                                         "",
+                                         token_type::TK_UNKNOWN_TOKEN_DETECTED,
+                                         ""},
       token_set_(true) {}

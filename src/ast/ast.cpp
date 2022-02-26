@@ -251,6 +251,19 @@ stmt *ast_pool::c_if_stmt(token *if_keyword, expr *expression, stmt *if_branch,
   cleanup_stmt_.push_back(o);
   return o;
 }
+import_stmt::import_stmt(token *import_token, std::vector<token *> import_names,
+                         token *name, file_info *data)
+    : import_token_(import_token), import_names_(std::move(import_names)),
+      name_(name), data_(data) {}
+void import_stmt::accept(stmt_visitor *v) { v->visit_import_stmt(this); }
+ast_type import_stmt::get_type() { return ast_type::STMT_IMPORT; }
+stmt *ast_pool::c_import_stmt(token *import_token,
+                              std::vector<token *> import_names, token *name,
+                              file_info *data) {
+  auto o = new import_stmt(import_token, std::move(import_names), name, data);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
 let_stmt::let_stmt(token *name, ykdatatype *data_type, expr *expression)
     : name_(name), data_type_(data_type), expression_(expression) {}
 void let_stmt::accept(stmt_visitor *v) { v->visit_let_stmt(this); }

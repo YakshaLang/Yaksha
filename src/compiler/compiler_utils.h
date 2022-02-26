@@ -11,7 +11,7 @@ namespace yaksha {
    * @param input name
    * @return prefixed name
    */
-  std::string prefix(const std::string &input);
+  std::string prefix(const std::string &input, const std::string &prefix_val);
   void write_indent(std::stringstream &where_to, int level);
 }// namespace yaksha
 #endif

@@ -1,20 +1,14 @@
 // compiler.cpp
 #include "compiler.h"
+#include "ast/parser.h"
 using namespace yaksha;
 compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool)
     : defs_classes_(defs_classes), scope_(pool), dt_pool(pool),
-      builtins_(pool) {
-  forward_declarations_ << "#include \"yk__lib.h\"\n";
-  forward_declarations_ << "// --forward declaration section-- \n";
-  body_ << "// --body section-- \n";
-  for (const auto &name : defs_classes.class_names_) {
-    forward_declarations_ << "struct " << name << ";\n";
-  }
-};
+      builtins_(pool){};
 compiler::~compiler() = default;
 void compiler::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
-  auto name = prefix(obj->name_->token_);
+  auto name = prefix(obj->name_->token_, prefix_val_);
   auto rhs = pop();
   write_indent(body_);
   if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str()) {
@@ -82,42 +76,71 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     }
     auto result = builtins_.compile(name, args);
     push(result.first, result.second);
+  } else if (name_pair.second.object_type_ == object_type::MODULE_CLASS) {
+    auto module_file = name_pair.second.module_file_;
+    auto module_class = name_pair.second.string_val_;
+    auto module_prefix = cf_->get(module_file)->prefix_;
+    auto prefixed_class_name = prefix(module_class, module_prefix);
+    compile_obj_creation(prefixed_class_name, code,
+                         dt_pool->create(module_class, module_file));
+  } else if (name_pair.second.object_type_ == object_type::MODULE_FUNCTION) {
+    auto module_file = name_pair.second.module_file_;
+    auto module_fn = name_pair.second.string_val_;
+    auto module_info = cf_->get(module_file);
+    auto module_prefix = module_info->prefix_;
+    auto prefixed_fn_name = prefix(module_fn, module_prefix);
+    auto fn_return =
+        module_info->data_->dsv_->get_function(module_fn)->return_type_;
+    compile_function_call(obj, prefixed_fn_name, code, fn_return);
   } else if (defs_classes_.has_function(name)) {
-    // Note: no need to check here as type_checker & def_class_visitor ensure this is present.
-    code << name << "(";
-    bool first = true;
-    for (auto arg : obj->args_) {
-      arg->accept(this);
-      auto arg_val = pop();
-      if (!first) {
-        code << ", ";
-      } else {
-        first = false;
-      }
-      if (arg_val.second.is_primitive_or_obj() &&
-          arg_val.second.datatype_->is_str()) {
-        code << "yk__sdsdup(" << arg_val.first << ")";
-      } else {
-        code << arg_val.first;
-      }
-    }
-    code << ")";
     auto fn_def = defs_classes_.get_function(name);
     auto return_type = fn_def->return_type_;
-    if (return_type->is_str()) {
-      auto temp_name = temp();
-      write_indent(body_);
-      body_ << "yk__sds " << temp_name << " = " << code.str();
-      write_end_statement(body_);
-      deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
-      push("(" + temp_name + ")", ykobject(return_type));
-    } else {
-      push(code.str(), ykobject(return_type));
-    }
+    compile_function_call(obj, prefix(name, prefix_val_), code, return_type);
   } else if (defs_classes_.has_class(name)) {
-    code << "calloc(1, sizeof(struct " << name << "))";
-    auto data = ykobject(dt_pool->create(name));
-    push(code.str(), data);
+    compile_obj_creation(prefix(name, prefix_val_), code,
+                         dt_pool->create(name));
+  } else {
+    std::cerr << "\n// Oh no!\n";
+  }
+}
+void compiler::compile_obj_creation(const std::string &name,
+                                    std::stringstream &code,
+                                    ykdatatype *return_type) {
+  code << "calloc(1, sizeof(struct " << name << "))";
+  auto data = ykobject(return_type);
+  push(code.str(), data);
+}
+void compiler::compile_function_call(fncall_expr *obj, const std::string &name,
+                                     std::stringstream &code,
+                                     ykdatatype *return_type) {
+  // Note: no need to check here as type_checker & def_class_visitor ensure this is present.
+  code << name << "(";
+  bool first = true;
+  for (auto arg : obj->args_) {
+    arg->accept(this);
+    auto arg_val = pop();
+    if (!first) {
+      code << ", ";
+    } else {
+      first = false;
+    }
+    if (arg_val.second.is_primitive_or_obj() &&
+        arg_val.second.datatype_->is_str()) {
+      code << "yk__sdsdup(" << arg_val.first << ")";
+    } else {
+      code << arg_val.first;
+    }
+  }
+  code << ")";
+  if (return_type->is_str()) {
+    auto temp_name = temp();
+    write_indent(body_);
+    body_ << "yk__sds " << temp_name << " = " << code.str();
+    write_end_statement(body_);
+    deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
+    push("(" + temp_name + ")", ykobject(return_type));
+  } else {
+    push(code.str(), ykobject(return_type));
   }
 }
 void compiler::visit_grouping_expr(grouping_expr *obj) {
@@ -174,11 +197,21 @@ void compiler::visit_unary_expr(unary_expr *obj) {
 }
 void compiler::visit_variable_expr(variable_expr *obj) {
   // Compiler is visiting a variable, can get data type from scope_
-  auto name = prefix(obj->name_->token_);
-  if (builtins::has_builtin(name)) {
+  auto name = prefix(obj->name_->token_, prefix_val_);
+  if (builtins::has_builtin(obj->name_->token_)) {
     auto b = ykobject(dt_pool);
     b.object_type_ = object_type::BUILTIN_FUNCTION;
-    push(name, b);
+    push(obj->name_->token_, b);
+    return;
+  } else if (defs_classes_.has_function(obj->name_->token_)) {
+    auto b = ykobject(dt_pool);
+    b.object_type_ = object_type::FUNCTION;
+    push(obj->name_->token_, b);
+    return;
+  } else if (defs_classes_.has_class(obj->name_->token_)) {
+    auto b = ykobject(dt_pool);
+    b.object_type_ = object_type::CLASS_ITSELF;
+    push(obj->name_->token_, b);
     return;
   }
   auto object = scope_.get(name);
@@ -211,52 +244,53 @@ void compiler::visit_continue_stmt(continue_stmt *obj) {
   write_end_statement(body_);
 }
 void compiler::visit_def_stmt(def_stmt *obj) {
-  auto name = prefix(obj->name_->token_);
+  auto name = prefix(obj->name_->token_, prefix_val_);
   bool first = false;
   // ::================================::
   // Compile @nativemacro if present
   // ::================================::
   if (obj->annotations_.native_macro_) {
-    forward_declarations_ << "#define " << name << "(";
+    struct_forward_declarations_ << "#define " << name << "(";
     first = true;
     for (auto para : obj->params_) {
       if (!first) {
-        forward_declarations_ << ", ";
+        struct_forward_declarations_ << ", ";
       } else {
         first = false;
       }
-      forward_declarations_ << prefix(para.name_->token_);
+      struct_forward_declarations_ << prefix(para.name_->token_, "nn__");
     }
-    forward_declarations_ << ") ";
+    struct_forward_declarations_ << ") ";
     if (obj->annotations_.native_macro_arg_.empty()) {
       // #define yy__name ccode..
       auto b = dynamic_cast<block_stmt *>(obj->function_body_);
       auto st = b->statements_[0];
       auto stn = dynamic_cast<ccode_stmt *>(st);
-      forward_declarations_ << ::string_utils::unescape(stn->code_str_->token_);
+      struct_forward_declarations_
+          << ::string_utils::unescape(stn->code_str_->token_);
     } else {
       // #define yy__name arg
-      forward_declarations_ << obj->annotations_.native_macro_arg_;
+      struct_forward_declarations_ << obj->annotations_.native_macro_arg_;
     }
-    forward_declarations_ << "\n";
+    struct_forward_declarations_ << "\n";
     return;
   }
   // ::================================::
   // Create declaration in header section
   // ::================================::
   auto return_type = convert_dt(obj->return_type_);
-  forward_declarations_ << return_type << " " << name << "(";
+  function_forward_declarations_ << return_type << " " << name << "(";
   first = true;
   for (auto para : obj->params_) {
     if (!first) {
-      forward_declarations_ << ", ";
+      function_forward_declarations_ << ", ";
     } else {
       first = false;
     }
-    forward_declarations_ << convert_dt(para.data_type_);
+    function_forward_declarations_ << convert_dt(para.data_type_);
   }
-  forward_declarations_ << ")";
-  write_end_statement(forward_declarations_);
+  function_forward_declarations_ << ")";
+  write_end_statement(function_forward_declarations_);
   // ::================================::
   // Create first part of method body
   //       datatype name (..params..)
@@ -269,7 +303,9 @@ void compiler::visit_def_stmt(def_stmt *obj) {
     } else {
       first = false;
     }
-    body_ << convert_dt(para.data_type_) << " " << prefix(para.name_->token_);
+    body_ << convert_dt(para.data_type_) << " "
+          << prefix(para.name_->token_,
+                    obj->annotations_.native_ ? "nn__" : prefix_val_);
   }
   body_ << ") ";
   // ::================================::
@@ -286,7 +322,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
       } else {
         first = false;
       }
-      body_ << prefix(para.name_->token_);
+      body_ << prefix(para.name_->token_, "nn__");
     }
     body_ << "); }\n";
     return;
@@ -299,10 +335,10 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   func_placeholder.object_type_ = object_type::FUNCTION;
   scope_.define_global(name, func_placeholder);
   scope_.push();
-  auto function_def = defs_classes_.get_function(name);
+  auto function_def = obj;
   for (auto param : function_def->params_) {
     auto placeholder = ykobject(param.data_type_);
-    scope_.define(prefix(param.name_->token_), placeholder);
+    scope_.define(prefix(param.name_->token_, prefix_val_), placeholder);
   }
   indent();
   // ::================================::
@@ -317,7 +353,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   // Schedule string argument deletions.
   for (auto param : function_def->params_) {
     if (param.data_type_->is_str()) {
-      auto to_delete = prefix(param.name_->token_);
+      auto to_delete = prefix(param.name_->token_, prefix_val_);
       deletions_.push(to_delete, "yk__sdsfree(" + to_delete + ")");
     }
   }
@@ -370,7 +406,7 @@ void compiler::visit_if_stmt(if_stmt *obj) {
   }
 }
 void compiler::visit_let_stmt(let_stmt *obj) {
-  auto name = prefix(obj->name_->token_);
+  auto name = prefix(obj->name_->token_, prefix_val_);
   auto object = ykobject(dt_pool);
   if (obj->data_type_->is_str()) {
     object = ykobject(std::string("str"), dt_pool);
@@ -487,10 +523,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   if (basic_dt->is_an_array()) {
     // int32_t*, yk__sds*, etc
     return convert_dt(basic_dt->args_[0]) + "*";
-  }
-  auto dt = basic_dt->token_->token_;
-  if (defs_classes_.has_class(dt)) { return "struct " + dt + "*"; }
-  if (basic_dt->is_str()) {
+  } else if (basic_dt->is_str()) {
     return "yk__sds";
   } else if (basic_dt->is_i8()) {
     return "int8_t";
@@ -510,18 +543,46 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "uint64_t";
   } else if (basic_dt->is_bool()) {
     return "bool";
+  } else if (basic_dt->is_none()) {
+    return "void";
+  }
+  auto dt = basic_dt->token_->token_;
+  if (!basic_dt->module_.empty() && cf_ != nullptr) {
+    auto imported_module_prefix = cf_->get(basic_dt->module_)->prefix_;
+    return "struct " + prefix(dt, imported_module_prefix) + "*";
+  }
+  if (defs_classes_.has_class(dt)) {
+    return "struct " + prefix(dt, prefix_val_) + "*";
   }
   return "void";
 }
-std::string compiler::compile(const std::vector<stmt *> &statements) {
+compiler_output compiler::compile(const std::vector<stmt *> &statements) {
+  for (const auto &name : this->defs_classes_.class_names_) {
+    struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
+                                 << ";\n";
+  }
   for (auto st : statements) { st->accept(this); }
-  std::stringstream code{};
-  code << forward_declarations_.str();
-  code << body_.str();
-  // Need to call yy__main from `C` main.
-  // TODO Handle arguments
-  code << "int main(void) { return yy__main(); }";
-  return code.str();
+  return {struct_forward_declarations_.str(),
+          function_forward_declarations_.str(), classes_.str(), body_.str()};
+}
+compiler_output compiler::compile(codefiles *cf, file_info *fi) {
+  this->cf_ = cf;
+  this->prefix_val_ = fi->prefix_;
+  for (const auto &name : this->defs_classes_.class_names_) {
+    struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
+                                 << ";\n";
+  }
+  for (auto imp_st : fi->data_->parser_->import_stmts_) {
+    auto obj = ykobject(dt_pool);
+    obj.object_type_ = yaksha::object_type::MODULE;
+    obj.string_val_ = imp_st->data_->filepath_;
+    obj.module_file_ = imp_st->data_->filepath_;
+    obj.module_name_ = imp_st->name_->token_;
+    scope_.define_global(prefix(imp_st->name_->token_, prefix_val_), obj);
+  }
+  for (auto st : fi->data_->parser_->stmts_) { st->accept(this); }
+  return {struct_forward_declarations_.str(),
+          function_forward_declarations_.str(), classes_.str(), body_.str()};
 }
 void compiler::push(const std::string &expr, const ykobject &data_type) {
   expr_stack_.push_back(expr);
@@ -557,23 +618,23 @@ void compiler::visit_class_stmt(class_stmt *obj) {
    *       int abc;
    *    };
    */
-  auto name = prefix(obj->name_->token_);
-  write_indent(body_);
-  body_ << "struct " << name << " {\n";
+  auto name = prefix(obj->name_->token_, prefix_val_);
+  write_indent(classes_);
+  classes_ << "struct " << name << " {\n";
   indent();
   //
   for (auto member : obj->members_) {
-    write_indent(body_);
-    auto member_name = prefix(member.name_->token_);
+    write_indent(classes_);
+    auto member_name = prefix(member.name_->token_, prefix_val_);
     auto dt = convert_dt(member.data_type_);
-    body_ << dt << " " << member_name;
-    write_end_statement(body_);
+    classes_ << dt << " " << member_name;
+    write_end_statement(classes_);
   }
   //
   dedent();
-  write_indent(body_);
-  body_ << "}";
-  write_end_statement(body_);
+  write_indent(classes_);
+  classes_ << "}";
+  write_end_statement(classes_);
 }
 void compiler::visit_del_stmt(del_stmt *obj) {
   obj->expression_->accept(this);
@@ -597,14 +658,44 @@ void compiler::visit_del_stmt(del_stmt *obj) {
 void compiler::visit_get_expr(get_expr *obj) {
   obj->lhs_->accept(this);
   auto lhs = pop();
-  auto item = prefix(obj->item_->token_);
+  if (lhs.second.object_type_ == object_type::MODULE) {
+    auto member_item = obj->item_;
+    auto imported = cf_->get(lhs.second.string_val_);
+    bool has_func = imported->data_->dsv_->has_function(member_item->token_);
+    bool has_class = imported->data_->dsv_->has_class(member_item->token_);
+    auto mod_obj = ykobject(dt_pool);
+    if (has_class) {
+      mod_obj.object_type_ = object_type::MODULE_CLASS;
+      /* for jungle.Banana */
+      mod_obj.string_val_ = member_item->token_;      /* Banana */
+      mod_obj.module_file_ = lhs.second.string_val_;  /* file path */
+      mod_obj.module_name_ = lhs.second.module_name_; /* jungle */
+    } else if (has_func) {
+      mod_obj.object_type_ = object_type::MODULE_FUNCTION;
+      mod_obj.string_val_ = member_item->token_;
+      mod_obj.module_file_ = lhs.second.string_val_;
+      mod_obj.module_name_ = lhs.second.module_name_;
+    }
+    push("<>", mod_obj);
+    return;
+  }
+  auto item = obj->item_->token_;
   auto user_defined_type = lhs.second.datatype_->type_;
-  auto class_ = defs_classes_.get_class(user_defined_type);
+  auto module_file = lhs.second.datatype_->module_;
+  class_stmt *class_;
+  std::string item_prefix = prefix_val_;
+  if (module_file.empty()) {
+    class_ = defs_classes_.get_class(user_defined_type);
+  } else {
+    file_info *module_info = cf_->get(module_file);
+    class_ = module_info->data_->dsv_->get_class(user_defined_type);
+    item_prefix = module_info->prefix_;
+  }
   for (const auto &member : class_->members_) {
-    if (item == prefix(member.name_->token_)) {
+    if (item == member.name_->token_) {
       auto placeholder = ykobject(dt_pool);
       placeholder.datatype_ = member.data_type_;
-      push(lhs.first + "->" + item, placeholder);
+      push(lhs.first + "->" + prefix(item, item_prefix), placeholder);
       return;
     }
   }
@@ -612,14 +703,23 @@ void compiler::visit_get_expr(get_expr *obj) {
 void compiler::visit_set_expr(set_expr *obj) {
   obj->lhs_->accept(this);
   auto lhs = pop();
-  auto item = prefix(obj->item_->token_);
+  auto item = obj->item_->token_;
   auto user_defined_type = lhs.second.datatype_->type_;
-  auto class_ = defs_classes_.get_class(user_defined_type);
+  auto module_file = lhs.second.datatype_->module_;
+  class_stmt *class_;
+  std::string item_prefix = prefix_val_;
+  if (module_file.empty()) {
+    class_ = defs_classes_.get_class(user_defined_type);
+  } else {
+    file_info *module_info = cf_->get(module_file);
+    class_ = module_info->data_->dsv_->get_class(user_defined_type);
+    item_prefix = module_info->prefix_;
+  }
   for (const auto &member : class_->members_) {
-    if (item == prefix(member.name_->token_)) {
+    if (item == member.name_->token_) {
       auto placeholder = ykobject(dt_pool);
       placeholder.datatype_ = member.data_type_;
-      push(lhs.first + "->" + item, placeholder);
+      push(lhs.first + "->" + prefix(item, item_prefix), placeholder);
       return;
     }
   }
@@ -684,3 +784,4 @@ void compiler::visit_ccode_stmt(ccode_stmt *obj) {
   body_ << ::string_utils::unescape(obj->code_str_->token_);
   write_end_statement(body_);
 }
+void compiler::visit_import_stmt(import_stmt *obj) {}

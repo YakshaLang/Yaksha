@@ -183,3 +183,4 @@ void ast_printer::visit_ccode_stmt(ccode_stmt *obj) {
                string_utils::unescape(obj->code_str_->token_))
         << ")";
 }
+void ast_printer::visit_import_stmt(import_stmt *obj) {}

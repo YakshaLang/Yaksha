@@ -1,0 +1,22 @@
+class banana:
+    id: int
+
+
+class monkey:
+    id: int
+    food: banana
+
+
+def print_monkey(m: monkey) -> None:
+    print("Monkey ")
+    print(m.id)
+    print(" has ")
+    print_banana(m.food)
+    return
+
+
+def print_banana(b: banana) -> None:
+    print("banana ")
+    print(b.id)
+    print("\n")
+    return

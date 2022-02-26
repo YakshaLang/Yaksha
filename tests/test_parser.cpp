@@ -19,7 +19,7 @@ using namespace yaksha;
         block_analyzer b{t.tokens_};                                           \
         b.analyze();                                                           \
         ykdt_pool dt_pool{};                                                   \
-        parser p{b.tokens_, &dt_pool};                                         \
+        parser p{A, b.tokens_, &dt_pool};                                      \
         auto tree = p.parse();                                                 \
         REQUIRE(!tree.empty());                                                \
         REQUIRE(p.errors_.empty());                                            \
@@ -88,6 +88,7 @@ TEST_CASE("parser: Unicode test") {
             "../test_data/unicode_test.py.ast.tokens");
 }
 TEST_CASE("parser: Negative numbers") {
-  TEST_FILE("../test_data/sample_negative_numbers.yaka", "sample_negative_numbers.yaka",
+  TEST_FILE("../test_data/sample_negative_numbers.yaka",
+            "sample_negative_numbers.yaka",
             "../test_data/sample_negative_numbers.yaka.ast.tokens");
 }

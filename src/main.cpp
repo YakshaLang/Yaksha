@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   b.analyze();
   ykdt_pool dt_pool{};
   try {
-    parser p{b.tokens_, &dt_pool};
+    parser p{file_name, b.tokens_, &dt_pool};
     auto tree = p.parse();
     if (!tree.empty() && p.errors_.empty()) {
       interpreter ip{&dt_pool};

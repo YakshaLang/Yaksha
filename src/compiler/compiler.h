@@ -2,18 +2,27 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 #include "ast/ast.h"
+#include "ast/codefiles.h"
 #include "ast/environment_stack.h"
 #include "builtins.h"
 #include "compiler/compiler_utils.h"
 #include "compiler/delete_stack_stack.h"
 #include "def_class_visitor.h"
+#include "tokenizer/token.h"
 #include "utilities/defer_stack_stack.h"
 #include <sstream>
 namespace yaksha {
+  struct compiler_output {
+    std::string struct_forward_declarations_{};
+    std::string function_forward_declarations_{};
+    std::string classes_{};
+    std::string body_{};
+  };
   struct compiler : expr_visitor, stmt_visitor {
     compiler(def_class_visitor &defs_classes, ykdt_pool *pool);
     ~compiler() override;
-    std::string compile(const std::vector<stmt *> &statements);
+    compiler_output compile(codefiles *cf, file_info *fi);
+    compiler_output compile(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
     void visit_binary_expr(binary_expr *obj) override;
     void visit_fncall_expr(fncall_expr *obj) override;
@@ -43,6 +52,7 @@ namespace yaksha {
     void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_ccode_stmt(ccode_stmt *obj) override;
+    void visit_import_stmt(import_stmt *obj) override;
 
 private:
     /**
@@ -64,6 +74,8 @@ private:
     void indent();
     void dedent();
     void push(const std::string &expr, const ykobject &data_type);
+    std::string prefix_val_{};
+    codefiles *cf_{nullptr};
     std::pair<std::string, ykobject> pop();
     // Indentation to generate
     int indent_{0};
@@ -73,11 +85,11 @@ private:
     /**
      * Function declarations, etc
      */
-    std::stringstream forward_declarations_{};
-    /**
-     * Function bodies, etc
-     */
+    std::stringstream struct_forward_declarations_{};
+    std::stringstream function_forward_declarations_{};
+    std::stringstream classes_{};
     std::stringstream body_{};
+    // Scope
     environment_stack scope_;
     // Expr + Type
     // This is to hold expressions.
@@ -94,7 +106,13 @@ private:
     std::vector<ast_type> scope_type_stack_{};
     // Defer stack
     defer_stack_stack defers_{};
+    // Data type pool
     ykdt_pool *dt_pool;
+    void compile_function_call(fncall_expr *obj, const std::string &name,
+                               std::stringstream &code,
+                               ykdatatype *return_type);
+    void compile_obj_creation(const std::string &name, std::stringstream &code,
+                              ykdatatype *return_type);
   };
 }// namespace yaksha
 #endif

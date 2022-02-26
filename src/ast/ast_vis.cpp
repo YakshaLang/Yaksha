@@ -281,3 +281,4 @@ void ast_vis::visit_ccode_stmt(ccode_stmt *obj) {
         << "<br />";
   end_block();
 }
+void ast_vis::visit_import_stmt(import_stmt *obj) {}

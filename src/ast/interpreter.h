@@ -49,6 +49,7 @@ namespace yaksha {
     void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_ccode_stmt(ccode_stmt *obj) override;
+    void visit_import_stmt(import_stmt *obj) override;
 
 private:
     environment_stack globals_;

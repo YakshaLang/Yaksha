@@ -1,0 +1,21 @@
+import city.house as h
+import jungle as j
+
+
+class MainClass:
+    id: int
+
+
+def main() -> int:
+    mc: MainClass = MainClass()
+    hs: h.ColomboHouse = h.ColomboHouse()
+    m: j.monkey = j.monkey()
+    m.id = 10
+    m.food = j.banana()
+    m.food.id = 50
+    j.print_monkey(m)
+    del m.food
+    del m
+    del hs
+    del mc
+    return 0

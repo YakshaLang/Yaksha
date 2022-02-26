@@ -2,13 +2,15 @@
 #ifndef TYPE_CHECKER_H
 #define TYPE_CHECKER_H
 #include "ast/ast.h"
+#include "ast/codefiles.h"
 #include "ast/environment_stack.h"
 #include "compiler/builtins.h"
 #include "compiler/def_class_visitor.h"
 #include "utilities/ykobject.h"
 namespace yaksha {
   struct type_checker : expr_visitor, stmt_visitor {
-    explicit type_checker(ykdt_pool *pool);
+    explicit type_checker(std::string filepath, codefiles *cf,
+                          def_class_visitor *dcv, ykdt_pool *pool);
     ~type_checker() override;
     void check(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -40,6 +42,7 @@ namespace yaksha {
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_square_bracket_set_expr(square_bracket_set_expr *obj) override;
     void visit_ccode_stmt(ccode_stmt *obj) override;
+    void visit_import_stmt(import_stmt *obj) override;
     /**
      * Errors vector, type checker will try and identify as much errors as possible
      * but after first error, everything else is best guess
@@ -48,7 +51,11 @@ namespace yaksha {
     /**
      * Get function information
      */
-    def_class_visitor defs_classes_{};
+    def_class_visitor *defs_classes_;
+    // Scope
+    environment_stack scope_;
+    codefiles *cf_;
+    std::string filepath_;
 
 private:
     ykobject pop();
@@ -65,8 +72,6 @@ private:
     void handle_square_access(expr *index_expr, token *sqb_token,
                               expr *name_expr);
     void handle_assigns(token *oper, const ykobject &lhs, const ykobject &rhs);
-    // Scope
-    environment_stack scope_;
     // Data type pool
     ykdt_pool *dt_pool_;
     std::vector<ykobject> object_stack_{};

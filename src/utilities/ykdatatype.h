@@ -25,6 +25,7 @@ namespace yaksha {
   struct ykdatatype {
     explicit ykdatatype(token *primitive_dt);
     explicit ykdatatype(std::string primitive_dt);
+    explicit ykdatatype(std::string primitive_dt, std::string module);
     ~ykdatatype();
     // Quick Checks for Primitive Data Types
     [[nodiscard]] bool is_int() const;
@@ -45,6 +46,7 @@ namespace yaksha {
     [[nodiscard]] bool is_f64() const;
     [[nodiscard]] bool is_none() const;
     [[nodiscard]] bool support_plus() const;
+    [[nodiscard]] bool is_builtin_or_primitive() const;
     [[nodiscard]] bool is_a_number() const;
     [[nodiscard]] bool is_an_integer() const;
     [[nodiscard]] bool is_a_signed_integer() const;
@@ -52,9 +54,9 @@ namespace yaksha {
     [[nodiscard]] bool is_a_float() const;
     [[nodiscard]] bool is_an_array() const;
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
-    void prefix();
     token *token_{};
     std::string type_{};
+    std::string module_{};
     std::vector<ykdatatype *> args_;
     ykprimitive primitive_type_{ykprimitive::NOT_A_PRIMITIVE};
     ykbuiltin builtin_type_{ykbuiltin::NOT_A_BUILTIN};

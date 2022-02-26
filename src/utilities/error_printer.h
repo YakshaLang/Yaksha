@@ -17,7 +17,7 @@ namespace yaksha::errors {
     if (tok.type_ == token_type::END_OF_FILE) {
       output << " at EOF";
     } else if (tok.type_ != token_type::TK_UNKNOWN_TOKEN_DETECTED) {
-      output << " at " << string_utils::repr_string(tok.token_);
+      output << " at " << string_utils::repr_string(tok.original_);
     } else {
       output << " ";
     }

@@ -35,6 +35,7 @@ namespace yaksha {
   struct del_stmt;
   struct expression_stmt;
   struct if_stmt;
+  struct import_stmt;
   struct let_stmt;
   struct pass_stmt;
   struct return_stmt;
@@ -65,6 +66,7 @@ namespace yaksha {
     STMT_DEL,
     STMT_EXPRESSION,
     STMT_IF,
+    STMT_IMPORT,
     STMT_LET,
     STMT_PASS,
     STMT_RETURN,
@@ -102,6 +104,7 @@ namespace yaksha {
     virtual void visit_del_stmt(del_stmt *obj) = 0;
     virtual void visit_expression_stmt(expression_stmt *obj) = 0;
     virtual void visit_if_stmt(if_stmt *obj) = 0;
+    virtual void visit_import_stmt(import_stmt *obj) = 0;
     virtual void visit_let_stmt(let_stmt *obj) = 0;
     virtual void visit_pass_stmt(pass_stmt *obj) = 0;
     virtual void visit_return_stmt(return_stmt *obj) = 0;
@@ -304,6 +307,16 @@ namespace yaksha {
     token *else_keyword_;
     stmt *else_branch_;
   };
+  struct import_stmt : stmt {
+    import_stmt(token *import_token, std::vector<token *> import_names,
+                token *name, file_info *data);
+    void accept(stmt_visitor *v) override;
+    ast_type get_type() override;
+    token *import_token_;
+    std::vector<token *> import_names_;
+    token *name_;
+    file_info *data_;
+  };
   struct let_stmt : stmt {
     let_stmt(token *name, ykdatatype *data_type, expr *expression);
     void accept(stmt_visitor *v) override;
@@ -369,6 +382,8 @@ namespace yaksha {
     stmt *c_expression_stmt(expr *expression);
     stmt *c_if_stmt(token *if_keyword, expr *expression, stmt *if_branch,
                     token *else_keyword, stmt *else_branch);
+    stmt *c_import_stmt(token *import_token, std::vector<token *> import_names,
+                        token *name, file_info *data);
     stmt *c_let_stmt(token *name, ykdatatype *data_type, expr *expression);
     stmt *c_pass_stmt(token *pass_token);
     stmt *c_return_stmt(token *return_keyword, expr *expression);

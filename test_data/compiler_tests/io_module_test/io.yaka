@@ -1,0 +1,8 @@
+@native
+def readfile(fname: str) -> str:
+    ccode """size_t ln;
+    int err;
+    char *out = yk__bhalib_read_file(nn__fname, &ln, &err);
+    yk__sdsfree(nn__fname); // clean up filename as it will be copied
+    if (err == 0) { return yk__sdsnewlen(out, ln); }
+    return yk__sdsempty()"""

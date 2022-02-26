@@ -8,7 +8,7 @@ TEST_CASE("interpreter: 1 + 2 * 3 + 4 / (2 + 2) * 10 - 2 --> 15") {
   ykdt_pool dt_pool{};
   tokenizer t{"code.py", "1 + 2 * 3 + 4 / (2 + 2) * 10 - 2"};
   t.tokenize();
-  parser p{t.tokens_, &dt_pool};
+  parser p{"code.py", t.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -25,7 +25,7 @@ TEST_CASE("interpreter: 10 / 0 (div by zero)") {
   ykdt_pool dt_pool{};
   tokenizer t{"code.py", "10 / 0"};
   t.tokenize();
-  parser p{t.tokens_, &dt_pool};
+  parser p{"code.py", t.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -42,7 +42,7 @@ TEST_CASE("interpreter: 1 + 2 != 3") {
   ykdt_pool dt_pool{};
   tokenizer t{"code.py", "1 + 2 != 3"};
   t.tokenize();
-  parser p{t.tokens_, &dt_pool};
+  parser p{"code.py", t.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -59,7 +59,7 @@ TEST_CASE("interpreter: 1.0 + 2 (different data types cannot be added)") {
   ykdt_pool dt_pool{};
   tokenizer t{"code.py", "1.0 + 2"};
   t.tokenize();
-  parser p{t.tokens_, &dt_pool};
+  parser p{"code.py", t.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -76,7 +76,7 @@ TEST_CASE("interpreter: None != None is False") {
   ykdt_pool dt_pool{};
   tokenizer t{"code.py", "None != None"};
   t.tokenize();
-  parser p{t.tokens_, &dt_pool};
+  parser p{"code.py", t.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -93,7 +93,7 @@ TEST_CASE("interpreter: None == None is True") {
   ykdt_pool dt_pool{};
   tokenizer t{"code.py", "None == None"};
   t.tokenize();
-  parser p{t.tokens_, &dt_pool};
+  parser p{"code.py", t.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -110,7 +110,7 @@ TEST_CASE("interpreter: Too big a float") {
   ykdt_pool dt_pool{};
   tokenizer t{"code.py", "3213211e32132\n"};
   t.tokenize();
-  parser p{t.tokens_, &dt_pool};
+  parser p{"code.py", t.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -128,7 +128,7 @@ TEST_CASE("interpreter: a == 1 and a == 2 is False") {
   ykdt_pool dt_pool{};
   tokenizer t{"code.py", "a: int = 1\na == 1 and a == 2\n"};
   t.tokenize();
-  parser p{t.tokens_, &dt_pool};
+  parser p{"code.py", t.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -145,7 +145,7 @@ TEST_CASE("interpreter: a == 1 or a == 2 is True") {
   ykdt_pool dt_pool{};
   tokenizer t{"code.py", "a: int = 1\na == 1 or a == 2\n"};
   t.tokenize();
-  parser p{t.tokens_, &dt_pool};
+  parser p{"code.py", t.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -175,7 +175,7 @@ TEST_CASE("interpreter: if and pass") {
   // Blocks need to be analyzed before parsing!
   block_analyzer b{t.tokens_};
   b.analyze();
-  parser p{b.tokens_, &dt_pool};
+  parser p{"code.py", b.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -205,7 +205,7 @@ TEST_CASE("interpreter: call a function") {
   // Blocks need to be analyzed before parsing!
   block_analyzer b{t.tokens_};
   b.analyze();
-  parser p{b.tokens_, &dt_pool};
+  parser p{"code.py", b.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -234,7 +234,7 @@ TEST_CASE("interpreter: call a function recursive") {
   // Blocks need to be analyzed before parsing!
   block_analyzer b{t.tokens_};
   b.analyze();
-  parser p{b.tokens_, &dt_pool};
+  parser p{"code.py", b.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -257,7 +257,7 @@ TEST_CASE("interpreter: not a callable") {
   // Blocks need to be analyzed before parsing!
   block_analyzer b{t.tokens_};
   b.analyze();
-  parser p{b.tokens_, &dt_pool};
+  parser p{"code.py", b.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};
@@ -281,7 +281,7 @@ TEST_CASE("interpreter: count to 10") {
   t.tokenize();
   block_analyzer b{t.tokens_};
   b.analyze();
-  parser p{b.tokens_, &dt_pool};
+  parser p{"code.py", b.tokens_, &dt_pool};
   auto expression = p.parse();
   if (!expression.empty()) {
     interpreter ip{&dt_pool};

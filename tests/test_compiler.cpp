@@ -1,54 +1,32 @@
-#include "ast/parser.h"
-#include "btest.h"
 #include "catch2/catch.hpp"
-#include "compiler/compiler.h"
-#include "compiler/type_checker.h"
+#include "compiler/multifile_compiler.h"
 #include "file_formats/tokens_file.h"
-#include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
+#include <string>
 using namespace yaksha;
 #define TEST_FILE(A, B, C)                                                     \
   do {                                                                         \
-    std::ifstream code_file(A);                                                \
-    if (code_file.good()) {                                                    \
-      std::string code((std::istreambuf_iterator<char>(code_file)),            \
-                       std::istreambuf_iterator<char>());                      \
-      try {                                                                    \
-        yaksha::tokenizer t(B, code);                                          \
-        t.tokenize();                                                          \
-        REQUIRE(t.errors_.empty());                                            \
-        block_analyzer b{t.tokens_};                                           \
-        b.analyze();                                                           \
-        ykdt_pool dt_pool{};                                                   \
-        parser p{b.tokens_, &dt_pool};                                         \
-        auto tree = p.parse();                                                 \
-        REQUIRE(!tree.empty());                                                \
-        REQUIRE(p.errors_.empty());                                            \
-        type_checker tc{&dt_pool};                                             \
-        tc.check(tree);                                                        \
-        REQUIRE(tc.errors_.empty());                                           \
-        compiler comp{tc.defs_classes_, &dt_pool};                             \
-        auto compiler_output = comp.compile(tree);                             \
-        tokenizer c_code{"output.c", compiler_output};                         \
-        c_code.tokenize();                                                     \
-        auto token_snapshot = yaksha::load_token_dump(C);                      \
-        yaksha::save_token_dump(C, c_code.tokens_);                            \
-        REQUIRE(c_code.tokens_.size() == token_snapshot.size());               \
-        for (int i = 0; i < token_snapshot.size(); i++) {                      \
-          auto parsed = c_code.tokens_[i];                                     \
-          auto snapshot = token_snapshot[i];                                   \
-          REQUIRE(parsed.file_ == snapshot.file_);                             \
-          REQUIRE(parsed.line_ == snapshot.line_);                             \
-          REQUIRE(parsed.pos_ == snapshot.pos_);                               \
-          REQUIRE(parsed.token_ == snapshot.token_);                           \
-          REQUIRE(parsed.type_ == snapshot.type_);                             \
-        }                                                                      \
-      } catch (parsing_error & e) {                                            \
-        DBGPRINT(e.message_);                                                  \
-        REQUIRE(false);                                                        \
-      }                                                                        \
-    } else {                                                                   \
-      REQUIRE(false);                                                          \
+    multifile_compiler mc{};                                                   \
+    auto result = mc.compile(A);                                               \
+    REQUIRE(result.failed_ == false);                                          \
+    tokenizer c_code{"output.c", result.code_};                                \
+    c_code.tokenize();                                                         \
+    auto token_snapshot = yaksha::load_token_dump(C);                          \
+    yaksha::save_token_dump(C, c_code.tokens_);                                \
+    std::string c_code_file{A};                                               \
+    c_code_file += ".output.c";                                                \
+    std::ofstream save_file(c_code_file);                                      \
+    REQUIRE(save_file.is_open() == true);                                      \
+    save_file << result.code_;                                               \
+    REQUIRE(c_code.tokens_.size() == token_snapshot.size());                   \
+    for (int i = 0; i < token_snapshot.size(); i++) {                          \
+      auto parsed = c_code.tokens_[i];                                         \
+      auto snapshot = token_snapshot[i];                                       \
+      REQUIRE(parsed.file_ == snapshot.file_);                                 \
+      REQUIRE(parsed.line_ == snapshot.line_);                                 \
+      REQUIRE(parsed.pos_ == snapshot.pos_);                                   \
+      REQUIRE(parsed.token_ == snapshot.token_);                               \
+      REQUIRE(parsed.type_ == snapshot.type_);                                 \
     }                                                                          \
   } while (0)
 TEST_CASE("compiler: Hello World") {
@@ -86,4 +64,12 @@ TEST_CASE("compiler: Void function") {
 TEST_CASE("compiler: Native functions") {
   TEST_FILE("../test_data/compiler_tests/nativefunc.yaka", "nativefunc.yaka",
             "../test_data/compiler_tests/nativefunc.tokens");
+}
+TEST_CASE("compiler: Imports") {
+  TEST_FILE("../test_data/import_tests/main.yaka", "main.yaka",
+            "../test_data/import_tests/main.tokens");
+}
+TEST_CASE("compiler: Native functions in imports") {
+  TEST_FILE("../test_data/compiler_tests/io_module_test/main.yaka", "main.yaka",
+            "../test_data/compiler_tests/io_module_test/main.tokens");
 }

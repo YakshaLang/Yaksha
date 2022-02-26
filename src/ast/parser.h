@@ -6,11 +6,12 @@
 #include "tokenizer/token.h"
 #include "utilities/ykdt_pool.h"
 #include <sstream>
+#include <unordered_map>
 #include <vector>
 namespace yaksha {
   struct parser {
-    explicit parser(std::vector<token> &tokens);
-    explicit parser(std::vector<token> &tokens, ykdt_pool *pool);
+    explicit parser(std::string filepath_, std::vector<token> &tokens,
+                    ykdt_pool *pool);
     ~parser();
     /**
    * parse and return a vector of statements
@@ -21,6 +22,11 @@ namespace yaksha {
      * Errors vector
      */
     std::vector<parsing_error> errors_;
+    std::vector<import_stmt *> import_stmts_;
+    std::unordered_map<std::string, import_stmt *> import_stmts_alias_{};
+    std::vector<stmt *> stmts_{};
+    std::string filepath_{};
+    void rescan_datatypes();
 
 private:
     // expressions
@@ -53,6 +59,7 @@ private:
     stmt *attempt_parse_def_or_class();
     stmt *def_statement(annotations ants);
     stmt *class_statement(annotations ants);
+    stmt *import_statement();
     std::vector<parameter> parse_class_members(token *name);
     stmt *expression_statement();
     stmt *declaration_statement();
@@ -78,7 +85,7 @@ private:
     ast_pool pool_;
     ykdt_pool *dt_pool_;
     std::vector<token> &tokens_;
-    bool delete_dt_pool_{false};
+    std::vector<ykdatatype *> datatypes_from_modules_{};
     // Increase when we allow control, flow.
     // Decrease after parsing.
     // If this is <= zero do not allow `continue` or `break`

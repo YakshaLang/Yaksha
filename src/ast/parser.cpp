@@ -4,11 +4,11 @@
 #include <cassert>
 #include <utility>
 using namespace yaksha;
-parser::parser(std::vector<token> &tokens, ykdt_pool *pool)
-    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0}, dt_pool_(pool) {}
-parser::parser(std::vector<token> &tokens)
-    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0},
-      dt_pool_(new ykdt_pool()) {}
+parser::parser(std::string filepath, std::vector<token> &tokens,
+               ykdt_pool *pool)
+    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0}, dt_pool_(pool),
+      import_stmts_(), filepath_(std::move(filepath)) {}
+parser::~parser() = default;
 token *parser::advance() {
   if (!is_at_end()) { current_++; }
   return previous();
@@ -141,13 +141,12 @@ parsing_error parser::error(token *tok, const std::string &message) {
 void parser::handle_error(const parsing_error &err) { errors_.push_back(err); }
 expr *parser::expression() { return assignment(); }
 std::vector<stmt *> parser::parse() {
-  std::vector<stmt *> statements{};
   while (!is_at_end()) {
     auto decl = declaration_statement();
-    if (decl == nullptr) { return statements; }
-    statements.emplace_back(decl);
+    if (decl == nullptr) { return stmts_; }
+    stmts_.emplace_back(decl);
   }
-  return statements;
+  return stmts_;
 }
 void parser::synchronize_parser() {
   advance();
@@ -254,6 +253,7 @@ stmt *parser::declaration_statement() {
   expr *exp = nullptr;
   token *data_type = nullptr;
   try {
+    if (match({token_type::KEYWORD_IMPORT})) { return import_statement(); }
     if (match({token_type::KEYWORD_DEF})) { return def_statement({}); }
     if (match({token_type::KEYWORD_CLASS})) { return class_statement({}); }
     if (match({token_type::AT})) { return attempt_parse_def_or_class(); }
@@ -377,8 +377,20 @@ ykdatatype *parser::parse_datatype() {
   if (!match({token_type::NAME, token_type::KEYWORD_NONE})) {
     throw error(peek(), "Must have a data type.");
   }
-  auto dt = dt_pool_->create(previous());
-  dt->prefix();
+  ykdatatype *dt;
+  auto tk = previous();
+  if (match({token_type::DOT})) {
+    auto after_dot = consume(token_type::NAME, "Must have a name after dot");
+    auto module_import_alias = tk->token_;
+    if (import_stmts_alias_.find(module_import_alias) ==
+        import_stmts_alias_.end()) {
+      throw error(tk, "Needs to be a module");
+    }
+    dt = dt_pool_->create(after_dot->token_, module_import_alias);
+    datatypes_from_modules_.emplace_back(dt);
+  } else {
+    dt = dt_pool_->create(tk->token_, filepath_);
+  }
   if (match({token_type::SQUARE_BRACKET_OPEN})) {
     if (dt->is_primitive()) {
       throw error(dt->token_,
@@ -395,9 +407,6 @@ ykdatatype *parser::parse_datatype() {
     consume(token_type::SQUARE_BRACKET_CLOSE, "Must have a closing ']'");
   }
   return dt;
-}
-parser::~parser() {
-  if (delete_dt_pool_) { delete dt_pool_; }
 }
 stmt *parser::class_statement(annotations ants) {
   auto name = consume(token_type::NAME, "Class name must be present");
@@ -489,4 +498,44 @@ stmt *parser::ccode_statement() {
   consume_or_eof(token_type::NEW_LINE,
                  "Expect new line after value for ccode statement.");
   return pool_.c_ccode_stmt(ccode_keyword, cc);
+}
+stmt *parser::import_statement() {
+  auto import_token = previous();
+  token *name_token;
+  std::vector<token *> imp_names{};
+  auto tk = consume(token_type::NAME,
+                    "At least one name for imported module must be present");
+  imp_names.emplace_back(tk);
+  while (peek()->type_ == token_type::DOT) {
+    consume(token_type::DOT, "Dot must be present");
+    tk = consume(token_type::NAME,
+                 "A name for imported module must be present after a dot");
+    imp_names.emplace_back(tk);
+  }
+  if (match({token_type::KEYWORD_AS})) {
+    name_token =
+        consume(token_type::NAME, "Name must be present after 'as' keyword.");
+  } else {
+    name_token = imp_names.back();
+  }
+  consume(token_type::NEW_LINE, "Import must end with new line.");
+  auto st = pool_.c_import_stmt(import_token, imp_names, name_token, nullptr);
+  if (import_stmts_alias_.find(name_token->token_) !=
+      import_stmts_alias_.end()) {
+    throw error(name_token, "Duplicate import alias");
+  }
+  auto import = dynamic_cast<import_stmt *>(st);
+  import_stmts_.emplace_back(import);
+  import_stmts_alias_.insert({name_token->token_, import});
+  return st;
+}
+void parser::rescan_datatypes() {
+  for (auto &dt : datatypes_from_modules_) {
+    if (dt->is_builtin_or_primitive()) continue;
+    auto import_alias = dt->module_;
+    auto module_data = import_stmts_alias_[import_alias];
+    dt->module_ = module_data->data_->filepath_;
+  }
+  // Clean up temporary vector
+  datatypes_from_modules_.clear();
 }
