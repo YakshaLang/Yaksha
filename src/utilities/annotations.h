@@ -9,9 +9,12 @@ namespace yaksha {
     void add(const annotation &a);
     bool native_{false};
     bool native_macro_{false};
+    bool native_define_{false};
     bool template_{false};
+    bool varargs_{false};
     std::string native_arg_{};
     std::string native_macro_arg_{};
+    std::string native_define_arg_{};
     std::string template_arg_{};
     std::string error_{};
 

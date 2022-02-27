@@ -432,6 +432,12 @@ stmt *parser::class_statement(annotations ants) {
   consume(token_type::NEW_LINE, "Class block must start with a new line");
   consume(token_type::BA_INDENT,
           "Class block must start with an indentation increase");
+  if (peek()->type_ == token_type::KEYWORD_PASS) {
+    consume(token_type::KEYWORD_PASS, "Expected 'pass'");
+    consume(token_type::NEW_LINE, "New line should follow 'pass'");
+    consume(token_type::BA_DEDENT, "Expected dedent");
+    return pool_.c_class_stmt(name, std::vector<parameter>{}, std::move(ants));
+  }
   std::vector<parameter> members = parse_class_members(name);
   return pool_.c_class_stmt(name, members, std::move(ants));
 }

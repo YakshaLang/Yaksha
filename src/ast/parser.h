@@ -90,7 +90,7 @@ private:
     // Decrease after parsing.
     // If this is <= zero do not allow `continue` or `break`
     int control_flow_;
-    token* magic_return_token_;
+    token *magic_return_token_;
   };
 }// namespace yaksha
 #endif

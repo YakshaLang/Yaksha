@@ -30,6 +30,17 @@ void def_class_visitor::visit_def_stmt(def_stmt *obj) {
     error(obj->name_, "Critical!! Redefinition of class as a function");
     return;
   }
+  if (obj->annotations_.varargs_ &&
+      (!obj->annotations_.native_macro_ && !obj->annotations_.native_define_)) {
+    error(obj->name_,
+          "@vararg must be used with @nativemacro or @nativedefine.");
+    return;
+  }
+  if (obj->annotations_.varargs_ && obj->params_.size() <= 1) {
+    error(obj->name_,
+          "@varargs only works with functions that have at least 2 arguments.");
+    return;
+  }
   function_names_.push_back(name);
   functions_.insert({name, obj});
 }
@@ -56,6 +67,17 @@ bool def_class_visitor::has_function(const std::string &prefixed_name) {
 }
 void def_class_visitor::visit_class_stmt(class_stmt *obj) {
   auto name = obj->name_->token_;
+  if (obj->annotations_.varargs_ || obj->annotations_.native_ ||
+      obj->annotations_.template_) {
+    error(obj->name_,
+          "@varargs, @native and @template are not allowed for classes.");
+    return;
+  }
+  if (obj->annotations_.native_define_ &&
+      obj->annotations_.native_define_arg_.empty()) {
+    error(obj->name_, "@nativedefine must have a valid argument");
+    return;
+  }
   if (builtins::has_builtin(name)) {
     error(obj->name_, "Critical!! Redefinition of builtin function");
     return;

@@ -77,3 +77,7 @@ TEST_CASE("compiler: Array methods") {
   TEST_FILE("../test_data/compiler_tests/arrstack.yaka", "arrstack.yaka",
             "../test_data/compiler_tests/arrstack.tokens");
 }
+TEST_CASE("compiler: Native defines") {
+  TEST_FILE("../test_data/byol/lisp.yaka", "lisp.yaka",
+            "../test_data/byol/lisp.tokens");
+}

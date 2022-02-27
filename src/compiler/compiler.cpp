@@ -159,7 +159,10 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     if (obj->literal_token_->token_.empty()) {
       body_ << " = yk__sdsempty()";
     } else {
-      body_ << " = yk__sdsnew(\"" << obj->literal_token_->token_ << "\")";
+      body_ << " = yk__sdsnew(\""
+            << string_utils::escape(
+                   string_utils::unescape(obj->literal_token_->token_))
+            << "\")";
     }
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
@@ -245,6 +248,12 @@ void compiler::visit_continue_stmt(continue_stmt *obj) {
 }
 void compiler::visit_def_stmt(def_stmt *obj) {
   auto name = prefix(obj->name_->token_, prefix_val_);
+  if (obj->annotations_.native_define_) {
+    struct_forward_declarations_ << "#define " << name << " "
+                                 << obj->annotations_.native_define_arg_
+                                 << "\n";
+    return;
+  }
   bool first = false;
   // ::================================::
   // Compile @nativemacro if present
@@ -426,23 +435,25 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     // Add to deletions
     deletions_.push(name, "yk__sdsfree(" + name + ")");
   } else if (obj->data_type_->is_an_array()) {
-    write_indent(body_);
     object = ykobject(obj->data_type_);
-    body_ << convert_dt(obj->data_type_) << " " << name;
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
       auto exp = pop();
+      write_indent(body_);
+      body_ << convert_dt(obj->data_type_) << " " << name;
       body_ << " = " << exp.first;
     } else {
+      write_indent(body_);
+      body_ << convert_dt(obj->data_type_) << " " << name;
       body_ << " = NULL";
     }
   } else {
-    write_indent(body_);
     object = ykobject(obj->data_type_);
-    body_ << convert_dt(obj->data_type_) << " " << name;
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
       auto exp = pop();
+      write_indent(body_);
+      body_ << convert_dt(obj->data_type_) << " " << name;
       body_ << " = " << exp.first;
     }
   }
@@ -548,18 +559,28 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   }
   auto dt = basic_dt->token_->token_;
   if (!basic_dt->module_.empty() && cf_ != nullptr) {
-    auto imported_module_prefix = cf_->get(basic_dt->module_)->prefix_;
-    return "struct " + prefix(dt, imported_module_prefix) + "*";
+    auto module = cf_->get(basic_dt->module_);
+    auto imported_module_prefix = module->prefix_;
+    auto class_info = module->data_->dsv_->get_class(dt);
+    auto class_name = prefix(dt, imported_module_prefix);
+    if (class_info->annotations_.native_define_) { return class_name; }
+    return "struct " + class_name + "*";
   }
   if (defs_classes_.has_class(dt)) {
-    return "struct " + prefix(dt, prefix_val_) + "*";
+    auto class_info = defs_classes_.get_class(dt);
+    auto class_name = prefix(dt, prefix_val_);
+    if (class_info->annotations_.native_define_) { return class_name; }
+    return "struct " + class_name + "*";
   }
   return "void";
 }
 compiler_output compiler::compile(const std::vector<stmt *> &statements) {
   for (const auto &name : this->defs_classes_.class_names_) {
-    struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
-                                 << ";\n";
+    auto cls = defs_classes_.get_class(name);
+    if (!cls->annotations_.native_macro_) {
+      struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
+                                   << ";\n";
+    }
   }
   for (auto st : statements) { st->accept(this); }
   return {struct_forward_declarations_.str(),
@@ -569,8 +590,11 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   this->cf_ = cf;
   this->prefix_val_ = fi->prefix_;
   for (const auto &name : this->defs_classes_.class_names_) {
-    struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
-                                 << ";\n";
+    auto cls = defs_classes_.get_class(name);
+    if (!cls->annotations_.native_macro_) {
+      struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
+                                   << ";\n";
+    }
   }
   for (auto imp_st : fi->data_->parser_->import_stmts_) {
     auto obj = ykobject(dt_pool);
@@ -619,6 +643,12 @@ void compiler::visit_class_stmt(class_stmt *obj) {
    *    };
    */
   auto name = prefix(obj->name_->token_, prefix_val_);
+  if (obj->annotations_.native_define_) {
+    struct_forward_declarations_ << "#define " << name << " "
+                                 << obj->annotations_.native_define_arg_
+                                 << "\n";
+    return;
+  }
   write_indent(classes_);
   classes_ << "struct " << name << " {\n";
   indent();

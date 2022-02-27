@@ -73,7 +73,6 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       arg->accept(this);
       arguments.push_back(pop());
     }
-    // check if it's same size
     def_stmt *funct;
     if (name.object_type_ == object_type::FUNCTION) {
       funct = defs_classes_->get_function(name.string_val_);
@@ -81,19 +80,35 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       auto imp = cf_->get(name.module_file_);
       funct = imp->data_->dsv_->get_function(name.string_val_);
     }
-    if (funct->params_.size() != arguments.size()) {
+    // check if it's same size
+    if (funct->params_.size() != arguments.size() &&
+        !funct->annotations_.varargs_) {
       error(obj->paren_token_, "Too few or too "
                                "much arguments for function call");
       push(ykobject(dt_pool_));// Push None here
       return;
     }
+    auto last_param_index = funct->params_.size() - 1;
     for (auto i = 0; i < funct->params_.size(); i++) {
       auto param = funct->params_[i];
-      auto arg = arguments[i];
-      if (!(arg.is_primitive_or_obj() && *arg.datatype_ == *param.data_type_)) {
-        std::stringstream message{};
-        message << "Parameter & argument " << (i + 1) << " mismatches";
-        error(obj->paren_token_, message.str());
+      if (i == last_param_index && funct->annotations_.varargs_) {
+        for (auto j = i; j < arguments.size(); j++) {
+          auto arg = arguments[j];
+          if (!(arg.is_primitive_or_obj() &&
+                *arg.datatype_ == *param.data_type_)) {
+            std::stringstream message{};
+            message << "Variable argument: " << (j + 1) << " mismatches";
+            error(obj->paren_token_, message.str());
+          }
+        }
+      } else {
+        auto arg = arguments[i];
+        if (!(arg.is_primitive_or_obj() &&
+              *arg.datatype_ == *param.data_type_)) {
+          std::stringstream message{};
+          message << "Parameter & argument " << (i + 1) << " mismatches";
+          error(obj->paren_token_, message.str());
+        }
       }
     }
     auto data = ykobject(funct->return_type_);

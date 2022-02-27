@@ -1,0 +1,13 @@
+@nativedefine("mpc_parser_t*")
+class Mpc:
+    pass
+
+@nativedefine("mpc_new")
+def new(a: str) -> Mpc:
+    pass
+
+
+@varargs
+@nativedefine("mpca_lang")
+def mpca_lang(a: int, b: str, c: Mpc) -> None:
+    pass

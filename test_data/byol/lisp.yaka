@@ -1,0 +1,15 @@
+import mpc
+
+def main() -> int:
+    number: mpc.Mpc   = mpc.new("number")
+    operator: mpc.Mpc = mpc.new("operator")
+    expr: mpc.Mpc     = mpc.new("expr")
+    lispy: mpc.Mpc    = mpc.new("lispy")
+    lang: str = """
+      number   : /-?[0-9]+/ ;
+      operator : '+' | '-' | '*' | '/' ;
+      expr     : <number> | '(' <operator> <expr>+ ')' ;
+      lispy    : /^/ <operator> <expr>+ /$/ ;
+    """
+    mpc.mpca_lang(1, lang, number, operator, expr, lispy)
+    return 0

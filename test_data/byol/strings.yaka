@@ -1,0 +1,5 @@
+@native
+def is_empty_str(s: str) -> bool:
+    ccode """bool x = yk__sdslen(nn__s) == 0;
+    yk__sdsfree(nn__s);
+    return x"""
