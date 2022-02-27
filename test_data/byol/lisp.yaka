@@ -1,8 +1,39 @@
-import libs.io
-import libs.mpc
+import libs.io as io
+import libs.mpc as mpc
+import libs.numbers as numbers
+import libs.strings as strings
 
 
 # based on https://buildyourownlisp.com/chapter6_parsing
+# based on https://buildyourownlisp.com/chapter7_evaluation
+
+def eval_op(x: int, op: str, y: int) -> int:
+    if op == "+":
+        return x + y
+    if op == "-":
+        return x - y
+    if op == "*":
+        return x * y
+    if op == "/":
+        return x / y
+    return 0
+
+def eval(t: mpc.Ast) -> int:
+    if strings.startswith(strings.from_cstr(t.tag), "number"):
+        return numbers.cstr2i(t.contents)
+
+    op: str = strings.from_cstr(t.children[1].contents)
+    x: int = eval(t.children[2])
+
+    i: int = 3
+    while True:
+        if strings.startswith(strings.from_cstr(t.children[i].tag), "expr"):
+            x = eval_op(x, op, eval(t.children[i]))
+            i = i + 1
+        else:
+            break
+
+    return x
 
 def main() -> int:
     number: mpc.Mpc = mpc.new("number")
@@ -10,24 +41,36 @@ def main() -> int:
     expr: mpc.Mpc = mpc.new("expr")
     lispy: mpc.Mpc = mpc.new("lispy")
 
+    defer del number
+    defer del operator
+    defer del expr
+    defer del lispy
+
     lang: str = """
       number   : /-?[0-9]+/ ;
       operator : '+' | '-' | '*' | '/' ;
       expr     : <number> | '(' <operator> <expr>+ ')' ;
       lispy    : /^/ <operator> <expr>+ /$/ ;
     """
-    mpc.mpca_lang(1, lang, number, operator, expr, lispy)
+    mpc.mpca_lang(0, lang, number, operator, expr, lispy)
 
     print("Lispy Version 0.0.0.0.2\n")
-    print("Press Ctrl+c to Exit\n\n")
+    print("Type just 'q' to exit.\n\n")
 
     filename: str = "<stdin>"
+    r: mpc.Result = mpc.new_result()
+    defer del r
     while True:
         inp: str = io.readline("lispy> ")
-        r: mpc.Result = mpc.new_result()
+        if inp == "q":
+            return 0
         if mpc.parse(filename, inp, lispy, r):
-            mpc.ast_print(r)
+            println(eval(r.output))
+            mpc.ast_del(r)
         else:
             mpc.err_print(r)
+            mpc.err_del(r)
+
+    mpc.cleanup(4, number, operator, expr, lispy)
     print(">>>bye!\n")
     return 0

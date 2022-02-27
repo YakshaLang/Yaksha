@@ -1,5 +1,20 @@
+@nativedefine("char*")
+class cstr:
+    pass
+
 @native
 def is_empty_str(s: str) -> bool:
     ccode """bool x = yk__sdslen(nn__s) == 0;
     yk__sdsfree(nn__s);
     return x"""
+
+@native
+def startswith(a: str, b: str) -> bool:
+    ccode """bool x = (strstr(nn__a, nn__b) != NULL);
+    yk__sdsfree(nn__a);
+    yk__sdsfree(nn__b);
+    return x"""
+
+@native
+def from_cstr(a: cstr) -> str:
+    ccode """return yk__sdsnewlen(nn__a, strlen(nn__a))"""

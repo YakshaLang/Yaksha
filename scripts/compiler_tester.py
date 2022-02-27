@@ -63,16 +63,8 @@ def main():
         print(Colors.cyan("----"))
         quit(EXIT_FAILURE)
     print(Colors.cyan("<<------>>"))
-    out, err, ret = execute("./a.out")
-    if out:
-        print(out)
-    if err:
-        eprint(err)
+    os.system("./a.out")
     print(Colors.cyan("<<------>>"))
-    if ret == 0:
-        print(Colors.cyan("ret ="), Colors.green(ret))
-    else:
-        print(Colors.cyan("ret ="), Colors.fail(ret))
 
 
 if __name__ == "__main__":

@@ -1,10 +1,18 @@
+import libs.strings as strings
+
+@nativedefine("mpc_ast_t*")
+class Ast:
+    tag: strings.cstr
+    contents: strings.cstr
+    children: Array[Ast]
+
 @nativedefine("mpc_parser_t*")
 class Mpc:
     pass
 
 @nativedefine("mpc_result_t*")
 class Result:
-    pass
+    output: Ast
 
 @nativedefine("mpc_new")
 def new(a: str) -> Mpc:
@@ -19,6 +27,11 @@ def new_result() -> Result:
 def mpca_lang(a: int, b: str, c: Mpc) -> None:
     pass
 
+@varargs
+@nativedefine("mpc_cleanup")
+def cleanup(a: int, c: Mpc) -> None:
+    pass
+
 @nativedefine("mpc_parse")
 def parse(a: str, b: str, c: Mpc, r: Result) -> bool:
     pass
@@ -30,3 +43,11 @@ def ast_print(r: Result) -> None:
 @native
 def err_print(r: Result) -> None:
     ccode """mpc_err_print(nn__r->output)"""
+
+@native
+def ast_del(r: Result) -> None:
+    ccode """mpc_ast_delete(nn__r->output)"""
+
+@native
+def err_del(r: Result) -> None:
+    ccode """mpc_err_delete(nn__r->output)"""
