@@ -168,7 +168,13 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
     push(temp_name, ykobject(std::string{"str"},
                              dt_pool));// Note: dummy value for ykobject
-  } else {                             // Assume this is int for now
+  } else if (obj->literal_token_->type_ == token_type::KEYWORD_TRUE) {
+    push("true", ykobject(dt_pool->create("bool")));
+  } else if (obj->literal_token_->type_ == token_type::KEYWORD_FALSE) {
+    push("false", ykobject(dt_pool->create("bool")));
+  } else if (obj->literal_token_->type_ == token_type::KEYWORD_NONE) {
+    push("NULL", ykobject());
+  } else {// Assume this is int for now
     // TODO support for other data types
     push(obj->literal_token_->token_,
          ykobject(0, dt_pool));// Note dummy value for ykobject
@@ -577,7 +583,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
 compiler_output compiler::compile(const std::vector<stmt *> &statements) {
   for (const auto &name : this->defs_classes_.class_names_) {
     auto cls = defs_classes_.get_class(name);
-    if (!cls->annotations_.native_macro_) {
+    if (!cls->annotations_.native_define_) {
       struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
                                    << ";\n";
     }
@@ -591,7 +597,7 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   this->prefix_val_ = fi->prefix_;
   for (const auto &name : this->defs_classes_.class_names_) {
     auto cls = defs_classes_.get_class(name);
-    if (!cls->annotations_.native_macro_) {
+    if (!cls->annotations_.native_define_) {
       struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
                                    << ";\n";
     }

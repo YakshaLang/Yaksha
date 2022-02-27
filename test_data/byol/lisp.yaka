@@ -1,10 +1,15 @@
-import mpc
+import libs.io
+import libs.mpc
+
+
+# based on https://buildyourownlisp.com/chapter6_parsing
 
 def main() -> int:
-    number: mpc.Mpc   = mpc.new("number")
+    number: mpc.Mpc = mpc.new("number")
     operator: mpc.Mpc = mpc.new("operator")
-    expr: mpc.Mpc     = mpc.new("expr")
-    lispy: mpc.Mpc    = mpc.new("lispy")
+    expr: mpc.Mpc = mpc.new("expr")
+    lispy: mpc.Mpc = mpc.new("lispy")
+
     lang: str = """
       number   : /-?[0-9]+/ ;
       operator : '+' | '-' | '*' | '/' ;
@@ -12,4 +17,17 @@ def main() -> int:
       lispy    : /^/ <operator> <expr>+ /$/ ;
     """
     mpc.mpca_lang(1, lang, number, operator, expr, lispy)
+
+    print("Lispy Version 0.0.0.0.2\n")
+    print("Press Ctrl+c to Exit\n\n")
+
+    filename: str = "<stdin>"
+    while True:
+        inp: str = io.readline("lispy> ")
+        r: mpc.Result = mpc.new_result()
+        if mpc.parse(filename, inp, lispy, r):
+            mpc.ast_print(r)
+        else:
+            mpc.err_print(r)
+    print(">>>bye!\n")
     return 0

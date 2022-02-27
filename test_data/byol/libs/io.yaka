@@ -6,3 +6,11 @@ def readfile(fname: str) -> str:
     yk__sdsfree(nn__fname); // clean up filename as it will be copied
     if (err == 0) { return yk__sdsnewlen(out, ln); }
     return yk__sdsempty()"""
+
+@native
+def readline(prompt: str) -> str:
+    ccode """char* input = yk__readline(nn__prompt);
+    yk__sds result = yk__sdsnew(input);
+    free(input);
+    yk__sdsfree(nn__prompt);
+    return result"""

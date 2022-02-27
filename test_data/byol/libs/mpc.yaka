@@ -1,0 +1,32 @@
+@nativedefine("mpc_parser_t*")
+class Mpc:
+    pass
+
+@nativedefine("mpc_result_t*")
+class Result:
+    pass
+
+@nativedefine("mpc_new")
+def new(a: str) -> Mpc:
+    pass
+
+@native
+def new_result() -> Result:
+    ccode """return calloc(1, sizeof(mpc_result_t))"""
+
+@varargs
+@nativedefine("mpca_lang")
+def mpca_lang(a: int, b: str, c: Mpc) -> None:
+    pass
+
+@nativedefine("mpc_parse")
+def parse(a: str, b: str, c: Mpc, r: Result) -> bool:
+    pass
+
+@native
+def ast_print(r: Result) -> None:
+    ccode """mpc_ast_print(nn__r->output)"""
+
+@native
+def err_print(r: Result) -> None:
+    ccode """mpc_err_print(nn__r->output)"""
