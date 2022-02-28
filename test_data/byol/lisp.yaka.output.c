@@ -1,7 +1,45 @@
 #include "yk__lib.h"
 // --forward declarations-- 
 #define yy__numbers_cstr2i atoi
-#define yy__strings_cstr char*
+#define yy__c_VoidPtr void*
+#define yy__c_Size size_t
+#define yy__c_CStr char*
+#define yy__c_CDouble double
+#define yy__c_CBool bool
+#define yy__c_CInt int
+#define yy__c_CLong long
+#define yy__c_CShort short
+#define yy__c_CUInt unsigned int
+#define yy__c_CULong unsigned long
+#define yy__c_CUShort unsigned short
+#define yy__c_free free
+#define yy__c_calloc calloc
+#define yy__c_realloc realloc
+#define yy__c_malloc malloc
+#define yy__c_system system
+#define yy__c_acos acos
+#define yy__c_asin asin
+#define yy__c_atan atan
+#define yy__c_atan2 atan2
+#define yy__c_cos cos
+#define yy__c_cosh cosh
+#define yy__c_sin sin
+#define yy__c_sinh sinh
+#define yy__c_tan tan
+#define yy__c_tanh tanh
+#define yy__c_log log
+#define yy__c_log10 log10
+#define yy__c_log2 log2
+#define yy__c_pow pow
+#define yy__c_sqrt sqrt
+#define yy__c_ceil ceil
+#define yy__c_fabs fabs
+#define yy__c_floor floor
+#define yy__c_fmod pow
+#define yy__c_memcpy memcpy
+#define yy__c_memmove memmove
+#define yy__c_memset memset
+#define yy__c_memcmp memcmp
 #define yy__mpc_Ast mpc_ast_t*
 #define yy__mpc_Mpc mpc_parser_t*
 #define yy__mpc_Result mpc_result_t*
@@ -9,9 +47,13 @@
 #define yy__mpc_mpca_lang mpca_lang
 #define yy__mpc_cleanup mpc_cleanup
 #define yy__mpc_parse mpc_parse
+int32_t yy__strings_get(yy__c_CStr, int32_t);
 bool yy__strings_is_empty_str(yk__sds);
 bool yy__strings_startswith(yk__sds, yk__sds);
-yk__sds yy__strings_from_cstr(yy__strings_cstr);
+yk__sds yy__strings_from_cstr(yy__c_CStr);
+yy__c_CStr yy__strings_to_cstr(yk__sds);
+void yy__strings_del_cstr(yy__c_CStr);
+bool yy__c_has_command_processor();
 yy__mpc_Result yy__mpc_new_result();
 void yy__mpc_ast_print(yy__mpc_Result);
 void yy__mpc_err_print(yy__mpc_Result);
@@ -24,6 +66,10 @@ int32_t yy__eval(yy__mpc_Ast);
 int32_t yy__main();
 // --structs-- 
 // --functions-- 
+int32_t yy__strings_get(yy__c_CStr nn__s, int32_t nn__pos) 
+{
+    return (int32_t)nn__s[nn__pos];
+}
 bool yy__strings_is_empty_str(yk__sds nn__s) 
 {
     bool x = yk__sdslen(nn__s) == 0;
@@ -37,9 +83,21 @@ bool yy__strings_startswith(yk__sds nn__a, yk__sds nn__b)
     yk__sdsfree(nn__b);
     return x;
 }
-yk__sds yy__strings_from_cstr(yy__strings_cstr nn__a) 
+yk__sds yy__strings_from_cstr(yy__c_CStr nn__a) 
 {
     return yk__sdsnewlen(nn__a, strlen(nn__a));
+}
+yy__c_CStr yy__strings_to_cstr(yk__sds nn__a) 
+{
+    return nn__a;
+}
+void yy__strings_del_cstr(yy__c_CStr nn__a) 
+{
+    free(nn__a);
+}
+bool yy__c_has_command_processor() 
+{
+    return (!!system(NULL));
 }
 yy__mpc_Result yy__mpc_new_result() 
 {

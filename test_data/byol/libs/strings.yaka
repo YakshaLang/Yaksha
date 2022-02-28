@@ -1,6 +1,8 @@
-@nativedefine("char*")
-class cstr:
-    pass
+import libs.c
+
+@native
+def get(s: c.CStr, pos: int) -> int:
+    ccode """return (int32_t)nn__s[nn__pos]"""
 
 @native
 def is_empty_str(s: str) -> bool:
@@ -16,5 +18,15 @@ def startswith(a: str, b: str) -> bool:
     return x"""
 
 @native
-def from_cstr(a: cstr) -> str:
+def from_cstr(a: c.CStr) -> str:
     ccode """return yk__sdsnewlen(nn__a, strlen(nn__a))"""
+
+
+# Yaksha copies managed strings that you pass in
+@native
+def to_cstr(a: str) -> c.CStr:
+    ccode """return nn__a"""
+
+@native
+def del_cstr(a: c.CStr) -> None:
+    ccode """free(nn__a)"""

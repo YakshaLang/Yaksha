@@ -1,5 +1,5 @@
-import libs.strings as strings
+import libs.c
 
 @nativedefine("atoi")
-def cstr2i(a: strings.cstr) -> int:
+def cstr2i(a: c.CStr) -> int:
     pass

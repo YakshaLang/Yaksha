@@ -42,7 +42,7 @@ file_info *codefiles::scan_main(const std::string &filename) {
   }
   auto p = parse(path);
   if (p == nullptr) {
-    print_file_not_found_error(path);
+    print_unable_to_process_error(path);
     return nullptr;
   }
   auto fi = new file_info{path, "yy__", p};
@@ -80,7 +80,7 @@ file_info *codefiles::scan(import_stmt *st) {
   }
   auto parsed_data = parse(path);
   if (parsed_data == nullptr) {
-    print_file_not_found_error(path);
+    print_unable_to_process_error(path);
     return nullptr;
   }
   // if we have it in our map we return that
@@ -147,4 +147,7 @@ file_info *codefiles::get(const std::string &f) {
 }
 void codefiles::print_file_not_found_error(const std::string &filepath) {
   std::cerr << "File not found or unable to read:" << filepath << "\n";
+}
+void codefiles::print_unable_to_process_error(const std::string &filepath) {
+  std::cerr << "Unable to parse file:" << filepath << "\n";
 }

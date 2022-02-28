@@ -26,6 +26,7 @@ private:
     std::unordered_set<std::string> prefixes_{};
     std::filesystem::path current_path_{};
     static void print_file_not_found_error(const std::string &filepath);
+    static void print_unable_to_process_error(const std::string &filepath);
   };
 }// namespace yaksha
 #endif

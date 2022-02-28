@@ -2,6 +2,7 @@ import libs.io as io
 import libs.mpc as mpc
 import libs.numbers as numbers
 import libs.strings as strings
+import libs.c
 
 
 # based on https://buildyourownlisp.com/chapter6_parsing

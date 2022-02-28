@@ -1,9 +1,9 @@
-import libs.strings as strings
+import libs.c as c
 
 @nativedefine("mpc_ast_t*")
 class Ast:
-    tag: strings.cstr
-    contents: strings.cstr
+    tag: c.CStr
+    contents: c.CStr
     children: Array[Ast]
 
 @nativedefine("mpc_parser_t*")
@@ -24,16 +24,16 @@ def new_result() -> Result:
 
 @varargs
 @nativedefine("mpca_lang")
-def mpca_lang(a: int, b: str, c: Mpc) -> None:
+def mpca_lang(a: int, b: str, v: Mpc) -> None:
     pass
 
 @varargs
 @nativedefine("mpc_cleanup")
-def cleanup(a: int, c: Mpc) -> None:
+def cleanup(a: int, v: Mpc) -> None:
     pass
 
 @nativedefine("mpc_parse")
-def parse(a: str, b: str, c: Mpc, r: Result) -> bool:
+def parse(a: str, b: str, v: Mpc, r: Result) -> bool:
     pass
 
 @native
