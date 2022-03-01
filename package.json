@@ -1,0 +1,30 @@
+{
+    "name": "yaksha-language-support",
+    "displayName": "Yaksha Language Support",
+    "description": "Yaksha Language Support Plugin",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.64.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "yaksha",
+            "aliases": ["Yaksha", "yaksha"],
+            "extensions": [".yaka"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "yaksha",
+            "scopeName": "source.yaksha",
+            "path": "./syntaxes/yaksha.json"
+        }]
+    },
+    "configurationDefaults": {
+        "yaksha": {
+            "editor.semanticHighlighting.enabled": true
+        }
+    }
+}
