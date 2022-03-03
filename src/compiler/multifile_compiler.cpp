@@ -47,12 +47,12 @@ multifile_compiler::compile(const std::string &main_file) {
   // Type check all files
   for (auto f : cf.files_) {
     f->data_->type_checker_ =
-        new type_checker(f->filepath_, &cf, f->data_->dsv_, &cf.pool_);
+        new type_checker(f->filepath_.string(), &cf, f->data_->dsv_, &cf.pool_);
     for (auto impo : f->data_->parser_->import_stmts_) {
       auto obj = ykobject(&cf.pool_);
       obj.object_type_ = yaksha::object_type::MODULE;
-      obj.string_val_ = impo->data_->filepath_;
-      obj.module_file_ = impo->data_->filepath_;
+      obj.string_val_ = impo->data_->filepath_.string();
+      obj.module_file_ = impo->data_->filepath_.string();
       obj.module_name_ = impo->name_->token_;
       f->data_->type_checker_->scope_.define_global(impo->name_->token_, obj);
     }

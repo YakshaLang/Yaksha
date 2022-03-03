@@ -25,28 +25,28 @@ file_info *codefiles::scan_main(const std::string &filename) {
   std::error_code err{};
   auto path = std::filesystem::absolute(std::filesystem::path(filename), err);
   if (err) {
-    print_file_not_found_error(path);
+    print_file_not_found_error(path.string());
     return nullptr;
   }
   if (!std::filesystem::exists(path, err)) {
-    print_file_not_found_error(path);
+    print_file_not_found_error(path.string());
     return nullptr;
   }
   if (err) {
-    print_file_not_found_error(path);
+    print_file_not_found_error(path.string());
     return nullptr;
   }
   current_path_ = path.parent_path();
-  if (path_to_fi_.find(path) != path_to_fi_.end()) {// not found
-    return path_to_fi_[path];
+  if (path_to_fi_.find(path.string()) != path_to_fi_.end()) {// not found
+    return path_to_fi_[path.string()];
   }
   auto p = parse(path);
   if (p == nullptr) {
-    print_unable_to_process_error(path);
+    print_unable_to_process_error(path.string());
     return nullptr;
   }
   auto fi = new file_info{path, "yy__", p};
-  path_to_fi_.insert({path, fi});
+  path_to_fi_.insert({path.string(), fi});
   prefixes_.insert(std::string{"yy__"});
   files_.emplace_back(fi);
   for (auto imp : fi->data_->parser_->import_stmts_) {
@@ -54,7 +54,7 @@ file_info *codefiles::scan_main(const std::string &filename) {
     if (import_data == nullptr) { return nullptr; }
     imp->data_ = import_data;
   }
-  return path_to_fi_[path];
+  return path_to_fi_[path.string()];
 }
 file_info *codefiles::scan(import_stmt *st) {
   auto p = std::filesystem::path{current_path_};
@@ -67,24 +67,26 @@ file_info *codefiles::scan(import_stmt *st) {
   std::error_code err{};
   auto path = std::filesystem::absolute(p, err);
   if (err) {
-    print_file_not_found_error(path);
+    print_file_not_found_error(path.string());
     return nullptr;
   }
   if (!std::filesystem::exists(path, err)) {
-    print_file_not_found_error(path);
+    print_file_not_found_error(path.string());
     return nullptr;
   }
   if (err) {
-    print_file_not_found_error(path);
+    print_file_not_found_error(path.string());
     return nullptr;
   }
   auto parsed_data = parse(path);
   if (parsed_data == nullptr) {
-    print_unable_to_process_error(path);
+    print_unable_to_process_error(path.string());
     return nullptr;
   }
   // if we have it in our map we return that
-  if (path_to_fi_.find(path) != path_to_fi_.end()) { return path_to_fi_[path]; }
+  if (path_to_fi_.find(path.string()) != path_to_fi_.end()) {
+    return path_to_fi_[path.string()];
+  }
   auto nm = names.back();
   std::string prefix = "yy__" + nm->token_;
   std::string cur_prefix = prefix + "_";
@@ -95,14 +97,14 @@ file_info *codefiles::scan(import_stmt *st) {
   }
   auto fi = new file_info{path, cur_prefix, parsed_data};
   prefixes_.insert(std::string{cur_prefix});
-  path_to_fi_.insert({path, fi});
+  path_to_fi_.insert({path.string(), fi});
   files_.emplace_back(fi);
   for (auto imp : fi->data_->parser_->import_stmts_) {
     auto import_data = scan(imp);
     if (import_data == nullptr) { return nullptr; }
     imp->data_ = import_data;
   }
-  return path_to_fi_[path];
+  return path_to_fi_[path.string()];
 }
 bool codefiles::has_prefix(std::string &root) {
   return prefixes_.find(root) != prefixes_.end();
@@ -115,7 +117,7 @@ file_data *codefiles::parse(std::filesystem::path &file_name) {
   }
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
-  auto *t = new tokenizer{file_name, data};
+  auto *t = new tokenizer{file_name.string(), data};
   t->tokenize();
   if (!t->errors_.empty()) {
     errors::print_errors(t->errors_);
@@ -130,7 +132,7 @@ file_data *codefiles::parse(std::filesystem::path &file_name) {
     delete (b);
     return nullptr;
   }
-  auto *p = new parser(file_name, b->tokens_, &pool_);
+  auto *p = new parser(file_name.string(), b->tokens_, &pool_);
   p->parse();
   if (!p->errors_.empty()) {
     errors::print_errors(p->errors_);

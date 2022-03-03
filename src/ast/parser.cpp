@@ -558,7 +558,7 @@ void parser::rescan_datatypes() {
     if (dt->is_builtin_or_primitive()) continue;
     auto import_alias = dt->module_;
     auto module_data = import_stmts_alias_[import_alias];
-    dt->module_ = module_data->data_->filepath_;
+    dt->module_ = module_data->data_->filepath_.string();
   }
   // Clean up temporary vector
   datatypes_from_modules_.clear();
