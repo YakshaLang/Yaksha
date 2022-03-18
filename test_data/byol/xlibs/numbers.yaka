@@ -1,0 +1,5 @@
+import xlibs.c
+
+@nativedefine("atoi")
+def cstr2i(a: c.CStr) -> int:
+    pass

@@ -1,0 +1,25 @@
+[project]
+main="main.yaka"
+name="carpntr"
+author="JaDoggx86"
+
+# C or C++ native code that get compiled
+[ccode]
+include_paths=[]
+defines=[]
+compiler_defines=[]
+includes=[]
+c_code=[]
+# cpp_code is not supported yet
+cpp_code=[]
+
+[compilation]
+override_alloc=false
+# Set this to true if whole project is pure C?
+only_ccode=false
+# libc=native|try_musl|musl|default
+libc="try_musl"
+# Automatically use zig cc & zig c++ to build project
+# We will start with just zig cc, zig c++ support so this is ignored for now
+compiler="zig"
+targets=["aarch64-linux-musl", "aarch64-macos-gnu", "i386-linux-musl", "i386-windows-gnu", "x86_64-linux-musl", "x86_64-windows-gnu", "x86_64-macos-gnu"]

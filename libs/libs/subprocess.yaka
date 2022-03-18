@@ -1,0 +1,9 @@
+@nativedefine("subprocess_result")
+class Result:
+    output: str
+    result: int
+
+
+@nativemacro("subprocess_run")
+def run(arguments: Array[str]) -> Result:
+    pass

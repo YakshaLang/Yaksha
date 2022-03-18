@@ -1,0 +1,258 @@
+import libs.strings.array as sarr
+import libs.fileformats.toml
+import libs.os
+import libs.os.path
+import libs.io
+
+class CCode:
+    include_paths: Array[str]
+    defines: Array[str]
+    compiler_defines: Array[str]
+    includes: Array[str]
+    system_includes: Array[str]
+    c_code: Array[str]
+    cpp_code: Array[str]
+
+
+class Project:
+    main: str
+    name: str
+    author: str
+
+
+class Compilation:
+    override_alloc: bool
+    only_ccode: bool
+    libc: str
+    compiler: str
+    targets: Array[str]
+
+
+class Config:
+    runtime_path: str
+    compiler_path: str
+    libs_path: str
+    zig_compiler_path: str
+    c_code: CCode
+    project: Project
+    compilation: Compilation
+    errors: Array[str]
+
+
+def find_runtime_path(c: Config) -> None:
+    exe_parent: str = os.exe_path()
+    l1: str = path.join(path.dirname(exe_parent), "runtime")
+    l2: str = path.join(path.dirname(path.dirname(exe_parent)), "runtime")
+    l3: str = path.join(exe_parent, "runtime")
+    if path.readable(path.join(l1, "yk__lib.h")):
+        c.runtime_path = l1
+        return
+    if path.readable(path.join(l2, "yk__lib.h")):
+        c.runtime_path = l2
+        return
+    if path.readable(path.join(l3, "yk__lib.h")):
+        c.runtime_path = l3
+        return
+    arrput(c.errors, "Failed to find runtime library in :" + l1)
+    arrput(c.errors, "Failed to find runtime library in :" + l2)
+    arrput(c.errors, "Failed to find runtime library in :" + l3)
+    c.runtime_path = "<not found>"
+
+def find_libs_path(c: Config) -> None:
+    exe_parent: str = os.exe_path()
+    l1: str = path.join(path.dirname(exe_parent), "libs")
+    l2: str = path.join(path.dirname(path.dirname(exe_parent)), "libs")
+    l3: str = path.join(exe_parent, "libs")
+    if path.readable(path.join(l1, "libs.yaka")):
+        c.libs_path = l1
+        return
+    if path.readable(path.join(l2, "libs.yaka")):
+        c.libs_path = l2
+        return
+    if path.readable(path.join(l3, "libs.yaka")):
+        c.libs_path = l3
+        return
+    arrput(c.errors, "Failed to find std library in :" + l1)
+    arrput(c.errors, "Failed to find std library in :" + l2)
+    arrput(c.errors, "Failed to find std library in :" + l3)
+    c.libs_path = "<not found>"
+
+
+def find_yaksha_compiler(c: Config) -> None:
+    exe_parent: str = os.exe_path()
+    l1: str = path.join(exe_parent, "yakshac")
+    if os.is_windows():
+        l1 = l1 + ".exe"
+    l2: str = path.join(path.dirname(path.dirname(exe_parent)), "bin")
+    l2 = path.join(l2, "yakshac")
+    if os.is_windows():
+        l2 = l2 + ".exe"
+    if path.executable(l1):
+        c.compiler_path = l1
+        return
+    if path.executable(l2):
+        c.compiler_path = l2
+        return
+    fallback: str = os.which("yakshac")
+    if len(fallback) > 0:
+        c.compiler_path = fallback
+        return
+    arrput(c.errors, "Failed to find yakshac in :" + l1)
+    arrput(c.errors, "Failed to find yakshac in :" + l2)
+    arrput(c.errors, "Failed to find yakshac in PATH")
+    c.compiler_path = "<not found>"
+
+def find_zig_compiler(c: Config) -> None:
+    zig: str = os.which("zig")
+    if len(zig) > 0:
+        c.zig_compiler_path = zig
+        return
+    arrput(c.errors, "Failed to find zig in PATH")
+    c.zig_compiler_path = "<not found>"
+
+def load_project(conf: toml.Table, c: Config) -> Project:
+    p: Project = Project()
+    project: toml.Table = toml.get_table(conf, "project")
+    if not toml.valid_table(project):
+        arrput(c.errors, "Failed to read '[project]'")
+        return p
+
+    main_code_file: str = toml.get_string(project, "main")
+    project_name: str = toml.get_string(project, "name")
+    project_author: str = toml.get_string(project, "author")
+    if main_code_file == "":
+        arrput(c.errors, "Invalid '[project].main'")
+    if project_name == "":
+        arrput(c.errors, "Invalid '[project].name'")
+    if project_author == "":
+        arrput(c.errors, "Invalid '[project].author'")
+
+    p.main = main_code_file
+    p.author = project_author
+    p.name = project_name
+
+    return p
+
+
+def load_c_code(conf: toml.Table, c: Config) -> CCode:
+    cc: CCode = CCode()
+    cc_data: toml.Table = toml.get_table(conf, "ccode")
+    if not toml.valid_table(cc_data):
+        # This is optional so ignore this
+        return cc
+    cc.include_paths = toml.get_string_array(cc_data, "include_paths")
+    cc.defines = toml.get_string_array(cc_data, "defines")
+    cc.compiler_defines = toml.get_string_array(cc_data, "compiler_defines")
+    cc.includes = toml.get_string_array(cc_data, "includes")
+    cc.system_includes = toml.get_string_array(cc_data, "system_includes")
+    cc.c_code = toml.get_string_array(cc_data, "c_code")
+    cc.cpp_code = toml.get_string_array(cc_data, "cpp_code")
+    return cc
+
+
+def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
+    current_dir: str = path.dirname(os.cwd())
+
+    # Add defaults to cc.include_paths
+    df_include_paths: Array[str] = sarr.new(2, c.runtime_path, path.join(current_dir, "build"))
+    orig_include_paths: Array[str] = cc.include_paths
+    defer sarr.del_str_array(orig_include_paths)
+    cc.include_paths = sarr.extend(df_include_paths, cc.include_paths)
+
+    # Add defaults to cc.compiler_defines
+    df_compiler_defines: Array[str] = sarr.new(1, "UTF8PROC_STATIC")
+    orig_compiler_defines: Array[str] = cc.compiler_defines
+    defer sarr.del_str_array(orig_compiler_defines)
+    cc.compiler_defines = sarr.extend(df_compiler_defines, cc.compiler_defines)
+
+    # Add defaults to cc.includes
+    df_includes: Array[str] = sarr.new(9, "whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h", "yk__colour.h", "mpc.h", "yk__arrayutils.h", "yk__process.h")
+    orig_includes: Array[str] = cc.includes
+    defer sarr.del_str_array(orig_includes)
+    cc.includes = sarr.extend(df_includes, cc.includes)
+
+    # Add defaults to c_code
+    df_c_code: Array[str]
+    arrput(df_c_code, path.join(c.runtime_path, "whereami.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "yk__system.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "utf8proc.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "toml.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "mpc.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "yk__colour.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "yk__arrayutils.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "yk__process.c"))
+    orig_c_code: Array[str] = cc.c_code
+    defer sarr.del_str_array(orig_c_code)
+    cc.c_code = sarr.extend(df_c_code, cc.c_code)
+
+    return cc
+
+
+def load_config() -> Config:
+    c: Config = Config()
+    configf: str = path.join(os.cwd(), "yaksha.toml")
+
+    config_text: str = io.readfile(configf)
+    conf: toml.Table = toml.from_str(config_text)
+    if not toml.valid_table(conf):
+        arrput(c.errors, "Failed to read config file")
+        return c
+    defer toml.del_table(conf)
+
+    # Try and find yakshac.exe
+    find_yaksha_compiler(c)
+    if len(c.errors) > 0:
+        return c
+    # Try and find zig.exe
+    find_zig_compiler(c)
+    if len(c.errors) > 0:
+        return c
+    # Try to find a runtime folder with 'yk__lib.h'
+    find_runtime_path(c)
+    if len(c.errors) > 0:
+        return c
+    # Try to find a libs folder with 'libs.yaka'
+    find_libs_path(c)
+    if len(c.errors) > 0:
+        return c
+    # Load project section of file
+    c.project = load_project(conf, c)
+    if len(c.errors) > 0:
+        return c
+    if not path.exists(c.project.main):
+        arrput(c.errors, "Project main file not found")
+        return c
+    c.c_code = inject_c_code_defaults(load_c_code(conf, c), c)
+    if len(c.errors) > 0:
+        return c
+    # TODO: Complete this?
+    c.compilation = Compilation()
+
+    return c
+
+
+def del_config(c: Config) -> None:
+    sarr.del_str_array(c.c_code.include_paths)
+    sarr.del_str_array(c.c_code.defines)
+    sarr.del_str_array(c.c_code.compiler_defines)
+    sarr.del_str_array(c.c_code.includes)
+    sarr.del_str_array(c.c_code.system_includes)
+    sarr.del_str_array(c.c_code.c_code)
+    sarr.del_str_array(c.c_code.cpp_code)
+    sarr.del_str_array(c.errors)
+    sarr.del_str_array(c.compilation.targets)
+    del c.project.main
+    del c.project.name
+    del c.project.author
+    del c.compilation.libc
+    del c.compilation.compiler
+
+    del c.c_code
+    del c.project
+    del c.compilation
+    del c.runtime_path
+    del c.compiler_path
+    del c.libs_path
+    del c.zig_compiler_path
+
+    del c

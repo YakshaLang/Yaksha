@@ -1,0 +1,163 @@
+@nativedefine("void*")
+class VoidPtr:
+    pass
+
+@nativedefine("size_t")
+class Size:
+    pass
+
+@nativedefine("char*")
+class CStr:
+    pass
+
+@nativedefine("double")
+class CDouble:
+    pass
+
+@nativedefine("bool")
+class CBool:
+    pass
+
+@nativedefine("int")
+class CInt:
+    pass
+
+@nativedefine("long")
+class CLong:
+    pass
+
+@nativedefine("short")
+class CShort:
+    pass
+
+@nativedefine("unsigned int")
+class CUInt:
+    pass
+
+@nativedefine("unsigned long")
+class CULong:
+    pass
+
+@nativedefine("unsigned short")
+class CUShort:
+    pass
+
+@nativedefine("free")
+def free(ptr: VoidPtr) -> None:
+    pass
+
+@nativedefine("calloc")
+def calloc(n: Size, size: Size) -> VoidPtr:
+    pass
+
+@nativedefine("realloc")
+def realloc(ptr: VoidPtr, size: Size) -> VoidPtr:
+    pass
+
+@nativedefine("malloc")
+def malloc(size: Size) -> VoidPtr:
+    pass
+
+@nativemacro("((size_t)nn__i)")
+def itosize(i: int) -> Size:
+    pass
+
+@nativedefine("system")
+def system(program: CStr) -> None:
+    pass
+
+@native
+def has_command_processor() -> bool:
+    ccode """return (!!system(NULL))"""
+
+@nativedefine("acos")
+def acos(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("asin")
+def asin(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("atan")
+def atan(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("atan2")
+def atan2(x: CDouble, y: CDouble) -> CDouble:
+    pass
+
+@nativedefine("cos")
+def cos(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("cosh")
+def cosh(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("sin")
+def sin(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("sinh")
+def sinh(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("tan")
+def tan(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("tanh")
+def tanh(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("log")
+def log(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("log10")
+def log10(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("log2")
+def log2(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("pow")
+def pow(x: CDouble, y: CDouble) -> CDouble:
+    pass
+
+@nativedefine("sqrt")
+def sqrt(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("ceil")
+def ceil(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("fabs")
+def fabs(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("floor")
+def floor(x: CDouble) -> CDouble:
+    pass
+
+@nativedefine("pow")
+def fmod(x: CDouble, y: CDouble) -> CDouble:
+    pass
+
+@nativedefine("memcpy")
+def memcpy(dest: VoidPtr, src: VoidPtr, size: Size) -> VoidPtr:
+    pass
+
+@nativedefine("memmove")
+def memmove(dest: VoidPtr, src: VoidPtr, size: Size) -> VoidPtr:
+    pass
+
+@nativedefine("memset")
+def memset(dest: VoidPtr, character: CInt, size: Size) -> VoidPtr:
+    pass
+
+@nativedefine("memcmp")
+def memcmp(str1: VoidPtr, str2: VoidPtr, size: Size) -> CInt:
+    pass

@@ -1,0 +1,9 @@
+# Read a file to as string, on error returns empty
+@native("yk__io_readfile")
+def readfile(fname: str) -> str:
+    pass
+
+# Write a file
+@native("yk__io_writefile")
+def writefile(fname: str, data: str) -> bool:
+    pass

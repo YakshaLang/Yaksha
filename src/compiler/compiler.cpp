@@ -475,13 +475,13 @@ void compiler::visit_return_stmt(return_stmt *obj) {
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto rhs = pop();
-    defers_.write_one(this);
+    defers_.write(this);
     deletions_.write(body_, indent_, rhs.first);
     write_indent(body_);
     body_ << "return " << rhs.first;
     write_end_statement(body_);
   } else {
-    defers_.write_one(this);
+    defers_.write(this);
     deletions_.write(body_, indent_, "");
     write_indent(body_);
     body_ << "return";

@@ -174,7 +174,11 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
   // -5 - correct, -"some string" is not
   obj->right_->accept(this);
   auto rhs = pop();
-  if (!rhs.is_primitive_or_obj() || !rhs.datatype_->is_a_number()) {
+  if (rhs.is_primitive_or_obj() && (rhs.datatype_->is_a_number() || rhs.datatype_->is_bool())) {
+    if (obj->opr_->type_ == token_type::KEYWORD_NOT && !rhs.datatype_->is_bool()) {
+      error(obj->opr_, "Invalid unary operation. Not operator must follow a boolean.");
+    }
+  } else {
     error(obj->opr_, "Invalid unary operation");
   }
   push(rhs);

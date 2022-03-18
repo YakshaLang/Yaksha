@@ -11,7 +11,7 @@
 #include <vector>
 namespace yaksha {
   struct codefiles {
-    codefiles();
+    codefiles(std::filesystem::path &libs_path);
     ~codefiles();
     file_info *get(const std::string &filename);
     file_info *scan_main(const std::string &filename);
@@ -25,6 +25,7 @@ private:
     std::unordered_map<std::string, file_info *> path_to_fi_{};
     std::unordered_set<std::string> prefixes_{};
     std::filesystem::path current_path_{};
+    std::filesystem::path libs_path_{};
     static void print_file_not_found_error(const std::string &filepath);
     static void print_unable_to_process_error(const std::string &filepath);
   };

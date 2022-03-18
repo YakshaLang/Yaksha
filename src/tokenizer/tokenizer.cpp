@@ -14,6 +14,38 @@ using namespace yaksha;
 #define HEX_MATCH 9
 #define MATCH_INTEGER_OR_FLOAT 10
 template<typename octet_iterator>
+std::pair<int, utf8::uint32_t>
+yaksha::consume_string(std::string &buf, octet_iterator &begin, octet_iterator end) {
+  octet_iterator begin_copy = begin;
+  int size = 0;
+  auto buf_inserter = std::back_inserter(buf);
+  utf8::uint32_t current = 0;
+  bool skip = false;
+  while (begin_copy != end) {
+    current = utf8::peek_next(begin_copy, end);
+    if (skip) {
+      utf8::append(static_cast<char32_t>(current), buf_inserter);
+      utf8::next(begin_copy, end);// move to next character
+      size++;
+      skip = false;
+      continue;
+    } else if (current == '\\') {
+      skip = true;
+    } else {
+      skip = false;
+    }
+    if (current != '\"' && current != '\n' && current != '\r') {
+      utf8::append(static_cast<char32_t>(current), buf_inserter);
+      utf8::next(begin_copy, end);// move to next character
+      size++;
+    } else {
+      begin = begin_copy;
+      return std::make_pair(size, current);
+    }
+  }
+  return std::make_pair(-1, 0);
+}
+template<typename octet_iterator>
 std::tuple<int, utf8::uint32_t, int>
 yaksha::consume_triple_str(std::string &buf, octet_iterator &begin,
                            octet_iterator end) {
@@ -427,8 +459,7 @@ void tokenizer::tokenize() {
       mode = NORMAL_MATCH;
     } else if (mode == STRING_MATCH) {
       token_buf = {};
-      auto result = ::string_utils::consume(::string_utils::allowed_in_string,
-                                            token_buf, iterator, end, false);
+      auto result = consume_string(token_buf, iterator, end);
       if (result.first == -1) {
         handle_error(
             parsing_error{"Tokenizer Error : Invalid string, end of file "

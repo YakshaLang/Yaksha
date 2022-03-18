@@ -1,0 +1,100 @@
+import libs.strings
+import libs.c
+
+# Are we usign forward slash or not?
+@native
+def forward_slash() -> bool:
+    ccode """#if defined(_WIN32) || defined(_WIN64)
+    bool bfwd = true;
+    #else
+    bool bfwd = false;
+    #endif
+    return bfwd"""
+
+@nativedefine("yk__exists")
+def exists(p: str) -> bool:
+    pass
+
+@nativedefine("yk__readable")
+def readable(p: str) -> bool:
+    pass
+
+@nativedefine("yk__writable")
+def writable(p: str) -> bool:
+    pass
+
+@nativedefine("yk__executable")
+def executable(p: str) -> bool:
+    pass
+
+# Does the given string end with slash
+def end_with_slash(a: str) -> bool:
+    length: int = len(a)
+    if length < 1:
+        return False
+    chr: int = charat(a, length - 1)
+    x: bool = chr == 47 or chr == 92
+    return x
+
+# Do a path join
+def join(a: str, b: str) -> str:
+    if end_with_slash(a):
+        return a + b
+    result: str
+    if forward_slash():
+        result = a + "\\" + b
+    else:
+        result = a + "/" + b
+    return result
+
+# Get just the filename of given path
+def basename(p: str) -> str:
+    full_length: int = len(p)
+    length: int = len(p)
+    if length < 1:
+        return p
+    # No basename as this is a directory
+    if end_with_slash(p):
+        return ""
+
+    x: c.CStr = strings.to_cstr(p)
+    defer strings.del_str(x)
+    while length > 0:
+        length = length - 1
+        chr: int = strings.get_cstr(x, length)
+        is_slash: bool = chr == 47 or chr == 92
+        if is_slash:
+            break
+
+    # Did not find a slash, so this is just a filename
+    if length <= 0:
+        return p
+
+    # Found a slash everything after is the filename
+    s: str = strings.from_cstrlen_after(x, full_length - length - 1, length + 1)
+    return s
+
+# Get dir name of given path 
+def dirname(p: str) -> str:
+    length: int = len(p)
+    if length <= 2:
+        return p
+    # Ignore last character        
+    if end_with_slash(p):
+        length = length - 1
+    x: c.CStr = strings.to_cstr(p)
+    defer strings.del_str(x)
+    while length > 0:
+        length = length - 1
+        chr: int = strings.get_cstr(x, length)
+        is_slash: bool = chr == 47 or chr == 92
+        if is_slash:
+            break
+    # No dirname found probably just a filename
+    if length <= 0:
+        return ""
+    # Assign here so defer does not delete the string we are not copying from
+    # Otherwise since we call the defer dels before return we will end up deleting x
+    # Which make it impossible to copy the given string
+    s: str = strings.from_cstrlen(x, length)
+    return s

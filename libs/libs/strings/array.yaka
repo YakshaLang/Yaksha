@@ -1,0 +1,59 @@
+######## String arrays
+
+@nativedefine("yk__newsdsarray")
+@varargs
+def new(count: int, s: str) -> Array[str]:
+    pass
+
+@native 
+def prefix(sa: Array[str], prefix_str: str) -> Array[str]:
+    ccode """if (NULL == nn__sa) return NULL;
+    size_t l = yk__arrlenu(nn__sa);
+    for (size_t x = 0; x < l; x++) {
+        yk__sds tmp = nn__sa[x];
+        nn__sa[x] = yk__sdscatsds(yk__sdsdup(nn__prefix_str), nn__sa[x]);
+        yk__sdsfree(tmp);
+    }
+    yk__sdsfree(nn__prefix_str);
+    return nn__sa"""
+
+@native 
+def suffix(sa: Array[str], suffix_str: str) -> Array[str]:
+    ccode """if (NULL == nn__sa) return NULL;
+    size_t l = yk__arrlenu(nn__sa);
+    for (size_t x = 0; x < l; x++) {
+        nn__sa[x] = yk__sdscatsds(nn__sa[x], nn__suffix_str);
+    }
+    yk__sdsfree(nn__suffix_str);
+    return nn__sa"""
+
+@native
+def join(values: Array[str], sep: str) -> str:
+    ccode """
+    if (NULL == nn__values) {
+        yk__sdsfree(nn__sep);
+        return yk__sdsempty();
+    }
+    yk__sds tmp = yk__sdsjoinsds(nn__values, yk__arrlen(nn__values), nn__sep, yk__sdslen(nn__sep));
+    yk__sdsfree(nn__sep);
+    return tmp"""
+
+@native
+def extend(a: Array[str], b: Array[str]) -> Array[str]:
+    ccode """yk__sds* lhs = nn__a;
+    if (NULL != nn__b) {
+        size_t l = yk__arrlenu(nn__b);
+        for (size_t x = 0; x < l; x++) {
+            yk__arrput(lhs, yk__sdsdup(nn__b[x]));
+        }
+    }
+    return lhs"""
+
+@native
+def del_str_array(sa: Array[str]) -> None:
+    ccode """if (NULL == nn__sa) return;
+    size_t l = yk__arrlenu(nn__sa);
+    for (size_t x = 0; x < l; x++) {
+        yk__sdsfree(nn__sa[x]);
+    }
+    yk__arrfree(nn__sa)"""

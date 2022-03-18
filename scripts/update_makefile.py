@@ -6,7 +6,7 @@ Update CMakeLists.txt with .cpp & .h files.
 import os.path
 from typing import List, Tuple
 
-IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp"]
+IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp", "utf8proc_data.c", "print_str.c"]
 
 
 def get_immediate_sub_dirs(directory: str) -> List[str]:
@@ -17,8 +17,8 @@ def get_immediate_sub_dirs(directory: str) -> List[str]:
 def find_files_(directory: str) -> Tuple[List[str], List[str], List[str]]:
     files = [x for x in os.listdir("./" + directory)
              if x not in IGNORE and os.path.isfile(os.path.join(directory, x))]
-    cpp_files = sorted([x for x in files if x.endswith(".cpp")])
-    objects = sorted([x.replace(".cpp", ".o") for x in cpp_files])
+    cpp_files = sorted([x for x in files if x.endswith(".cpp") or x.endswith(".c")])
+    objects = sorted([x.replace(".cpp", ".o").replace(".c", ".o") for x in cpp_files])
     objects = [os.path.join("build", x) for x in objects]
     headers = sorted([x for x in files if x.endswith(".h")])
     headers = [os.path.join(directory, x) for x in headers]
@@ -70,7 +70,8 @@ def update_cmake_file(headers: List[str], cpp_files: List[str], marker: str):
 def main():
     # Look for given markers in CMakeLists.txt and update with files.
     location_markers = (("src", "# update_makefile.py SRC"),
-                        ("tests", "# update_makefile.py TESTS"))
+                        ("tests", "# update_makefile.py TESTS"),
+                        ("runtime", "# update_makefile.py YK_RUNTIME"))
     for directory, marker in location_markers:
         cpp_files, headers, _ = find_files_2_levels(directory)
         update_cmake_file(headers, cpp_files, marker)

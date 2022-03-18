@@ -1,8 +1,8 @@
-import libs.io as io
-import libs.mpc as mpc
-import libs.numbers as numbers
-import libs.strings as strings
-import libs.c
+import xlibs.io as io
+import xlibs.mpc as mpc
+import xlibs.numbers as numbers
+import xlibs.strings as strings
+import xlibs.c
 
 
 # based on https://buildyourownlisp.com/chapter6_parsing

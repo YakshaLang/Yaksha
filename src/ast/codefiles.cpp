@@ -5,9 +5,9 @@
 #include "tokenizer/block_analyzer.h"
 #include "utilities/error_printer.h"
 using namespace yaksha;
-codefiles::codefiles()
+codefiles::codefiles(std::filesystem::path &libs_path)
     : current_path_(std::filesystem::current_path()), prefixes_(),
-      path_to_fi_() {}
+      path_to_fi_(), libs_path_{libs_path} {}
 codefiles::~codefiles() {
   for (auto f : files_) {
     if (f->data_ != nullptr) {
@@ -59,6 +59,10 @@ file_info *codefiles::scan_main(const std::string &filename) {
 file_info *codefiles::scan(import_stmt *st) {
   auto p = std::filesystem::path{current_path_};
   std::vector<token *> names = st->import_names_;
+  // If we have a custom path for libs
+  if (names.front()->token_ == "libs") {
+    p = std::filesystem::path{libs_path_};
+  }
   for (auto name_tok : names) {
     auto name = name_tok->token_;
     p /= name; /* equal to path join with '/' */

@@ -1,3 +1,4 @@
+// YK
 #include "yk__lib.h"
 // --forward declarations-- 
 struct yy__jungle_banana;
@@ -25,10 +26,10 @@ struct yy__MainClass {
 void yy__jungle_print_monkey(struct yy__jungle_monkey* yy__jungle_m) 
 {
     yk__sds t__0 = yk__sdsnew("Monkey ");
-    printf("%s", (t__0));
+    yk__printstr((t__0));
     printf("%jd", ((intmax_t)yy__jungle_m->yy__jungle_id));
     yk__sds t__1 = yk__sdsnew(" has ");
-    printf("%s", (t__1));
+    yk__printstr((t__1));
     yy__jungle_print_banana(yy__jungle_m->yy__jungle_food);
     yk__sdsfree(t__1);
     yk__sdsfree(t__0);
@@ -37,10 +38,10 @@ void yy__jungle_print_monkey(struct yy__jungle_monkey* yy__jungle_m)
 void yy__jungle_print_banana(struct yy__jungle_banana* yy__jungle_b) 
 {
     yk__sds t__2 = yk__sdsnew("banana ");
-    printf("%s", (t__2));
+    yk__printstr((t__2));
     printf("%jd", ((intmax_t)yy__jungle_b->yy__jungle_id));
     yk__sds t__3 = yk__sdsnew("\n");
-    printf("%s", (t__3));
+    yk__printstr((t__3));
     yk__sdsfree(t__3);
     yk__sdsfree(t__2);
     return;
@@ -60,4 +61,6 @@ int32_t yy__main()
     free(yy__mc);
     return 0;
 }
+#if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }
+#endif

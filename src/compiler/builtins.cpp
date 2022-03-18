@@ -10,6 +10,7 @@ bool builtins::has_builtin(const std::string &name) {
   if (name == "print") { return true; }
   if (name == "println") { return true; }
   if (name == "len") { return true; }
+  if (name == "charat") { return true; }
   return false;
 }
 ykobject builtins::verify(const std::string &name,
@@ -30,6 +31,9 @@ ykobject builtins::verify(const std::string &name,
   } else if (name == "arrpop" && args.size() == 1 &&
              args[0].datatype_->is_an_array()) {
     return ykobject(args[0].datatype_->args_[0]);// Array[x] << access this x
+  } else if (name == "charat" && args.size() == 2
+             && args[0].datatype_->is_str() && args[1].datatype_->is_an_integer()) {
+    return ykobject(dt_pool_->create("int"));
   }
   o.object_type_ = object_type::RUNTIME_ERROR;
   o.string_val_ = "Invalid arguments for builtin function";
@@ -41,7 +45,11 @@ builtins::compile(const std::string &name,
   std::stringstream code{};
   auto o = ykobject(dt_pool_);
   if (name == "arrput") {
-    code << "yk__arrput(" << args[0].first << ", " << args[1].first << ")";
+    if (args[1].second.datatype_->is_str()) {
+      code << "yk__arrput(" << args[0].first << ", yk__sdsdup(" << args[1].first << "))";
+    } else {
+      code << "yk__arrput(" << args[0].first << ", " << args[1].first << ")";
+    }
   } else if (name == "print") {
     auto rhs = args[0];
     if (rhs.second.datatype_->is_a_signed_integer()) {
@@ -49,8 +57,7 @@ builtins::compile(const std::string &name,
     } else if (rhs.second.datatype_->is_an_unsigned_integer()) {
       code << "printf(\"%ju\", ((uintmax_t)" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_str()) {
-      // TODO do not assume it's all ascii, and works fine :p
-      code << "printf(\"%s\", (" << rhs.first << "))";
+      code << "yk__printstr((" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_a_float()) {
       code << "printf(\"%f\", (" << rhs.first << "))";
     }
@@ -61,8 +68,7 @@ builtins::compile(const std::string &name,
     } else if (rhs.second.datatype_->is_an_unsigned_integer()) {
       code << R"(printf("%ju\n", ((uintmax_t))" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_str()) {
-      // TODO do not assume it's all ascii, and works fine :p
-      code << R"(printf("%s\n", ()" << rhs.first << "))";
+      code << "yk__printlnstr((" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_a_float()) {
       code << R"(printf("%f\n", ()" << rhs.first << "))";
     }
@@ -76,6 +82,9 @@ builtins::compile(const std::string &name,
   } else if (name == "arrpop") {
     o = ykobject(args[0].second.datatype_->args_[0]);
     code << "yk__arrpop(" << args[0].first << ")";
+  } else if (name == "charat") {
+    code << "(" << args[0].first << "[" << args[1].first << "])";
+    o = ykobject(dt_pool_->create("int"));
   }
   return {code.str(), o};
 }
