@@ -475,13 +475,13 @@ void compiler::visit_return_stmt(return_stmt *obj) {
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto rhs = pop();
-    defers_.write_one(this);
+    defers_.write(this);
     deletions_.write(body_, indent_, rhs.first);
     write_indent(body_);
     body_ << "return " << rhs.first;
     write_end_statement(body_);
   } else {
-    defers_.write_one(this);
+    defers_.write(this);
     deletions_.write(body_, indent_, "");
     write_indent(body_);
     body_ << "return";
@@ -605,8 +605,8 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   for (auto imp_st : fi->data_->parser_->import_stmts_) {
     auto obj = ykobject(dt_pool);
     obj.object_type_ = yaksha::object_type::MODULE;
-    obj.string_val_ = imp_st->data_->filepath_;
-    obj.module_file_ = imp_st->data_->filepath_;
+    obj.string_val_ = imp_st->data_->filepath_.string();
+    obj.module_file_ = imp_st->data_->filepath_.string();
     obj.module_name_ = imp_st->name_->token_;
     scope_.define_global(prefix(imp_st->name_->token_, prefix_val_), obj);
   }
@@ -727,9 +727,7 @@ void compiler::visit_get_expr(get_expr *obj) {
     class_ = module_info->data_->dsv_->get_class(user_defined_type);
     item_prefix = module_info->prefix_;
   }
-  if (class_->annotations_.native_define_) {
-    item_prefix = "";
-  }
+  if (class_->annotations_.native_define_) { item_prefix = ""; }
   for (const auto &member : class_->members_) {
     if (item == member.name_->token_) {
       auto placeholder = ykobject(dt_pool);

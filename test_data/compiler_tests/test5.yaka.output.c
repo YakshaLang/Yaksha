@@ -1,3 +1,4 @@
+// YK
 #include "yk__lib.h"
 // --forward declarations-- 
 struct yy__Captain;
@@ -20,12 +21,12 @@ struct yy__Spaceship {
 // --functions-- 
 int32_t yy__print_str_item(yk__sds yy__item, yk__sds yy__value) 
 {
-    printf("%s", (yy__item));
+    yk__printstr((yy__item));
     yk__sds t__0 = yk__sdsnew(":\t");
-    printf("%s", (t__0));
-    printf("%s", (yy__value));
+    yk__printstr((t__0));
+    yk__printstr((yy__value));
     yk__sds t__1 = yk__sdsnew("\n");
-    printf("%s", (t__1));
+    yk__printstr((t__1));
     yk__sdsfree(t__1);
     yk__sdsfree(t__0);
     yk__sdsfree(yy__value);
@@ -34,12 +35,12 @@ int32_t yy__print_str_item(yk__sds yy__item, yk__sds yy__value)
 }
 int32_t yy__print_int_item(yk__sds yy__item, int32_t yy__value) 
 {
-    printf("%s", (yy__item));
+    yk__printstr((yy__item));
     yk__sds t__2 = yk__sdsnew(":\t");
-    printf("%s", (t__2));
+    yk__printstr((t__2));
     printf("%jd", ((intmax_t)yy__value));
     yk__sds t__3 = yk__sdsnew("\n");
-    printf("%s", (t__3));
+    yk__printstr((t__3));
     yk__sdsfree(t__3);
     yk__sdsfree(t__2);
     yk__sdsfree(yy__item);
@@ -91,4 +92,6 @@ int32_t yy__main()
     yk__sdsfree(t__8);
     return 0;
 }
+#if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }
+#endif

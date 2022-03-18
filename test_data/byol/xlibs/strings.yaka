@@ -1,4 +1,4 @@
-import libs.c
+import xlibs.c
 
 @native
 def get(s: c.CStr, pos: int) -> int:

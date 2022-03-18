@@ -1,3 +1,4 @@
+// YK
 #include "yk__lib.h"
 // --forward declarations-- 
 #define yy__min_int(nn__a, nn__b) ((nn__a < nn__b) ? nn__a : nn__b)
@@ -27,19 +28,19 @@ void yy__leakme(yk__sds nn__a, yk__sds nn__b) { fopen(nn__a, nn__b); }
 int32_t yy__main() 
 {
     yk__sds t__0 = yk__sdsnew("// ----->>> this is my code <<<<------\n");
-    printf("%s", (t__0));
+    yk__printstr((t__0));
     yk__sds t__1 = yk__sdsnew("test.c");
     yk__sds t__2 = yy__readfile(yk__sdsdup(t__1));
     yk__sds yy__a = yk__sdsdup((t__2));
     if (yy__is_empty_str(yk__sdsdup(yy__a)))
     {
         yk__sds t__3 = yk__sdsnew("test.c is empty or not found");
-        printf("%s", (t__3));
+        yk__printstr((t__3));
         yk__sdsfree(t__3);
     }
     else
     {
-        printf("%s", (yy__a));
+        yk__printstr((yy__a));
     }
     yk__sdsfree(yy__a);
     yk__sdsfree(t__2);
@@ -47,4 +48,6 @@ int32_t yy__main()
     yk__sdsfree(t__0);
     return 0;
 }
+#if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }
+#endif

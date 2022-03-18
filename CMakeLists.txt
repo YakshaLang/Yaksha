@@ -4,10 +4,8 @@ project(Yaksha)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fsanitize=address -ggdb -g -O0")
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(CMAKE_INSTALL_PREFIX build})
-
 set(UTF8_DIR 3rd/utfcpp/source)
 
 get_filename_component(CMAKE_BINARY_DIR "bin" ABSOLUTE)
@@ -22,6 +20,10 @@ set(YAKSHA_SOURCE_FILES
 
 set(YAKSHA_TEST_FILES
         tests/btest.h tests/test_block_analyzer.cpp tests/test_compiler.cpp tests/test_interpreter.cpp tests/test_parser.cpp tests/test_string_utils.cpp tests/test_tokenizer.cpp) # update_makefile.py TESTS
+
+include_directories("runtime")
+set(YAKSHA_RUNTIME_FILES
+        runtime/ini.h runtime/mpc.h runtime/subprocess.h runtime/toml.h runtime/utf8proc.h runtime/whereami.h runtime/yk__arrayutils.h runtime/yk__colour.h runtime/yk__lib.h runtime/yk__process.h runtime/yk__system.h runtime/yk__utf8iter.h runtime/mpc.c runtime/toml.c runtime/utf8proc.c runtime/whereami.c runtime/yk__arrayutils.c runtime/yk__colour.c runtime/yk__main.c runtime/yk__process.c runtime/yk__system.c) # update_makefile.py YK_RUNTIME
 
 add_library(yaksha ${YAKSHA_SOURCE_FILES})
 # -- Yaksha executable - interpreter --
@@ -64,3 +66,11 @@ add_executable(YakshaFuzz tests/fuzz_main.cpp)
 target_link_libraries(YakshaFuzz ${LIBS})
 target_link_libraries(YakshaFuzz PUBLIC yaksha)
 target_compile_features(YakshaFuzz PRIVATE cxx_std_17)
+
+# CMake Build for carpntr
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+add_executable(cmakecarpntr ${YAKSHA_RUNTIME_FILES} carpntr/build/program_code.c)
+target_compile_features(cmakecarpntr PRIVATE c_std_99)
+target_compile_definitions(cmakecarpntr PUBLIC UTF8PROC_STATIC)
+

@@ -1,0 +1,92 @@
+import libs.clrprint
+import libs.io
+import libs.os.path
+import libs.os
+import libs.strings.buffer as sbuf
+import libs.strings.array as sarr
+import configuration as carp
+
+def prepare_code(c: carp.Config, code: str) -> str:
+    buf: sbuf.StringBuffer = sbuf.new()
+    defer sbuf.del_buf(buf)
+    # --
+    length: int = 0
+    x: int = 0
+    # write #defines
+    length = len(c.c_code.defines)
+    x = 0
+    while x < length:
+        sbuf.append(buf, "#define " + c.c_code.defines[x] + "\n")
+        x = x + 1
+    # write #include <>
+    length = len(c.c_code.system_includes)
+    x = 0
+    while x < length:
+        sbuf.append(buf, "#include <" + c.c_code.system_includes[x] + ">\n")
+        x = x + 1
+    # write #include ""
+    length = len(c.c_code.includes)
+    x = 0
+    while x < length:
+        sbuf.append(buf, "#include \"" + c.c_code.includes[x] + "\"\n")
+        x = x + 1
+    # code itself
+    sbuf.append(buf, code)
+    sbuf.append(buf, "\n")
+    # to string
+    result: str = sbuf.to_str(buf)
+    return result
+
+def create_args(c: carp.Config, code_path: str, build_path: str) -> Array[str]:
+    args: Array[str] = sarr.new(3, c.zig_compiler_path, "cc", "-std=c99", "-Oz")
+    # --
+    length: int = 0
+    x: int = 0
+    # include paths
+    length = len(c.c_code.include_paths)
+    x = 0
+    while x < length:
+        include: str = "-I" + c.c_code.include_paths[x]
+        arrput(args, include)
+        x = x + 1
+    # compiler defines
+    length = len(c.c_code.compiler_defines)
+    x = 0
+    while x < length:
+        cdefine: str = "-D" + c.c_code.compiler_defines[x]
+        arrput(args, cdefine)
+        x = x + 1
+    # c codes
+    length = len(c.c_code.c_code)
+    x = 0
+    while x < length:
+        cc: str = c.c_code.c_code[x]
+        arrput(args, cc)
+        x = x + 1
+    # program code
+    arrput(args, code_path)
+    # yk__main.c
+    the_yk_main: str = path.join(c.runtime_path, "yk__main.c")
+    arrput(args, the_yk_main)
+    # -o bin.exe
+    arrput(args, "-o")
+    binary: str = c.project.name
+    if os.is_windows():
+        binary = binary + ".exe"
+    binary = path.join(build_path, binary)
+    arrput(args, binary)
+    # ----
+    return args
+
+def build(c: carp.Config, code: str) -> int:
+    println("\nbuilding...")
+    build_path: str = path.join(os.cwd(), "build")
+    code_path: str = path.join(build_path, "program_code.c")
+    if not io.writefile(code_path, prepare_code(c, code)):
+        clrprint.red("Failed to write file:")
+        println(code_path)
+        return -1
+    a: Array[str] = create_args(c, code_path, build_path)
+    defer sarr.del_str_array(a)
+    result: str = os.run(a)
+    return 0

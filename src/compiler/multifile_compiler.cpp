@@ -10,7 +10,14 @@
 using namespace yaksha;
 multifile_compiler_result
 multifile_compiler::compile(const std::string &main_file) {
-  codefiles cf{};
+  auto libs_path = std::filesystem::current_path().string();
+  return compile(main_file, libs_path);
+}
+multifile_compiler_result
+multifile_compiler::compile(const std::string &main_file,
+                            const std::string &libs_path) {
+  std::filesystem::path library_parent{libs_path};
+  codefiles cf{library_parent};
   // Parse all imports by scanning given main file
   auto main_file_info = cf.scan_main(main_file);
   if (main_file_info == nullptr) {
@@ -47,12 +54,12 @@ multifile_compiler::compile(const std::string &main_file) {
   // Type check all files
   for (auto f : cf.files_) {
     f->data_->type_checker_ =
-        new type_checker(f->filepath_, &cf, f->data_->dsv_, &cf.pool_);
+        new type_checker(f->filepath_.string(), &cf, f->data_->dsv_, &cf.pool_);
     for (auto impo : f->data_->parser_->import_stmts_) {
       auto obj = ykobject(&cf.pool_);
       obj.object_type_ = yaksha::object_type::MODULE;
-      obj.string_val_ = impo->data_->filepath_;
-      obj.module_file_ = impo->data_->filepath_;
+      obj.string_val_ = impo->data_->filepath_.string();
+      obj.module_file_ = impo->data_->filepath_.string();
       obj.module_name_ = impo->name_->token_;
       f->data_->type_checker_->scope_.define_global(impo->name_->token_, obj);
     }
@@ -79,6 +86,7 @@ multifile_compiler::compile(const std::string &main_file) {
     function_body << result.body_;
   }
   std::stringstream c_code{};
+  c_code << "// YK\n";
   c_code << "#include \"yk__lib.h\"\n";
   c_code << "// --forward declarations-- \n";
   c_code << struct_forward_decls.str();
@@ -87,6 +95,8 @@ multifile_compiler::compile(const std::string &main_file) {
   c_code << struct_body.str();
   c_code << "// --functions-- \n";
   c_code << function_body.str();
-  c_code << "int main(void) { return yy__main(); }";
+  c_code << "#if defined(YK__MINIMAL_MAIN)\n";
+  c_code << "int main(void) { return yy__main(); }\n";
+  c_code << "#endif";
   return {false, c_code.str()};
 }

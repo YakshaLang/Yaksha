@@ -231,6 +231,17 @@ stmt *parser::block_statement() {
     throw error(colon, "Block cannot be empty. Use 'pass'"
                        " statement for an empty block.");
   }
+  if (statements.front()->get_type() == ast_type::EXPR_LITERAL) {
+    auto first_item = dynamic_cast<literal_expr *>(statements.front());
+    if (first_item->literal_token_->type_ == token_type::STRING ||
+        first_item->literal_token_->type_ == token_type::THREE_QUOTE_STRING) {
+      statements.erase(statements.begin());
+    }
+  }
+  if (statements.empty()) {
+    throw error(colon, "Block cannot be empty. Use 'pass'"
+                       " statement for an empty block.");
+  }
   consume(token_type::BA_DEDENT, "Expected dedent");
   return pool_.c_block_stmt(statements);
 }
@@ -558,7 +569,7 @@ void parser::rescan_datatypes() {
     if (dt->is_builtin_or_primitive()) continue;
     auto import_alias = dt->module_;
     auto module_data = import_stmts_alias_[import_alias];
-    dt->module_ = module_data->data_->filepath_;
+    dt->module_ = module_data->data_->filepath_.string();
   }
   // Clean up temporary vector
   datatypes_from_modules_.clear();

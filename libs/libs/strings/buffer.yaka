@@ -1,0 +1,47 @@
+@nativedefine("yk__sds*")
+class StringBuffer:
+    pass
+
+@native
+def new() -> StringBuffer:
+    ccode """yk__sds* srr = calloc(1, sizeof(yk__sds*));
+    srr[0] = yk__sdsempty();
+    return srr"""
+
+@native
+def new_size(s: int) -> StringBuffer:
+    ccode """yk__sds* srr = calloc(1, sizeof(yk__sds*));
+    srr[0] = yk__sdsempty();
+    srr[0] = yk__sdsgrowzero(srr[0], nn__s);
+    return srr"""
+
+@native
+def append(buf: StringBuffer, v: str) -> None:
+    ccode """nn__buf[0] = yk__sdscatsds(nn__buf[0], nn__v);
+    yk__sdsfree(nn__v)"""
+
+@native
+def prepend(buf: StringBuffer, v: str) -> None:
+    ccode """yk__sds tmp = nn__buf[0];
+    nn__buf[0] = yk__sdscatsds(nn__v, nn__buf[0]);
+    yk__sdsfree(tmp);"""
+
+@native
+def to_str(buf: StringBuffer) -> str:
+    ccode """return yk__sdsdup(nn__buf[0])"""
+
+@native
+def join(buf: StringBuffer, values: Array[str], sep: str) -> None:
+    ccode """if (NULL == nn__values) {
+        yk__sdsfree(nn__sep);
+        return;
+    }
+    yk__sds tmp = yk__sdsjoinsds(nn__values, yk__arrlen(nn__values), nn__sep, yk__sdslen(nn__sep));
+    nn__buf[0] = yk__sdscatsds(nn__buf[0], tmp);
+    yk__sdsfree(tmp);
+    yk__sdsfree(nn__sep)"""
+
+@native
+def del_buf(buf: StringBuffer) -> None:
+    ccode """yk__sdsfree(nn__buf[0]); 
+    free(nn__buf)"""

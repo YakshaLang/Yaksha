@@ -1,0 +1,38 @@
+@nativedefine("ini_t*")
+class Ini:
+    pass
+
+@native
+def del_ini(object: Ini) -> None:
+    ccode """ini_destroy(nn__object)"""
+
+@native
+def from_str(ini_data: str) -> Ini:
+    ccode """ini_t* ini = ini_load(nn__ini_data);
+    yk__sdsfree(nn__ini_data);
+    return ini"""
+
+@native
+def get(object: Ini, section: str, property: str) -> str:
+    ccode """ 
+    int section = ini_find_section(nn__object, nn__section, yk__sdslen(nn__section));
+    if (section == INI_NOT_FOUND) {
+        yk__sdsfree(nn__section);
+        yk__sdsfree(nn__property);
+        return yk__sdsempty();
+    }
+    int prop ini_find_property(nn__object, section, nn__property, yk__sdslen(nn__property));
+    if (prop == INI_NOT_FOUND) {
+        yk__sdsfree(nn__section);
+        yk__sdsfree(nn__property);
+        return yk__sdsempty();
+    }
+    char const* data = ini_property_value(nn__object), section, prop);
+    if (data == NULL) {
+        yk__sdsfree(nn__section);
+        yk__sdsfree(nn__property);
+        return yk__sdsempty();
+    }
+    yk__sdsfree(nn__section);
+    yk__sdsfree(nn__property);    
+    return yk__sdsnew(data)"""

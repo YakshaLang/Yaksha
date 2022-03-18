@@ -1,4 +1,4 @@
-import libs.c as c
+import xlibs.c as c
 
 @nativedefine("mpc_ast_t*")
 class Ast:
