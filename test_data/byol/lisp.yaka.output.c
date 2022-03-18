@@ -1,3 +1,4 @@
+// YK
 #include "yk__lib.h"
 // --forward declarations-- 
 #define yy__numbers_cstr2i atoi
@@ -233,9 +234,9 @@ int32_t yy__main()
     yk__sds yy__lang = yk__sdsdup(t__13);
     yy__mpc_mpca_lang(0, yk__sdsdup(yy__lang), yy__number, yy__operator, yy__expr, yy__lispy);
     yk__sds t__14 = yk__sdsnew("Lispy Version 0.0.0.0.2\n");
-    printf("%s", (t__14));
+    yk__printstr((t__14));
     yk__sds t__15 = yk__sdsnew("Type just \'q\' to exit.\n\n");
-    printf("%s", (t__15));
+    yk__printstr((t__15));
     yk__sds t__16 = yk__sdsnew("<stdin>");
     yk__sds yy__filename = yk__sdsdup(t__16);
     yy__mpc_Result yy__r = yy__mpc_new_result();
@@ -250,6 +251,11 @@ int32_t yy__main()
             yk__sds t__19 = yk__sdsnew("q");
             if ((yk__sdscmp(yy__inp , t__19) == 0))
             {
+                free(yy__r);
+                free(yy__lispy);
+                free(yy__expr);
+                free(yy__operator);
+                free(yy__number);
                 yk__sdsfree(t__19);
                 yk__sdsfree(yy__inp);
                 yk__sdsfree(t__18);
@@ -284,7 +290,7 @@ int32_t yy__main()
     }
     yy__mpc_cleanup(4, yy__number, yy__operator, yy__expr, yy__lispy);
     yk__sds t__20 = yk__sdsnew(">>>bye!\n");
-    printf("%s", (t__20));
+    yk__printstr((t__20));
     free(yy__r);
     free(yy__lispy);
     free(yy__expr);
@@ -303,4 +309,6 @@ int32_t yy__main()
     yk__sdsfree(t__9);
     return 0;
 }
+#if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }
+#endif

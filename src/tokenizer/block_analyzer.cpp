@@ -106,20 +106,29 @@ void block_analyzer::analyze() {
   tokens_.reserve(original_tokens_.size());
   auto iterator = original_tokens_.begin();
   auto end = original_tokens_.end();
+  auto prev_comment = false;
   // clean up comments and extra new lines
   while (iterator != end) {
     auto tok = *iterator;
     iterator++;
     if (tok.type_ == token_type::COMMENT) {
-      continue;
-    } else if (tok.type_ == token_type::NEW_LINE) {
-      // Don't start with new lines, Don't add a newline after a new line
-      if (cleaned.empty() || cleaned.back().type_ == token_type::NEW_LINE) {
-        continue;
-      } else if (cleaned.back().type_ == token_type::INDENT) {
-        // get rid of empty indents that just follows by a new line
+      prev_comment = true;
+      if (!cleaned.empty() && cleaned.back().type_ == token_type::INDENT) {
+        // get rid of empty indents that just follows by a comment
         cleaned.pop_back();
       }
+      continue;
+    } else {
+      if (tok.type_ == token_type::NEW_LINE) {
+        // Don't start with new lines, Don't add a newline after a new line
+        if (prev_comment || cleaned.empty() || cleaned.back().type_ == token_type::NEW_LINE) {
+          continue;
+        } else if (cleaned.back().type_ == token_type::INDENT) {
+          // get rid of empty indents that just follows by a new line
+          cleaned.pop_back();
+        }
+      }
+      prev_comment = false;
     }
     cleaned.emplace_back(tok);
   }

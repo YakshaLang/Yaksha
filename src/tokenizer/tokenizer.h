@@ -10,6 +10,9 @@
 #include <utf8.h>
 #include <vector>
 namespace yaksha {
+  template<typename octet_iterator>
+  static std::pair<int, utf8::uint32_t>
+  consume_string(std::string &buf, octet_iterator &begin, octet_iterator end);
   /**
  * Consume a triple quoted string
  * @tparam octet_iterator iterator data type

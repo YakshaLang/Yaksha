@@ -16,11 +16,9 @@
     ["block_analyzer_test.py",2,9,"a","NAME"],
     ["block_analyzer_test.py",2,11,"=","EQ"],
     ["block_analyzer_test.py",2,13,"1","INTEGER_DECIMAL"],
-    ["block_analyzer_test.py",2,35,"\n","NEW_LINE"],
     ["block_analyzer_test.py",3,9,"b","NAME"],
     ["block_analyzer_test.py",3,11,"=","EQ"],
     ["block_analyzer_test.py",3,13,"2","INTEGER_DECIMAL"],
-    ["block_analyzer_test.py",3,56,"\n","NEW_LINE"],
     ["block_analyzer_test.py",5,9,"c","NAME"],
     ["block_analyzer_test.py",5,11,"=","EQ"],
     ["block_analyzer_test.py",5,13,"3","INTEGER_DECIMAL"],
@@ -49,7 +47,6 @@
     ["block_analyzer_test.py",12,5,"e","NAME"],
     ["block_analyzer_test.py",12,7,"=","EQ"],
     ["block_analyzer_test.py",12,9,"1","INTEGER_DECIMAL"],
-    ["block_analyzer_test.py",12,51,"\n","NEW_LINE"],
     ["block_analyzer_test.py",14,5,"f","NAME"],
     ["block_analyzer_test.py",14,7,"=","EQ"],
     ["block_analyzer_test.py",14,9,"2","INTEGER_DECIMAL"],
@@ -68,6 +65,5 @@
     ["block_analyzer_test.py",19,12,",","COMMA"],
     ["block_analyzer_test.py",19,14,"5","INTEGER_DECIMAL"],
     ["block_analyzer_test.py",19,15,"]","SQUARE_BRACKET_CLOSE"],
-    ["block_analyzer_test.py",19,24,"\n","NEW_LINE"],
     ["block_analyzer_test.py",20,1,"","END_OF_FILE"]
 ]

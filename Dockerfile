@@ -26,6 +26,9 @@ ADD test_data /app/test_data
 ADD tests /app/tests
 ADD CMakeLists.txt /app/CMakeLists.txt
 ADD scripts /app/scripts
+ADD libs /app/libs
+ADD runtime /app/runtime
+ADD carpntr /app/carpntr
 RUN mkdir "/app/bin"
 
 ENTRYPOINT ["/app/scripts/code-coverage.sh"]

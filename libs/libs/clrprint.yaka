@@ -1,0 +1,45 @@
+@native
+def set_colour(c: int) -> None:
+    ccode """if (nn__c == 0) { // rewind
+        yk__set_colour(REWIND);
+    } else if (nn__c == 1) { // red 
+        yk__set_colour(RED);
+    } else if (nn__c == 2) { // green 
+        yk__set_colour(GREEN);
+    } else if (nn__c == 3) { // white 
+        yk__set_colour(WHITE);
+    } else if (nn__c == 4) { // blue 
+        yk__set_colour(BLUE);
+    } else if (nn__c == 5) { // purple 
+        yk__set_colour(PURPLE);
+    } else if (nn__c == 6) { // yellow 
+        yk__set_colour(YELLOW);
+    } else if (nn__c == 7) { // cyan  
+        yk__set_colour(CYAN);
+    }"""
+
+def colour_print(colour: int, x: str) -> None:
+    set_colour(colour)
+    print(x)
+    set_colour(0)
+
+def red(x: str) -> None:
+    colour_print(1, x)
+
+def green(x: str) -> None:
+    colour_print(2, x)
+
+def white(x: str) -> None:
+    colour_print(3, x)
+
+def blue(x: str) -> None:
+    colour_print(4, x)
+
+def purple(x: str) -> None:
+    colour_print(5, x)
+
+def yellow(x: str) -> None:
+    colour_print(6, x)
+
+def cyan(x: str) -> None:
+    colour_print(7, x)
