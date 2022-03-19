@@ -49,9 +49,20 @@ def cwd() -> str:
     free(path);
     return value"""
 
+
+@nativedefine("struct yk__process_result*")
+class ProcessResult:
+    ok: bool
+    output: str
+    return_code: int
+
 # Run these arguments and get stdout/stderr then return it as a string, empty string if we cannot run.
 @native("yk__run")
-def run(args: Array[str]) -> str:
+def run(args: Array[str]) -> ProcessResult:
+    pass
+
+@native("yk__free_process_result")
+def del_process_result(pr: ProcessResult) -> None:
     pass
 
 # Are we running Windows?
@@ -62,6 +73,14 @@ def is_windows() -> bool:
     win = true;
     #endif
     return win"""
+
+@native
+def is_macos() -> bool:
+    ccode """bool mach_os = false;
+    #if defined(__APPLE__) && defined(__MACH__)
+    mach_os = true;
+    #endif
+    return mach_os"""
 
 # Get environment variable, empty if not found or error
 @native("yk__getenv")

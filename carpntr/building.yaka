@@ -38,7 +38,9 @@ def prepare_code(c: carp.Config, code: str) -> str:
     return result
 
 def create_args(c: carp.Config, code_path: str, build_path: str) -> Array[str]:
-    args: Array[str] = sarr.new(3, c.zig_compiler_path, "cc", "-std=c99", "-Oz")
+    args: Array[str] = sarr.new(7, c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC")
+    if not os.is_macos():
+        arrput(args, "-flto=full")
     # --
     length: int = 0
     x: int = 0
@@ -88,5 +90,12 @@ def build(c: carp.Config, code: str) -> int:
         return -1
     a: Array[str] = create_args(c, code_path, build_path)
     defer sarr.del_str_array(a)
-    result: str = os.run(a)
-    return 0
+    result: os.ProcessResult = os.run(a)
+    defer os.del_process_result(result)
+    if result.ok:
+        clrprint.green("done.\n")
+        return 0
+    clrprint.cyan("------ C compiler failed -------\n")
+    clrprint.red(result.output)
+    print("\n")
+    return -1

@@ -118,13 +118,20 @@ yk__sds yk__windows_join_args(yk__sds *args) {
   return output;
 }
 #endif
-yk__sds yk__run(yk__sds *args) {
+struct yk__process_result *yk__run(yk__sds *args) {
+  struct yk__process_result *res = calloc(1, sizeof(struct yk__process_result));
+  res->ok = false;
+  res->return_code = -1;
+  res->output = NULL;
 #if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__)) ||         \
     defined(__unix__)
-  if (args == NULL) { return yk__sdsempty(); }
+  if (args == NULL) {
+    res->output = yk__sdsempty();
+    return res;
+  }
   yk__arrput(args, (yk__sds) NULL);
   struct subprocess_s *sub = calloc(1, sizeof(struct subprocess_s));
-  int result = subprocess_create(args,
+  int result = subprocess_create((const char *const *) args,
                                  subprocess_option_combined_stdout_stderr |
                                      subprocess_option_inherit_environment |
                                      subprocess_option_no_window,
@@ -132,13 +139,15 @@ yk__sds yk__run(yk__sds *args) {
   if (0 != result || sub->stdin_file == 0) {
     subprocess_destroy(sub);
     free(sub);
-    return yk__sdsempty();
+    res->output = yk__sdsempty();
+    return res;
   }
   FILE *so = subprocess_stdout(sub);
   if (NULL == so) {
     subprocess_destroy(sub);
     free(sub);
-    return yk__sdsempty();
+    res->output = yk__sdsempty();
+    return res;
   }
   yk__sds text = yk__sdsempty();
   size_t bytes_read;
@@ -150,16 +159,28 @@ yk__sds yk__run(yk__sds *args) {
   if (0 != subprocess_join(sub, &return_code)) {
     subprocess_destroy(sub);
     free(sub);
-    return yk__sdsempty();
+    res->output = text;
+    return res;
+  }
+  // Read left over content after joining..
+  while ((bytes_read = fread(buffer, sizeof(char), 1024, so)) != 0) {
+    text = yk__sdscatlen(text, buffer, bytes_read);
   }
   subprocess_destroy(sub);
   free(sub);
-  return text;
+  res->ok = return_code == 0;
+  res->output = text;
+  res->return_code = return_code;
+  return res;
 #else
   yk__sds joined = yk__windows_join_args(args);
-  if (NULL == joined) { return yk__sdsempty(); }
+  if (NULL == joined) {
+    res->output = yk__sdsempty();
+    return res;
+  }
   wchar_t *cmd = yk__utf8_to_utf16_null_terminated(joined);
-  if (NULL == cmd) { return yk__sdsempty(); }
+  if (NULL == cmd) {     res->output = yk__sdsempty();
+    return res; }
   yk__sdsfree(joined);// no longer needed free it.
   yk__sds result = yk__sdsempty();
   HANDLE hPipeRead, hPipeWrite;
@@ -169,7 +190,8 @@ yk__sds yk__run(yk__sds *args) {
   // Create a pipe to get results from child's stdout.
   if (!CreatePipe(&hPipeRead, &hPipeWrite, &saAttr, 0)) {
     free(cmd);
-    return result;
+    res->output = result;
+    return res;
   }
   STARTUPINFOW si = {sizeof(STARTUPINFOW)};
   si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
@@ -184,7 +206,8 @@ yk__sds yk__run(yk__sds *args) {
     CloseHandle(hPipeWrite);
     CloseHandle(hPipeRead);
     free(cmd);
-    return result;
+    res->output = result;
+    return res;
   }
   bool bProcessEnded = false;
   for (; !bProcessEnded;) {
@@ -210,11 +233,24 @@ yk__sds yk__run(yk__sds *args) {
       result = yk__sdscatlen(result, buf, dwRead);
     }
   }//for
+  // Process exited, get return code.
+  DWORD exit_code;
+  if (FALSE != GetExitCodeProcess(pi.hProcess, &exit_code)) {
+    res->return_code = (int)exit_code;
+    res->ok = res->return_code == 0;
+  }
   CloseHandle(hPipeWrite);
   CloseHandle(hPipeRead);
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
   free(cmd);
-  return result;
+  res->output = result;
+  return res;
 #endif
+}
+
+void yk__free_process_result(struct yk__process_result* result) {
+  if (NULL == result) return;
+  yk__sdsfree(result->output);
+  free(result);
 }

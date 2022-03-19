@@ -60,22 +60,27 @@ def start_build() -> int:
 
 
     yk_args: Array[str] = sarr.new(3, config.compiler_path, config.project.main, config.libs_path)
-    result: str = os.run(yk_args)
-    if len(result) <= 0:
+    defer del yk_args
+    result: os.ProcessResult = os.run(yk_args)
+    defer os.del_process_result(result)
+
+    if not result.ok:
         clrprint.cyan("---- running Yaksha compiler ---\n")
         clrprint.red("Failed to execute: " + sarr.join(yk_args, " ") + "\n")
+        clrprint.red(result.output)
+        print("\n")
         return_val = -1
         clrprint.cyan("---- end of compiler run ---\n")
     else:
-        if strings.startswith(result, "// YK"):
-            return_val = building.build(config, result)
+        if strings.startswith(result.output, "// YK"):
+            return_val = building.build(config, result.output)
         else:
             clrprint.cyan("---- running Yaksha compiler ---\n")
-            clrprint.red(result)
+            clrprint.red(result.output)
             print("\n")
             return_val = -1
             clrprint.cyan("---- end of compiler run ---\n")
-    defer del yk_args
+
     return return_val
 
 def main() -> int:
