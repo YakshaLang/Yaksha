@@ -1,4 +1,4 @@
-import libs.clrprint
+import libs.console
 import libs.io
 import libs.os.path
 import libs.os
@@ -38,7 +38,7 @@ def prepare_code(c: carp.Config, code: str) -> str:
     return result
 
 def create_args(c: carp.Config, code_path: str, build_path: str) -> Array[str]:
-    args: Array[str] = sarr.new(7, c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC")
+    args: Array[str] = sarr.new(8, c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC")
     if not os.is_macos():
         arrput(args, "-flto=full")
     # --
@@ -85,7 +85,7 @@ def build(c: carp.Config, code: str) -> int:
     build_path: str = path.join(os.cwd(), "build")
     code_path: str = path.join(build_path, "program_code.c")
     if not io.writefile(code_path, prepare_code(c, code)):
-        clrprint.red("Failed to write file:")
+        console.red("Failed to write file:")
         println(code_path)
         return -1
     a: Array[str] = create_args(c, code_path, build_path)
@@ -93,9 +93,9 @@ def build(c: carp.Config, code: str) -> int:
     result: os.ProcessResult = os.run(a)
     defer os.del_process_result(result)
     if result.ok:
-        clrprint.green("done.\n")
+        console.green("done.\n")
         return 0
-    clrprint.cyan("------ C compiler failed -------\n")
-    clrprint.red(result.output)
+    console.cyan("------ C compiler failed -------\n")
+    console.red(result.output)
     print("\n")
     return -1

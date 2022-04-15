@@ -3,7 +3,7 @@ import libs.os.path
 import libs.fileformats.toml
 import libs.io
 import libs.c
-import libs.clrprint
+import libs.console
 import libs.strings
 import libs.strings.array as sarr
 import configuration as carp
@@ -28,21 +28,21 @@ def print_banner() -> None:
      |  >:===========`
       )(
       \"\"\n"""
-    clrprint.green(art)
-    clrprint.cyan(text)
-    clrprint.yellow(art2)
+    console.green(art)
+    console.cyan(text)
+    console.yellow(art2)
 
 def print_errors(er: Array[str]) -> None:
     length: int = len(er)
     x: int = 0
     while x < length:
-        clrprint.red(er[x] + "\n")
+        console.red(er[x] + "\n")
         x = x + 1
 
 def printkv(k: str, v: str) -> None:
-    clrprint.cyan(k)
-    clrprint.red(" := ")
-    clrprint.green(v)
+    console.cyan(k)
+    console.red(" := ")
+    console.green(v)
     print("\n")
 
 def start_build() -> int:
@@ -60,31 +60,31 @@ def start_build() -> int:
 
 
     yk_args: Array[str] = sarr.new(3, config.compiler_path, config.project.main, config.libs_path)
-    defer del yk_args
+    defer sarr.del_str_array(yk_args)
     result: os.ProcessResult = os.run(yk_args)
     defer os.del_process_result(result)
 
     if not result.ok:
-        clrprint.cyan("---- running Yaksha compiler ---\n")
-        clrprint.red("Failed to execute: " + sarr.join(yk_args, " ") + "\n")
-        clrprint.red(result.output)
+        console.cyan("---- running Yaksha compiler ---\n")
+        console.red("Failed to execute: " + sarr.join(yk_args, " ") + "\n")
+        console.red(result.output)
         print("\n")
         return_val = -1
-        clrprint.cyan("---- end of compiler run ---\n")
+        console.cyan("---- end of compiler run ---\n")
     else:
         if strings.startswith(result.output, "// YK"):
             return_val = building.build(config, result.output)
         else:
-            clrprint.cyan("---- running Yaksha compiler ---\n")
-            clrprint.red(result.output)
+            console.cyan("---- running Yaksha compiler ---\n")
+            console.red(result.output)
             print("\n")
             return_val = -1
-            clrprint.cyan("---- end of compiler run ---\n")
+            console.cyan("---- end of compiler run ---\n")
 
     return return_val
 
 def main() -> int:
-    defer clrprint.red("\n >--> program end <--< \n")
+    defer console.red("\n >--> program end <--< \n")
     print_banner()
     result: int = start_build()
     return result

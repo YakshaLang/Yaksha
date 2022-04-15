@@ -2,6 +2,7 @@
 #define YK__COLOUR
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
+#include <conio.h>
 void yk__set_colour(int color);
 #define RED FOREGROUND_RED
 #define GREEN FOREGROUND_GREEN
@@ -11,6 +12,7 @@ void yk__set_colour(int color);
 #define YELLOW FOREGROUND_RED | FOREGROUND_GREEN
 #define CYAN FOREGROUND_GREEN | FOREGROUND_BLUE
 #define REWIND FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN
+#define yk__getch _getch
 #else
 #define RED "\033[0;31m"
 #define GREEN "\033[0;32m"
@@ -23,9 +25,11 @@ void yk__set_colour(int color);
 #if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__)) ||         \
     defined(__unix__)
 void yk__set_colour(char *color);
+int yk__getch();
 #else
 // Do nothing if not supported
 #define yk__set_colour(x)
+#define yk__getch() -1
 #endif
 #endif
 #endif

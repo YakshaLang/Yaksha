@@ -166,7 +166,7 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     cc.compiler_defines = sarr.extend(df_compiler_defines, cc.compiler_defines)
 
     # Add defaults to cc.includes
-    df_includes: Array[str] = sarr.new(9, "whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h", "yk__colour.h", "mpc.h", "yk__arrayutils.h", "yk__process.h")
+    df_includes: Array[str] = sarr.new(9, "whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h", "yk__console.h", "mpc.h", "yk__arrayutils.h", "yk__process.h")
     orig_includes: Array[str] = cc.includes
     defer sarr.del_str_array(orig_includes)
     cc.includes = sarr.extend(df_includes, cc.includes)
@@ -178,7 +178,7 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     arrput(df_c_code, path.join(c.runtime_path, "utf8proc.c"))
     arrput(df_c_code, path.join(c.runtime_path, "toml.c"))
     arrput(df_c_code, path.join(c.runtime_path, "mpc.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "yk__colour.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "yk__console.c"))
     arrput(df_c_code, path.join(c.runtime_path, "yk__arrayutils.c"))
     arrput(df_c_code, path.join(c.runtime_path, "yk__process.c"))
     orig_c_code: Array[str] = cc.c_code
@@ -232,20 +232,26 @@ def load_config() -> Config:
 
 
 def del_config(c: Config) -> None:
-    sarr.del_str_array(c.c_code.include_paths)
-    sarr.del_str_array(c.c_code.defines)
-    sarr.del_str_array(c.c_code.compiler_defines)
-    sarr.del_str_array(c.c_code.includes)
-    sarr.del_str_array(c.c_code.system_includes)
-    sarr.del_str_array(c.c_code.c_code)
-    sarr.del_str_array(c.c_code.cpp_code)
+    if c.c_code != None:
+        sarr.del_str_array(c.c_code.include_paths)
+        sarr.del_str_array(c.c_code.defines)
+        sarr.del_str_array(c.c_code.compiler_defines)
+        sarr.del_str_array(c.c_code.includes)
+        sarr.del_str_array(c.c_code.system_includes)
+        sarr.del_str_array(c.c_code.c_code)
+        sarr.del_str_array(c.c_code.cpp_code)
+
     sarr.del_str_array(c.errors)
-    sarr.del_str_array(c.compilation.targets)
-    del c.project.main
-    del c.project.name
-    del c.project.author
-    del c.compilation.libc
-    del c.compilation.compiler
+
+    if c.compilation != None:
+        sarr.del_str_array(c.compilation.targets)
+        del c.compilation.libc
+        del c.compilation.compiler
+
+    if c.project != None:
+        del c.project.main
+        del c.project.name
+        del c.project.author
 
     del c.c_code
     del c.project

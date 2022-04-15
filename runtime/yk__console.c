@@ -1,4 +1,4 @@
-#include "yk__colour.h"
+#include "yk__console.h"
 #if defined(_WIN32) || defined(_WIN64)
 #include <io.h>
 #include <stdio.h>
@@ -15,13 +15,32 @@ void yk__set_colour(int color) {
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #endif
+#include <stdbool.h>
 #include <stdio.h>
+#include <termios.h>
 #include <unistd.h>
 #define ISATTY isatty
 #define FILENO fileno
 void yk__set_colour(char *color) {
   if (!ISATTY(FILENO(stdout))) { return; }
   printf("%s", color);
+}
+// https://stackoverflow.com/a/912796
+int yk__getch() {
+  bool success = true;
+  char buf = 0;
+  struct termios old = {0};
+  if (tcgetattr(0, &old) < 0) { success = false; }
+  old.c_lflag &= ~ICANON;
+  old.c_lflag &= ~ECHO;
+  old.c_cc[VMIN] = 1;
+  old.c_cc[VTIME] = 0;
+  if (tcsetattr(0, TCSANOW, &old) < 0) { success = false; }
+  if (read(0, &buf, 1) < 0) { success = false; }
+  old.c_lflag |= ICANON;
+  old.c_lflag |= ECHO;
+  if (tcsetattr(0, TCSADRAIN, &old) < 0) { success = false; }
+  return !success ? EOF : buf;
 }
 #endif
 /*

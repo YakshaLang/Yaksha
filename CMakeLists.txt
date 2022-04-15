@@ -23,7 +23,7 @@ set(YAKSHA_TEST_FILES
 
 include_directories("runtime")
 set(YAKSHA_RUNTIME_FILES
-        runtime/ini.h runtime/mpc.h runtime/subprocess.h runtime/toml.h runtime/utf8proc.h runtime/whereami.h runtime/yk__arrayutils.h runtime/yk__colour.h runtime/yk__lib.h runtime/yk__process.h runtime/yk__system.h runtime/yk__utf8iter.h runtime/mpc.c runtime/toml.c runtime/utf8proc.c runtime/whereami.c runtime/yk__arrayutils.c runtime/yk__colour.c runtime/yk__main.c runtime/yk__process.c runtime/yk__system.c) # update_makefile.py YK_RUNTIME
+        runtime/ini.h runtime/mpc.h runtime/subprocess.h runtime/toml.h runtime/utf8proc.h runtime/whereami.h runtime/yk__arrayutils.h runtime/yk__console.h runtime/yk__lib.h runtime/yk__process.h runtime/yk__system.h runtime/yk__utf8iter.h runtime/mpc.c runtime/toml.c runtime/utf8proc.c runtime/whereami.c runtime/yk__arrayutils.c runtime/yk__console.c runtime/yk__main.c runtime/yk__process.c runtime/yk__system.c) # update_makefile.py YK_RUNTIME
 
 add_library(yaksha ${YAKSHA_SOURCE_FILES})
 # -- Yaksha executable - interpreter --

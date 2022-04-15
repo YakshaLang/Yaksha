@@ -18,6 +18,10 @@ def set_colour(c: int) -> None:
         yk__set_colour(CYAN);
     }"""
 
+@native
+def getch() -> int:
+    ccode """return yk__getch()"""
+
 def colour_print(colour: int, x: str) -> None:
     set_colour(colour)
     print(x)
