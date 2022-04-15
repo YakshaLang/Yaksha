@@ -165,10 +165,11 @@ void type_checker::visit_logical_expr(logical_expr *obj) {
   obj->right_->accept(this);
   auto rhs = pop();
   if (!(lhs.is_primitive_or_obj() && lhs.datatype_->is_bool() &&
-        lhs.is_primitive_or_obj() && lhs.datatype_->is_bool())) {
+        rhs.is_primitive_or_obj() && rhs.datatype_->is_bool())) {
     error(obj->opr_, "Both LHS and RHS of logical"
                      " operator need to be boolean");
   }
+  push(rhs);
 }
 void type_checker::visit_unary_expr(unary_expr *obj) {
   // -5 - correct, -"some string" is not

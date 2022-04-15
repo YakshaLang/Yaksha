@@ -149,6 +149,15 @@ def load_c_code(conf: toml.Table, c: Config) -> CCode:
     cc.cpp_code = toml.get_string_array(cc_data, "cpp_code")
     return cc
 
+def load_compilation(conf: toml.Table, c: Config) -> Compilation:
+    co: Compilation = Compilation()
+    co_data: toml.Table = toml.get_table(conf, "compilation")
+    if not toml.valid_table(co_data):
+        # This is optional so ignore this
+        return co
+    co.targets = toml.get_string_array(co_data, "targets")
+    return co
+
 
 def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     current_dir: str = path.dirname(os.cwd())
@@ -226,7 +235,7 @@ def load_config() -> Config:
     if len(c.errors) > 0:
         return c
     # TODO: Complete this?
-    c.compilation = Compilation()
+    c.compilation = load_compilation(conf, c)
 
     return c
 

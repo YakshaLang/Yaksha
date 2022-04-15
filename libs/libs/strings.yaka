@@ -19,9 +19,12 @@ def get(s: str, pos: int) -> int:
 
 ######## Utils
 
-@nativemacro
-def valid(s: str) -> bool:
-    ccode """(NULL != nn__s)"""
+@native
+def contains(haystack: str, needle: str) -> bool:
+    ccode """bool val = strstr(nn__haystack, nn__needle) != NULL;
+    yk__sdsfree(nn__haystack);
+    yk__sdsfree(nn__needle);
+    return val"""
 
 @nativemacro
 def valid_cstr(s: c.CStr) -> bool:
