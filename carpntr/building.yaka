@@ -94,10 +94,10 @@ def build_target(c: carp.Config, code_path: str, build_path: str, target: str) -
     result: os.ProcessResult = os.run(a)
     defer os.del_process_result(result)
     if len(target) == 0:
-        console.yellow("native ")
+        console.yellow("native")
     else:
         console.yellow(target)
-    console.cyan(":= ")
+    console.cyan(" := ")
     if result.ok:
         console.green("done.\n")
         return 0

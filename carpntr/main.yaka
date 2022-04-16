@@ -66,7 +66,9 @@ def start_build() -> int:
 
     if not result.ok:
         console.cyan("---- running Yaksha compiler ---\n")
-        console.red("Failed to execute: " + sarr.join(yk_args, " ") + "\n")
+        console.red("Failed to execute: ")
+        console.yellow(sarr.join(yk_args, " "))
+        print("\n")
         console.red(result.output)
         print("\n")
         return_val = -1

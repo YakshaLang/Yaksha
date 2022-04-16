@@ -447,7 +447,7 @@ int32_t yy__building_build_target(struct yy__configuration_Config* yy__building_
     yy__os_ProcessResult yy__building_result = yy__os_run(yy__building_a);
     if ((yk__sdslen(yy__building_target) == 0))
     {
-        yk__sds t__38 = yk__sdsnew("native ");
+        yk__sds t__38 = yk__sdsnew("native");
         yy__console_yellow(yk__sdsdup(t__38));
         yk__sdsfree(t__38);
     }
@@ -455,7 +455,7 @@ int32_t yy__building_build_target(struct yy__configuration_Config* yy__building_
     {
         yy__console_yellow(yk__sdsdup(yy__building_target));
     }
-    yk__sds t__39 = yk__sdsnew(":= ");
+    yk__sds t__39 = yk__sdsnew(" := ");
     yy__console_cyan(yk__sdsdup(t__39));
     if (yy__building_result->ok)
     {
@@ -2156,20 +2156,18 @@ int32_t yy__start_build()
         yk__sds t__11 = yk__sdsnew("---- running Yaksha compiler ---\n");
         yy__console_cyan(yk__sdsdup(t__11));
         yk__sds t__12 = yk__sdsnew("Failed to execute: ");
+        yy__console_red(yk__sdsdup(t__12));
         yk__sds t__13 = yk__sdsnew(" ");
         yk__sds t__14 = yy__array_join(yy__yk_args, yk__sdsdup(t__13));
-        yk__sds t__15 = yk__sdscatsds(yk__sdsdup(t__12), (t__14));
-        yk__sds t__16 = yk__sdsnew("\n");
-        yk__sds t__17 = yk__sdscatsds(yk__sdsdup(t__15), t__16);
-        yy__console_red(yk__sdsdup(t__17));
+        yy__console_yellow(yk__sdsdup((t__14)));
+        yk__sds t__15 = yk__sdsnew("\n");
+        yk__printstr((t__15));
         yy__console_red(yk__sdsdup(yy__result->output));
-        yk__sds t__18 = yk__sdsnew("\n");
-        yk__printstr((t__18));
+        yk__sds t__16 = yk__sdsnew("\n");
+        yk__printstr((t__16));
         yy__return_val = (- (1));
-        yk__sds t__19 = yk__sdsnew("---- end of compiler run ---\n");
-        yy__console_cyan(yk__sdsdup(t__19));
-        yk__sdsfree(t__19);
-        yk__sdsfree(t__18);
+        yk__sds t__17 = yk__sdsnew("---- end of compiler run ---\n");
+        yy__console_cyan(yk__sdsdup(t__17));
         yk__sdsfree(t__17);
         yk__sdsfree(t__16);
         yk__sdsfree(t__15);
@@ -2180,26 +2178,26 @@ int32_t yy__start_build()
     }
     else
     {
-        yk__sds t__20 = yk__sdsnew("// YK");
-        if (yy__strings_startswith(yk__sdsdup(yy__result->output), yk__sdsdup(t__20)))
+        yk__sds t__18 = yk__sdsnew("// YK");
+        if (yy__strings_startswith(yk__sdsdup(yy__result->output), yk__sdsdup(t__18)))
         {
             yy__return_val = yy__building_build(yy__config, yk__sdsdup(yy__result->output));
         }
         else
         {
-            yk__sds t__21 = yk__sdsnew("---- running Yaksha compiler ---\n");
-            yy__console_cyan(yk__sdsdup(t__21));
+            yk__sds t__19 = yk__sdsnew("---- running Yaksha compiler ---\n");
+            yy__console_cyan(yk__sdsdup(t__19));
             yy__console_red(yk__sdsdup(yy__result->output));
-            yk__sds t__22 = yk__sdsnew("\n");
-            yk__printstr((t__22));
+            yk__sds t__20 = yk__sdsnew("\n");
+            yk__printstr((t__20));
             yy__return_val = (- (1));
-            yk__sds t__23 = yk__sdsnew("---- end of compiler run ---\n");
-            yy__console_cyan(yk__sdsdup(t__23));
-            yk__sdsfree(t__23);
-            yk__sdsfree(t__22);
+            yk__sds t__21 = yk__sdsnew("---- end of compiler run ---\n");
+            yy__console_cyan(yk__sdsdup(t__21));
             yk__sdsfree(t__21);
+            yk__sdsfree(t__20);
+            yk__sdsfree(t__19);
         }
-        yk__sdsfree(t__20);
+        yk__sdsfree(t__18);
     }
     yy__os_del_process_result(yy__result);
     yy__array_del_str_array(yy__yk_args);
@@ -2214,9 +2212,9 @@ int32_t yy__main()
 {
     yy__print_banner();
     int32_t yy__result = yy__start_build();
-    yk__sds t__24 = yk__sdsnew("\n >--> program end <--< \n");
-    yy__console_red(yk__sdsdup(t__24));
-    yk__sdsfree(t__24);
+    yk__sds t__22 = yk__sdsnew("\n >--> program end <--< \n");
+    yy__console_red(yk__sdsdup(t__22));
+    yk__sdsfree(t__22);
     return yy__result;
 }
 #if defined(YK__MINIMAL_MAIN)
