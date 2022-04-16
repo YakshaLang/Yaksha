@@ -56,7 +56,7 @@ class ProcessResult:
     output: str
     return_code: int
 
-# Run these arguments and get stdout/stderr then return it as a string, empty string if we cannot run.
+
 @native("yk__run")
 def run(args: Array[str]) -> ProcessResult:
     pass

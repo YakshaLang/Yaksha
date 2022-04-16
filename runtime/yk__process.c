@@ -125,17 +125,23 @@ struct yk__process_result *yk__run(yk__sds *args) {
   res->output = NULL;
 #if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__)) ||         \
     defined(__unix__)
-  if (args == NULL) {
+  if (args == NULL || yk__arrlenu(args) == 0) {
     res->output = yk__sdsempty();
     return res;
   }
-  yk__arrput(args, (yk__sds) NULL);
+  yk__sds* args_copy = NULL;
+  size_t args_size = yk__arrlenu(args);
+  for (size_t i = 0; i < args_size; i++) {
+    yk__arrput(args_copy, args[i]);
+  }
+  yk__arrput(args_copy, (yk__sds) NULL);
   struct subprocess_s *sub = calloc(1, sizeof(struct subprocess_s));
-  int result = subprocess_create((const char *const *) args,
+  int result = subprocess_create((const char *const *) args_copy,
                                  subprocess_option_combined_stdout_stderr |
                                      subprocess_option_inherit_environment |
                                      subprocess_option_no_window,
                                  sub);
+  yk__arrfree(args_copy);
   if (0 != result || sub->stdin_file == 0) {
     subprocess_destroy(sub);
     free(sub);
