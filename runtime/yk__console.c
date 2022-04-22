@@ -10,6 +10,20 @@ void yk__set_colour(int color) {
   if (!out) out = GetStdHandle(STD_OUTPUT_HANDLE);
   SetConsoleTextAttribute(out, FOREGROUND_INTENSITY | color);
 }
+// https://stackoverflow.com/a/6487534/1355145
+void yk__clear() {
+  COORD topLeft = {0, 0};
+  HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+  CONSOLE_SCREEN_BUFFER_INFO screen;
+  DWORD written;
+  GetConsoleScreenBufferInfo(console, &screen);
+  FillConsoleOutputCharacterA(console, ' ', screen.dwSize.X * screen.dwSize.Y,
+                              topLeft, &written);
+  FillConsoleOutputAttribute(
+      console, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
+      screen.dwSize.X * screen.dwSize.Y, topLeft, &written);
+  SetConsoleCursorPosition(console, topLeft);
+}
 #elif defined(__linux__) || (defined(__APPLE__) && defined(__MACH__)) ||       \
     defined(__unix__)
 #ifndef _POSIX_C_SOURCE
@@ -42,6 +56,8 @@ int yk__getch() {
   if (tcsetattr(0, TCSADRAIN, &old) < 0) { success = false; }
   return !success ? EOF : buf;
 }
+// https://stackoverflow.com/a/6487534/1355145
+void yk__clear() { printf("\x1B[2J\x1B[H"); }
 #endif
 /*
 The MIT License (MIT)

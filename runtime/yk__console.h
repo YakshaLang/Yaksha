@@ -13,6 +13,7 @@ void yk__set_colour(int color);
 #define CYAN FOREGROUND_GREEN | FOREGROUND_BLUE
 #define REWIND FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN
 #define yk__getch _getch
+void yk__clear();
 #else
 #define RED "\033[0;31m"
 #define GREEN "\033[0;32m"
@@ -26,10 +27,12 @@ void yk__set_colour(int color);
     defined(__unix__)
 void yk__set_colour(char *color);
 int yk__getch();
+void yk__clear();
 #else
 // Do nothing if not supported
 #define yk__set_colour(x)
 #define yk__getch() -1
+#define yk__clear()
 #endif
 #endif
 #endif
