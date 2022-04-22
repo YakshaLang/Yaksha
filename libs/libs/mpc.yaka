@@ -5,6 +5,7 @@ class Ast:
     tag: c.CStr
     contents: c.CStr
     children: Array[Ast]
+    children_num: int
 
 @nativedefine("mpc_parser_t*")
 class Mpc:
