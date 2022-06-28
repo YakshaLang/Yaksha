@@ -1,3 +1,13 @@
+REWIND: Const[int] = 0
+RED: Const[int] = 1
+GREEN: Const[int] = 2
+WHITE: Const[int] = 3
+BLUE: Const[int] = 4
+PURPLE: Const[int] = 5
+YELLOW: Const[int] = 6
+CYAN: Const[int] = 7
+
+
 @native
 def set_colour(c: int) -> None:
     ccode """if (nn__c == 0) { // rewind

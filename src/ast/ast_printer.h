@@ -49,6 +49,7 @@ namespace yaksha {
     void visit_ccode_stmt(ccode_stmt *obj) override;
     void visit_class_stmt(class_stmt *obj) override;
     void visit_import_stmt(import_stmt *obj) override;
+    void visit_const_stmt(const_stmt *obj) override;
 
 private:
     std::stringstream text_{};

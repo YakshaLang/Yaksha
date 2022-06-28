@@ -10,11 +10,20 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
+const int32_t yy__console_REWIND = 0;
+const int32_t yy__console_RED = 1;
+const int32_t yy__console_GREEN = 2;
+const int32_t yy__console_WHITE = 3;
+const int32_t yy__console_BLUE = 4;
+const int32_t yy__console_PURPLE = 5;
+const int32_t yy__console_YELLOW = 6;
+const int32_t yy__console_CYAN = 7;
 #define yy__buffer_StringBuffer yk__sds*
 struct yy__configuration_CCode;
 struct yy__configuration_Project;
 struct yy__configuration_Compilation;
 struct yy__configuration_Config;
+#define yy__console_clear yk__clear
 #define yy__toml_Table toml_table_t*
 #define yy__toml_TomlArray toml_array_t*
 #define yy__toml_valid_table(nn__x) (NULL != nn__x)

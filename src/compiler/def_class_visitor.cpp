@@ -30,6 +30,10 @@ void def_class_visitor::visit_def_stmt(def_stmt *obj) {
     error(obj->name_, "Critical!! Redefinition of class as a function");
     return;
   }
+  if (has_const(name)) {
+    error(obj->name_, "Critical!! Redefinition of global constant");
+    return;
+  }
   if (obj->annotations_.varargs_ &&
       (!obj->annotations_.native_macro_ && !obj->annotations_.native_define_)) {
     error(obj->name_,
@@ -51,7 +55,52 @@ void def_class_visitor::visit_pass_stmt(pass_stmt *obj) {}
 void def_class_visitor::visit_return_stmt(return_stmt *obj) {}
 void def_class_visitor::visit_while_stmt(while_stmt *obj) {}
 void def_class_visitor::extract(const std::vector<stmt *> &statements) {
-  for (auto st : statements) { st->accept(this); }
+  for (auto st : statements) {
+    auto statement_type = st->get_type();
+    if (statement_type == ast_type::STMT_DEF
+        || statement_type == ast_type::STMT_CLASS
+        || statement_type == ast_type::STMT_CONST || statement_type == ast_type::STMT_IMPORT) {
+      st->accept(this);
+    } else {
+      // TODO can we find out if there's a token for this statement type?
+      error(nullptr, "Invalid statement detected. Only def, class, import"
+                     " or constant statements are supported at module level.");
+    }
+  }
+}
+void def_class_visitor::visit_const_stmt(const_stmt *obj) {
+  auto name = obj->name_->token_;
+  if (builtins::has_builtin(name)) {
+    error(obj->name_, "Critical!! Redefinition of builtin function");
+    return;
+  }
+  if (has_function(name)) {
+    error(obj->name_, "Critical!! Redefinition of function");
+    return;
+  }
+  if (has_class(name)) {
+    error(obj->name_, "Critical!! Redefinition of class");
+    return;
+  }
+  if (has_const(name)) {
+    error(obj->name_, "Critical!! Redefinition of global constant");
+    return;
+  }
+  if (obj->data_type_->args_.size() != 1) {
+    error(obj->name_, "Should be Const[x], only single data type can be specified");
+    return;
+  }
+  if (!obj->data_type_->args_[0]->is_a_number() && !obj->data_type_->args_[0]->is_bool()) {
+    error(obj->name_, "Only number and boolean constants are supported.");
+    return;
+  }
+  // Note below is only at the moment --> // at the moment?
+  if (obj->expression_->get_type() != ast_type::EXPR_LITERAL) {
+    error(obj->name_, "Only a literal can be assigned to a constant.");
+    return;
+  }
+  global_const_names_.push_back(name);
+  global_consts_.insert({name, obj});
 }
 void def_class_visitor::visit_defer_stmt(defer_stmt *obj) {}
 void def_class_visitor::error(token *tok, const std::string &message) {
@@ -90,6 +139,10 @@ void def_class_visitor::visit_class_stmt(class_stmt *obj) {
     error(obj->name_, "Critical!! Redefinition of function as a class");
     return;
   }
+  if (has_const(name)) {
+    error(obj->name_, "Critical!! Redefinition of global constant");
+    return;
+  }
   class_names_.push_back(name);
   classes_.insert({name, obj});
 }
@@ -111,3 +164,10 @@ void def_class_visitor::visit_square_bracket_set_expr(
     square_bracket_set_expr *obj) {}
 void def_class_visitor::visit_ccode_stmt(ccode_stmt *obj) {}
 void def_class_visitor::visit_import_stmt(import_stmt *obj) {}
+bool def_class_visitor::has_const(const std::string &prefixed_name) {
+  return global_consts_.find(prefixed_name) != global_consts_.end();
+}
+const_stmt *def_class_visitor::get_const(const std::string &prefixed_name) {
+  if (has_const(prefixed_name)) { return global_consts_[prefixed_name]; }
+  return nullptr;
+}

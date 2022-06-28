@@ -290,6 +290,9 @@ stmt *parser::declaration_statement() {
     if (match({token_type::EQ})) { exp = expression(); }
     consume_or_eof(token_type::NEW_LINE,
                    "Expect new line after value for variable declaration.");
+    if (dt->is_const()) {
+      return pool_.c_const_stmt(var_name, dt, exp);
+    }
     return pool_.c_let_stmt(var_name, dt, exp);
   } catch (parsing_error &err) {
     synchronize_parser();

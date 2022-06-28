@@ -175,9 +175,12 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
   // -5 - correct, -"some string" is not
   obj->right_->accept(this);
   auto rhs = pop();
-  if (rhs.is_primitive_or_obj() && (rhs.datatype_->is_a_number() || rhs.datatype_->is_bool())) {
-    if (obj->opr_->type_ == token_type::KEYWORD_NOT && !rhs.datatype_->is_bool()) {
-      error(obj->opr_, "Invalid unary operation. Not operator must follow a boolean.");
+  if (rhs.is_primitive_or_obj() &&
+      (rhs.datatype_->is_a_number() || rhs.datatype_->is_bool())) {
+    if (obj->opr_->type_ == token_type::KEYWORD_NOT &&
+        !rhs.datatype_->is_bool()) {
+      error(obj->opr_,
+            "Invalid unary operation. Not operator must follow a boolean.");
     }
   } else {
     error(obj->opr_, "Invalid unary operation");
@@ -357,6 +360,12 @@ void type_checker::check(const std::vector<stmt *> &statements) {
     class_placeholder_object.object_type_ = object_type::CLASS_ITSELF;
     scope_.define_global(class_name, class_placeholder_object);
   }
+  // Define global constants
+  for (const auto &constant_name : defs_classes_->global_const_names_) {
+    auto constant_definition = defs_classes_->get_const(constant_name);
+    auto placeholder_object = ykobject(constant_definition->data_type_);
+    scope_.define_global(constant_name, placeholder_object);
+  }
   // Visit all statements
   for (auto st : statements) { st->accept(this); }
 }
@@ -428,6 +437,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     auto imported = cf_->get(lhs.string_val_);
     bool has_func = imported->data_->dsv_->has_function(member_item->token_);
     bool has_class = imported->data_->dsv_->has_class(member_item->token_);
+    bool has_const = imported->data_->dsv_->has_const(member_item->token_);
     auto obj = ykobject(dt_pool_);
     if (has_class) {
       obj.object_type_ = object_type::MODULE_CLASS;
@@ -437,6 +447,13 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
       obj.module_name_ = lhs.module_name_;   /* io */
     } else if (has_func) {
       obj.object_type_ = object_type::MODULE_FUNCTION;
+      obj.string_val_ = member_item->token_;
+      obj.module_file_ = lhs.string_val_;
+      obj.module_name_ = lhs.module_name_;
+    } else if (has_const) {
+      auto glob = imported->data_->dsv_->get_const(member_item->token_);
+      obj.object_type_ = object_type::PRIMITIVE_OR_OBJ;
+      obj.datatype_ = glob->data_type_;
       obj.string_val_ = member_item->token_;
       obj.module_file_ = lhs.string_val_;
       obj.module_name_ = lhs.module_name_;
@@ -528,6 +545,7 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
       *lhs.datatype_ != *rhs.datatype_) {
     error(oper, "Cannot assign between 2 different data types.");
   }
+  if (lhs.datatype_->is_const()) { error(oper, "Cannot assign to a constant"); }
 }
 void type_checker::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
   handle_square_access(obj->index_expr_, obj->sqb_token_, obj->name_);
@@ -541,3 +559,22 @@ void type_checker::visit_ccode_stmt(ccode_stmt *obj) {
   }
 }
 void type_checker::visit_import_stmt(import_stmt *obj) {}
+void type_checker::visit_const_stmt(const_stmt *obj) {
+  if (!obj->data_type_->args_[0]->is_bool() && !obj->data_type_->args_[0]->is_a_number()) {
+    error(obj->name_, "Only number and bool constants are supported");
+  }
+  if (obj->expression_ == nullptr) {
+    error(obj->name_, "Need a value for the constant");
+  }
+  auto name = obj->name_->token_;
+  auto placeholder = ykobject(obj->data_type_);
+  if (obj->expression_ != nullptr) {
+    obj->expression_->accept(this);
+    auto expression_data = pop();
+    if (expression_data.object_type_ != placeholder.object_type_) {
+      error(obj->name_, "Data type mismatch in expression and declaration.");
+    }
+  }
+  // If this is not a global constant define it
+  if (!scope_.is_global_level()) { scope_.define(name, placeholder); }
+}

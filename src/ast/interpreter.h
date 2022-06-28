@@ -50,6 +50,7 @@ namespace yaksha {
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_ccode_stmt(ccode_stmt *obj) override;
     void visit_import_stmt(import_stmt *obj) override;
+    void visit_const_stmt(const_stmt *obj) override;
 
 private:
     environment_stack globals_;

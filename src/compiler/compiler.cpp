@@ -4,8 +4,10 @@
 using namespace yaksha;
 compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool)
     : defs_classes_(defs_classes), scope_(pool), dt_pool(pool),
-      builtins_(pool){};
-compiler::~compiler() = default;
+      builtins_(pool) {
+  ast_pool_ = new ast_pool();
+}
+compiler::~compiler() { delete ast_pool_; }
 void compiler::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
   auto name = prefix(obj->name_->token_, prefix_val_);
@@ -540,6 +542,8 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   if (basic_dt->is_an_array()) {
     // int32_t*, yk__sds*, etc
     return convert_dt(basic_dt->args_[0]) + "*";
+  } else if (basic_dt->is_const()) {
+    return "const " + convert_dt(basic_dt->args_[0]);
   } else if (basic_dt->is_str()) {
     return "yk__sds";
   } else if (basic_dt->is_i8()) {
@@ -590,7 +594,8 @@ compiler_output compiler::compile(const std::vector<stmt *> &statements) {
   }
   for (auto st : statements) { st->accept(this); }
   return {struct_forward_declarations_.str(),
-          function_forward_declarations_.str(), classes_.str(), body_.str()};
+          function_forward_declarations_.str(), classes_.str(), body_.str(),
+          global_constants_.str()};
 }
 compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   this->cf_ = cf;
@@ -612,7 +617,8 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   }
   for (auto st : fi->data_->parser_->stmts_) { st->accept(this); }
   return {struct_forward_declarations_.str(),
-          function_forward_declarations_.str(), classes_.str(), body_.str()};
+          function_forward_declarations_.str(), classes_.str(), body_.str(),
+          global_constants_.str()};
 }
 void compiler::push(const std::string &expr, const ykobject &data_type) {
   expr_stack_.push_back(expr);
@@ -699,6 +705,7 @@ void compiler::visit_get_expr(get_expr *obj) {
     auto imported = cf_->get(lhs.second.string_val_);
     bool has_func = imported->data_->dsv_->has_function(member_item->token_);
     bool has_class = imported->data_->dsv_->has_class(member_item->token_);
+    bool has_const = imported->data_->dsv_->has_const(member_item->token_);
     auto mod_obj = ykobject(dt_pool);
     if (has_class) {
       mod_obj.object_type_ = object_type::MODULE_CLASS;
@@ -711,6 +718,16 @@ void compiler::visit_get_expr(get_expr *obj) {
       mod_obj.string_val_ = member_item->token_;
       mod_obj.module_file_ = lhs.second.string_val_;
       mod_obj.module_name_ = lhs.second.module_name_;
+    } else if (has_const) {
+      auto glob = imported->data_->dsv_->get_const(member_item->token_);
+      mod_obj.object_type_ = object_type::PRIMITIVE_OR_OBJ;
+      mod_obj.datatype_ = glob->data_type_;
+      mod_obj.string_val_ = member_item->token_;
+      mod_obj.module_file_ = lhs.second.string_val_;
+      mod_obj.module_name_ = lhs.second.module_name_;
+      auto prefixed_name = prefix(mod_obj.string_val_, prefix(mod_obj.module_name_, "yy__") + "_");
+      push(prefixed_name, mod_obj);
+      return;
     }
     push("<>", mod_obj);
     return;
@@ -822,3 +839,16 @@ void compiler::visit_ccode_stmt(ccode_stmt *obj) {
   write_end_statement(body_);
 }
 void compiler::visit_import_stmt(import_stmt *obj) {}
+void compiler::visit_const_stmt(const_stmt *obj) {
+  if (scope_.is_global_level()) {// constant is global
+    auto name = prefix(obj->name_->token_, prefix_val_);
+    auto *literal_expression = dynamic_cast<literal_expr *>(obj->expression_);
+    global_constants_ << this->convert_dt(obj->data_type_) << " " << name
+                      << " = " << literal_expression->literal_token_->token_;
+    write_end_statement(global_constants_);
+  } else {// Compile as you would compile a let statement
+    auto let_stmt_obj =
+        ast_pool_->c_let_stmt(obj->name_, obj->data_type_, obj->expression_);
+    let_stmt_obj->accept(this);
+  }
+}

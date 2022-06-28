@@ -42,6 +42,8 @@ void ykdatatype::find_builtin_or_primitive() {
     primitive_type_ = ykprimitive::NONE;
   } else if (token_->token_ == "Array") {
     builtin_type_ = ykbuiltin::ARRAY;
+  } else if (token_->token_ == "Const") {
+    builtin_type_ = ykbuiltin::CONSTANT;
   }
 }
 ykdatatype::~ykdatatype() { delete (token_); }
@@ -134,6 +136,9 @@ bool ykdatatype::is_an_integer() const {
 }
 bool ykdatatype::is_an_array() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::ARRAY;
+}
+bool ykdatatype::is_const() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::CONSTANT;
 }
 bool ykdatatype::is_a_signed_integer() const {
   return is_int() || is_i8() || is_i16() || is_i32() || is_i64();

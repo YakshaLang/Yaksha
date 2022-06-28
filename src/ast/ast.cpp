@@ -183,6 +183,16 @@ stmt *ast_pool::c_class_stmt(token *name, std::vector<parameter> members,
   cleanup_stmt_.push_back(o);
   return o;
 }
+const_stmt::const_stmt(token *name, ykdatatype *data_type, expr *expression)
+    : name_(name), data_type_(data_type), expression_(expression) {}
+void const_stmt::accept(stmt_visitor *v) { v->visit_const_stmt(this); }
+ast_type const_stmt::get_type() { return ast_type::STMT_CONST; }
+stmt *ast_pool::c_const_stmt(token *name, ykdatatype *data_type,
+                             expr *expression) {
+  auto o = new const_stmt(name, data_type, expression);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
 continue_stmt::continue_stmt(token *continue_token)
     : continue_token_(continue_token) {}
 void continue_stmt::accept(stmt_visitor *v) { v->visit_continue_stmt(this); }

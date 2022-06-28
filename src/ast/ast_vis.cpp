@@ -282,3 +282,9 @@ void ast_vis::visit_ccode_stmt(ccode_stmt *obj) {
   end_block();
 }
 void ast_vis::visit_import_stmt(import_stmt *obj) {}
+void ast_vis::visit_const_stmt(const_stmt *obj) {
+  begin_block("const");
+  field("name", obj->name_->token_);
+  if (obj->expression_ != nullptr) { field("value", obj->expression_); }
+  end_block();
+}

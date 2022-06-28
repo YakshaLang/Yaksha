@@ -17,6 +17,7 @@ namespace yaksha {
     std::string function_forward_declarations_{};
     std::string classes_{};
     std::string body_{};
+    std::string global_constants_{};
   };
   struct compiler : expr_visitor, stmt_visitor {
     compiler(def_class_visitor &defs_classes, ykdt_pool *pool);
@@ -53,6 +54,7 @@ namespace yaksha {
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_ccode_stmt(ccode_stmt *obj) override;
     void visit_import_stmt(import_stmt *obj) override;
+    void visit_const_stmt(const_stmt *obj) override;
 
 private:
     /**
@@ -89,6 +91,7 @@ private:
     std::stringstream function_forward_declarations_{};
     std::stringstream classes_{};
     std::stringstream body_{};
+    std::stringstream global_constants_{};
     // Scope
     environment_stack scope_;
     // Expr + Type
@@ -108,6 +111,8 @@ private:
     defer_stack_stack defers_{};
     // Data type pool
     ykdt_pool *dt_pool;
+    // AST pool
+    ast_pool *ast_pool_;
     void compile_function_call(fncall_expr *obj, const std::string &name,
                                std::stringstream &code,
                                ykdatatype *return_type);

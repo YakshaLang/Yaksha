@@ -18,7 +18,8 @@ namespace yaksha {
     BUILTIN_FUNCTION,
     MODULE,
     MODULE_CLASS,
-    MODULE_FUNCTION
+    MODULE_FUNCTION,
+    //MODULE_OBJECT
   };
   struct ykobject {
     ykobject();

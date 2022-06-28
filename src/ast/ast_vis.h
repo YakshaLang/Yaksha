@@ -53,6 +53,7 @@ namespace yaksha {
     void visit_unary_expr(unary_expr *obj) override;
     void visit_return_stmt(return_stmt *obj) override;
     void visit_import_stmt(import_stmt *obj) override;
+    void visit_const_stmt(const_stmt *obj) override;
 
 private:
     std::stringstream text_{};

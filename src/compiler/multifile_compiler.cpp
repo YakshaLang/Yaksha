@@ -75,6 +75,7 @@ multifile_compiler::compile(const std::string &main_file,
   std::stringstream function_forward_decls{};
   std::stringstream struct_body{};
   std::stringstream function_body{};
+  std::stringstream global_consts{};
   int file_count = static_cast<int>(cf.files_.size());
   for (int i = file_count - 1; i >= 0; i--) {
     auto f = cf.files_[i];
@@ -84,11 +85,13 @@ multifile_compiler::compile(const std::string &main_file,
     function_forward_decls << result.function_forward_declarations_;
     struct_body << result.classes_;
     function_body << result.body_;
+    global_consts << result.global_constants_;
   }
   std::stringstream c_code{};
   c_code << "// YK\n";
   c_code << "#include \"yk__lib.h\"\n";
   c_code << "// --forward declarations-- \n";
+  c_code << global_consts.str();
   c_code << struct_forward_decls.str();
   c_code << function_forward_decls.str();
   c_code << "// --structs-- \n";

@@ -29,6 +29,7 @@ namespace yaksha {
   struct break_stmt;
   struct ccode_stmt;
   struct class_stmt;
+  struct const_stmt;
   struct continue_stmt;
   struct def_stmt;
   struct defer_stmt;
@@ -60,6 +61,7 @@ namespace yaksha {
     STMT_BREAK,
     STMT_CCODE,
     STMT_CLASS,
+    STMT_CONST,
     STMT_CONTINUE,
     STMT_DEF,
     STMT_DEFER,
@@ -98,6 +100,7 @@ namespace yaksha {
     virtual void visit_break_stmt(break_stmt *obj) = 0;
     virtual void visit_ccode_stmt(ccode_stmt *obj) = 0;
     virtual void visit_class_stmt(class_stmt *obj) = 0;
+    virtual void visit_const_stmt(const_stmt *obj) = 0;
     virtual void visit_continue_stmt(continue_stmt *obj) = 0;
     virtual void visit_def_stmt(def_stmt *obj) = 0;
     virtual void visit_defer_stmt(defer_stmt *obj) = 0;
@@ -258,6 +261,14 @@ namespace yaksha {
     std::vector<parameter> members_;
     annotations annotations_;
   };
+  struct const_stmt : stmt {
+    const_stmt(token *name, ykdatatype *data_type, expr *expression);
+    void accept(stmt_visitor *v) override;
+    ast_type get_type() override;
+    token *name_;
+    ykdatatype *data_type_;
+    expr *expression_;
+  };
   struct continue_stmt : stmt {
     explicit continue_stmt(token *continue_token);
     void accept(stmt_visitor *v) override;
@@ -372,6 +383,7 @@ namespace yaksha {
     stmt *c_ccode_stmt(token *ccode_keyword, token *code_str);
     stmt *c_class_stmt(token *name, std::vector<parameter> members,
                        annotations annotations);
+    stmt *c_const_stmt(token *name, ykdatatype *data_type, expr *expression);
     stmt *c_continue_stmt(token *continue_token);
     stmt *c_def_stmt(token *name, std::vector<parameter> params,
                      stmt *function_body, ykdatatype *return_type,

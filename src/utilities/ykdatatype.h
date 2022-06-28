@@ -21,7 +21,7 @@ namespace yaksha {
     NONE,
     NOT_A_PRIMITIVE,
   };
-  enum class ykbuiltin { ARRAY, STRING_HASHMAP, NOT_A_BUILTIN };
+  enum class ykbuiltin { ARRAY, STRING_HASHMAP, NOT_A_BUILTIN, CONSTANT };
   struct ykdatatype {
     explicit ykdatatype(token *primitive_dt);
     explicit ykdatatype(std::string primitive_dt);
@@ -53,6 +53,7 @@ namespace yaksha {
     [[nodiscard]] bool is_an_unsigned_integer() const;
     [[nodiscard]] bool is_a_float() const;
     [[nodiscard]] bool is_an_array() const;
+    [[nodiscard]] bool is_const() const;
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
     token *token_{};
     std::string type_{};
@@ -65,12 +66,30 @@ private:
     void write_to_str(std::stringstream &s) const;
     void find_builtin_or_primitive();
   };
-  inline bool operator==(const yaksha::ykdatatype &lhs,
-                         const yaksha::ykdatatype &rhs) {
+  inline bool primitive_equals(const ykdatatype &lhs, const ykdatatype &rhs) {
     if (lhs.is_primitive() && rhs.is_primitive()) {
       return lhs.primitive_type_ == rhs.primitive_type_;
     }
     return lhs.as_string() == rhs.as_string();
+  }
+  inline bool operator==(const yaksha::ykdatatype &lhs,
+                         const yaksha::ykdatatype &rhs) {
+    if (lhs.is_const() || rhs.is_const()) {
+      const yaksha::ykdatatype *unwrapped_lhs;
+      const yaksha::ykdatatype *unwrapped_rhs;
+      if (lhs.is_const()) {
+        unwrapped_lhs = lhs.args_[0];
+      } else {
+        unwrapped_lhs = &lhs;
+      }
+      if (rhs.is_const()) {
+        unwrapped_rhs = rhs.args_[0];
+      } else {
+        unwrapped_rhs = &rhs;
+      }
+      return primitive_equals(*unwrapped_lhs, *unwrapped_rhs);
+    }
+    return primitive_equals(lhs, rhs);
   }
   inline bool operator!=(const ykdatatype &lhs, const ykdatatype &rhs) {
     return !(lhs == rhs);

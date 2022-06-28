@@ -184,3 +184,9 @@ void ast_printer::visit_ccode_stmt(ccode_stmt *obj) {
         << ")";
 }
 void ast_printer::visit_import_stmt(import_stmt *obj) {}
+void ast_printer::visit_const_stmt(const_stmt *obj) {
+  text_ << "(const " << obj->name_->token_;
+  text_ << ":" << obj->data_type_->as_string() << " ";
+  if (obj->expression_ != nullptr) { obj->expression_->accept(this); }
+  text_ << ")";
+}

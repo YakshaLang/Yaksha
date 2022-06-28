@@ -69,6 +69,7 @@ STMTS = sorted([
     # Let statements
     # TODO we use both declare and let in the code, stick to one terminology
     ("let", (("token*", "name"), ("ykdatatype*", "data_type"), ("expr*", "expression"))),
+    ("const", (("token*", "name"), ("ykdatatype*", "data_type"), ("expr*", "expression"))),
     # Function declarations
     # Make sure we always say the return type
     # `def abc(a: int) -> None:`
