@@ -44,6 +44,12 @@ target_link_libraries(yakshavz PUBLIC ${LIBS})
 target_link_libraries(yakshavz PUBLIC yaksha)
 target_compile_features(yakshavz PRIVATE cxx_std_17)
 
+# -- yakshadmp - syntax extractor --
+add_executable(yakshadmp src/dump.cpp)
+target_link_libraries(yakshadmp PUBLIC ${LIBS})
+target_link_libraries(yakshadmp PUBLIC yaksha)
+target_compile_features(yakshadmp PRIVATE cxx_std_17)
+
 # Adding Tests
 # -----------------------
 add_subdirectory(3rd/Catch2) # Add the Catch2 library

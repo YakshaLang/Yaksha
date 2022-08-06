@@ -153,7 +153,7 @@ def int_at_default(x: TomlArray, pos: int, default: int) -> int:
     }
     return nn__default"""
 
-############ Convinient methods
+############ Convenient methods
 
 def get_string_array(x: Table, name: str) -> Array[str]:
     str_array: Array[str]
