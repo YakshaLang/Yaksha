@@ -64,10 +64,13 @@ def itosize(i: int) -> Size:
 
 @nativedefine("system")
 def system(program: CStr) -> None:
+    # Run a system command without caring what it will do
+    # Wait for exit
     pass
 
 @native
 def has_command_processor() -> bool:
+    # Can we run system commands?
     ccode """return (!!system(NULL))"""
 
 @nativedefine("acos")

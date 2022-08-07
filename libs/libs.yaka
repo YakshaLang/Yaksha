@@ -1,3 +1,4 @@
-# Yaksha standard library version
 def version() -> str:
+    # This returns standard library version
+    # (Note: this is hardcoded)
     return "0.1"

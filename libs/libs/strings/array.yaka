@@ -3,10 +3,16 @@
 @nativedefine("yk__newsdsarray")
 @varargs
 def new(count: int, s: str) -> Array[str]:
+    # Create new string array
+    # Example:
+    #
+    # import libs.strings.array as sarr
+    # my_array: Array[str] = sarr.new(4, "A", "B", "C", "D")
     pass
 
 @native 
 def prefix(sa: Array[str], prefix_str: str) -> Array[str]:
+    # Mutate all strings in this array by prefixing with prefix_str
     ccode """if (NULL == nn__sa) return NULL;
     size_t l = yk__arrlenu(nn__sa);
     for (size_t x = 0; x < l; x++) {
@@ -19,6 +25,7 @@ def prefix(sa: Array[str], prefix_str: str) -> Array[str]:
 
 @native 
 def suffix(sa: Array[str], suffix_str: str) -> Array[str]:
+    # Mutate all strings in this array by suffixing with suffix_str
     ccode """if (NULL == nn__sa) return NULL;
     size_t l = yk__arrlenu(nn__sa);
     for (size_t x = 0; x < l; x++) {
@@ -29,6 +36,7 @@ def suffix(sa: Array[str], suffix_str: str) -> Array[str]:
 
 @native
 def join(values: Array[str], sep: str) -> str:
+    # Join given string array with given separator and return a single string
     ccode """
     if (NULL == nn__values) {
         yk__sdsfree(nn__sep);
@@ -40,6 +48,7 @@ def join(values: Array[str], sep: str) -> str:
 
 @native
 def extend(a: Array[str], b: Array[str]) -> Array[str]:
+    # Copy all strings from b to a and return a
     ccode """yk__sds* lhs = nn__a;
     if (NULL != nn__b) {
         size_t l = yk__arrlenu(nn__b);
@@ -51,6 +60,7 @@ def extend(a: Array[str], b: Array[str]) -> Array[str]:
 
 @native
 def del_str_array(sa: Array[str]) -> None:
+    # Delete a string array by deleting individual string objects and array itself
     ccode """if (NULL == nn__sa) return;
     size_t l = yk__arrlenu(nn__sa);
     for (size_t x = 0; x < l; x++) {

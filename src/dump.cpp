@@ -5,6 +5,59 @@
 #include "tokenizer/tokenizer.h"
 #include "utilities/error_printer.h"
 using namespace yaksha;
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+            return !std::isspace(ch);
+          }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+  s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+            return !std::isspace(ch);
+          }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+  ltrim(s);
+  rtrim(s);
+}
+// trim from both ends (copying)
+static inline std::string trim_copy(std::string s) {
+  trim(s);
+  return s;
+}
+std::string extract_comments(int definition_line, tokenizer &token_extractor) {
+  std::size_t position = 0;
+  // Skip to first token, after `def, class, const` line
+  for (; position < token_extractor.tokens_.size(); position++) {
+    auto token = token_extractor.tokens_[position];
+    if (token.line_ > definition_line) { break; }
+  }
+  std::stringstream comments{};
+  bool first = true;
+  // Extract comments
+  for (; position < token_extractor.tokens_.size(); position++) {
+    auto token = token_extractor.tokens_[position];
+    if (token.type_ == yaksha::token_type::NEW_LINE ||
+        token.type_ == yaksha::token_type::INDENT) {
+      continue;
+    }
+    if (token.type_ == yaksha::token_type::COMMENT) {
+      if (first) {
+        first = false;
+      } else {
+        comments << "\n";
+      }
+      comments << trim_copy(token.token_);
+    } else {
+      break;
+    }
+  }
+  return comments.str();
+}
 void display_datatype(ykdatatype *dt);
 void display_dt_args(std::vector<ykdatatype *> &args) {
   bool first = true;
@@ -31,9 +84,12 @@ void display_datatype(ykdatatype *dt) {
   }
   std::cout << " }";
 }
-void display_const(const_stmt *const_statement) {
+void display_const(const_stmt *const_statement, tokenizer& token_extractor) {
+  std::string comment = extract_comments(const_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
             << string_utils::escape(const_statement->name_->token_)
+            << "\", \"comment\": \""
+            << string_utils::escape(comment)
             << "\", \"datatype\": ";
   display_datatype(const_statement->data_type_);
   std::cout << " }";
@@ -82,9 +138,12 @@ void display_annotations(annotations &annotations) {
     std::cout << "{ \"name\": \"@varargs\", \"argument\": \"\" }";
   }
 }
-void display_fnc(def_stmt *def_statement) {
+void display_fnc(def_stmt *def_statement, tokenizer& token_extractor) {
+  std::string comment = extract_comments(def_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
             << string_utils::escape(def_statement->name_->token_)
+            << "\", \"comment\": \""
+            << string_utils::escape(comment)
             << "\", \"return_type\": ";
   display_datatype(def_statement->return_type_);
   std::cout << ", \"parameters\": [";
@@ -93,9 +152,12 @@ void display_fnc(def_stmt *def_statement) {
   display_annotations(def_statement->annotations_);
   std::cout << "] }";
 }
-void display_cls(class_stmt *class_statement) {
+void display_cls(class_stmt *class_statement, tokenizer& token_extractor) {
+  std::string comment = extract_comments(class_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
             << string_utils::escape(class_statement->name_->token_)
+            << "\", \"comment\": \""
+            << string_utils::escape(comment)
             << "\", \"members\": [";
   display_params(class_statement->members_);
   std::cout << "], \"annotations\": [";
@@ -120,7 +182,7 @@ void display_import(import_stmt *import_statement) {
   display_import_path(import_statement);
   std::cout << "] }";
 }
-void display(def_class_visitor &df, parser &parser_object) {
+void display(def_class_visitor &df, parser &parser_object, tokenizer& token_extractor) {
   std::cout << "{";
   // Dump imports
   std::cout << "\n \"imports\": [";
@@ -142,7 +204,7 @@ void display(def_class_visitor &df, parser &parser_object) {
     } else {
       std::cout << ",";
     }
-    display_const(df.get_const(const_name));
+    display_const(df.get_const(const_name), token_extractor);
   }
   // Dump Functions
   std::cout << "\n], \"functions\": [";
@@ -153,7 +215,7 @@ void display(def_class_visitor &df, parser &parser_object) {
     } else {
       std::cout << ",";
     }
-    display_fnc(df.get_function(fnc_name));
+    display_fnc(df.get_function(fnc_name), token_extractor);
   }
   // Dump classes
   std::cout << "\n], \"classes\": [";
@@ -164,7 +226,7 @@ void display(def_class_visitor &df, parser &parser_object) {
     } else {
       std::cout << ",";
     }
-    display_cls(df.get_class(cls_name));
+    display_cls(df.get_class(cls_name), token_extractor);
   }
   std::cout << "\n]}" << std::endl;
 }
@@ -182,19 +244,19 @@ int main(int argc, char *argv[]) {
   }
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
-  tokenizer t{file_name, data};
-  t.tokenize();
-  if (!t.errors_.empty()) {
-    errors::print_errors(t.errors_);
+  tokenizer token_extractor{file_name, data};
+  token_extractor.tokenize();
+  if (!token_extractor.errors_.empty()) {
+    errors::print_errors(token_extractor.errors_);
     return EXIT_FAILURE;
   }
-  block_analyzer b{t.tokens_};
-  b.analyze();
+  block_analyzer block_scanner{token_extractor.tokens_};
+  block_scanner.analyze();
   ykdt_pool dt_pool{};
   try {
-    parser p{file_name, b.tokens_, &dt_pool};
-    auto tree = p.parse();
-    if (!tree.empty() && p.errors_.empty()) {
+    parser parser_obj{file_name, block_scanner.tokens_, &dt_pool};
+    auto tree = parser_obj.parse();
+    if (!tree.empty() && parser_obj.errors_.empty()) {
       def_class_visitor def_visitor{};
       def_visitor.extract(tree);
       // def visitor should extract functions, classes & consts
@@ -202,9 +264,9 @@ int main(int argc, char *argv[]) {
         errors::print_errors(def_visitor.errors_);
         return EXIT_FAILURE;
       }
-      display(def_visitor, p);
+      display(def_visitor, parser_obj, token_extractor);
     } else {
-      errors::print_errors(p.errors_);
+      errors::print_errors(parser_obj.errors_);
       return EXIT_FAILURE;
     }
   } catch (parsing_error &p) {

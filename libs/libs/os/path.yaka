@@ -1,9 +1,10 @@
 import libs.strings
 import libs.c
 
-# Are we usign forward slash or not?
 @native
 def forward_slash() -> bool:
+    # Are we using forward slash or not?
+    # Same as using libs.os.is_windows()
     ccode """#if defined(_WIN32) || defined(_WIN64)
     bool bfwd = true;
     #else
@@ -13,22 +14,26 @@ def forward_slash() -> bool:
 
 @nativedefine("yk__exists")
 def exists(p: str) -> bool:
+    # Does the file exist?
     pass
 
 @nativedefine("yk__readable")
 def readable(p: str) -> bool:
+    # Is a readable?
     pass
 
 @nativedefine("yk__writable")
 def writable(p: str) -> bool:
+    # Is a writable?
     pass
 
 @nativedefine("yk__executable")
 def executable(p: str) -> bool:
+    # Is an executable?
     pass
 
-# Does the given string end with slash
 def end_with_slash(a: str) -> bool:
+    # Does the given string end with slash?
     length: int = len(a)
     if length < 1:
         return False
@@ -36,8 +41,8 @@ def end_with_slash(a: str) -> bool:
     x: bool = chr == 47 or chr == 92
     return x
 
-# Do a path join
 def join(a: str, b: str) -> str:
+    # Do a path join
     if end_with_slash(a):
         return a + b
     result: str
@@ -47,8 +52,8 @@ def join(a: str, b: str) -> str:
         result = a + "/" + b
     return result
 
-# Get just the filename of given path
 def basename(p: str) -> str:
+    # Get just the filename of given path
     full_length: int = len(p)
     length: int = len(p)
     if length < 1:
@@ -74,8 +79,8 @@ def basename(p: str) -> str:
     s: str = strings.from_cstrlen_after(x, full_length - length - 1, length + 1)
     return s
 
-# Get dir name of given path 
 def dirname(p: str) -> str:
+    # Get dir name of given path
     length: int = len(p)
     if length <= 2:
         return p

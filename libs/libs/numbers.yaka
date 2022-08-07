@@ -2,4 +2,5 @@ import libs.c
 
 @nativedefine("atoi")
 def cstr2i(a: c.CStr) -> int:
+    # Convert a c-string to an integer
     pass

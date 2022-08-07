@@ -1,4 +1,5 @@
 REWIND: Const[int] = 0
+# Use rewind with set_colour to stop applying colour
 RED: Const[int] = 1
 GREEN: Const[int] = 2
 WHITE: Const[int] = 3
@@ -37,6 +38,7 @@ def clear() -> None:
     pass
 
 def colour_print(colour: int, x: str) -> None:
+    # Print in given colour and then rewind
     set_colour(colour)
     print(x)
     set_colour(0)

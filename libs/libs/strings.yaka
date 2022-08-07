@@ -5,14 +5,21 @@ import libs.c
 
 @native
 def get_cstr(s: c.CStr, pos: int) -> int:
+    # Get a single byte from given CStr
+    # Warning: Does not do a length check
     ccode """return (int32_t)nn__s[nn__pos]"""
 
 @native 
 def set_cstr(s: c.CStr, pos: int, v: int) -> None:
+    # Set a byte to given CStr position
+    # Warning: Does not do a length check
     ccode """nn__s[nn__pos] = nn__v;"""
 
 @native
 def get(s: str, pos: int) -> int:
+    # Get a single byte from given string and position
+    # Warning: Does not do a length check
+    # Warning: This copies the string to just get a single byte
     ccode """int32_t x = (int32_t)nn__s[nn__pos];
     yk__sdsfree(nn__s);
     return x"""
@@ -21,6 +28,7 @@ def get(s: str, pos: int) -> int:
 
 @native
 def contains(haystack: str, needle: str) -> bool:
+    # Does the string needle contain in string haystack?
     ccode """bool val = strstr(nn__haystack, nn__needle) != NULL;
     yk__sdsfree(nn__haystack);
     yk__sdsfree(nn__needle);
@@ -28,29 +36,35 @@ def contains(haystack: str, needle: str) -> bool:
 
 @nativemacro
 def valid_cstr(s: c.CStr) -> bool:
+    # Is a valid CStr
     ccode """(NULL != nn__s)"""
 
 @native
 def isempty(s: str) -> bool:
+    # Is this string empty?
     ccode """bool x = yk__sdslen(nn__s) == 0;
     yk__sdsfree(nn__s);
     return x"""
 
 @native
 def isempty_cstr(s: c.CStr) -> bool:
+    # Is an empty CStr?
     ccode """bool x = strlen(nn__s) == 0;
     yk__sdsfree(nn__s);
     return x"""
 
 @native
 def ord_cstr(s: c.CStr) -> int:
+    # Get first byte of CStr
     ccode """return (int32_t)nn__s[0]"""
 
 def ord(s: str) -> int:
+    # Get first byte of string
     return get(s, 0)
 
 @native
 def startswith(a: str, b: str) -> bool:
+    # Does the given string a starts with b
     ccode """bool x = (strstr(nn__a, nn__b) != NULL);
     yk__sdsfree(nn__a);
     yk__sdsfree(nn__b);
@@ -58,6 +72,7 @@ def startswith(a: str, b: str) -> bool:
 
 @native
 def split(value: str, sep: str) -> Array[str]:
+    # Split a string to a string array
     ccode """int count;
     yk__sds* result = yk__sdssplitlen(nn__value, yk__sdslen(nn__value),
             nn__sep, yk__sdslen(nn__sep), &count);
@@ -77,44 +92,50 @@ def split(value: str, sep: str) -> Array[str]:
 
 @native
 def from_cstr(a: c.CStr) -> str:
+    # Create a string from CStr
     ccode """return yk__sdsnewlen(nn__a, strlen(nn__a))"""
 
 @native
 def from_cstrlen(a: c.CStr, length: int) -> str:
+    # Create a string from CStr with a given length
     ccode """return yk__sdsnewlen(nn__a, nn__length)"""
 
 @native
 def from_cstrlen_after(a: c.CStr, length: int, after: int) -> str:
+    # Create a new string from CStr from given after location for given length
     ccode """return yk__sdsnewlen(nn__a + nn__after, nn__length)"""
 
-# Yaksha copies managed strings that you pass in so must free this.
 @native
 def to_cstr(a: str) -> c.CStr:
+    # Yaksha copies managed strings that you pass in so must free this
     ccode """return nn__a"""
 
-# Delete a native c-string created from other other functions (calls free)
 @native
 def del_cstr(a: c.CStr) -> None:
+    # Delete a native c-string created from other other functions (calls free)
     ccode """free(nn__a)"""
 
-# Delete a normal string that was casted as a c-str with to_cstr (calls runtime sdsfree)
 @native
 def del_str(a: c.CStr) -> None:
+    # Delete a normal string that was cast as a c-str with to_cstr
+    # You only need to use this if CStr was cast from standard str
     ccode """if (NULL == nn__a) return;
     yk__sdsfree(nn__a)"""
 
-# to delete a str just use del
 
 ############ UTF8 iteration
 
 
 @nativedefine("struct utf8proc_iter_state*")
 class Utf8IterateState:
+    # Iterator state for UTF-8 iteration
+    # See the codepoint for current character
     step_size: int
     codepoint: int
 
 @native
 def new_iter(s: str) -> Utf8IterateState:
+    # Create a new iterator from given string
     ccode """struct utf8proc_iter_state* x = calloc(1, sizeof(struct utf8proc_iter_state));
     if (x == NULL) return x;
     x->str_original = (utf8proc_uint8_t *) nn__s;
@@ -126,11 +147,14 @@ def new_iter(s: str) -> Utf8IterateState:
 
 @native
 def del_iter(s: Utf8IterateState) -> None:
+    # Delete the iterator object after done
     ccode """yk__sdsfree((yk__sds)nn__s->str_original);
     free(nn__s)"""
 
 @native
 def iterate(s: Utf8IterateState) -> bool:
+    # Go to next character
+    # Returns false if nothing to read or we ran out of length of string
     ccode """if (nn__s->length <= 0) { return false; }
     utf8proc_int32_t val;
     utf8proc_ssize_t read_bytes = utf8proc_iterate(nn__s->str_position, nn__s->length, &val);

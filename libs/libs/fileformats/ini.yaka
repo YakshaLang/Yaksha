@@ -1,19 +1,23 @@
 @nativedefine("ini_t*")
 class Ini:
+    # INI Object
     pass
 
 @native
 def del_ini(object: Ini) -> None:
+    # Delete INI object
     ccode """ini_destroy(nn__object)"""
 
 @native
 def from_str(ini_data: str) -> Ini:
+    # Parse INI file from given string data
     ccode """ini_t* ini = ini_load(nn__ini_data);
     yk__sdsfree(nn__ini_data);
     return ini"""
 
 @native
 def get(object: Ini, section: str, property: str) -> str:
+    # Get a property in given section
     ccode """ 
     int section = ini_find_section(nn__object, nn__section, yk__sdslen(nn__section));
     if (section == INI_NOT_FOUND) {

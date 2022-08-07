@@ -168,6 +168,7 @@ bool yy__os_is_windows();
 bool yy__os_is_macos();
 yk__sds yy__os_getenv(yk__sds);
 yk__sds yy__os_which(yk__sds);
+yk__sds yy__libs_version();
 void yy__print_banner();
 void yy__print_errors(yk__sds*);
 void yy__printkv(yk__sds, yk__sds);
@@ -2088,6 +2089,11 @@ yk__sds yy__os_which(yk__sds yy__os_binary)
     yk__sdsfree(yy__os_binary);
     return t__11;
 }
+yk__sds yy__libs_version() 
+{
+    yk__sds t__0 = yk__sdsnew("0.1");
+    return t__0;
+}
 void yy__print_banner() 
 {
     yk__sds t__0 = yk__sdsnew("\n    ╔═╗┌─┐┬─┐╔═╗┌┐┌┌┬┐┬─┐\n    ║  ├─┤├┬┘╠═╝│││ │ ├┬┘\n    ╚═╝┴ ┴┴└─╩  ┘└┘ ┴ ┴└─\n    ");
@@ -2157,60 +2163,65 @@ int32_t yy__start_build()
     yy__printkv(yk__sdsdup(t__9), yk__sdsdup(yy__config->yy__configuration_compiler_path));
     yk__sds t__10 = yk__sdsnew("zig compiler");
     yy__printkv(yk__sdsdup(t__10), yk__sdsdup(yy__config->yy__configuration_zig_compiler_path));
+    yk__sds t__11 = yk__sdsnew("standard library version");
+    yk__sds t__12 = yy__libs_version();
+    yy__printkv(yk__sdsdup(t__11), yk__sdsdup((t__12)));
     int32_t yy__return_val = 0;
     yk__sds* yy__yk_args = yy__array_new(3, yk__sdsdup(yy__config->yy__configuration_compiler_path), yk__sdsdup(yy__config->yy__configuration_project->yy__configuration_main), yk__sdsdup(yy__config->yy__configuration_libs_path));
     yy__os_ProcessResult yy__result = yy__os_run(yy__yk_args);
     if ((! (yy__result->ok)))
     {
-        yk__sds t__11 = yk__sdsnew("---- running Yaksha compiler ---\n");
-        yy__console_cyan(yk__sdsdup(t__11));
-        yk__sds t__12 = yk__sdsnew("Failed to execute: ");
-        yy__console_red(yk__sdsdup(t__12));
-        yk__sds t__13 = yk__sdsnew(" ");
-        yk__sds t__14 = yy__array_join(yy__yk_args, yk__sdsdup(t__13));
-        yy__console_yellow(yk__sdsdup((t__14)));
-        yk__sds t__15 = yk__sdsnew("\n");
-        yk__printstr((t__15));
+        yk__sds t__13 = yk__sdsnew("---- running Yaksha compiler ---\n");
+        yy__console_cyan(yk__sdsdup(t__13));
+        yk__sds t__14 = yk__sdsnew("Failed to execute: ");
+        yy__console_red(yk__sdsdup(t__14));
+        yk__sds t__15 = yk__sdsnew(" ");
+        yk__sds t__16 = yy__array_join(yy__yk_args, yk__sdsdup(t__15));
+        yy__console_yellow(yk__sdsdup((t__16)));
+        yk__sds t__17 = yk__sdsnew("\n");
+        yk__printstr((t__17));
         yy__console_red(yk__sdsdup(yy__result->output));
-        yk__sds t__16 = yk__sdsnew("\n");
-        yk__printstr((t__16));
+        yk__sds t__18 = yk__sdsnew("\n");
+        yk__printstr((t__18));
         yy__return_val = (- (1));
-        yk__sds t__17 = yk__sdsnew("---- end of compiler run ---\n");
-        yy__console_cyan(yk__sdsdup(t__17));
+        yk__sds t__19 = yk__sdsnew("---- end of compiler run ---\n");
+        yy__console_cyan(yk__sdsdup(t__19));
+        yk__sdsfree(t__19);
+        yk__sdsfree(t__18);
         yk__sdsfree(t__17);
         yk__sdsfree(t__16);
         yk__sdsfree(t__15);
         yk__sdsfree(t__14);
         yk__sdsfree(t__13);
-        yk__sdsfree(t__12);
-        yk__sdsfree(t__11);
     }
     else
     {
-        yk__sds t__18 = yk__sdsnew("// YK");
-        if (yy__strings_startswith(yk__sdsdup(yy__result->output), yk__sdsdup(t__18)))
+        yk__sds t__20 = yk__sdsnew("// YK");
+        if (yy__strings_startswith(yk__sdsdup(yy__result->output), yk__sdsdup(t__20)))
         {
             yy__return_val = yy__building_build(yy__config, yk__sdsdup(yy__result->output));
         }
         else
         {
-            yk__sds t__19 = yk__sdsnew("---- running Yaksha compiler ---\n");
-            yy__console_cyan(yk__sdsdup(t__19));
-            yy__console_red(yk__sdsdup(yy__result->output));
-            yk__sds t__20 = yk__sdsnew("\n");
-            yk__printstr((t__20));
-            yy__return_val = (- (1));
-            yk__sds t__21 = yk__sdsnew("---- end of compiler run ---\n");
+            yk__sds t__21 = yk__sdsnew("---- running Yaksha compiler ---\n");
             yy__console_cyan(yk__sdsdup(t__21));
+            yy__console_red(yk__sdsdup(yy__result->output));
+            yk__sds t__22 = yk__sdsnew("\n");
+            yk__printstr((t__22));
+            yy__return_val = (- (1));
+            yk__sds t__23 = yk__sdsnew("---- end of compiler run ---\n");
+            yy__console_cyan(yk__sdsdup(t__23));
+            yk__sdsfree(t__23);
+            yk__sdsfree(t__22);
             yk__sdsfree(t__21);
-            yk__sdsfree(t__20);
-            yk__sdsfree(t__19);
         }
-        yk__sdsfree(t__18);
+        yk__sdsfree(t__20);
     }
     yy__os_del_process_result(yy__result);
     yy__array_del_str_array(yy__yk_args);
     yy__configuration_del_config(yy__config);
+    yk__sdsfree(t__12);
+    yk__sdsfree(t__11);
     yk__sdsfree(t__10);
     yk__sdsfree(t__9);
     yk__sdsfree(t__8);
@@ -2221,9 +2232,9 @@ int32_t yy__main()
 {
     yy__print_banner();
     int32_t yy__result = yy__start_build();
-    yk__sds t__22 = yk__sdsnew("\n >--> program end <--< \n");
-    yy__console_red(yk__sdsdup(t__22));
-    yk__sdsfree(t__22);
+    yk__sds t__24 = yk__sdsnew("\n >--> program end <--< \n");
+    yy__console_red(yk__sdsdup(t__24));
+    yk__sdsfree(t__24);
     return yy__result;
 }
 #if defined(YK__MINIMAL_MAIN)

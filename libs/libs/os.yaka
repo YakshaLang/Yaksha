@@ -4,20 +4,21 @@ import libs.os.path as ospath
 
 @nativedefine("struct yk__arguments*")
 class arguments:
-    # Number of arguments
+    # UTF-8 converted arguments and argument count
+    # Do not delete, Do not modify
     argc: int
-    # Arguments themselves
     argv: Array[str]
 
 
 # Get command line arguments
 @nativedefine("yk__get_args")
 def get_args() -> arguments:
+    # Get arguments
     pass
 
-# Get exe file path, or empty string on return
 @native
 def exe() -> str:
+    # Get exe file path, or empty string (if failed) on return
     ccode """int length = wai_getExecutablePath(NULL, 0, NULL);
     char* path = malloc(length + 1);
     if (path == NULL) return yk__sdsempty();
@@ -27,9 +28,9 @@ def exe() -> str:
     free(path);
     return value"""
 
-# Get exe directory path, or empty string on return
 @native
 def exe_path() -> str:
+    # Get exe directory path, or empty string (if failed) on return
     ccode """int length = wai_getExecutablePath(NULL, 0, NULL);
     char* path = malloc(length + 1);
     if (path == NULL) return yk__sdsempty();
@@ -40,9 +41,9 @@ def exe_path() -> str:
     free(path);
     return value"""
 
-# Get current working directory, or empty string on return
 @native
 def cwd() -> str:
+    # Get current working directory, or empty string (if failed) on return
     ccode """char* path = yk__get_current_dir_path();
     if (path == NULL) return yk__sdsempty();
     yk__sds value = yk__sdsnewlen(path, strlen(path));
@@ -65,9 +66,9 @@ def run(args: Array[str]) -> ProcessResult:
 def del_process_result(pr: ProcessResult) -> None:
     pass
 
-# Are we running Windows?
 @native
 def is_windows() -> bool:
+    # Are we running Windows?
     ccode """bool win = false;
     #if defined(_WIN32) || defined(_WIN64)
     win = true;
@@ -76,25 +77,32 @@ def is_windows() -> bool:
 
 @native
 def is_macos() -> bool:
+    # Are we running macOS?
     ccode """bool mach_os = false;
     #if defined(__APPLE__) && defined(__MACH__)
     mach_os = true;
     #endif
     return mach_os"""
 
-# Get environment variable, empty if not found or error
 @native("yk__getenv")
 def getenv(name: str) -> str:
+    # Get environment variable, empty if not found or error
     pass
 
 
-# Try to find full path to binary in PATH, no need .exe for windows
 def which(binary: str) -> str:
+    # Try to find full path to binary in $PATH, no need .exe for windows
+    # If we cannot find in $PATH, This will fallback to current path and exe path as well
+    #
+    # Example find zig compiler path:
+    #
+    # os.which("zig")
     actual_bin: str = binary
     env: str = getenv("PATH")
     sep: str = ":"
     if is_windows():
         sep = ";"
+        # add .exe to windows
         actual_bin = actual_bin + ".exe"
     paths: Array[str] = strings.split(env, sep)
     defer sarr.del_str_array(paths)
@@ -104,18 +112,14 @@ def which(binary: str) -> str:
         cur_path: str = paths[length]
         full_path:str = ospath.join(cur_path, actual_bin)
         if ospath.executable(full_path):
-            #sarr.del_str_array(paths)
             return full_path
     # Not found from any of the paths, try fallbacks
     # Current path?
     special: str = ospath.join(cwd(), actual_bin)
     if ospath.executable(special):
-        #sarr.del_str_array(paths)
         return special
     # Exe path?
     special = ospath.join(exe_path(), actual_bin)
     if ospath.executable(special):
-        #sarr.del_str_array(paths)
         return special
-    #sarr.del_str_array(paths)
     return ""

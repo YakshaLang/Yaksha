@@ -175,6 +175,16 @@ def display_datatype(buf: Buf, dt: dict):
         buf.append_red("]")
 
 
+def display_comment(buf: Buf, element: dict):
+    if "comment" in element and element["comment"]:
+        comment: str = element["comment"]
+        comment_lines = comment.splitlines(keepends=False)
+        for single_comment in comment_lines:
+            buf.append(os.linesep)
+            buf.append_yellow("    # ")
+            buf.append_yellow(single_comment)
+
+
 def display_param(buf: Buf, param: dict):
     buf.append(param["name"])
     buf.append_red(": ")
@@ -191,11 +201,13 @@ def display_function(buf: Buf, fnc: dict):
         display_param(buf, arg)
     buf.append_red(") -> ")
     display_datatype(buf, fnc["return_type"])
+    display_comment(buf, fnc)
 
 
 def display_class(buf: Buf, fnc: dict):
     buf.append_green("class ")
     buf.append_blue(fnc["name"])
+    display_comment(buf, fnc)
     if fnc["members"]:
         buf.append_red(": ")
         buf.append(os.linesep)
@@ -227,6 +239,7 @@ def main():
         for f in structures[yaksha_mod]["global_consts"]:
             buf = Buf()
             display_param(buf, f)
+            display_comment(buf, f)
             print("  🔒", buf.build_color())
 
         for f in structures[yaksha_mod]["classes"]:

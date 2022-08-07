@@ -1,15 +1,18 @@
 @nativedefine("yk__sds*")
 class StringBuffer:
+    # String buffer object
     pass
 
 @native
 def new() -> StringBuffer:
+    # Create a new empty string buffer
     ccode """yk__sds* srr = calloc(1, sizeof(yk__sds*));
     srr[0] = yk__sdsempty();
     return srr"""
 
 @native
 def new_size(s: int) -> StringBuffer:
+    # Create a string buffer with capacity s
     ccode """yk__sds* srr = calloc(1, sizeof(yk__sds*));
     srr[0] = yk__sdsempty();
     srr[0] = yk__sdsgrowzero(srr[0], nn__s);
@@ -17,21 +20,25 @@ def new_size(s: int) -> StringBuffer:
 
 @native
 def append(buf: StringBuffer, v: str) -> None:
+    # Append a string to string buffer
     ccode """nn__buf[0] = yk__sdscatsds(nn__buf[0], nn__v);
     yk__sdsfree(nn__v)"""
 
 @native
 def prepend(buf: StringBuffer, v: str) -> None:
+    # Prepend a string to string buffer
     ccode """yk__sds tmp = nn__buf[0];
     nn__buf[0] = yk__sdscatsds(nn__v, nn__buf[0]);
     yk__sdsfree(tmp);"""
 
 @native
 def to_str(buf: StringBuffer) -> str:
+    # Get a new string out of string buffer
     ccode """return yk__sdsdup(nn__buf[0])"""
 
 @native
 def join(buf: StringBuffer, values: Array[str], sep: str) -> None:
+    # Join given values in array with provided seperator and append this to string
     ccode """if (NULL == nn__values) {
         yk__sdsfree(nn__sep);
         return;
@@ -43,5 +50,6 @@ def join(buf: StringBuffer, values: Array[str], sep: str) -> None:
 
 @native
 def del_buf(buf: StringBuffer) -> None:
+    # Delete string buffer object
     ccode """yk__sdsfree(nn__buf[0]); 
     free(nn__buf)"""
