@@ -181,7 +181,7 @@ def display_comment(buf: Buf, element: dict):
         comment_lines = comment.splitlines(keepends=False)
         for single_comment in comment_lines:
             buf.append(os.linesep)
-            buf.append_yellow("    # ")
+            buf.append_yellow("# ")
             buf.append_yellow(single_comment)
 
 
@@ -214,7 +214,7 @@ def display_class(buf: Buf, fnc: dict):
         for i, arg in enumerate(fnc["members"]):
             if i != 0:
                 buf.append_red(os.linesep)
-            buf.append_to_normal_and_color_texts("       ", "     • ")
+            buf.append("    ")
             display_param(buf, arg)
 
 
@@ -222,35 +222,47 @@ def display_class(buf: Buf, fnc: dict):
 
 def main():
     structures = {}
-
+    files = []
+    # Scan
     for mod_full_filepath in glob.glob(os.path.join(LIBS_DIR, '**', '*.yaka'), recursive=True):
         yaksha_mod = as_full_mod(mod_full_filepath.replace(LIBS_DIR, "")[1:])
         sout, serr, ret = execute(DUMPER + " \"" + mod_full_filepath + "\"")
         if ret != 0:
             eprint(Colors.fail("Failed to parse ") + yaksha_mod)
             return
-        print(Colors.cyan("──────────│ ") + Colors.blue(yaksha_mod) + Colors.cyan(" │──────────"))
+
         try:
             structures[yaksha_mod] = cleanup_structure(json.loads(sout), yaksha_mod)
         except json.decoder.JSONDecodeError:
             print(Colors.fail(sout))
             raise
-
+        files.append((yaksha_mod, mod_full_filepath))
+    # Sort
+    files = sorted(files, key=lambda x: x[0])
+    # Display
+    print("---")
+    for yaksha_mod, mod_full_filepath in files:
+        print(Colors.cyan("## ") + Colors.blue(yaksha_mod))
+        print("---")
+        print("```")
         for f in structures[yaksha_mod]["global_consts"]:
             buf = Buf()
             display_param(buf, f)
             display_comment(buf, f)
-            print("  🔒", buf.build_color())
+            print(buf.build_color())
 
         for f in structures[yaksha_mod]["classes"]:
             buf = Buf()
             display_class(buf, f)
-            print("  🌐", buf.build_color())
+            print(buf.build_color())
 
         for f in structures[yaksha_mod]["functions"]:
             buf = Buf()
             display_function(buf, f)
-            print("  ▶", buf.build_color())
+            print(buf.build_color())
+
+        print("```")
+        print("---")
 
 
 if __name__ == "__main__":
