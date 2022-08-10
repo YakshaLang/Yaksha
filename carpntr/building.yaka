@@ -134,3 +134,18 @@ def build(c: carp.Config, code: str) -> int:
         return -1
     else:
         return 0
+
+def build_simple(c: carp.Config, code: str) -> int:
+    code_path: str = path.join(os.cwd(), c.project.name + ".c")
+
+    if not io.writefile(code_path, prepare_code(c, code)):
+        console.red("Failed to write file:")
+        println(code_path)
+        return -1
+
+    failed_count: int = build_target(c, code_path, os.cwd(), "")
+
+    if failed_count > 0:
+        return -1
+    else:
+        return 0

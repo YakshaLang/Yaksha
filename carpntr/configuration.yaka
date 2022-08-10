@@ -239,6 +239,36 @@ def load_config() -> Config:
 
     return c
 
+def create_adhoc_config(name: str, file_path: str) -> Config:
+    c: Config = Config()
+    # Try and find yakshac.exe
+    find_yaksha_compiler(c)
+    if len(c.errors) > 0:
+        return c
+    # Try and find zig.exe
+    find_zig_compiler(c)
+    if len(c.errors) > 0:
+        return c
+    # Try to find a runtime folder with 'yk__lib.h'
+    find_runtime_path(c)
+    if len(c.errors) > 0:
+        return c
+    # Try to find a libs folder with 'libs.yaka'
+    find_libs_path(c)
+    if len(c.errors) > 0:
+        return c
+    c.project = Project()
+    c.project.main = file_path
+    c.project.author = "unknown"
+    c.project.name = name
+    c.c_code = inject_c_code_defaults(CCode(), c)
+    if len(c.errors) > 0:
+        return c
+    # TODO: Complete this?
+    c.compilation = Compilation()
+    c.compilation.targets = sarr.new(1, "native")
+    return c
+
 
 def del_config(c: Config) -> None:
     if c.c_code != None:

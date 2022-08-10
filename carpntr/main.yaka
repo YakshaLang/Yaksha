@@ -46,37 +46,35 @@ def printkv(k: str, v: str) -> None:
     console.green(v)
     print("\n")
 
-def start_build() -> int:
-    config: carp.Config = carp.load_config()
-    defer carp.del_config(config)
-    if len(config.errors) > 0:
-        print_errors(config.errors)
-        return -1
+def print_config(config: carp.Config) -> None:
     printkv("libs", config.libs_path)
     printkv("runtime", config.runtime_path)
     printkv("compiler", config.compiler_path)
     printkv("zig compiler", config.zig_compiler_path)
     printkv("standard library version", libs.version())
+
+def build_from_config(config: carp.Config, simple: bool) -> int:
     return_val: int = 0
-
-
     yk_args: Array[str] = sarr.new(3, config.compiler_path, config.project.main, config.libs_path)
-    defer sarr.del_str_array(yk_args)
     result: os.ProcessResult = os.run(yk_args)
+
+    defer sarr.del_str_array(yk_args)
     defer os.del_process_result(result)
 
     if not result.ok:
         console.cyan("---- running Yaksha compiler ---\n")
+        console.red(result.output)
         console.red("Failed to execute: ")
         console.yellow(sarr.join(yk_args, " "))
-        print("\n")
-        console.red(result.output)
         print("\n")
         return_val = -1
         console.cyan("---- end of compiler run ---\n")
     else:
         if strings.startswith(result.output, "// YK"):
-            return_val = building.build(config, result.output)
+            if simple:
+                return_val = building.build_simple(config, result.output)
+            else:
+                return_val = building.build(config, result.output)
         else:
             console.cyan("---- running Yaksha compiler ---\n")
             console.red(result.output)
@@ -86,8 +84,53 @@ def start_build() -> int:
 
     return return_val
 
+def perform_build() -> int:
+    config: carp.Config = carp.load_config()
+    defer carp.del_config(config)
+    if len(config.errors) > 0:
+        print_errors(config.errors)
+        return -1
+    print_config(config)
+    ret: int = build_from_config(config, False)
+    return ret
+
+def perform_run(filename: str) -> int:
+    name: str = path.basename(filename)
+    config: carp.Config = carp.create_adhoc_config(name, filename)
+    defer carp.del_config(config)
+    if len(config.errors) > 0:
+        print_errors(config.errors)
+        return -1
+    print_config(config)
+    ret: int = build_from_config(config, True)
+    if ret != 0:
+        return ret
+    console.clear()
+    # Try to run binary now
+    binary: str = name
+    if os.is_windows():
+        binary = binary + ".exe"
+    binary_cstr: c.CStr = strings.to_cstr(binary)
+    defer strings.del_str(binary_cstr)
+    c.system(binary_cstr)
+    return 0
+
+
+def usage_print(sample: str, help: str) -> None:
+    console.red("Usage: ")
+    console.cyan(sample)
+    console.red(" -> ")
+    println(help)
+
+
 def main() -> int:
-    defer console.red("\n >--> program end <--< \n")
+    args: os.arguments = os.get_args()
     print_banner()
-    result: int = start_build()
-    return result
+    if args.argc <= 1:
+        return perform_build()
+    if args.argc == 3:
+        if args.argv[1] == "run_file":
+            return perform_run(args.argv[2])
+    usage_print("carpntr", "Build program using 'yaksha.toml'")
+    usage_print("carpntr run_file prog.yaka", "Build single file with main() prog.yaka and run it.")
+    return 1
