@@ -53,9 +53,9 @@ builtins::compile(const std::string &name,
   } else if (name == "print") {
     auto rhs = args[0];
     if (rhs.second.datatype_->is_a_signed_integer()) {
-      code << "printf(\"%jd\", ((intmax_t)" << rhs.first << "))";
+      code << "yk__printint(((intmax_t)" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_an_unsigned_integer()) {
-      code << "printf(\"%ju\", ((uintmax_t)" << rhs.first << "))";
+      code << "yk__printuint(((uintmax_t)" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_str()) {
       code << "yk__printstr((" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_a_float()) {
@@ -64,9 +64,9 @@ builtins::compile(const std::string &name,
   } else if (name == "println") {
     auto rhs = args[0];
     if (rhs.second.datatype_->is_a_signed_integer()) {
-      code << R"(printf("%jd\n", ((intmax_t))" << rhs.first << "))";
+      code << "yk__printlnint(((intmax_t)" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_an_unsigned_integer()) {
-      code << R"(printf("%ju\n", ((uintmax_t))" << rhs.first << "))";
+      code << "yk__printlnuint(((uintmax_t)" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_str()) {
       code << "yk__printlnstr((" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_a_float()) {

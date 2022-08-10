@@ -10,6 +10,34 @@
 #include <wchar.h>
 #endif
 // clang-format on
+void yk__printint(intmax_t to_print) {
+#if defined(_WIN32) || defined(_WIN64)
+  wprintf(L"%jd", to_print);
+#else
+  printf("%jd", to_print);
+#endif
+}
+void yk__printlnint(intmax_t to_print) {
+#if defined(_WIN32) || defined(_WIN64)
+  wprintf(L"%jd\n", to_print);
+#else
+  printf("%jd\n", to_print);
+#endif
+}
+void yk__printuint(uintmax_t to_print) {
+#if defined(_WIN32) || defined(_WIN64)
+  wprintf(L"%ju", to_print);
+#else
+  printf("%ju", to_print);
+#endif
+}
+void yk__printlnuint(uintmax_t to_print) {
+#if defined(_WIN32) || defined(_WIN64)
+  wprintf(L"%ju\n", to_print);
+#else
+  printf("%ju\n", to_print);
+#endif
+}
 struct yk__arguments *yk__copy_args(int argc, char **argv) {
   // Create arguments by copying argv
   struct yk__arguments *arguments = malloc(sizeof(struct yk__arguments));
@@ -249,7 +277,7 @@ yk__sds yk__getenv(yk__sds name) {
 char *yk__windows_read_file(const char *path, size_t *length, int *error) {
   // both length and error must be present
   if (length == NULL || error == NULL) { return NULL; }
-  wchar_t* wpath = yk__utf8_to_utf16_null_terminated(path);
+  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(path);
   if (wpath == NULL) { return NULL; }
   *error = 0;
 #if defined(_MSC_VER)// MSVC
@@ -257,9 +285,7 @@ char *yk__windows_read_file(const char *path, size_t *length, int *error) {
   errno_t openerr = _wfopen_s(&file, wpath, L"rb");
   if (0 != openerr) {
     free(wpath);
-    if (NULL != file) {
-      fclose(file);
-    }
+    if (NULL != file) { fclose(file); }
     *error = YK__BHALIB_ERROR_NO_OPEN;
     return NULL;
   }
@@ -303,7 +329,7 @@ yk__sds yk__io_readfile(yk__sds name) {
 #else
   char *out = yk__bhalib_read_file(name, &ln, &err);
 #endif
-  yk__sdsfree(name); // clean up filename as it will be copied
+  yk__sdsfree(name);// clean up filename as it will be copied
   if (err == 0) {
     yk__sds tmp = yk__sdsnewlen(out, ln);
     yk__bhalib_free(out);
@@ -313,7 +339,7 @@ yk__sds yk__io_readfile(yk__sds name) {
 }
 bool yk__io_writefile(yk__sds fpath, yk__sds data) {
 #if defined(_WIN32) || defined(_WIN64)
-  wchar_t* wpath = yk__utf8_to_utf16_null_terminated(fpath);
+  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(fpath);
   if (wpath == NULL) {
     yk__sdsfree(fpath);
     yk__sdsfree(data);
@@ -323,9 +349,7 @@ bool yk__io_writefile(yk__sds fpath, yk__sds data) {
   FILE *file;
   errno_t openerr = _wfopen_s(&file, wpath, L"wb+");
   if (0 != openerr) {
-    if (NULL != file) {
-      fclose(file);
-    }
+    if (NULL != file) { fclose(file); }
     free(wpath);
     yk__sdsfree(fpath);
     yk__sdsfree(data);
@@ -339,7 +363,7 @@ bool yk__io_writefile(yk__sds fpath, yk__sds data) {
     yk__sdsfree(data);
     return false;
   }
-#endif // msvc check
+#endif// msvc check
 #else // not windows
   FILE *file = fopen(fpath, "wb+");
   if (file == NULL) {
@@ -347,7 +371,7 @@ bool yk__io_writefile(yk__sds fpath, yk__sds data) {
     yk__sdsfree(data);
     return false;
   }
-#endif // unix / windows check
+#endif// unix / windows check
   size_t written = fwrite(data, sizeof(char), yk__sdslen(data), file);
   bool fully_written = (written == yk__sdslen(data));
 #if defined(_WIN32) || defined(_WIN64)
