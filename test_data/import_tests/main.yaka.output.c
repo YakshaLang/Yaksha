@@ -27,7 +27,7 @@ void yy__jungle_print_monkey(struct yy__jungle_monkey* yy__jungle_m)
 {
     yk__sds t__0 = yk__sdsnew("Monkey ");
     yk__printstr((t__0));
-    printf("%jd", ((intmax_t)yy__jungle_m->yy__jungle_id));
+    yk__printint(((intmax_t)yy__jungle_m->yy__jungle_id));
     yk__sds t__1 = yk__sdsnew(" has ");
     yk__printstr((t__1));
     yy__jungle_print_banana(yy__jungle_m->yy__jungle_food);
@@ -39,7 +39,7 @@ void yy__jungle_print_banana(struct yy__jungle_banana* yy__jungle_b)
 {
     yk__sds t__2 = yk__sdsnew("banana ");
     yk__printstr((t__2));
-    printf("%jd", ((intmax_t)yy__jungle_b->yy__jungle_id));
+    yk__printint(((intmax_t)yy__jungle_b->yy__jungle_id));
     yk__sds t__3 = yk__sdsnew("\n");
     yk__printstr((t__3));
     yk__sdsfree(t__3);

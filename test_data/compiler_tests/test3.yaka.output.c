@@ -22,7 +22,7 @@ int32_t yy__main()
         // Body of while loop
 
         {
-            printf("%jd", ((intmax_t)yy__a));
+            yk__printint(((intmax_t)yy__a));
             yk__sds t__0 = yk__sdsnew("\n");
             yk__printstr((t__0));
             yy__a = (yy__a - 1);

@@ -38,7 +38,7 @@ int32_t yy__print_int_item(yk__sds yy__item, int32_t yy__value)
     yk__printstr((yy__item));
     yk__sds t__2 = yk__sdsnew(":\t");
     yk__printstr((t__2));
-    printf("%jd", ((intmax_t)yy__value));
+    yk__printint(((intmax_t)yy__value));
     yk__sds t__3 = yk__sdsnew("\n");
     yk__printstr((t__3));
     yk__sdsfree(t__3);

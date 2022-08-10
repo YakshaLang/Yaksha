@@ -16,7 +16,7 @@ int32_t yy__factorial(int32_t yy__x)
 }
 int32_t yy__on_end(int32_t yy__n) 
 {
-    printf("%jd", ((intmax_t)yy__n));
+    yk__printint(((intmax_t)yy__n));
     yk__sds t__0 = yk__sdsnew(" From defer --> Program Completed\n");
     yk__printstr((t__0));
     yk__sdsfree(t__0);
@@ -32,7 +32,7 @@ int32_t yy__main()
         // Body of while loop
 
         {
-            printf("%jd", ((intmax_t)yy__factorial(yy__a)));
+            yk__printint(((intmax_t)yy__factorial(yy__a)));
             yk__sds t__2 = yk__sdsnew("\n");
             yk__printstr((t__2));
             yy__a = (yy__a - 1);

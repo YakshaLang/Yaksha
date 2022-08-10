@@ -274,7 +274,7 @@ int32_t yy__main()
             }
             if (yy__mpc_parse(yk__sdsdup(yy__filename), yk__sdsdup(yy__inp), yy__lispy, yy__r))
             {
-                printf("%jd\n", ((intmax_t)yy__eval(yy__r->output)));
+                yk__printlnint(((intmax_t)yy__eval(yy__r->output)));
                 yy__mpc_ast_del(yy__r);
             }
             else

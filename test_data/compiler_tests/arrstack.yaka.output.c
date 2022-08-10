@@ -15,7 +15,7 @@ int32_t yy__main()
         // Body of while loop
 
         {
-            printf("%jd\n", ((intmax_t)yk__arrpop(yy__a)));
+            yk__printlnint(((intmax_t)yk__arrpop(yy__a)));
         }
     }
     yk__arrfree(yy__a);
