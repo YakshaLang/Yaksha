@@ -110,6 +110,9 @@ def build_target(c: carp.Config, code_path: str, build_path: str, target: str, r
     else:
         console.red("failed.\n")
         console.cyan("-------\n")
+        console.red("command := ")
+        console.yellow(sarr.join(a, " "))
+        console.cyan("\n-------\n")
         console.red(result.output)
         return 1
 

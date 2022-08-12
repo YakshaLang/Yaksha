@@ -17,7 +17,8 @@ def fill_arguments(src_path: str, c: CObject) -> CObject:
     args: Array[str] = sarr.new(4, "-std=gnu99", "-DPLATFORM_DESKTOP", "-DGL_SILENCE_DEPRECATION=199309L", "-fno-sanitize=undefined")
 
     arrput(args, "-I" + src_path)
-    glfw: str = path.join(path.join(src_path, "external"), "glfw")
+    external: str = path.join(src_path, "external")
+    glfw: str = path.join(external, "glfw")
     arrput(args, "-I" + path.join(glfw, "include"))
 
     # Add mingw dependencies for windows
@@ -40,7 +41,8 @@ def co(filename: str, src_path: str, target_path: str) -> CObject:
     obj.c_file = path.join(src_path, filename + ".c")
     obj.o_file = path.join(target_path, filename + ".o")
     obj.base_name = filename
-    return fill_arguments(src_path, obj)
+    obj = fill_arguments(src_path, obj)
+    return obj
 
 
 def del_c_object(c: CObject) -> None:
@@ -77,13 +79,16 @@ def get_objects(raylib_src_path: str, build_path: str) -> Array[CObject]:
 
 
 def get_external_libs() -> Array[str]:
+    external_libs: Array[str]
     if os.is_windows():
-        return sarr.new(3, "-lwinmm", "-lgdi32", "-lopengl32")
-    if os.is_macos():
-        return sarr.new(2, "-framework", "Foundation")
-    # linux
-    return sarr.new(5, "-lGL", "-lrt", "-ldl", "-lm", "-lX11")
-
+        external_libs = sarr.new(3, "-lwinmm", "-lgdi32", "-lopengl32")
+    else:
+        if os.is_macos():
+            external_libs =  sarr.new(12, "-framework", "Foundation", "-framework", "OpenGL", "-framework", "OpenAL", "-framework", "IOKit", "-framework", "CoreVideo", "-framework", "Cocoa")
+        else:
+            # linux
+            external_libs = sarr.new(5, "-lGL", "-lrt", "-ldl", "-lm", "-lX11")
+    return external_libs
 
 def produce_object(c: CObject, compiler: str) -> bool:
     # Creates a new .o file for a raylib source
@@ -108,6 +113,8 @@ def produce_object(c: CObject, compiler: str) -> bool:
         return True
     console.red("failed.\n")
     console.cyan("--c compiler output---\n")
+    console.red("command := ")
+    console.cyan(sarr.join(cmd, " ") + "\n")
     console.red(pr.output)
     console.cyan("--end c compiler output---\n")
     return False

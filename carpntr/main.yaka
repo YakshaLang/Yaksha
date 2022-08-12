@@ -96,7 +96,7 @@ def perform_build() -> int:
     return ret
 
 def perform_run(filename: str, use_raylib: bool) -> int:
-    name: str = path.basename(filename)
+    name: str = path.remove_extension(path.basename(filename))
     config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib)
     defer carp.del_config(config)
     if len(config.errors) > 0:
@@ -111,9 +111,11 @@ def perform_run(filename: str, use_raylib: bool) -> int:
     binary: str = name
     if os.is_windows():
         binary = binary + ".exe"
+    else:
+        binary = "./" + binary
     binary_cstr: c.CStr = strings.to_cstr(binary)
-    defer strings.del_str(binary_cstr)
     c.system(binary_cstr)
+    del strings.del_str(binary_cstr)
     return 0
 
 

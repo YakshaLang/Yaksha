@@ -8,6 +8,9 @@
 #include <windows.h>
 #include <shellapi.h>
 #include <wchar.h>
+#else
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 // clang-format on
 void yk__printint(intmax_t to_print) {
