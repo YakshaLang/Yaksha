@@ -1,28 +1,26 @@
 #if !defined(YK__COLOUR)
 #define YK__COLOUR
 #if defined(_WIN32) || defined(_WIN64)
-#include <windows.h>
-#include <conio.h>
 void yk__set_colour(int color);
-#define RED FOREGROUND_RED
-#define GREEN FOREGROUND_GREEN
-#define WHITE FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN
-#define BLUE FOREGROUND_BLUE
-#define PURPLE FOREGROUND_BLUE | FOREGROUND_RED
-#define YELLOW FOREGROUND_RED | FOREGROUND_GREEN
-#define CYAN FOREGROUND_GREEN | FOREGROUND_BLUE
-#define REWIND FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN
+#define YK__CONSOLE_RED 0x0004
+#define YK__CONSOLE_GREEN 0x0002
+#define YK__CONSOLE_BLUE 0x0001
+#define YK__CONSOLE_WHITE YK__CONSOLE_RED | YK__CONSOLE_GREEN | YK__CONSOLE_BLUE
+#define YK__CONSOLE_PURPLE YK__CONSOLE_BLUE | YK__CONSOLE_RED
+#define YK__CONSOLE_YELLOW YK__CONSOLE_RED | YK__CONSOLE_GREEN
+#define YK__CONSOLE_CYAN YK__CONSOLE_GREEN | YK__CONSOLE_BLUE
+#define YK__CONSOLE_REWIND YK__CONSOLE_BLUE | YK__CONSOLE_RED | YK__CONSOLE_GREEN
 #define yk__getch _getch
 void yk__clear();
 #else
-#define RED "\033[0;31m"
-#define GREEN "\033[0;32m"
-#define WHITE "\033[0;37m"
-#define BLUE "\033[0;34m"
-#define PURPLE "\033[0;35m"
-#define YELLOW "\033[0;33m"
-#define CYAN "\033[0;36m"
-#define REWIND "\x1B[0m"
+#define YK__CONSOLE_RED "\033[0;31m"
+#define YK__CONSOLE_GREEN "\033[0;32m"
+#define YK__CONSOLE_WHITE "\033[0;37m"
+#define YK__CONSOLE_BLUE "\033[0;34m"
+#define YK__CONSOLE_PURPLE "\033[0;35m"
+#define YK__CONSOLE_YELLOW "\033[0;33m"
+#define YK__CONSOLE_CYAN "\033[0;36m"
+#define YK__CONSOLE_REWIND "\x1B[0m"
 #if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__)) ||         \
     defined(__unix__)
 void yk__set_colour(char *color);

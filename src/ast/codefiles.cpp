@@ -60,7 +60,7 @@ file_info *codefiles::scan(import_stmt *st) {
   auto p = std::filesystem::path{current_path_};
   std::vector<token *> names = st->import_names_;
   // If we have a custom path for libs
-  if (names.front()->token_ == "libs") {
+  if (names.front()->token_ == "libs" || names.front()->token_ == "raylib") {
     p = std::filesystem::path{libs_path_};
   }
   for (auto name_tok : names) {

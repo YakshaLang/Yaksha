@@ -63,9 +63,10 @@ def build_from_config(config: carp.Config, simple: bool) -> int:
 
     if not result.ok:
         console.cyan("---- running Yaksha compiler ---\n")
-        console.red(result.output)
         console.red("Failed to execute: ")
         console.yellow(sarr.join(yk_args, " "))
+        print("\n")
+        console.red(result.output)
         print("\n")
         return_val = -1
         console.cyan("---- end of compiler run ---\n")
@@ -94,9 +95,9 @@ def perform_build() -> int:
     ret: int = build_from_config(config, False)
     return ret
 
-def perform_run(filename: str) -> int:
+def perform_run(filename: str, use_raylib: bool) -> int:
     name: str = path.basename(filename)
-    config: carp.Config = carp.create_adhoc_config(name, filename)
+    config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib)
     defer carp.del_config(config)
     if len(config.errors) > 0:
         print_errors(config.errors)
@@ -130,7 +131,10 @@ def main() -> int:
         return perform_build()
     if args.argc == 3:
         if args.argv[1] == "run_file":
-            return perform_run(args.argv[2])
+            return perform_run(args.argv[2], False)
+        if args.argv[1] == "ray_file":
+            return perform_run(args.argv[2], True)
     usage_print("carpntr", "Build program using 'yaksha.toml'")
     usage_print("carpntr run_file prog.yaka", "Build single file with main() prog.yaka and run it.")
+    usage_print("carpntr ray_file prog.yaka", "Build single file with main() prog.yaka, linked with raylib and run it.")
     return 1

@@ -1,0 +1,14 @@
+import raylib as r
+
+
+def main() -> int:
+    r.init_window(800, 450, "raylib example")
+
+    while not r.window_should_close():
+        r.begin_drawing()
+        r.clear()
+        r.draw_text("Hello game world!", 190, 200, 20)
+        r.end_drawing()
+
+    return 0
+

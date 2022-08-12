@@ -5,6 +5,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <fcntl.h>
 #include <io.h>
+#include <windows.h>
 #endif
 ////// Get Arguments implementation that we have in yk__system ///
 static struct yk__arguments *yk__arguments_copy;
@@ -17,6 +18,10 @@ int main(int argc, char *argv[]) {
   int result_mode;
   result_mode = _setmode(_fileno(stdout), _O_U16TEXT);
   if (result_mode == -1) { return -1; }
+#if defined(YK__WINDOWS_HIDE_CONSOLE)
+  ShowWindow(GetConsoleWindow(), SW_HIDE);
+  FreeConsole();
+#endif
 #endif
   yk__arguments_copy = yk__copy_args(argc, argv);
   int result = yy__main();

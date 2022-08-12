@@ -1,0 +1,44 @@
+# Raylib wrapper
+# Note: This import does not wrap all the functions
+# Only hello world at the moment
+
+@nativedefine("InitWindow")
+def init_window(width: int, height: int, title: str) -> None:
+    # Create a new game window
+    pass
+
+
+@nativedefine("WindowShouldClose")
+def window_should_close() -> bool:
+    # Esc pressed or close button clicked?
+    pass
+
+
+@nativedefine("CloseWindow")
+def close_window() -> None:
+    # Close window after game is done.
+    pass
+
+
+@native
+def clear() -> None:
+    # Clear with RAYWHITE colour
+    ccode """ClearBackground(RAYWHITE)"""
+
+
+@native
+def draw_text(text: str, x: int, y: int, size: int) -> None:
+    # Draw text with light gray color
+    ccode """DrawText(nn__text, nn__x, nn__y, nn__size, BLACK);
+    yk__sdsfree(nn__text)
+    """
+
+
+@nativedefine("BeginDrawing")
+def begin_drawing() -> None:
+    pass
+
+
+@nativedefine("EndDrawing")
+def end_drawing() -> None:
+    pass

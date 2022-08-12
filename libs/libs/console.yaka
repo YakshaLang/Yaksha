@@ -12,21 +12,21 @@ CYAN: Const[int] = 7
 @native
 def set_colour(c: int) -> None:
     ccode """if (nn__c == 0) { // rewind
-        yk__set_colour(REWIND);
+        yk__set_colour(YK__CONSOLE_REWIND);
     } else if (nn__c == 1) { // red 
-        yk__set_colour(RED);
+        yk__set_colour(YK__CONSOLE_RED);
     } else if (nn__c == 2) { // green 
-        yk__set_colour(GREEN);
+        yk__set_colour(YK__CONSOLE_GREEN);
     } else if (nn__c == 3) { // white 
-        yk__set_colour(WHITE);
+        yk__set_colour(YK__CONSOLE_WHITE);
     } else if (nn__c == 4) { // blue 
-        yk__set_colour(BLUE);
+        yk__set_colour(YK__CONSOLE_BLUE);
     } else if (nn__c == 5) { // purple 
-        yk__set_colour(PURPLE);
+        yk__set_colour(YK__CONSOLE_PURPLE);
     } else if (nn__c == 6) { // yellow 
-        yk__set_colour(YELLOW);
+        yk__set_colour(YK__CONSOLE_YELLOW);
     } else if (nn__c == 7) { // cyan  
-        yk__set_colour(CYAN);
+        yk__set_colour(YK__CONSOLE_CYAN);
     }"""
 
 @native

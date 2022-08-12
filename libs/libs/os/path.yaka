@@ -12,6 +12,12 @@ def forward_slash() -> bool:
     #endif
     return bfwd"""
 
+@nativedefine("yk__mkdir")
+def mkdir(p: str) -> bool:
+    # Create given folder. (Linux uses 0755 permissions)
+    # Returns True if successful
+    pass
+
 @nativedefine("yk__exists")
 def exists(p: str) -> bool:
     # Does the file exist?

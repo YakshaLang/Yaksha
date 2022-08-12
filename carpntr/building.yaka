@@ -5,6 +5,7 @@ import libs.os
 import libs.strings
 import libs.strings.buffer as sbuf
 import libs.strings.array as sarr
+import raylib_support as rs
 import configuration as carp
 
 def prepare_code(c: carp.Config, code: str) -> str:
@@ -31,6 +32,9 @@ def prepare_code(c: carp.Config, code: str) -> str:
     while x < length:
         sbuf.append(buf, "#include \"" + c.c_code.includes[x] + "\"\n")
         x = x + 1
+    # Add raylib.h
+    if c.compilation.raylib:
+        sbuf.append(buf, "#include \"raylib.h\"\n")
     # code itself
     sbuf.append(buf, code)
     sbuf.append(buf, "\n")
@@ -38,9 +42,11 @@ def prepare_code(c: carp.Config, code: str) -> str:
     result: str = sbuf.to_str(buf)
     return result
 
-def create_args(c: carp.Config, code_path: str, build_path: str, target: str) -> Array[str]:
+def create_args(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> Array[str]:
     native: bool = len(target) == 0
     args: Array[str] = sarr.new(8, c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC")
+    args = sarr.extend(args, raylib_args)
+    # If not macos do link time optimization
     if (native and (not os.is_macos())) or (not native and not strings.contains(target, "macos")):
         arrput(args, "-flto=full")
     # --
@@ -88,8 +94,8 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str) ->
     # ----
     return args
 
-def build_target(c: carp.Config, code_path: str, build_path: str, target: str) -> int:
-    a: Array[str] = create_args(c, code_path, build_path, target)
+def build_target(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> int:
+    a: Array[str] = create_args(c, code_path, build_path, target, raylib_args)
     defer sarr.del_str_array(a)
     result: os.ProcessResult = os.run(a)
     defer os.del_process_result(result)
@@ -108,10 +114,22 @@ def build_target(c: carp.Config, code_path: str, build_path: str, target: str) -
         return 1
 
 def build(c: carp.Config, code: str) -> int:
+    target_count: int = len(c.compilation.targets)
+    raylib_args: Array[str]
+    defer sarr.del_str_array(raylib_args)
+    if target_count != 0 and c.compilation.raylib:
+        console.red("raylib build only support native builds.\n")
+        console.cyan("Hint: You need to keep [compilation].targets empty\n")
+        return -1
+    if c.compilation.raylib:
+        raylib_args = rs.get_raylib_args(c.zig_compiler_path, c.runtime_path)
+
+
     print("\nbuilding ")
-    print(len(c.compilation.targets) + 1)
+    print(target_count + 1)
     println(" target(s) ...")
     build_path: str = path.join(os.cwd(), "build")
+    path.mkdir(build_path)
     code_path: str = path.join(build_path, "program_code.c")
     if not io.writefile(code_path, prepare_code(c, code)):
         console.red("Failed to write file:")
@@ -120,13 +138,13 @@ def build(c: carp.Config, code: str) -> int:
 
     failed_count: int = 0
     # Build current system native binary
-    failed_count = failed_count + build_target(c, code_path, build_path, "")
+    failed_count = failed_count + build_target(c, code_path, build_path, "", raylib_args)
 
     # Building other targets
     cnt: int = 0
     while cnt < len(c.compilation.targets):
         target: str = c.compilation.targets[cnt]
-        failed_count = failed_count + build_target(c, code_path, build_path, target)
+        failed_count = failed_count + build_target(c, code_path, build_path, target, raylib_args)
         cnt = cnt + 1
 
     print("\n")
@@ -137,13 +155,16 @@ def build(c: carp.Config, code: str) -> int:
 
 def build_simple(c: carp.Config, code: str) -> int:
     code_path: str = path.join(os.cwd(), c.project.name + ".c")
+    raylib_args: Array[str]
+    if c.compilation.raylib:
+        raylib_args = rs.get_raylib_args(c.zig_compiler_path, c.runtime_path)
 
     if not io.writefile(code_path, prepare_code(c, code)):
         console.red("Failed to write file:")
         println(code_path)
         return -1
 
-    failed_count: int = build_target(c, code_path, os.cwd(), "")
+    failed_count: int = build_target(c, code_path, os.cwd(), "", raylib_args)
 
     if failed_count > 0:
         return -1

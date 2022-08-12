@@ -1,4 +1,5 @@
 import libs.strings.array as sarr
+import libs.strings
 import libs.fileformats.toml
 import libs.os
 import libs.os.path
@@ -26,6 +27,7 @@ class Compilation:
     libc: str
     compiler: str
     targets: Array[str]
+    raylib: bool
 
 
 class Config:
@@ -156,6 +158,7 @@ def load_compilation(conf: toml.Table, c: Config) -> Compilation:
         # This is optional so ignore this
         return co
     co.targets = toml.get_string_array(co_data, "targets")
+    co.raylib = toml.get_bool_default(co_data, "raylib", False)
     return co
 
 
@@ -239,7 +242,7 @@ def load_config() -> Config:
 
     return c
 
-def create_adhoc_config(name: str, file_path: str) -> Config:
+def create_adhoc_config(name: str, file_path: str, use_raylib: bool) -> Config:
     c: Config = Config()
     # Try and find yakshac.exe
     find_yaksha_compiler(c)
@@ -267,6 +270,7 @@ def create_adhoc_config(name: str, file_path: str) -> Config:
     # TODO: Complete this?
     c.compilation = Compilation()
     c.compilation.targets = sarr.new(1, "native")
+    c.compilation.raylib = use_raylib
     return c
 
 

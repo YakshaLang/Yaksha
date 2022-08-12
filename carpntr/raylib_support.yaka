@@ -1,0 +1,158 @@
+# Add support for building raylib projects
+
+import libs.os
+import libs.os.path
+import libs.console
+import libs.strings.array as sarr
+
+
+class CObject:
+    c_file: str
+    o_file: str
+    base_name: str
+    args: Array[str]
+
+
+def fill_arguments(src_path: str, c: CObject) -> CObject:
+    args: Array[str] = sarr.new(4, "-std=gnu99", "-DPLATFORM_DESKTOP", "-DGL_SILENCE_DEPRECATION=199309L", "-fno-sanitize=undefined")
+
+    arrput(args, "-I" + src_path)
+    glfw: str = path.join(path.join(src_path, "external"), "glfw")
+    arrput(args, "-I" + path.join(glfw, "include"))
+
+    # Add mingw dependencies for windows
+    if os.is_windows():
+        arrput(args, "-I" + path.join(path.join(glfw, "deps"), "mingw"))
+
+    if os.is_macos() and c.base_name == "rglfw":
+        arrput(args, "-ObjC")
+
+    arrput(args, c.c_file)
+    arrput(args, "-o")
+    arrput(args, c.o_file)
+
+    c.args = args
+    return c
+
+
+def co(filename: str, src_path: str, target_path: str) -> CObject:
+    obj: CObject = CObject()
+    obj.c_file = path.join(src_path, filename + ".c")
+    obj.o_file = path.join(target_path, filename + ".o")
+    obj.base_name = filename
+    return fill_arguments(src_path, obj)
+
+
+def del_c_object(c: CObject) -> None:
+    del c.c_file
+    del c.o_file
+    del c.base_name
+    sarr.del_str_array(c.args)
+    del c
+
+
+def del_objects(x: Array[CObject]) -> None:
+    if len(x) == 0:
+        del x
+        return
+    pos: int = 0
+    length: int = len(x)
+    while pos < length:
+        del_c_object(x[pos])
+        pos = pos + 1
+    del x
+
+
+def get_objects(raylib_src_path: str, build_path: str) -> Array[CObject]:
+    objects: Array[CObject]
+    arrput(objects, co("rglfw", raylib_src_path, build_path))
+    arrput(objects, co("raudio", raylib_src_path, build_path))
+    arrput(objects, co("rcore", raylib_src_path, build_path))
+    arrput(objects, co("rmodels", raylib_src_path, build_path))
+    arrput(objects, co("rshapes", raylib_src_path, build_path))
+    arrput(objects, co("rtext", raylib_src_path, build_path))
+    arrput(objects, co("rtextures", raylib_src_path, build_path))
+    arrput(objects, co("utils", raylib_src_path, build_path))
+    return objects
+
+
+def get_external_libs() -> Array[str]:
+    if os.is_windows():
+        return sarr.new(3, "-lwinmm", "-lgdi32", "-lopengl32")
+    if os.is_macos():
+        return sarr.new(2, "-framework", "Foundation")
+    # linux
+    return sarr.new(5, "-lGL", "-lrt", "-ldl", "-lm", "-lX11")
+
+
+def produce_object(c: CObject, compiler: str) -> bool:
+    # Creates a new .o file for a raylib source
+    # If raylib object already exists do not bother building it again
+    # 1) We are only supporting native at the moment
+    # 2) It takes too long to compile it again (zig might cache it though)
+    console.cyan("raylib::")
+    console.yellow(c.base_name)
+    console.cyan(" := ")
+    if path.readable(c.o_file):
+        console.green("prebuilt.\n")
+        return True
+
+    cmd: Array[str] = sarr.new(4, compiler, "cc", "-c", "-Oz")
+    cmd = sarr.extend(cmd, c.args)
+    defer sarr.del_str_array(cmd)
+    pr: os.ProcessResult = os.run(cmd)
+    defer os.del_process_result(pr)
+
+    if pr.ok:
+        console.green("done.\n")
+        return True
+    console.red("failed.\n")
+    console.cyan("--c compiler output---\n")
+    console.red(pr.output)
+    console.cyan("--end c compiler output---\n")
+    return False
+
+
+def get_raylib_args(zig_compiler: str, runtime_path:str) -> Array[str]:
+    # Build raylib objects
+    # Return list of objects & libraries that we want to link
+    arguments: Array[str]
+    compiler: str = zig_compiler
+    build_path: str = path.join(os.cwd(), "build")
+    path.mkdir(build_path)
+    raylib_path: str = path.join(path.join(runtime_path, "raylib"), "src")
+    objects: Array[CObject] = get_objects(raylib_path, build_path)
+    o_files: Array[str]
+    defer sarr.del_str_array(o_files)
+    defer del_objects(objects)
+
+
+    object_count: int = len(objects)
+    pos: int = 0
+    fail: bool = False
+    println("\nbuilding raylib ...")
+    while pos < object_count:
+        object: CObject = objects[pos]
+        if produce_object(object, compiler):
+            arrput(o_files, object.o_file)
+        else:
+            fail = True
+            break
+        pos = pos + 1
+
+    if fail:
+        return arguments
+
+    # Link external libs + objects
+    arguments = get_external_libs()
+    arguments = sarr.extend(arguments, o_files)
+    # Add main include
+    arrput(arguments, "-I" + raylib_path)
+    # On windows try and build a gui application so it will not annoy us
+    if os.is_windows():
+        arrput(arguments, "-Wl,--subsystem,windows")
+        # Fix until zig support ^^ Windows subsystem
+        # Basically when this #define is set we hide the console window.
+        # However, this does not work if you are using the new Windows Terminal
+        arrput(arguments, "-DYK__WINDOWS_HIDE_CONSOLE")
+    return arguments

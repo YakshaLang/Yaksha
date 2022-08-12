@@ -21,6 +21,7 @@ bool yk__exists(yk__sds path);
 bool yk__readable(yk__sds path);
 bool yk__writable(yk__sds path);
 bool yk__executable(yk__sds path);
+bool yk__mkdir(yk__sds path);
 yk__sds yk__getenv(yk__sds name);
 yk__sds yk__io_readfile(yk__sds name);
 bool yk__io_writefile(yk__sds name, yk__sds data);

@@ -215,6 +215,25 @@ bool yk__executable(yk__sds path) {
   yk__sdsfree(path);
   return value;
 }
+bool yk__mkdir(yk__sds path) {
+  if (path == NULL || !yk__sdslen(path)) {
+    yk__sdsfree(path);
+    return false;
+  }
+#if defined(_WIN32) || defined(_WIN64)
+  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(path);
+  if (wpath == NULL) {
+    yk__sdsfree(path);
+    return false;
+  }
+  bool value = (_wmkdir(wpath) == 0);
+  free(wpath);
+#else
+  bool value = mkdir(path, 0755) == 0;
+#endif
+  yk__sdsfree(path);
+  return value;
+}
 ////// Environ ///////
 yk__sds yk__getenv(yk__sds name) {
   if (name == NULL || !yk__sdslen(name)) {

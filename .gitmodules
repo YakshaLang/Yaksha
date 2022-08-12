@@ -5,3 +5,6 @@
 [submodule "3rd/utfcpp"]
 	path = 3rd/utfcpp
 	url = git@github.com:nemtrif/utfcpp.git
+[submodule "runtime/raylib"]
+	path = runtime/raylib
+	url = git@github.com:raysan5/raylib.git

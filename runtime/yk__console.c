@@ -1,5 +1,7 @@
 #include "yk__console.h"
 #if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#include <conio.h>
 #include <io.h>
 #include <stdio.h>
 #define ISATTY _isatty
