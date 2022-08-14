@@ -30,6 +30,10 @@ class CLong:
 class CShort:
     pass
 
+@nativedefine("char")
+class CChar:
+    pass
+
 @nativedefine("unsigned int")
 class CUInt:
     pass
@@ -40,6 +44,14 @@ class CULong:
 
 @nativedefine("unsigned short")
 class CUShort:
+    pass
+
+@nativedefine("unsigned char")
+class CUChar:
+    pass
+
+@nativedefine("float")
+class CFloat:
     pass
 
 @nativedefine("free")

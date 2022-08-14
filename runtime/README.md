@@ -4,14 +4,15 @@ Bunch of `C` code that standard library and main program depend on.
 
 ## Third Party Libraries
 
-| files          | author             | use                                |
-|----------------|--------------------|------------------------------------|
-| `ini.h`        | Mattias Gustavsson | work with .ini files               |
-| `subprocess.h` | sheredom           | Subprocess support (used for UNIX) |
-| `toml.*`       | CK Tan             | TOML support                       |
-| `mpc.*`        | orangeduck         | Text parsing                       |
-| `utfproc*`     | various            | utf8 string iteration support      |
-| `whereami.*`   | Gregory Pakosz     | Get exe path                       |
+| files          | author                            | use                                |
+|----------------|-----------------------------------|------------------------------------|
+| `ini.h`        | Mattias Gustavsson                | work with .ini files               |
+| `subprocess.h` | sheredom                          | Subprocess support (used for UNIX) |
+| `toml.*`       | CK Tan                            | TOML support                       |
+| `mpc.*`        | orangeduck                        | Text parsing                       |
+| `utfproc*`     | various                           | utf8 string iteration support      |
+| `whereami.*`   | Gregory Pakosz                    | Get exe path                       |
+| `raylib/*`     | Ramon Santamaria and contributors | Game/GUI development               |
 
 ### Third Party Derived
 

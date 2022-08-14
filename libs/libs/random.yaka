@@ -1,0 +1,27 @@
+@nativedefine("yk__init_random")
+def init_random() -> u64:
+    # Set a seed to random number generator using time (crypto unsafe)
+    pass
+
+@native
+def set_seed(seed: u64) -> None:
+    # Set a seed to random number generator (crypto unsafe)
+    ccode """srand((unsigned) nn__seed)"""
+
+@native
+def random() -> f64:
+    # Get a random value between 0 - 1 (crypto unsafe)
+    ccode """return ((double)rand() / (double)RAND_MAX)"""
+
+def random_between(a: f64, b: f64) -> f64:
+    # Get a random value between a and b (crypto unsafe)
+    min: f64 = a
+    max: f64 = b
+    if a > b:
+        min = b
+        max = a
+    return min + (random() * (max - min))
+
+@nativedefine("yk__random_u64")
+def random_u64() -> u64:
+    pass

@@ -6,7 +6,7 @@ import sys
 import glob
 from typing import Mapping
 
-from kabaraya import Colors
+from generate_raylib import Colors
 
 EXIT_FAILURE = 1
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -229,6 +229,8 @@ def main():
         sout, serr, ret = execute(DUMPER + " \"" + mod_full_filepath + "\"")
         if ret != 0:
             eprint(Colors.fail("Failed to parse ") + yaksha_mod)
+            eprint()
+            eprint(Colors.fail(sout + serr))
             return
 
         try:

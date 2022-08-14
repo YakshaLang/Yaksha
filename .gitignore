@@ -24,6 +24,7 @@ bin/yakshavz
 bin/YakshaFuzz
 bin/YakshaTests
 bin/cmakecarpntr
+bin/raylib-parser
 comp_output_test
 __pycache__
 !carpntr/build/program_code.c

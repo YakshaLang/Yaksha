@@ -1,44 +1,3691 @@
-# Raylib wrapper
-# Note: This import does not wrap all the functions
-# Only hello world at the moment
+# -- Raylib Wrapper for Yaksha --- 
+# This is generated with generate_raylib.py, Uses raylib_parser.c and raylib.h
 
-@nativedefine("InitWindow")
-def init_window(width: int, height: int, title: str) -> None:
-    # Create a new game window
+import libs.c
+
+FLAG_VSYNC_HINT: Const[int] = 64
+# Set to try enabling V-Sync on GPU
+FLAG_FULLSCREEN_MODE: Const[int] = 2
+# Set to run program in fullscreen
+FLAG_WINDOW_RESIZABLE: Const[int] = 4
+# Set to allow resizable window
+FLAG_WINDOW_UNDECORATED: Const[int] = 8
+# Set to disable window decoration (frame and buttons)
+FLAG_WINDOW_HIDDEN: Const[int] = 128
+# Set to hide window
+FLAG_WINDOW_MINIMIZED: Const[int] = 512
+# Set to minimize window (iconify)
+FLAG_WINDOW_MAXIMIZED: Const[int] = 1024
+# Set to maximize window (expanded to monitor)
+FLAG_WINDOW_UNFOCUSED: Const[int] = 2048
+# Set to window non focused
+FLAG_WINDOW_TOPMOST: Const[int] = 4096
+# Set to window always on top
+FLAG_WINDOW_ALWAYS_RUN: Const[int] = 256
+# Set to allow windows running while minimized
+FLAG_WINDOW_TRANSPARENT: Const[int] = 16
+# Set to allow transparent framebuffer
+FLAG_WINDOW_HIGHDPI: Const[int] = 8192
+# Set to support HighDPI
+FLAG_WINDOW_MOUSE_PASSTHROUGH: Const[int] = 16384
+# Set to support mouse passthrough, only supported when FLAG_WINDOW_UNDECORATED
+FLAG_MSAA_4X_HINT: Const[int] = 32
+# Set to try enabling MSAA 4X
+FLAG_INTERLACED_HINT: Const[int] = 65536
+# Set to try enabling interlaced video format (for V3D)
+LOG_ALL: Const[int] = 0
+# Display all logs
+LOG_TRACE: Const[int] = 1
+# Trace logging, intended for internal use only
+LOG_DEBUG: Const[int] = 2
+# Debug logging, used for internal debugging, it should be disabled on release builds
+LOG_INFO: Const[int] = 3
+# Info logging, used for program execution info
+LOG_WARNING: Const[int] = 4
+# Warning logging, used on recoverable failures
+LOG_ERROR: Const[int] = 5
+# Error logging, used on unrecoverable failures
+LOG_FATAL: Const[int] = 6
+# Fatal logging, used to abort program: exit(EXIT_FAILURE)
+LOG_NONE: Const[int] = 7
+# Disable logging
+KEY_NULL: Const[int] = 0
+# Key: NULL, used for no key pressed
+KEY_APOSTROPHE: Const[int] = 39
+# Key: '
+KEY_COMMA: Const[int] = 44
+# Key: ,
+KEY_MINUS: Const[int] = 45
+# Key: -
+KEY_PERIOD: Const[int] = 46
+# Key: .
+KEY_SLASH: Const[int] = 47
+# Key: /
+KEY_ZERO: Const[int] = 48
+# Key: 0
+KEY_ONE: Const[int] = 49
+# Key: 1
+KEY_TWO: Const[int] = 50
+# Key: 2
+KEY_THREE: Const[int] = 51
+# Key: 3
+KEY_FOUR: Const[int] = 52
+# Key: 4
+KEY_FIVE: Const[int] = 53
+# Key: 5
+KEY_SIX: Const[int] = 54
+# Key: 6
+KEY_SEVEN: Const[int] = 55
+# Key: 7
+KEY_EIGHT: Const[int] = 56
+# Key: 8
+KEY_NINE: Const[int] = 57
+# Key: 9
+KEY_SEMICOLON: Const[int] = 59
+# Key: ;
+KEY_EQUAL: Const[int] = 61
+# Key: =
+KEY_A: Const[int] = 65
+# Key: A | a
+KEY_B: Const[int] = 66
+# Key: B | b
+KEY_C: Const[int] = 67
+# Key: C | c
+KEY_D: Const[int] = 68
+# Key: D | d
+KEY_E: Const[int] = 69
+# Key: E | e
+KEY_F: Const[int] = 70
+# Key: F | f
+KEY_G: Const[int] = 71
+# Key: G | g
+KEY_H: Const[int] = 72
+# Key: H | h
+KEY_I: Const[int] = 73
+# Key: I | i
+KEY_J: Const[int] = 74
+# Key: J | j
+KEY_K: Const[int] = 75
+# Key: K | k
+KEY_L: Const[int] = 76
+# Key: L | l
+KEY_M: Const[int] = 77
+# Key: M | m
+KEY_N: Const[int] = 78
+# Key: N | n
+KEY_O: Const[int] = 79
+# Key: O | o
+KEY_P: Const[int] = 80
+# Key: P | p
+KEY_Q: Const[int] = 81
+# Key: Q | q
+KEY_R: Const[int] = 82
+# Key: R | r
+KEY_S: Const[int] = 83
+# Key: S | s
+KEY_T: Const[int] = 84
+# Key: T | t
+KEY_U: Const[int] = 85
+# Key: U | u
+KEY_V: Const[int] = 86
+# Key: V | v
+KEY_W: Const[int] = 87
+# Key: W | w
+KEY_X: Const[int] = 88
+# Key: X | x
+KEY_Y: Const[int] = 89
+# Key: Y | y
+KEY_Z: Const[int] = 90
+# Key: Z | z
+KEY_LEFT_BRACKET: Const[int] = 91
+# Key: [
+KEY_BACKSLASH: Const[int] = 92
+# Key: '\'
+KEY_RIGHT_BRACKET: Const[int] = 93
+# Key: ]
+KEY_GRAVE: Const[int] = 96
+# Key: `
+KEY_SPACE: Const[int] = 32
+# Key: Space
+KEY_ESCAPE: Const[int] = 256
+# Key: Esc
+KEY_ENTER: Const[int] = 257
+# Key: Enter
+KEY_TAB: Const[int] = 258
+# Key: Tab
+KEY_BACKSPACE: Const[int] = 259
+# Key: Backspace
+KEY_INSERT: Const[int] = 260
+# Key: Ins
+KEY_DELETE: Const[int] = 261
+# Key: Del
+KEY_RIGHT: Const[int] = 262
+# Key: Cursor right
+KEY_LEFT: Const[int] = 263
+# Key: Cursor left
+KEY_DOWN: Const[int] = 264
+# Key: Cursor down
+KEY_UP: Const[int] = 265
+# Key: Cursor up
+KEY_PAGE_UP: Const[int] = 266
+# Key: Page up
+KEY_PAGE_DOWN: Const[int] = 267
+# Key: Page down
+KEY_HOME: Const[int] = 268
+# Key: Home
+KEY_END: Const[int] = 269
+# Key: End
+KEY_CAPS_LOCK: Const[int] = 280
+# Key: Caps lock
+KEY_SCROLL_LOCK: Const[int] = 281
+# Key: Scroll down
+KEY_NUM_LOCK: Const[int] = 282
+# Key: Num lock
+KEY_PRINT_SCREEN: Const[int] = 283
+# Key: Print screen
+KEY_PAUSE: Const[int] = 284
+# Key: Pause
+KEY_F1: Const[int] = 290
+# Key: F1
+KEY_F2: Const[int] = 291
+# Key: F2
+KEY_F3: Const[int] = 292
+# Key: F3
+KEY_F4: Const[int] = 293
+# Key: F4
+KEY_F5: Const[int] = 294
+# Key: F5
+KEY_F6: Const[int] = 295
+# Key: F6
+KEY_F7: Const[int] = 296
+# Key: F7
+KEY_F8: Const[int] = 297
+# Key: F8
+KEY_F9: Const[int] = 298
+# Key: F9
+KEY_F10: Const[int] = 299
+# Key: F10
+KEY_F11: Const[int] = 300
+# Key: F11
+KEY_F12: Const[int] = 301
+# Key: F12
+KEY_LEFT_SHIFT: Const[int] = 340
+# Key: Shift left
+KEY_LEFT_CONTROL: Const[int] = 341
+# Key: Control left
+KEY_LEFT_ALT: Const[int] = 342
+# Key: Alt left
+KEY_LEFT_SUPER: Const[int] = 343
+# Key: Super left
+KEY_RIGHT_SHIFT: Const[int] = 344
+# Key: Shift right
+KEY_RIGHT_CONTROL: Const[int] = 345
+# Key: Control right
+KEY_RIGHT_ALT: Const[int] = 346
+# Key: Alt right
+KEY_RIGHT_SUPER: Const[int] = 347
+# Key: Super right
+KEY_KB_MENU: Const[int] = 348
+# Key: KB menu
+KEY_KP_0: Const[int] = 320
+# Key: Keypad 0
+KEY_KP_1: Const[int] = 321
+# Key: Keypad 1
+KEY_KP_2: Const[int] = 322
+# Key: Keypad 2
+KEY_KP_3: Const[int] = 323
+# Key: Keypad 3
+KEY_KP_4: Const[int] = 324
+# Key: Keypad 4
+KEY_KP_5: Const[int] = 325
+# Key: Keypad 5
+KEY_KP_6: Const[int] = 326
+# Key: Keypad 6
+KEY_KP_7: Const[int] = 327
+# Key: Keypad 7
+KEY_KP_8: Const[int] = 328
+# Key: Keypad 8
+KEY_KP_9: Const[int] = 329
+# Key: Keypad 9
+KEY_KP_DECIMAL: Const[int] = 330
+# Key: Keypad .
+KEY_KP_DIVIDE: Const[int] = 331
+# Key: Keypad /
+KEY_KP_MULTIPLY: Const[int] = 332
+# Key: Keypad *
+KEY_KP_SUBTRACT: Const[int] = 333
+# Key: Keypad -
+KEY_KP_ADD: Const[int] = 334
+# Key: Keypad +
+KEY_KP_ENTER: Const[int] = 335
+# Key: Keypad Enter
+KEY_KP_EQUAL: Const[int] = 336
+# Key: Keypad =
+KEY_BACK: Const[int] = 4
+# Key: Android back button
+KEY_MENU: Const[int] = 82
+# Key: Android menu button
+KEY_VOLUME_UP: Const[int] = 24
+# Key: Android volume up button
+KEY_VOLUME_DOWN: Const[int] = 25
+# Key: Android volume down button
+MOUSE_BUTTON_LEFT: Const[int] = 0
+# Mouse button left
+MOUSE_BUTTON_RIGHT: Const[int] = 1
+# Mouse button right
+MOUSE_BUTTON_MIDDLE: Const[int] = 2
+# Mouse button middle (pressed wheel)
+MOUSE_BUTTON_SIDE: Const[int] = 3
+# Mouse button side (advanced mouse device)
+MOUSE_BUTTON_EXTRA: Const[int] = 4
+# Mouse button extra (advanced mouse device)
+MOUSE_BUTTON_FORWARD: Const[int] = 5
+# Mouse button fordward (advanced mouse device)
+MOUSE_BUTTON_BACK: Const[int] = 6
+# Mouse button back (advanced mouse device)
+MOUSE_CURSOR_DEFAULT: Const[int] = 0
+# Default pointer shape
+MOUSE_CURSOR_ARROW: Const[int] = 1
+# Arrow shape
+MOUSE_CURSOR_IBEAM: Const[int] = 2
+# Text writing cursor shape
+MOUSE_CURSOR_CROSSHAIR: Const[int] = 3
+# Cross shape
+MOUSE_CURSOR_POINTING_HAND: Const[int] = 4
+# Pointing hand cursor
+MOUSE_CURSOR_RESIZE_EW: Const[int] = 5
+# Horizontal resize/move arrow shape
+MOUSE_CURSOR_RESIZE_NS: Const[int] = 6
+# Vertical resize/move arrow shape
+MOUSE_CURSOR_RESIZE_NWSE: Const[int] = 7
+# Top-left to bottom-right diagonal resize/move arrow shape
+MOUSE_CURSOR_RESIZE_NESW: Const[int] = 8
+# The top-right to bottom-left diagonal resize/move arrow shape
+MOUSE_CURSOR_RESIZE_ALL: Const[int] = 9
+# The omni-directional resize/move cursor shape
+MOUSE_CURSOR_NOT_ALLOWED: Const[int] = 10
+# The operation-not-allowed shape
+GAMEPAD_BUTTON_UNKNOWN: Const[int] = 0
+# Unknown button, just for error checking
+GAMEPAD_BUTTON_LEFT_FACE_UP: Const[int] = 1
+# Gamepad left DPAD up button
+GAMEPAD_BUTTON_LEFT_FACE_RIGHT: Const[int] = 2
+# Gamepad left DPAD right button
+GAMEPAD_BUTTON_LEFT_FACE_DOWN: Const[int] = 3
+# Gamepad left DPAD down button
+GAMEPAD_BUTTON_LEFT_FACE_LEFT: Const[int] = 4
+# Gamepad left DPAD left button
+GAMEPAD_BUTTON_RIGHT_FACE_UP: Const[int] = 5
+# Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
+GAMEPAD_BUTTON_RIGHT_FACE_RIGHT: Const[int] = 6
+# Gamepad right button right (i.e. PS3: Square, Xbox: X)
+GAMEPAD_BUTTON_RIGHT_FACE_DOWN: Const[int] = 7
+# Gamepad right button down (i.e. PS3: Cross, Xbox: A)
+GAMEPAD_BUTTON_RIGHT_FACE_LEFT: Const[int] = 8
+# Gamepad right button left (i.e. PS3: Circle, Xbox: B)
+GAMEPAD_BUTTON_LEFT_TRIGGER_1: Const[int] = 9
+# Gamepad top/back trigger left (first), it could be a trailing button
+GAMEPAD_BUTTON_LEFT_TRIGGER_2: Const[int] = 10
+# Gamepad top/back trigger left (second), it could be a trailing button
+GAMEPAD_BUTTON_RIGHT_TRIGGER_1: Const[int] = 11
+# Gamepad top/back trigger right (one), it could be a trailing button
+GAMEPAD_BUTTON_RIGHT_TRIGGER_2: Const[int] = 12
+# Gamepad top/back trigger right (second), it could be a trailing button
+GAMEPAD_BUTTON_MIDDLE_LEFT: Const[int] = 13
+# Gamepad center buttons, left one (i.e. PS3: Select)
+GAMEPAD_BUTTON_MIDDLE: Const[int] = 14
+# Gamepad center buttons, middle one (i.e. PS3: PS, Xbox: XBOX)
+GAMEPAD_BUTTON_MIDDLE_RIGHT: Const[int] = 15
+# Gamepad center buttons, right one (i.e. PS3: Start)
+GAMEPAD_BUTTON_LEFT_THUMB: Const[int] = 16
+# Gamepad joystick pressed button left
+GAMEPAD_BUTTON_RIGHT_THUMB: Const[int] = 17
+# Gamepad joystick pressed button right
+GAMEPAD_AXIS_LEFT_X: Const[int] = 0
+# Gamepad left stick X axis
+GAMEPAD_AXIS_LEFT_Y: Const[int] = 1
+# Gamepad left stick Y axis
+GAMEPAD_AXIS_RIGHT_X: Const[int] = 2
+# Gamepad right stick X axis
+GAMEPAD_AXIS_RIGHT_Y: Const[int] = 3
+# Gamepad right stick Y axis
+GAMEPAD_AXIS_LEFT_TRIGGER: Const[int] = 4
+# Gamepad back trigger left, pressure level: [1..-1]
+GAMEPAD_AXIS_RIGHT_TRIGGER: Const[int] = 5
+# Gamepad back trigger right, pressure level: [1..-1]
+MATERIAL_MAP_ALBEDO: Const[int] = 0
+# Albedo material (same as: MATERIAL_MAP_DIFFUSE)
+MATERIAL_MAP_METALNESS: Const[int] = 1
+# Metalness material (same as: MATERIAL_MAP_SPECULAR)
+MATERIAL_MAP_NORMAL: Const[int] = 2
+# Normal material
+MATERIAL_MAP_ROUGHNESS: Const[int] = 3
+# Roughness material
+MATERIAL_MAP_OCCLUSION: Const[int] = 4
+# Ambient occlusion material
+MATERIAL_MAP_EMISSION: Const[int] = 5
+# Emission material
+MATERIAL_MAP_HEIGHT: Const[int] = 6
+# Heightmap material
+MATERIAL_MAP_CUBEMAP: Const[int] = 7
+# Cubemap material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+MATERIAL_MAP_IRRADIANCE: Const[int] = 8
+# Irradiance material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+MATERIAL_MAP_PREFILTER: Const[int] = 9
+# Prefilter material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+MATERIAL_MAP_BRDF: Const[int] = 10
+# Brdf material
+SHADER_LOC_VERTEX_POSITION: Const[int] = 0
+# Shader location: vertex attribute: position
+SHADER_LOC_VERTEX_TEXCOORD01: Const[int] = 1
+# Shader location: vertex attribute: texcoord01
+SHADER_LOC_VERTEX_TEXCOORD02: Const[int] = 2
+# Shader location: vertex attribute: texcoord02
+SHADER_LOC_VERTEX_NORMAL: Const[int] = 3
+# Shader location: vertex attribute: normal
+SHADER_LOC_VERTEX_TANGENT: Const[int] = 4
+# Shader location: vertex attribute: tangent
+SHADER_LOC_VERTEX_COLOR: Const[int] = 5
+# Shader location: vertex attribute: color
+SHADER_LOC_MATRIX_MVP: Const[int] = 6
+# Shader location: matrix uniform: model-view-projection
+SHADER_LOC_MATRIX_VIEW: Const[int] = 7
+# Shader location: matrix uniform: view (camera transform)
+SHADER_LOC_MATRIX_PROJECTION: Const[int] = 8
+# Shader location: matrix uniform: projection
+SHADER_LOC_MATRIX_MODEL: Const[int] = 9
+# Shader location: matrix uniform: model (transform)
+SHADER_LOC_MATRIX_NORMAL: Const[int] = 10
+# Shader location: matrix uniform: normal
+SHADER_LOC_VECTOR_VIEW: Const[int] = 11
+# Shader location: vector uniform: view
+SHADER_LOC_COLOR_DIFFUSE: Const[int] = 12
+# Shader location: vector uniform: diffuse color
+SHADER_LOC_COLOR_SPECULAR: Const[int] = 13
+# Shader location: vector uniform: specular color
+SHADER_LOC_COLOR_AMBIENT: Const[int] = 14
+# Shader location: vector uniform: ambient color
+SHADER_LOC_MAP_ALBEDO: Const[int] = 15
+# Shader location: sampler2d texture: albedo (same as: SHADER_LOC_MAP_DIFFUSE)
+SHADER_LOC_MAP_METALNESS: Const[int] = 16
+# Shader location: sampler2d texture: metalness (same as: SHADER_LOC_MAP_SPECULAR)
+SHADER_LOC_MAP_NORMAL: Const[int] = 17
+# Shader location: sampler2d texture: normal
+SHADER_LOC_MAP_ROUGHNESS: Const[int] = 18
+# Shader location: sampler2d texture: roughness
+SHADER_LOC_MAP_OCCLUSION: Const[int] = 19
+# Shader location: sampler2d texture: occlusion
+SHADER_LOC_MAP_EMISSION: Const[int] = 20
+# Shader location: sampler2d texture: emission
+SHADER_LOC_MAP_HEIGHT: Const[int] = 21
+# Shader location: sampler2d texture: height
+SHADER_LOC_MAP_CUBEMAP: Const[int] = 22
+# Shader location: samplerCube texture: cubemap
+SHADER_LOC_MAP_IRRADIANCE: Const[int] = 23
+# Shader location: samplerCube texture: irradiance
+SHADER_LOC_MAP_PREFILTER: Const[int] = 24
+# Shader location: samplerCube texture: prefilter
+SHADER_LOC_MAP_BRDF: Const[int] = 25
+# Shader location: sampler2d texture: brdf
+SHADER_UNIFORM_FLOAT: Const[int] = 0
+# Shader uniform type: float
+SHADER_UNIFORM_VEC2: Const[int] = 1
+# Shader uniform type: vec2 (2 float)
+SHADER_UNIFORM_VEC3: Const[int] = 2
+# Shader uniform type: vec3 (3 float)
+SHADER_UNIFORM_VEC4: Const[int] = 3
+# Shader uniform type: vec4 (4 float)
+SHADER_UNIFORM_INT: Const[int] = 4
+# Shader uniform type: int
+SHADER_UNIFORM_IVEC2: Const[int] = 5
+# Shader uniform type: ivec2 (2 int)
+SHADER_UNIFORM_IVEC3: Const[int] = 6
+# Shader uniform type: ivec3 (3 int)
+SHADER_UNIFORM_IVEC4: Const[int] = 7
+# Shader uniform type: ivec4 (4 int)
+SHADER_UNIFORM_SAMPLER2D: Const[int] = 8
+# Shader uniform type: sampler2d
+SHADER_ATTRIB_FLOAT: Const[int] = 0
+# Shader attribute type: float
+SHADER_ATTRIB_VEC2: Const[int] = 1
+# Shader attribute type: vec2 (2 float)
+SHADER_ATTRIB_VEC3: Const[int] = 2
+# Shader attribute type: vec3 (3 float)
+SHADER_ATTRIB_VEC4: Const[int] = 3
+# Shader attribute type: vec4 (4 float)
+PIXELFORMAT_UNCOMPRESSED_GRAYSCALE: Const[int] = 1
+# 8 bit per pixel (no alpha)
+PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA: Const[int] = 2
+# 8*2 bpp (2 channels)
+PIXELFORMAT_UNCOMPRESSED_R5G6B5: Const[int] = 3
+# 16 bpp
+PIXELFORMAT_UNCOMPRESSED_R8G8B8: Const[int] = 4
+# 24 bpp
+PIXELFORMAT_UNCOMPRESSED_R5G5B5A1: Const[int] = 5
+# 16 bpp (1 bit alpha)
+PIXELFORMAT_UNCOMPRESSED_R4G4B4A4: Const[int] = 6
+# 16 bpp (4 bit alpha)
+PIXELFORMAT_UNCOMPRESSED_R8G8B8A8: Const[int] = 7
+# 32 bpp
+PIXELFORMAT_UNCOMPRESSED_R32: Const[int] = 8
+# 32 bpp (1 channel - float)
+PIXELFORMAT_UNCOMPRESSED_R32G32B32: Const[int] = 9
+# 32*3 bpp (3 channels - float)
+PIXELFORMAT_UNCOMPRESSED_R32G32B32A32: Const[int] = 10
+# 32*4 bpp (4 channels - float)
+PIXELFORMAT_COMPRESSED_DXT1_RGB: Const[int] = 11
+# 4 bpp (no alpha)
+PIXELFORMAT_COMPRESSED_DXT1_RGBA: Const[int] = 12
+# 4 bpp (1 bit alpha)
+PIXELFORMAT_COMPRESSED_DXT3_RGBA: Const[int] = 13
+# 8 bpp
+PIXELFORMAT_COMPRESSED_DXT5_RGBA: Const[int] = 14
+# 8 bpp
+PIXELFORMAT_COMPRESSED_ETC1_RGB: Const[int] = 15
+# 4 bpp
+PIXELFORMAT_COMPRESSED_ETC2_RGB: Const[int] = 16
+# 4 bpp
+PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA: Const[int] = 17
+# 8 bpp
+PIXELFORMAT_COMPRESSED_PVRT_RGB: Const[int] = 18
+# 4 bpp
+PIXELFORMAT_COMPRESSED_PVRT_RGBA: Const[int] = 19
+# 4 bpp
+PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA: Const[int] = 20
+# 8 bpp
+PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA: Const[int] = 21
+# 2 bpp
+TEXTURE_FILTER_POINT: Const[int] = 0
+# No filter, just pixel approximation
+TEXTURE_FILTER_BILINEAR: Const[int] = 1
+# Linear filtering
+TEXTURE_FILTER_TRILINEAR: Const[int] = 2
+# Trilinear filtering (linear with mipmaps)
+TEXTURE_FILTER_ANISOTROPIC_4X: Const[int] = 3
+# Anisotropic filtering 4x
+TEXTURE_FILTER_ANISOTROPIC_8X: Const[int] = 4
+# Anisotropic filtering 8x
+TEXTURE_FILTER_ANISOTROPIC_16X: Const[int] = 5
+# Anisotropic filtering 16x
+TEXTURE_WRAP_REPEAT: Const[int] = 0
+# Repeats texture in tiled mode
+TEXTURE_WRAP_CLAMP: Const[int] = 1
+# Clamps texture to edge pixel in tiled mode
+TEXTURE_WRAP_MIRROR_REPEAT: Const[int] = 2
+# Mirrors and repeats the texture in tiled mode
+TEXTURE_WRAP_MIRROR_CLAMP: Const[int] = 3
+# Mirrors and clamps to border the texture in tiled mode
+CUBEMAP_LAYOUT_AUTO_DETECT: Const[int] = 0
+# Automatically detect layout type
+CUBEMAP_LAYOUT_LINE_VERTICAL: Const[int] = 1
+# Layout is defined by a vertical line with faces
+CUBEMAP_LAYOUT_LINE_HORIZONTAL: Const[int] = 2
+# Layout is defined by an horizontal line with faces
+CUBEMAP_LAYOUT_CROSS_THREE_BY_FOUR: Const[int] = 3
+# Layout is defined by a 3x4 cross with cubemap faces
+CUBEMAP_LAYOUT_CROSS_FOUR_BY_THREE: Const[int] = 4
+# Layout is defined by a 4x3 cross with cubemap faces
+CUBEMAP_LAYOUT_PANORAMA: Const[int] = 5
+# Layout is defined by a panorama image (equirectangular map)
+FONT_DEFAULT: Const[int] = 0
+# Default font generation, anti-aliased
+FONT_BITMAP: Const[int] = 1
+# Bitmap font generation, no anti-aliasing
+FONT_SDF: Const[int] = 2
+# SDF font generation, requires external shader
+BLEND_ALPHA: Const[int] = 0
+# Blend textures considering alpha (default)
+BLEND_ADDITIVE: Const[int] = 1
+# Blend textures adding colors
+BLEND_MULTIPLIED: Const[int] = 2
+# Blend textures multiplying colors
+BLEND_ADD_COLORS: Const[int] = 3
+# Blend textures adding colors (alternative)
+BLEND_SUBTRACT_COLORS: Const[int] = 4
+# Blend textures subtracting colors (alternative)
+BLEND_ALPHA_PREMULTIPLY: Const[int] = 5
+# Blend premultiplied textures considering alpha
+BLEND_CUSTOM: Const[int] = 6
+# Blend textures using custom src/dst factors (use rlSetBlendMode())
+GESTURE_NONE: Const[int] = 0
+# No gesture
+GESTURE_TAP: Const[int] = 1
+# Tap gesture
+GESTURE_DOUBLETAP: Const[int] = 2
+# Double tap gesture
+GESTURE_HOLD: Const[int] = 4
+# Hold gesture
+GESTURE_DRAG: Const[int] = 8
+# Drag gesture
+GESTURE_SWIPE_RIGHT: Const[int] = 16
+# Swipe right gesture
+GESTURE_SWIPE_LEFT: Const[int] = 32
+# Swipe left gesture
+GESTURE_SWIPE_UP: Const[int] = 64
+# Swipe up gesture
+GESTURE_SWIPE_DOWN: Const[int] = 128
+# Swipe down gesture
+GESTURE_PINCH_IN: Const[int] = 256
+# Pinch in gesture
+GESTURE_PINCH_OUT: Const[int] = 512
+# Pinch out gesture
+CAMERA_CUSTOM: Const[int] = 0
+# Custom camera
+CAMERA_FREE: Const[int] = 1
+# Free camera
+CAMERA_ORBITAL: Const[int] = 2
+# Orbital camera
+CAMERA_FIRST_PERSON: Const[int] = 3
+# First person camera
+CAMERA_THIRD_PERSON: Const[int] = 4
+# Third person camera
+CAMERA_PERSPECTIVE: Const[int] = 0
+# Perspective projection
+CAMERA_ORTHOGRAPHIC: Const[int] = 1
+# Orthographic projection
+NPATCH_NINE_PATCH: Const[int] = 0
+# Npatch layout: 3x3 tiles
+NPATCH_THREE_PATCH_VERTICAL: Const[int] = 1
+# Npatch layout: 1x3 tiles
+NPATCH_THREE_PATCH_HORIZONTAL: Const[int] = 2
+# Npatch layout: 3x1 tiles
+
+
+@nativedefine("char[32]")
+class CChar32:
     pass
 
-
-@nativedefine("WindowShouldClose")
-def window_should_close() -> bool:
-    # Esc pressed or close button clicked?
+@nativedefine("float[2]")
+class CFloat2:
     pass
 
-
-@nativedefine("CloseWindow")
-def close_window() -> None:
-    # Close window after game is done.
+@nativedefine("float[4]")
+class CFloat4:
     pass
 
+@nativedefine("Matrix[2]")
+class DTMatrix2:
+    pass
+
+@nativedefine("rAudioBuffer *")
+class RAudioBufferPtr:
+    pass
+
+@nativedefine("rAudioProcessor *")
+class RAudioProcessorPtr:
+    pass
 
 @native
 def clear() -> None:
-    # Clear with RAYWHITE colour
+    # Clear background with RAYWHITE colour
     ccode """ClearBackground(RAYWHITE)"""
 
+@dotaccess
+@nativedefine("Vector2")
+class Vector2:
+    # Vector2, 2 components
+    x: float
+    y: float
+
+@nativemacro
+def vector2(x: f64, y: f64) -> Vector2:
+    # Factory function for: Vector2
+    ccode """(Vector2){(float)nn__x, (float)nn__y}"""
+
+@dotaccess
+@nativedefine("Vector3")
+class Vector3:
+    # Vector3, 3 components
+    x: float
+    y: float
+    z: float
+
+@nativemacro
+def vector3(x: f64, y: f64, z: f64) -> Vector3:
+    # Factory function for: Vector3
+    ccode """(Vector3){(float)nn__x, (float)nn__y, (float)nn__z}"""
+
+@dotaccess
+@nativedefine("Vector4")
+class Vector4:
+    # Vector4, 4 components
+    x: float
+    y: float
+    z: float
+    w: float
+
+@nativemacro
+def vector4(x: f64, y: f64, z: f64, w: f64) -> Vector4:
+    # Factory function for: Vector4
+    ccode """(Vector4){(float)nn__x, (float)nn__y, (float)nn__z, (float)nn__w}"""
+
+@dotaccess
+@nativedefine("Matrix")
+class Matrix:
+    # Matrix, 4x4 components, column major, OpenGL style, right handed
+    m0: float
+    m4: float
+    m8: float
+    m12: float
+    m1: float
+    m5: float
+    m9: float
+    m13: float
+    m2: float
+    m6: float
+    m10: float
+    m14: float
+    m3: float
+    m7: float
+    m11: float
+    m15: float
+
+@nativemacro
+def matrix(m0: f64, m4: f64, m8: f64, m12: f64, m1: f64, m5: f64, m9: f64, m13: f64, m2: f64, m6: f64, m10: f64, m14: f64, m3: f64, m7: f64, m11: f64, m15: f64) -> Matrix:
+    # Factory function for: Matrix
+    ccode """(Matrix){(float)nn__m0, (float)nn__m4, (float)nn__m8, (float)nn__m12, (float)nn__m1, (float)nn__m5, (float)nn__m9, (float)nn__m13, (float)nn__m2, (float)nn__m6, (float)nn__m10, (float)nn__m14, (float)nn__m3, (float)nn__m7, (float)nn__m11, (float)nn__m15}"""
+
+@dotaccess
+@nativedefine("Color")
+class Color:
+    # Color, 4 components, R8G8B8A8 (32bit)
+    r: c.CUChar
+    g: c.CUChar
+    b: c.CUChar
+    a: c.CUChar
+
+@nativemacro
+def color(r: int, g: int, b: int, a: int) -> Color:
+    # Factory function for: Color
+    ccode """(Color){(unsigned char)nn__r, (unsigned char)nn__g, (unsigned char)nn__b, (unsigned char)nn__a}"""
+
+@dotaccess
+@nativedefine("Rectangle")
+class Rectangle:
+    # Rectangle, 4 components
+    x: float
+    y: float
+    width: float
+    height: float
+
+@nativemacro
+def rectangle(x: f64, y: f64, width: f64, height: f64) -> Rectangle:
+    # Factory function for: Rectangle
+    ccode """(Rectangle){(float)nn__x, (float)nn__y, (float)nn__width, (float)nn__height}"""
+
+@dotaccess
+@nativedefine("Image")
+class Image:
+    # Image, pixel data stored in CPU memory (RAM)
+    data: c.VoidPtr
+    width: c.CInt
+    height: c.CInt
+    mipmaps: c.CInt
+    format: c.CInt
+
+@nativemacro
+def image(data: c.VoidPtr, width: int, height: int, mipmaps: int, format: int) -> Image:
+    # Factory function for: Image
+    ccode """(Image){nn__data, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
+
+@dotaccess
+@nativedefine("Texture")
+class Texture:
+    # Texture, tex data stored in GPU memory (VRAM)
+    id: c.CUInt
+    width: c.CInt
+    height: c.CInt
+    mipmaps: c.CInt
+    format: c.CInt
+
+@nativemacro
+def texture(id: u32, width: int, height: int, mipmaps: int, format: int) -> Texture:
+    # Factory function for: Texture
+    ccode """(Texture){(unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
+
+@dotaccess
+@nativedefine("RenderTexture")
+class RenderTexture:
+    # RenderTexture, fbo for texture rendering
+    id: c.CUInt
+    texture: Texture
+    depth: Texture
+
+@nativemacro
+def render_texture(id: u32, p_texture: Texture, depth: Texture) -> RenderTexture:
+    # Factory function for: RenderTexture
+    ccode """(RenderTexture){(unsigned int)nn__id, nn__p_texture, nn__depth}"""
+
+@dotaccess
+@nativedefine("NPatchInfo")
+class NPatchInfo:
+    # NPatchInfo, n-patch layout info
+    source: Rectangle
+    left: c.CInt
+    top: c.CInt
+    right: c.CInt
+    bottom: c.CInt
+    layout: c.CInt
+
+@nativemacro
+def n_patch_info(source: Rectangle, left: int, top: int, right: int, bottom: int, layout: int) -> NPatchInfo:
+    # Factory function for: NPatchInfo
+    ccode """(NPatchInfo){nn__source, (int)nn__left, (int)nn__top, (int)nn__right, (int)nn__bottom, (int)nn__layout}"""
+
+@dotaccess
+@nativedefine("GlyphInfo")
+class GlyphInfo:
+    # GlyphInfo, font characters glyphs info
+    value: c.CInt
+    offsetX: c.CInt
+    offsetY: c.CInt
+    advanceX: c.CInt
+    image: Image
+
+@nativemacro
+def glyph_info(value: int, offsetX: int, offsetY: int, advanceX: int, p_image: Image) -> GlyphInfo:
+    # Factory function for: GlyphInfo
+    ccode """(GlyphInfo){(int)nn__value, (int)nn__offsetX, (int)nn__offsetY, (int)nn__advanceX, nn__p_image}"""
+
+@dotaccess
+@nativedefine("Font")
+class Font:
+    # Font, font texture and GlyphInfo array data
+    baseSize: c.CInt
+    glyphCount: c.CInt
+    glyphPadding: c.CInt
+    texture: Texture2D
+    recs: Ptr[Rectangle]
+    glyphs: Ptr[GlyphInfo]
+
+@nativemacro
+def font(baseSize: int, glyphCount: int, glyphPadding: int, p_texture: Texture2D, recs: Ptr[Rectangle], glyphs: Ptr[GlyphInfo]) -> Font:
+    # Factory function for: Font
+    ccode """(Font){(int)nn__baseSize, (int)nn__glyphCount, (int)nn__glyphPadding, nn__p_texture, nn__recs, nn__glyphs}"""
+
+@dotaccess
+@nativedefine("Camera3D")
+class Camera3D:
+    # Camera, defines position/orientation in 3d space
+    position: Vector3
+    target: Vector3
+    up: Vector3
+    fovy: float
+    projection: c.CInt
+
+@nativemacro
+def camera3_d(position: Vector3, target: Vector3, up: Vector3, fovy: f64, projection: int) -> Camera3D:
+    # Factory function for: Camera3D
+    ccode """(Camera3D){nn__position, nn__target, nn__up, (float)nn__fovy, (int)nn__projection}"""
+
+@dotaccess
+@nativedefine("Camera2D")
+class Camera2D:
+    # Camera2D, defines position/orientation in 2d space
+    offset: Vector2
+    target: Vector2
+    rotation: float
+    zoom: float
+
+@nativemacro
+def camera2_d(offset: Vector2, target: Vector2, rotation: f64, zoom: f64) -> Camera2D:
+    # Factory function for: Camera2D
+    ccode """(Camera2D){nn__offset, nn__target, (float)nn__rotation, (float)nn__zoom}"""
+
+@nativedefine("Mesh")
+class Mesh:
+    # Mesh, vertex data and vao/vbo
+    pass
+
+@nativedefine("Shader")
+class Shader:
+    # Shader
+    pass
+
+@dotaccess
+@nativedefine("MaterialMap")
+class MaterialMap:
+    # MaterialMap
+    texture: Texture2D
+    color: Color
+    value: float
+
+@nativemacro
+def material_map(p_texture: Texture2D, p_color: Color, value: f64) -> MaterialMap:
+    # Factory function for: MaterialMap
+    ccode """(MaterialMap){nn__p_texture, nn__p_color, (float)nn__value}"""
+
+@nativedefine("Material")
+class Material:
+    # Material, includes shader and maps
+    pass
+
+@dotaccess
+@nativedefine("Transform")
+class Transform:
+    # Transform, vectex transformation data
+    translation: Vector3
+    rotation: Quaternion
+    scale: Vector3
+
+@nativemacro
+def transform(translation: Vector3, rotation: Quaternion, scale: Vector3) -> Transform:
+    # Factory function for: Transform
+    ccode """(Transform){nn__translation, nn__rotation, nn__scale}"""
+
+@nativedefine("BoneInfo")
+class BoneInfo:
+    # Bone, skeletal animation bone
+    pass
+
+@nativedefine("Model")
+class Model:
+    # Model, meshes, materials and animation data
+    pass
+
+@nativedefine("ModelAnimation")
+class ModelAnimation:
+    # ModelAnimation
+    pass
+
+@dotaccess
+@nativedefine("Ray")
+class Ray:
+    # Ray, ray for raycasting
+    position: Vector3
+    direction: Vector3
+
+@nativemacro
+def ray(position: Vector3, direction: Vector3) -> Ray:
+    # Factory function for: Ray
+    ccode """(Ray){nn__position, nn__direction}"""
+
+@dotaccess
+@nativedefine("RayCollision")
+class RayCollision:
+    # RayCollision, ray hit information
+    hit: bool
+    distance: float
+    point: Vector3
+    normal: Vector3
+
+@nativemacro
+def ray_collision(hit: bool, distance: f64, point: Vector3, normal: Vector3) -> RayCollision:
+    # Factory function for: RayCollision
+    ccode """(RayCollision){nn__hit, (float)nn__distance, nn__point, nn__normal}"""
+
+@dotaccess
+@nativedefine("BoundingBox")
+class BoundingBox:
+    # BoundingBox
+    min: Vector3
+    max: Vector3
+
+@nativemacro
+def bounding_box(min: Vector3, max: Vector3) -> BoundingBox:
+    # Factory function for: BoundingBox
+    ccode """(BoundingBox){nn__min, nn__max}"""
+
+@dotaccess
+@nativedefine("Wave")
+class Wave:
+    # Wave, audio wave data
+    frameCount: c.CUInt
+    sampleRate: c.CUInt
+    sampleSize: c.CUInt
+    channels: c.CUInt
+    data: c.VoidPtr
+
+@nativemacro
+def wave(frameCount: u32, sampleRate: u32, sampleSize: u32, channels: u32, data: c.VoidPtr) -> Wave:
+    # Factory function for: Wave
+    ccode """(Wave){(unsigned int)nn__frameCount, (unsigned int)nn__sampleRate, (unsigned int)nn__sampleSize, (unsigned int)nn__channels, nn__data}"""
+
+@nativedefine("AudioStream")
+class AudioStream:
+    # AudioStream, custom audio stream
+    pass
+
+@dotaccess
+@nativedefine("Sound")
+class Sound:
+    # Sound
+    stream: AudioStream
+    frameCount: c.CUInt
+
+@nativemacro
+def sound(stream: AudioStream, frameCount: u32) -> Sound:
+    # Factory function for: Sound
+    ccode """(Sound){nn__stream, (unsigned int)nn__frameCount}"""
+
+@dotaccess
+@nativedefine("Music")
+class Music:
+    # Music, audio stream, anything longer than ~10 seconds should be streamed
+    stream: AudioStream
+    frameCount: c.CUInt
+    looping: bool
+    ctxType: c.CInt
+    ctxData: c.VoidPtr
+
+@nativemacro
+def music(stream: AudioStream, frameCount: u32, looping: bool, ctxType: int, ctxData: c.VoidPtr) -> Music:
+    # Factory function for: Music
+    ccode """(Music){nn__stream, (unsigned int)nn__frameCount, nn__looping, (int)nn__ctxType, nn__ctxData}"""
+
+@nativedefine("VrDeviceInfo")
+class VrDeviceInfo:
+    # VrDeviceInfo, Head-Mounted-Display device parameters
+    pass
+
+@nativedefine("VrStereoConfig")
+class VrStereoConfig:
+    # VrStereoConfig, VR stereo rendering configuration for simulator
+    pass
+
+@nativedefine("FilePathList")
+class FilePathList:
+    # File path list
+    pass
+
+@dotaccess
+@nativedefine("Quaternion")
+class Quaternion:
+    # Quaternion, 4 components (Vector4 alias)
+    x: float
+    y: float
+    z: float
+    w: float
+
+@nativemacro
+def quaternion(x: f64, y: f64, z: f64, w: f64) -> Quaternion:
+    # Factory function for: Quaternion
+    ccode """(Quaternion){(float)nn__x, (float)nn__y, (float)nn__z, (float)nn__w}"""
+
+@dotaccess
+@nativedefine("Texture2D")
+class Texture2D:
+    # Texture2D, same as Texture
+    id: c.CUInt
+    width: c.CInt
+    height: c.CInt
+    mipmaps: c.CInt
+    format: c.CInt
+
+@nativemacro
+def texture2_d(id: u32, width: int, height: int, mipmaps: int, format: int) -> Texture2D:
+    # Factory function for: Texture2D
+    ccode """(Texture2D){(unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
+
+@dotaccess
+@nativedefine("TextureCubemap")
+class TextureCubemap:
+    # TextureCubemap, same as Texture
+    id: c.CUInt
+    width: c.CInt
+    height: c.CInt
+    mipmaps: c.CInt
+    format: c.CInt
+
+@nativemacro
+def texture_cubemap(id: u32, width: int, height: int, mipmaps: int, format: int) -> TextureCubemap:
+    # Factory function for: TextureCubemap
+    ccode """(TextureCubemap){(unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
+
+@dotaccess
+@nativedefine("RenderTexture2D")
+class RenderTexture2D:
+    # RenderTexture2D, same as RenderTexture
+    id: c.CUInt
+    p_texture: Texture
+    depth: Texture
+
+@nativemacro
+def render_texture2_d(id: u32, p_texture: Texture, depth: Texture) -> RenderTexture2D:
+    # Factory function for: RenderTexture2D
+    ccode """(RenderTexture2D){(unsigned int)nn__id, nn__p_texture, nn__depth}"""
+
+@dotaccess
+@nativedefine("Camera")
+class Camera:
+    # Camera type fallback, defaults to Camera3D
+    position: Vector3
+    target: Vector3
+    up: Vector3
+    fovy: float
+    projection: c.CInt
+
+@nativemacro
+def camera(position: Vector3, target: Vector3, up: Vector3, fovy: f64, projection: int) -> Camera:
+    # Factory function for: Camera
+    ccode """(Camera){nn__position, nn__target, nn__up, (float)nn__fovy, (int)nn__projection}"""
 
 @native
-def draw_text(text: str, x: int, y: int, size: int) -> None:
-    # Draw text with light gray color
-    ccode """DrawText(nn__text, nn__x, nn__y, nn__size, BLACK);
-    yk__sdsfree(nn__text)
+def init_window(width: int, height: int, title: str) -> None:
+    # Initialize window and OpenGL context
+    ccode """InitWindow((int)nn__width, (int)nn__height, nn__title);
+    yk__sdsfree(nn__title);
     """
 
+@nativemacro
+def window_should_close() -> bool:
+    # Check if KEY_ESCAPE pressed or Close icon pressed
+    ccode """WindowShouldClose()"""
 
-@nativedefine("BeginDrawing")
+@nativemacro
+def close_window() -> None:
+    # Close window and unload OpenGL context
+    ccode """CloseWindow()"""
+
+@nativemacro
+def is_window_ready() -> bool:
+    # Check if window has been initialized successfully
+    ccode """IsWindowReady()"""
+
+@nativemacro
+def is_window_fullscreen() -> bool:
+    # Check if window is currently fullscreen
+    ccode """IsWindowFullscreen()"""
+
+@nativemacro
+def is_window_hidden() -> bool:
+    # Check if window is currently hidden (only PLATFORM_DESKTOP)
+    ccode """IsWindowHidden()"""
+
+@nativemacro
+def is_window_minimized() -> bool:
+    # Check if window is currently minimized (only PLATFORM_DESKTOP)
+    ccode """IsWindowMinimized()"""
+
+@nativemacro
+def is_window_maximized() -> bool:
+    # Check if window is currently maximized (only PLATFORM_DESKTOP)
+    ccode """IsWindowMaximized()"""
+
+@nativemacro
+def is_window_focused() -> bool:
+    # Check if window is currently focused (only PLATFORM_DESKTOP)
+    ccode """IsWindowFocused()"""
+
+@nativemacro
+def is_window_resized() -> bool:
+    # Check if window has been resized last frame
+    ccode """IsWindowResized()"""
+
+@nativemacro
+def is_window_state(flag: u32) -> bool:
+    # Check if one specific window flag is enabled
+    ccode """IsWindowState((unsigned int)nn__flag)"""
+
+@nativemacro
+def set_window_state(flags: u32) -> None:
+    # Set window configuration state using flags (only PLATFORM_DESKTOP)
+    ccode """SetWindowState((unsigned int)nn__flags)"""
+
+@nativemacro
+def clear_window_state(flags: u32) -> None:
+    # Clear window configuration state flags
+    ccode """ClearWindowState((unsigned int)nn__flags)"""
+
+@nativemacro
+def toggle_fullscreen() -> None:
+    # Toggle window state: fullscreen/windowed (only PLATFORM_DESKTOP)
+    ccode """ToggleFullscreen()"""
+
+@nativemacro
+def maximize_window() -> None:
+    # Set window state: maximized, if resizable (only PLATFORM_DESKTOP)
+    ccode """MaximizeWindow()"""
+
+@nativemacro
+def minimize_window() -> None:
+    # Set window state: minimized, if resizable (only PLATFORM_DESKTOP)
+    ccode """MinimizeWindow()"""
+
+@nativemacro
+def restore_window() -> None:
+    # Set window state: not minimized/maximized (only PLATFORM_DESKTOP)
+    ccode """RestoreWindow()"""
+
+@nativemacro
+def set_window_icon(p_image: Image) -> None:
+    # Set icon for window (only PLATFORM_DESKTOP)
+    ccode """SetWindowIcon(nn__p_image)"""
+
+@native
+def set_window_title(title: str) -> None:
+    # Set title for window (only PLATFORM_DESKTOP)
+    ccode """SetWindowTitle(nn__title);
+    yk__sdsfree(nn__title);
+    """
+
+@nativemacro
+def set_window_position(x: int, y: int) -> None:
+    # Set window position on screen (only PLATFORM_DESKTOP)
+    ccode """SetWindowPosition((int)nn__x, (int)nn__y)"""
+
+@nativemacro
+def set_window_monitor(monitor: int) -> None:
+    # Set monitor for the current window (fullscreen mode)
+    ccode """SetWindowMonitor((int)nn__monitor)"""
+
+@nativemacro
+def set_window_min_size(width: int, height: int) -> None:
+    # Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
+    ccode """SetWindowMinSize((int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def set_window_size(width: int, height: int) -> None:
+    # Set window dimensions
+    ccode """SetWindowSize((int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def set_window_opacity(opacity: f64) -> None:
+    # Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)
+    ccode """SetWindowOpacity((float)nn__opacity)"""
+
+@nativemacro
+def get_window_handle() -> c.VoidPtr:
+    # Get native window handle
+    ccode """GetWindowHandle()"""
+
+@nativemacro
+def get_screen_width() -> int:
+    # Get current screen width
+    ccode """GetScreenWidth()"""
+
+@nativemacro
+def get_screen_height() -> int:
+    # Get current screen height
+    ccode """GetScreenHeight()"""
+
+@nativemacro
+def get_render_width() -> int:
+    # Get current render width (it considers HiDPI)
+    ccode """GetRenderWidth()"""
+
+@nativemacro
+def get_render_height() -> int:
+    # Get current render height (it considers HiDPI)
+    ccode """GetRenderHeight()"""
+
+@nativemacro
+def get_monitor_count() -> int:
+    # Get number of connected monitors
+    ccode """GetMonitorCount()"""
+
+@nativemacro
+def get_current_monitor() -> int:
+    # Get current connected monitor
+    ccode """GetCurrentMonitor()"""
+
+@nativemacro
+def get_monitor_position(monitor: int) -> Vector2:
+    # Get specified monitor position
+    ccode """GetMonitorPosition((int)nn__monitor)"""
+
+@nativemacro
+def get_monitor_width(monitor: int) -> int:
+    # Get specified monitor width (current video mode used by monitor)
+    ccode """GetMonitorWidth((int)nn__monitor)"""
+
+@nativemacro
+def get_monitor_height(monitor: int) -> int:
+    # Get specified monitor height (current video mode used by monitor)
+    ccode """GetMonitorHeight((int)nn__monitor)"""
+
+@nativemacro
+def get_monitor_physical_width(monitor: int) -> int:
+    # Get specified monitor physical width in millimetres
+    ccode """GetMonitorPhysicalWidth((int)nn__monitor)"""
+
+@nativemacro
+def get_monitor_physical_height(monitor: int) -> int:
+    # Get specified monitor physical height in millimetres
+    ccode """GetMonitorPhysicalHeight((int)nn__monitor)"""
+
+@nativemacro
+def get_monitor_refresh_rate(monitor: int) -> int:
+    # Get specified monitor refresh rate
+    ccode """GetMonitorRefreshRate((int)nn__monitor)"""
+
+@nativemacro
+def get_window_position() -> Vector2:
+    # Get window position XY on monitor
+    ccode """GetWindowPosition()"""
+
+@nativemacro
+def get_window_scale_dpi() -> Vector2:
+    # Get window scale DPI factor
+    ccode """GetWindowScaleDPI()"""
+
+@nativemacro
+def get_monitor_name(monitor: int) -> str:
+    # Get the human-readable, UTF-8 encoded name of the primary monitor
+    ccode """GetMonitorName((int)nn__monitor)"""
+
+@native
+def set_clipboard_text(text: str) -> None:
+    # Set clipboard text content
+    ccode """SetClipboardText(nn__text);
+    yk__sdsfree(nn__text);
+    """
+
+@nativemacro
+def get_clipboard_text() -> str:
+    # Get clipboard text content
+    ccode """GetClipboardText()"""
+
+@nativemacro
+def enable_event_waiting() -> None:
+    # Enable waiting for events on EndDrawing(), no automatic event polling
+    ccode """EnableEventWaiting()"""
+
+@nativemacro
+def disable_event_waiting() -> None:
+    # Disable waiting for events on EndDrawing(), automatic events polling
+    ccode """DisableEventWaiting()"""
+
+@nativemacro
+def swap_screen_buffer() -> None:
+    # Swap back buffer with front buffer (screen drawing)
+    ccode """SwapScreenBuffer()"""
+
+@nativemacro
+def poll_input_events() -> None:
+    # Register all input events
+    ccode """PollInputEvents()"""
+
+@nativemacro
+def wait_time(seconds: f64) -> None:
+    # Wait for some time (halt program execution)
+    ccode """WaitTime(nn__seconds)"""
+
+@nativemacro
+def show_cursor() -> None:
+    # Shows cursor
+    ccode """ShowCursor()"""
+
+@nativemacro
+def hide_cursor() -> None:
+    # Hides cursor
+    ccode """HideCursor()"""
+
+@nativemacro
+def is_cursor_hidden() -> bool:
+    # Check if cursor is not visible
+    ccode """IsCursorHidden()"""
+
+@nativemacro
+def enable_cursor() -> None:
+    # Enables cursor (unlock cursor)
+    ccode """EnableCursor()"""
+
+@nativemacro
+def disable_cursor() -> None:
+    # Disables cursor (lock cursor)
+    ccode """DisableCursor()"""
+
+@nativemacro
+def is_cursor_on_screen() -> bool:
+    # Check if cursor is on the screen
+    ccode """IsCursorOnScreen()"""
+
+@nativemacro
+def clear_background(p_color: Color) -> None:
+    # Set background color (framebuffer clear color)
+    ccode """ClearBackground(nn__p_color)"""
+
+@nativemacro
 def begin_drawing() -> None:
-    pass
+    # Setup canvas (framebuffer) to start drawing
+    ccode """BeginDrawing()"""
 
-
-@nativedefine("EndDrawing")
+@nativemacro
 def end_drawing() -> None:
-    pass
+    # End canvas drawing and swap buffers (double buffering)
+    ccode """EndDrawing()"""
+
+@nativemacro
+def begin_mode2_d(p_camera: Camera2D) -> None:
+    # Begin 2D mode with custom camera (2D)
+    ccode """BeginMode2D(nn__p_camera)"""
+
+@nativemacro
+def end_mode2_d() -> None:
+    # Ends 2D mode with custom camera
+    ccode """EndMode2D()"""
+
+@nativemacro
+def begin_mode3_d(p_camera: Camera3D) -> None:
+    # Begin 3D mode with custom camera (3D)
+    ccode """BeginMode3D(nn__p_camera)"""
+
+@nativemacro
+def end_mode3_d() -> None:
+    # Ends 3D mode and returns to default 2D orthographic mode
+    ccode """EndMode3D()"""
+
+@nativemacro
+def begin_texture_mode(target: RenderTexture2D) -> None:
+    # Begin drawing to render texture
+    ccode """BeginTextureMode(nn__target)"""
+
+@nativemacro
+def end_texture_mode() -> None:
+    # Ends drawing to render texture
+    ccode """EndTextureMode()"""
+
+@nativemacro
+def begin_shader_mode(shader: Shader) -> None:
+    # Begin custom shader drawing
+    ccode """BeginShaderMode(nn__shader)"""
+
+@nativemacro
+def end_shader_mode() -> None:
+    # End custom shader drawing (use default shader)
+    ccode """EndShaderMode()"""
+
+@nativemacro
+def begin_blend_mode(mode: int) -> None:
+    # Begin blending mode (alpha, additive, multiplied, subtract, custom)
+    ccode """BeginBlendMode((int)nn__mode)"""
+
+@nativemacro
+def end_blend_mode() -> None:
+    # End blending mode (reset to default: alpha blending)
+    ccode """EndBlendMode()"""
+
+@nativemacro
+def begin_scissor_mode(x: int, y: int, width: int, height: int) -> None:
+    # Begin scissor mode (define screen area for following drawing)
+    ccode """BeginScissorMode((int)nn__x, (int)nn__y, (int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def end_scissor_mode() -> None:
+    # End scissor mode
+    ccode """EndScissorMode()"""
+
+@nativemacro
+def begin_vr_stereo_mode(config: VrStereoConfig) -> None:
+    # Begin stereo rendering (requires VR simulator)
+    ccode """BeginVrStereoMode(nn__config)"""
+
+@nativemacro
+def end_vr_stereo_mode() -> None:
+    # End stereo rendering (requires VR simulator)
+    ccode """EndVrStereoMode()"""
+
+@nativemacro
+def load_vr_stereo_config(device: VrDeviceInfo) -> VrStereoConfig:
+    # Load VR stereo config for VR simulator device parameters
+    ccode """LoadVrStereoConfig(nn__device)"""
+
+@nativemacro
+def unload_vr_stereo_config(config: VrStereoConfig) -> None:
+    # Unload VR stereo config
+    ccode """UnloadVrStereoConfig(nn__config)"""
+
+@native
+def load_shader(vsFileName: str, fsFileName: str) -> Shader:
+    # Load shader from files and bind default locations
+    ccode """Shader temp_rl = LoadShader(nn__vsFileName, nn__fsFileName);
+    yk__sdsfree(nn__vsFileName);
+    yk__sdsfree(nn__fsFileName);
+    return temp_rl"""
+
+@native
+def load_shader_from_memory(vsCode: str, fsCode: str) -> Shader:
+    # Load shader from code strings and bind default locations
+    ccode """Shader temp_rl = LoadShaderFromMemory(nn__vsCode, nn__fsCode);
+    yk__sdsfree(nn__vsCode);
+    yk__sdsfree(nn__fsCode);
+    return temp_rl"""
+
+@native
+def get_shader_location(shader: Shader, uniformName: str) -> int:
+    # Get shader uniform location
+    ccode """int temp_rl = GetShaderLocation(nn__shader, nn__uniformName);
+    yk__sdsfree(nn__uniformName);
+    return temp_rl"""
+
+@native
+def get_shader_location_attrib(shader: Shader, attribName: str) -> int:
+    # Get shader attribute location
+    ccode """int temp_rl = GetShaderLocationAttrib(nn__shader, nn__attribName);
+    yk__sdsfree(nn__attribName);
+    return temp_rl"""
+
+@nativemacro
+def set_shader_value(shader: Shader, locIndex: int, value: Const[c.VoidPtr], uniformType: int) -> None:
+    # Set shader uniform value
+    ccode """SetShaderValue(nn__shader, (int)nn__locIndex, nn__value, (int)nn__uniformType)"""
+
+@nativemacro
+def set_shader_value_v(shader: Shader, locIndex: int, value: Const[c.VoidPtr], uniformType: int, count: int) -> None:
+    # Set shader uniform value vector
+    ccode """SetShaderValueV(nn__shader, (int)nn__locIndex, nn__value, (int)nn__uniformType, (int)nn__count)"""
+
+@nativemacro
+def set_shader_value_matrix(shader: Shader, locIndex: int, mat: Matrix) -> None:
+    # Set shader uniform value (matrix 4x4)
+    ccode """SetShaderValueMatrix(nn__shader, (int)nn__locIndex, nn__mat)"""
+
+@nativemacro
+def set_shader_value_texture(shader: Shader, locIndex: int, p_texture: Texture2D) -> None:
+    # Set shader uniform value for texture (sampler2d)
+    ccode """SetShaderValueTexture(nn__shader, (int)nn__locIndex, nn__p_texture)"""
+
+@nativemacro
+def unload_shader(shader: Shader) -> None:
+    # Unload shader from GPU memory (VRAM)
+    ccode """UnloadShader(nn__shader)"""
+
+@nativemacro
+def get_mouse_ray(mousePosition: Vector2, p_camera: Camera) -> Ray:
+    # Get a ray trace from mouse position
+    ccode """GetMouseRay(nn__mousePosition, nn__p_camera)"""
+
+@nativemacro
+def get_camera_matrix(p_camera: Camera) -> Matrix:
+    # Get camera transform matrix (view matrix)
+    ccode """GetCameraMatrix(nn__p_camera)"""
+
+@nativemacro
+def get_camera_matrix2_d(p_camera: Camera2D) -> Matrix:
+    # Get camera 2d transform matrix
+    ccode """GetCameraMatrix2D(nn__p_camera)"""
+
+@nativemacro
+def get_world_to_screen(position: Vector3, p_camera: Camera) -> Vector2:
+    # Get the screen space position for a 3d world space position
+    ccode """GetWorldToScreen(nn__position, nn__p_camera)"""
+
+@nativemacro
+def get_screen_to_world2_d(position: Vector2, p_camera: Camera2D) -> Vector2:
+    # Get the world space position for a 2d camera screen space position
+    ccode """GetScreenToWorld2D(nn__position, nn__p_camera)"""
+
+@nativemacro
+def get_world_to_screen_ex(position: Vector3, p_camera: Camera, width: int, height: int) -> Vector2:
+    # Get size position for a 3d world space position
+    ccode """GetWorldToScreenEx(nn__position, nn__p_camera, (int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def get_world_to_screen2_d(position: Vector2, p_camera: Camera2D) -> Vector2:
+    # Get the screen space position for a 2d camera world space position
+    ccode """GetWorldToScreen2D(nn__position, nn__p_camera)"""
+
+@nativemacro
+def set_target_fps(fps: int) -> None:
+    # Set target FPS (maximum)
+    ccode """SetTargetFPS((int)nn__fps)"""
+
+@nativemacro
+def get_fps() -> int:
+    # Get current FPS
+    ccode """GetFPS()"""
+
+@nativemacro
+def get_frame_time() -> f64:
+    # Get time in seconds for last frame drawn (delta time)
+    ccode """GetFrameTime()"""
+
+@nativemacro
+def get_time() -> f64:
+    # Get elapsed time in seconds since InitWindow()
+    ccode """GetTime()"""
+
+@nativemacro
+def get_random_value(min: int, max: int) -> int:
+    # Get a random value between min and max (both included)
+    ccode """GetRandomValue((int)nn__min, (int)nn__max)"""
+
+@nativemacro
+def set_random_seed(seed: u32) -> None:
+    # Set the seed for the random number generator
+    ccode """SetRandomSeed((unsigned int)nn__seed)"""
+
+@native
+def take_screenshot(fileName: str) -> None:
+    # Takes a screenshot of current screen (filename extension defines format)
+    ccode """TakeScreenshot(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    """
+
+@nativemacro
+def set_config_flags(flags: u32) -> None:
+    # Setup init configuration flags (view FLAGS)
+    ccode """SetConfigFlags((unsigned int)nn__flags)"""
+
+@nativemacro
+def set_trace_log_level(logLevel: int) -> None:
+    # Set the current threshold (minimum) log level
+    ccode """SetTraceLogLevel((int)nn__logLevel)"""
+
+@nativemacro
+def mem_alloc(size: int) -> c.VoidPtr:
+    # Internal memory allocator
+    ccode """MemAlloc((int)nn__size)"""
+
+@nativemacro
+def mem_realloc(ptr: c.VoidPtr, size: int) -> c.VoidPtr:
+    # Internal memory reallocator
+    ccode """MemRealloc(nn__ptr, (int)nn__size)"""
+
+@nativemacro
+def mem_free(ptr: c.VoidPtr) -> None:
+    # Internal memory free
+    ccode """MemFree(nn__ptr)"""
+
+@native
+def open_url(url: str) -> None:
+    # Open URL with default system browser (if available)
+    ccode """OpenURL(nn__url);
+    yk__sdsfree(nn__url);
+    """
+
+@native
+def load_file_data(fileName: str, bytesRead: Ptr[c.CUInt]) -> Ptr[c.CUChar]:
+    # Load file data as byte array (read)
+    ccode """unsigned char * temp_rl = LoadFileData(nn__fileName, nn__bytesRead);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def unload_file_data(data: Ptr[c.CUChar]) -> None:
+    # Unload file data allocated by LoadFileData()
+    ccode """UnloadFileData(nn__data)"""
+
+@native
+def save_file_data(fileName: str, data: c.VoidPtr, bytesToWrite: u32) -> bool:
+    # Save data to file from byte array (write), returns true on success
+    ccode """bool temp_rl = SaveFileData(nn__fileName, nn__data, (unsigned int)nn__bytesToWrite);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def export_data_as_code(data: str, size: u32, fileName: str) -> bool:
+    # Export data to code (.h), returns true on success
+    ccode """bool temp_rl = ExportDataAsCode(nn__data, (unsigned int)nn__size, nn__fileName);
+    yk__sdsfree(nn__data);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def load_file_text(fileName: str) -> str:
+    # Load text data from file (read), returns a '\0' terminated string
+    ccode """char * temp_rl = LoadFileText(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def unload_file_text(text: str) -> None:
+    # Unload file text data allocated by LoadFileText()
+    ccode """UnloadFileText(nn__text);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def save_file_text(fileName: str, text: str) -> bool:
+    # Save text data to file (write), string must be '\0' terminated, returns true on success
+    ccode """bool temp_rl = SaveFileText(nn__fileName, nn__text);
+    yk__sdsfree(nn__fileName);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def file_exists(fileName: str) -> bool:
+    # Check if file exists
+    ccode """bool temp_rl = FileExists(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def directory_exists(dirPath: str) -> bool:
+    # Check if a directory path exists
+    ccode """bool temp_rl = DirectoryExists(nn__dirPath);
+    yk__sdsfree(nn__dirPath);
+    return temp_rl"""
+
+@native
+def is_file_extension(fileName: str, ext: str) -> bool:
+    # Check file extension (including point: .png, .wav)
+    ccode """bool temp_rl = IsFileExtension(nn__fileName, nn__ext);
+    yk__sdsfree(nn__fileName);
+    yk__sdsfree(nn__ext);
+    return temp_rl"""
+
+@native
+def get_file_length(fileName: str) -> int:
+    # Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)
+    ccode """int temp_rl = GetFileLength(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def get_file_extension(fileName: str) -> str:
+    # Get pointer to extension for a filename string (includes dot: '.png')
+    ccode """const char * temp_rl = GetFileExtension(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def get_file_name(filePath: str) -> str:
+    # Get pointer to filename for a path string
+    ccode """const char * temp_rl = GetFileName(nn__filePath);
+    yk__sdsfree(nn__filePath);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def get_file_name_without_ext(filePath: str) -> str:
+    # Get filename string without extension (uses static string)
+    ccode """const char * temp_rl = GetFileNameWithoutExt(nn__filePath);
+    yk__sdsfree(nn__filePath);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def get_directory_path(filePath: str) -> str:
+    # Get full path for a given fileName with path (uses static string)
+    ccode """const char * temp_rl = GetDirectoryPath(nn__filePath);
+    yk__sdsfree(nn__filePath);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def get_prev_directory_path(dirPath: str) -> str:
+    # Get previous directory path for a given path (uses static string)
+    ccode """const char * temp_rl = GetPrevDirectoryPath(nn__dirPath);
+    yk__sdsfree(nn__dirPath);
+    return yk__sdsnew(temp_rl)"""
+
+@nativemacro
+def get_working_directory() -> str:
+    # Get current working directory (uses static string)
+    ccode """GetWorkingDirectory()"""
+
+@nativemacro
+def get_application_directory() -> str:
+    # Get the directory if the running application (uses static string)
+    ccode """GetApplicationDirectory()"""
+
+@native
+def change_directory(dir: str) -> bool:
+    # Change working directory, return true on success
+    ccode """bool temp_rl = ChangeDirectory(nn__dir);
+    yk__sdsfree(nn__dir);
+    return temp_rl"""
+
+@native
+def is_path_file(path: str) -> bool:
+    # Check if a given path is a file or a directory
+    ccode """bool temp_rl = IsPathFile(nn__path);
+    yk__sdsfree(nn__path);
+    return temp_rl"""
+
+@native
+def load_directory_files(dirPath: str) -> FilePathList:
+    # Load directory filepaths
+    ccode """FilePathList temp_rl = LoadDirectoryFiles(nn__dirPath);
+    yk__sdsfree(nn__dirPath);
+    return temp_rl"""
+
+@native
+def load_directory_files_ex(basePath: str, filter: str, scanSubdirs: bool) -> FilePathList:
+    # Load directory filepaths with extension filtering and recursive directory scan
+    ccode """FilePathList temp_rl = LoadDirectoryFilesEx(nn__basePath, nn__filter, nn__scanSubdirs);
+    yk__sdsfree(nn__basePath);
+    yk__sdsfree(nn__filter);
+    return temp_rl"""
+
+@nativemacro
+def unload_directory_files(files: FilePathList) -> None:
+    # Unload filepaths
+    ccode """UnloadDirectoryFiles(nn__files)"""
+
+@nativemacro
+def is_file_dropped() -> bool:
+    # Check if a file has been dropped into window
+    ccode """IsFileDropped()"""
+
+@nativemacro
+def load_dropped_files() -> FilePathList:
+    # Load dropped filepaths
+    ccode """LoadDroppedFiles()"""
+
+@nativemacro
+def unload_dropped_files(files: FilePathList) -> None:
+    # Unload dropped filepaths
+    ccode """UnloadDroppedFiles(nn__files)"""
+
+@native
+def get_file_mod_time(fileName: str) -> i64:
+    # Get file modification time (last write time)
+    ccode """long temp_rl = GetFileModTime(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def compress_data(data: Const[Ptr[c.CUChar]], dataSize: int, compDataSize: Ptr[c.CInt]) -> Ptr[c.CUChar]:
+    # Compress data (DEFLATE algorithm), memory must be MemFree()
+    ccode """CompressData(nn__data, (int)nn__dataSize, nn__compDataSize)"""
+
+@nativemacro
+def decompress_data(compData: Const[Ptr[c.CUChar]], compDataSize: int, dataSize: Ptr[c.CInt]) -> Ptr[c.CUChar]:
+    # Decompress data (DEFLATE algorithm), memory must be MemFree()
+    ccode """DecompressData(nn__compData, (int)nn__compDataSize, nn__dataSize)"""
+
+@nativemacro
+def encode_data_base64(data: Const[Ptr[c.CUChar]], dataSize: int, outputSize: Ptr[c.CInt]) -> str:
+    # Encode data to Base64 string, memory must be MemFree()
+    ccode """EncodeDataBase64(nn__data, (int)nn__dataSize, nn__outputSize)"""
+
+@nativemacro
+def decode_data_base64(data: Const[Ptr[c.CUChar]], outputSize: Ptr[c.CInt]) -> Ptr[c.CUChar]:
+    # Decode Base64 string data, memory must be MemFree()
+    ccode """DecodeDataBase64(nn__data, nn__outputSize)"""
+
+@nativemacro
+def is_key_pressed(key: int) -> bool:
+    # Check if a key has been pressed once
+    ccode """IsKeyPressed((int)nn__key)"""
+
+@nativemacro
+def is_key_down(key: int) -> bool:
+    # Check if a key is being pressed
+    ccode """IsKeyDown((int)nn__key)"""
+
+@nativemacro
+def is_key_released(key: int) -> bool:
+    # Check if a key has been released once
+    ccode """IsKeyReleased((int)nn__key)"""
+
+@nativemacro
+def is_key_up(key: int) -> bool:
+    # Check if a key is NOT being pressed
+    ccode """IsKeyUp((int)nn__key)"""
+
+@nativemacro
+def set_exit_key(key: int) -> None:
+    # Set a custom key to exit program (default is ESC)
+    ccode """SetExitKey((int)nn__key)"""
+
+@nativemacro
+def get_key_pressed() -> int:
+    # Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty
+    ccode """GetKeyPressed()"""
+
+@nativemacro
+def get_char_pressed() -> int:
+    # Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty
+    ccode """GetCharPressed()"""
+
+@nativemacro
+def is_gamepad_available(gamepad: int) -> bool:
+    # Check if a gamepad is available
+    ccode """IsGamepadAvailable((int)nn__gamepad)"""
+
+@nativemacro
+def get_gamepad_name(gamepad: int) -> str:
+    # Get gamepad internal name id
+    ccode """GetGamepadName((int)nn__gamepad)"""
+
+@nativemacro
+def is_gamepad_button_pressed(gamepad: int, button: int) -> bool:
+    # Check if a gamepad button has been pressed once
+    ccode """IsGamepadButtonPressed((int)nn__gamepad, (int)nn__button)"""
+
+@nativemacro
+def is_gamepad_button_down(gamepad: int, button: int) -> bool:
+    # Check if a gamepad button is being pressed
+    ccode """IsGamepadButtonDown((int)nn__gamepad, (int)nn__button)"""
+
+@nativemacro
+def is_gamepad_button_released(gamepad: int, button: int) -> bool:
+    # Check if a gamepad button has been released once
+    ccode """IsGamepadButtonReleased((int)nn__gamepad, (int)nn__button)"""
+
+@nativemacro
+def is_gamepad_button_up(gamepad: int, button: int) -> bool:
+    # Check if a gamepad button is NOT being pressed
+    ccode """IsGamepadButtonUp((int)nn__gamepad, (int)nn__button)"""
+
+@nativemacro
+def get_gamepad_button_pressed() -> int:
+    # Get the last gamepad button pressed
+    ccode """GetGamepadButtonPressed()"""
+
+@nativemacro
+def get_gamepad_axis_count(gamepad: int) -> int:
+    # Get gamepad axis count for a gamepad
+    ccode """GetGamepadAxisCount((int)nn__gamepad)"""
+
+@nativemacro
+def get_gamepad_axis_movement(gamepad: int, axis: int) -> f64:
+    # Get axis movement value for a gamepad axis
+    ccode """GetGamepadAxisMovement((int)nn__gamepad, (int)nn__axis)"""
+
+@native
+def set_gamepad_mappings(mappings: str) -> int:
+    # Set internal gamepad mappings (SDL_GameControllerDB)
+    ccode """int temp_rl = SetGamepadMappings(nn__mappings);
+    yk__sdsfree(nn__mappings);
+    return temp_rl"""
+
+@nativemacro
+def is_mouse_button_pressed(button: int) -> bool:
+    # Check if a mouse button has been pressed once
+    ccode """IsMouseButtonPressed((int)nn__button)"""
+
+@nativemacro
+def is_mouse_button_down(button: int) -> bool:
+    # Check if a mouse button is being pressed
+    ccode """IsMouseButtonDown((int)nn__button)"""
+
+@nativemacro
+def is_mouse_button_released(button: int) -> bool:
+    # Check if a mouse button has been released once
+    ccode """IsMouseButtonReleased((int)nn__button)"""
+
+@nativemacro
+def is_mouse_button_up(button: int) -> bool:
+    # Check if a mouse button is NOT being pressed
+    ccode """IsMouseButtonUp((int)nn__button)"""
+
+@nativemacro
+def get_mouse_x() -> int:
+    # Get mouse position X
+    ccode """GetMouseX()"""
+
+@nativemacro
+def get_mouse_y() -> int:
+    # Get mouse position Y
+    ccode """GetMouseY()"""
+
+@nativemacro
+def get_mouse_position() -> Vector2:
+    # Get mouse position XY
+    ccode """GetMousePosition()"""
+
+@nativemacro
+def get_mouse_delta() -> Vector2:
+    # Get mouse delta between frames
+    ccode """GetMouseDelta()"""
+
+@nativemacro
+def set_mouse_position(x: int, y: int) -> None:
+    # Set mouse position XY
+    ccode """SetMousePosition((int)nn__x, (int)nn__y)"""
+
+@nativemacro
+def set_mouse_offset(offsetX: int, offsetY: int) -> None:
+    # Set mouse offset
+    ccode """SetMouseOffset((int)nn__offsetX, (int)nn__offsetY)"""
+
+@nativemacro
+def set_mouse_scale(scaleX: f64, scaleY: f64) -> None:
+    # Set mouse scaling
+    ccode """SetMouseScale((float)nn__scaleX, (float)nn__scaleY)"""
+
+@nativemacro
+def get_mouse_wheel_move() -> f64:
+    # Get mouse wheel movement for X or Y, whichever is larger
+    ccode """GetMouseWheelMove()"""
+
+@nativemacro
+def get_mouse_wheel_move_v() -> Vector2:
+    # Get mouse wheel movement for both X and Y
+    ccode """GetMouseWheelMoveV()"""
+
+@nativemacro
+def set_mouse_cursor(cursor: int) -> None:
+    # Set mouse cursor
+    ccode """SetMouseCursor((int)nn__cursor)"""
+
+@nativemacro
+def get_touch_x() -> int:
+    # Get touch position X for touch point 0 (relative to screen size)
+    ccode """GetTouchX()"""
+
+@nativemacro
+def get_touch_y() -> int:
+    # Get touch position Y for touch point 0 (relative to screen size)
+    ccode """GetTouchY()"""
+
+@nativemacro
+def get_touch_position(index: int) -> Vector2:
+    # Get touch position XY for a touch point index (relative to screen size)
+    ccode """GetTouchPosition((int)nn__index)"""
+
+@nativemacro
+def get_touch_point_id(index: int) -> int:
+    # Get touch point identifier for given index
+    ccode """GetTouchPointId((int)nn__index)"""
+
+@nativemacro
+def get_touch_point_count() -> int:
+    # Get number of touch points
+    ccode """GetTouchPointCount()"""
+
+@nativemacro
+def set_gestures_enabled(flags: u32) -> None:
+    # Enable a set of gestures using flags
+    ccode """SetGesturesEnabled((unsigned int)nn__flags)"""
+
+@nativemacro
+def is_gesture_detected(gesture: int) -> bool:
+    # Check if a gesture have been detected
+    ccode """IsGestureDetected((int)nn__gesture)"""
+
+@nativemacro
+def get_gesture_detected() -> int:
+    # Get latest detected gesture
+    ccode """GetGestureDetected()"""
+
+@nativemacro
+def get_gesture_hold_duration() -> f64:
+    # Get gesture hold time in milliseconds
+    ccode """GetGestureHoldDuration()"""
+
+@nativemacro
+def get_gesture_drag_vector() -> Vector2:
+    # Get gesture drag vector
+    ccode """GetGestureDragVector()"""
+
+@nativemacro
+def get_gesture_drag_angle() -> f64:
+    # Get gesture drag angle
+    ccode """GetGestureDragAngle()"""
+
+@nativemacro
+def get_gesture_pinch_vector() -> Vector2:
+    # Get gesture pinch delta
+    ccode """GetGesturePinchVector()"""
+
+@nativemacro
+def get_gesture_pinch_angle() -> f64:
+    # Get gesture pinch angle
+    ccode """GetGesturePinchAngle()"""
+
+@nativemacro
+def set_camera_mode(p_camera: Camera, mode: int) -> None:
+    # Set camera mode (multiple camera modes available)
+    ccode """SetCameraMode(nn__p_camera, (int)nn__mode)"""
+
+@nativemacro
+def update_camera(p_camera: Ptr[Camera]) -> None:
+    # Update camera position for selected mode
+    ccode """UpdateCamera(nn__p_camera)"""
+
+@nativemacro
+def set_camera_pan_control(keyPan: int) -> None:
+    # Set camera pan key to combine with mouse movement (free camera)
+    ccode """SetCameraPanControl((int)nn__keyPan)"""
+
+@nativemacro
+def set_camera_alt_control(keyAlt: int) -> None:
+    # Set camera alt key to combine with mouse movement (free camera)
+    ccode """SetCameraAltControl((int)nn__keyAlt)"""
+
+@nativemacro
+def set_camera_smooth_zoom_control(keySmoothZoom: int) -> None:
+    # Set camera smooth zoom key to combine with mouse (free camera)
+    ccode """SetCameraSmoothZoomControl((int)nn__keySmoothZoom)"""
+
+@nativemacro
+def set_camera_move_controls(keyFront: int, keyBack: int, keyRight: int, keyLeft: int, keyUp: int, keyDown: int) -> None:
+    # Set camera move controls (1st person and 3rd person cameras)
+    ccode """SetCameraMoveControls((int)nn__keyFront, (int)nn__keyBack, (int)nn__keyRight, (int)nn__keyLeft, (int)nn__keyUp, (int)nn__keyDown)"""
+
+@nativemacro
+def set_shapes_texture(p_texture: Texture2D, source: Rectangle) -> None:
+    # Set texture and rectangle to be used on shapes drawing
+    ccode """SetShapesTexture(nn__p_texture, nn__source)"""
+
+@nativemacro
+def draw_pixel(posX: int, posY: int, p_color: Color) -> None:
+    # Draw a pixel
+    ccode """DrawPixel((int)nn__posX, (int)nn__posY, nn__p_color)"""
+
+@nativemacro
+def draw_pixel_v(position: Vector2, p_color: Color) -> None:
+    # Draw a pixel (Vector version)
+    ccode """DrawPixelV(nn__position, nn__p_color)"""
+
+@nativemacro
+def draw_line(startPosX: int, startPosY: int, endPosX: int, endPosY: int, p_color: Color) -> None:
+    # Draw a line
+    ccode """DrawLine((int)nn__startPosX, (int)nn__startPosY, (int)nn__endPosX, (int)nn__endPosY, nn__p_color)"""
+
+@nativemacro
+def draw_line_v(startPos: Vector2, endPos: Vector2, p_color: Color) -> None:
+    # Draw a line (Vector version)
+    ccode """DrawLineV(nn__startPos, nn__endPos, nn__p_color)"""
+
+@nativemacro
+def draw_line_ex(startPos: Vector2, endPos: Vector2, thick: f64, p_color: Color) -> None:
+    # Draw a line defining thickness
+    ccode """DrawLineEx(nn__startPos, nn__endPos, (float)nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_line_bezier(startPos: Vector2, endPos: Vector2, thick: f64, p_color: Color) -> None:
+    # Draw a line using cubic-bezier curves in-out
+    ccode """DrawLineBezier(nn__startPos, nn__endPos, (float)nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_line_bezier_quad(startPos: Vector2, endPos: Vector2, controlPos: Vector2, thick: f64, p_color: Color) -> None:
+    # Draw line using quadratic bezier curves with a control point
+    ccode """DrawLineBezierQuad(nn__startPos, nn__endPos, nn__controlPos, (float)nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_line_bezier_cubic(startPos: Vector2, endPos: Vector2, startControlPos: Vector2, endControlPos: Vector2, thick: f64, p_color: Color) -> None:
+    # Draw line using cubic bezier curves with 2 control points
+    ccode """DrawLineBezierCubic(nn__startPos, nn__endPos, nn__startControlPos, nn__endControlPos, (float)nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_line_strip(points: Ptr[Vector2], pointCount: int, p_color: Color) -> None:
+    # Draw lines sequence
+    ccode """DrawLineStrip(nn__points, (int)nn__pointCount, nn__p_color)"""
+
+@nativemacro
+def draw_circle(centerX: int, centerY: int, radius: f64, p_color: Color) -> None:
+    # Draw a color-filled circle
+    ccode """DrawCircle((int)nn__centerX, (int)nn__centerY, (float)nn__radius, nn__p_color)"""
+
+@nativemacro
+def draw_circle_sector(center: Vector2, radius: f64, startAngle: f64, endAngle: f64, segments: int, p_color: Color) -> None:
+    # Draw a piece of a circle
+    ccode """DrawCircleSector(nn__center, (float)nn__radius, (float)nn__startAngle, (float)nn__endAngle, (int)nn__segments, nn__p_color)"""
+
+@nativemacro
+def draw_circle_sector_lines(center: Vector2, radius: f64, startAngle: f64, endAngle: f64, segments: int, p_color: Color) -> None:
+    # Draw circle sector outline
+    ccode """DrawCircleSectorLines(nn__center, (float)nn__radius, (float)nn__startAngle, (float)nn__endAngle, (int)nn__segments, nn__p_color)"""
+
+@nativemacro
+def draw_circle_gradient(centerX: int, centerY: int, radius: f64, color1: Color, color2: Color) -> None:
+    # Draw a gradient-filled circle
+    ccode """DrawCircleGradient((int)nn__centerX, (int)nn__centerY, (float)nn__radius, nn__color1, nn__color2)"""
+
+@nativemacro
+def draw_circle_v(center: Vector2, radius: f64, p_color: Color) -> None:
+    # Draw a color-filled circle (Vector version)
+    ccode """DrawCircleV(nn__center, (float)nn__radius, nn__p_color)"""
+
+@nativemacro
+def draw_circle_lines(centerX: int, centerY: int, radius: f64, p_color: Color) -> None:
+    # Draw circle outline
+    ccode """DrawCircleLines((int)nn__centerX, (int)nn__centerY, (float)nn__radius, nn__p_color)"""
+
+@nativemacro
+def draw_ellipse(centerX: int, centerY: int, radiusH: f64, radiusV: f64, p_color: Color) -> None:
+    # Draw ellipse
+    ccode """DrawEllipse((int)nn__centerX, (int)nn__centerY, (float)nn__radiusH, (float)nn__radiusV, nn__p_color)"""
+
+@nativemacro
+def draw_ellipse_lines(centerX: int, centerY: int, radiusH: f64, radiusV: f64, p_color: Color) -> None:
+    # Draw ellipse outline
+    ccode """DrawEllipseLines((int)nn__centerX, (int)nn__centerY, (float)nn__radiusH, (float)nn__radiusV, nn__p_color)"""
+
+@nativemacro
+def draw_ring(center: Vector2, innerRadius: f64, outerRadius: f64, startAngle: f64, endAngle: f64, segments: int, p_color: Color) -> None:
+    # Draw ring
+    ccode """DrawRing(nn__center, (float)nn__innerRadius, (float)nn__outerRadius, (float)nn__startAngle, (float)nn__endAngle, (int)nn__segments, nn__p_color)"""
+
+@nativemacro
+def draw_ring_lines(center: Vector2, innerRadius: f64, outerRadius: f64, startAngle: f64, endAngle: f64, segments: int, p_color: Color) -> None:
+    # Draw ring outline
+    ccode """DrawRingLines(nn__center, (float)nn__innerRadius, (float)nn__outerRadius, (float)nn__startAngle, (float)nn__endAngle, (int)nn__segments, nn__p_color)"""
+
+@nativemacro
+def draw_rectangle(posX: int, posY: int, width: int, height: int, p_color: Color) -> None:
+    # Draw a color-filled rectangle
+    ccode """DrawRectangle((int)nn__posX, (int)nn__posY, (int)nn__width, (int)nn__height, nn__p_color)"""
+
+@nativemacro
+def draw_rectangle_v(position: Vector2, size: Vector2, p_color: Color) -> None:
+    # Draw a color-filled rectangle (Vector version)
+    ccode """DrawRectangleV(nn__position, nn__size, nn__p_color)"""
+
+@nativemacro
+def draw_rectangle_rec(rec: Rectangle, p_color: Color) -> None:
+    # Draw a color-filled rectangle
+    ccode """DrawRectangleRec(nn__rec, nn__p_color)"""
+
+@nativemacro
+def draw_rectangle_pro(rec: Rectangle, origin: Vector2, rotation: f64, p_color: Color) -> None:
+    # Draw a color-filled rectangle with pro parameters
+    ccode """DrawRectanglePro(nn__rec, nn__origin, (float)nn__rotation, nn__p_color)"""
+
+@nativemacro
+def draw_rectangle_gradient_v(posX: int, posY: int, width: int, height: int, color1: Color, color2: Color) -> None:
+    # Draw a vertical-gradient-filled rectangle
+    ccode """DrawRectangleGradientV((int)nn__posX, (int)nn__posY, (int)nn__width, (int)nn__height, nn__color1, nn__color2)"""
+
+@nativemacro
+def draw_rectangle_gradient_h(posX: int, posY: int, width: int, height: int, color1: Color, color2: Color) -> None:
+    # Draw a horizontal-gradient-filled rectangle
+    ccode """DrawRectangleGradientH((int)nn__posX, (int)nn__posY, (int)nn__width, (int)nn__height, nn__color1, nn__color2)"""
+
+@nativemacro
+def draw_rectangle_gradient_ex(rec: Rectangle, col1: Color, col2: Color, col3: Color, col4: Color) -> None:
+    # Draw a gradient-filled rectangle with custom vertex colors
+    ccode """DrawRectangleGradientEx(nn__rec, nn__col1, nn__col2, nn__col3, nn__col4)"""
+
+@nativemacro
+def draw_rectangle_lines(posX: int, posY: int, width: int, height: int, p_color: Color) -> None:
+    # Draw rectangle outline
+    ccode """DrawRectangleLines((int)nn__posX, (int)nn__posY, (int)nn__width, (int)nn__height, nn__p_color)"""
+
+@nativemacro
+def draw_rectangle_lines_ex(rec: Rectangle, lineThick: f64, p_color: Color) -> None:
+    # Draw rectangle outline with extended parameters
+    ccode """DrawRectangleLinesEx(nn__rec, (float)nn__lineThick, nn__p_color)"""
+
+@nativemacro
+def draw_rectangle_rounded(rec: Rectangle, roundness: f64, segments: int, p_color: Color) -> None:
+    # Draw rectangle with rounded edges
+    ccode """DrawRectangleRounded(nn__rec, (float)nn__roundness, (int)nn__segments, nn__p_color)"""
+
+@nativemacro
+def draw_rectangle_rounded_lines(rec: Rectangle, roundness: f64, segments: int, lineThick: f64, p_color: Color) -> None:
+    # Draw rectangle with rounded edges outline
+    ccode """DrawRectangleRoundedLines(nn__rec, (float)nn__roundness, (int)nn__segments, (float)nn__lineThick, nn__p_color)"""
+
+@nativemacro
+def draw_triangle(v1: Vector2, v2: Vector2, v3: Vector2, p_color: Color) -> None:
+    # Draw a color-filled triangle (vertex in counter-clockwise order!)
+    ccode """DrawTriangle(nn__v1, nn__v2, nn__v3, nn__p_color)"""
+
+@nativemacro
+def draw_triangle_lines(v1: Vector2, v2: Vector2, v3: Vector2, p_color: Color) -> None:
+    # Draw triangle outline (vertex in counter-clockwise order!)
+    ccode """DrawTriangleLines(nn__v1, nn__v2, nn__v3, nn__p_color)"""
+
+@nativemacro
+def draw_triangle_fan(points: Ptr[Vector2], pointCount: int, p_color: Color) -> None:
+    # Draw a triangle fan defined by points (first vertex is the center)
+    ccode """DrawTriangleFan(nn__points, (int)nn__pointCount, nn__p_color)"""
+
+@nativemacro
+def draw_triangle_strip(points: Ptr[Vector2], pointCount: int, p_color: Color) -> None:
+    # Draw a triangle strip defined by points
+    ccode """DrawTriangleStrip(nn__points, (int)nn__pointCount, nn__p_color)"""
+
+@nativemacro
+def draw_poly(center: Vector2, sides: int, radius: f64, rotation: f64, p_color: Color) -> None:
+    # Draw a regular polygon (Vector version)
+    ccode """DrawPoly(nn__center, (int)nn__sides, (float)nn__radius, (float)nn__rotation, nn__p_color)"""
+
+@nativemacro
+def draw_poly_lines(center: Vector2, sides: int, radius: f64, rotation: f64, p_color: Color) -> None:
+    # Draw a polygon outline of n sides
+    ccode """DrawPolyLines(nn__center, (int)nn__sides, (float)nn__radius, (float)nn__rotation, nn__p_color)"""
+
+@nativemacro
+def draw_poly_lines_ex(center: Vector2, sides: int, radius: f64, rotation: f64, lineThick: f64, p_color: Color) -> None:
+    # Draw a polygon outline of n sides with extended parameters
+    ccode """DrawPolyLinesEx(nn__center, (int)nn__sides, (float)nn__radius, (float)nn__rotation, (float)nn__lineThick, nn__p_color)"""
+
+@nativemacro
+def check_collision_recs(rec1: Rectangle, rec2: Rectangle) -> bool:
+    # Check collision between two rectangles
+    ccode """CheckCollisionRecs(nn__rec1, nn__rec2)"""
+
+@nativemacro
+def check_collision_circles(center1: Vector2, radius1: f64, center2: Vector2, radius2: f64) -> bool:
+    # Check collision between two circles
+    ccode """CheckCollisionCircles(nn__center1, (float)nn__radius1, nn__center2, (float)nn__radius2)"""
+
+@nativemacro
+def check_collision_circle_rec(center: Vector2, radius: f64, rec: Rectangle) -> bool:
+    # Check collision between circle and rectangle
+    ccode """CheckCollisionCircleRec(nn__center, (float)nn__radius, nn__rec)"""
+
+@nativemacro
+def check_collision_point_rec(point: Vector2, rec: Rectangle) -> bool:
+    # Check if point is inside rectangle
+    ccode """CheckCollisionPointRec(nn__point, nn__rec)"""
+
+@nativemacro
+def check_collision_point_circle(point: Vector2, center: Vector2, radius: f64) -> bool:
+    # Check if point is inside circle
+    ccode """CheckCollisionPointCircle(nn__point, nn__center, (float)nn__radius)"""
+
+@nativemacro
+def check_collision_point_triangle(point: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) -> bool:
+    # Check if point is inside a triangle
+    ccode """CheckCollisionPointTriangle(nn__point, nn__p1, nn__p2, nn__p3)"""
+
+@nativemacro
+def check_collision_lines(startPos1: Vector2, endPos1: Vector2, startPos2: Vector2, endPos2: Vector2, collisionPoint: Ptr[Vector2]) -> bool:
+    # Check the collision between two lines defined by two points each, returns collision point by reference
+    ccode """CheckCollisionLines(nn__startPos1, nn__endPos1, nn__startPos2, nn__endPos2, nn__collisionPoint)"""
+
+@nativemacro
+def check_collision_point_line(point: Vector2, p1: Vector2, p2: Vector2, threshold: int) -> bool:
+    # Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]
+    ccode """CheckCollisionPointLine(nn__point, nn__p1, nn__p2, (int)nn__threshold)"""
+
+@nativemacro
+def get_collision_rec(rec1: Rectangle, rec2: Rectangle) -> Rectangle:
+    # Get collision rectangle for two rectangles collision
+    ccode """GetCollisionRec(nn__rec1, nn__rec2)"""
+
+@native
+def load_image(fileName: str) -> Image:
+    # Load image from file into CPU memory (RAM)
+    ccode """Image temp_rl = LoadImage(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def load_image_raw(fileName: str, width: int, height: int, format: int, headerSize: int) -> Image:
+    # Load image from RAW file data
+    ccode """Image temp_rl = LoadImageRaw(nn__fileName, (int)nn__width, (int)nn__height, (int)nn__format, (int)nn__headerSize);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def load_image_anim(fileName: str, frames: Ptr[c.CInt]) -> Image:
+    # Load image sequence from file (frames appended to image.data)
+    ccode """Image temp_rl = LoadImageAnim(nn__fileName, nn__frames);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def load_image_from_memory(fileType: str, fileData: Const[Ptr[c.CUChar]], dataSize: int) -> Image:
+    # Load image from memory buffer, fileType refers to extension: i.e. '.png'
+    ccode """Image temp_rl = LoadImageFromMemory(nn__fileType, nn__fileData, (int)nn__dataSize);
+    yk__sdsfree(nn__fileType);
+    return temp_rl"""
+
+@nativemacro
+def load_image_from_texture(p_texture: Texture2D) -> Image:
+    # Load image from GPU texture data
+    ccode """LoadImageFromTexture(nn__p_texture)"""
+
+@nativemacro
+def load_image_from_screen() -> Image:
+    # Load image from screen buffer and (screenshot)
+    ccode """LoadImageFromScreen()"""
+
+@nativemacro
+def unload_image(p_image: Image) -> None:
+    # Unload image from CPU memory (RAM)
+    ccode """UnloadImage(nn__p_image)"""
+
+@native
+def export_image(p_image: Image, fileName: str) -> bool:
+    # Export image data to file, returns true on success
+    ccode """bool temp_rl = ExportImage(nn__p_image, nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def export_image_as_code(p_image: Image, fileName: str) -> bool:
+    # Export image as code file defining an array of bytes, returns true on success
+    ccode """bool temp_rl = ExportImageAsCode(nn__p_image, nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def gen_image_color(width: int, height: int, p_color: Color) -> Image:
+    # Generate image: plain color
+    ccode """GenImageColor((int)nn__width, (int)nn__height, nn__p_color)"""
+
+@nativemacro
+def gen_image_gradient_v(width: int, height: int, top: Color, bottom: Color) -> Image:
+    # Generate image: vertical gradient
+    ccode """GenImageGradientV((int)nn__width, (int)nn__height, nn__top, nn__bottom)"""
+
+@nativemacro
+def gen_image_gradient_h(width: int, height: int, left: Color, right: Color) -> Image:
+    # Generate image: horizontal gradient
+    ccode """GenImageGradientH((int)nn__width, (int)nn__height, nn__left, nn__right)"""
+
+@nativemacro
+def gen_image_gradient_radial(width: int, height: int, density: f64, inner: Color, outer: Color) -> Image:
+    # Generate image: radial gradient
+    ccode """GenImageGradientRadial((int)nn__width, (int)nn__height, (float)nn__density, nn__inner, nn__outer)"""
+
+@nativemacro
+def gen_image_checked(width: int, height: int, checksX: int, checksY: int, col1: Color, col2: Color) -> Image:
+    # Generate image: checked
+    ccode """GenImageChecked((int)nn__width, (int)nn__height, (int)nn__checksX, (int)nn__checksY, nn__col1, nn__col2)"""
+
+@nativemacro
+def gen_image_white_noise(width: int, height: int, factor: f64) -> Image:
+    # Generate image: white noise
+    ccode """GenImageWhiteNoise((int)nn__width, (int)nn__height, (float)nn__factor)"""
+
+@nativemacro
+def gen_image_cellular(width: int, height: int, tileSize: int) -> Image:
+    # Generate image: cellular algorithm, bigger tileSize means bigger cells
+    ccode """GenImageCellular((int)nn__width, (int)nn__height, (int)nn__tileSize)"""
+
+@nativemacro
+def image_copy(p_image: Image) -> Image:
+    # Create an image duplicate (useful for transformations)
+    ccode """ImageCopy(nn__p_image)"""
+
+@nativemacro
+def image_from_image(p_image: Image, rec: Rectangle) -> Image:
+    # Create an image from another image piece
+    ccode """ImageFromImage(nn__p_image, nn__rec)"""
+
+@native
+def image_text(text: str, fontSize: int, p_color: Color) -> Image:
+    # Create an image from text (default font)
+    ccode """Image temp_rl = ImageText(nn__text, (int)nn__fontSize, nn__p_color);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def image_text_ex(p_font: Font, text: str, fontSize: f64, spacing: f64, tint: Color) -> Image:
+    # Create an image from text (custom sprite font)
+    ccode """Image temp_rl = ImageTextEx(nn__p_font, nn__text, (float)nn__fontSize, (float)nn__spacing, nn__tint);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@nativemacro
+def image_format(p_image: Ptr[Image], newFormat: int) -> None:
+    # Convert image data to desired format
+    ccode """ImageFormat(nn__p_image, (int)nn__newFormat)"""
+
+@nativemacro
+def image_to_pot(p_image: Ptr[Image], fill: Color) -> None:
+    # Convert image to POT (power-of-two)
+    ccode """ImageToPOT(nn__p_image, nn__fill)"""
+
+@nativemacro
+def image_crop(p_image: Ptr[Image], crop: Rectangle) -> None:
+    # Crop an image to a defined rectangle
+    ccode """ImageCrop(nn__p_image, nn__crop)"""
+
+@nativemacro
+def image_alpha_crop(p_image: Ptr[Image], threshold: f64) -> None:
+    # Crop image depending on alpha value
+    ccode """ImageAlphaCrop(nn__p_image, (float)nn__threshold)"""
+
+@nativemacro
+def image_alpha_clear(p_image: Ptr[Image], p_color: Color, threshold: f64) -> None:
+    # Clear alpha channel to desired color
+    ccode """ImageAlphaClear(nn__p_image, nn__p_color, (float)nn__threshold)"""
+
+@nativemacro
+def image_alpha_mask(p_image: Ptr[Image], alphaMask: Image) -> None:
+    # Apply alpha mask to image
+    ccode """ImageAlphaMask(nn__p_image, nn__alphaMask)"""
+
+@nativemacro
+def image_alpha_premultiply(p_image: Ptr[Image]) -> None:
+    # Premultiply alpha channel
+    ccode """ImageAlphaPremultiply(nn__p_image)"""
+
+@nativemacro
+def image_resize(p_image: Ptr[Image], newWidth: int, newHeight: int) -> None:
+    # Resize image (Bicubic scaling algorithm)
+    ccode """ImageResize(nn__p_image, (int)nn__newWidth, (int)nn__newHeight)"""
+
+@nativemacro
+def image_resize_nn(p_image: Ptr[Image], newWidth: int, newHeight: int) -> None:
+    # Resize image (Nearest-Neighbor scaling algorithm)
+    ccode """ImageResizeNN(nn__p_image, (int)nn__newWidth, (int)nn__newHeight)"""
+
+@nativemacro
+def image_resize_canvas(p_image: Ptr[Image], newWidth: int, newHeight: int, offsetX: int, offsetY: int, fill: Color) -> None:
+    # Resize canvas and fill with color
+    ccode """ImageResizeCanvas(nn__p_image, (int)nn__newWidth, (int)nn__newHeight, (int)nn__offsetX, (int)nn__offsetY, nn__fill)"""
+
+@nativemacro
+def image_mipmaps(p_image: Ptr[Image]) -> None:
+    # Compute all mipmap levels for a provided image
+    ccode """ImageMipmaps(nn__p_image)"""
+
+@nativemacro
+def image_dither(p_image: Ptr[Image], rBpp: int, gBpp: int, bBpp: int, aBpp: int) -> None:
+    # Dither image data to 16bpp or lower (Floyd-Steinberg dithering)
+    ccode """ImageDither(nn__p_image, (int)nn__rBpp, (int)nn__gBpp, (int)nn__bBpp, (int)nn__aBpp)"""
+
+@nativemacro
+def image_flip_vertical(p_image: Ptr[Image]) -> None:
+    # Flip image vertically
+    ccode """ImageFlipVertical(nn__p_image)"""
+
+@nativemacro
+def image_flip_horizontal(p_image: Ptr[Image]) -> None:
+    # Flip image horizontally
+    ccode """ImageFlipHorizontal(nn__p_image)"""
+
+@nativemacro
+def image_rotate_cw(p_image: Ptr[Image]) -> None:
+    # Rotate image clockwise 90deg
+    ccode """ImageRotateCW(nn__p_image)"""
+
+@nativemacro
+def image_rotate_ccw(p_image: Ptr[Image]) -> None:
+    # Rotate image counter-clockwise 90deg
+    ccode """ImageRotateCCW(nn__p_image)"""
+
+@nativemacro
+def image_color_tint(p_image: Ptr[Image], p_color: Color) -> None:
+    # Modify image color: tint
+    ccode """ImageColorTint(nn__p_image, nn__p_color)"""
+
+@nativemacro
+def image_color_invert(p_image: Ptr[Image]) -> None:
+    # Modify image color: invert
+    ccode """ImageColorInvert(nn__p_image)"""
+
+@nativemacro
+def image_color_grayscale(p_image: Ptr[Image]) -> None:
+    # Modify image color: grayscale
+    ccode """ImageColorGrayscale(nn__p_image)"""
+
+@nativemacro
+def image_color_contrast(p_image: Ptr[Image], contrast: f64) -> None:
+    # Modify image color: contrast (-100 to 100)
+    ccode """ImageColorContrast(nn__p_image, (float)nn__contrast)"""
+
+@nativemacro
+def image_color_brightness(p_image: Ptr[Image], brightness: int) -> None:
+    # Modify image color: brightness (-255 to 255)
+    ccode """ImageColorBrightness(nn__p_image, (int)nn__brightness)"""
+
+@nativemacro
+def image_color_replace(p_image: Ptr[Image], p_color: Color, replace: Color) -> None:
+    # Modify image color: replace color
+    ccode """ImageColorReplace(nn__p_image, nn__p_color, nn__replace)"""
+
+@nativemacro
+def load_image_colors(p_image: Image) -> Ptr[Color]:
+    # Load color data from image as a Color array (RGBA - 32bit)
+    ccode """LoadImageColors(nn__p_image)"""
+
+@nativemacro
+def load_image_palette(p_image: Image, maxPaletteSize: int, colorCount: Ptr[c.CInt]) -> Ptr[Color]:
+    # Load colors palette from image as a Color array (RGBA - 32bit)
+    ccode """LoadImagePalette(nn__p_image, (int)nn__maxPaletteSize, nn__colorCount)"""
+
+@nativemacro
+def unload_image_colors(colors: Ptr[Color]) -> None:
+    # Unload color data loaded with LoadImageColors()
+    ccode """UnloadImageColors(nn__colors)"""
+
+@nativemacro
+def unload_image_palette(colors: Ptr[Color]) -> None:
+    # Unload colors palette loaded with LoadImagePalette()
+    ccode """UnloadImagePalette(nn__colors)"""
+
+@nativemacro
+def get_image_alpha_border(p_image: Image, threshold: f64) -> Rectangle:
+    # Get image alpha border rectangle
+    ccode """GetImageAlphaBorder(nn__p_image, (float)nn__threshold)"""
+
+@nativemacro
+def get_image_color(p_image: Image, x: int, y: int) -> Color:
+    # Get image pixel color at (x, y) position
+    ccode """GetImageColor(nn__p_image, (int)nn__x, (int)nn__y)"""
+
+@nativemacro
+def image_clear_background(dst: Ptr[Image], p_color: Color) -> None:
+    # Clear image background with given color
+    ccode """ImageClearBackground(nn__dst, nn__p_color)"""
+
+@nativemacro
+def image_draw_pixel(dst: Ptr[Image], posX: int, posY: int, p_color: Color) -> None:
+    # Draw pixel within an image
+    ccode """ImageDrawPixel(nn__dst, (int)nn__posX, (int)nn__posY, nn__p_color)"""
+
+@nativemacro
+def image_draw_pixel_v(dst: Ptr[Image], position: Vector2, p_color: Color) -> None:
+    # Draw pixel within an image (Vector version)
+    ccode """ImageDrawPixelV(nn__dst, nn__position, nn__p_color)"""
+
+@nativemacro
+def image_draw_line(dst: Ptr[Image], startPosX: int, startPosY: int, endPosX: int, endPosY: int, p_color: Color) -> None:
+    # Draw line within an image
+    ccode """ImageDrawLine(nn__dst, (int)nn__startPosX, (int)nn__startPosY, (int)nn__endPosX, (int)nn__endPosY, nn__p_color)"""
+
+@nativemacro
+def image_draw_line_v(dst: Ptr[Image], start: Vector2, end: Vector2, p_color: Color) -> None:
+    # Draw line within an image (Vector version)
+    ccode """ImageDrawLineV(nn__dst, nn__start, nn__end, nn__p_color)"""
+
+@nativemacro
+def image_draw_circle(dst: Ptr[Image], centerX: int, centerY: int, radius: int, p_color: Color) -> None:
+    # Draw circle within an image
+    ccode """ImageDrawCircle(nn__dst, (int)nn__centerX, (int)nn__centerY, (int)nn__radius, nn__p_color)"""
+
+@nativemacro
+def image_draw_circle_v(dst: Ptr[Image], center: Vector2, radius: int, p_color: Color) -> None:
+    # Draw circle within an image (Vector version)
+    ccode """ImageDrawCircleV(nn__dst, nn__center, (int)nn__radius, nn__p_color)"""
+
+@nativemacro
+def image_draw_rectangle(dst: Ptr[Image], posX: int, posY: int, width: int, height: int, p_color: Color) -> None:
+    # Draw rectangle within an image
+    ccode """ImageDrawRectangle(nn__dst, (int)nn__posX, (int)nn__posY, (int)nn__width, (int)nn__height, nn__p_color)"""
+
+@nativemacro
+def image_draw_rectangle_v(dst: Ptr[Image], position: Vector2, size: Vector2, p_color: Color) -> None:
+    # Draw rectangle within an image (Vector version)
+    ccode """ImageDrawRectangleV(nn__dst, nn__position, nn__size, nn__p_color)"""
+
+@nativemacro
+def image_draw_rectangle_rec(dst: Ptr[Image], rec: Rectangle, p_color: Color) -> None:
+    # Draw rectangle within an image
+    ccode """ImageDrawRectangleRec(nn__dst, nn__rec, nn__p_color)"""
+
+@nativemacro
+def image_draw_rectangle_lines(dst: Ptr[Image], rec: Rectangle, thick: int, p_color: Color) -> None:
+    # Draw rectangle lines within an image
+    ccode """ImageDrawRectangleLines(nn__dst, nn__rec, (int)nn__thick, nn__p_color)"""
+
+@nativemacro
+def image_draw(dst: Ptr[Image], src: Image, srcRec: Rectangle, dstRec: Rectangle, tint: Color) -> None:
+    # Draw a source image within a destination image (tint applied to source)
+    ccode """ImageDraw(nn__dst, nn__src, nn__srcRec, nn__dstRec, nn__tint)"""
+
+@native
+def image_draw_text(dst: Ptr[Image], text: str, posX: int, posY: int, fontSize: int, p_color: Color) -> None:
+    # Draw text (using default font) within an image (destination)
+    ccode """ImageDrawText(nn__dst, nn__text, (int)nn__posX, (int)nn__posY, (int)nn__fontSize, nn__p_color);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def image_draw_text_ex(dst: Ptr[Image], p_font: Font, text: str, position: Vector2, fontSize: f64, spacing: f64, tint: Color) -> None:
+    # Draw text (custom sprite font) within an image (destination)
+    ccode """ImageDrawTextEx(nn__dst, nn__p_font, nn__text, nn__position, (float)nn__fontSize, (float)nn__spacing, nn__tint);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def load_texture(fileName: str) -> Texture2D:
+    # Load texture from file into GPU memory (VRAM)
+    ccode """Texture2D temp_rl = LoadTexture(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def load_texture_from_image(p_image: Image) -> Texture2D:
+    # Load texture from image data
+    ccode """LoadTextureFromImage(nn__p_image)"""
+
+@nativemacro
+def load_texture_cubemap(p_image: Image, layout: int) -> TextureCubemap:
+    # Load cubemap from image, multiple image cubemap layouts supported
+    ccode """LoadTextureCubemap(nn__p_image, (int)nn__layout)"""
+
+@nativemacro
+def load_render_texture(width: int, height: int) -> RenderTexture2D:
+    # Load texture for rendering (framebuffer)
+    ccode """LoadRenderTexture((int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def unload_texture(p_texture: Texture2D) -> None:
+    # Unload texture from GPU memory (VRAM)
+    ccode """UnloadTexture(nn__p_texture)"""
+
+@nativemacro
+def unload_render_texture(target: RenderTexture2D) -> None:
+    # Unload render texture from GPU memory (VRAM)
+    ccode """UnloadRenderTexture(nn__target)"""
+
+@nativemacro
+def update_texture(p_texture: Texture2D, pixels: Const[c.VoidPtr]) -> None:
+    # Update GPU texture with new data
+    ccode """UpdateTexture(nn__p_texture, nn__pixels)"""
+
+@nativemacro
+def update_texture_rec(p_texture: Texture2D, rec: Rectangle, pixels: Const[c.VoidPtr]) -> None:
+    # Update GPU texture rectangle with new data
+    ccode """UpdateTextureRec(nn__p_texture, nn__rec, nn__pixels)"""
+
+@nativemacro
+def gen_texture_mipmaps(p_texture: Ptr[Texture2D]) -> None:
+    # Generate GPU mipmaps for a texture
+    ccode """GenTextureMipmaps(nn__p_texture)"""
+
+@nativemacro
+def set_texture_filter(p_texture: Texture2D, filter: int) -> None:
+    # Set texture scaling filter mode
+    ccode """SetTextureFilter(nn__p_texture, (int)nn__filter)"""
+
+@nativemacro
+def set_texture_wrap(p_texture: Texture2D, wrap: int) -> None:
+    # Set texture wrapping mode
+    ccode """SetTextureWrap(nn__p_texture, (int)nn__wrap)"""
+
+@nativemacro
+def draw_texture(p_texture: Texture2D, posX: int, posY: int, tint: Color) -> None:
+    # Draw a Texture2D
+    ccode """DrawTexture(nn__p_texture, (int)nn__posX, (int)nn__posY, nn__tint)"""
+
+@nativemacro
+def draw_texture_v(p_texture: Texture2D, position: Vector2, tint: Color) -> None:
+    # Draw a Texture2D with position defined as Vector2
+    ccode """DrawTextureV(nn__p_texture, nn__position, nn__tint)"""
+
+@nativemacro
+def draw_texture_ex(p_texture: Texture2D, position: Vector2, rotation: f64, scale: f64, tint: Color) -> None:
+    # Draw a Texture2D with extended parameters
+    ccode """DrawTextureEx(nn__p_texture, nn__position, (float)nn__rotation, (float)nn__scale, nn__tint)"""
+
+@nativemacro
+def draw_texture_rec(p_texture: Texture2D, source: Rectangle, position: Vector2, tint: Color) -> None:
+    # Draw a part of a texture defined by a rectangle
+    ccode """DrawTextureRec(nn__p_texture, nn__source, nn__position, nn__tint)"""
+
+@nativemacro
+def draw_texture_quad(p_texture: Texture2D, tiling: Vector2, offset: Vector2, quad: Rectangle, tint: Color) -> None:
+    # Draw texture quad with tiling and offset parameters
+    ccode """DrawTextureQuad(nn__p_texture, nn__tiling, nn__offset, nn__quad, nn__tint)"""
+
+@nativemacro
+def draw_texture_tiled(p_texture: Texture2D, source: Rectangle, dest: Rectangle, origin: Vector2, rotation: f64, scale: f64, tint: Color) -> None:
+    # Draw part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
+    ccode """DrawTextureTiled(nn__p_texture, nn__source, nn__dest, nn__origin, (float)nn__rotation, (float)nn__scale, nn__tint)"""
+
+@nativemacro
+def draw_texture_pro(p_texture: Texture2D, source: Rectangle, dest: Rectangle, origin: Vector2, rotation: f64, tint: Color) -> None:
+    # Draw a part of a texture defined by a rectangle with 'pro' parameters
+    ccode """DrawTexturePro(nn__p_texture, nn__source, nn__dest, nn__origin, (float)nn__rotation, nn__tint)"""
+
+@nativemacro
+def draw_texture_n_patch(p_texture: Texture2D, nPatchInfo: NPatchInfo, dest: Rectangle, origin: Vector2, rotation: f64, tint: Color) -> None:
+    # Draws a texture (or part of it) that stretches or shrinks nicely
+    ccode """DrawTextureNPatch(nn__p_texture, nn__nPatchInfo, nn__dest, nn__origin, (float)nn__rotation, nn__tint)"""
+
+@nativemacro
+def draw_texture_poly(p_texture: Texture2D, center: Vector2, points: Ptr[Vector2], texcoords: Ptr[Vector2], pointCount: int, tint: Color) -> None:
+    # Draw a textured polygon
+    ccode """DrawTexturePoly(nn__p_texture, nn__center, nn__points, nn__texcoords, (int)nn__pointCount, nn__tint)"""
+
+@nativemacro
+def fade(p_color: Color, alpha: f64) -> Color:
+    # Get color with alpha applied, alpha goes from 0.0f to 1.0f
+    ccode """Fade(nn__p_color, (float)nn__alpha)"""
+
+@nativemacro
+def color_to_int(p_color: Color) -> int:
+    # Get hexadecimal value for a Color
+    ccode """ColorToInt(nn__p_color)"""
+
+@nativemacro
+def color_normalize(p_color: Color) -> Vector4:
+    # Get Color normalized as float [0..1]
+    ccode """ColorNormalize(nn__p_color)"""
+
+@nativemacro
+def color_from_normalized(normalized: Vector4) -> Color:
+    # Get Color from normalized values [0..1]
+    ccode """ColorFromNormalized(nn__normalized)"""
+
+@nativemacro
+def color_to_hsv(p_color: Color) -> Vector3:
+    # Get HSV values for a Color, hue [0..360], saturation/value [0..1]
+    ccode """ColorToHSV(nn__p_color)"""
+
+@nativemacro
+def color_from_hsv(hue: f64, saturation: f64, value: f64) -> Color:
+    # Get a Color from HSV values, hue [0..360], saturation/value [0..1]
+    ccode """ColorFromHSV((float)nn__hue, (float)nn__saturation, (float)nn__value)"""
+
+@nativemacro
+def color_alpha(p_color: Color, alpha: f64) -> Color:
+    # Get color with alpha applied, alpha goes from 0.0f to 1.0f
+    ccode """ColorAlpha(nn__p_color, (float)nn__alpha)"""
+
+@nativemacro
+def color_alpha_blend(dst: Color, src: Color, tint: Color) -> Color:
+    # Get src alpha-blended into dst color with tint
+    ccode """ColorAlphaBlend(nn__dst, nn__src, nn__tint)"""
+
+@nativemacro
+def get_color(hexValue: u32) -> Color:
+    # Get Color structure from hexadecimal value
+    ccode """GetColor((unsigned int)nn__hexValue)"""
+
+@nativemacro
+def get_pixel_color(srcPtr: c.VoidPtr, format: int) -> Color:
+    # Get Color from a source pixel pointer of certain format
+    ccode """GetPixelColor(nn__srcPtr, (int)nn__format)"""
+
+@nativemacro
+def set_pixel_color(dstPtr: c.VoidPtr, p_color: Color, format: int) -> None:
+    # Set color formatted into destination pixel pointer
+    ccode """SetPixelColor(nn__dstPtr, nn__p_color, (int)nn__format)"""
+
+@nativemacro
+def get_pixel_data_size(width: int, height: int, format: int) -> int:
+    # Get pixel data size in bytes for certain format
+    ccode """GetPixelDataSize((int)nn__width, (int)nn__height, (int)nn__format)"""
+
+@nativemacro
+def get_font_default() -> Font:
+    # Get the default Font
+    ccode """GetFontDefault()"""
+
+@native
+def load_font(fileName: str) -> Font:
+    # Load font from file into GPU memory (VRAM)
+    ccode """Font temp_rl = LoadFont(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def load_font_ex(fileName: str, fontSize: int, fontChars: Ptr[c.CInt], glyphCount: int) -> Font:
+    # Load font from file with extended parameters, use NULL for fontChars and 0 for glyphCount to load the default character set
+    ccode """Font temp_rl = LoadFontEx(nn__fileName, (int)nn__fontSize, nn__fontChars, (int)nn__glyphCount);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def load_font_from_image(p_image: Image, key: Color, firstChar: int) -> Font:
+    # Load font from Image (XNA style)
+    ccode """LoadFontFromImage(nn__p_image, nn__key, (int)nn__firstChar)"""
+
+@native
+def load_font_from_memory(fileType: str, fileData: Const[Ptr[c.CUChar]], dataSize: int, fontSize: int, fontChars: Ptr[c.CInt], glyphCount: int) -> Font:
+    # Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
+    ccode """Font temp_rl = LoadFontFromMemory(nn__fileType, nn__fileData, (int)nn__dataSize, (int)nn__fontSize, nn__fontChars, (int)nn__glyphCount);
+    yk__sdsfree(nn__fileType);
+    return temp_rl"""
+
+@nativemacro
+def load_font_data(fileData: Const[Ptr[c.CUChar]], dataSize: int, fontSize: int, fontChars: Ptr[c.CInt], glyphCount: int, type: int) -> Ptr[GlyphInfo]:
+    # Load font data for further use
+    ccode """LoadFontData(nn__fileData, (int)nn__dataSize, (int)nn__fontSize, nn__fontChars, (int)nn__glyphCount, (int)nn__type)"""
+
+@nativemacro
+def gen_image_font_atlas(chars: Const[Ptr[GlyphInfo]], recs: Ptr[Ptr[Rectangle ]], glyphCount: int, fontSize: int, padding: int, packMethod: int) -> Image:
+    # Generate image font atlas using chars info
+    ccode """GenImageFontAtlas(nn__chars, nn__recs, (int)nn__glyphCount, (int)nn__fontSize, (int)nn__padding, (int)nn__packMethod)"""
+
+@nativemacro
+def unload_font_data(chars: Ptr[GlyphInfo], glyphCount: int) -> None:
+    # Unload font chars info data (RAM)
+    ccode """UnloadFontData(nn__chars, (int)nn__glyphCount)"""
+
+@nativemacro
+def unload_font(p_font: Font) -> None:
+    # Unload font from GPU memory (VRAM)
+    ccode """UnloadFont(nn__p_font)"""
+
+@native
+def export_font_as_code(p_font: Font, fileName: str) -> bool:
+    # Export font as code file, returns true on success
+    ccode """bool temp_rl = ExportFontAsCode(nn__p_font, nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def draw_fps(posX: int, posY: int) -> None:
+    # Draw current FPS
+    ccode """DrawFPS((int)nn__posX, (int)nn__posY)"""
+
+@native
+def draw_text(text: str, posX: int, posY: int, fontSize: int, p_color: Color) -> None:
+    # Draw text (using default font)
+    ccode """DrawText(nn__text, (int)nn__posX, (int)nn__posY, (int)nn__fontSize, nn__p_color);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def draw_text_ex(p_font: Font, text: str, position: Vector2, fontSize: f64, spacing: f64, tint: Color) -> None:
+    # Draw text using font and additional parameters
+    ccode """DrawTextEx(nn__p_font, nn__text, nn__position, (float)nn__fontSize, (float)nn__spacing, nn__tint);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def draw_text_pro(p_font: Font, text: str, position: Vector2, origin: Vector2, rotation: f64, fontSize: f64, spacing: f64, tint: Color) -> None:
+    # Draw text using Font and pro parameters (rotation)
+    ccode """DrawTextPro(nn__p_font, nn__text, nn__position, nn__origin, (float)nn__rotation, (float)nn__fontSize, (float)nn__spacing, nn__tint);
+    yk__sdsfree(nn__text);
+    """
+
+@nativemacro
+def draw_text_codepoint(p_font: Font, codepoint: int, position: Vector2, fontSize: f64, tint: Color) -> None:
+    # Draw one character (codepoint)
+    ccode """DrawTextCodepoint(nn__p_font, (int)nn__codepoint, nn__position, (float)nn__fontSize, nn__tint)"""
+
+@nativemacro
+def draw_text_codepoints(p_font: Font, codepoints: Const[Ptr[c.CInt]], count: int, position: Vector2, fontSize: f64, spacing: f64, tint: Color) -> None:
+    # Draw multiple character (codepoint)
+    ccode """DrawTextCodepoints(nn__p_font, nn__codepoints, (int)nn__count, nn__position, (float)nn__fontSize, (float)nn__spacing, nn__tint)"""
+
+@native
+def measure_text(text: str, fontSize: int) -> int:
+    # Measure string width for default font
+    ccode """int temp_rl = MeasureText(nn__text, (int)nn__fontSize);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def measure_text_ex(p_font: Font, text: str, fontSize: f64, spacing: f64) -> Vector2:
+    # Measure string size for Font
+    ccode """Vector2 temp_rl = MeasureTextEx(nn__p_font, nn__text, (float)nn__fontSize, (float)nn__spacing);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@nativemacro
+def get_glyph_index(p_font: Font, codepoint: int) -> int:
+    # Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
+    ccode """GetGlyphIndex(nn__p_font, (int)nn__codepoint)"""
+
+@nativemacro
+def get_glyph_info(p_font: Font, codepoint: int) -> GlyphInfo:
+    # Get glyph font info data for a codepoint (unicode character), fallback to '?' if not found
+    ccode """GetGlyphInfo(nn__p_font, (int)nn__codepoint)"""
+
+@nativemacro
+def get_glyph_atlas_rec(p_font: Font, codepoint: int) -> Rectangle:
+    # Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
+    ccode """GetGlyphAtlasRec(nn__p_font, (int)nn__codepoint)"""
+
+@native
+def load_codepoints(text: str, count: Ptr[c.CInt]) -> Ptr[c.CInt]:
+    # Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
+    ccode """int * temp_rl = LoadCodepoints(nn__text, nn__count);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@nativemacro
+def unload_codepoints(codepoints: Ptr[c.CInt]) -> None:
+    # Unload codepoints data from memory
+    ccode """UnloadCodepoints(nn__codepoints)"""
+
+@native
+def get_codepoint_count(text: str) -> int:
+    # Get total number of codepoints in a UTF-8 encoded string
+    ccode """int temp_rl = GetCodepointCount(nn__text);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def get_codepoint(text: str, bytesProcessed: Ptr[c.CInt]) -> int:
+    # Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+    ccode """int temp_rl = GetCodepoint(nn__text, nn__bytesProcessed);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@nativemacro
+def codepoint_to_utf8(codepoint: int, byteSize: Ptr[c.CInt]) -> str:
+    # Encode one codepoint into UTF-8 byte array (array length returned as parameter)
+    ccode """CodepointToUTF8((int)nn__codepoint, nn__byteSize)"""
+
+@nativemacro
+def text_codepoints_to_utf8(codepoints: Const[Ptr[c.CInt]], length: int) -> str:
+    # Encode text as codepoints array into UTF-8 text string (WARNING: memory must be freed!)
+    ccode """TextCodepointsToUTF8(nn__codepoints, (int)nn__length)"""
+
+@native
+def text_copy(dst: str, src: str) -> int:
+    # Copy one string to another, returns bytes copied
+    ccode """int temp_rl = TextCopy(nn__dst, nn__src);
+    yk__sdsfree(nn__dst);
+    yk__sdsfree(nn__src);
+    return temp_rl"""
+
+@native
+def text_is_equal(text1: str, text2: str) -> bool:
+    # Check if two text string are equal
+    ccode """bool temp_rl = TextIsEqual(nn__text1, nn__text2);
+    yk__sdsfree(nn__text1);
+    yk__sdsfree(nn__text2);
+    return temp_rl"""
+
+@native
+def text_length(text: str) -> u32:
+    # Get text length, checks for '\0' ending
+    ccode """unsigned int temp_rl = TextLength(nn__text);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def text_subtext(text: str, position: int, length: int) -> str:
+    # Get a piece of a text string
+    ccode """const char * temp_rl = TextSubtext(nn__text, (int)nn__position, (int)nn__length);
+    yk__sdsfree(nn__text);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def text_replace(text: str, replace: str, by: str) -> str:
+    # Replace text string (WARNING: memory must be freed!)
+    ccode """char * temp_rl = TextReplace(nn__text, nn__replace, nn__by);
+    yk__sdsfree(nn__text);
+    yk__sdsfree(nn__replace);
+    yk__sdsfree(nn__by);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def text_insert(text: str, insert: str, position: int) -> str:
+    # Insert text in a position (WARNING: memory must be freed!)
+    ccode """char * temp_rl = TextInsert(nn__text, nn__insert, (int)nn__position);
+    yk__sdsfree(nn__text);
+    yk__sdsfree(nn__insert);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def text_join(textList: Const[Ptr[Ptr[c.CChar]]], count: int, delimiter: str) -> str:
+    # Join text strings with delimiter
+    ccode """const char * temp_rl = TextJoin(nn__textList, (int)nn__count, nn__delimiter);
+    yk__sdsfree(nn__delimiter);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def text_split(text: str, delimiter: int, count: Ptr[c.CInt]) -> Const[Ptr[Ptr[c.CChar]]]:
+    # Split text into multiple strings
+    ccode """const char ** temp_rl = TextSplit(nn__text, (char)nn__delimiter, nn__count);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def text_append(text: str, append: str, position: Ptr[c.CInt]) -> None:
+    # Append text at specific position and move cursor!
+    ccode """TextAppend(nn__text, nn__append, nn__position);
+    yk__sdsfree(nn__text);
+    yk__sdsfree(nn__append);
+    """
+
+@native
+def text_find_index(text: str, find: str) -> int:
+    # Find first text occurrence within a string
+    ccode """int temp_rl = TextFindIndex(nn__text, nn__find);
+    yk__sdsfree(nn__text);
+    yk__sdsfree(nn__find);
+    return temp_rl"""
+
+@native
+def text_to_upper(text: str) -> str:
+    # Get upper case version of provided string
+    ccode """const char * temp_rl = TextToUpper(nn__text);
+    yk__sdsfree(nn__text);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def text_to_lower(text: str) -> str:
+    # Get lower case version of provided string
+    ccode """const char * temp_rl = TextToLower(nn__text);
+    yk__sdsfree(nn__text);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def text_to_pascal(text: str) -> str:
+    # Get Pascal case notation version of provided string
+    ccode """const char * temp_rl = TextToPascal(nn__text);
+    yk__sdsfree(nn__text);
+    return yk__sdsnew(temp_rl)"""
+
+@native
+def text_to_integer(text: str) -> int:
+    # Get integer value from text (negative values not supported)
+    ccode """int temp_rl = TextToInteger(nn__text);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@nativemacro
+def draw_line3_d(startPos: Vector3, endPos: Vector3, p_color: Color) -> None:
+    # Draw a line in 3D world space
+    ccode """DrawLine3D(nn__startPos, nn__endPos, nn__p_color)"""
+
+@nativemacro
+def draw_point3_d(position: Vector3, p_color: Color) -> None:
+    # Draw a point in 3D space, actually a small line
+    ccode """DrawPoint3D(nn__position, nn__p_color)"""
+
+@nativemacro
+def draw_circle3_d(center: Vector3, radius: f64, rotationAxis: Vector3, rotationAngle: f64, p_color: Color) -> None:
+    # Draw a circle in 3D world space
+    ccode """DrawCircle3D(nn__center, (float)nn__radius, nn__rotationAxis, (float)nn__rotationAngle, nn__p_color)"""
+
+@nativemacro
+def draw_triangle3_d(v1: Vector3, v2: Vector3, v3: Vector3, p_color: Color) -> None:
+    # Draw a color-filled triangle (vertex in counter-clockwise order!)
+    ccode """DrawTriangle3D(nn__v1, nn__v2, nn__v3, nn__p_color)"""
+
+@nativemacro
+def draw_triangle_strip3_d(points: Ptr[Vector3], pointCount: int, p_color: Color) -> None:
+    # Draw a triangle strip defined by points
+    ccode """DrawTriangleStrip3D(nn__points, (int)nn__pointCount, nn__p_color)"""
+
+@nativemacro
+def draw_cube(position: Vector3, width: f64, height: f64, length: f64, p_color: Color) -> None:
+    # Draw cube
+    ccode """DrawCube(nn__position, (float)nn__width, (float)nn__height, (float)nn__length, nn__p_color)"""
+
+@nativemacro
+def draw_cube_v(position: Vector3, size: Vector3, p_color: Color) -> None:
+    # Draw cube (Vector version)
+    ccode """DrawCubeV(nn__position, nn__size, nn__p_color)"""
+
+@nativemacro
+def draw_cube_wires(position: Vector3, width: f64, height: f64, length: f64, p_color: Color) -> None:
+    # Draw cube wires
+    ccode """DrawCubeWires(nn__position, (float)nn__width, (float)nn__height, (float)nn__length, nn__p_color)"""
+
+@nativemacro
+def draw_cube_wires_v(position: Vector3, size: Vector3, p_color: Color) -> None:
+    # Draw cube wires (Vector version)
+    ccode """DrawCubeWiresV(nn__position, nn__size, nn__p_color)"""
+
+@nativemacro
+def draw_cube_texture(p_texture: Texture2D, position: Vector3, width: f64, height: f64, length: f64, p_color: Color) -> None:
+    # Draw cube textured
+    ccode """DrawCubeTexture(nn__p_texture, nn__position, (float)nn__width, (float)nn__height, (float)nn__length, nn__p_color)"""
+
+@nativemacro
+def draw_cube_texture_rec(p_texture: Texture2D, source: Rectangle, position: Vector3, width: f64, height: f64, length: f64, p_color: Color) -> None:
+    # Draw cube with a region of a texture
+    ccode """DrawCubeTextureRec(nn__p_texture, nn__source, nn__position, (float)nn__width, (float)nn__height, (float)nn__length, nn__p_color)"""
+
+@nativemacro
+def draw_sphere(centerPos: Vector3, radius: f64, p_color: Color) -> None:
+    # Draw sphere
+    ccode """DrawSphere(nn__centerPos, (float)nn__radius, nn__p_color)"""
+
+@nativemacro
+def draw_sphere_ex(centerPos: Vector3, radius: f64, rings: int, slices: int, p_color: Color) -> None:
+    # Draw sphere with extended parameters
+    ccode """DrawSphereEx(nn__centerPos, (float)nn__radius, (int)nn__rings, (int)nn__slices, nn__p_color)"""
+
+@nativemacro
+def draw_sphere_wires(centerPos: Vector3, radius: f64, rings: int, slices: int, p_color: Color) -> None:
+    # Draw sphere wires
+    ccode """DrawSphereWires(nn__centerPos, (float)nn__radius, (int)nn__rings, (int)nn__slices, nn__p_color)"""
+
+@nativemacro
+def draw_cylinder(position: Vector3, radiusTop: f64, radiusBottom: f64, height: f64, slices: int, p_color: Color) -> None:
+    # Draw a cylinder/cone
+    ccode """DrawCylinder(nn__position, (float)nn__radiusTop, (float)nn__radiusBottom, (float)nn__height, (int)nn__slices, nn__p_color)"""
+
+@nativemacro
+def draw_cylinder_ex(startPos: Vector3, endPos: Vector3, startRadius: f64, endRadius: f64, sides: int, p_color: Color) -> None:
+    # Draw a cylinder with base at startPos and top at endPos
+    ccode """DrawCylinderEx(nn__startPos, nn__endPos, (float)nn__startRadius, (float)nn__endRadius, (int)nn__sides, nn__p_color)"""
+
+@nativemacro
+def draw_cylinder_wires(position: Vector3, radiusTop: f64, radiusBottom: f64, height: f64, slices: int, p_color: Color) -> None:
+    # Draw a cylinder/cone wires
+    ccode """DrawCylinderWires(nn__position, (float)nn__radiusTop, (float)nn__radiusBottom, (float)nn__height, (int)nn__slices, nn__p_color)"""
+
+@nativemacro
+def draw_cylinder_wires_ex(startPos: Vector3, endPos: Vector3, startRadius: f64, endRadius: f64, sides: int, p_color: Color) -> None:
+    # Draw a cylinder wires with base at startPos and top at endPos
+    ccode """DrawCylinderWiresEx(nn__startPos, nn__endPos, (float)nn__startRadius, (float)nn__endRadius, (int)nn__sides, nn__p_color)"""
+
+@nativemacro
+def draw_plane(centerPos: Vector3, size: Vector2, p_color: Color) -> None:
+    # Draw a plane XZ
+    ccode """DrawPlane(nn__centerPos, nn__size, nn__p_color)"""
+
+@nativemacro
+def draw_ray(p_ray: Ray, p_color: Color) -> None:
+    # Draw a ray line
+    ccode """DrawRay(nn__p_ray, nn__p_color)"""
+
+@nativemacro
+def draw_grid(slices: int, spacing: f64) -> None:
+    # Draw a grid (centered at (0, 0, 0))
+    ccode """DrawGrid((int)nn__slices, (float)nn__spacing)"""
+
+@native
+def load_model(fileName: str) -> Model:
+    # Load model from files (meshes and materials)
+    ccode """Model temp_rl = LoadModel(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def load_model_from_mesh(mesh: Mesh) -> Model:
+    # Load model from generated mesh (default material)
+    ccode """LoadModelFromMesh(nn__mesh)"""
+
+@nativemacro
+def unload_model(model: Model) -> None:
+    # Unload model (including meshes) from memory (RAM and/or VRAM)
+    ccode """UnloadModel(nn__model)"""
+
+@nativemacro
+def unload_model_keep_meshes(model: Model) -> None:
+    # Unload model (but not meshes) from memory (RAM and/or VRAM)
+    ccode """UnloadModelKeepMeshes(nn__model)"""
+
+@nativemacro
+def get_model_bounding_box(model: Model) -> BoundingBox:
+    # Compute model bounding box limits (considers all meshes)
+    ccode """GetModelBoundingBox(nn__model)"""
+
+@nativemacro
+def draw_model(model: Model, position: Vector3, scale: f64, tint: Color) -> None:
+    # Draw a model (with texture if set)
+    ccode """DrawModel(nn__model, nn__position, (float)nn__scale, nn__tint)"""
+
+@nativemacro
+def draw_model_ex(model: Model, position: Vector3, rotationAxis: Vector3, rotationAngle: f64, scale: Vector3, tint: Color) -> None:
+    # Draw a model with extended parameters
+    ccode """DrawModelEx(nn__model, nn__position, nn__rotationAxis, (float)nn__rotationAngle, nn__scale, nn__tint)"""
+
+@nativemacro
+def draw_model_wires(model: Model, position: Vector3, scale: f64, tint: Color) -> None:
+    # Draw a model wires (with texture if set)
+    ccode """DrawModelWires(nn__model, nn__position, (float)nn__scale, nn__tint)"""
+
+@nativemacro
+def draw_model_wires_ex(model: Model, position: Vector3, rotationAxis: Vector3, rotationAngle: f64, scale: Vector3, tint: Color) -> None:
+    # Draw a model wires (with texture if set) with extended parameters
+    ccode """DrawModelWiresEx(nn__model, nn__position, nn__rotationAxis, (float)nn__rotationAngle, nn__scale, nn__tint)"""
+
+@nativemacro
+def draw_bounding_box(box: BoundingBox, p_color: Color) -> None:
+    # Draw bounding box (wires)
+    ccode """DrawBoundingBox(nn__box, nn__p_color)"""
+
+@nativemacro
+def draw_billboard(p_camera: Camera, p_texture: Texture2D, position: Vector3, size: f64, tint: Color) -> None:
+    # Draw a billboard texture
+    ccode """DrawBillboard(nn__p_camera, nn__p_texture, nn__position, (float)nn__size, nn__tint)"""
+
+@nativemacro
+def draw_billboard_rec(p_camera: Camera, p_texture: Texture2D, source: Rectangle, position: Vector3, size: Vector2, tint: Color) -> None:
+    # Draw a billboard texture defined by source
+    ccode """DrawBillboardRec(nn__p_camera, nn__p_texture, nn__source, nn__position, nn__size, nn__tint)"""
+
+@nativemacro
+def draw_billboard_pro(p_camera: Camera, p_texture: Texture2D, source: Rectangle, position: Vector3, up: Vector3, size: Vector2, origin: Vector2, rotation: f64, tint: Color) -> None:
+    # Draw a billboard texture defined by source and rotation
+    ccode """DrawBillboardPro(nn__p_camera, nn__p_texture, nn__source, nn__position, nn__up, nn__size, nn__origin, (float)nn__rotation, nn__tint)"""
+
+@nativemacro
+def upload_mesh(mesh: Ptr[Mesh], dynamic: bool) -> None:
+    # Upload mesh vertex data in GPU and provide VAO/VBO ids
+    ccode """UploadMesh(nn__mesh, nn__dynamic)"""
+
+@nativemacro
+def update_mesh_buffer(mesh: Mesh, index: int, data: Const[c.VoidPtr], dataSize: int, offset: int) -> None:
+    # Update mesh vertex data in GPU for a specific buffer index
+    ccode """UpdateMeshBuffer(nn__mesh, (int)nn__index, nn__data, (int)nn__dataSize, (int)nn__offset)"""
+
+@nativemacro
+def unload_mesh(mesh: Mesh) -> None:
+    # Unload mesh data from CPU and GPU
+    ccode """UnloadMesh(nn__mesh)"""
+
+@nativemacro
+def draw_mesh(mesh: Mesh, material: Material, p_transform: Matrix) -> None:
+    # Draw a 3d mesh with material and transform
+    ccode """DrawMesh(nn__mesh, nn__material, nn__p_transform)"""
+
+@nativemacro
+def draw_mesh_instanced(mesh: Mesh, material: Material, transforms: Const[Ptr[Matrix]], instances: int) -> None:
+    # Draw multiple mesh instances with material and different transforms
+    ccode """DrawMeshInstanced(nn__mesh, nn__material, nn__transforms, (int)nn__instances)"""
+
+@native
+def export_mesh(mesh: Mesh, fileName: str) -> bool:
+    # Export mesh data to file, returns true on success
+    ccode """bool temp_rl = ExportMesh(nn__mesh, nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def get_mesh_bounding_box(mesh: Mesh) -> BoundingBox:
+    # Compute mesh bounding box limits
+    ccode """GetMeshBoundingBox(nn__mesh)"""
+
+@nativemacro
+def gen_mesh_tangents(mesh: Ptr[Mesh]) -> None:
+    # Compute mesh tangents
+    ccode """GenMeshTangents(nn__mesh)"""
+
+@nativemacro
+def gen_mesh_poly(sides: int, radius: f64) -> Mesh:
+    # Generate polygonal mesh
+    ccode """GenMeshPoly((int)nn__sides, (float)nn__radius)"""
+
+@nativemacro
+def gen_mesh_plane(width: f64, length: f64, resX: int, resZ: int) -> Mesh:
+    # Generate plane mesh (with subdivisions)
+    ccode """GenMeshPlane((float)nn__width, (float)nn__length, (int)nn__resX, (int)nn__resZ)"""
+
+@nativemacro
+def gen_mesh_cube(width: f64, height: f64, length: f64) -> Mesh:
+    # Generate cuboid mesh
+    ccode """GenMeshCube((float)nn__width, (float)nn__height, (float)nn__length)"""
+
+@nativemacro
+def gen_mesh_sphere(radius: f64, rings: int, slices: int) -> Mesh:
+    # Generate sphere mesh (standard sphere)
+    ccode """GenMeshSphere((float)nn__radius, (int)nn__rings, (int)nn__slices)"""
+
+@nativemacro
+def gen_mesh_hemi_sphere(radius: f64, rings: int, slices: int) -> Mesh:
+    # Generate half-sphere mesh (no bottom cap)
+    ccode """GenMeshHemiSphere((float)nn__radius, (int)nn__rings, (int)nn__slices)"""
+
+@nativemacro
+def gen_mesh_cylinder(radius: f64, height: f64, slices: int) -> Mesh:
+    # Generate cylinder mesh
+    ccode """GenMeshCylinder((float)nn__radius, (float)nn__height, (int)nn__slices)"""
+
+@nativemacro
+def gen_mesh_cone(radius: f64, height: f64, slices: int) -> Mesh:
+    # Generate cone/pyramid mesh
+    ccode """GenMeshCone((float)nn__radius, (float)nn__height, (int)nn__slices)"""
+
+@nativemacro
+def gen_mesh_torus(radius: f64, size: f64, radSeg: int, sides: int) -> Mesh:
+    # Generate torus mesh
+    ccode """GenMeshTorus((float)nn__radius, (float)nn__size, (int)nn__radSeg, (int)nn__sides)"""
+
+@nativemacro
+def gen_mesh_knot(radius: f64, size: f64, radSeg: int, sides: int) -> Mesh:
+    # Generate trefoil knot mesh
+    ccode """GenMeshKnot((float)nn__radius, (float)nn__size, (int)nn__radSeg, (int)nn__sides)"""
+
+@nativemacro
+def gen_mesh_heightmap(heightmap: Image, size: Vector3) -> Mesh:
+    # Generate heightmap mesh from image data
+    ccode """GenMeshHeightmap(nn__heightmap, nn__size)"""
+
+@nativemacro
+def gen_mesh_cubicmap(cubicmap: Image, cubeSize: Vector3) -> Mesh:
+    # Generate cubes-based map mesh from image data
+    ccode """GenMeshCubicmap(nn__cubicmap, nn__cubeSize)"""
+
+@native
+def load_materials(fileName: str, materialCount: Ptr[c.CInt]) -> Ptr[Material]:
+    # Load materials from model file
+    ccode """Material * temp_rl = LoadMaterials(nn__fileName, nn__materialCount);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def load_material_default() -> Material:
+    # Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
+    ccode """LoadMaterialDefault()"""
+
+@nativemacro
+def unload_material(material: Material) -> None:
+    # Unload material from GPU memory (VRAM)
+    ccode """UnloadMaterial(nn__material)"""
+
+@nativemacro
+def set_material_texture(material: Ptr[Material], mapType: int, p_texture: Texture2D) -> None:
+    # Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
+    ccode """SetMaterialTexture(nn__material, (int)nn__mapType, nn__p_texture)"""
+
+@nativemacro
+def set_model_mesh_material(model: Ptr[Model], meshId: int, materialId: int) -> None:
+    # Set material for a mesh
+    ccode """SetModelMeshMaterial(nn__model, (int)nn__meshId, (int)nn__materialId)"""
+
+@native
+def load_model_animations(fileName: str, animCount: Ptr[c.CUInt]) -> Ptr[ModelAnimation]:
+    # Load model animations from file
+    ccode """ModelAnimation * temp_rl = LoadModelAnimations(nn__fileName, nn__animCount);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def update_model_animation(model: Model, anim: ModelAnimation, frame: int) -> None:
+    # Update model animation pose
+    ccode """UpdateModelAnimation(nn__model, nn__anim, (int)nn__frame)"""
+
+@nativemacro
+def unload_model_animation(anim: ModelAnimation) -> None:
+    # Unload animation data
+    ccode """UnloadModelAnimation(nn__anim)"""
+
+@nativemacro
+def unload_model_animations(animations: Ptr[ModelAnimation], count: u32) -> None:
+    # Unload animation array data
+    ccode """UnloadModelAnimations(nn__animations, (unsigned int)nn__count)"""
+
+@nativemacro
+def is_model_animation_valid(model: Model, anim: ModelAnimation) -> bool:
+    # Check model animation skeleton match
+    ccode """IsModelAnimationValid(nn__model, nn__anim)"""
+
+@nativemacro
+def check_collision_spheres(center1: Vector3, radius1: f64, center2: Vector3, radius2: f64) -> bool:
+    # Check collision between two spheres
+    ccode """CheckCollisionSpheres(nn__center1, (float)nn__radius1, nn__center2, (float)nn__radius2)"""
+
+@nativemacro
+def check_collision_boxes(box1: BoundingBox, box2: BoundingBox) -> bool:
+    # Check collision between two bounding boxes
+    ccode """CheckCollisionBoxes(nn__box1, nn__box2)"""
+
+@nativemacro
+def check_collision_box_sphere(box: BoundingBox, center: Vector3, radius: f64) -> bool:
+    # Check collision between box and sphere
+    ccode """CheckCollisionBoxSphere(nn__box, nn__center, (float)nn__radius)"""
+
+@nativemacro
+def get_ray_collision_sphere(p_ray: Ray, center: Vector3, radius: f64) -> RayCollision:
+    # Get collision info between ray and sphere
+    ccode """GetRayCollisionSphere(nn__p_ray, nn__center, (float)nn__radius)"""
+
+@nativemacro
+def get_ray_collision_box(p_ray: Ray, box: BoundingBox) -> RayCollision:
+    # Get collision info between ray and box
+    ccode """GetRayCollisionBox(nn__p_ray, nn__box)"""
+
+@nativemacro
+def get_ray_collision_mesh(p_ray: Ray, mesh: Mesh, p_transform: Matrix) -> RayCollision:
+    # Get collision info between ray and mesh
+    ccode """GetRayCollisionMesh(nn__p_ray, nn__mesh, nn__p_transform)"""
+
+@nativemacro
+def get_ray_collision_triangle(p_ray: Ray, p1: Vector3, p2: Vector3, p3: Vector3) -> RayCollision:
+    # Get collision info between ray and triangle
+    ccode """GetRayCollisionTriangle(nn__p_ray, nn__p1, nn__p2, nn__p3)"""
+
+@nativemacro
+def get_ray_collision_quad(p_ray: Ray, p1: Vector3, p2: Vector3, p3: Vector3, p4: Vector3) -> RayCollision:
+    # Get collision info between ray and quad
+    ccode """GetRayCollisionQuad(nn__p_ray, nn__p1, nn__p2, nn__p3, nn__p4)"""
+
+@nativemacro
+def init_audio_device() -> None:
+    # Initialize audio device and context
+    ccode """InitAudioDevice()"""
+
+@nativemacro
+def close_audio_device() -> None:
+    # Close the audio device and context
+    ccode """CloseAudioDevice()"""
+
+@nativemacro
+def is_audio_device_ready() -> bool:
+    # Check if audio device has been initialized successfully
+    ccode """IsAudioDeviceReady()"""
+
+@nativemacro
+def set_master_volume(volume: f64) -> None:
+    # Set master volume (listener)
+    ccode """SetMasterVolume((float)nn__volume)"""
+
+@native
+def load_wave(fileName: str) -> Wave:
+    # Load wave data from file
+    ccode """Wave temp_rl = LoadWave(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def load_wave_from_memory(fileType: str, fileData: Const[Ptr[c.CUChar]], dataSize: int) -> Wave:
+    # Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
+    ccode """Wave temp_rl = LoadWaveFromMemory(nn__fileType, nn__fileData, (int)nn__dataSize);
+    yk__sdsfree(nn__fileType);
+    return temp_rl"""
+
+@native
+def load_sound(fileName: str) -> Sound:
+    # Load sound from file
+    ccode """Sound temp_rl = LoadSound(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def load_sound_from_wave(p_wave: Wave) -> Sound:
+    # Load sound from wave data
+    ccode """LoadSoundFromWave(nn__p_wave)"""
+
+@nativemacro
+def update_sound(p_sound: Sound, data: Const[c.VoidPtr], sampleCount: int) -> None:
+    # Update sound buffer with new data
+    ccode """UpdateSound(nn__p_sound, nn__data, (int)nn__sampleCount)"""
+
+@nativemacro
+def unload_wave(p_wave: Wave) -> None:
+    # Unload wave data
+    ccode """UnloadWave(nn__p_wave)"""
+
+@nativemacro
+def unload_sound(p_sound: Sound) -> None:
+    # Unload sound
+    ccode """UnloadSound(nn__p_sound)"""
+
+@native
+def export_wave(p_wave: Wave, fileName: str) -> bool:
+    # Export wave data to file, returns true on success
+    ccode """bool temp_rl = ExportWave(nn__p_wave, nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def export_wave_as_code(p_wave: Wave, fileName: str) -> bool:
+    # Export wave sample data to code (.h), returns true on success
+    ccode """bool temp_rl = ExportWaveAsCode(nn__p_wave, nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@nativemacro
+def play_sound(p_sound: Sound) -> None:
+    # Play a sound
+    ccode """PlaySound(nn__p_sound)"""
+
+@nativemacro
+def stop_sound(p_sound: Sound) -> None:
+    # Stop playing a sound
+    ccode """StopSound(nn__p_sound)"""
+
+@nativemacro
+def pause_sound(p_sound: Sound) -> None:
+    # Pause a sound
+    ccode """PauseSound(nn__p_sound)"""
+
+@nativemacro
+def resume_sound(p_sound: Sound) -> None:
+    # Resume a paused sound
+    ccode """ResumeSound(nn__p_sound)"""
+
+@nativemacro
+def play_sound_multi(p_sound: Sound) -> None:
+    # Play a sound (using multichannel buffer pool)
+    ccode """PlaySoundMulti(nn__p_sound)"""
+
+@nativemacro
+def stop_sound_multi() -> None:
+    # Stop any sound playing (using multichannel buffer pool)
+    ccode """StopSoundMulti()"""
+
+@nativemacro
+def get_sounds_playing() -> int:
+    # Get number of sounds playing in the multichannel
+    ccode """GetSoundsPlaying()"""
+
+@nativemacro
+def is_sound_playing(p_sound: Sound) -> bool:
+    # Check if a sound is currently playing
+    ccode """IsSoundPlaying(nn__p_sound)"""
+
+@nativemacro
+def set_sound_volume(p_sound: Sound, volume: f64) -> None:
+    # Set volume for a sound (1.0 is max level)
+    ccode """SetSoundVolume(nn__p_sound, (float)nn__volume)"""
+
+@nativemacro
+def set_sound_pitch(p_sound: Sound, pitch: f64) -> None:
+    # Set pitch for a sound (1.0 is base level)
+    ccode """SetSoundPitch(nn__p_sound, (float)nn__pitch)"""
+
+@nativemacro
+def set_sound_pan(p_sound: Sound, pan: f64) -> None:
+    # Set pan for a sound (0.5 is center)
+    ccode """SetSoundPan(nn__p_sound, (float)nn__pan)"""
+
+@nativemacro
+def wave_copy(p_wave: Wave) -> Wave:
+    # Copy a wave to a new wave
+    ccode """WaveCopy(nn__p_wave)"""
+
+@nativemacro
+def wave_crop(p_wave: Ptr[Wave], initSample: int, finalSample: int) -> None:
+    # Crop a wave to defined samples range
+    ccode """WaveCrop(nn__p_wave, (int)nn__initSample, (int)nn__finalSample)"""
+
+@nativemacro
+def wave_format(p_wave: Ptr[Wave], sampleRate: int, sampleSize: int, channels: int) -> None:
+    # Convert wave data to desired format
+    ccode """WaveFormat(nn__p_wave, (int)nn__sampleRate, (int)nn__sampleSize, (int)nn__channels)"""
+
+@nativemacro
+def load_wave_samples(p_wave: Wave) -> Ptr[c.CFloat]:
+    # Load samples data from wave as a 32bit float data array
+    ccode """LoadWaveSamples(nn__p_wave)"""
+
+@nativemacro
+def unload_wave_samples(samples: Ptr[c.CFloat]) -> None:
+    # Unload samples data loaded with LoadWaveSamples()
+    ccode """UnloadWaveSamples(nn__samples)"""
+
+@native
+def load_music_stream(fileName: str) -> Music:
+    # Load music stream from file
+    ccode """Music temp_rl = LoadMusicStream(nn__fileName);
+    yk__sdsfree(nn__fileName);
+    return temp_rl"""
+
+@native
+def load_music_stream_from_memory(fileType: str, data: Const[Ptr[c.CUChar]], dataSize: int) -> Music:
+    # Load music stream from data
+    ccode """Music temp_rl = LoadMusicStreamFromMemory(nn__fileType, nn__data, (int)nn__dataSize);
+    yk__sdsfree(nn__fileType);
+    return temp_rl"""
+
+@nativemacro
+def unload_music_stream(p_music: Music) -> None:
+    # Unload music stream
+    ccode """UnloadMusicStream(nn__p_music)"""
+
+@nativemacro
+def play_music_stream(p_music: Music) -> None:
+    # Start music playing
+    ccode """PlayMusicStream(nn__p_music)"""
+
+@nativemacro
+def is_music_stream_playing(p_music: Music) -> bool:
+    # Check if music is playing
+    ccode """IsMusicStreamPlaying(nn__p_music)"""
+
+@nativemacro
+def update_music_stream(p_music: Music) -> None:
+    # Updates buffers for music streaming
+    ccode """UpdateMusicStream(nn__p_music)"""
+
+@nativemacro
+def stop_music_stream(p_music: Music) -> None:
+    # Stop music playing
+    ccode """StopMusicStream(nn__p_music)"""
+
+@nativemacro
+def pause_music_stream(p_music: Music) -> None:
+    # Pause music playing
+    ccode """PauseMusicStream(nn__p_music)"""
+
+@nativemacro
+def resume_music_stream(p_music: Music) -> None:
+    # Resume playing paused music
+    ccode """ResumeMusicStream(nn__p_music)"""
+
+@nativemacro
+def seek_music_stream(p_music: Music, position: f64) -> None:
+    # Seek music to a position (in seconds)
+    ccode """SeekMusicStream(nn__p_music, (float)nn__position)"""
+
+@nativemacro
+def set_music_volume(p_music: Music, volume: f64) -> None:
+    # Set volume for music (1.0 is max level)
+    ccode """SetMusicVolume(nn__p_music, (float)nn__volume)"""
+
+@nativemacro
+def set_music_pitch(p_music: Music, pitch: f64) -> None:
+    # Set pitch for a music (1.0 is base level)
+    ccode """SetMusicPitch(nn__p_music, (float)nn__pitch)"""
+
+@nativemacro
+def set_music_pan(p_music: Music, pan: f64) -> None:
+    # Set pan for a music (0.5 is center)
+    ccode """SetMusicPan(nn__p_music, (float)nn__pan)"""
+
+@nativemacro
+def get_music_time_length(p_music: Music) -> f64:
+    # Get music time length (in seconds)
+    ccode """GetMusicTimeLength(nn__p_music)"""
+
+@nativemacro
+def get_music_time_played(p_music: Music) -> f64:
+    # Get current music time played (in seconds)
+    ccode """GetMusicTimePlayed(nn__p_music)"""
+
+@nativemacro
+def load_audio_stream(sampleRate: u32, sampleSize: u32, channels: u32) -> AudioStream:
+    # Load audio stream (to stream raw audio pcm data)
+    ccode """LoadAudioStream((unsigned int)nn__sampleRate, (unsigned int)nn__sampleSize, (unsigned int)nn__channels)"""
+
+@nativemacro
+def unload_audio_stream(stream: AudioStream) -> None:
+    # Unload audio stream and free memory
+    ccode """UnloadAudioStream(nn__stream)"""
+
+@nativemacro
+def update_audio_stream(stream: AudioStream, data: Const[c.VoidPtr], frameCount: int) -> None:
+    # Update audio stream buffers with data
+    ccode """UpdateAudioStream(nn__stream, nn__data, (int)nn__frameCount)"""
+
+@nativemacro
+def is_audio_stream_processed(stream: AudioStream) -> bool:
+    # Check if any audio stream buffers requires refill
+    ccode """IsAudioStreamProcessed(nn__stream)"""
+
+@nativemacro
+def play_audio_stream(stream: AudioStream) -> None:
+    # Play audio stream
+    ccode """PlayAudioStream(nn__stream)"""
+
+@nativemacro
+def pause_audio_stream(stream: AudioStream) -> None:
+    # Pause audio stream
+    ccode """PauseAudioStream(nn__stream)"""
+
+@nativemacro
+def resume_audio_stream(stream: AudioStream) -> None:
+    # Resume audio stream
+    ccode """ResumeAudioStream(nn__stream)"""
+
+@nativemacro
+def is_audio_stream_playing(stream: AudioStream) -> bool:
+    # Check if audio stream is playing
+    ccode """IsAudioStreamPlaying(nn__stream)"""
+
+@nativemacro
+def stop_audio_stream(stream: AudioStream) -> None:
+    # Stop audio stream
+    ccode """StopAudioStream(nn__stream)"""
+
+@nativemacro
+def set_audio_stream_volume(stream: AudioStream, volume: f64) -> None:
+    # Set volume for audio stream (1.0 is max level)
+    ccode """SetAudioStreamVolume(nn__stream, (float)nn__volume)"""
+
+@nativemacro
+def set_audio_stream_pitch(stream: AudioStream, pitch: f64) -> None:
+    # Set pitch for audio stream (1.0 is base level)
+    ccode """SetAudioStreamPitch(nn__stream, (float)nn__pitch)"""
+
+@nativemacro
+def set_audio_stream_pan(stream: AudioStream, pan: f64) -> None:
+    # Set pan for audio stream (0.5 is centered)
+    ccode """SetAudioStreamPan(nn__stream, (float)nn__pan)"""
+
+@nativemacro
+def set_audio_stream_buffer_size_default(size: int) -> None:
+    # Default size for new audio streams
+    ccode """SetAudioStreamBufferSizeDefault((int)nn__size)"""
+

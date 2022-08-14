@@ -1,0 +1,16 @@
+@nativedefine("yk__perlin1d")
+def noise1d(x: f64) -> f64:
+    # Get perlin noise in 1d (Calls 3d noise with hardcoded y, z values)
+    pass
+
+
+@nativedefine("yk__perlin2d")
+def noise2d(x: f64, y: f64) -> f64:
+    # Get perlin noise in 2d
+    pass
+
+
+@nativedefine("yk__perlin3d")
+def noise3d(x: f64, y: f64, z: f64) -> f64:
+    # Get perlin noise in 3d
+    pass

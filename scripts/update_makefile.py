@@ -48,8 +48,7 @@ def find_files_2_levels(directory: str) -> Tuple[List[str], List[str], List[str]
         cpp_files += c
         headers += h
         objects += o
-    return sort_and_standardize(cpp_files), \
-           sort_and_standardize(headers), sort_and_standardize(objects)
+    return sort_and_standardize(cpp_files), sort_and_standardize(headers), sort_and_standardize(objects)
 
 
 def update_cmake_file(headers: List[str], cpp_files: List[str], marker: str):
@@ -71,10 +70,15 @@ def main():
     # Look for given markers in CMakeLists.txt and update with files.
     location_markers = (("src", "# update_makefile.py SRC"),
                         ("tests", "# update_makefile.py TESTS"),
-                        ("runtime", "# update_makefile.py YK_RUNTIME"))
+                        )
     for directory, marker in location_markers:
         cpp_files, headers, _ = find_files_2_levels(directory)
         update_cmake_file(headers, cpp_files, marker)
+
+    # Only 1 level directory scanning, so we do not scan raylib stuff
+    directory, marker = "runtime", "# update_makefile.py YK_RUNTIME"
+    cpp_files, headers, _ = find_files_(directory)
+    update_cmake_file(headers, cpp_files, marker)
 
 
 if __name__ == "__main__":

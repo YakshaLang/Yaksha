@@ -29,6 +29,29 @@ static inline std::string trim_copy(std::string s) {
   trim(s);
   return s;
 }
+// https://stackoverflow.com/questions/5878775/how-to-find-and-replace-string
+void replace_all(
+    std::string& s,
+    std::string const& toReplace,
+    std::string const& replaceWith
+) {
+  std::ostringstream oss;
+  std::size_t pos = 0;
+  std::size_t prevPos = pos;
+
+  while (true) {
+    prevPos = pos;
+    pos = s.find(toReplace, pos);
+    if (pos == std::string::npos) { break; }
+    oss << s.substr(prevPos, pos - prevPos);
+    oss << replaceWith;
+    pos += toReplace.size();
+  }
+
+  oss << s.substr(prevPos);
+  s = oss.str();
+}
+
 std::string extract_comments(int definition_line, tokenizer &token_extractor) {
   std::size_t position = 0;
   // Skip to first token, after `def, class, const` line
@@ -57,6 +80,11 @@ std::string extract_comments(int definition_line, tokenizer &token_extractor) {
     }
   }
   return comments.str();
+}
+std::string escape_comment(const std::string& v) {
+  std::string escaped = string_utils::escape(v);
+  replace_all(escaped, "\\'", "'");
+  return escaped;
 }
 void display_datatype(ykdatatype *dt);
 void display_dt_args(std::vector<ykdatatype *> &args) {
@@ -89,7 +117,7 @@ void display_const(const_stmt *const_statement, tokenizer& token_extractor) {
   std::cout << "\n{ \"name\": \""
             << string_utils::escape(const_statement->name_->token_)
             << "\", \"comment\": \""
-            << string_utils::escape(comment)
+            << escape_comment(comment)
             << "\", \"datatype\": ";
   display_datatype(const_statement->data_type_);
   std::cout << " }";
@@ -143,7 +171,7 @@ void display_fnc(def_stmt *def_statement, tokenizer& token_extractor) {
   std::cout << "\n{ \"name\": \""
             << string_utils::escape(def_statement->name_->token_)
             << "\", \"comment\": \""
-            << string_utils::escape(comment)
+            << escape_comment(comment)
             << "\", \"return_type\": ";
   display_datatype(def_statement->return_type_);
   std::cout << ", \"parameters\": [";
@@ -157,7 +185,7 @@ void display_cls(class_stmt *class_statement, tokenizer& token_extractor) {
   std::cout << "\n{ \"name\": \""
             << string_utils::escape(class_statement->name_->token_)
             << "\", \"comment\": \""
-            << string_utils::escape(comment)
+            << escape_comment(comment)
             << "\", \"members\": [";
   display_params(class_statement->members_);
   std::cout << "], \"annotations\": [";

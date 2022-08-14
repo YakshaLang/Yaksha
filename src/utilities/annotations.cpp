@@ -66,7 +66,7 @@ void annotations::add(const annotation &a) {
     native_define_arg_ = a.arg_;
     validate_native_arg(native_define_arg_, a.arg_set_);
     if (native_define_arg_.empty()) {
-      error_ = "@nativemacro must have an argument";
+      error_ = "@nativedefine must have an argument";
       native_define_ = false;
       native_define_arg_ = "";
       return;
@@ -91,6 +91,16 @@ void annotations::add(const annotation &a) {
       return;
     }
     varargs_ = true;
+  } else if (a.name_ == "dotaccess") {
+    if (dot_access_) {
+      error_ = "Duplicate annotation: @dotaccess";
+      return;
+    }
+    if (a.arg_set_) {
+      error_ = "@dotaccess does not allow any argument";
+      return;
+    }
+    dot_access_ = true;
   } else {
     error_ = "Invalid annotation:" + a.name_;
     return;

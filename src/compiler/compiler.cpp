@@ -539,7 +539,7 @@ std::string compiler::temp() {
   return name;
 }
 std::string compiler::convert_dt(ykdatatype *basic_dt) {
-  if (basic_dt->is_an_array()) {
+  if (basic_dt->is_an_array() || basic_dt->is_a_pointer()) {
     // int32_t*, yk__sds*, etc
     return convert_dt(basic_dt->args_[0]) + "*";
   } else if (basic_dt->is_const()) {
@@ -566,6 +566,10 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "bool";
   } else if (basic_dt->is_none()) {
     return "void";
+  } else if (basic_dt->is_float() || basic_dt->is_f32()) {
+    return "float";
+  } else if (basic_dt->is_f64()) {
+    return "double";
   }
   auto dt = basic_dt->token_->token_;
   if (!basic_dt->module_.empty() && cf_ != nullptr) {
@@ -729,6 +733,7 @@ void compiler::visit_get_expr(get_expr *obj) {
       push(prefixed_name, mod_obj);
       return;
     }
+    // Should not happen
     push("<>", mod_obj);
     return;
   }
@@ -737,6 +742,7 @@ void compiler::visit_get_expr(get_expr *obj) {
   auto module_file = lhs.second.datatype_->module_;
   class_stmt *class_;
   std::string item_prefix = prefix_val_;
+  std::string access_ = "->";
   if (module_file.empty()) {
     class_ = defs_classes_.get_class(user_defined_type);
   } else {
@@ -745,11 +751,12 @@ void compiler::visit_get_expr(get_expr *obj) {
     item_prefix = module_info->prefix_;
   }
   if (class_->annotations_.native_define_) { item_prefix = ""; }
+  if (class_->annotations_.dot_access_) { access_ = "."; }
   for (const auto &member : class_->members_) {
     if (item == member.name_->token_) {
       auto placeholder = ykobject(dt_pool);
       placeholder.datatype_ = member.data_type_;
-      push(lhs.first + "->" + prefix(item, item_prefix), placeholder);
+      push(lhs.first + access_ + prefix(item, item_prefix), placeholder);
       return;
     }
   }
@@ -762,6 +769,7 @@ void compiler::visit_set_expr(set_expr *obj) {
   auto module_file = lhs.second.datatype_->module_;
   class_stmt *class_;
   std::string item_prefix = prefix_val_;
+  std::string access_ = "->";
   if (module_file.empty()) {
     class_ = defs_classes_.get_class(user_defined_type);
   } else {
@@ -769,11 +777,13 @@ void compiler::visit_set_expr(set_expr *obj) {
     class_ = module_info->data_->dsv_->get_class(user_defined_type);
     item_prefix = module_info->prefix_;
   }
+  if (class_->annotations_.native_define_) { item_prefix = ""; }
+  if (class_->annotations_.dot_access_) { access_ = "."; }
   for (const auto &member : class_->members_) {
     if (item == member.name_->token_) {
       auto placeholder = ykobject(dt_pool);
       placeholder.datatype_ = member.data_type_;
-      push(lhs.first + "->" + prefix(item, item_prefix), placeholder);
+      push(lhs.first + access_ + prefix(item, item_prefix), placeholder);
       return;
     }
   }

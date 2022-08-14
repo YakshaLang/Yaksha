@@ -438,6 +438,12 @@ ykdatatype *parser::parse_datatype() {
     } while (match({token_type::COMMA}));
     consume(token_type::SQUARE_BRACKET_CLOSE, "Must have a closing ']'");
   }
+  if (dt->is_an_array() || dt->is_a_pointer()) {
+    if (dt->args_.size() != 1) {
+      throw error(dt->token_,
+                  "Array/Ptr must only have a single internal data type.");
+    }
+  }
   return dt;
 }
 stmt *parser::class_statement(annotations ants) {

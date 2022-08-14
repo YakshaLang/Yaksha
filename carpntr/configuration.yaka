@@ -178,7 +178,7 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     cc.compiler_defines = sarr.extend(df_compiler_defines, cc.compiler_defines)
 
     # Add defaults to cc.includes
-    df_includes: Array[str] = sarr.new(9, "whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h", "yk__console.h", "mpc.h", "yk__arrayutils.h", "yk__process.h")
+    df_includes: Array[str] = sarr.new(10, "whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h", "yk__console.h", "mpc.h", "yk__arrayutils.h", "yk__process.h", "yk__graphic_utils.h")
     orig_includes: Array[str] = cc.includes
     defer sarr.del_str_array(orig_includes)
     cc.includes = sarr.extend(df_includes, cc.includes)
@@ -193,6 +193,7 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     arrput(df_c_code, path.join(c.runtime_path, "yk__console.c"))
     arrput(df_c_code, path.join(c.runtime_path, "yk__arrayutils.c"))
     arrput(df_c_code, path.join(c.runtime_path, "yk__process.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "yk__graphic_utils.c"))
     orig_c_code: Array[str] = cc.c_code
     defer sarr.del_str_array(orig_c_code)
     cc.c_code = sarr.extend(df_c_code, cc.c_code)

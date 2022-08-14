@@ -44,6 +44,8 @@ void ykdatatype::find_builtin_or_primitive() {
     builtin_type_ = ykbuiltin::ARRAY;
   } else if (token_->token_ == "Const") {
     builtin_type_ = ykbuiltin::CONSTANT;
+  } else if (token_->token_ == "Ptr") {
+    builtin_type_ = ykbuiltin::POINTER;
   }
 }
 ykdatatype::~ykdatatype() { delete (token_); }
@@ -51,7 +53,7 @@ bool ykdatatype::is_int() const { return primitive_type_ == ykprimitive::I32; }
 bool ykdatatype::is_i8() const { return primitive_type_ == ykprimitive::I8; }
 bool ykdatatype::is_i16() const { return primitive_type_ == ykprimitive::I16; }
 bool ykdatatype::is_i32() const { return primitive_type_ == ykprimitive::I32; }
-bool ykdatatype::is_i64() const { return primitive_type_ == ykprimitive::U64; }
+bool ykdatatype::is_i64() const { return primitive_type_ == ykprimitive::I64; }
 bool ykdatatype::is_u8() const { return primitive_type_ == ykprimitive::U8; }
 bool ykdatatype::is_u16() const { return primitive_type_ == ykprimitive::U16; }
 bool ykdatatype::is_u32() const { return primitive_type_ == ykprimitive::U32; }
@@ -152,4 +154,7 @@ bool ykdatatype::is_a_float() const {
 bool ykdatatype::is_builtin_or_primitive() const {
   return this->primitive_type_ != ykprimitive::NOT_A_PRIMITIVE ||
          this->builtin_type_ != ykbuiltin::NOT_A_BUILTIN;
+}
+bool ykdatatype::is_a_pointer() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::POINTER;
 }
