@@ -44,9 +44,12 @@ struct yy__configuration_Config;
 #define yy__c_CInt int
 #define yy__c_CLong long
 #define yy__c_CShort short
+#define yy__c_CChar char
 #define yy__c_CUInt unsigned int
 #define yy__c_CULong unsigned long
 #define yy__c_CUShort unsigned short
+#define yy__c_CUChar unsigned char
+#define yy__c_CFloat float
 #define yy__c_free free
 #define yy__c_calloc calloc
 #define yy__c_realloc realloc

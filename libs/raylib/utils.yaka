@@ -46,3 +46,8 @@ def lerp_color(a: rl.Color, b: rl.Color, fraction: f64) -> rl.Color:
     double a = (nn__b.a - nn__a.a) * x - (nn__a.a);
     return (Color){(unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a}
     """
+
+@native
+def clear() -> None:
+    # Clear background with RAYWHITE colour
+    ccode """ClearBackground(RAYWHITE)"""

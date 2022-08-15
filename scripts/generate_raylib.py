@@ -13,6 +13,8 @@ RAYLIB_OUTPUT_MAIN = os.path.join(LIBS_DIR, "raylib.yaka")
 RUNTIME_DIR = os.path.abspath(os.path.join(os.path.dirname(SCRIPT_DIR), "runtime"))
 RAYLIB_HEADER = os.path.join(RUNTIME_DIR, "raylib", "src", "raylib.h")
 DUMPER = os.path.join(BIN_DIR, "raylib-parser")
+if os.name == 'nt':
+    DUMPER += ".exe"
 MAX_EXECUTION_TIME_SEC = 3
 OUTPUT_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "comp_output_test")
 OUT = os.path.join(OUTPUT_DIR, "raylib.json")
@@ -48,11 +50,6 @@ class RAudioBufferPtr:
 @nativedefine("rAudioProcessor *")
 class RAudioProcessorPtr:
     pass
-
-@native
-def clear() -> None:
-    # Clear background with RAYWHITE colour
-    ccode \"\"\"ClearBackground(RAYWHITE)\"\"\"
 """.strip() + "\n\n"
 
 
@@ -126,6 +123,10 @@ F_DT = {
     "void *": {"t": "c.VoidPtr", "del": None, "conv": None},
     "bool": {"t": "bool", "del": None, "conv": None},
     "void": {"t": "None", "del": None, "conv": None},
+}
+R_DT = {
+    "const char *": "Const[c.CStr]",
+    "char *": "c.CStr",
 }
 S_DT = {
     "char": "c.CChar",
@@ -205,15 +206,21 @@ CODE = Code()
 
 def underscore(word):
     # based on https://inflection.readthedocs.io/en/latest/_modules/inflection.html#underscore
+    word = word.replace("3D", "Thredez")
+    word = word.replace("2D", "Twodez")
     word = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1_\2', word)
     word = re.sub(r"([a-z\d])([A-Z])", r'\1_\2', word)
     word = word.replace("-", "_")
+    word = word.replace("Thredez", "3d")
+    word = word.replace("Twodez", "2d")
     return word.lower()
 
 
 def macro_field(f: dict) -> str:
     typ = f["type"]
-    fname = f["name"]
+    fname = underscore(f["name"])
+    if fname in NAMESPACE:
+        fname = "p_" + fname
     if typ not in F_DT:
         return "nn__" + fname
     conversion = F_DT[typ]
@@ -230,7 +237,7 @@ def create_macro_factory(s: dict) -> Optional[Code]:
     c.append("def ").append(name).append("(")
     for i, field in enumerate(s["fields"]):
         typ = field["type"]
-        fname = field["name"]
+        fname = underscore(field["name"])
         if fname in NAMESPACE:
             field["name"] = "p_" + fname
             fname = field["name"]
@@ -385,7 +392,7 @@ def create_macro_function(s: dict) -> Optional[Code]:
         return None
     for i, field in enumerate(s.get("params", [])):
         typ = field["type"]
-        fname = field["name"]
+        fname = underscore(field["name"])
         if fname in NAMESPACE:
             field["name"] = "p_" + fname
             fname = field["name"]
@@ -424,9 +431,12 @@ def create_native_function(s: dict) -> Optional[Code]:
     if not rtype:
         CANNOT_CONVERT.add(s["returnType"])
         return None
+    actual_return_type = rtype
+    if rtype == "str":
+        actual_return_type = R_DT[s["returnType"]]
     for i, field in enumerate(s.get("params", [])):
         typ = field["type"]
-        fname = field["name"]
+        fname = underscore(field["name"])
         if fname in NAMESPACE:
             field["name"] = "p_" + fname
             fname = field["name"]
@@ -439,7 +449,7 @@ def create_native_function(s: dict) -> Optional[Code]:
             print(Colors.fail(f"For function -> {name}. Type {typ} was not convertable."))
             CANNOT_CONVERT.add(typ)
             return None
-    c.append(") -> ").append(rtype).append(":").newline().indent()
+    c.append(") -> ").append(actual_return_type).append(":").newline().indent()
     c.comment(s["description"]).newline()
     c.append("ccode").append(' """', do_indent=False)
     if rtype != "None":
@@ -452,7 +462,9 @@ def create_native_function(s: dict) -> Optional[Code]:
     c.append(");", do_indent=False).newline()
     # Delete all strings
     for i, field in enumerate(s.get("params", [])):
-        fname = field["name"]
+        fname = underscore(field["name"])
+        if fname in NAMESPACE:
+            fname = "p_" + fname
         typ = field["type"]
         if typ in F_DT:
             ptype = F_DT[typ]
@@ -461,10 +473,7 @@ def create_native_function(s: dict) -> Optional[Code]:
             deletion = ptype["del"].replace("$", "nn__" + fname)
             c.append(deletion).append(";", do_indent=False).newline()
     if rtype != "None":
-        if rtype == "str":
-            c.append("return yk__sdsnew(temp_rl)")
-        else:
-            c.append("return temp_rl")
+        c.append("return temp_rl")
         c.append('"""', do_indent=False)
     else:
         c.append('"""')
@@ -488,6 +497,8 @@ def create_function(s: dict) -> bool:
             if F_DT[typ]["t"] == "str":
                 has_strings = True
                 break
+    if s["returnType"] in F_DT and F_DT[s["returnType"]]["t"] == "str":
+        has_strings = True
     if not has_strings:
         f = create_macro_function(s)
     else:
@@ -513,7 +524,7 @@ def convert_enum(ev: dict) -> bool:
 
 
 def main():
-    arg = DUMPER + " " + "--input '" + RAYLIB_HEADER + "'" + " --output '" + OUT + "' --format JSON"
+    arg = DUMPER + " " + "--input \"" + RAYLIB_HEADER + "\"" + " --output \"" + OUT + "\" --format JSON"
     _, _, ret = execute(arg)
     if ret != 0:
         eprint("Failed to run raylib-parser")
