@@ -40,10 +40,10 @@ def lerp_color(a: rl.Color, b: rl.Color, fraction: f64) -> rl.Color:
     if (x < 0.0) {
         x = 0.0;
     }
-    double r = (nn__b.r - nn__a.r) * x - (nn__a.r);
-    double g = (nn__b.g - nn__a.g) * x - (nn__a.g);
-    double b = (nn__b.b - nn__a.b) * x - (nn__a.b);
-    double a = (nn__b.a - nn__a.a) * x - (nn__a.a);
+    double r = (nn__b.r - nn__a.r) * x + (nn__a.r);
+    double g = (nn__b.g - nn__a.g) * x + (nn__a.g);
+    double b = (nn__b.b - nn__a.b) * x + (nn__a.b);
+    double a = (nn__b.a - nn__a.a) * x + (nn__a.a);
     return (Color){(unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a}
     """
 
