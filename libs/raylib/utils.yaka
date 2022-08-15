@@ -33,7 +33,7 @@ def tan_deg(x: f64) -> f64:
 
 @native
 def lerp_color(a: rl.Color, b: rl.Color, fraction: f64) -> rl.Color:
-    ccode """float x = (float)nn__fraction;
+    ccode """double x = nn__fraction;
     if (x > 1.0) {
         x = 1.0;
     }
