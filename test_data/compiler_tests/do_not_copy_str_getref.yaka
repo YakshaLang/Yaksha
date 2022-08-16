@@ -1,0 +1,14 @@
+@native
+def world(a: Ptr[str]) -> None:
+    ccode """yk__printstr(*nn__a);
+    yk__printstr(\" world\\n\")"""
+
+
+def main() -> int:
+    hello: str = "hello"
+    i: int = 10
+    while i > 0:
+        # Basically this avoids copying hello variable when calling world
+        world(getref(hello))
+        i = i - 1
+    return 0

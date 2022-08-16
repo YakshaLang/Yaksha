@@ -2967,30 +2967,35 @@ int32_t yy__perform_run(yk__sds yy__filename, bool yy__use_raylib)
         yk__sdsfree(yy__filename);
         return yy__ret;
     }
-    yy__console_clear();
+    yk__sds t__26 = yk__sdsnew("-----------------------------");
+    yy__console_cyan(yk__sdsdup(t__26));
+    yk__sds t__27 = yk__sdsnew("\n");
+    yk__printstr((t__27));
     yk__sds yy__binary = yk__sdsdup(yy__name);
     if (yy__os_is_windows())
     {
-        yk__sds t__26 = yk__sdsnew(".exe");
-        yk__sds t__27 = yk__sdscatsds(yk__sdsdup(yy__binary), t__26);
-        yk__sdsfree(yy__binary);
-        yy__binary = yk__sdsdup(t__27);
-        yk__sdsfree(t__27);
-        yk__sdsfree(t__26);
-    }
-    else
-    {
-        yk__sds t__28 = yk__sdsnew("./");
-        yk__sds t__29 = yk__sdscatsds(yk__sdsdup(t__28), yy__binary);
+        yk__sds t__28 = yk__sdsnew(".exe");
+        yk__sds t__29 = yk__sdscatsds(yk__sdsdup(yy__binary), t__28);
         yk__sdsfree(yy__binary);
         yy__binary = yk__sdsdup(t__29);
         yk__sdsfree(t__29);
         yk__sdsfree(t__28);
     }
+    else
+    {
+        yk__sds t__30 = yk__sdsnew("./");
+        yk__sds t__31 = yk__sdscatsds(yk__sdsdup(t__30), yy__binary);
+        yk__sdsfree(yy__binary);
+        yy__binary = yk__sdsdup(t__31);
+        yk__sdsfree(t__31);
+        yk__sdsfree(t__30);
+    }
     yy__c_CStr yy__binary_cstr = yy__strings_to_cstr(yk__sdsdup(yy__binary));
     yy__c_system(yy__binary_cstr);
     yy__configuration_del_config(yy__config);
     yk__sdsfree(yy__binary);
+    yk__sdsfree(t__27);
+    yk__sdsfree(t__26);
     yk__sdsfree(yy__name);
     yk__sdsfree(t__25);
     yk__sdsfree(t__24);
@@ -2999,14 +3004,14 @@ int32_t yy__perform_run(yk__sds yy__filename, bool yy__use_raylib)
 }
 void yy__usage_print(yk__sds yy__sample, yk__sds yy__help) 
 {
-    yk__sds t__30 = yk__sdsnew("Usage: ");
-    yy__console_red(yk__sdsdup(t__30));
+    yk__sds t__32 = yk__sdsnew("Usage: ");
+    yy__console_red(yk__sdsdup(t__32));
     yy__console_cyan(yk__sdsdup(yy__sample));
-    yk__sds t__31 = yk__sdsnew(" -> ");
-    yy__console_red(yk__sdsdup(t__31));
+    yk__sds t__33 = yk__sdsnew(" -> ");
+    yy__console_red(yk__sdsdup(t__33));
     yk__printlnstr((yy__help));
-    yk__sdsfree(t__31);
-    yk__sdsfree(t__30);
+    yk__sdsfree(t__33);
+    yk__sdsfree(t__32);
     yk__sdsfree(yy__help);
     yk__sdsfree(yy__sample);
     return;
@@ -3021,37 +3026,37 @@ int32_t yy__main()
     }
     if ((yy__args->argc == 3))
     {
-        yk__sds t__32 = yk__sdsnew("run_file");
-        if ((yk__sdscmp(yy__args->argv[1] , t__32) == 0))
+        yk__sds t__34 = yk__sdsnew("run_file");
+        if ((yk__sdscmp(yy__args->argv[1] , t__34) == 0))
         {
-            yk__sdsfree(t__32);
+            yk__sdsfree(t__34);
             return yy__perform_run(yk__sdsdup(yy__args->argv[2]), false);
         }
-        yk__sds t__33 = yk__sdsnew("ray_file");
-        if ((yk__sdscmp(yy__args->argv[1] , t__33) == 0))
+        yk__sds t__35 = yk__sdsnew("ray_file");
+        if ((yk__sdscmp(yy__args->argv[1] , t__35) == 0))
         {
-            yk__sdsfree(t__33);
-            yk__sdsfree(t__32);
+            yk__sdsfree(t__35);
+            yk__sdsfree(t__34);
             return yy__perform_run(yk__sdsdup(yy__args->argv[2]), true);
         }
-        yk__sdsfree(t__33);
-        yk__sdsfree(t__32);
+        yk__sdsfree(t__35);
+        yk__sdsfree(t__34);
     }
-    yk__sds t__34 = yk__sdsnew("carpntr");
-    yk__sds t__35 = yk__sdsnew("Build program using \'yaksha.toml\'");
-    yy__usage_print(yk__sdsdup(t__34), yk__sdsdup(t__35));
-    yk__sds t__36 = yk__sdsnew("carpntr run_file prog.yaka");
-    yk__sds t__37 = yk__sdsnew("Build single file with main() prog.yaka and run it.");
+    yk__sds t__36 = yk__sdsnew("carpntr");
+    yk__sds t__37 = yk__sdsnew("Build program using \'yaksha.toml\'");
     yy__usage_print(yk__sdsdup(t__36), yk__sdsdup(t__37));
-    yk__sds t__38 = yk__sdsnew("carpntr ray_file prog.yaka");
-    yk__sds t__39 = yk__sdsnew("Build single file with main() prog.yaka, linked with raylib and run it.");
+    yk__sds t__38 = yk__sdsnew("carpntr run_file prog.yaka");
+    yk__sds t__39 = yk__sdsnew("Build single file with main() prog.yaka and run it.");
     yy__usage_print(yk__sdsdup(t__38), yk__sdsdup(t__39));
+    yk__sds t__40 = yk__sdsnew("carpntr ray_file prog.yaka");
+    yk__sds t__41 = yk__sdsnew("Build single file with main() prog.yaka, linked with raylib and run it.");
+    yy__usage_print(yk__sdsdup(t__40), yk__sdsdup(t__41));
+    yk__sdsfree(t__41);
+    yk__sdsfree(t__40);
     yk__sdsfree(t__39);
     yk__sdsfree(t__38);
     yk__sdsfree(t__37);
     yk__sdsfree(t__36);
-    yk__sdsfree(t__35);
-    yk__sdsfree(t__34);
     return 1;
 }
 #if defined(YK__MINIMAL_MAIN)

@@ -12,6 +12,7 @@ bool builtins::has_builtin(const std::string &name) {
   if (name == "len") { return true; }
   if (name == "charat") { return true; }
   if (name == "getref") { return true; }
+  if (name == "unref") { return true; }
   return false;
 }
 ykobject builtins::verify(const std::string &name,
@@ -31,14 +32,20 @@ ykobject builtins::verify(const std::string &name,
     return ykobject(dt_pool_->create("int"));
   } else if (name == "arrpop" && args.size() == 1 &&
              args[0].datatype_->is_an_array()) {
-    return ykobject(args[0].datatype_->args_[0]);// Array[x] << access this x
-  } else if (name == "charat" && args.size() == 2
-             && args[0].datatype_->is_str() && args[1].datatype_->is_an_integer()) {
+    // Array[x] << access this x
+    return ykobject(args[0].datatype_->args_[0]);
+  } else if (name == "charat" && args.size() == 2 &&
+             args[0].datatype_->is_str() &&
+             args[1].datatype_->is_an_integer()) {
     return ykobject(dt_pool_->create("int"));
   } else if (name == "getref" && args.size() == 1) {
-    ykdatatype* dt = dt_pool_->create("Ptr");
+    ykdatatype *dt = dt_pool_->create("Ptr");
     dt->args_.emplace_back(args[0].datatype_);
     return ykobject(dt);
+  } else if (name == "unref" && args.size() == 1
+             && args[0].datatype_->is_a_pointer()) {
+    // Ptr[x] << access this x
+    return ykobject(args[0].datatype_->args_[0]);
   }
   o.object_type_ = object_type::RUNTIME_ERROR;
   o.string_val_ = "Invalid arguments for builtin function";
@@ -51,7 +58,8 @@ builtins::compile(const std::string &name,
   auto o = ykobject(dt_pool_);
   if (name == "arrput") {
     if (args[1].second.datatype_->is_str()) {
-      code << "yk__arrput(" << args[0].first << ", yk__sdsdup(" << args[1].first << "))";
+      code << "yk__arrput(" << args[0].first << ", yk__sdsdup(" << args[1].first
+           << "))";
     } else {
       code << "yk__arrput(" << args[0].first << ", " << args[1].first << ")";
     }
@@ -92,9 +100,12 @@ builtins::compile(const std::string &name,
     o = ykobject(dt_pool_->create("int"));
   } else if (name == "getref") {
     code << "(&(" << args[0].first << "))";
-    ykdatatype* dt = dt_pool_->create("Ptr");
+    ykdatatype *dt = dt_pool_->create("Ptr");
     dt->args_.emplace_back(args[0].second.datatype_);
     o = ykobject(dt);
+  } else if (name == "unref") {
+    code << "(*(" << args[0].first << "))";
+    o = ykobject(args[0].second.datatype_->args_[0]);
   }
   return {code.str(), o};
 }

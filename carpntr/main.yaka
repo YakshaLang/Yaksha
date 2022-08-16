@@ -106,7 +106,8 @@ def perform_run(filename: str, use_raylib: bool) -> int:
     ret: int = build_from_config(config, True)
     if ret != 0:
         return ret
-    console.clear()
+    console.cyan("-----------------------------")
+    print("\n")
     # Try to run binary now
     binary: str = name
     if os.is_windows():

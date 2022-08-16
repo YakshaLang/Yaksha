@@ -81,3 +81,11 @@ TEST_CASE("compiler: Native defines") {
   TEST_FILE("../test_data/byol/lisp.yaka", "lisp.yaka",
             "../test_data/byol/lisp.tokens");
 }
+TEST_CASE("compiler: Do not copy str for getref") {
+  TEST_FILE("../test_data/compiler_tests/do_not_copy_str_getref.yaka", "do_not_copy_str_getref.yaka",
+            "../test_data/compiler_tests/do_not_copy_str_getref.tokens");
+}
+TEST_CASE("compiler: str unref and getref hacks!") {
+  TEST_FILE("../test_data/compiler_tests/str_getref_unref.yaka", "str_getref_unref.yaka",
+            "../test_data/compiler_tests/str_getref_unref.tokens");
+}

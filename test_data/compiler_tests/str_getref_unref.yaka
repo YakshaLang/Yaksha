@@ -1,0 +1,22 @@
+def world1(a: Ptr[str]) -> None:
+    # *a is not copied when printing as print calls does not copy (optimization when calling builtins)
+    print(unref(a))
+    println(" world")
+
+
+def world2(a: Ptr[str]) -> None:
+    # *a is copied to b
+    b: str = unref(a)
+    print(b)
+    println(" world")
+
+
+def main() -> int:
+    hello: str = "hello"
+    i: int = 5
+    while i > 0:
+        # Basically this avoids copying hello variable when calling world
+        world1(getref(hello))
+        world2(getref(hello))
+        i = i - 1
+    return 0
