@@ -82,4 +82,7 @@ add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 add_executable(cmakecarpntr ${YAKSHA_RUNTIME_FILES} carpntr/build/program_code.c)
 target_compile_features(cmakecarpntr PRIVATE c_std_99)
 target_compile_definitions(cmakecarpntr PUBLIC UTF8PROC_STATIC)
+if(UNIX AND NOT APPLE)
+    target_link_libraries(cmakecarpntr PUBLIC m)
+endif()
 
