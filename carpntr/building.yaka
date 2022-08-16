@@ -35,6 +35,9 @@ def prepare_code(c: carp.Config, code: str) -> str:
     # Add raylib.h
     if c.compilation.raylib:
         sbuf.append(buf, "#include \"raylib.h\"\n")
+        sbuf.append(buf, "#include \"raygui.h\"\n")
+        sbuf.append(buf, "#include \"raymath.h\"\n")
+        sbuf.append(buf, "#include \"rlgl.h\"\n")
     # code itself
     sbuf.append(buf, code)
     sbuf.append(buf, "\n")

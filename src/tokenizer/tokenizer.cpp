@@ -14,8 +14,9 @@ using namespace yaksha;
 #define HEX_MATCH 9
 #define MATCH_INTEGER_OR_FLOAT 10
 template<typename octet_iterator>
-std::pair<int, utf8::uint32_t>
-yaksha::consume_string(std::string &buf, octet_iterator &begin, octet_iterator end) {
+std::pair<int, utf8::uint32_t> yaksha::consume_string(std::string &buf,
+                                                      octet_iterator &begin,
+                                                      octet_iterator end) {
   octet_iterator begin_copy = begin;
   int size = 0;
   auto buf_inserter = std::back_inserter(buf);
@@ -150,8 +151,15 @@ yaksha::consume_number(std::string &buf, octet_iterator &begin,
   if (exponent_found && expo_size <= 0) {
     return {-1, 0, token_type::INTEGER_DECIMAL};
   }
+  if (current == 'f') {
+    utf8::next(begin, end);
+    size++;
+    utf8::append(static_cast<char32_t>(current), buf_inserter);
+    current = next;
+    return {size, current, token_type::FLOAT_NUMBER};
+  }
   return {size, current,
-          (dot_found || exponent_found) ? token_type::FLOAT_NUMBER
+          (dot_found || exponent_found) ? token_type::DOUBLE_NUMBER
                                         : token_type::INTEGER_DECIMAL};
 }
 tokenizer::tokenizer(std::string file, std::string data)

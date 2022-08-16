@@ -13,6 +13,11 @@ def random() -> f64:
     # Get a random value between 0 - 1 (crypto unsafe)
     ccode """return ((double)rand() / (double)RAND_MAX)"""
 
+@native
+def randomf() -> float:
+    # Get a random value between 0 - 1 (crypto unsafe)
+    ccode """return ((float)rand() / (float)RAND_MAX)"""
+
 def random_between(a: f64, b: f64) -> f64:
     # Get a random value between a and b (crypto unsafe)
     min: f64 = a
@@ -21,6 +26,15 @@ def random_between(a: f64, b: f64) -> f64:
         min = b
         max = a
     return min + (random() * (max - min))
+
+def random_betweenf(a: float, b: float) -> float:
+    # Get a random value between a and b (crypto unsafe)
+    min: float = a
+    max: float = b
+    if a > b:
+        min = b
+        max = a
+    return min + (randomf() * (max - min))
 
 @nativedefine("yk__random_u64")
 def random_u64() -> u64:

@@ -14,3 +14,20 @@ def noise2d(x: f64, y: f64) -> f64:
 def noise3d(x: f64, y: f64, z: f64) -> f64:
     # Get perlin noise in 3d
     pass
+
+
+@nativemacro
+def noise1df(x: float) -> float:
+    ccode """((float)yk__perlin1d((double) nn__x))"""
+
+
+@nativemacro
+def noise2df(x: float, y: float) -> float:
+    # Get perlin noise in 2d
+    ccode """((float)yk__perlin1d((double) nn__x, (double) nn__y))"""
+
+
+@nativemacro
+def noise3df(x: float, y: float, z: float) -> float:
+    # Get perlin noise in 3d
+    ccode """((float)yk__perlin1d((double) nn__x, (double) nn__y, (double) nn__z))"""

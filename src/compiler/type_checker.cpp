@@ -154,8 +154,10 @@ void type_checker::visit_literal_expr(literal_expr *obj) {
              literal_type == token_type::INTEGER_DECIMAL ||
              literal_type == token_type::INTEGER_HEX) {
     data = ykobject(1, dt_pool_);
-  } else if (literal_type == token_type::FLOAT_NUMBER) {
+  } else if (literal_type == token_type::DOUBLE_NUMBER) {
     data = ykobject(1.2, dt_pool_);
+  } else if (literal_type == token_type::FLOAT_NUMBER) {
+    data = ykobject((float)1.2f, dt_pool_);
   }// else - none data type by default
   push(data);
 }

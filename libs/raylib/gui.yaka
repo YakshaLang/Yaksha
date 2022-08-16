@@ -1,0 +1,715 @@
+import libs.c
+import raylib as rl
+
+STATE_NORMAL: Const[int] = 0
+STATE_FOCUSED: Const[int] = 1
+STATE_PRESSED: Const[int] = 2
+STATE_DISABLED: Const[int] = 3
+TEXT_ALIGN_LEFT: Const[int] = 0
+TEXT_ALIGN_CENTER: Const[int] = 1
+TEXT_ALIGN_RIGHT: Const[int] = 2
+DEFAULT: Const[int] = 0
+LABEL: Const[int] = 1
+# Used also for: LABELBUTTON
+BUTTON: Const[int] = 2
+TOGGLE: Const[int] = 3
+# Used also for: TOGGLEGROUP
+SLIDER: Const[int] = 4
+# Used also for: SLIDERBAR
+PROGRESSBAR: Const[int] = 5
+CHECKBOX: Const[int] = 6
+COMBOBOX: Const[int] = 7
+DROPDOWNBOX: Const[int] = 8
+TEXTBOX: Const[int] = 9
+# Used also for: TEXTBOXMULTI
+VALUEBOX: Const[int] = 10
+SPINNER: Const[int] = 11
+# Uses: BUTTON, VALUEBOX
+LISTVIEW: Const[int] = 12
+COLORPICKER: Const[int] = 13
+SCROLLBAR: Const[int] = 14
+STATUSBAR: Const[int] = 15
+BORDER_COLOR_NORMAL: Const[int] = 0
+BASE_COLOR_NORMAL: Const[int] = 1
+TEXT_COLOR_NORMAL: Const[int] = 2
+BORDER_COLOR_FOCUSED: Const[int] = 3
+BASE_COLOR_FOCUSED: Const[int] = 4
+TEXT_COLOR_FOCUSED: Const[int] = 5
+BORDER_COLOR_PRESSED: Const[int] = 6
+BASE_COLOR_PRESSED: Const[int] = 7
+TEXT_COLOR_PRESSED: Const[int] = 8
+BORDER_COLOR_DISABLED: Const[int] = 9
+BASE_COLOR_DISABLED: Const[int] = 10
+TEXT_COLOR_DISABLED: Const[int] = 11
+BORDER_WIDTH: Const[int] = 12
+TEXT_PADDING: Const[int] = 13
+TEXT_ALIGNMENT: Const[int] = 14
+RESERVED: Const[int] = 15
+TEXT_SIZE: Const[int] = 16
+# Text size (glyphs max height)
+TEXT_SPACING: Const[int] = 17
+# Text spacing between glyphs
+LINE_COLOR: Const[int] = 18
+# Line control color
+BACKGROUND_COLOR: Const[int] = 19
+# Background color
+GROUP_PADDING: Const[int] = 16
+# ToggleGroup separation between toggles
+SLIDER_WIDTH: Const[int] = 16
+# Slider size of internal bar
+SLIDER_PADDING: Const[int] = 17
+# Slider/SliderBar internal bar padding
+PROGRESS_PADDING: Const[int] = 16
+# ProgressBar internal padding
+ARROWS_SIZE: Const[int] = 16
+ARROWS_VISIBLE: Const[int] = 17
+SCROLL_SLIDER_PADDING: Const[int] = 18
+# (SLIDERBAR, SLIDER_PADDING)
+SCROLL_SLIDER_SIZE: Const[int] = 19
+SCROLL_PADDING: Const[int] = 20
+SCROLL_SPEED: Const[int] = 21
+CHECK_PADDING: Const[int] = 16
+# CheckBox internal check padding
+COMBO_BUTTON_WIDTH: Const[int] = 16
+# ComboBox right button width
+COMBO_BUTTON_SPACING: Const[int] = 17
+# ComboBox button separation
+ARROW_PADDING: Const[int] = 16
+# DropdownBox arrow separation from border and items
+DROPDOWN_ITEMS_SPACING: Const[int] = 17
+# DropdownBox items separation
+TEXT_INNER_PADDING: Const[int] = 16
+# TextBox/TextBoxMulti/ValueBox/Spinner inner text padding
+TEXT_LINES_SPACING: Const[int] = 17
+# TextBoxMulti lines separation
+SPIN_BUTTON_WIDTH: Const[int] = 16
+# Spinner left/right buttons width
+SPIN_BUTTON_SPACING: Const[int] = 17
+# Spinner buttons separation
+LIST_ITEMS_HEIGHT: Const[int] = 16
+# ListView items height
+LIST_ITEMS_SPACING: Const[int] = 17
+# ListView items separation
+SCROLLBAR_WIDTH: Const[int] = 18
+# ListView scrollbar size (usually width)
+SCROLLBAR_SIDE: Const[int] = 19
+# ListView scrollbar side (0-left, 1-right)
+COLOR_SELECTOR_SIZE: Const[int] = 16
+HUEBAR_WIDTH: Const[int] = 17
+# ColorPicker right hue bar width
+HUEBAR_PADDING: Const[int] = 18
+# ColorPicker right hue bar separation from panel
+HUEBAR_SELECTOR_HEIGHT: Const[int] = 19
+# ColorPicker right hue bar selector height
+HUEBAR_SELECTOR_OVERFLOW: Const[int] = 20
+# ColorPicker right hue bar selector overflow
+ICON_NONE: Const[int] = 0
+ICON_FOLDER_FILE_OPEN: Const[int] = 1
+ICON_FILE_SAVE_CLASSIC: Const[int] = 2
+ICON_FOLDER_OPEN: Const[int] = 3
+ICON_FOLDER_SAVE: Const[int] = 4
+ICON_FILE_OPEN: Const[int] = 5
+ICON_FILE_SAVE: Const[int] = 6
+ICON_FILE_EXPORT: Const[int] = 7
+ICON_FILE_ADD: Const[int] = 8
+ICON_FILE_DELETE: Const[int] = 9
+ICON_FILETYPE_TEXT: Const[int] = 10
+ICON_FILETYPE_AUDIO: Const[int] = 11
+ICON_FILETYPE_IMAGE: Const[int] = 12
+ICON_FILETYPE_PLAY: Const[int] = 13
+ICON_FILETYPE_VIDEO: Const[int] = 14
+ICON_FILETYPE_INFO: Const[int] = 15
+ICON_FILE_COPY: Const[int] = 16
+ICON_FILE_CUT: Const[int] = 17
+ICON_FILE_PASTE: Const[int] = 18
+ICON_CURSOR_HAND: Const[int] = 19
+ICON_CURSOR_POINTER: Const[int] = 20
+ICON_CURSOR_CLASSIC: Const[int] = 21
+ICON_PENCIL: Const[int] = 22
+ICON_PENCIL_BIG: Const[int] = 23
+ICON_BRUSH_CLASSIC: Const[int] = 24
+ICON_BRUSH_PAINTER: Const[int] = 25
+ICON_WATER_DROP: Const[int] = 26
+ICON_COLOR_PICKER: Const[int] = 27
+ICON_RUBBER: Const[int] = 28
+ICON_COLOR_BUCKET: Const[int] = 29
+ICON_TEXT_T: Const[int] = 30
+ICON_TEXT_A: Const[int] = 31
+ICON_SCALE: Const[int] = 32
+ICON_RESIZE: Const[int] = 33
+ICON_FILTER_POINT: Const[int] = 34
+ICON_FILTER_BILINEAR: Const[int] = 35
+ICON_CROP: Const[int] = 36
+ICON_CROP_ALPHA: Const[int] = 37
+ICON_SQUARE_TOGGLE: Const[int] = 38
+ICON_SYMMETRY: Const[int] = 39
+ICON_SYMMETRY_HORIZONTAL: Const[int] = 40
+ICON_SYMMETRY_VERTICAL: Const[int] = 41
+ICON_LENS: Const[int] = 42
+ICON_LENS_BIG: Const[int] = 43
+ICON_EYE_ON: Const[int] = 44
+ICON_EYE_OFF: Const[int] = 45
+ICON_FILTER_TOP: Const[int] = 46
+ICON_FILTER: Const[int] = 47
+ICON_TARGET_POINT: Const[int] = 48
+ICON_TARGET_SMALL: Const[int] = 49
+ICON_TARGET_BIG: Const[int] = 50
+ICON_TARGET_MOVE: Const[int] = 51
+ICON_CURSOR_MOVE: Const[int] = 52
+ICON_CURSOR_SCALE: Const[int] = 53
+ICON_CURSOR_SCALE_RIGHT: Const[int] = 54
+ICON_CURSOR_SCALE_LEFT: Const[int] = 55
+ICON_UNDO: Const[int] = 56
+ICON_REDO: Const[int] = 57
+ICON_REREDO: Const[int] = 58
+ICON_MUTATE: Const[int] = 59
+ICON_ROTATE: Const[int] = 60
+ICON_REPEAT: Const[int] = 61
+ICON_SHUFFLE: Const[int] = 62
+ICON_EMPTYBOX: Const[int] = 63
+ICON_TARGET: Const[int] = 64
+ICON_TARGET_SMALL_FILL: Const[int] = 65
+ICON_TARGET_BIG_FILL: Const[int] = 66
+ICON_TARGET_MOVE_FILL: Const[int] = 67
+ICON_CURSOR_MOVE_FILL: Const[int] = 68
+ICON_CURSOR_SCALE_FILL: Const[int] = 69
+ICON_CURSOR_SCALE_RIGHT_FILL: Const[int] = 70
+ICON_CURSOR_SCALE_LEFT_FILL: Const[int] = 71
+ICON_UNDO_FILL: Const[int] = 72
+ICON_REDO_FILL: Const[int] = 73
+ICON_REREDO_FILL: Const[int] = 74
+ICON_MUTATE_FILL: Const[int] = 75
+ICON_ROTATE_FILL: Const[int] = 76
+ICON_REPEAT_FILL: Const[int] = 77
+ICON_SHUFFLE_FILL: Const[int] = 78
+ICON_EMPTYBOX_SMALL: Const[int] = 79
+ICON_BOX: Const[int] = 80
+ICON_BOX_TOP: Const[int] = 81
+ICON_BOX_TOP_RIGHT: Const[int] = 82
+ICON_BOX_RIGHT: Const[int] = 83
+ICON_BOX_BOTTOM_RIGHT: Const[int] = 84
+ICON_BOX_BOTTOM: Const[int] = 85
+ICON_BOX_BOTTOM_LEFT: Const[int] = 86
+ICON_BOX_LEFT: Const[int] = 87
+ICON_BOX_TOP_LEFT: Const[int] = 88
+ICON_BOX_CENTER: Const[int] = 89
+ICON_BOX_CIRCLE_MASK: Const[int] = 90
+ICON_POT: Const[int] = 91
+ICON_ALPHA_MULTIPLY: Const[int] = 92
+ICON_ALPHA_CLEAR: Const[int] = 93
+ICON_DITHERING: Const[int] = 94
+ICON_MIPMAPS: Const[int] = 95
+ICON_BOX_GRID: Const[int] = 96
+ICON_GRID: Const[int] = 97
+ICON_BOX_CORNERS_SMALL: Const[int] = 98
+ICON_BOX_CORNERS_BIG: Const[int] = 99
+ICON_FOUR_BOXES: Const[int] = 100
+ICON_GRID_FILL: Const[int] = 101
+ICON_BOX_MULTISIZE: Const[int] = 102
+ICON_ZOOM_SMALL: Const[int] = 103
+ICON_ZOOM_MEDIUM: Const[int] = 104
+ICON_ZOOM_BIG: Const[int] = 105
+ICON_ZOOM_ALL: Const[int] = 106
+ICON_ZOOM_CENTER: Const[int] = 107
+ICON_BOX_DOTS_SMALL: Const[int] = 108
+ICON_BOX_DOTS_BIG: Const[int] = 109
+ICON_BOX_CONCENTRIC: Const[int] = 110
+ICON_BOX_GRID_BIG: Const[int] = 111
+ICON_OK_TICK: Const[int] = 112
+ICON_CROSS: Const[int] = 113
+ICON_ARROW_LEFT: Const[int] = 114
+ICON_ARROW_RIGHT: Const[int] = 115
+ICON_ARROW_DOWN: Const[int] = 116
+ICON_ARROW_UP: Const[int] = 117
+ICON_ARROW_LEFT_FILL: Const[int] = 118
+ICON_ARROW_RIGHT_FILL: Const[int] = 119
+ICON_ARROW_DOWN_FILL: Const[int] = 120
+ICON_ARROW_UP_FILL: Const[int] = 121
+ICON_AUDIO: Const[int] = 122
+ICON_FX: Const[int] = 123
+ICON_WAVE: Const[int] = 124
+ICON_WAVE_SINUS: Const[int] = 125
+ICON_WAVE_SQUARE: Const[int] = 126
+ICON_WAVE_TRIANGULAR: Const[int] = 127
+ICON_CROSS_SMALL: Const[int] = 128
+ICON_PLAYER_PREVIOUS: Const[int] = 129
+ICON_PLAYER_PLAY_BACK: Const[int] = 130
+ICON_PLAYER_PLAY: Const[int] = 131
+ICON_PLAYER_PAUSE: Const[int] = 132
+ICON_PLAYER_STOP: Const[int] = 133
+ICON_PLAYER_NEXT: Const[int] = 134
+ICON_PLAYER_RECORD: Const[int] = 135
+ICON_MAGNET: Const[int] = 136
+ICON_LOCK_CLOSE: Const[int] = 137
+ICON_LOCK_OPEN: Const[int] = 138
+ICON_CLOCK: Const[int] = 139
+ICON_TOOLS: Const[int] = 140
+ICON_GEAR: Const[int] = 141
+ICON_GEAR_BIG: Const[int] = 142
+ICON_BIN: Const[int] = 143
+ICON_HAND_POINTER: Const[int] = 144
+ICON_LASER: Const[int] = 145
+ICON_COIN: Const[int] = 146
+ICON_EXPLOSION: Const[int] = 147
+ICON_1UP: Const[int] = 148
+ICON_PLAYER: Const[int] = 149
+ICON_PLAYER_JUMP: Const[int] = 150
+ICON_KEY: Const[int] = 151
+ICON_DEMON: Const[int] = 152
+ICON_TEXT_POPUP: Const[int] = 153
+ICON_GEAR_EX: Const[int] = 154
+ICON_CRACK: Const[int] = 155
+ICON_CRACK_POINTS: Const[int] = 156
+ICON_STAR: Const[int] = 157
+ICON_DOOR: Const[int] = 158
+ICON_EXIT: Const[int] = 159
+ICON_MODE_2D: Const[int] = 160
+ICON_MODE_3D: Const[int] = 161
+ICON_CUBE: Const[int] = 162
+ICON_CUBE_FACE_TOP: Const[int] = 163
+ICON_CUBE_FACE_LEFT: Const[int] = 164
+ICON_CUBE_FACE_FRONT: Const[int] = 165
+ICON_CUBE_FACE_BOTTOM: Const[int] = 166
+ICON_CUBE_FACE_RIGHT: Const[int] = 167
+ICON_CUBE_FACE_BACK: Const[int] = 168
+ICON_CAMERA: Const[int] = 169
+ICON_SPECIAL: Const[int] = 170
+ICON_LINK_NET: Const[int] = 171
+ICON_LINK_BOXES: Const[int] = 172
+ICON_LINK_MULTI: Const[int] = 173
+ICON_LINK: Const[int] = 174
+ICON_LINK_BROKE: Const[int] = 175
+ICON_TEXT_NOTES: Const[int] = 176
+ICON_NOTEBOOK: Const[int] = 177
+ICON_SUITCASE: Const[int] = 178
+ICON_SUITCASE_ZIP: Const[int] = 179
+ICON_MAILBOX: Const[int] = 180
+ICON_MONITOR: Const[int] = 181
+ICON_PRINTER: Const[int] = 182
+ICON_PHOTO_CAMERA: Const[int] = 183
+ICON_PHOTO_CAMERA_FLASH: Const[int] = 184
+ICON_HOUSE: Const[int] = 185
+ICON_HEART: Const[int] = 186
+ICON_CORNER: Const[int] = 187
+ICON_VERTICAL_BARS: Const[int] = 188
+ICON_VERTICAL_BARS_FILL: Const[int] = 189
+ICON_LIFE_BARS: Const[int] = 190
+ICON_INFO: Const[int] = 191
+ICON_CROSSLINE: Const[int] = 192
+ICON_HELP: Const[int] = 193
+ICON_FILETYPE_ALPHA: Const[int] = 194
+ICON_FILETYPE_HOME: Const[int] = 195
+ICON_LAYERS_VISIBLE: Const[int] = 196
+ICON_LAYERS: Const[int] = 197
+ICON_WINDOW: Const[int] = 198
+ICON_HIDPI: Const[int] = 199
+ICON_FILETYPE_BINARY: Const[int] = 200
+ICON_HEX: Const[int] = 201
+ICON_SHIELD: Const[int] = 202
+ICON_FILE_NEW: Const[int] = 203
+ICON_FOLDER_ADD: Const[int] = 204
+ICON_ALARM: Const[int] = 205
+ICON_206: Const[int] = 206
+ICON_207: Const[int] = 207
+ICON_208: Const[int] = 208
+ICON_209: Const[int] = 209
+ICON_210: Const[int] = 210
+ICON_211: Const[int] = 211
+ICON_212: Const[int] = 212
+ICON_213: Const[int] = 213
+ICON_214: Const[int] = 214
+ICON_215: Const[int] = 215
+ICON_216: Const[int] = 216
+ICON_217: Const[int] = 217
+ICON_218: Const[int] = 218
+ICON_219: Const[int] = 219
+ICON_220: Const[int] = 220
+ICON_221: Const[int] = 221
+ICON_222: Const[int] = 222
+ICON_223: Const[int] = 223
+ICON_224: Const[int] = 224
+ICON_225: Const[int] = 225
+ICON_226: Const[int] = 226
+ICON_227: Const[int] = 227
+ICON_228: Const[int] = 228
+ICON_229: Const[int] = 229
+ICON_230: Const[int] = 230
+ICON_231: Const[int] = 231
+ICON_232: Const[int] = 232
+ICON_233: Const[int] = 233
+ICON_234: Const[int] = 234
+ICON_235: Const[int] = 235
+ICON_236: Const[int] = 236
+ICON_237: Const[int] = 237
+ICON_238: Const[int] = 238
+ICON_239: Const[int] = 239
+ICON_240: Const[int] = 240
+ICON_241: Const[int] = 241
+ICON_242: Const[int] = 242
+ICON_243: Const[int] = 243
+ICON_244: Const[int] = 244
+ICON_245: Const[int] = 245
+ICON_246: Const[int] = 246
+ICON_247: Const[int] = 247
+ICON_248: Const[int] = 248
+ICON_249: Const[int] = 249
+ICON_250: Const[int] = 250
+ICON_251: Const[int] = 251
+ICON_252: Const[int] = 252
+ICON_253: Const[int] = 253
+ICON_254: Const[int] = 254
+ICON_255: Const[int] = 255
+@dotaccess
+@nativedefine("GuiStyleProp")
+class GuiStyleProp:
+    # Style property
+    controlId: c.CUShort
+    propertyId: c.CUShort
+    propertyValue: c.CUInt
+
+@nativemacro
+def gui_style_prop(control_id: int, property_id: int, property_value: u32) -> GuiStyleProp:
+    # Factory function for: GuiStyleProp
+    ccode """(GuiStyleProp){(unsigned short)nn__control_id, (unsigned short)nn__property_id, (unsigned int)nn__property_value}"""
+
+@nativemacro
+def gui_enable() -> None:
+    # Enable gui controls (global state)
+    ccode """GuiEnable()"""
+
+@nativemacro
+def gui_disable() -> None:
+    # Disable gui controls (global state)
+    ccode """GuiDisable()"""
+
+@nativemacro
+def gui_lock() -> None:
+    # Lock gui controls (global state)
+    ccode """GuiLock()"""
+
+@nativemacro
+def gui_unlock() -> None:
+    # Unlock gui controls (global state)
+    ccode """GuiUnlock()"""
+
+@nativemacro
+def gui_is_locked() -> bool:
+    # Check if gui is locked (global state)
+    ccode """GuiIsLocked()"""
+
+@nativemacro
+def gui_fade(alpha: float) -> None:
+    # Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f
+    ccode """GuiFade(nn__alpha)"""
+
+@nativemacro
+def gui_set_state(state: int) -> None:
+    # Set gui state (global state)
+    ccode """GuiSetState((int)nn__state)"""
+
+@nativemacro
+def gui_get_state() -> int:
+    # Get gui state (global state)
+    ccode """GuiGetState()"""
+
+@nativemacro
+def gui_set_font(p_font: rl.Font) -> None:
+    # Set gui custom font (global state)
+    ccode """GuiSetFont(nn__p_font)"""
+
+@nativemacro
+def gui_get_font() -> rl.Font:
+    # Get gui custom font (global state)
+    ccode """GuiGetFont()"""
+
+@nativemacro
+def gui_set_style(control: int, property: int, value: int) -> None:
+    # Set one style property
+    ccode """GuiSetStyle((int)nn__control, (int)nn__property, (int)nn__value)"""
+
+@nativemacro
+def gui_get_style(control: int, property: int) -> int:
+    # Get one style property
+    ccode """GuiGetStyle((int)nn__control, (int)nn__property)"""
+
+@native
+def gui_window_box(bounds: rl.Rectangle, title: str) -> bool:
+    # Window Box control, shows a window that can be closed
+    ccode """bool temp_rl = GuiWindowBox(nn__bounds, nn__title);
+    yk__sdsfree(nn__title);
+    return temp_rl"""
+
+@native
+def gui_group_box(bounds: rl.Rectangle, text: str) -> None:
+    # Group Box control with text name
+    ccode """GuiGroupBox(nn__bounds, nn__text);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def gui_line(bounds: rl.Rectangle, text: str) -> None:
+    # Line separator control, could contain text
+    ccode """GuiLine(nn__bounds, nn__text);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def gui_panel(bounds: rl.Rectangle, text: str) -> None:
+    # Panel control, useful to group controls
+    ccode """GuiPanel(nn__bounds, nn__text);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def gui_scroll_panel(bounds: rl.Rectangle, text: str, content: rl.Rectangle, scroll: Ptr[rl.Vector2]) -> rl.Rectangle:
+    # Scroll Panel control
+    ccode """Rectangle temp_rl = GuiScrollPanel(nn__bounds, nn__text, nn__content, nn__scroll);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_label(bounds: rl.Rectangle, text: str) -> None:
+    # Label control, shows text
+    ccode """GuiLabel(nn__bounds, nn__text);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def gui_button(bounds: rl.Rectangle, text: str) -> bool:
+    # Button control, returns true when clicked
+    ccode """bool temp_rl = GuiButton(nn__bounds, nn__text);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_label_button(bounds: rl.Rectangle, text: str) -> bool:
+    # Label button control, show true when clicked
+    ccode """bool temp_rl = GuiLabelButton(nn__bounds, nn__text);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_toggle(bounds: rl.Rectangle, text: str, active: bool) -> bool:
+    # Toggle Button control, returns true when active
+    ccode """bool temp_rl = GuiToggle(nn__bounds, nn__text, nn__active);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_toggle_group(bounds: rl.Rectangle, text: str, active: int) -> int:
+    # Toggle Group control, returns active toggle index
+    ccode """int temp_rl = GuiToggleGroup(nn__bounds, nn__text, (int)nn__active);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_check_box(bounds: rl.Rectangle, text: str, checked: bool) -> bool:
+    # Check Box control, returns true when active
+    ccode """bool temp_rl = GuiCheckBox(nn__bounds, nn__text, nn__checked);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_combo_box(bounds: rl.Rectangle, text: str, active: int) -> int:
+    # Combo Box control, returns selected item index
+    ccode """int temp_rl = GuiComboBox(nn__bounds, nn__text, (int)nn__active);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_dropdown_box(bounds: rl.Rectangle, text: str, active: Ptr[c.CInt], edit_mode: bool) -> bool:
+    # Dropdown Box control, returns selected item
+    ccode """bool temp_rl = GuiDropdownBox(nn__bounds, nn__text, nn__active, nn__edit_mode);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_spinner(bounds: rl.Rectangle, text: str, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> bool:
+    # Spinner control, returns selected value
+    ccode """bool temp_rl = GuiSpinner(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_value_box(bounds: rl.Rectangle, text: str, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> bool:
+    # Value Box control, updates input text with numbers
+    ccode """bool temp_rl = GuiValueBox(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_text_box(bounds: rl.Rectangle, text: str, text_size: int, edit_mode: bool) -> bool:
+    # Text Box control, updates input text
+    ccode """bool temp_rl = GuiTextBox(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_text_box_multi(bounds: rl.Rectangle, text: str, text_size: int, edit_mode: bool) -> bool:
+    # Text Box control with multiple lines
+    ccode """bool temp_rl = GuiTextBoxMulti(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_slider(bounds: rl.Rectangle, text_left: str, text_right: str, value: float, min_value: float, max_value: float) -> float:
+    # Slider control, returns selected value
+    ccode """float temp_rl = GuiSlider(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value);
+    yk__sdsfree(nn__text_left);
+    yk__sdsfree(nn__text_right);
+    return temp_rl"""
+
+@native
+def gui_slider_bar(bounds: rl.Rectangle, text_left: str, text_right: str, value: float, min_value: float, max_value: float) -> float:
+    # Slider Bar control, returns selected value
+    ccode """float temp_rl = GuiSliderBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value);
+    yk__sdsfree(nn__text_left);
+    yk__sdsfree(nn__text_right);
+    return temp_rl"""
+
+@native
+def gui_progress_bar(bounds: rl.Rectangle, text_left: str, text_right: str, value: float, min_value: float, max_value: float) -> float:
+    # Progress Bar control, shows current progress value
+    ccode """float temp_rl = GuiProgressBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value);
+    yk__sdsfree(nn__text_left);
+    yk__sdsfree(nn__text_right);
+    return temp_rl"""
+
+@native
+def gui_status_bar(bounds: rl.Rectangle, text: str) -> None:
+    # Status Bar control, shows info text
+    ccode """GuiStatusBar(nn__bounds, nn__text);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def gui_dummy_rec(bounds: rl.Rectangle, text: str) -> None:
+    # Dummy control for placeholders
+    ccode """GuiDummyRec(nn__bounds, nn__text);
+    yk__sdsfree(nn__text);
+    """
+
+@native
+def gui_grid(bounds: rl.Rectangle, text: str, spacing: float, subdivs: int) -> rl.Vector2:
+    # Grid control, returns mouse cell position
+    ccode """Vector2 temp_rl = GuiGrid(nn__bounds, nn__text, nn__spacing, (int)nn__subdivs);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_list_view(bounds: rl.Rectangle, text: str, scroll_index: Ptr[c.CInt], active: int) -> int:
+    # List View control, returns selected list item index
+    ccode """int temp_rl = GuiListView(nn__bounds, nn__text, nn__scroll_index, (int)nn__active);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@nativemacro
+def gui_list_view_ex(bounds: rl.Rectangle, text: Const[Ptr[Ptr[c.CChar]]], count: int, focus: Ptr[c.CInt], scroll_index: Ptr[c.CInt], active: int) -> int:
+    # List View with extended parameters
+    ccode """GuiListViewEx(nn__bounds, nn__text, (int)nn__count, nn__focus, nn__scroll_index, (int)nn__active)"""
+
+@native
+def gui_message_box(bounds: rl.Rectangle, title: str, message: str, buttons: str) -> int:
+    # Message Box control, displays a message
+    ccode """int temp_rl = GuiMessageBox(nn__bounds, nn__title, nn__message, nn__buttons);
+    yk__sdsfree(nn__title);
+    yk__sdsfree(nn__message);
+    yk__sdsfree(nn__buttons);
+    return temp_rl"""
+
+@native
+def gui_text_input_box(bounds: rl.Rectangle, title: str, message: str, buttons: str, text: str, text_max_size: int, secret_view_active: Ptr[c.CInt]) -> int:
+    # Text Input Box control, ask for text, supports secret
+    ccode """int temp_rl = GuiTextInputBox(nn__bounds, nn__title, nn__message, nn__buttons, nn__text, (int)nn__text_max_size, nn__secret_view_active);
+    yk__sdsfree(nn__title);
+    yk__sdsfree(nn__message);
+    yk__sdsfree(nn__buttons);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_color_picker(bounds: rl.Rectangle, text: str, p_color: rl.Color) -> rl.Color:
+    # Color Picker control (multiple color controls)
+    ccode """Color temp_rl = GuiColorPicker(nn__bounds, nn__text, nn__p_color);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_color_panel(bounds: rl.Rectangle, text: str, p_color: rl.Color) -> rl.Color:
+    # Color Panel control
+    ccode """Color temp_rl = GuiColorPanel(nn__bounds, nn__text, nn__p_color);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_color_bar_alpha(bounds: rl.Rectangle, text: str, alpha: float) -> float:
+    # Color Bar Alpha control
+    ccode """float temp_rl = GuiColorBarAlpha(nn__bounds, nn__text, nn__alpha);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_color_bar_hue(bounds: rl.Rectangle, text: str, value: float) -> float:
+    # Color Bar Hue control
+    ccode """float temp_rl = GuiColorBarHue(nn__bounds, nn__text, nn__value);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@native
+def gui_load_style(file_name: str) -> None:
+    # Load style file over global style variable (.rgs)
+    ccode """GuiLoadStyle(nn__file_name);
+    yk__sdsfree(nn__file_name);
+    """
+
+@nativemacro
+def gui_load_style_default() -> None:
+    # Load style default over global style
+    ccode """GuiLoadStyleDefault()"""
+
+@native
+def gui_icon_text(icon_id: int, text: str) -> Const[c.CStr]:
+    # Get text with icon id prepended (if supported)
+    ccode """const char * temp_rl = GuiIconText((int)nn__icon_id, nn__text);
+    yk__sdsfree(nn__text);
+    return temp_rl"""
+
+@nativemacro
+def gui_draw_icon(icon_id: int, pos_x: int, pos_y: int, pixel_size: int, p_color: rl.Color) -> None:
+    ccode """GuiDrawIcon((int)nn__icon_id, (int)nn__pos_x, (int)nn__pos_y, (int)nn__pixel_size, nn__p_color)"""
+
+@nativemacro
+def gui_get_icons() -> Ptr[c.CUInt]:
+    # Get full icons data pointer
+    ccode """GuiGetIcons()"""
+
+@nativemacro
+def gui_get_icon_data(icon_id: int) -> Ptr[c.CUInt]:
+    # Get icon bit data
+    ccode """GuiGetIconData((int)nn__icon_id)"""
+
+@nativemacro
+def gui_set_icon_data(icon_id: int, data: Ptr[c.CUInt]) -> None:
+    # Set icon bit data
+    ccode """GuiSetIconData((int)nn__icon_id, nn__data)"""
+
+@nativemacro
+def gui_set_icon_scale(scale: u32) -> None:
+    # Set icon scale (1 by default)
+    ccode """GuiSetIconScale((unsigned int)nn__scale)"""
+
+@nativemacro
+def gui_set_icon_pixel(icon_id: int, x: int, y: int) -> None:
+    # Set icon pixel value
+    ccode """GuiSetIconPixel((int)nn__icon_id, (int)nn__x, (int)nn__y)"""
+
+@nativemacro
+def gui_clear_icon_pixel(icon_id: int, x: int, y: int) -> None:
+    # Clear icon pixel value
+    ccode """GuiClearIconPixel((int)nn__icon_id, (int)nn__x, (int)nn__y)"""
+
+@nativemacro
+def gui_check_icon_pixel(icon_id: int, x: int, y: int) -> bool:
+    # Check icon pixel value
+    ccode """GuiCheckIconPixel((int)nn__icon_id, (int)nn__x, (int)nn__y)"""
+

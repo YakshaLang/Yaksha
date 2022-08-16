@@ -221,9 +221,9 @@ TEST_CASE("tokenizer: Numbers: single number") {
 }
 TEST_CASE("tokenizer: Numbers: Bunch of numbers") {
   yaksha::tokenizer t("test.py", "0xABCDEF0 0b1111001 "
-                                 "0o123456 1.2e3 123");
+                                 "0o123456 1.2e3 123 1.2e+3 1.2e-3 1f 1.2f 1.2e1f");
   t.tokenize();
-  REQUIRE(t.tokens_.size() == 5 + 1);
+  REQUIRE(t.tokens_.size() == 10 + 1);
   REQUIRE(t.tokens_[0].token_ == "0xABCDEF0");
   REQUIRE(t.tokens_[0].type_ == token_type::INTEGER_HEX);
   REQUIRE(t.tokens_[1].token_ == "0b1111001");
@@ -231,9 +231,19 @@ TEST_CASE("tokenizer: Numbers: Bunch of numbers") {
   REQUIRE(t.tokens_[2].token_ == "0o123456");
   REQUIRE(t.tokens_[2].type_ == token_type::INTEGER_OCT);
   REQUIRE(t.tokens_[3].token_ == "1.2e3");
-  REQUIRE(t.tokens_[3].type_ == token_type::FLOAT_NUMBER);
+  REQUIRE(t.tokens_[3].type_ == token_type::DOUBLE_NUMBER);
   REQUIRE(t.tokens_[4].token_ == "123");
   REQUIRE(t.tokens_[4].type_ == token_type::INTEGER_DECIMAL);
+  REQUIRE(t.tokens_[5].token_ == "1.2e+3");
+  REQUIRE(t.tokens_[5].type_ == token_type::DOUBLE_NUMBER);
+  REQUIRE(t.tokens_[6].token_ == "1.2e-3");
+  REQUIRE(t.tokens_[6].type_ == token_type::DOUBLE_NUMBER);
+  REQUIRE(t.tokens_[7].token_ == "1f");
+  REQUIRE(t.tokens_[7].type_ == token_type::FLOAT_NUMBER);
+  REQUIRE(t.tokens_[8].token_ == "1.2f");
+  REQUIRE(t.tokens_[8].type_ == token_type::FLOAT_NUMBER);
+  REQUIRE(t.tokens_[9].token_ == "1.2e1f");
+  REQUIRE(t.tokens_[9].type_ == token_type::FLOAT_NUMBER);
   REQUIRE(t.errors_.empty());
 }
 TEST_CASE("tokenizer: Comment: Basic") {

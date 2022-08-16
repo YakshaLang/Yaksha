@@ -10,14 +10,21 @@ SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 BIN_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "bin")
 LIBS_DIR = os.path.abspath(os.path.join(os.path.dirname(SCRIPT_DIR), "libs"))
 RAYLIB_OUTPUT_MAIN = os.path.join(LIBS_DIR, "raylib.yaka")
+RAYGUI_OUTPUT_MAIN = os.path.join(LIBS_DIR, "raylib", "gui.yaka")
+RAYMATH_OUTPUT_MAIN = os.path.join(LIBS_DIR, "raylib", "math.yaka")
+RAYGL_OUTPUT_MAIN = os.path.join(LIBS_DIR, "raylib", "gl.yaka")
 RUNTIME_DIR = os.path.abspath(os.path.join(os.path.dirname(SCRIPT_DIR), "runtime"))
 RAYLIB_HEADER = os.path.join(RUNTIME_DIR, "raylib", "src", "raylib.h")
+RAYGUI_HEADER = os.path.join(RUNTIME_DIR, "raygui", "src", "raygui.h")
+RAYMATH_HEADER = os.path.join(RUNTIME_DIR, "raylib", "src", "raymath.h")
+RAYGL_HEADER = os.path.join(RUNTIME_DIR, "raylib", "src", "rlgl.h")
 DUMPER = os.path.join(BIN_DIR, "raylib-parser")
 if os.name == 'nt':
     DUMPER += ".exe"
 MAX_EXECUTION_TIME_SEC = 3
 OUTPUT_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "comp_output_test")
 OUT = os.path.join(OUTPUT_DIR, "raylib.json")
+PREFIX = ""
 
 FILE_BEGIN = """
 # -- Raylib Wrapper for Yaksha --- 
@@ -118,7 +125,7 @@ F_DT = {
     "unsigned long": {"t": "u64", "del": None, "conv": "(?)$"},
     "short": {"t": "int", "del": None, "conv": "(?)$"},
     "unsigned short": {"t": "int", "del": None, "conv": "(?)$"},
-    "float": {"t": "f64", "del": None, "conv": "(?)$"},
+    "float": {"t": "float", "del": None, "conv": None},
     "double": {"t": "f64", "del": None, "conv": None},
     "void *": {"t": "c.VoidPtr", "del": None, "conv": None},
     "bool": {"t": "bool", "del": None, "conv": None},
@@ -159,6 +166,7 @@ S_DT = {
     "rAudioProcessor *": "RAudioProcessorPtr",
     "double": "f64",
 }
+S_DT_MUST_PREFIX = {"CFloat4", "CFloat2", "CChar32", "DTMatrix2", "RAudioBufferPtr", "RAudioProcessorPtr"}
 
 NAMESPACE = set()
 KNOWN_STRUCTURES = set()
@@ -213,7 +221,13 @@ def underscore(word):
     word = word.replace("-", "_")
     word = word.replace("Thredez", "3d")
     word = word.replace("Twodez", "2d")
-    return word.lower()
+    word = word.lower()
+    from update_tokens import KEYWORDS, RESERVED
+    if word in KEYWORDS \
+            or word in RESERVED \
+            or word in ["arrput", "arrpop", "print", "println", "len", "charat", "getref"]:
+        word = "p_" + word
+    return word
 
 
 def macro_field(f: dict) -> str:
@@ -244,12 +258,12 @@ def create_macro_factory(s: dict) -> Optional[Code]:
         if i != 0:
             c.append(", ")
         if typ in KNOWN_STRUCTURES or typ == s["name"]:
-            c.append(fname).append(": ").append(typ)
+            c.append(fname).append(": ").append(PREFIX + typ)
         elif typ in F_DT:
             c.append(fname).append(": ").append(F_DT[typ]["t"])
         elif typ.endswith(" *") and typ[:-2] in KNOWN_STRUCTURES or typ[:-2] == name:
             # Pointer data type of something we know of
-            c.append(fname).append(": ").append("Ptr[" + typ[:-2] + "]")
+            c.append(fname).append(": ").append("Ptr[" + PREFIX + typ[:-2] + "]")
         else:
             print(Colors.fail(f"For factory -> {name}. Type {typ} was not convertable."))
             CANNOT_CONVERT.add(typ)
@@ -302,7 +316,8 @@ def convert_barebones_structure(s: dict) -> bool:
     comment = s["description"]
     c.append("@nativedefine(\"").append(name).append("\")").newline()
     c.append("class ").append(name).append(":").newline().indent()
-    c.comment(comment).newline()
+    if comment:
+        c.comment(comment).newline()
     c.append("pass").dedent()
     c.newline()
     c.newline()
@@ -320,25 +335,28 @@ def convert_structure(s: dict) -> bool:
     c.append("@dotaccess").newline()
     c.append("@nativedefine(\"").append(name).append("\")").newline()
     c.append("class ").append(name).append(":").newline().indent()
-    c.comment(comment).newline()
+    if comment:
+        c.comment(comment).newline()
     for field in s["fields"]:
         typ = field["type"]
         fname = field["name"]
         # Add support for field comments later on
         c.append(fname).append(": ", do_indent=False)
         if typ in KNOWN_STRUCTURES or typ == name:
-            c.append(typ, do_indent=False)
+            c.append(PREFIX + typ, do_indent=False)
+        elif typ in S_DT_MUST_PREFIX:
+            c.append(PREFIX + S_DT[typ], do_indent=False)
         elif typ in S_DT:
             c.append(S_DT[typ], do_indent=False)
         elif typ.endswith(" *") and typ[:-2] in KNOWN_STRUCTURES or typ[:-2] == name:
             # Pointer data type of something we know of
             c.append("Ptr[", do_indent=False)
-            c.append(typ[:-2], do_indent=False)
+            c.append(PREFIX + typ[:-2], do_indent=False)
             c.append("]", do_indent=False)
         elif typ.endswith(" **") and typ[:-3] in KNOWN_STRUCTURES or typ[:-3] == name:
             # Pointer to Pointer data type of something we know of
             c.append("Ptr[Ptr[", do_indent=False)
-            c.append(typ[:-2], do_indent=False)
+            c.append(PREFIX + typ[:-2], do_indent=False)
             c.append("]]", do_indent=False)
         else:
             print(Colors.fail(f"For structure -> {name}. Type {typ} was not convertable."))
@@ -365,18 +383,21 @@ def find_struct(name, data) -> Optional[dict]:
 
 def get_func_data_type(typ) -> Optional[str]:
     if typ in KNOWN_STRUCTURES:
-        return typ
+        return PREFIX + typ
     elif typ in F_DT:
         return F_DT[typ]["t"]
+    elif typ in S_DT_MUST_PREFIX:
+        PREFIX + S_DT[typ]
     elif typ in S_DT:
         return S_DT[typ]
     elif typ.endswith(" *") and typ[:-2] in KNOWN_STRUCTURES:
-        return "Ptr[" + typ[:-2] + "]"
+        return "Ptr[" + PREFIX + typ[:-2] + "]"
     elif typ.endswith(" **") and typ[:-3] in KNOWN_STRUCTURES:
-        return "Ptr[Ptr[" + typ[:-2] + "]]"
+        return "Ptr[Ptr[" + PREFIX + typ[:-2] + "]]"
     elif typ.startswith("const ") and typ.endswith(" *") and typ[6:-2] in KNOWN_STRUCTURES:
-        return "Const[Ptr[" + typ[6:-2] + "]]"
-
+        return "Const[Ptr[" + PREFIX + typ[6:-2] + "]]"
+    elif typ.startswith("const ") and typ[6:] in KNOWN_STRUCTURES:
+        return "Const[" + PREFIX + typ[6:] + "]"
     return None
 
 
@@ -406,7 +427,8 @@ def create_macro_function(s: dict) -> Optional[Code]:
             CANNOT_CONVERT.add(typ)
             return None
     c.append(") -> ").append(rtype).append(":").newline().indent()
-    c.comment(s["description"]).newline()
+    if s["description"]:
+        c.comment(s["description"]).newline()
     c.append("ccode").dedent().append(' """')
     c.append(s["name"]).append("(")
     for i, field in enumerate(s.get("params", [])):
@@ -450,7 +472,8 @@ def create_native_function(s: dict) -> Optional[Code]:
             CANNOT_CONVERT.add(typ)
             return None
     c.append(") -> ").append(actual_return_type).append(":").newline().indent()
-    c.comment(s["description"]).newline()
+    if s["description"]:
+        c.comment(s["description"]).newline()
     c.append("ccode").append(' """', do_indent=False)
     if rtype != "None":
         c.append(s["returnType"], do_indent=False).append(" temp_rl = ", do_indent=False)
@@ -517,14 +540,22 @@ def convert_enum(ev: dict) -> bool:
         return False
     c = Code()
     c.append(name).append(": Const[int] = ").append(val).newline()
-    c.comment(comment).newline()
+    if comment:
+        c.comment(comment).newline()
     CODE.extend(c)
     NAMESPACE.add(name)
     return True
 
 
-def main():
-    arg = DUMPER + " " + "--input \"" + RAYLIB_HEADER + "\"" + " --output \"" + OUT + "\" --format JSON"
+def build(header, target_file, define="RLAPI", add_base=False):
+    print(Colors.green("==============="))
+    print("Building:" + Colors.cyan(os.path.basename(target_file)))
+    print(Colors.green("==============="))
+    if not add_base:
+        CODE.buf = ["import libs.c\nimport raylib as rl\n\n"]
+    else:
+        CODE.buf = []
+    arg = DUMPER + " " + "--input \"" + header + "\"" + " --define " + define + " --output \"" + OUT + "\" --format JSON"
     _, _, ret = execute(arg)
     if ret != 0:
         eprint("Failed to run raylib-parser")
@@ -536,8 +567,9 @@ def main():
         for ev in e["values"]:
             if not convert_enum(ev):
                 print(Colors.fail("Failed to convert enum-val: " + ev["name"]))
-    text = FILE_BEGIN.replace("$REPLACE_ME$", CODE.as_text())
-    CODE.buf = [text]
+    if add_base:
+        text = FILE_BEGIN.replace("$REPLACE_ME$", CODE.as_text())
+        CODE.buf = [text]
     for s in data["structs"]:
         KNOWN_STRUCTURES.add(s["name"])
     for s in data["aliases"]:
@@ -561,8 +593,17 @@ def main():
         if not create_function(f):
             continue
     generated = CODE.as_text()
-    with open(RAYLIB_OUTPUT_MAIN, "w+", encoding="utf-8") as h:
+    with open(target_file, "w+", encoding="utf-8") as h:
         h.write(generated)
+
+
+def main():
+    global PREFIX
+    build(RAYLIB_HEADER, RAYLIB_OUTPUT_MAIN, add_base=True)
+    PREFIX = "rl."
+    build(RAYGUI_HEADER, RAYGUI_OUTPUT_MAIN, define="RAYGUIAPI")
+    build(RAYMATH_HEADER, RAYMATH_OUTPUT_MAIN, define="RMAPI")
+    build(RAYGL_HEADER, RAYGL_OUTPUT_MAIN)
 
 
 if __name__ == "__main__":

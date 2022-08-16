@@ -19,7 +19,6 @@ namespace yaksha {
     MODULE,
     MODULE_CLASS,
     MODULE_FUNCTION,
-    //MODULE_OBJECT
   };
   struct ykobject {
     ykobject();
@@ -29,6 +28,7 @@ namespace yaksha {
     explicit ykobject(std::string str, ykdt_pool *pool);
     explicit ykobject(const std::string &str, token *bad_token);
     explicit ykobject(double dbl, ykdt_pool *pool);
+    explicit ykobject(float dbl, ykdt_pool *pool);
     explicit ykobject(ykfunction *fun);
     explicit ykobject(control_flow_change flow_change);
     explicit ykobject(ykdt_pool *pool);

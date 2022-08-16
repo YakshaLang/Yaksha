@@ -65,7 +65,7 @@ def del_objects(x: Array[CObject]) -> None:
     del x
 
 
-def get_objects(raylib_src_path: str, build_path: str) -> Array[CObject]:
+def get_objects(raylib_src_path: str, gui_path: str, extra_path: str, build_path: str) -> Array[CObject]:
     objects: Array[CObject]
     arrput(objects, co("rglfw", raylib_src_path, build_path))
     arrput(objects, co("raudio", raylib_src_path, build_path))
@@ -75,6 +75,10 @@ def get_objects(raylib_src_path: str, build_path: str) -> Array[CObject]:
     arrput(objects, co("rtext", raylib_src_path, build_path))
     arrput(objects, co("rtextures", raylib_src_path, build_path))
     arrput(objects, co("utils", raylib_src_path, build_path))
+    extra: CObject = co("rayextras", extra_path, build_path)
+    arrput(extra.args, "-I" + raylib_src_path)
+    arrput(extra.args, "-I" + gui_path)
+    arrput(objects, extra)
     return objects
 
 
@@ -128,11 +132,12 @@ def get_raylib_args(zig_compiler: str, runtime_path:str) -> Array[str]:
     build_path: str = path.join(os.cwd(), "build")
     path.mkdir(build_path)
     raylib_path: str = path.join(path.join(runtime_path, "raylib"), "src")
-    objects: Array[CObject] = get_objects(raylib_path, build_path)
+    raygui_path: str = path.join(path.join(runtime_path, "raygui"), "src")
+    rayextra_path: str = path.join(runtime_path, "raylib_additional")
+    objects: Array[CObject] = get_objects(raylib_path, raygui_path, rayextra_path, build_path)
     o_files: Array[str]
     defer sarr.del_str_array(o_files)
     defer del_objects(objects)
-
 
     object_count: int = len(objects)
     pos: int = 0
@@ -153,8 +158,10 @@ def get_raylib_args(zig_compiler: str, runtime_path:str) -> Array[str]:
     # Link external libs + objects
     arguments = get_external_libs()
     arguments = sarr.extend(arguments, o_files)
-    # Add main include
+    # Add includes
     arrput(arguments, "-I" + raylib_path)
+    arrput(arguments, "-I" + raygui_path)
+    arrput(arguments, "-I" + rayextra_path)
     # On windows try and build a gui application so it will not annoy us
     if os.is_windows():
         arrput(arguments, "-Wl,--subsystem,windows")

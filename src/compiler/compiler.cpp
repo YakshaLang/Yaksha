@@ -729,7 +729,8 @@ void compiler::visit_get_expr(get_expr *obj) {
       mod_obj.string_val_ = member_item->token_;
       mod_obj.module_file_ = lhs.second.string_val_;
       mod_obj.module_name_ = lhs.second.module_name_;
-      auto prefixed_name = prefix(mod_obj.string_val_, prefix(mod_obj.module_name_, "yy__") + "_");
+      auto module_info = cf_->get(mod_obj.module_file_);
+      auto prefixed_name = prefix(mod_obj.string_val_, module_info->prefix_);
       push(prefixed_name, mod_obj);
       return;
     }

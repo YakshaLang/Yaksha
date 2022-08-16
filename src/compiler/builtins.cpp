@@ -11,6 +11,7 @@ bool builtins::has_builtin(const std::string &name) {
   if (name == "println") { return true; }
   if (name == "len") { return true; }
   if (name == "charat") { return true; }
+  if (name == "getref") { return true; }
   return false;
 }
 ykobject builtins::verify(const std::string &name,

@@ -28,6 +28,17 @@ def i2d(a: int) -> f64:
     ccode """((double)(nn__a))"""
 
 @nativemacro
+def f2i(a: float) -> int:
+    # f64 (double precision) to int/i32
+    # Warning: value is truncated
+    ccode """((int32_t)(nn__a))"""
+
+@nativemacro
+def i2f(a: int) -> float:
+    # int/i32 to f64 (double precision)
+    ccode """((float)(nn__a))"""
+
+@nativemacro
 def f2d(a: float) -> f64:
     # float/f32 (single precision) to f64 (double precision)
     ccode """((double)nn__a)"""
@@ -37,6 +48,16 @@ def d2f(a: float) -> f64:
     # float/f32 (single precision) to f64 (double precision)
     # Warning: precision might be lost/truncated
     ccode """((double)nn__a)"""
+
+@nativemacro
+def i2u(a: int) -> u32:
+    # int/i32 to a u64
+    ccode """((uint32_t)nn__a)"""
+
+@nativemacro
+def u2i(a: u32) -> int:
+    # int/i32 to a u64
+    ccode """((int32_t)nn__a)"""
 
 @nativemacro
 def i2uu(a: int) -> u64:
@@ -57,3 +78,13 @@ def d2uu(a: f64) -> u64:
 def uu2d(a: u64) -> f64:
     # int/i32 to a u64
     ccode """((double)nn__a)"""
+
+@nativemacro
+def f2uu(a: float) -> u64:
+    # int/i32 to a u64
+    ccode """((uint64_t)nn__a)"""
+
+@nativemacro
+def uu2f(a: u64) -> float:
+    # int/i32 to a u64
+    ccode """((float)nn__a)"""

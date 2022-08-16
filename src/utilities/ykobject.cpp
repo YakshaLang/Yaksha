@@ -20,6 +20,10 @@ ykobject::ykobject(double dbl, ykdt_pool *pool)
     : double_val_{dbl}, object_type_{object_type::PRIMITIVE_OR_OBJ} {
   datatype_ = pool->create("f64");
 }
+ykobject::ykobject(float float_val, ykdt_pool *pool)
+    : double_val_{float_val}, object_type_{object_type::PRIMITIVE_OR_OBJ} {
+  datatype_ = pool->create("f32");
+}
 ykobject::ykobject(bool i, ykdt_pool *pool)
     : object_type_(object_type::PRIMITIVE_OR_OBJ), bool_val_(i) {
   datatype_ = pool->create("bool");

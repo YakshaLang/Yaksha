@@ -6,52 +6,52 @@ import libs.random
 
 
 class State:
-    width: f64
-    height: f64
-    angle: f64
+    width: float
+    height: float
+    angle: float
     frame_count: u64
     blue: rl.Color
     green: rl.Color
     color3: rl.Color
 
 
-def branch(x: f64, y: f64, length: f64, angle: f64, s: State) -> None:
-    if length < 4.0:
-        leaf_width: f64 = random.random_between(1.0, 3.0)
-        leaf_height: f64 = random.random_between(3.0, 6.0)
-        lerped_green: rl.Color = utils.lerp_color(s.green, s.blue, utils.remap(x, 0.0, s.width, 0.0, 1.0) * 2.0)
-        color: rl.Color = utils.lerp_color(lerped_green, s.color3, utils.remap(y, 0.0, s.height, 0.0, 1.0) * 1.5)
-        rl.draw_ellipse(num.d2i(x), num.d2i(y), leaf_height, leaf_width, color)
+def branch(x: float, y: float, length: float, angle: float, s: State) -> None:
+    if length < 4.0f:
+        leaf_width: float = random.random_betweenf(1.0f, 3.0f)
+        leaf_height: float = random.random_betweenf(3.0f, 6.0f)
+        lerped_green: rl.Color = utils.lerp_color(s.green, s.blue, utils.remap(x, 0.0f, s.width, 0.0f, 1.0f) * 2.0f)
+        color: rl.Color = utils.lerp_color(lerped_green, s.color3, utils.remap(y, 0.0f, s.height, 0.0f, 1.0f) * 1.5f)
+        rl.draw_ellipse(num.f2i(x), num.f2i(y), leaf_height, leaf_width, color)
         return
-    wind: f64 = utils.sin_deg(perlin.noise1d(num.uu2d(s.frame_count) / 50.0)) * 100.0 * utils.sin_deg(num.uu2d(s.frame_count) / 2.0)
-    next_y: f64 = y - length * utils.cos_deg(angle)
-    next_x: f64 = x + length * utils.sin_deg(angle)
-    thick: f64 = utils.remap(length, 0.0, s.height / 4.0, 2.0, 6.0)
+    wind: float = utils.sin_deg(perlin.noise1df(num.uu2f(s.frame_count) / 50.0f)) * 100.0f * utils.sin_deg(num.uu2f(s.frame_count) / 2.0f)
+    next_y: float = y - length * utils.cos_deg(angle)
+    next_x: float = x + length * utils.sin_deg(angle)
+    thick: float = utils.remap(length, 0.0f, s.height / 4.0f, 2.0f, 6.0f)
     rl.draw_line_ex(rl.vector2(x, y),
                     rl.vector2(next_x, next_y),
                     thick,
                     rl.color(152, 50, 1, 255))
-    r1: f64 = random.random_between(0.3, 0.9)
-    r2: f64 = random.random_between(0.5, 0.8)
-    branch(next_x, next_y, (length * r2), angle + s.angle + wind * 10.0, s)
-    branch(next_x, next_y, (length * r1), angle - s.angle + wind * 10.0, s)
+    r1: float = random.random_betweenf(0.3f, 0.9f)
+    r2: float = random.random_betweenf(0.5f, 0.8f)
+    branch(next_x, next_y, (length * r2), angle + s.angle + wind * 10.0f, s)
+    branch(next_x, next_y, (length * r1), angle - s.angle + wind * 10.0f, s)
 
 
 def update_draw_frame(s: State) -> None:
     rl.clear_background(rl.color(255, 255, 255, 255))
-    branch(s.width / 2.0, s.height, s.height / 4.0, 0.0, s)
+    branch(s.width / 2.0f, s.height, s.height / 4.0f, 0.0f, s)
 
 
 def main() -> int:
     s: State = State()
-    s.angle = random.random_between(30.0, 45.0)
-    s.width = 600.0
-    s.height = 600.0
+    s.angle = random.random_betweenf(30.0f, 45.0f)
+    s.width = 600.0f
+    s.height = 600.0f
     s.frame_count = num.i2uu(0)
     s.blue = rl.color(0, 255, 214, 255)
     s.green = rl.color(0, 255, 0, 255)
     s.color3 = rl.color(255, 45, 156, 255)
-    rl.init_window(num.d2i(s.width), num.d2i(s.height), "Fractal Tree in the Wind")
+    rl.init_window(num.f2i(s.width), num.f2i(s.height), "Fractal Tree in the Wind")
     rl.set_target_fps(120)
     seed: u64 = random.init_random()
     while not rl.window_should_close():

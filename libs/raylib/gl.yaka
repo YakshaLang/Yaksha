@@ -1,0 +1,922 @@
+import libs.c
+import raylib as rl
+
+OPENGL_11: Const[int] = 1
+OPENGL_21: Const[int] = 2
+OPENGL_33: Const[int] = 3
+OPENGL_43: Const[int] = 4
+OPENGL_ES_20: Const[int] = 5
+RL_ATTACHMENT_COLOR_CHANNEL0: Const[int] = 0
+RL_ATTACHMENT_COLOR_CHANNEL1: Const[int] = 1
+RL_ATTACHMENT_COLOR_CHANNEL2: Const[int] = 2
+RL_ATTACHMENT_COLOR_CHANNEL3: Const[int] = 3
+RL_ATTACHMENT_COLOR_CHANNEL4: Const[int] = 4
+RL_ATTACHMENT_COLOR_CHANNEL5: Const[int] = 5
+RL_ATTACHMENT_COLOR_CHANNEL6: Const[int] = 6
+RL_ATTACHMENT_COLOR_CHANNEL7: Const[int] = 7
+RL_ATTACHMENT_DEPTH: Const[int] = 100
+RL_ATTACHMENT_STENCIL: Const[int] = 200
+RL_ATTACHMENT_CUBEMAP_POSITIVE_X: Const[int] = 0
+RL_ATTACHMENT_CUBEMAP_NEGATIVE_X: Const[int] = 1
+RL_ATTACHMENT_CUBEMAP_POSITIVE_Y: Const[int] = 2
+RL_ATTACHMENT_CUBEMAP_NEGATIVE_Y: Const[int] = 3
+RL_ATTACHMENT_CUBEMAP_POSITIVE_Z: Const[int] = 4
+RL_ATTACHMENT_CUBEMAP_NEGATIVE_Z: Const[int] = 5
+RL_ATTACHMENT_TEXTURE2D: Const[int] = 100
+RL_ATTACHMENT_RENDERBUFFER: Const[int] = 200
+RL_LOG_ALL: Const[int] = 0
+# Display all logs
+RL_LOG_TRACE: Const[int] = 1
+# Trace logging, intended for internal use only
+RL_LOG_DEBUG: Const[int] = 2
+# Debug logging, used for internal debugging, it should be disabled on release builds
+RL_LOG_INFO: Const[int] = 3
+# Info logging, used for program execution info
+RL_LOG_WARNING: Const[int] = 4
+# Warning logging, used on recoverable failures
+RL_LOG_ERROR: Const[int] = 5
+# Error logging, used on unrecoverable failures
+RL_LOG_FATAL: Const[int] = 6
+# Fatal logging, used to abort program: exit(EXIT_FAILURE)
+RL_LOG_NONE: Const[int] = 7
+# Disable logging
+RL_PIXELFORMAT_UNCOMPRESSED_GRAYSCALE: Const[int] = 1
+# 8 bit per pixel (no alpha)
+RL_PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA: Const[int] = 2
+# 8*2 bpp (2 channels)
+RL_PIXELFORMAT_UNCOMPRESSED_R5G6B5: Const[int] = 3
+# 16 bpp
+RL_PIXELFORMAT_UNCOMPRESSED_R8G8B8: Const[int] = 4
+# 24 bpp
+RL_PIXELFORMAT_UNCOMPRESSED_R5G5B5A1: Const[int] = 5
+# 16 bpp (1 bit alpha)
+RL_PIXELFORMAT_UNCOMPRESSED_R4G4B4A4: Const[int] = 6
+# 16 bpp (4 bit alpha)
+RL_PIXELFORMAT_UNCOMPRESSED_R8G8B8A8: Const[int] = 7
+# 32 bpp
+RL_PIXELFORMAT_UNCOMPRESSED_R32: Const[int] = 8
+# 32 bpp (1 channel - float)
+RL_PIXELFORMAT_UNCOMPRESSED_R32G32B32: Const[int] = 9
+# 32*3 bpp (3 channels - float)
+RL_PIXELFORMAT_UNCOMPRESSED_R32G32B32A32: Const[int] = 10
+# 32*4 bpp (4 channels - float)
+RL_PIXELFORMAT_COMPRESSED_DXT1_RGB: Const[int] = 11
+# 4 bpp (no alpha)
+RL_PIXELFORMAT_COMPRESSED_DXT1_RGBA: Const[int] = 12
+# 4 bpp (1 bit alpha)
+RL_PIXELFORMAT_COMPRESSED_DXT3_RGBA: Const[int] = 13
+# 8 bpp
+RL_PIXELFORMAT_COMPRESSED_DXT5_RGBA: Const[int] = 14
+# 8 bpp
+RL_PIXELFORMAT_COMPRESSED_ETC1_RGB: Const[int] = 15
+# 4 bpp
+RL_PIXELFORMAT_COMPRESSED_ETC2_RGB: Const[int] = 16
+# 4 bpp
+RL_PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA: Const[int] = 17
+# 8 bpp
+RL_PIXELFORMAT_COMPRESSED_PVRT_RGB: Const[int] = 18
+# 4 bpp
+RL_PIXELFORMAT_COMPRESSED_PVRT_RGBA: Const[int] = 19
+# 4 bpp
+RL_PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA: Const[int] = 20
+# 8 bpp
+RL_PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA: Const[int] = 21
+# 2 bpp
+RL_TEXTURE_FILTER_POINT: Const[int] = 0
+# No filter, just pixel approximation
+RL_TEXTURE_FILTER_BILINEAR: Const[int] = 1
+# Linear filtering
+RL_TEXTURE_FILTER_TRILINEAR: Const[int] = 2
+# Trilinear filtering (linear with mipmaps)
+RL_TEXTURE_FILTER_ANISOTROPIC_4X: Const[int] = 3
+# Anisotropic filtering 4x
+RL_TEXTURE_FILTER_ANISOTROPIC_8X: Const[int] = 4
+# Anisotropic filtering 8x
+RL_TEXTURE_FILTER_ANISOTROPIC_16X: Const[int] = 5
+# Anisotropic filtering 16x
+RL_BLEND_ALPHA: Const[int] = 0
+# Blend textures considering alpha (default)
+RL_BLEND_ADDITIVE: Const[int] = 1
+# Blend textures adding colors
+RL_BLEND_MULTIPLIED: Const[int] = 2
+# Blend textures multiplying colors
+RL_BLEND_ADD_COLORS: Const[int] = 3
+# Blend textures adding colors (alternative)
+RL_BLEND_SUBTRACT_COLORS: Const[int] = 4
+# Blend textures subtracting colors (alternative)
+RL_BLEND_ALPHA_PREMULTIPLY: Const[int] = 5
+# Blend premultiplied textures considering alpha
+RL_BLEND_CUSTOM: Const[int] = 6
+# Blend textures using custom src/dst factors (use rlSetBlendFactors())
+RL_SHADER_LOC_VERTEX_POSITION: Const[int] = 0
+# Shader location: vertex attribute: position
+RL_SHADER_LOC_VERTEX_TEXCOORD01: Const[int] = 1
+# Shader location: vertex attribute: texcoord01
+RL_SHADER_LOC_VERTEX_TEXCOORD02: Const[int] = 2
+# Shader location: vertex attribute: texcoord02
+RL_SHADER_LOC_VERTEX_NORMAL: Const[int] = 3
+# Shader location: vertex attribute: normal
+RL_SHADER_LOC_VERTEX_TANGENT: Const[int] = 4
+# Shader location: vertex attribute: tangent
+RL_SHADER_LOC_VERTEX_COLOR: Const[int] = 5
+# Shader location: vertex attribute: color
+RL_SHADER_LOC_MATRIX_MVP: Const[int] = 6
+# Shader location: matrix uniform: model-view-projection
+RL_SHADER_LOC_MATRIX_VIEW: Const[int] = 7
+# Shader location: matrix uniform: view (camera transform)
+RL_SHADER_LOC_MATRIX_PROJECTION: Const[int] = 8
+# Shader location: matrix uniform: projection
+RL_SHADER_LOC_MATRIX_MODEL: Const[int] = 9
+# Shader location: matrix uniform: model (transform)
+RL_SHADER_LOC_MATRIX_NORMAL: Const[int] = 10
+# Shader location: matrix uniform: normal
+RL_SHADER_LOC_VECTOR_VIEW: Const[int] = 11
+# Shader location: vector uniform: view
+RL_SHADER_LOC_COLOR_DIFFUSE: Const[int] = 12
+# Shader location: vector uniform: diffuse color
+RL_SHADER_LOC_COLOR_SPECULAR: Const[int] = 13
+# Shader location: vector uniform: specular color
+RL_SHADER_LOC_COLOR_AMBIENT: Const[int] = 14
+# Shader location: vector uniform: ambient color
+RL_SHADER_LOC_MAP_ALBEDO: Const[int] = 15
+# Shader location: sampler2d texture: albedo (same as: RL_SHADER_LOC_MAP_DIFFUSE)
+RL_SHADER_LOC_MAP_METALNESS: Const[int] = 16
+# Shader location: sampler2d texture: metalness (same as: RL_SHADER_LOC_MAP_SPECULAR)
+RL_SHADER_LOC_MAP_NORMAL: Const[int] = 17
+# Shader location: sampler2d texture: normal
+RL_SHADER_LOC_MAP_ROUGHNESS: Const[int] = 18
+# Shader location: sampler2d texture: roughness
+RL_SHADER_LOC_MAP_OCCLUSION: Const[int] = 19
+# Shader location: sampler2d texture: occlusion
+RL_SHADER_LOC_MAP_EMISSION: Const[int] = 20
+# Shader location: sampler2d texture: emission
+RL_SHADER_LOC_MAP_HEIGHT: Const[int] = 21
+# Shader location: sampler2d texture: height
+RL_SHADER_LOC_MAP_CUBEMAP: Const[int] = 22
+# Shader location: samplerCube texture: cubemap
+RL_SHADER_LOC_MAP_IRRADIANCE: Const[int] = 23
+# Shader location: samplerCube texture: irradiance
+RL_SHADER_LOC_MAP_PREFILTER: Const[int] = 24
+# Shader location: samplerCube texture: prefilter
+RL_SHADER_LOC_MAP_BRDF: Const[int] = 25
+# Shader location: sampler2d texture: brdf
+RL_SHADER_UNIFORM_FLOAT: Const[int] = 0
+# Shader uniform type: float
+RL_SHADER_UNIFORM_VEC2: Const[int] = 1
+# Shader uniform type: vec2 (2 float)
+RL_SHADER_UNIFORM_VEC3: Const[int] = 2
+# Shader uniform type: vec3 (3 float)
+RL_SHADER_UNIFORM_VEC4: Const[int] = 3
+# Shader uniform type: vec4 (4 float)
+RL_SHADER_UNIFORM_INT: Const[int] = 4
+# Shader uniform type: int
+RL_SHADER_UNIFORM_IVEC2: Const[int] = 5
+# Shader uniform type: ivec2 (2 int)
+RL_SHADER_UNIFORM_IVEC3: Const[int] = 6
+# Shader uniform type: ivec3 (3 int)
+RL_SHADER_UNIFORM_IVEC4: Const[int] = 7
+# Shader uniform type: ivec4 (4 int)
+RL_SHADER_UNIFORM_SAMPLER2D: Const[int] = 8
+# Shader uniform type: sampler2d
+RL_SHADER_ATTRIB_FLOAT: Const[int] = 0
+# Shader attribute type: float
+RL_SHADER_ATTRIB_VEC2: Const[int] = 1
+# Shader attribute type: vec2 (2 float)
+RL_SHADER_ATTRIB_VEC3: Const[int] = 2
+# Shader attribute type: vec3 (3 float)
+RL_SHADER_ATTRIB_VEC4: Const[int] = 3
+# Shader attribute type: vec4 (4 float)
+@nativedefine("rlVertexBuffer")
+class rlVertexBuffer:
+    # Dynamic vertex buffers (position + texcoords + colors + indices arrays)
+    pass
+
+@dotaccess
+@nativedefine("rlDrawCall")
+class rlDrawCall:
+    # of those state-change happens (this is done in core module)
+    mode: c.CInt
+    vertexCount: c.CInt
+    vertexAlignment: c.CInt
+    textureId: c.CUInt
+
+@nativemacro
+def rl_draw_call(mode: int, vertex_count: int, vertex_alignment: int, texture_id: u32) -> rlDrawCall:
+    # Factory function for: rlDrawCall
+    ccode """(rlDrawCall){(int)nn__mode, (int)nn__vertex_count, (int)nn__vertex_alignment, (unsigned int)nn__texture_id}"""
+
+@dotaccess
+@nativedefine("rlRenderBatch")
+class rlRenderBatch:
+    # rlRenderBatch type
+    bufferCount: c.CInt
+    currentBuffer: c.CInt
+    vertexBuffer: Ptr[rl.rlVertexBuffer]
+    draws: Ptr[rl.rlDrawCall]
+    drawCounter: c.CInt
+    currentDepth: float
+
+@nativemacro
+def rl_render_batch(buffer_count: int, current_buffer: int, vertex_buffer: Ptr[rl.rlVertexBuffer], draws: Ptr[rl.rlDrawCall], draw_counter: int, current_depth: float) -> rlRenderBatch:
+    # Factory function for: rlRenderBatch
+    ccode """(rlRenderBatch){(int)nn__buffer_count, (int)nn__current_buffer, nn__vertex_buffer, nn__draws, (int)nn__draw_counter, nn__current_depth}"""
+
+@nativedefine("rlglData")
+class rlglData:
+    pass
+
+@nativemacro
+def rl_matrix_mode(mode: int) -> None:
+    # Choose the current matrix to be transformed
+    ccode """rlMatrixMode((int)nn__mode)"""
+
+@nativemacro
+def rl_push_matrix() -> None:
+    # Push the current matrix to stack
+    ccode """rlPushMatrix()"""
+
+@nativemacro
+def rl_pop_matrix() -> None:
+    # Pop lattest inserted matrix from stack
+    ccode """rlPopMatrix()"""
+
+@nativemacro
+def rl_load_identity() -> None:
+    # Reset current matrix to identity matrix
+    ccode """rlLoadIdentity()"""
+
+@nativemacro
+def rl_translatef(x: float, y: float, z: float) -> None:
+    # Multiply the current matrix by a translation matrix
+    ccode """rlTranslatef(nn__x, nn__y, nn__z)"""
+
+@nativemacro
+def rl_rotatef(angle: float, x: float, y: float, z: float) -> None:
+    # Multiply the current matrix by a rotation matrix
+    ccode """rlRotatef(nn__angle, nn__x, nn__y, nn__z)"""
+
+@nativemacro
+def rl_scalef(x: float, y: float, z: float) -> None:
+    # Multiply the current matrix by a scaling matrix
+    ccode """rlScalef(nn__x, nn__y, nn__z)"""
+
+@nativemacro
+def rl_mult_matrixf(matf: Ptr[c.CFloat]) -> None:
+    # Multiply the current matrix by another matrix
+    ccode """rlMultMatrixf(nn__matf)"""
+
+@nativemacro
+def rl_frustum(left: f64, right: f64, bottom: f64, top: f64, znear: f64, zfar: f64) -> None:
+    ccode """rlFrustum(nn__left, nn__right, nn__bottom, nn__top, nn__znear, nn__zfar)"""
+
+@nativemacro
+def rl_ortho(left: f64, right: f64, bottom: f64, top: f64, znear: f64, zfar: f64) -> None:
+    ccode """rlOrtho(nn__left, nn__right, nn__bottom, nn__top, nn__znear, nn__zfar)"""
+
+@nativemacro
+def rl_viewport(x: int, y: int, width: int, height: int) -> None:
+    # Set the viewport area
+    ccode """rlViewport((int)nn__x, (int)nn__y, (int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def rl_begin(mode: int) -> None:
+    # Initialize drawing mode (how to organize vertex)
+    ccode """rlBegin((int)nn__mode)"""
+
+@nativemacro
+def rl_end() -> None:
+    # Finish vertex providing
+    ccode """rlEnd()"""
+
+@nativemacro
+def rl_vertex2i(x: int, y: int) -> None:
+    # Define one vertex (position) - 2 int
+    ccode """rlVertex2i((int)nn__x, (int)nn__y)"""
+
+@nativemacro
+def rl_vertex2f(x: float, y: float) -> None:
+    # Define one vertex (position) - 2 float
+    ccode """rlVertex2f(nn__x, nn__y)"""
+
+@nativemacro
+def rl_vertex3f(x: float, y: float, z: float) -> None:
+    # Define one vertex (position) - 3 float
+    ccode """rlVertex3f(nn__x, nn__y, nn__z)"""
+
+@nativemacro
+def rl_tex_coord2f(x: float, y: float) -> None:
+    # Define one vertex (texture coordinate) - 2 float
+    ccode """rlTexCoord2f(nn__x, nn__y)"""
+
+@nativemacro
+def rl_normal3f(x: float, y: float, z: float) -> None:
+    # Define one vertex (normal) - 3 float
+    ccode """rlNormal3f(nn__x, nn__y, nn__z)"""
+
+@nativemacro
+def rl_color4ub(r: int, g: int, b: int, a: int) -> None:
+    # Define one vertex (color) - 4 byte
+    ccode """rlColor4ub((unsigned char)nn__r, (unsigned char)nn__g, (unsigned char)nn__b, (unsigned char)nn__a)"""
+
+@nativemacro
+def rl_color3f(x: float, y: float, z: float) -> None:
+    # Define one vertex (color) - 3 float
+    ccode """rlColor3f(nn__x, nn__y, nn__z)"""
+
+@nativemacro
+def rl_color4f(x: float, y: float, z: float, w: float) -> None:
+    # Define one vertex (color) - 4 float
+    ccode """rlColor4f(nn__x, nn__y, nn__z, nn__w)"""
+
+@nativemacro
+def rl_enable_vertex_array(vao_id: u32) -> bool:
+    # Enable vertex array (VAO, if supported)
+    ccode """rlEnableVertexArray((unsigned int)nn__vao_id)"""
+
+@nativemacro
+def rl_disable_vertex_array() -> None:
+    # Disable vertex array (VAO, if supported)
+    ccode """rlDisableVertexArray()"""
+
+@nativemacro
+def rl_enable_vertex_buffer(id: u32) -> None:
+    # Enable vertex buffer (VBO)
+    ccode """rlEnableVertexBuffer((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_disable_vertex_buffer() -> None:
+    # Disable vertex buffer (VBO)
+    ccode """rlDisableVertexBuffer()"""
+
+@nativemacro
+def rl_enable_vertex_buffer_element(id: u32) -> None:
+    # Enable vertex buffer element (VBO element)
+    ccode """rlEnableVertexBufferElement((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_disable_vertex_buffer_element() -> None:
+    # Disable vertex buffer element (VBO element)
+    ccode """rlDisableVertexBufferElement()"""
+
+@nativemacro
+def rl_enable_vertex_attribute(index: u32) -> None:
+    # Enable vertex attribute index
+    ccode """rlEnableVertexAttribute((unsigned int)nn__index)"""
+
+@nativemacro
+def rl_disable_vertex_attribute(index: u32) -> None:
+    # Disable vertex attribute index
+    ccode """rlDisableVertexAttribute((unsigned int)nn__index)"""
+
+@nativemacro
+def rl_enable_state_pointer(vertex_attrib_type: int, buffer: c.VoidPtr) -> None:
+    # Enable attribute state pointer
+    ccode """rlEnableStatePointer((int)nn__vertex_attrib_type, nn__buffer)"""
+
+@nativemacro
+def rl_disable_state_pointer(vertex_attrib_type: int) -> None:
+    # Disable attribute state pointer
+    ccode """rlDisableStatePointer((int)nn__vertex_attrib_type)"""
+
+@nativemacro
+def rl_active_texture_slot(slot: int) -> None:
+    # Select and active a texture slot
+    ccode """rlActiveTextureSlot((int)nn__slot)"""
+
+@nativemacro
+def rl_enable_texture(id: u32) -> None:
+    # Enable texture
+    ccode """rlEnableTexture((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_disable_texture() -> None:
+    # Disable texture
+    ccode """rlDisableTexture()"""
+
+@nativemacro
+def rl_enable_texture_cubemap(id: u32) -> None:
+    # Enable texture cubemap
+    ccode """rlEnableTextureCubemap((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_disable_texture_cubemap() -> None:
+    # Disable texture cubemap
+    ccode """rlDisableTextureCubemap()"""
+
+@nativemacro
+def rl_texture_parameters(id: u32, param: int, value: int) -> None:
+    # Set texture parameters (filter, wrap)
+    ccode """rlTextureParameters((unsigned int)nn__id, (int)nn__param, (int)nn__value)"""
+
+@nativemacro
+def rl_enable_shader(id: u32) -> None:
+    # Enable shader program
+    ccode """rlEnableShader((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_disable_shader() -> None:
+    # Disable shader program
+    ccode """rlDisableShader()"""
+
+@nativemacro
+def rl_enable_framebuffer(id: u32) -> None:
+    # Enable render texture (fbo)
+    ccode """rlEnableFramebuffer((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_disable_framebuffer() -> None:
+    # Disable render texture (fbo), return to default framebuffer
+    ccode """rlDisableFramebuffer()"""
+
+@nativemacro
+def rl_active_draw_buffers(count: int) -> None:
+    # Activate multiple draw color buffers
+    ccode """rlActiveDrawBuffers((int)nn__count)"""
+
+@nativemacro
+def rl_enable_color_blend() -> None:
+    # Enable color blending
+    ccode """rlEnableColorBlend()"""
+
+@nativemacro
+def rl_disable_color_blend() -> None:
+    # Disable color blending
+    ccode """rlDisableColorBlend()"""
+
+@nativemacro
+def rl_enable_depth_test() -> None:
+    # Enable depth test
+    ccode """rlEnableDepthTest()"""
+
+@nativemacro
+def rl_disable_depth_test() -> None:
+    # Disable depth test
+    ccode """rlDisableDepthTest()"""
+
+@nativemacro
+def rl_enable_depth_mask() -> None:
+    # Enable depth write
+    ccode """rlEnableDepthMask()"""
+
+@nativemacro
+def rl_disable_depth_mask() -> None:
+    # Disable depth write
+    ccode """rlDisableDepthMask()"""
+
+@nativemacro
+def rl_enable_backface_culling() -> None:
+    # Enable backface culling
+    ccode """rlEnableBackfaceCulling()"""
+
+@nativemacro
+def rl_disable_backface_culling() -> None:
+    # Disable backface culling
+    ccode """rlDisableBackfaceCulling()"""
+
+@nativemacro
+def rl_enable_scissor_test() -> None:
+    # Enable scissor test
+    ccode """rlEnableScissorTest()"""
+
+@nativemacro
+def rl_disable_scissor_test() -> None:
+    # Disable scissor test
+    ccode """rlDisableScissorTest()"""
+
+@nativemacro
+def rl_scissor(x: int, y: int, width: int, height: int) -> None:
+    # Scissor test
+    ccode """rlScissor((int)nn__x, (int)nn__y, (int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def rl_enable_wire_mode() -> None:
+    # Enable wire mode
+    ccode """rlEnableWireMode()"""
+
+@nativemacro
+def rl_disable_wire_mode() -> None:
+    # Disable wire mode
+    ccode """rlDisableWireMode()"""
+
+@nativemacro
+def rl_set_line_width(width: float) -> None:
+    # Set the line drawing width
+    ccode """rlSetLineWidth(nn__width)"""
+
+@nativemacro
+def rl_get_line_width() -> float:
+    # Get the line drawing width
+    ccode """rlGetLineWidth()"""
+
+@nativemacro
+def rl_enable_smooth_lines() -> None:
+    # Enable line aliasing
+    ccode """rlEnableSmoothLines()"""
+
+@nativemacro
+def rl_disable_smooth_lines() -> None:
+    # Disable line aliasing
+    ccode """rlDisableSmoothLines()"""
+
+@nativemacro
+def rl_enable_stereo_render() -> None:
+    # Enable stereo rendering
+    ccode """rlEnableStereoRender()"""
+
+@nativemacro
+def rl_disable_stereo_render() -> None:
+    # Disable stereo rendering
+    ccode """rlDisableStereoRender()"""
+
+@nativemacro
+def rl_is_stereo_render_enabled() -> bool:
+    # Check if stereo render is enabled
+    ccode """rlIsStereoRenderEnabled()"""
+
+@nativemacro
+def rl_clear_color(r: int, g: int, b: int, a: int) -> None:
+    # Clear color buffer with color
+    ccode """rlClearColor((unsigned char)nn__r, (unsigned char)nn__g, (unsigned char)nn__b, (unsigned char)nn__a)"""
+
+@nativemacro
+def rl_clear_screen_buffers() -> None:
+    # Clear used screen buffers (color and depth)
+    ccode """rlClearScreenBuffers()"""
+
+@nativemacro
+def rl_check_errors() -> None:
+    # Check and log OpenGL error codes
+    ccode """rlCheckErrors()"""
+
+@nativemacro
+def rl_set_blend_mode(mode: int) -> None:
+    # Set blending mode
+    ccode """rlSetBlendMode((int)nn__mode)"""
+
+@nativemacro
+def rl_set_blend_factors(gl_src_factor: int, gl_dst_factor: int, gl_equation: int) -> None:
+    # Set blending mode factor and equation (using OpenGL factors)
+    ccode """rlSetBlendFactors((int)nn__gl_src_factor, (int)nn__gl_dst_factor, (int)nn__gl_equation)"""
+
+@nativemacro
+def rlgl_init(width: int, height: int) -> None:
+    # Initialize rlgl (buffers, shaders, textures, states)
+    ccode """rlglInit((int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def rlgl_close() -> None:
+    # De-inititialize rlgl (buffers, shaders, textures)
+    ccode """rlglClose()"""
+
+@nativemacro
+def rl_load_extensions(loader: c.VoidPtr) -> None:
+    # Load OpenGL extensions (loader function required)
+    ccode """rlLoadExtensions(nn__loader)"""
+
+@nativemacro
+def rl_get_version() -> int:
+    # Get current OpenGL version
+    ccode """rlGetVersion()"""
+
+@nativemacro
+def rl_set_framebuffer_width(width: int) -> None:
+    # Set current framebuffer width
+    ccode """rlSetFramebufferWidth((int)nn__width)"""
+
+@nativemacro
+def rl_get_framebuffer_width() -> int:
+    # Get default framebuffer width
+    ccode """rlGetFramebufferWidth()"""
+
+@nativemacro
+def rl_set_framebuffer_height(height: int) -> None:
+    # Set current framebuffer height
+    ccode """rlSetFramebufferHeight((int)nn__height)"""
+
+@nativemacro
+def rl_get_framebuffer_height() -> int:
+    # Get default framebuffer height
+    ccode """rlGetFramebufferHeight()"""
+
+@nativemacro
+def rl_get_texture_id_default() -> u32:
+    # Get default texture id
+    ccode """rlGetTextureIdDefault()"""
+
+@nativemacro
+def rl_get_shader_id_default() -> u32:
+    # Get default shader id
+    ccode """rlGetShaderIdDefault()"""
+
+@nativemacro
+def rl_get_shader_locs_default() -> Ptr[c.CInt]:
+    # Get default shader locations
+    ccode """rlGetShaderLocsDefault()"""
+
+@nativemacro
+def rl_load_render_batch(num_buffers: int, buffer_elements: int) -> rl.rlRenderBatch:
+    # Load a render batch system
+    ccode """rlLoadRenderBatch((int)nn__num_buffers, (int)nn__buffer_elements)"""
+
+@nativemacro
+def rl_unload_render_batch(batch: rl.rlRenderBatch) -> None:
+    # Unload render batch system
+    ccode """rlUnloadRenderBatch(nn__batch)"""
+
+@nativemacro
+def rl_draw_render_batch(batch: Ptr[rl.rlRenderBatch]) -> None:
+    # Draw render batch data (Update->Draw->Reset)
+    ccode """rlDrawRenderBatch(nn__batch)"""
+
+@nativemacro
+def rl_set_render_batch_active(batch: Ptr[rl.rlRenderBatch]) -> None:
+    # Set the active render batch for rlgl (NULL for default internal)
+    ccode """rlSetRenderBatchActive(nn__batch)"""
+
+@nativemacro
+def rl_draw_render_batch_active() -> None:
+    # Update and draw internal render batch
+    ccode """rlDrawRenderBatchActive()"""
+
+@nativemacro
+def rl_check_render_batch_limit(v_count: int) -> bool:
+    # Check internal buffer overflow for a given number of vertex
+    ccode """rlCheckRenderBatchLimit((int)nn__v_count)"""
+
+@nativemacro
+def rl_set_texture(id: u32) -> None:
+    # Set current texture for render batch and check buffers limits
+    ccode """rlSetTexture((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_load_vertex_array() -> u32:
+    # Load vertex array (vao) if supported
+    ccode """rlLoadVertexArray()"""
+
+@nativemacro
+def rl_load_vertex_buffer(buffer: Const[c.VoidPtr], size: int, dynamic: bool) -> u32:
+    # Load a vertex buffer attribute
+    ccode """rlLoadVertexBuffer(nn__buffer, (int)nn__size, nn__dynamic)"""
+
+@nativemacro
+def rl_load_vertex_buffer_element(buffer: Const[c.VoidPtr], size: int, dynamic: bool) -> u32:
+    # Load a new attributes element buffer
+    ccode """rlLoadVertexBufferElement(nn__buffer, (int)nn__size, nn__dynamic)"""
+
+@nativemacro
+def rl_update_vertex_buffer(buffer_id: u32, data: Const[c.VoidPtr], data_size: int, offset: int) -> None:
+    # Update GPU buffer with new data
+    ccode """rlUpdateVertexBuffer((unsigned int)nn__buffer_id, nn__data, (int)nn__data_size, (int)nn__offset)"""
+
+@nativemacro
+def rl_update_vertex_buffer_elements(id: u32, data: Const[c.VoidPtr], data_size: int, offset: int) -> None:
+    # Update vertex buffer elements with new data
+    ccode """rlUpdateVertexBufferElements((unsigned int)nn__id, nn__data, (int)nn__data_size, (int)nn__offset)"""
+
+@nativemacro
+def rl_unload_vertex_array(vao_id: u32) -> None:
+    ccode """rlUnloadVertexArray((unsigned int)nn__vao_id)"""
+
+@nativemacro
+def rl_unload_vertex_buffer(vbo_id: u32) -> None:
+    ccode """rlUnloadVertexBuffer((unsigned int)nn__vbo_id)"""
+
+@nativemacro
+def rl_set_vertex_attribute(index: u32, comp_size: int, type: int, normalized: bool, stride: int, pointer: Const[c.VoidPtr]) -> None:
+    ccode """rlSetVertexAttribute((unsigned int)nn__index, (int)nn__comp_size, (int)nn__type, nn__normalized, (int)nn__stride, nn__pointer)"""
+
+@nativemacro
+def rl_set_vertex_attribute_divisor(index: u32, divisor: int) -> None:
+    ccode """rlSetVertexAttributeDivisor((unsigned int)nn__index, (int)nn__divisor)"""
+
+@nativemacro
+def rl_set_vertex_attribute_default(loc_index: int, value: Const[c.VoidPtr], attrib_type: int, count: int) -> None:
+    # Set vertex attribute default value
+    ccode """rlSetVertexAttributeDefault((int)nn__loc_index, nn__value, (int)nn__attrib_type, (int)nn__count)"""
+
+@nativemacro
+def rl_draw_vertex_array(offset: int, count: int) -> None:
+    ccode """rlDrawVertexArray((int)nn__offset, (int)nn__count)"""
+
+@nativemacro
+def rl_draw_vertex_array_elements(offset: int, count: int, buffer: Const[c.VoidPtr]) -> None:
+    ccode """rlDrawVertexArrayElements((int)nn__offset, (int)nn__count, nn__buffer)"""
+
+@nativemacro
+def rl_draw_vertex_array_instanced(offset: int, count: int, instances: int) -> None:
+    ccode """rlDrawVertexArrayInstanced((int)nn__offset, (int)nn__count, (int)nn__instances)"""
+
+@nativemacro
+def rl_draw_vertex_array_elements_instanced(offset: int, count: int, buffer: Const[c.VoidPtr], instances: int) -> None:
+    ccode """rlDrawVertexArrayElementsInstanced((int)nn__offset, (int)nn__count, nn__buffer, (int)nn__instances)"""
+
+@nativemacro
+def rl_load_texture(data: Const[c.VoidPtr], width: int, height: int, format: int, mipmap_count: int) -> u32:
+    # Load texture in GPU
+    ccode """rlLoadTexture(nn__data, (int)nn__width, (int)nn__height, (int)nn__format, (int)nn__mipmap_count)"""
+
+@nativemacro
+def rl_load_texture_depth(width: int, height: int, use_render_buffer: bool) -> u32:
+    # Load depth texture/renderbuffer (to be attached to fbo)
+    ccode """rlLoadTextureDepth((int)nn__width, (int)nn__height, nn__use_render_buffer)"""
+
+@nativemacro
+def rl_load_texture_cubemap(data: Const[c.VoidPtr], size: int, format: int) -> u32:
+    # Load texture cubemap
+    ccode """rlLoadTextureCubemap(nn__data, (int)nn__size, (int)nn__format)"""
+
+@nativemacro
+def rl_update_texture(id: u32, offset_x: int, offset_y: int, width: int, height: int, format: int, data: Const[c.VoidPtr]) -> None:
+    # Update GPU texture with new data
+    ccode """rlUpdateTexture((unsigned int)nn__id, (int)nn__offset_x, (int)nn__offset_y, (int)nn__width, (int)nn__height, (int)nn__format, nn__data)"""
+
+@nativemacro
+def rl_get_gl_texture_formats(format: int, gl_internal_format: Ptr[c.CUInt], gl_format: Ptr[c.CUInt], gl_type: Ptr[c.CUInt]) -> None:
+    # Get OpenGL internal formats
+    ccode """rlGetGlTextureFormats((int)nn__format, nn__gl_internal_format, nn__gl_format, nn__gl_type)"""
+
+@native
+def rl_get_pixel_format_name(format: u32) -> Const[c.CStr]:
+    # Get name string for pixel format
+    ccode """const char * temp_rl = rlGetPixelFormatName((unsigned int)nn__format);
+    return temp_rl"""
+
+@nativemacro
+def rl_unload_texture(id: u32) -> None:
+    # Unload texture from GPU memory
+    ccode """rlUnloadTexture((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_gen_texture_mipmaps(id: u32, width: int, height: int, format: int, mipmaps: Ptr[c.CInt]) -> None:
+    # Generate mipmap data for selected texture
+    ccode """rlGenTextureMipmaps((unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__format, nn__mipmaps)"""
+
+@nativemacro
+def rl_read_texture_pixels(id: u32, width: int, height: int, format: int) -> c.VoidPtr:
+    # Read texture pixel data
+    ccode """rlReadTexturePixels((unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__format)"""
+
+@nativemacro
+def rl_read_screen_pixels(width: int, height: int) -> Ptr[c.CUChar]:
+    # Read screen pixel data (color buffer)
+    ccode """rlReadScreenPixels((int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def rl_load_framebuffer(width: int, height: int) -> u32:
+    # Load an empty framebuffer
+    ccode """rlLoadFramebuffer((int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def rl_framebuffer_attach(fbo_id: u32, tex_id: u32, attach_type: int, tex_type: int, mip_level: int) -> None:
+    # Attach texture/renderbuffer to a framebuffer
+    ccode """rlFramebufferAttach((unsigned int)nn__fbo_id, (unsigned int)nn__tex_id, (int)nn__attach_type, (int)nn__tex_type, (int)nn__mip_level)"""
+
+@nativemacro
+def rl_framebuffer_complete(id: u32) -> bool:
+    # Verify framebuffer is complete
+    ccode """rlFramebufferComplete((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_unload_framebuffer(id: u32) -> None:
+    # Delete framebuffer from GPU
+    ccode """rlUnloadFramebuffer((unsigned int)nn__id)"""
+
+@native
+def rl_load_shader_code(vs_code: str, fs_code: str) -> u32:
+    # Load shader from code strings
+    ccode """unsigned int temp_rl = rlLoadShaderCode(nn__vs_code, nn__fs_code);
+    yk__sdsfree(nn__vs_code);
+    yk__sdsfree(nn__fs_code);
+    return temp_rl"""
+
+@native
+def rl_compile_shader(shader_code: str, type: int) -> u32:
+    # Compile custom shader and return shader id (type: RL_VERTEX_SHADER, RL_FRAGMENT_SHADER, RL_COMPUTE_SHADER)
+    ccode """unsigned int temp_rl = rlCompileShader(nn__shader_code, (int)nn__type);
+    yk__sdsfree(nn__shader_code);
+    return temp_rl"""
+
+@nativemacro
+def rl_load_shader_program(v_shader_id: u32, f_shader_id: u32) -> u32:
+    # Load custom shader program
+    ccode """rlLoadShaderProgram((unsigned int)nn__v_shader_id, (unsigned int)nn__f_shader_id)"""
+
+@nativemacro
+def rl_unload_shader_program(id: u32) -> None:
+    # Unload shader program
+    ccode """rlUnloadShaderProgram((unsigned int)nn__id)"""
+
+@native
+def rl_get_location_uniform(shader_id: u32, uniform_name: str) -> int:
+    # Get shader location uniform
+    ccode """int temp_rl = rlGetLocationUniform((unsigned int)nn__shader_id, nn__uniform_name);
+    yk__sdsfree(nn__uniform_name);
+    return temp_rl"""
+
+@native
+def rl_get_location_attrib(shader_id: u32, attrib_name: str) -> int:
+    # Get shader location attribute
+    ccode """int temp_rl = rlGetLocationAttrib((unsigned int)nn__shader_id, nn__attrib_name);
+    yk__sdsfree(nn__attrib_name);
+    return temp_rl"""
+
+@nativemacro
+def rl_set_uniform(loc_index: int, value: Const[c.VoidPtr], uniform_type: int, count: int) -> None:
+    # Set shader value uniform
+    ccode """rlSetUniform((int)nn__loc_index, nn__value, (int)nn__uniform_type, (int)nn__count)"""
+
+@nativemacro
+def rl_set_uniform_matrix(loc_index: int, mat: rl.Matrix) -> None:
+    # Set shader value matrix
+    ccode """rlSetUniformMatrix((int)nn__loc_index, nn__mat)"""
+
+@nativemacro
+def rl_set_uniform_sampler(loc_index: int, texture_id: u32) -> None:
+    # Set shader value sampler
+    ccode """rlSetUniformSampler((int)nn__loc_index, (unsigned int)nn__texture_id)"""
+
+@nativemacro
+def rl_set_shader(id: u32, locs: Ptr[c.CInt]) -> None:
+    # Set shader currently active (id and locations)
+    ccode """rlSetShader((unsigned int)nn__id, nn__locs)"""
+
+@nativemacro
+def rl_load_compute_shader_program(shader_id: u32) -> u32:
+    # Load compute shader program
+    ccode """rlLoadComputeShaderProgram((unsigned int)nn__shader_id)"""
+
+@nativemacro
+def rl_compute_shader_dispatch(group_x: u32, group_y: u32, group_z: u32) -> None:
+    # Dispatch compute shader (equivalent to *draw* for graphics pilepine)
+    ccode """rlComputeShaderDispatch((unsigned int)nn__group_x, (unsigned int)nn__group_y, (unsigned int)nn__group_z)"""
+
+@nativemacro
+def rl_unload_shader_buffer(ssbo_id: u32) -> None:
+    # Unload shader storage buffer object (SSBO)
+    ccode """rlUnloadShaderBuffer((unsigned int)nn__ssbo_id)"""
+
+@nativemacro
+def rl_bind_shader_buffer(id: u32, index: u32) -> None:
+    # Copy SSBO buffer data
+    ccode """rlBindShaderBuffer((unsigned int)nn__id, (unsigned int)nn__index)"""
+
+@nativemacro
+def rl_bind_image_texture(id: u32, index: u32, format: u32, readonly: int) -> None:
+    # Bind image texture
+    ccode """rlBindImageTexture((unsigned int)nn__id, (unsigned int)nn__index, (unsigned int)nn__format, (int)nn__readonly)"""
+
+@nativemacro
+def rl_get_matrix_modelview() -> rl.Matrix:
+    # Get internal modelview matrix
+    ccode """rlGetMatrixModelview()"""
+
+@nativemacro
+def rl_get_matrix_projection() -> rl.Matrix:
+    # Get internal projection matrix
+    ccode """rlGetMatrixProjection()"""
+
+@nativemacro
+def rl_get_matrix_transform() -> rl.Matrix:
+    # Get internal accumulated transform matrix
+    ccode """rlGetMatrixTransform()"""
+
+@nativemacro
+def rl_get_matrix_projection_stereo(eye: int) -> rl.Matrix:
+    # Get internal projection matrix for stereo render (selected eye)
+    ccode """rlGetMatrixProjectionStereo((int)nn__eye)"""
+
+@nativemacro
+def rl_get_matrix_view_offset_stereo(eye: int) -> rl.Matrix:
+    # Get internal view offset matrix for stereo render (selected eye)
+    ccode """rlGetMatrixViewOffsetStereo((int)nn__eye)"""
+
+@nativemacro
+def rl_set_matrix_projection(proj: rl.Matrix) -> None:
+    # Set a custom projection matrix (replaces internal projection matrix)
+    ccode """rlSetMatrixProjection(nn__proj)"""
+
+@nativemacro
+def rl_set_matrix_modelview(view: rl.Matrix) -> None:
+    # Set a custom modelview matrix (replaces internal modelview matrix)
+    ccode """rlSetMatrixModelview(nn__view)"""
+
+@nativemacro
+def rl_set_matrix_projection_stereo(right: rl.Matrix, left: rl.Matrix) -> None:
+    # Set eyes projection matrices for stereo rendering
+    ccode """rlSetMatrixProjectionStereo(nn__right, nn__left)"""
+
+@nativemacro
+def rl_set_matrix_view_offset_stereo(right: rl.Matrix, left: rl.Matrix) -> None:
+    # Set eyes view offsets matrices for stereo rendering
+    ccode """rlSetMatrixViewOffsetStereo(nn__right, nn__left)"""
+
+@nativemacro
+def rl_load_draw_cube() -> None:
+    # Load and draw a cube
+    ccode """rlLoadDrawCube()"""
+
+@nativemacro
+def rl_load_draw_quad() -> None:
+    # Load and draw a quad
+    ccode """rlLoadDrawQuad()"""
+

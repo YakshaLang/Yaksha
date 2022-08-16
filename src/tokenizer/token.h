@@ -24,6 +24,7 @@ namespace yaksha {
     DIV,
     DIV_EQ,
     DOT,
+    DOUBLE_NUMBER,
     ELLIPSIS,
     END_OF_FILE,
     EQ,
@@ -113,6 +114,7 @@ namespace yaksha {
     if (t == token_type::DIV) return "DIV";
     if (t == token_type::DIV_EQ) return "DIV_EQ";
     if (t == token_type::DOT) return "DOT";
+    if (t == token_type::DOUBLE_NUMBER) return "DOUBLE_NUMBER";
     if (t == token_type::ELLIPSIS) return "ELLIPSIS";
     if (t == token_type::END_OF_FILE) return "END_OF_FILE";
     if (t == token_type::EQ) return "EQ";
@@ -197,6 +199,7 @@ namespace yaksha {
     if (t == "DIV") return token_type::DIV;
     if (t == "DIV_EQ") return token_type::DIV_EQ;
     if (t == "DOT") return token_type::DOT;
+    if (t == "DOUBLE_NUMBER") return token_type::DOUBLE_NUMBER;
     if (t == "ELLIPSIS") return token_type::ELLIPSIS;
     if (t == "END_OF_FILE") return token_type::END_OF_FILE;
     if (t == "EQ") return token_type::EQ;

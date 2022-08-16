@@ -75,6 +75,7 @@ private:
   }
   inline bool operator==(const yaksha::ykdatatype &lhs,
                          const yaksha::ykdatatype &rhs) {
+    // TODO rethink this, this is clearly wrong?
     if (lhs.is_const() || rhs.is_const()) {
       const yaksha::ykdatatype *unwrapped_lhs;
       const yaksha::ykdatatype *unwrapped_rhs;

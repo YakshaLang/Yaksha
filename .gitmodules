@@ -8,3 +8,6 @@
 [submodule "runtime/raylib"]
 	path = runtime/raylib
 	url = git@github.com:raysan5/raylib.git
+[submodule "runtime/raygui"]
+	path = runtime/raygui
+	url = git@github.com:raysan5/raygui.git

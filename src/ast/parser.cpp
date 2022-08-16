@@ -125,7 +125,7 @@ expr *parser::match_array_access(expr *name) {
 }
 expr *parser::primary() {
   if (match({token_type::KEYWORD_FALSE, token_type::KEYWORD_TRUE,
-             token_type::KEYWORD_NONE, token_type::FLOAT_NUMBER,
+             token_type::KEYWORD_NONE, token_type::DOUBLE_NUMBER, token_type::FLOAT_NUMBER,
              token_type::INTEGER_DECIMAL, token_type::INTEGER_BIN,
              token_type::INTEGER_OCT, token_type::INTEGER_HEX,
              token_type::STRING, token_type::THREE_QUOTE_STRING})) {

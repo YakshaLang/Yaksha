@@ -21,8 +21,9 @@ KEYWORDS = sorted(["False", "else", "import", "pass",
                    "assert", "del", "not",
                    "elif", "if", "or", "defer", "ccode"])
 TOKENS = sorted([
-    "NAME", "AT", "INTEGER_DECIMAL", "INTEGER_OCT", "INTEGER_HEX", "INTEGER_BIN", "FLOAT_NUMBER", "INDENT",
-    "BA_INDENT", "BA_DEDENT", "NEW_LINE", "COLON", "COMMENT", "THREE_QUOTE_STRING", "STRING", "PAREN_OPEN",
+    "NAME", "AT", "INTEGER_DECIMAL", "INTEGER_OCT", "INTEGER_HEX", "INTEGER_BIN", "DOUBLE_NUMBER",
+    "FLOAT_NUMBER", "INDENT", "BA_INDENT", "BA_DEDENT", "NEW_LINE", "COLON", "COMMENT",
+    "THREE_QUOTE_STRING", "STRING", "PAREN_OPEN",
     "PAREN_CLOSE", "SQUARE_BRACKET_OPEN", "SQUARE_BRACKET_CLOSE", "CURLY_BRACKET_OPEN", "CURLY_BRACKET_CLOSE", "LESS",
     "EQ", "GREAT", "OR", "PLUS", "SUB", "MUL", "DIV", "AND", "XOR", "MOD", "INT_DIV", "POWER", "LESS_EQ", "EQ_EQ",
     "GREAT_EQ", "OR_EQ", "PLUS_EQ", "SUB_EQ", "MUL_EQ", "DIV_EQ", "AND_EQ", "XOR_EQ", "MOD_EQ", "INT_DIV_EQ",

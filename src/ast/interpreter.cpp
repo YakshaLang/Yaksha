@@ -148,7 +148,7 @@ void interpreter::visit_literal_expr(literal_expr *obj) {
       return;
     }
     push(ykobject(val, dt_pool_));
-  } else if (obj->literal_token_->type_ == token_type::FLOAT_NUMBER) {
+  } else if (obj->literal_token_->type_ == token_type::DOUBLE_NUMBER) {
     double val;
     try {
       val = std::stod(obj->literal_token_->token_);

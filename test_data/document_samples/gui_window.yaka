@@ -1,0 +1,19 @@
+import raylib as rl
+import raylib.utils
+import raylib.gui
+
+
+def main() -> int:
+    width: int = 600
+    height: int = 600
+    rl.init_window(width, height, "Gui Window Sample")
+    rl.set_target_fps(120)
+    while not rl.window_should_close():
+        rl.begin_drawing()
+        rl.clear_background(rl.color(255, 255, 255, 255))
+        gui.gui_panel(rl.rectangle(10.0f, 10.0f, 100.0f, 160.0f), "Panel Info")
+        gui.gui_panel(rl.rectangle(10.0f, 10.0f, 100.0f, 160.0f), "Panel Info")
+        rl.draw_fps(0, 560)
+        rl.end_drawing()
+    rl.close_window()
+    return 0
