@@ -67,15 +67,15 @@ def vector2_length_sqr(v: rl.Vector2) -> float:
     ccode """Vector2LengthSqr(nn__v)"""
 
 @nativemacro
-def vector_2dot_product(v1: rl.Vector2, v2: rl.Vector2) -> float:
+def vector2_dot_product(v1: rl.Vector2, v2: rl.Vector2) -> float:
     ccode """Vector2DotProduct(nn__v1, nn__v2)"""
 
 @nativemacro
-def vector_2distance(v1: rl.Vector2, v2: rl.Vector2) -> float:
+def vector2_distance(v1: rl.Vector2, v2: rl.Vector2) -> float:
     ccode """Vector2Distance(nn__v1, nn__v2)"""
 
 @nativemacro
-def vector_2distance_sqr(v1: rl.Vector2, v2: rl.Vector2) -> float:
+def vector2_distance_sqr(v1: rl.Vector2, v2: rl.Vector2) -> float:
     ccode """Vector2DistanceSqr(nn__v1, nn__v2)"""
 
 @nativemacro
@@ -95,7 +95,7 @@ def vector2_negate(v: rl.Vector2) -> rl.Vector2:
     ccode """Vector2Negate(nn__v)"""
 
 @nativemacro
-def vector_2divide(v1: rl.Vector2, v2: rl.Vector2) -> rl.Vector2:
+def vector2_divide(v1: rl.Vector2, v2: rl.Vector2) -> rl.Vector2:
     ccode """Vector2Divide(nn__v1, nn__v2)"""
 
 @nativemacro
@@ -187,15 +187,15 @@ def vector3_length_sqr(v: Const[rl.Vector3]) -> float:
     ccode """Vector3LengthSqr(nn__v)"""
 
 @nativemacro
-def vector_3dot_product(v1: rl.Vector3, v2: rl.Vector3) -> float:
+def vector3_dot_product(v1: rl.Vector3, v2: rl.Vector3) -> float:
     ccode """Vector3DotProduct(nn__v1, nn__v2)"""
 
 @nativemacro
-def vector_3distance(v1: rl.Vector3, v2: rl.Vector3) -> float:
+def vector3_distance(v1: rl.Vector3, v2: rl.Vector3) -> float:
     ccode """Vector3Distance(nn__v1, nn__v2)"""
 
 @nativemacro
-def vector_3distance_sqr(v1: rl.Vector3, v2: rl.Vector3) -> float:
+def vector3_distance_sqr(v1: rl.Vector3, v2: rl.Vector3) -> float:
     ccode """Vector3DistanceSqr(nn__v1, nn__v2)"""
 
 @nativemacro
@@ -207,7 +207,7 @@ def vector3_negate(v: rl.Vector3) -> rl.Vector3:
     ccode """Vector3Negate(nn__v)"""
 
 @nativemacro
-def vector_3divide(v1: rl.Vector3, v2: rl.Vector3) -> rl.Vector3:
+def vector3_divide(v1: rl.Vector3, v2: rl.Vector3) -> rl.Vector3:
     ccode """Vector3Divide(nn__v1, nn__v2)"""
 
 @nativemacro

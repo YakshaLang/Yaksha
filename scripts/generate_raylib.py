@@ -214,13 +214,16 @@ CODE = Code()
 
 def underscore(word):
     # based on https://inflection.readthedocs.io/en/latest/_modules/inflection.html#underscore
-    word = word.replace("3D", "Thredez")
-    word = word.replace("2D", "Twodez")
+    orig = word
+    if orig.endswith("3D") or orig.endswith("2D"):
+        word = word.replace("3D", "Thredez")
+        word = word.replace("2D", "Twodez")
     word = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1_\2', word)
     word = re.sub(r"([a-z\d])([A-Z])", r'\1_\2', word)
     word = word.replace("-", "_")
-    word = word.replace("Thredez", "3d")
-    word = word.replace("Twodez", "2d")
+    if orig.endswith("3D") or orig.endswith("2D"):
+        word = word.replace("Thredez", "3d")
+        word = word.replace("Twodez", "2d")
     word = word.lower()
     from update_tokens import KEYWORDS, RESERVED
     if word in KEYWORDS \
