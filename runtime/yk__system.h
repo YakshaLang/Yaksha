@@ -16,6 +16,8 @@ void yk__printint(intmax_t to_print);
 void yk__printlnint(intmax_t to_print);
 void yk__printuint(uintmax_t to_print);
 void yk__printlnuint(uintmax_t to_print);
+void yk__printdbl(double to_print);
+void yk__printlndbl(double to_print);
 char *yk__get_current_dir_path();
 bool yk__exists(yk__sds path);
 bool yk__readable(yk__sds path);

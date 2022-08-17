@@ -21,6 +21,7 @@ namespace yaksha {
 private:
     ykdt_pool *pool_;
     std::vector<entry_data> autogen_structs_list_;
+    std::unordered_map<std::string, unsigned int> autogen_structs_;
     std::stringstream code_;
     unsigned int counter_;
   };

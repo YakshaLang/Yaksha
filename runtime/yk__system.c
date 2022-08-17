@@ -41,6 +41,20 @@ void yk__printlnuint(uintmax_t to_print) {
   printf("%ju\n", to_print);
 #endif
 }
+void yk__printdbl(double to_print) {
+#if defined(_WIN32) || defined(_WIN64)
+  wprintf(L"%f", to_print);
+#else
+  printf("%f", to_print);
+#endif
+}
+void yk__printlndbl(double to_print) {
+#if defined(_WIN32) || defined(_WIN64)
+  wprintf(L"%f\n", to_print);
+#else
+  printf("%f\n", to_print);
+#endif
+}
 struct yk__arguments *yk__copy_args(int argc, char **argv) {
   // Create arguments by copying argv
   struct yk__arguments *arguments = malloc(sizeof(struct yk__arguments));

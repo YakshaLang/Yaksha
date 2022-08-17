@@ -2,9 +2,13 @@
 #include "entry_struct_compiler.h"
 using namespace yaksha;
 entry_struct_compiler::entry_struct_compiler(ykdt_pool *pool)
-    : pool_(pool), counter_(0), autogen_structs_list_(), code_() {}
+    : pool_(pool), counter_(0), autogen_structs_list_(), autogen_structs_(), code_() {}
 std::string entry_struct_compiler::compile(ykdatatype *entry_dt,
                                            datatype_compiler *dtc) {
+  std::string repr = entry_dt->as_string();
+  if (autogen_structs_.find(repr) != autogen_structs_.end()) {
+    return "struct ykentry" + std::to_string(autogen_structs_[repr]);
+  }
   entry_data d{};
   d.incremented_id_ = counter_++;
   if (entry_dt->is_sm_entry()) {
@@ -21,6 +25,7 @@ std::string entry_struct_compiler::compile(ykdatatype *entry_dt,
         << dtc->convert_dt(d.key_dt_) << " key; " << dtc->convert_dt(d.val_dt_)
         << " value; };\n";
   autogen_structs_list_.emplace_back(d);
+  autogen_structs_[repr] = d.incremented_id_;
   return "struct ykentry" + std::to_string(d.incremented_id_);
 }
 void entry_struct_compiler::compile_forward_declarations(

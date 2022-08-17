@@ -16,6 +16,7 @@ bool builtins::has_builtin(const std::string &name) {
   if (name == "shnew") { return true; }
   if (name == "shput") { return true; }
   if (name == "shget") { return true; }
+  if (name == "shgeti") { return true; }
   return false;
 }
 ykobject builtins::verify(const std::string &name,
@@ -102,7 +103,7 @@ builtins::compile(const std::string &name,
     } else if (rhs.second.datatype_->is_str()) {
       code << "yk__printstr((" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_a_float()) {
-      code << "printf(\"%f\", (" << rhs.first << "))";
+      code << "yk__printdbl((" << rhs.first << "))";
     }
   } else if (name == "println") {
     auto rhs = args[0];
@@ -113,7 +114,7 @@ builtins::compile(const std::string &name,
     } else if (rhs.second.datatype_->is_str()) {
       code << "yk__printlnstr((" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_a_float()) {
-      code << R"(printf("%f\n", ()" << rhs.first << "))";
+      code << "yk__printlndbl((" << rhs.first << "))";
     }
   } else if (name == "len") {
     if (args[0].second.datatype_->is_str()) {
@@ -145,7 +146,7 @@ builtins::compile(const std::string &name,
   } else if (name == "shget") {
     code << "yk__shget(" << args[0].first << ", " << args[1].first << ")";
     o = ykobject(args[0].second.datatype_->args_[0]->args_[0]);
-  } else if (name == "shget") {
+  } else if (name == "shgeti") {
     code << "yk__shgeti(" << args[0].first << ", " << args[1].first << ")";
     o = ykobject(dt_pool_->create("int"));
   } else if (name == "shput") {

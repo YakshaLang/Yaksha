@@ -7,6 +7,25 @@ def main() -> int:
     println(shget(m, "hello"))
     print("length of this map is = ")
     println(len(m))
+    print("\"hello\" is located at = ")
+    println(shgeti(m, "hello"))
+    print("\"unknown\" is located at = ")
+    println(shgeti(m, "unknown"))
     del m
+
+    # floats
+    m2: Array[SMEntry[float]]
+    shnew(m2)
+    shput(m2, "hello", 42.0f)
+    print("hello in m2 = ")
+    println(shget(m2, "hello"))
+
+    # Another float
+    m3: Array[SMEntry[float]]
+    shnew(m3)
+    shput(m3, "hello", 123.0f)
+    print("hello in m3 = ")
+    println(shget(m3, "hello"))
+
     println("bye!")
     return 0
