@@ -6,7 +6,7 @@ Update CMakeLists.txt with .cpp & .h files.
 import os.path
 from typing import List, Tuple
 
-IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp", "utf8proc_data.c", "print_str.c"]
+IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp", "utf8proc_data.c", "print_str.c", "dump.cpp"]
 
 
 def get_immediate_sub_dirs(directory: str) -> List[str]:
@@ -59,7 +59,9 @@ def update_cmake_file(headers: List[str], cpp_files: List[str], marker: str):
     for line in cmake_file.splitlines():
         if marker in line:
             sources = headers + cpp_files
-            lines.append(fmt.format(files=" ".join(sources)))
+            replacement = " ".join(sources)
+            replacement = replacement.replace("\\", "/")
+            lines.append(fmt.format(files=replacement))
         else:
             lines.append(line)
         with open("CMakeLists.txt", "w+") as h:
