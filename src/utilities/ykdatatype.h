@@ -21,7 +21,7 @@ namespace yaksha {
     NONE,
     NOT_A_PRIMITIVE,
   };
-  enum class ykbuiltin { ARRAY, STRING_HASHMAP, NOT_A_BUILTIN, CONSTANT, POINTER };
+  enum class ykbuiltin { ARRAY, SM_ENTRY, M_ENTRY, NOT_A_BUILTIN, CONSTANT, POINTER };
   struct ykdatatype {
     explicit ykdatatype(token *primitive_dt);
     explicit ykdatatype(std::string primitive_dt);
@@ -55,6 +55,8 @@ namespace yaksha {
     [[nodiscard]] bool is_an_array() const;
     [[nodiscard]] bool is_a_pointer() const;
     [[nodiscard]] bool is_const() const;
+    [[nodiscard]] bool is_m_entry() const;
+    [[nodiscard]] bool is_sm_entry() const;
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
     token *token_{};
     std::string type_{};

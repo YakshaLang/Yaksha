@@ -79,7 +79,7 @@ multifile_compiler::compile(const std::string &main_file,
   int file_count = static_cast<int>(cf.files_.size());
   for (int i = file_count - 1; i >= 0; i--) {
     auto f = cf.files_[i];
-    compiler c{*f->data_->dsv_, &cf.pool_};
+    compiler c{*f->data_->dsv_, &cf.pool_, cf.esc_};
     auto result = c.compile(&cf, f);
     struct_forward_decls << result.struct_forward_declarations_;
     function_forward_decls << result.function_forward_declarations_;
@@ -93,9 +93,11 @@ multifile_compiler::compile(const std::string &main_file,
   c_code << "// --forward declarations-- \n";
   c_code << global_consts.str();
   c_code << struct_forward_decls.str();
+  if (cf.esc_->has()) { cf.esc_->compile_forward_declarations(c_code); }
   c_code << function_forward_decls.str();
   c_code << "// --structs-- \n";
   c_code << struct_body.str();
+  if (cf.esc_->has()) { cf.esc_->compile_structures(c_code); }
   c_code << "// --functions-- \n";
   c_code << function_body.str();
   c_code << "#if defined(YK__MINIMAL_MAIN)\n";

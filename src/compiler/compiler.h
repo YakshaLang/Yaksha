@@ -7,7 +7,9 @@
 #include "builtins.h"
 #include "compiler/compiler_utils.h"
 #include "compiler/delete_stack_stack.h"
+#include "datatype_compiler.h"
 #include "def_class_visitor.h"
+#include "entry_struct_compiler.h"
 #include "tokenizer/token.h"
 #include "utilities/defer_stack_stack.h"
 #include <sstream>
@@ -19,8 +21,8 @@ namespace yaksha {
     std::string body_{};
     std::string global_constants_{};
   };
-  struct compiler : expr_visitor, stmt_visitor {
-    compiler(def_class_visitor &defs_classes, ykdt_pool *pool);
+  struct compiler : expr_visitor, stmt_visitor, datatype_compiler {
+    compiler(def_class_visitor &defs_classes, ykdt_pool *pool, entry_struct_compiler* esc);
     ~compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
     compiler_output compile(const std::vector<stmt *> &statements);
@@ -55,18 +57,19 @@ namespace yaksha {
     void visit_ccode_stmt(ccode_stmt *obj) override;
     void visit_import_stmt(import_stmt *obj) override;
     void visit_const_stmt(const_stmt *obj) override;
+    /**
+     * Convert Yaksha data type to appropriate C data type.
+     * @param basic_dt data type as a token.
+     * @return converted data type.
+     */
+    std::string convert_dt(ykdatatype *basic_dt) override;
+
 
 private:
     /**
      * @return unique temp variable name
      */
     std::string temp();
-    /**
-     * Convert Yaksha data type to appropriate C data type.
-     * @param basic_dt data type as a token.
-     * @return converted data type.
-     */
-    std::string convert_dt(ykdatatype *basic_dt);
     void push_scope_type(ast_type scope_type);
     ast_type peek_scope_type();
     void pop_scope_type();
@@ -113,6 +116,8 @@ private:
     ykdt_pool *dt_pool;
     // AST pool
     ast_pool *ast_pool_;
+    // Entry struct compiler
+    entry_struct_compiler* esc_;
     void compile_function_call(fncall_expr *obj, const std::string &name,
                                std::stringstream &code,
                                ykdatatype *return_type);

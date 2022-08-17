@@ -7,7 +7,9 @@
 using namespace yaksha;
 codefiles::codefiles(std::filesystem::path &libs_path)
     : current_path_(std::filesystem::current_path()), prefixes_(),
-      path_to_fi_(), libs_path_{libs_path} {}
+      path_to_fi_(), libs_path_{libs_path}, pool_() {
+  esc_ = new entry_struct_compiler(&pool_);
+}
 codefiles::~codefiles() {
   for (auto f : files_) {
     if (f->data_ != nullptr) {
@@ -20,6 +22,7 @@ codefiles::~codefiles() {
     delete (f->data_);
     delete (f);
   }
+  delete esc_;
 }
 file_info *codefiles::scan_main(const std::string &filename) {
   std::error_code err{};

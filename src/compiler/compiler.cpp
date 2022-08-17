@@ -2,9 +2,10 @@
 #include "compiler.h"
 #include "ast/parser.h"
 using namespace yaksha;
-compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool)
-    : defs_classes_(defs_classes), scope_(pool), dt_pool(pool),
-      builtins_(pool) {
+compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
+                   entry_struct_compiler *esc)
+    : defs_classes_(defs_classes), scope_(pool), dt_pool(pool), builtins_(pool),
+      esc_(esc) {
   ast_pool_ = new ast_pool();
 }
 compiler::~compiler() { delete ast_pool_; }
@@ -570,6 +571,9 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "float";
   } else if (basic_dt->is_f64()) {
     return "double";
+  } else if (basic_dt->is_sm_entry() || basic_dt->is_m_entry()) {
+    // Handle SMEntry and Entry
+    return esc_->compile(basic_dt, this);
   }
   auto dt = basic_dt->token_->token_;
   if (!basic_dt->module_.empty() && cf_ != nullptr) {
@@ -692,7 +696,11 @@ void compiler::visit_del_stmt(del_stmt *obj) {
   }
   write_indent(body_);
   if (name.second.datatype_->is_an_array()) {
-    body_ << "yk__arrfree(" << name.first << ")";
+    if (name.second.datatype_->args_[0]->is_sm_entry()) {
+      body_ << "yk__shfree(" << name.first << ")";
+    } else {
+      body_ << "yk__arrfree(" << name.first << ")";
+    }
   } else if (name.second.is_primitive_or_obj() &&
              name.second.datatype_->is_str()) {
     body_ << "yk__sdsfree(" << name.first << ")";

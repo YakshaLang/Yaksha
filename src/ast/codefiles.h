@@ -2,6 +2,7 @@
 #ifndef CODEFILES_H
 #define CODEFILES_H
 #include "ast/ast.h"
+#include "compiler/entry_struct_compiler.h"
 #include "tokenizer/tokenizer.h"
 #include "utilities/ykdt_pool.h"
 #include <filesystem>
@@ -17,7 +18,8 @@ namespace yaksha {
     file_info *scan_main(const std::string &filename);
     file_info *scan(import_stmt *st);
     std::vector<file_info *> files_;
-    ykdt_pool pool_{};
+    ykdt_pool pool_;
+    entry_struct_compiler* esc_;
 
 private:
     file_data *parse(std::filesystem::path &fpath);

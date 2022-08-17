@@ -46,6 +46,10 @@ void ykdatatype::find_builtin_or_primitive() {
     builtin_type_ = ykbuiltin::CONSTANT;
   } else if (token_->token_ == "Ptr") {
     builtin_type_ = ykbuiltin::POINTER;
+  } else if (token_->token_ == "SMEntry") {
+    builtin_type_ = ykbuiltin::SM_ENTRY;
+  } else if (token_->token_ == "MEntry") {
+    builtin_type_ = ykbuiltin::M_ENTRY;
   }
 }
 ykdatatype::~ykdatatype() { delete (token_); }
@@ -157,4 +161,10 @@ bool ykdatatype::is_builtin_or_primitive() const {
 }
 bool ykdatatype::is_a_pointer() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::POINTER;
+}
+bool ykdatatype::is_m_entry() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::M_ENTRY;
+}
+bool ykdatatype::is_sm_entry() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::SM_ENTRY;
 }

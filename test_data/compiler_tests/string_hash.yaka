@@ -1,0 +1,12 @@
+def main() -> int:
+    m: Array[SMEntry[int]]
+    shnew(m)
+    shput(m, "hello", 42)
+    shput(m, "world", 10000)
+    print("hello = ")
+    println(shget(m, "hello"))
+    print("length of this map is = ")
+    println(len(m))
+    del m
+    println("bye!")
+    return 0

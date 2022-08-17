@@ -89,3 +89,7 @@ TEST_CASE("compiler: str unref and getref hacks!") {
   TEST_FILE("../test_data/compiler_tests/str_getref_unref.yaka", "str_getref_unref.yaka",
             "../test_data/compiler_tests/str_getref_unref.tokens");
 }
+TEST_CASE("compiler: test automatic generation for string hashes!") {
+  TEST_FILE("../test_data/compiler_tests/string_hash.yaka", "string_hash.yaka",
+            "../test_data/compiler_tests/string_hash.tokens");
+}

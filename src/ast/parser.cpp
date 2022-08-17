@@ -125,10 +125,11 @@ expr *parser::match_array_access(expr *name) {
 }
 expr *parser::primary() {
   if (match({token_type::KEYWORD_FALSE, token_type::KEYWORD_TRUE,
-             token_type::KEYWORD_NONE, token_type::DOUBLE_NUMBER, token_type::FLOAT_NUMBER,
-             token_type::INTEGER_DECIMAL, token_type::INTEGER_BIN,
-             token_type::INTEGER_OCT, token_type::INTEGER_HEX,
-             token_type::STRING, token_type::THREE_QUOTE_STRING})) {
+             token_type::KEYWORD_NONE, token_type::DOUBLE_NUMBER,
+             token_type::FLOAT_NUMBER, token_type::INTEGER_DECIMAL,
+             token_type::INTEGER_BIN, token_type::INTEGER_OCT,
+             token_type::INTEGER_HEX, token_type::STRING,
+             token_type::THREE_QUOTE_STRING})) {
     return pool_.c_literal_expr(previous());
   }
   if (match({token_type::NAME})) { return pool_.c_variable_expr(previous()); }
@@ -290,9 +291,7 @@ stmt *parser::declaration_statement() {
     if (match({token_type::EQ})) { exp = expression(); }
     consume_or_eof(token_type::NEW_LINE,
                    "Expect new line after value for variable declaration.");
-    if (dt->is_const()) {
-      return pool_.c_const_stmt(var_name, dt, exp);
-    }
+    if (dt->is_const()) { return pool_.c_const_stmt(var_name, dt, exp); }
     return pool_.c_let_stmt(var_name, dt, exp);
   } catch (parsing_error &err) {
     synchronize_parser();
@@ -438,10 +437,17 @@ ykdatatype *parser::parse_datatype() {
     } while (match({token_type::COMMA}));
     consume(token_type::SQUARE_BRACKET_CLOSE, "Must have a closing ']'");
   }
-  if (dt->is_an_array() || dt->is_a_pointer()) {
+  if (dt->is_an_array() || dt->is_a_pointer() || dt->is_const() ||
+      dt->is_sm_entry()) {
     if (dt->args_.size() != 1) {
-      throw error(dt->token_,
-                  "Array/Ptr must only have a single internal data type.");
+      throw error(
+          dt->token_,
+          "Array/Ptr/Const/SMEntry must only have a single data type arg.");
+    }
+  }
+  if (dt->is_m_entry()) {
+    if (dt->args_.size() != 2) {
+      throw error(dt->token_, "MEntry must only have a two data types args.");
     }
   }
   return dt;

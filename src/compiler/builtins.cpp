@@ -13,6 +13,9 @@ bool builtins::has_builtin(const std::string &name) {
   if (name == "charat") { return true; }
   if (name == "getref") { return true; }
   if (name == "unref") { return true; }
+  if (name == "shnew") { return true; }
+  if (name == "shput") { return true; }
+  if (name == "shget") { return true; }
   return false;
 }
 ykobject builtins::verify(const std::string &name,
@@ -21,6 +24,7 @@ ykobject builtins::verify(const std::string &name,
   if (name == "arrput" && args.size() == 2 &&
       args[0].datatype_->is_an_array() &&
       *(args[0].datatype_->args_[0]) == *args[1].datatype_) {
+    // verify arrput(Array[T], T)
     return o;
   } else if ((name == "print" || name == "println") && args.size() == 1 &&
              args[0].is_primitive_or_obj() &&
@@ -29,10 +33,11 @@ ykobject builtins::verify(const std::string &name,
   } else if (name == "len" && args.size() == 1 &&
              (args[0].datatype_->is_an_array() ||
               args[0].datatype_->is_str())) {
+    // verify len(Array[?])
     return ykobject(dt_pool_->create("int"));
   } else if (name == "arrpop" && args.size() == 1 &&
              args[0].datatype_->is_an_array()) {
-    // Array[x] << access this x
+    // arrpop(Array[T]) -> returns T
     return ykobject(args[0].datatype_->args_[0]);
   } else if (name == "charat" && args.size() == 2 &&
              args[0].datatype_->is_str() &&
@@ -42,10 +47,35 @@ ykobject builtins::verify(const std::string &name,
     ykdatatype *dt = dt_pool_->create("Ptr");
     dt->args_.emplace_back(args[0].datatype_);
     return ykobject(dt);
-  } else if (name == "unref" && args.size() == 1
-             && args[0].datatype_->is_a_pointer()) {
+  } else if (name == "unref" && args.size() == 1 &&
+             args[0].datatype_->is_a_pointer()) {
     // Ptr[x] << access this x
     return ykobject(args[0].datatype_->args_[0]);
+  } else if (name == "shnew" && args.size() == 1 &&
+             args[0].datatype_->is_an_array() &&
+             args[0].datatype_->args_[0]->is_sm_entry()) {
+    // shnew(Array[SMEntry[T]])
+    // Create a new string hash
+    return o;// None returned
+  } else if (name == "shget" && args.size() == 2 &&
+             args[0].datatype_->is_an_array() &&
+             args[0].datatype_->args_[0]->is_sm_entry() &&
+             args[1].datatype_->is_str()) {
+    // shget(Array[SMEntry[T]], str) -> T
+    return ykobject(args[0].datatype_->args_[0]->args_[0]);
+  } else if (name == "shgeti" && args.size() == 2 &&
+             args[0].datatype_->is_an_array() &&
+             args[0].datatype_->args_[0]->is_sm_entry() &&
+             args[1].datatype_->is_str()) {
+    // shgeti(Array[SMEntry[T]], str) -> int
+    return ykobject(dt_pool_->create("int"));
+  } else if (name == "shput" && args.size() == 3 &&
+             args[0].datatype_->is_an_array() &&
+             args[0].datatype_->args_[0]->is_sm_entry() &&
+             args[1].datatype_->is_str() &&
+             (*args[2].datatype_ == *args[0].datatype_->args_[0]->args_[0])) {
+    // shput(Array[SMEntry[T]], str, T) -> None
+    return o;
   }
   o.object_type_ = object_type::RUNTIME_ERROR;
   o.string_val_ = "Invalid arguments for builtin function";
@@ -88,6 +118,10 @@ builtins::compile(const std::string &name,
   } else if (name == "len") {
     if (args[0].second.datatype_->is_str()) {
       code << "yk__sdslen(" << args[0].first << ")";
+    } else if (args[0].second.datatype_->is_an_array()
+               && args[0].second.datatype_->args_[0]->is_sm_entry()) {
+      // Array[SMEntry[?]]
+      code << "yk__shlen(" << args[0].first << ")";
     } else {
       code << "yk__arrlen(" << args[0].first << ")";
     }
@@ -106,6 +140,17 @@ builtins::compile(const std::string &name,
   } else if (name == "unref") {
     code << "(*(" << args[0].first << "))";
     o = ykobject(args[0].second.datatype_->args_[0]);
+  } else if (name == "shnew") {
+    code << "yk__sh_new_strdup(" << args[0].first << ")";
+  } else if (name == "shget") {
+    code << "yk__shget(" << args[0].first << ", " << args[1].first << ")";
+    o = ykobject(args[0].second.datatype_->args_[0]->args_[0]);
+  } else if (name == "shget") {
+    code << "yk__shgeti(" << args[0].first << ", " << args[1].first << ")";
+    o = ykobject(dt_pool_->create("int"));
+  } else if (name == "shput") {
+    code << "yk__shput(" << args[0].first << ", " << args[1].first << ", "
+         << args[2].first << ")";
   }
   return {code.str(), o};
 }
