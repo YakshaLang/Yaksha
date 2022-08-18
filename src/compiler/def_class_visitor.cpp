@@ -34,10 +34,8 @@ void def_class_visitor::visit_def_stmt(def_stmt *obj) {
     error(obj->name_, "Critical!! Redefinition of global constant");
     return;
   }
-  if (obj->annotations_.varargs_ &&
-      (!obj->annotations_.native_macro_ && !obj->annotations_.native_define_)) {
-    error(obj->name_,
-          "@vararg must be used with @nativemacro or @nativedefine.");
+  if (obj->annotations_.varargs_ && !obj->annotations_.native_define_) {
+    error(obj->name_, "@varargs must be used with @nativedefine ");
     return;
   }
   if (obj->annotations_.varargs_ && obj->params_.size() <= 1) {
@@ -57,9 +55,10 @@ void def_class_visitor::visit_while_stmt(while_stmt *obj) {}
 void def_class_visitor::extract(const std::vector<stmt *> &statements) {
   for (auto st : statements) {
     auto statement_type = st->get_type();
-    if (statement_type == ast_type::STMT_DEF
-        || statement_type == ast_type::STMT_CLASS
-        || statement_type == ast_type::STMT_CONST || statement_type == ast_type::STMT_IMPORT) {
+    if (statement_type == ast_type::STMT_DEF ||
+        statement_type == ast_type::STMT_CLASS ||
+        statement_type == ast_type::STMT_CONST ||
+        statement_type == ast_type::STMT_IMPORT) {
       st->accept(this);
     } else {
       // TODO can we find out if there's a token for this statement type?
@@ -87,10 +86,12 @@ void def_class_visitor::visit_const_stmt(const_stmt *obj) {
     return;
   }
   if (obj->data_type_->args_.size() != 1) {
-    error(obj->name_, "Should be Const[x], only single data type can be specified");
+    error(obj->name_,
+          "Should be Const[x], only single data type can be specified");
     return;
   }
-  if (!obj->data_type_->args_[0]->is_a_number() && !obj->data_type_->args_[0]->is_bool()) {
+  if (!obj->data_type_->args_[0]->is_a_number() &&
+      !obj->data_type_->args_[0]->is_bool()) {
     error(obj->name_, "Only number and boolean constants are supported.");
     return;
   }
@@ -117,10 +118,13 @@ bool def_class_visitor::has_function(const std::string &prefixed_name) {
 void def_class_visitor::visit_class_stmt(class_stmt *obj) {
   auto name = obj->name_->token_;
   if (obj->annotations_.varargs_ || obj->annotations_.native_ ||
-      obj->annotations_.template_) {
-    error(obj->name_,
-          "@varargs, @native and @template are not allowed for classes.");
+      obj->annotations_.template_ || obj->annotations_.native_macro_) {
+    error(obj->name_, "@varargs, @native, @nativemacro and @template are not "
+                      "allowed for classes.");
     return;
+  }
+  if (obj->annotations_.dot_access_ && !obj->annotations_.native_define_) {
+    error(obj->name_, "@dotaccess must be used with @nativedefine");
   }
   if (obj->annotations_.native_define_ &&
       obj->annotations_.native_define_arg_.empty()) {

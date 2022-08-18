@@ -97,3 +97,7 @@ TEST_CASE("compiler: Test return calls a function with defer deleted stuff !") {
   TEST_FILE("../test_data/compiler_tests/defer_return.yaka", "defer_return.yaka",
             "../test_data/compiler_tests/defer_return.tokens");
 }
+TEST_CASE("compiler: All @native stuff !") {
+  TEST_FILE("../test_data/compiler_tests/native_function_type_tests.yaka", "native_function_type_tests.yaka",
+            "../test_data/compiler_tests/native_function_type_tests.tokens");
+}

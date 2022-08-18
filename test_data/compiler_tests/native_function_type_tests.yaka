@@ -1,0 +1,39 @@
+@native("getarg")
+def get_arg(n: int) -> str:
+    pass
+
+@native
+def get_global_arg(n: int) -> str:
+    ccode "yk__sdsdup(global_args[yy__n])"
+
+@nativemacro
+def min_int(a: int, b:int) -> int:
+    ccode "((nn__a < nn__b) ? nn__a : nn__b)"
+
+@nativemacro("((nn__a > nn__b) ? nn__a : nn__b)")
+def max_int(a: int, b:int) -> int:
+    pass
+
+@nativedefine("banana")
+def banana(a: int, b: int, c:int) -> int:
+    pass
+
+@nativedefine("something")
+class Something:
+    something_id: int
+
+@nativedefine("Color")
+@dotaccess
+class Color:
+    r: int
+    g: int
+    b: int
+
+@nativedefine("yk__newsdsarray")
+@varargs
+def new(count: int, s: str) -> Array[str]:
+    pass
+
+def main() -> int:
+    println("hello world")
+    return 0
