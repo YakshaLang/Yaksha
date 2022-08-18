@@ -85,11 +85,15 @@ TEST_CASE("compiler: Do not copy str for getref") {
   TEST_FILE("../test_data/compiler_tests/do_not_copy_str_getref.yaka", "do_not_copy_str_getref.yaka",
             "../test_data/compiler_tests/do_not_copy_str_getref.tokens");
 }
-TEST_CASE("compiler: str unref and getref hacks!") {
+TEST_CASE("compiler: Str unref and getref hacks!") {
   TEST_FILE("../test_data/compiler_tests/str_getref_unref.yaka", "str_getref_unref.yaka",
             "../test_data/compiler_tests/str_getref_unref.tokens");
 }
-TEST_CASE("compiler: test automatic generation for string hashes!") {
+TEST_CASE("compiler: Test automatic generation for string hashes!") {
   TEST_FILE("../test_data/compiler_tests/string_hash.yaka", "string_hash.yaka",
             "../test_data/compiler_tests/string_hash.tokens");
+}
+TEST_CASE("compiler: Test return calls a function with defer deleted stuff !") {
+  TEST_FILE("../test_data/compiler_tests/defer_return.yaka", "defer_return.yaka",
+            "../test_data/compiler_tests/defer_return.tokens");
 }

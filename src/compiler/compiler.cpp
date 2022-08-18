@@ -478,10 +478,22 @@ void compiler::visit_return_stmt(return_stmt *obj) {
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto rhs = pop();
+    std::string return_val = rhs.first;
+    // Literals are safe to return as it is
+    if (obj->expression_->get_type() != ast_type::EXPR_LITERAL) {
+      // First we assign return value to a temp variable
+      std::string temp_name = temp();
+      write_indent(body_);
+      body_ << convert_dt(rhs.second.datatype_) << " " << temp_name << " = " << rhs.first;
+      write_end_statement(body_);
+      return_val = temp_name;
+    }
+    // Do the deletions, defers
     defers_.write(this);
     deletions_.write(body_, indent_, rhs.first);
+    // Now we return the temp value
     write_indent(body_);
-    body_ << "return " << rhs.first;
+    body_ << "return " << return_val;
     write_end_statement(body_);
   } else {
     defers_.write(this);

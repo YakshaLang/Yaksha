@@ -1,0 +1,15 @@
+class B:
+    a: int
+
+def f2(b: B) -> int:
+    return b.a
+
+def f1() -> int:
+    b: B = B()
+    b.a = 4
+    defer del b
+    return f2(b)
+
+def main() -> int:
+    println(f1())
+    return 0
