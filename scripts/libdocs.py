@@ -13,7 +13,7 @@ SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 BIN_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "bin")
 LIBS_DIR = os.path.abspath(os.path.join(os.path.dirname(SCRIPT_DIR), "libs"))
 DUMPER = os.path.join(BIN_DIR, "yakshadmp")
-MAX_EXECUTION_TIME_SEC = 3
+MAX_EXECUTION_TIME_SEC = 30
 OUTPUT_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "comp_output_test", "docs")
 
 
@@ -225,6 +225,7 @@ def main():
     files = []
     # Scan
     for mod_full_filepath in glob.glob(os.path.join(LIBS_DIR, '**', '*.yaka'), recursive=True):
+        print("!!!<!-- parsing", Colors.cyan(mod_full_filepath), "-->")
         yaksha_mod = as_full_mod(mod_full_filepath.replace(LIBS_DIR, "")[1:])
         sout, serr, ret = execute(DUMPER + " \"" + mod_full_filepath + "\"")
         if ret != 0:
@@ -246,7 +247,7 @@ def main():
     for yaksha_mod, mod_full_filepath in files:
         print(Colors.cyan("## ") + Colors.blue(yaksha_mod))
         print("---")
-        print("```")
+        print("```yaksha")
         for f in structures[yaksha_mod]["global_consts"]:
             buf = Buf()
             display_param(buf, f)
