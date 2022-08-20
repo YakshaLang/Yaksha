@@ -72,7 +72,7 @@ public class YakshaPsiImplUtil {
 
             @Override
             public Icon getIcon(boolean unused) {
-                return YakshaIcons.D;
+                return YakshaIcons.DEF;
             }
         };
     }
@@ -148,7 +148,7 @@ public class YakshaPsiImplUtil {
 
             @Override
             public Icon getIcon(boolean unused) {
-                return YakshaIcons.C;
+                return YakshaIcons.CLASS;
             }
         };
     }
@@ -260,7 +260,7 @@ public class YakshaPsiImplUtil {
 
             @Override
             public Icon getIcon(boolean unused) {
-                return YakshaIcons.I;
+                return YakshaIcons.IMPORT;
             }
         };
     }
@@ -303,7 +303,7 @@ public class YakshaPsiImplUtil {
 
             @Override
             public Icon getIcon(boolean unused) {
-                return YakshaIcons.E;
+                return YakshaIcons.CONSTANT;
             }
         };
     }

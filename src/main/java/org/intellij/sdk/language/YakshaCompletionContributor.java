@@ -5,11 +5,141 @@ import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
+import org.intellij.sdk.language.psi.YakshaImportStatement;
+import org.intellij.sdk.language.yaksha_docs.Loader;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class YakshaCompletionContributor extends CompletionContributor {
+    public YakshaCompletionContributor() {
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(),
+                new CompletionProvider<>() {
+                    public void addCompletions(@NotNull CompletionParameters parameters,
+                                               @NotNull ProcessingContext context,
+                                               @NotNull CompletionResultSet resultSet) {
+                        boolean filled = false;
+                        /*
+                         * Provide from docs.json
+                         */
+                        try {
+                            if (parameters.getPosition().getPrevSibling().getPrevSibling().getPrevSibling() == null &&
+                                    parameters.getPosition().getPrevSibling().toString().equals("PsiElement(YakshaTokenType.OPERATOR_DOT)")) {
+                                // 1) Find what is my identifier
+                                final String ident = parameters.getPosition().getPrevSibling().getPrevSibling().getText();
+                                // 2) Find all my imports, match with identifier
+                                YakshaImportStatement whichImport = null;
+                                List<YakshaImportStatement> imps = ExtractUtils.getChildrenOfTypeAsList(parameters.getOriginalFile(), YakshaImportStatement.class);
+                                for (YakshaImportStatement i : imps) {
+                                    if (ident.equals(i.getName())) {
+                                        // Found the import
+                                        whichImport = i;
+                                        break;
+                                    }
+                                }
+                                // 2) Based on my import match with Loader.INSTANCE.doc fill it now
+                                if (whichImport != null) {
+                                    filled = Loader.INSTANCE.fillTo(resultSet, whichImport.getImportPath());
+                                }
+
+                            }
+                        } catch (Exception ignored) {
+                        }
+
+                        if (filled) {
+                            return;
+                        }
+                        /*
+                         * Provide standard lib imports
+                         */
+
+                        // Imports
+                        try {
+                            if (parameters.getPosition().getPrevSibling() == null ||
+                                    String.valueOf(parameters.getPosition().getPrevSibling().getFirstChild()).equals("YakshaImportStatementImpl(IMPORT_STATEMENT)")) {
+                                for (final String imp : IMPORTS) {
+                                    resultSet.addElement(
+                                            LookupElementBuilder.create(imp).withIcon(YakshaIcons.IMPORT)
+                                    );
+                                }
+                            }
+                        } catch (Exception ignored) {
+                        }
+
+
+                        /*
+                         * Provide keywords
+                         */
+                        resultSet.addElement(LookupElementBuilder.create("import").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("as").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("def").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("class").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("ccode").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("if").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("else").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("while").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("break").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("continue").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("del").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("defer").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("return").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("pass").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("True").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("False").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("None").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("and").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("not").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("or").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("@native").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("@nativedefine").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("@nativemacro").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("@varargs").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("@dotaccess").withIcon(YakshaIcons.KEYWORD));
+
+                        resultSet.addElement(LookupElementBuilder.create("Array").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("SMEntry").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("MEntry").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("int").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("i8").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("i16").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("i32").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("i64").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("u8").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("u16").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("u32").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("u64").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("str").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("float").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("bool").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("f32").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("f64").withIcon(YakshaIcons.DATA_TYPE));
+
+                        resultSet.addElement(LookupElementBuilder.create("print").withIcon(YakshaIcons.BUILT_IN).withTypeText("Print without a new line"));
+                        resultSet.addElement(LookupElementBuilder.create("println").withIcon(YakshaIcons.BUILT_IN).withTypeText("Print + new line"));
+                        resultSet.addElement(LookupElementBuilder.create("len").withIcon(YakshaIcons.BUILT_IN).withTypeText("Get length of arrays,maps"));
+                        resultSet.addElement(LookupElementBuilder.create("sizeof").withIcon(YakshaIcons.BUILT_IN).withTypeText("Size of structures or C data types"));
+                        resultSet.addElement(LookupElementBuilder.create("tostr").withIcon(YakshaIcons.BUILT_IN).withTypeText("If it is a string, copy is created. Floats are converted to 2 decimal places"));
+                        resultSet.addElement(LookupElementBuilder.create("arrput").withIcon(YakshaIcons.BUILT_IN).withTypeText("Put item to an array"));
+                        resultSet.addElement(LookupElementBuilder.create("arrpop").withIcon(YakshaIcons.BUILT_IN).withTypeText("Remove last item from an array and return it"));
+                        resultSet.addElement(LookupElementBuilder.create("getref").withIcon(YakshaIcons.BUILT_IN).withTypeText("Get a pointer to given object"));
+                        resultSet.addElement(LookupElementBuilder.create("unref").withIcon(YakshaIcons.BUILT_IN).withTypeText("Dereference a pointer"));
+                        resultSet.addElement(LookupElementBuilder.create("charat").withIcon(YakshaIcons.BUILT_IN).withTypeText("Get a character at a specific location in string"));
+                        resultSet.addElement(LookupElementBuilder.create("shnew").withIcon(YakshaIcons.BUILT_IN).withTypeText("Initialize Array[SMEntry[T]] object"));
+                        resultSet.addElement(LookupElementBuilder.create("shput").withIcon(YakshaIcons.BUILT_IN).withTypeText("Put item to a Array[SMEntry[T]]"));
+                        resultSet.addElement(LookupElementBuilder.create("shget").withIcon(YakshaIcons.BUILT_IN).withTypeText("Get item from a Array[SMEntry[T]]"));
+                        resultSet.addElement(LookupElementBuilder.create("shgeti").withIcon(YakshaIcons.BUILT_IN).withTypeText("Get item index from a Array[SMEntry[T]] (-1 if not found)"));
+                        resultSet.addElement(LookupElementBuilder.create("hmnew").withIcon(YakshaIcons.BUILT_IN).withTypeText("Initialize Array[MEntry[T]] object"));
+                        resultSet.addElement(LookupElementBuilder.create("hmput").withIcon(YakshaIcons.BUILT_IN).withTypeText("Put item to a Array[MEntry[T]]"));
+                        resultSet.addElement(LookupElementBuilder.create("hmget").withIcon(YakshaIcons.BUILT_IN).withTypeText("Get item from a Array[MEntry[T]]"));
+                        resultSet.addElement(LookupElementBuilder.create("hmgeti").withIcon(YakshaIcons.BUILT_IN).withTypeText("Get item index from a Array[MEntry[T]] (-1 if not found)"));
+                        resultSet.addElement(LookupElementBuilder.create("reverse").withIcon(YakshaIcons.BUILT_IN).withTypeText("Reverse an array creating a new array. New array need to be deleted"));
+                        resultSet.addElement(LookupElementBuilder.create("sorted").withIcon(YakshaIcons.BUILT_IN).withTypeText("Sort an array creating a new array. New array need to be deleted"));
+                        resultSet.addElement(LookupElementBuilder.create("format").withIcon(YakshaIcons.BUILT_IN).withTypeText("String formatting"));
+
+                    }
+                });
+    }
+
 
     private static final List<String> IMPORTS = ImmutableList.<String>builder()
             .add("import libs.strings.array as sarr")
@@ -39,25 +169,4 @@ public class YakshaCompletionContributor extends CompletionContributor {
             .add("import raylib.math")
             .add("import raylib.utils")
             .build();
-
-    public YakshaCompletionContributor() {
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(),
-                new CompletionProvider<>() {
-                    public void addCompletions(@NotNull CompletionParameters parameters,
-                                               @NotNull ProcessingContext context,
-                                               @NotNull CompletionResultSet resultSet) {
-                        try {
-                            if (String.valueOf(parameters.getPosition().getPrevSibling().getFirstChild()).equals("YakshaImportStatementImpl(IMPORT_STATEMENT)")) {
-                                for (final String imp : IMPORTS) {
-                                    resultSet.addElement(
-                                            LookupElementBuilder.create(imp).withIcon(YakshaIcons.YK)
-                                    );
-                                }
-                            }
-                        } catch (NullPointerException ignored) {}
-                    }
-                }
-        );
-    }
-
 }

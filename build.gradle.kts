@@ -26,6 +26,7 @@ repositories {
 
 dependencies {
     implementation("com.google.guava:guava:31.1-jre")
+    implementation("com.google.code.gson:gson:2.9.1")
 }
 
 // Set the JVM language level used to compile sources and generate files - Java 11 is required since 2020.3

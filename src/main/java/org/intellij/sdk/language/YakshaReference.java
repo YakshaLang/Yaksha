@@ -51,7 +51,7 @@ public class YakshaReference extends PsiReferenceBase<PsiElement> implements Psi
     for (final YakshaDefStatement st : defs) {
       if (st.getName() != null && st.getName().length() > 0) {
         variants.add(LookupElementBuilder
-                .create(st).withIcon(YakshaIcons.D)
+                .create(st).withIcon(YakshaIcons.DEF)
                 .withTypeText(st.getContainingFile().getName())
         );
       }
@@ -62,7 +62,7 @@ public class YakshaReference extends PsiReferenceBase<PsiElement> implements Psi
     for (final YakshaClassStatement st : classes) {
       if (st.getName() != null && st.getName().length() > 0) {
         variants.add(LookupElementBuilder
-                .create(st).withIcon(YakshaIcons.C)
+                .create(st).withIcon(YakshaIcons.CLASS)
                 .withTypeText(st.getContainingFile().getName())
         );
       }
