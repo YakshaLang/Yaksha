@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 2048 2048">
+	<circle fill-opacity="0.6" r="896" cx="1024" cy="1024" fill="#ff2227" style="stroke: rgb(238, 51, 219); stroke-width: 128px; stroke-opacity: 1;"></circle>
+	<g transform="scale(0.75)"><path fill-opacity="0.7" transform="translate(675.84, 2211.36) rotate(180) scale(-1, 1)" fill="#ffffff" d="M1073 53q-77 -41 -158 -61.5t-172 -20.5q-287 0 -445.5 203t-158.5 571q0 366 159.5 570.5t444.5 204.5q91 0 172 -20.5t158 -61.5v-207q-74 61 -159 93t-171 32q-197 0 -295 -152t-98 -459q0 -306 98 -458t295 -152q88 0 172.5 32t157.5 93v-207z"></path></g>
+</svg>

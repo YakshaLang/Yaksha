@@ -11,6 +11,8 @@
   elementTypeHolderClass="org.intellij.sdk.language.psi.YakshaTypes"
   elementTypeClass="org.intellij.sdk.language.psi.YakshaElementType"
   tokenTypeClass="org.intellij.sdk.language.psi.YakshaTokenType"
+
+  psiImplUtilClass="org.intellij.sdk.language.psi.impl.YakshaPsiImplUtil"
 }
 
 yakshaFile ::= item_*
@@ -21,14 +23,22 @@ empty_line ::= S? NL
 
 outer_statement ::= import_statement | const_statement | annotation* class_statement | annotation* def_statement
 
-import_statement ::= KW_IMPORT S IDENTIFIER (OPERATOR_DOT IDENTIFIER)* (S KW_AS S IDENTIFIER)? S? NL
+import_statement ::= KW_IMPORT S IDENTIFIER (OPERATOR_DOT IDENTIFIER)* (S KW_AS S IDENTIFIER)? S? NL {methods=[getImportPath getName]}
 const_statement ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? literal S? NL
 literal ::= NUMBER
 
-class_statement ::= KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? NL class_bits+
+class_statement ::= KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? NL class_bits+ {
+    mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
+    implements="org.intellij.sdk.language.psi.YakshaNamedElement"
+    methods=[getName setName getNameIdentifier getPresentation]
+}
 class_bits ::= pass_statement | COMMENT | empty_line | I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL
 
-def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON NL def_bits+
+def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON NL def_bits+ {
+    mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
+    implements="org.intellij.sdk.language.psi.YakshaNamedElement"
+    methods=[getName setName getNameIdentifier getPresentation]
+}
 def_params ::= def_param (S? OPERATOR_COMMA S? def_param)*
 def_param ::= IDENTIFIER S? OPERATOR_COLON S? data_type
 def_bits ::= pass_statement | ccode_statement | if_statement | else_statement | while_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | COMMENT
@@ -46,7 +56,7 @@ continue_statement ::= I KW_CONTINUE S? NL
 break_statement ::= I KW_BREAK S? NL
 ccode_statement ::= I KW_CCODE S? STRING S? NL
 del_statement ::= I KW_DEL  S? exp NL
-return_statement ::= I KW_RETURN S? exp NL
+return_statement ::= I KW_RETURN (S? exp)? NL
 defer_statement ::= I KW_DEFER S? KW_DEL? S? exp NL
 expr_statement ::= I exp S? NL
 assignment_statement ::= I identifier_exp S? OPERATOR_EQ S? exp S? NL
@@ -61,7 +71,7 @@ comparison ::= term (S? OPERATOR_COMPARISON S? term)* | term
 term ::= factor (S? (OPERATOR_MINUS | OPERATOR_PLUS) S? factor)* | factor
 factor ::= unary (S? (OPERATOR_MUL | OPERATOR_DIV) S? unary)* | unary
 unary ::= OPERATOR_MINUS S? exp | fncall | primary
-fncall ::= identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB )
+fncall ::= identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB ) {methods=[getDefOrClassName]}
 primary ::= KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | identifier_exp | paren_exp
 paren_exp ::= OPERATOR_OPEN_P S? exp S? OPERATOR_CLOSE_P
 arguments ::= exp (S? OPERATOR_COMMA S? exp)*

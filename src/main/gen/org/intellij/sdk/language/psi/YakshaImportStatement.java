@@ -7,4 +7,8 @@ import com.intellij.psi.PsiElement;
 
 public interface YakshaImportStatement extends PsiElement {
 
+  String getImportPath();
+
+  String getName();
+
 }

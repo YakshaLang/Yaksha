@@ -16,4 +16,6 @@ public interface YakshaFncall extends PsiElement {
   @NotNull
   YakshaIdentifierExp getIdentifierExp();
 
+  String getDefOrClassName();
+
 }

@@ -20,8 +20,22 @@
         <lang.syntaxHighlighterFactory
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaSyntaxHighlighterFactory"/>
-<!--        <colorSettingsPage-->
-<!--                implementation="org.intellij.sdk.language.YakshaColorSettingsPage"/>-->
+        <colorSettingsPage
+                implementation="org.intellij.sdk.language.YakshaColorSettingsPage"/>
+        <completion.contributor
+                language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaCompletionContributor"/>
+        <psi.referenceContributor language="Yaksha"
+                                  implementation="org.intellij.sdk.language.YakshaReferenceContributor"/>
+        <lang.findUsagesProvider
+                language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaFindUsagesProvider"/>
+        <gotoSymbolContributor
+                implementation="org.intellij.sdk.language.YakshaChooseByNameContributor"/>
+        <lang.commenter
+                language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaCommenter"/>
+
     </extensions>
 
 </idea-plugin>

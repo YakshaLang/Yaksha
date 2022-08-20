@@ -28,9 +28,9 @@ public class YakshaReturnStatementImpl extends ASTWrapperPsiElement implements Y
   }
 
   @Override
-  @NotNull
+  @Nullable
   public YakshaExp getExp() {
-    return findNotNullChildByClass(YakshaExp.class);
+    return findChildByClass(YakshaExp.class);
   }
 
 }

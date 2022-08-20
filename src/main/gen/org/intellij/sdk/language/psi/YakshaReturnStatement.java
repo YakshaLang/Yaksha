@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface YakshaReturnStatement extends PsiElement {
 
-  @NotNull
+  @Nullable
   YakshaExp getExp();
 
 }

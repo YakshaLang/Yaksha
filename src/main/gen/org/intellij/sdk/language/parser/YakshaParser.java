@@ -1707,7 +1707,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I KW_RETURN S? exp NL
+  // I KW_RETURN (S? exp)? NL
   public static boolean return_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -1715,15 +1715,32 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, I, KW_RETURN);
     r = r && return_statement_2(b, l + 1);
-    r = r && exp(b, l + 1);
     r = r && consumeToken(b, NL);
     exit_section_(b, m, RETURN_STATEMENT, r);
     return r;
   }
 
-  // S?
+  // (S? exp)?
   private static boolean return_statement_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_statement_2")) return false;
+    return_statement_2_0(b, l + 1);
+    return true;
+  }
+
+  // S? exp
+  private static boolean return_statement_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_statement_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = return_statement_2_0_0(b, l + 1);
+    r = r && exp(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean return_statement_2_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_statement_2_0_0")) return false;
     consumeToken(b, S);
     return true;
   }

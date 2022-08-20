@@ -45,4 +45,9 @@ public class YakshaFncallImpl extends ASTWrapperPsiElement implements YakshaFnca
     return findNotNullChildByClass(YakshaIdentifierExp.class);
   }
 
+  @Override
+  public String getDefOrClassName() {
+    return YakshaPsiImplUtil.getDefOrClassName(this);
+  }
+
 }

@@ -27,4 +27,14 @@ public class YakshaImportStatementImpl extends ASTWrapperPsiElement implements Y
     else super.accept(visitor);
   }
 
+  @Override
+  public String getImportPath() {
+    return YakshaPsiImplUtil.getImportPath(this);
+  }
+
+  @Override
+  public String getName() {
+    return YakshaPsiImplUtil.getName(this);
+  }
+
 }
