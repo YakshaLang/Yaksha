@@ -11,14 +11,14 @@ import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
 
-public class YakshaClassBitsImpl extends ASTWrapperPsiElement implements YakshaClassBits {
+public class YakshaClassFieldImpl extends ASTWrapperPsiElement implements YakshaClassField {
 
-  public YakshaClassBitsImpl(@NotNull ASTNode node) {
+  public YakshaClassFieldImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YakshaVisitor visitor) {
-    visitor.visitClassBits(this);
+    visitor.visitClassField(this);
   }
 
   @Override
@@ -28,21 +28,9 @@ public class YakshaClassBitsImpl extends ASTWrapperPsiElement implements YakshaC
   }
 
   @Override
-  @Nullable
-  public YakshaClassField getClassField() {
-    return findChildByClass(YakshaClassField.class);
-  }
-
-  @Override
-  @Nullable
-  public YakshaEmptyLine getEmptyLine() {
-    return findChildByClass(YakshaEmptyLine.class);
-  }
-
-  @Override
-  @Nullable
-  public YakshaPassStatement getPassStatement() {
-    return findChildByClass(YakshaPassStatement.class);
+  @NotNull
+  public YakshaDataType getDataType() {
+    return findNotNullChildByClass(YakshaDataType.class);
   }
 
 }

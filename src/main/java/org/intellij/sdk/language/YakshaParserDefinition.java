@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class YakshaParserDefinition implements ParserDefinition {
 
   public static final TokenSet COMMENTS = TokenSet.create(YakshaTypes.COMMENT);
+  public static final TokenSet STRINGS = TokenSet.create(YakshaTypes.STRING);
 
   public static final IFileElementType FILE = new IFileElementType(YakshaLanguage.INSTANCE);
 
@@ -36,7 +37,7 @@ public class YakshaParserDefinition implements ParserDefinition {
   @NotNull
   @Override
   public TokenSet getStringLiteralElements() {
-    return TokenSet.EMPTY;
+    return STRINGS;
   }
 
   @NotNull

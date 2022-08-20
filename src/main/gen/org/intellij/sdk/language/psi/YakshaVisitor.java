@@ -35,6 +35,10 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitClassField(@NotNull YakshaClassField o) {
+    visitPsiElement(o);
+  }
+
   public void visitClassStatement(@NotNull YakshaClassStatement o) {
     visitNamedElement(o);
   }
@@ -44,7 +48,7 @@ public class YakshaVisitor extends PsiElementVisitor {
   }
 
   public void visitConstStatement(@NotNull YakshaConstStatement o) {
-    visitPsiElement(o);
+    visitNamedElement(o);
   }
 
   public void visitContinueStatement(@NotNull YakshaContinueStatement o) {
@@ -124,7 +128,7 @@ public class YakshaVisitor extends PsiElementVisitor {
   }
 
   public void visitImportStatement(@NotNull YakshaImportStatement o) {
-    visitPsiElement(o);
+    visitNamedElement(o);
   }
 
   public void visitLetStatement(@NotNull YakshaLetStatement o) {

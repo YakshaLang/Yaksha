@@ -17,9 +17,9 @@ public class YakshaFindUsagesProvider implements FindUsagesProvider {
   @Override
   public WordsScanner getWordsScanner() {
     return new DefaultWordsScanner(new YakshaLexerAdapter(),
-            TokenSet.create(YakshaTypes.IDENTIFIER_EXP, YakshaTypes.DATA_TYPE_IDENTIFIER),
+            TokenSet.create(YakshaTypes.IDENTIFIER),
             TokenSet.create(YakshaTypes.COMMENT),
-            TokenSet.create(YakshaTypes.DEF_STATEMENT, YakshaTypes.IMPORT_STATEMENT, YakshaTypes.CLASS_STATEMENT),
+            TokenSet.create(YakshaTypes.STRING, YakshaTypes.NUMBER),
             TokenSet.EMPTY);
   }
 

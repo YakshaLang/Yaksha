@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.sdk.language.psi.YakshaTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
+import com.intellij.navigation.ItemPresentation;
 
-public class YakshaConstStatementImpl extends ASTWrapperPsiElement implements YakshaConstStatement {
+public class YakshaConstStatementImpl extends YakshaNamedElementImpl implements YakshaConstStatement {
 
   public YakshaConstStatementImpl(@NotNull ASTNode node) {
     super(node);
@@ -37,6 +37,26 @@ public class YakshaConstStatementImpl extends ASTWrapperPsiElement implements Ya
   @NotNull
   public YakshaLiteral getLiteral() {
     return findNotNullChildByClass(YakshaLiteral.class);
+  }
+
+  @Override
+  public String getName() {
+    return YakshaPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public PsiElement setName(String newName) {
+    return YakshaPsiImplUtil.setName(this, newName);
+  }
+
+  @Override
+  public PsiElement getNameIdentifier() {
+    return YakshaPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
+  public ItemPresentation getPresentation() {
+    return YakshaPsiImplUtil.getPresentation(this);
   }
 
 }

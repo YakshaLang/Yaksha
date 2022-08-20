@@ -7,6 +7,7 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.intellij.sdk.language.psi.YakshaClassStatement;
+import org.intellij.sdk.language.psi.YakshaConstStatement;
 import org.intellij.sdk.language.psi.YakshaDefStatement;
 import org.intellij.sdk.language.psi.YakshaFile;
 
@@ -77,6 +78,41 @@ public class YakshaUtil {
             YakshaFile yakaFile = (YakshaFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (yakaFile != null) {
                 YakshaDefStatement[] statements = ExtractUtils.getChildrenOfType(yakaFile, YakshaDefStatement.class);
+                if (statements != null) {
+                    Collections.addAll(result, statements);
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public static List<YakshaConstStatement> findConsts(Project project, String key) {
+        List<YakshaConstStatement> result = new ArrayList<>();
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(YakaFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        for (VirtualFile virtualFile : virtualFiles) {
+            YakshaFile yakaFile = (YakshaFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (yakaFile != null) {
+                YakshaConstStatement[] statements = ExtractUtils.getChildrenOfType(yakaFile, YakshaConstStatement.class);
+                if (statements != null) {
+                    for (YakshaConstStatement statement : statements) {
+                        if (key.equals(statement.getName())) {
+                            result.add(statement);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<YakshaConstStatement> findConsts(Project project) {
+        List<YakshaConstStatement> result = new ArrayList<>();
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(YakaFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        for (VirtualFile virtualFile : virtualFiles) {
+            YakshaFile yakaFile = (YakshaFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (yakaFile != null) {
+                YakshaConstStatement[] statements = ExtractUtils.getChildrenOfType(yakaFile, YakshaConstStatement.class);
                 if (statements != null) {
                     Collections.addAll(result, statements);
                 }

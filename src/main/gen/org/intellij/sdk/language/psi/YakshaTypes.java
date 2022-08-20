@@ -15,6 +15,7 @@ public interface YakshaTypes {
   IElementType BREAK_STATEMENT = new YakshaElementType("BREAK_STATEMENT");
   IElementType CCODE_STATEMENT = new YakshaElementType("CCODE_STATEMENT");
   IElementType CLASS_BITS = new YakshaElementType("CLASS_BITS");
+  IElementType CLASS_FIELD = new YakshaElementType("CLASS_FIELD");
   IElementType CLASS_STATEMENT = new YakshaElementType("CLASS_STATEMENT");
   IElementType COMPARISON = new YakshaElementType("COMPARISON");
   IElementType CONST_STATEMENT = new YakshaElementType("CONST_STATEMENT");
@@ -120,6 +121,9 @@ public interface YakshaTypes {
       }
       else if (type == CLASS_BITS) {
         return new YakshaClassBitsImpl(node);
+      }
+      else if (type == CLASS_FIELD) {
+        return new YakshaClassFieldImpl(node);
       }
       else if (type == CLASS_STATEMENT) {
         return new YakshaClassStatementImpl(node);

@@ -15,9 +15,7 @@ public interface YakshaClassStatement extends YakshaNamedElement {
 
   PsiElement setName(String newName);
 
-  //WARNING: getNameIdentifier(...) is skipped
-  //matching getNameIdentifier(YakshaClassStatement, ...)
-  //methods are not found in YakshaPsiImplUtil
+  PsiElement getNameIdentifier();
 
   ItemPresentation getPresentation();
 

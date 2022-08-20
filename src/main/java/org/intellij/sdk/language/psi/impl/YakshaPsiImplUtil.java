@@ -6,10 +6,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.intellij.sdk.language.YakshaIcons;
 import org.intellij.sdk.language.psi.*;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
 import java.util.LinkedList;
+import java.util.List;
 
 public class YakshaPsiImplUtil {
 
@@ -35,10 +37,30 @@ public class YakshaPsiImplUtil {
 
     public static ItemPresentation getPresentation(final YakshaDefStatement element) {
         return new ItemPresentation() {
-            @Nullable
             @Override
-            public String getPresentableText() {
-                return element.getName();
+            public @NotNull String getPresentableText() {
+                final StringBuilder def = new StringBuilder();
+                def.append(element.getName()).append("(");
+                final YakshaDefParams params = element.getDefParams();
+                if (params != null && params.getDefParamList() != null) {
+                    boolean first = true;
+                    for (YakshaDefParam param : params.getDefParamList()) {
+                        ASTNode ident = param.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+                        if (ident != null && param.getDataType() != null) {
+                            if (first) {
+                                first = false;
+                            } else {
+                                def.append(", ");
+                            }
+                            def.append(ident.getText()).append(": ").append(param.getDataType().getText());
+                        }
+                    }
+                }
+                def.append(") -> ");
+                if (element.getDataType() != null) {
+                    def.append(element.getDataType().getText());
+                }
+                return def.toString();
             }
 
             @Nullable
@@ -88,7 +110,33 @@ public class YakshaPsiImplUtil {
             @Nullable
             @Override
             public String getPresentableText() {
-                return element.getName();
+                final StringBuilder classStruct = new StringBuilder();
+                boolean fieldFound = false;
+                boolean first = true;
+                classStruct.append(element.getName()).append(" { ");
+                final List<YakshaClassBits> bits = element.getClassBitsList();
+                if (bits != null) {
+                    for (YakshaClassBits bit : bits) {
+                        final YakshaClassField field = bit.getClassField();
+                        if (field != null) {
+                            ASTNode ident = field.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+                            if (ident != null && field.getDataType() != null) {
+                                fieldFound = true;
+                                if (first) {
+                                    first = false;
+                                } else {
+                                    classStruct.append(", ");
+                                }
+                                classStruct.append(ident.getText()).append(": ").append(field.getDataType().getText());
+                            }
+                        }
+                    }
+                }
+                classStruct.append(" }");
+                if (!fieldFound) {
+                    return element.getName();
+                }
+                return classStruct.toString();
             }
 
             @Nullable
@@ -105,7 +153,7 @@ public class YakshaPsiImplUtil {
         };
     }
 
-    public static PsiElement getNameIdentifier(final YakshaImportStatement statement) {
+    public static PsiElement getNameIdentifier(final YakshaClassStatement statement) {
         ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
         if (nameNode != null) {
             return nameNode.getPsi();
@@ -147,7 +195,7 @@ public class YakshaPsiImplUtil {
             return null;
         }
         if (kwAS != null) {
-            identifiers.pop();
+            identifiers.removeLast();
         }
         StringBuilder sb = new StringBuilder();
         boolean first = true;
@@ -172,6 +220,99 @@ public class YakshaPsiImplUtil {
         if (identifiers.isEmpty()) {
             return null;
         }
-        return identifiers.pop().getText();
+        return identifiers.getLast().getText();
+    }
+
+    public static PsiElement setName(final YakshaImportStatement statement, String newName) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+
+        }
+        return statement;
+    }
+    public static PsiElement getNameIdentifier(final YakshaImportStatement statement) {
+        final LinkedList<ASTNode> identifiers = new LinkedList<>();
+        for (ASTNode element = statement.getNode().getFirstChildNode(); element != null; element = element.getTreeNext()) {
+            if (element.getElementType() == YakshaTypes.IDENTIFIER) {
+                identifiers.add(element);
+            }
+        }
+        if (identifiers.isEmpty()) {
+            return null;
+        }
+        return identifiers.getLast().getPsi();
+    }
+
+    public static ItemPresentation getPresentation(final YakshaImportStatement element) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return element.getName() + " <-- " + element.getImportPath();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                PsiFile containingFile = element.getContainingFile();
+                return containingFile == null ? null : containingFile.getName();
+            }
+
+            @Override
+            public Icon getIcon(boolean unused) {
+                return YakshaIcons.I;
+            }
+        };
+    }
+
+
+    /* ============================================================== */
+    // const
+    /* ============================================================== */
+
+    public static String getName(final YakshaConstStatement statement) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+            return nameNode.getText();
+        }
+        return null;
+    }
+
+    public static PsiElement setName(final YakshaConstStatement statement, String newName) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+
+        }
+        return statement;
+    }
+
+    public static ItemPresentation getPresentation(final YakshaConstStatement element) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return element.getName();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                PsiFile containingFile = element.getContainingFile();
+                return containingFile == null ? null : containingFile.getName();
+            }
+
+            @Override
+            public Icon getIcon(boolean unused) {
+                return YakshaIcons.E;
+            }
+        };
+    }
+
+    public static PsiElement getNameIdentifier(final YakshaConstStatement statement) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+            return nameNode.getPsi();
+        }
+        return null;
     }
 }

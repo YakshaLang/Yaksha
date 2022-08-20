@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface YakshaClassBits extends PsiElement {
 
   @Nullable
-  YakshaDataType getDataType();
+  YakshaClassField getClassField();
 
   @Nullable
   YakshaEmptyLine getEmptyLine();

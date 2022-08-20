@@ -44,6 +44,11 @@ public class YakshaClassStatementImpl extends YakshaNamedElementImpl implements 
   }
 
   @Override
+  public PsiElement getNameIdentifier() {
+    return YakshaPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
   public ItemPresentation getPresentation() {
     return YakshaPsiImplUtil.getPresentation(this);
   }

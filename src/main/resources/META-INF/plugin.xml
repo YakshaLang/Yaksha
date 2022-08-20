@@ -16,7 +16,6 @@
         <lang.parserDefinition
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaParserDefinition"/>
-
         <lang.syntaxHighlighterFactory
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaSyntaxHighlighterFactory"/>
@@ -25,8 +24,9 @@
         <completion.contributor
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaCompletionContributor"/>
-        <psi.referenceContributor language="Yaksha"
-                                  implementation="org.intellij.sdk.language.YakshaReferenceContributor"/>
+        <psi.referenceContributor
+                language="Yaksha"
+                implementation="org.intellij.sdk.language.YakshaReferenceContributor"/>
         <lang.findUsagesProvider
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaFindUsagesProvider"/>
@@ -35,7 +35,12 @@
         <lang.commenter
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaCommenter"/>
-
+        <lang.psiStructureViewFactory
+                language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaStructureViewFactory"/>
+        <annotator
+                language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaAnnotator"/>
     </extensions>
 
 </idea-plugin>

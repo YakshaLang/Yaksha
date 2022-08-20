@@ -244,7 +244,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // pass_statement | COMMENT | empty_line | I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL
+  // pass_statement | COMMENT | empty_line | class_field
   public static boolean class_bits(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_bits")) return false;
     boolean r;
@@ -252,44 +252,46 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = pass_statement(b, l + 1);
     if (!r) r = consumeToken(b, COMMENT);
     if (!r) r = empty_line(b, l + 1);
-    if (!r) r = class_bits_3(b, l + 1);
+    if (!r) r = class_field(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
+  /* ********************************************************** */
   // I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL
-  private static boolean class_bits_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_bits_3")) return false;
+  public static boolean class_field(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_field")) return false;
+    if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, I, IDENTIFIER);
-    r = r && class_bits_3_2(b, l + 1);
+    r = r && class_field_2(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
-    r = r && class_bits_3_4(b, l + 1);
+    r = r && class_field_4(b, l + 1);
     r = r && data_type(b, l + 1);
-    r = r && class_bits_3_6(b, l + 1);
+    r = r && class_field_6(b, l + 1);
     r = r && consumeToken(b, NL);
-    exit_section_(b, m, null, r);
+    exit_section_(b, m, CLASS_FIELD, r);
     return r;
   }
 
   // S?
-  private static boolean class_bits_3_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_bits_3_2")) return false;
+  private static boolean class_field_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_field_2")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean class_bits_3_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_bits_3_4")) return false;
+  private static boolean class_field_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_field_4")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean class_bits_3_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_bits_3_6")) return false;
+  private static boolean class_field_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_field_6")) return false;
     consumeToken(b, S);
     return true;
   }
