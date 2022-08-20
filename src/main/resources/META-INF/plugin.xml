@@ -7,12 +7,21 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.jadogg.yakshaintellij.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.jadogg.yakshaintellij.services.MyProjectService"/>
+        <fileType
+                name="Yaka File"
+                implementationClass="org.intellij.sdk.language.YakaFileType"
+                fieldName="INSTANCE"
+                language="Yaksha"
+                extensions="yaka"/>
+        <lang.parserDefinition
+                language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory
+                language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaSyntaxHighlighterFactory"/>
+<!--        <colorSettingsPage-->
+<!--                implementation="org.intellij.sdk.language.YakshaColorSettingsPage"/>-->
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.jadogg.yakshaintellij.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
 </idea-plugin>
