@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import glob
@@ -14,7 +15,7 @@ BIN_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "bin")
 LIBS_DIR = os.path.abspath(os.path.join(os.path.dirname(SCRIPT_DIR), "libs"))
 DUMPER = os.path.join(BIN_DIR, "yakshadmp")
 MAX_EXECUTION_TIME_SEC = 30
-OUTPUT_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "comp_output_test", "docs")
+OUTPUT_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "comp_output_test")
 
 
 def execute(arg: str) -> (str, str, int):
@@ -240,6 +241,10 @@ def main():
             print(Colors.fail(sout))
             raise
         files.append((yaksha_mod, mod_full_filepath))
+
+    with open(os.path.join(OUTPUT_DIR, "docs.json"), "w+", encoding="utf-8") as h:
+        json.dump(structures, h, indent="  ")
+
     # Sort
     files = sorted(files, key=lambda x: x[0])
     # Display
