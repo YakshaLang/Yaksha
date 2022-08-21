@@ -41,6 +41,8 @@
         <annotator
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaAnnotator"/>
+        <psi.declarationProvider
+                implementation="com.intellij.model.psi.impl.YakshaPsiSymbolDeclarationProvider"/>
     </extensions>
 
 </idea-plugin>

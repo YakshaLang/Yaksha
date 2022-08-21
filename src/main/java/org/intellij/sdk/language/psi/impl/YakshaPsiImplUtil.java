@@ -27,6 +27,11 @@ public class YakshaPsiImplUtil {
         return null;
     }
 
+    public static int getTextOffset(final YakshaDefStatement statement) {
+        return statement.getNode().getFirstChildNode().getTextLength()
+                + statement.getNode().getFirstChildNode().getTreeNext().getTextLength();
+    }
+
     public static PsiElement setName(final YakshaDefStatement statement, String newName) {
         ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
         if (nameNode != null) {
@@ -176,7 +181,31 @@ public class YakshaPsiImplUtil {
         if (identifiers.isEmpty()) {
             return null;
         }
-        return identifiers.pop().getText();
+        return identifiers.getLast().getText();
+    }
+
+    public static String getFullName(final YakshaFncall fncallExpr) {
+        final YakshaIdentifierExp identifierExp = fncallExpr.getIdentifierExp();
+        final LinkedList<ASTNode> identifiers = new LinkedList<>();
+        for (ASTNode element = identifierExp.getNode().getFirstChildNode(); element != null; element = element.getTreeNext()) {
+            if (element.getElementType() == YakshaTypes.IDENTIFIER) {
+                identifiers.add(element);
+            }
+        }
+        if (identifiers.isEmpty()) {
+            return null;
+        }
+        final StringBuilder b = new StringBuilder();
+        boolean first = true;
+        for (ASTNode n : identifiers) {
+            if (first) {
+                first = false;
+            } else {
+                b.append(".");
+            }
+            b.append(n.getText());
+        }
+        return b.toString();
     }
 
     /* ============================================================== */

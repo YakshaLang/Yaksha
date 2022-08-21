@@ -46,7 +46,7 @@ class_field ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL
 def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON NL def_bits+ {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
-    methods=[getName setName getNameIdentifier getPresentation]
+    methods=[getName setName getNameIdentifier getPresentation getTextOffset]
 }
 def_params ::= def_param (S? OPERATOR_COMMA S? def_param)*
 def_param ::= IDENTIFIER S? OPERATOR_COLON S? data_type
@@ -80,7 +80,9 @@ comparison ::= term (S? OPERATOR_COMPARISON S? term)* | term
 term ::= factor (S? (OPERATOR_MINUS | OPERATOR_PLUS) S? factor)* | factor
 factor ::= unary (S? (OPERATOR_MUL | OPERATOR_DIV) S? unary)* | unary
 unary ::= OPERATOR_MINUS S? exp | fncall | primary
-fncall ::= identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB ) {methods=[getDefOrClassName]}
+fncall ::= identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB ) {
+    methods=[getDefOrClassName getFullName]
+}
 primary ::= KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | identifier_exp | paren_exp
 paren_exp ::= OPERATOR_OPEN_P S? exp S? OPERATOR_CLOSE_P
 arguments ::= exp (S? OPERATOR_COMMA S? exp)*
