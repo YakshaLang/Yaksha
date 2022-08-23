@@ -51,7 +51,6 @@ public interface YakshaTypes {
   IElementType RETURN_STATEMENT = new YakshaElementType("RETURN_STATEMENT");
   IElementType TERM = new YakshaElementType("TERM");
   IElementType UNARY = new YakshaElementType("UNARY");
-  IElementType WHILE_BITS = new YakshaElementType("WHILE_BITS");
   IElementType WHILE_STATEMENT = new YakshaElementType("WHILE_STATEMENT");
 
   IElementType COMMENT = new YakshaTokenType("COMMENT");
@@ -229,9 +228,6 @@ public interface YakshaTypes {
       }
       else if (type == UNARY) {
         return new YakshaUnaryImpl(node);
-      }
-      else if (type == WHILE_BITS) {
-        return new YakshaWhileBitsImpl(node);
       }
       else if (type == WHILE_STATEMENT) {
         return new YakshaWhileStatementImpl(node);

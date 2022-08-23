@@ -29,14 +29,14 @@ public class YakshaWhileStatementImpl extends ASTWrapperPsiElement implements Ya
 
   @Override
   @NotNull
-  public YakshaExp getExp() {
-    return findNotNullChildByClass(YakshaExp.class);
+  public List<YakshaDefBits> getDefBitsList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaDefBits.class);
   }
 
   @Override
   @NotNull
-  public List<YakshaWhileBits> getWhileBitsList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaWhileBits.class);
+  public YakshaExp getExp() {
+    return findNotNullChildByClass(YakshaExp.class);
   }
 
 }

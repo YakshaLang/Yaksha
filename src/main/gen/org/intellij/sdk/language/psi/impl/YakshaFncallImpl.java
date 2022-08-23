@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
+import com.intellij.psi.PsiReference;
 
 public class YakshaFncallImpl extends ASTWrapperPsiElement implements YakshaFncall {
 
@@ -48,6 +49,16 @@ public class YakshaFncallImpl extends ASTWrapperPsiElement implements YakshaFnca
   @Override
   public String getDefOrClassName() {
     return YakshaPsiImplUtil.getDefOrClassName(this);
+  }
+
+  @Override
+  public String getFullName() {
+    return YakshaPsiImplUtil.getFullName(this);
+  }
+
+  @Override
+  public PsiReference getReference() {
+    return YakshaPsiImplUtil.getReference(this);
   }
 
 }

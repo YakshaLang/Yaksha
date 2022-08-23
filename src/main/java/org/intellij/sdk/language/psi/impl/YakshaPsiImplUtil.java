@@ -4,7 +4,9 @@ import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiReference;
 import org.intellij.sdk.language.YakshaIcons;
+import org.intellij.sdk.language.YakshaReference;
 import org.intellij.sdk.language.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,10 +29,10 @@ public class YakshaPsiImplUtil {
         return null;
     }
 
-    public static int getTextOffset(final YakshaDefStatement statement) {
-        return statement.getNode().getFirstChildNode().getTextLength()
-                + statement.getNode().getFirstChildNode().getTreeNext().getTextLength();
-    }
+//    public static int getTextOffset(final YakshaDefStatement statement) {
+//        return statement.getNode().getFirstChildNode().getTextLength()
+//                + statement.getNode().getFirstChildNode().getTreeNext().getTextLength();
+//    }
 
     public static PsiElement setName(final YakshaDefStatement statement, String newName) {
         ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
@@ -206,6 +208,14 @@ public class YakshaPsiImplUtil {
             b.append(n.getText());
         }
         return b.toString();
+    }
+
+    public static PsiReference getReference(final YakshaFncall fnCallExpr) {
+        final String def = fnCallExpr.getDefOrClassName();
+        if (def == null) {
+            return null;
+        }
+        return new YakshaReference(fnCallExpr, fnCallExpr.getIdentifierExp().getTextRangeInParent());
     }
 
     /* ============================================================== */

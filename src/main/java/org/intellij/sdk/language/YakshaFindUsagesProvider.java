@@ -29,7 +29,6 @@ public class YakshaFindUsagesProvider implements FindUsagesProvider {
 
     @Override
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-        System.out.println("Can find usages for -> " + psiElement);
         return psiElement instanceof PsiNamedElement;
     }
 
@@ -65,7 +64,6 @@ public class YakshaFindUsagesProvider implements FindUsagesProvider {
     @Override
     public String getNodeText(@NotNull PsiElement element, boolean useFullName) {
         return getDescriptiveName(element);
-
     }
 
 }

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import org.intellij.sdk.language.DocBuilder;
 import org.intellij.sdk.language.YakshaIcons;
 
 import java.io.IOException;
@@ -62,6 +63,31 @@ public class Loader {
         return true;
     }
 
+    public String generateDoc(String importPath, String name) {
+        Doc documentation = doc.get(importPath);
+        if (documentation == null) {
+            return "";
+        }
+        // TODO hashmap this thing to make it faster
+        for (GlobalConstant c: documentation.global_consts) {
+            if (c.name.equals(name)) {
+                return c.genDoc(importPath);
+            }
+        }
+        for (Fn f: documentation.functions) {
+            if (f.name.equals(name)) {
+                return f.genDoc(importPath);
+            }
+        }
+
+        for (Cls cl: documentation.classes) {
+            if (cl.name.equals(name)) {
+                return cl.genDoc(importPath);
+            }
+        }
+        return "";
+    }
+
     public static class Doc {
         public List<Import> imports;
         public List<GlobalConstant> global_consts;
@@ -85,6 +111,15 @@ public class Loader {
         public String getTypeText() {
             return comment;
         }
+
+        public String genDoc(final String importPath) {
+            DocBuilder b= new DocBuilder();
+            b.title(importPath + "." + name);
+            b.description(comment);
+            b.keyValue("<b>Kind</b>", "Constant");
+            b.keyValue("Data Type", datatype.toString());
+            return b.build();
+        }
     }
 
     public static class Fn {
@@ -107,6 +142,18 @@ public class Loader {
         }
         public String getTypeText() {
             return comment;
+        }
+
+        public String genDoc(final String importPath) {
+            DocBuilder b= new DocBuilder();
+            b.title(importPath + "." + name);
+            b.description(comment);
+            b.keyValue("<b>Kind</b>", "Function");
+            if (parameters != null && !parameters.isEmpty()) {
+                parameters.forEach(p -> b.typeKeyValue("Param", p.name, p.datatype.toString()));
+            }
+            b.keyValue("Return Type", return_type.toString());
+            return b.build();
         }
     }
 
@@ -168,6 +215,17 @@ public class Loader {
         }
         public String getTypeText() {
             return comment;
+        }
+
+        public String genDoc(final String importPath) {
+            DocBuilder b= new DocBuilder();
+            b.title(importPath + "." + name);
+            b.description(comment);
+            b.keyValue("<b>Kind</b>", "Class");
+            if (members != null && !members.isEmpty()) {
+                members.forEach(p -> b.typeKeyValue("Member", p.name, p.datatype.toString()));
+            }
+            return b.build();
         }
     }
 

@@ -4,6 +4,7 @@ package org.intellij.sdk.language.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 
 public interface YakshaFncall extends PsiElement {
 
@@ -17,5 +18,9 @@ public interface YakshaFncall extends PsiElement {
   YakshaIdentifierExp getIdentifierExp();
 
   String getDefOrClassName();
+
+  String getFullName();
+
+  PsiReference getReference();
 
 }

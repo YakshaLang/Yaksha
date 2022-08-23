@@ -8,8 +8,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.util.ReflectionUtil;
 import org.intellij.sdk.language.psi.YakshaClassStatement;
+import org.intellij.sdk.language.psi.YakshaConstStatement;
 import org.intellij.sdk.language.psi.YakshaDefStatement;
-import org.intellij.sdk.language.psi.YakshaFncall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,28 +27,45 @@ public class YakshaReference extends PsiReferenceBase<PsiElement> implements Psi
 
     @Override
     public ResolveResult @NotNull [] multiResolve(boolean incompleteCode) {
-        final PsiFile file = myElement.getNode().getPsi().getContainingFile();
-        final List<YakshaFncall> calls = ExtractUtils.getChildrenOfTypeAsList(file, YakshaFncall.class);;
-        List<ResolveResult> results = new ArrayList<>();
-        for (YakshaFncall st : calls) {
-            final String name = st.getDefOrClassName();
-            if (name != null && key != null && key.equals(name)) {
-                results.add(new PsiElementResolveResult(st));
-            }
+        String thisK = key;
+        if (key.contains(".")) {
+            String[] t  = key.split("\\.");
+            thisK = t[t.length - 1];
         }
-        System.out.println("Returned for [" + key + "] -> " + results.size());
-        return results.toArray(new ResolveResult[results.size()]);
+        final Project p = myElement.getNode().getPsi().getProject();
+        final List<ResolveResult> results = new ArrayList<>();
+        YakshaUtil.findDefs(p, thisK).stream().map(PsiElementResolveResult::new).forEach(results::add);
+        YakshaUtil.findClasses(p, thisK).stream().map(PsiElementResolveResult::new).forEach(results::add);
+        YakshaUtil.findConsts(p, thisK).stream().map(PsiElementResolveResult::new).forEach(results::add);
+        return results.toArray(new ResolveResult[0]);
     }
 
     @Nullable
     @Override
     public PsiElement resolve() {
+        if (key.contains(".")) {
+            ResolveResult[] a = multiResolve(false);
+            if (a.length == 1) {
+                return a[0].getElement();
+            }
+        }
         final PsiFile file = myElement.getNode().getPsi().getContainingFile();
         List<YakshaDefStatement> defs = ExtractUtils.getChildrenOfTypeAsList(file, YakshaDefStatement.class);
         for (YakshaDefStatement d : defs) {
             if (d.getName() != null && key != null && key.equals(d.getName())) {
-                System.out.println("Single resolve -> " + key + " -- found");
                 return d;
+            }
+        }
+        List<YakshaClassStatement> classes = ExtractUtils.getChildrenOfTypeAsList(file, YakshaClassStatement.class);
+        for (YakshaClassStatement c : classes) {
+            if (c.getName() != null && key != null && key.equals(c.getName())) {
+                return c;
+            }
+        }
+        List<YakshaConstStatement> consts = ExtractUtils.getChildrenOfTypeAsList(file, YakshaConstStatement.class);
+        for (YakshaConstStatement co : consts) {
+            if (co.getName() != null && key != null && key.equals(co.getName())) {
+                return co;
             }
         }
         return null;
@@ -56,15 +73,9 @@ public class YakshaReference extends PsiReferenceBase<PsiElement> implements Psi
 
     @Override
     public boolean canResolveTo(Class<? extends PsiElement> elementClass) {
-        System.out.println("canResolveTo");
         return ReflectionUtil.isAssignable(PsiFile.class, elementClass);
     }
 
-    @Override
-    public boolean isReferenceTo(@NotNull PsiElement element) {
-        System.out.println("Is reference to " + key + " -> " + element.getText());
-        return super.isReferenceTo(element);
-    }
 
     @Override
     public Object @NotNull [] getVariants() {
