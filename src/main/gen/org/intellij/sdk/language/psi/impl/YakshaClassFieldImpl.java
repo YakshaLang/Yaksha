@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
+import com.intellij.navigation.ItemPresentation;
 
 public class YakshaClassFieldImpl extends ASTWrapperPsiElement implements YakshaClassField {
 
@@ -31,6 +32,21 @@ public class YakshaClassFieldImpl extends ASTWrapperPsiElement implements Yaksha
   @NotNull
   public YakshaDataType getDataType() {
     return findNotNullChildByClass(YakshaDataType.class);
+  }
+
+  @Override
+  public String getName() {
+    return YakshaPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public PsiElement getNameIdentifier() {
+    return YakshaPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
+  public ItemPresentation getPresentation() {
+    return YakshaPsiImplUtil.getPresentation(this);
   }
 
 }

@@ -46,7 +46,7 @@
         <lang.documentationProvider
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaDocumentationProvider"/>
-
+        <lang.braceMatcher language="Yaksha" implementationClass="org.intellij.sdk.language.YakshaBraceMatcher"/>
     </extensions>
 
 </idea-plugin>

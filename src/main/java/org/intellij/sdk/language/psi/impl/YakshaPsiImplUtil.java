@@ -117,33 +117,7 @@ public class YakshaPsiImplUtil {
             @Nullable
             @Override
             public String getPresentableText() {
-                final StringBuilder classStruct = new StringBuilder();
-                boolean fieldFound = false;
-                boolean first = true;
-                classStruct.append(element.getName()).append(" { ");
-                final List<YakshaClassBits> bits = element.getClassBitsList();
-                if (bits != null) {
-                    for (YakshaClassBits bit : bits) {
-                        final YakshaClassField field = bit.getClassField();
-                        if (field != null) {
-                            ASTNode ident = field.getNode().findChildByType(YakshaTypes.IDENTIFIER);
-                            if (ident != null && field.getDataType() != null) {
-                                fieldFound = true;
-                                if (first) {
-                                    first = false;
-                                } else {
-                                    classStruct.append(", ");
-                                }
-                                classStruct.append(ident.getText()).append(": ").append(field.getDataType().getText());
-                            }
-                        }
-                    }
-                }
-                classStruct.append(" }");
-                if (!fieldFound) {
-                    return element.getName();
-                }
-                return classStruct.toString();
+                return element.getName();
             }
 
             @Nullable
@@ -161,6 +135,57 @@ public class YakshaPsiImplUtil {
     }
 
     public static PsiElement getNameIdentifier(final YakshaClassStatement statement) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+            return nameNode.getPsi();
+        }
+        return null;
+    }
+
+    /* ============================================================== */
+    // class field
+    /* ============================================================== */
+
+    public static String getName(final YakshaClassField statement) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+            return nameNode.getText();
+        }
+        return null;
+    }
+
+
+    public static ItemPresentation getPresentation(final YakshaClassField element) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                ASTNode nameNode = element.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+                if (nameNode != null && nameNode.getText() != null) {
+                    String dt = "?";
+                    if (element.getDataType() != null) {
+                        dt = element.getDataType().getText();
+                    }
+                    return nameNode.getText() + ": " + dt;
+                }
+                return "-";
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                PsiFile containingFile = element.getContainingFile();
+                return containingFile == null ? null : containingFile.getName();
+            }
+
+            @Override
+            public Icon getIcon(boolean unused) {
+                return YakshaIcons.KEYWORD;
+            }
+        };
+    }
+
+    public static PsiElement getNameIdentifier(final YakshaClassField statement) {
         ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
         if (nameNode != null) {
             return nameNode.getPsi();

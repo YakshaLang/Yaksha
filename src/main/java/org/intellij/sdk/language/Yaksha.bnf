@@ -41,7 +41,9 @@ class_statement ::= KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? NL class_bits+ {
     methods=[getName setName getNameIdentifier getPresentation]
 }
 class_bits ::= pass_statement | COMMENT | empty_line | class_field
-class_field ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL
+class_field ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL {
+    methods=[getName getNameIdentifier getPresentation]
+}
 
 def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON NL def_bits+ {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"

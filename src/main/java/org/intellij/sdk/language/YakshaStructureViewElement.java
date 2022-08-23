@@ -7,10 +7,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.NavigatablePsiElement;
 import org.intellij.sdk.language.psi.*;
-import org.intellij.sdk.language.psi.impl.YakshaClassStatementImpl;
-import org.intellij.sdk.language.psi.impl.YakshaConstStatementImpl;
-import org.intellij.sdk.language.psi.impl.YakshaDefStatementImpl;
-import org.intellij.sdk.language.psi.impl.YakshaImportStatementImpl;
+import org.intellij.sdk.language.psi.impl.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -83,6 +80,21 @@ public class YakshaStructureViewElement implements StructureViewTreeElement, Sor
         treeElements.add(new YakshaStructureViewElement((YakshaDefStatementImpl) def));
       }
 
+      return treeElements.toArray(new TreeElement[0]);
+    }
+    if (myElement instanceof YakshaClassStatement) {
+      List<TreeElement> treeElements = new ArrayList<>();
+      YakshaClassStatement st = (YakshaClassStatement) myElement;
+      List<YakshaClassBits> bitList = st.getClassBitsList();
+      if (bitList == null || bitList.isEmpty()) {
+        return EMPTY_ARRAY;
+      }
+      for (YakshaClassBits bit: bitList) {
+        final YakshaClassField field = bit.getClassField();
+        if (field != null) {
+          treeElements.add(new YakshaStructureViewElement((YakshaClassFieldImpl)field));
+        }
+      }
       return treeElements.toArray(new TreeElement[0]);
     }
     return EMPTY_ARRAY;

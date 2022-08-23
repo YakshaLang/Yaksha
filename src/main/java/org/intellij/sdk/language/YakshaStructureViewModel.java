@@ -6,10 +6,7 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiFile;
-import org.intellij.sdk.language.psi.YakshaClassStatement;
-import org.intellij.sdk.language.psi.YakshaConstStatement;
-import org.intellij.sdk.language.psi.YakshaDefStatement;
-import org.intellij.sdk.language.psi.YakshaImportStatement;
+import org.intellij.sdk.language.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +30,7 @@ public class YakshaStructureViewModel extends StructureViewModelBase implements
 
     @Override
     public boolean isAlwaysLeaf(StructureViewTreeElement element) {
-        return element.getValue() instanceof YakshaClassStatement
+        return element.getValue() instanceof YakshaClassField
                 || element.getValue() instanceof YakshaDefStatement
                 || element.getValue() instanceof YakshaConstStatement
                 || element.getValue() instanceof YakshaImportStatement
@@ -42,6 +39,6 @@ public class YakshaStructureViewModel extends StructureViewModelBase implements
 
     @Override
     protected Class<?> @NotNull [] getSuitableClasses() {
-        return new Class[]{YakshaClassStatement.class, YakshaDefStatement.class, YakshaConstStatement.class, YakshaImportStatement.class};
+        return new Class[]{YakshaClassStatement.class, YakshaDefStatement.class, YakshaConstStatement.class, YakshaImportStatement.class, YakshaClassField.class};
     }
 }
