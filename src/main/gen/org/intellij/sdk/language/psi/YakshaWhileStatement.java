@@ -8,9 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface YakshaWhileStatement extends PsiElement {
 
   @NotNull
-  YakshaExp getExp();
+  List<YakshaDefBits> getDefBitsList();
 
   @NotNull
-  List<YakshaWhileBits> getWhileBitsList();
+  YakshaExp getExp();
 
 }

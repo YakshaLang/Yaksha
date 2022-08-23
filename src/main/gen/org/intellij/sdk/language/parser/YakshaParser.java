@@ -642,7 +642,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // pass_statement | ccode_statement | if_statement | else_statement | while_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | COMMENT
+  // pass_statement | ccode_statement | if_statement | else_statement | while_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | continue_statement | break_statement | COMMENT
   public static boolean def_bits(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "def_bits")) return false;
     boolean r;
@@ -659,6 +659,8 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = assignment_statement(b, l + 1);
     if (!r) r = let_statement(b, l + 1);
     if (!r) r = empty_line(b, l + 1);
+    if (!r) r = continue_statement(b, l + 1);
+    if (!r) r = break_statement(b, l + 1);
     if (!r) r = consumeToken(b, COMMENT);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -1850,20 +1852,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // def_bits | continue_statement | break_statement
-  public static boolean while_bits(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "while_bits")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, WHILE_BITS, "<while bits>");
-    r = def_bits(b, l + 1);
-    if (!r) r = continue_statement(b, l + 1);
-    if (!r) r = break_statement(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // I KW_WHILE S? exp S? OPERATOR_COLON S? NL while_bits+
+  // I KW_WHILE S? exp S? OPERATOR_COLON S? NL def_bits+
   public static boolean while_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "while_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -1902,15 +1891,15 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // while_bits+
+  // def_bits+
   private static boolean while_statement_8(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "while_statement_8")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = while_bits(b, l + 1);
+    r = def_bits(b, l + 1);
     while (r) {
       int c = current_position_(b);
-      if (!while_bits(b, l + 1)) break;
+      if (!def_bits(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "while_statement_8", c)) break;
     }
     exit_section_(b, m, null, r);

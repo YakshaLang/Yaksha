@@ -32,6 +32,8 @@
                 implementationClass="org.intellij.sdk.language.YakshaFindUsagesProvider"/>
         <gotoSymbolContributor
                 implementation="org.intellij.sdk.language.YakshaChooseByNameContributor"/>
+        <gotoClassContributor
+                implementation="org.intellij.sdk.language.YakshaChooseByNameContributorClassOnly"/>
         <lang.commenter
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaCommenter"/>
@@ -41,6 +43,10 @@
         <annotator
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaAnnotator"/>
+        <lang.documentationProvider
+                language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaDocumentationProvider"/>
+
     </extensions>
 
 </idea-plugin>

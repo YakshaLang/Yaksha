@@ -50,14 +50,12 @@ def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERA
 }
 def_params ::= def_param (S? OPERATOR_COMMA S? def_param)*
 def_param ::= IDENTIFIER S? OPERATOR_COLON S? data_type
-def_bits ::= pass_statement | ccode_statement | if_statement | else_statement | while_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | COMMENT
+def_bits ::= pass_statement | ccode_statement | if_statement | else_statement | while_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | continue_statement | break_statement | COMMENT
 
 // Compound statements
 if_statement ::= I KW_IF S? exp S? OPERATOR_COLON S? NL def_bits+
 else_statement ::= I KW_ELSE S? OPERATOR_COLON S? NL def_bits+
-while_statement ::= I KW_WHILE S? exp S? OPERATOR_COLON S? NL while_bits+
-while_bits ::= def_bits | continue_statement | break_statement
-
+while_statement ::= I KW_WHILE S? exp S? OPERATOR_COLON S? NL def_bits+
 
 // Simple statements
 pass_statement ::= I KW_PASS S? NL
@@ -80,7 +78,9 @@ comparison ::= term (S? OPERATOR_COMPARISON S? term)* | term
 term ::= factor (S? (OPERATOR_MINUS | OPERATOR_PLUS) S? factor)* | factor
 factor ::= unary (S? (OPERATOR_MUL | OPERATOR_DIV) S? unary)* | unary
 unary ::= OPERATOR_MINUS S? exp | fncall | primary
-fncall ::= identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB ) {methods=[getDefOrClassName]}
+fncall ::= identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB ) {
+    methods=[getDefOrClassName getFullName getReference]
+}
 primary ::= KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | identifier_exp | paren_exp
 paren_exp ::= OPERATOR_OPEN_P S? exp S? OPERATOR_CLOSE_P
 arguments ::= exp (S? OPERATOR_COMMA S? exp)*

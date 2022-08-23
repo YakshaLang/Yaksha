@@ -179,10 +179,6 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitWhileBits(@NotNull YakshaWhileBits o) {
-    visitPsiElement(o);
-  }
-
   public void visitWhileStatement(@NotNull YakshaWhileStatement o) {
     visitPsiElement(o);
   }
