@@ -1,7 +1,7 @@
 package org.intellij.sdk.language.psi;
 
-import org.intellij.sdk.language.YakshaLanguage;
 import com.intellij.psi.tree.IElementType;
+import org.intellij.sdk.language.YakshaLanguage;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

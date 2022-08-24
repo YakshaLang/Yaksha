@@ -5,7 +5,16 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.presentation.java.SymbolPresentationUtil;
-import org.intellij.sdk.language.psi.*;
+import org.intellij.sdk.language.psi.YakshaClassBits;
+import org.intellij.sdk.language.psi.YakshaClassField;
+import org.intellij.sdk.language.psi.YakshaClassStatement;
+import org.intellij.sdk.language.psi.YakshaDataType;
+import org.intellij.sdk.language.psi.YakshaDefParam;
+import org.intellij.sdk.language.psi.YakshaDefParams;
+import org.intellij.sdk.language.psi.YakshaDefStatement;
+import org.intellij.sdk.language.psi.YakshaFncall;
+import org.intellij.sdk.language.psi.YakshaImportStatement;
+import org.intellij.sdk.language.psi.YakshaTypes;
 import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +33,8 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
                     final String comment = node.getText();
                     sb.append(comment.trim().substring(1).trim());
                     sb.append("<br />");
-                } catch (NullPointerException | StringIndexOutOfBoundsException ignored) {}
+                } catch (NullPointerException | StringIndexOutOfBoundsException ignored) {
+                }
             } else {
                 break;
             }
@@ -35,8 +45,8 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
     @Override
     public @Nullable String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
         if (element instanceof YakshaFncall) {
-            final String ident = ((YakshaFncall)element).getFullName();
-            final String name = ((YakshaFncall)element).getDefOrClassName();
+            final String ident = ((YakshaFncall) element).getFullName();
+            final String name = ((YakshaFncall) element).getDefOrClassName();
             int count = CharMatcher.is('.').countIn(ident);
             if (count == 1) {
                 final String importingName = ident.split("\\.")[0];
@@ -63,12 +73,12 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
         }
         if (element instanceof YakshaClassStatement) {
             DocBuilder b = new DocBuilder();
-            YakshaClassStatement c = (YakshaClassStatement)element;
+            YakshaClassStatement c = (YakshaClassStatement) element;
             b.title(c.getName());
             b.keyValue("<b>Kind</b>", "Class");
             final List<YakshaClassBits> bitsList = c.getClassBitsList();
             if (bitsList != null) {
-                for (YakshaClassBits bit: bitsList) {
+                for (YakshaClassBits bit : bitsList) {
                     YakshaClassField field = bit.getClassField();
                     if (field != null) {
                         final ASTNode node = field.getNode().findChildByType(YakshaTypes.IDENTIFIER);
@@ -87,20 +97,20 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
         }
         if (element instanceof YakshaDefStatement) {
             DocBuilder b = new DocBuilder();
-            YakshaDefStatement c = (YakshaDefStatement)element;
+            YakshaDefStatement c = (YakshaDefStatement) element;
             b.title(c.getName());
             b.keyValue("<b>Kind</b>", "Function");
             final YakshaDefParams paramsList = c.getDefParams();
             if (paramsList != null && paramsList.getDefParamList() != null) {
-                for (YakshaDefParam param: paramsList.getDefParamList()) {
-                    final ASTNode paramName = param.getNode().findChildByType(YakshaTypes.IDENTIFIER);;
+                for (YakshaDefParam param : paramsList.getDefParamList()) {
+                    final ASTNode paramName = param.getNode().findChildByType(YakshaTypes.IDENTIFIER);
                     YakshaDataType dataType = param.getDataType();
                     if (paramName != null) {
-                            String dt = "?";
-                            if (dataType != null) {
-                                dt = dataType.getText();
-                            }
-                            b.typeKeyValue("Param", paramName.getText(), dt);
+                        String dt = "?";
+                        if (dataType != null) {
+                            dt = dataType.getText();
+                        }
+                        b.typeKeyValue("Param", paramName.getText(), dt);
                     }
                 }
             }
@@ -115,7 +125,6 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
         }
         return null;
     }
-
 
 
     @Override

@@ -7,13 +7,21 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import org.intellij.sdk.language.YakshaIcons;
 import org.intellij.sdk.language.YakshaReference;
-import org.intellij.sdk.language.psi.*;
+import org.intellij.sdk.language.psi.YakshaClassField;
+import org.intellij.sdk.language.psi.YakshaClassStatement;
+import org.intellij.sdk.language.psi.YakshaConstStatement;
+import org.intellij.sdk.language.psi.YakshaDefParam;
+import org.intellij.sdk.language.psi.YakshaDefParams;
+import org.intellij.sdk.language.psi.YakshaDefStatement;
+import org.intellij.sdk.language.psi.YakshaFncall;
+import org.intellij.sdk.language.psi.YakshaIdentifierExp;
+import org.intellij.sdk.language.psi.YakshaImportStatement;
+import org.intellij.sdk.language.psi.YakshaTypes;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
 import java.util.LinkedList;
-import java.util.List;
 
 public class YakshaPsiImplUtil {
 
@@ -263,7 +271,7 @@ public class YakshaPsiImplUtil {
         }
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (ASTNode element: identifiers) {
+        for (ASTNode element : identifiers) {
             if (first) {
                 first = false;
             } else {
@@ -294,6 +302,7 @@ public class YakshaPsiImplUtil {
         }
         return statement;
     }
+
     public static PsiElement getNameIdentifier(final YakshaImportStatement statement) {
         final LinkedList<ASTNode> identifiers = new LinkedList<>();
         for (ASTNode element = statement.getNode().getFirstChildNode(); element != null; element = element.getTreeNext()) {

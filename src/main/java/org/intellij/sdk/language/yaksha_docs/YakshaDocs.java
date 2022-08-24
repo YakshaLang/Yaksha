@@ -21,9 +21,6 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 public class YakshaDocs {
-    private static final Type TYPE_OF_HASHMAP = new TypeToken<Map<String, Doc>>() {
-    }.getType();
-    private static final Gson GSON = new GsonBuilder().create();
     public static final Map<String, String> BUILTIN_FUNCTIONS = ImmutableMap.<String, String>builder()
             .put("print", "Print without a new line")
             .put("println", "Print + new line")
@@ -48,15 +45,18 @@ public class YakshaDocs {
             .put("format", "String formatting builtin")
             .build();
     public static final Set<String> BUILTIN_FUNCTION_NAMES = BUILTIN_FUNCTIONS.keySet();
+    public static final YakshaDocs INSTANCE = new YakshaDocs();
     private final Map<String, Doc> doc;
 
-    public static final YakshaDocs INSTANCE = new YakshaDocs();
-
     public YakshaDocs() {
+        final Type typeOfHashmap = new TypeToken<Map<String, Doc>>() {
+        }.getType();
+        final Gson gson = new GsonBuilder().create();
+
         Map<String, Doc> doc;
         try (Reader reader = new InputStreamReader(Objects
                 .requireNonNull(this.getClass().getResourceAsStream("/apidocs/docs.json")))) {
-            doc = GSON.fromJson(reader, TYPE_OF_HASHMAP);
+            doc = gson.fromJson(reader, typeOfHashmap);
         } catch (IOException e) {
             doc = new HashMap<>();
         }

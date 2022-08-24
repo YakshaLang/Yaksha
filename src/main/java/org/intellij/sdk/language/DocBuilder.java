@@ -7,9 +7,9 @@ import java.util.List;
 
 public class DocBuilder {
     private final StringBuilder sb;
+    private final List<KV> args = new ArrayList<>();
     private String title = "no title";
     private String description = "no desc";
-    private final List<KV> args = new ArrayList<>();
 
     public DocBuilder() {
         sb = new StringBuilder();
@@ -77,6 +77,7 @@ public class DocBuilder {
     public static class KV {
         public final String k;
         public final String v;
+
         public KV(final String k, final String v) {
             this.k = k;
             this.v = v;

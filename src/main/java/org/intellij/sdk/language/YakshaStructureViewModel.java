@@ -6,7 +6,11 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiFile;
-import org.intellij.sdk.language.psi.*;
+import org.intellij.sdk.language.psi.YakshaClassField;
+import org.intellij.sdk.language.psi.YakshaClassStatement;
+import org.intellij.sdk.language.psi.YakshaConstStatement;
+import org.intellij.sdk.language.psi.YakshaDefStatement;
+import org.intellij.sdk.language.psi.YakshaImportStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

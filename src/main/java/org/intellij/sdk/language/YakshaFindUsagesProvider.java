@@ -56,7 +56,7 @@ public class YakshaFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getDescriptiveName(@NotNull PsiElement element) {
-        final String name = element instanceof PsiNamedElement ? ((PsiNamedElement)element).getName() : null;
+        final String name = element instanceof PsiNamedElement ? ((PsiNamedElement) element).getName() : null;
         return name != null ? name : JsonBundle.message("unnamed.desc");
     }
 

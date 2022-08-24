@@ -5,7 +5,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.intellij.sdk.language.psi.YakshaClassStatement;
 import org.intellij.sdk.language.psi.YakshaConstStatement;
 import org.intellij.sdk.language.psi.YakshaDefStatement;

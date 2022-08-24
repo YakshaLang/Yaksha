@@ -8,10 +8,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class YakshaSyntaxHighlighterFactory extends SyntaxHighlighterFactory {
 
-  @NotNull
-  @Override
-  public SyntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
-    return new YakshaSyntaxHighlighter();
-  }
+    @NotNull
+    @Override
+    public SyntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
+        return new YakshaSyntaxHighlighter();
+    }
 
 }

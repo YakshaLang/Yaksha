@@ -1,7 +1,11 @@
 package org.intellij.sdk.language;
 
 import com.google.common.collect.ImmutableList;
-import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.completion.CompletionContributor;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionProvider;
+import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
@@ -13,6 +17,36 @@ import java.util.List;
 import java.util.Map;
 
 public class YakshaCompletionContributor extends CompletionContributor {
+    private static final List<String> IMPORTS = ImmutableList.<String>builder()
+            .add("import libs.strings.array as sarr")
+            .add("import libs.strings.array")
+            .add("import libs.strings")
+            .add("import libs.fileformats.toml")
+            .add("import libs.fileformats.ini")
+            .add("import libs.console")
+            .add("import libs.io")
+            .add("import libs.os.path")
+            .add("import libs.os.path as ospath")
+            .add("import libs.os")
+            .add("import libs.mpc")
+            .add("import libs.number")
+            .add("import libs.number as num")
+            .add("import libs.number as n")
+            .add("import libs.perlin")
+            .add("import libs.random")
+            .add("import libs.strings.buffer as sbuf")
+            .add("import libs.strings.buffer")
+            .add("import libs")
+            .add("import libs.c")
+            .add("import raylib as rl")
+            .add("import raylib")
+            .add("import raylib.gl")
+            .add("import raylib.gui")
+            .add("import raylib.math")
+            .add("import raylib.utils")
+            .build();
+
+
     public YakshaCompletionContributor() {
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(),
                 new CompletionProvider<>() {
@@ -115,41 +149,11 @@ public class YakshaCompletionContributor extends CompletionContributor {
                         resultSet.addElement(LookupElementBuilder.create("f32").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("f64").withIcon(YakshaIcons.DATA_TYPE));
 
-                        for (Map.Entry<String, String> e: YakshaDocs.BUILTIN_FUNCTIONS.entrySet()) {
+                        for (Map.Entry<String, String> e : YakshaDocs.BUILTIN_FUNCTIONS.entrySet()) {
                             resultSet.addElement(LookupElementBuilder.create(e.getKey())
                                     .withIcon(YakshaIcons.BUILT_IN).withTypeText(e.getValue()));
                         }
                     }
                 });
     }
-
-
-    private static final List<String> IMPORTS = ImmutableList.<String>builder()
-            .add("import libs.strings.array as sarr")
-            .add("import libs.strings.array")
-            .add("import libs.strings")
-            .add("import libs.fileformats.toml")
-            .add("import libs.fileformats.ini")
-            .add("import libs.console")
-            .add("import libs.io")
-            .add("import libs.os.path")
-            .add("import libs.os.path as ospath")
-            .add("import libs.os")
-            .add("import libs.mpc")
-            .add("import libs.number")
-            .add("import libs.number as num")
-            .add("import libs.number as n")
-            .add("import libs.perlin")
-            .add("import libs.random")
-            .add("import libs.strings.buffer as sbuf")
-            .add("import libs.strings.buffer")
-            .add("import libs")
-            .add("import libs.c")
-            .add("import raylib as rl")
-            .add("import raylib")
-            .add("import raylib.gl")
-            .add("import raylib.gui")
-            .add("import raylib.math")
-            .add("import raylib.utils")
-            .build();
 }

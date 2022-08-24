@@ -4,8 +4,8 @@ import com.intellij.lexer.FlexAdapter;
 
 public class YakshaLexerAdapter extends FlexAdapter {
 
-  public YakshaLexerAdapter() {
-    super(new YakshaLexer(null));
-  }
+    public YakshaLexerAdapter() {
+        super(new YakshaLexer(null));
+    }
 
 }

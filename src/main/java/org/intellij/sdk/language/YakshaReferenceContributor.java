@@ -2,9 +2,17 @@ package org.intellij.sdk.language;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiReferenceContributor;
+import com.intellij.psi.PsiReferenceProvider;
+import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.util.ProcessingContext;
-import org.intellij.sdk.language.psi.*;
+import org.intellij.sdk.language.psi.YakshaClassStatement;
+import org.intellij.sdk.language.psi.YakshaConstStatement;
+import org.intellij.sdk.language.psi.YakshaDefStatement;
+import org.intellij.sdk.language.psi.YakshaImportStatement;
+import org.intellij.sdk.language.psi.YakshaTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class YakshaReferenceContributor extends PsiReferenceContributor {
@@ -21,16 +29,16 @@ public class YakshaReferenceContributor extends PsiReferenceContributor {
                                                                @NotNull ProcessingContext context) {
             try {
                 if (element instanceof YakshaDefStatement) {
-                    return getDefReference((YakshaDefStatement)element);
+                    return getDefReference((YakshaDefStatement) element);
                 }
                 if (element instanceof YakshaImportStatement) {
-                    return getImportReference((YakshaImportStatement)element);
+                    return getImportReference((YakshaImportStatement) element);
                 }
                 if (element instanceof YakshaConstStatement) {
-                    return getConstDeclRefrence((YakshaConstStatement)element);
+                    return getConstDeclRefrence((YakshaConstStatement) element);
                 }
                 if (element instanceof YakshaClassStatement) {
-                    return getClassReference((YakshaClassStatement)element);
+                    return getClassReference((YakshaClassStatement) element);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();

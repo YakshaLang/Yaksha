@@ -5,7 +5,13 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementResolveResult;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiPolyVariantReference;
+import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.ResolveResult;
+import com.intellij.psi.ResolvingHint;
 import com.intellij.util.ReflectionUtil;
 import org.intellij.sdk.language.psi.YakshaClassStatement;
 import org.intellij.sdk.language.psi.YakshaConstStatement;
@@ -16,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class YakshaReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference, ResolvingHint  {
+public class YakshaReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference, ResolvingHint {
 
     private final String key;
 
@@ -29,7 +35,7 @@ public class YakshaReference extends PsiReferenceBase<PsiElement> implements Psi
     public ResolveResult @NotNull [] multiResolve(boolean incompleteCode) {
         String thisK = key;
         if (key.contains(".")) {
-            String[] t  = key.split("\\.");
+            String[] t = key.split("\\.");
             thisK = t[t.length - 1];
         }
         final Project p = myElement.getNode().getPsi().getProject();

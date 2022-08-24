@@ -14,42 +14,42 @@ import java.util.List;
 
 public class YakshaChooseByNameContributor implements ChooseByNameContributor {
 
-  @Override
-  public String @NotNull [] getNames(Project project, boolean includeNonProjectItems) {
-    List<String> names = new ArrayList<>();
+    @Override
+    public String @NotNull [] getNames(Project project, boolean includeNonProjectItems) {
+        List<String> names = new ArrayList<>();
 
-    List<YakshaConstStatement> consts = YakshaUtil.findConsts(project);
-    for (YakshaConstStatement st : consts) {
-      if (st.getName() != null && st.getName().length() > 0) {
-        names.add(st.getName());
-      }
+        List<YakshaConstStatement> consts = YakshaUtil.findConsts(project);
+        for (YakshaConstStatement st : consts) {
+            if (st.getName() != null && st.getName().length() > 0) {
+                names.add(st.getName());
+            }
+        }
+
+        List<YakshaClassStatement> classes = YakshaUtil.findClasses(project);
+        for (YakshaClassStatement st : classes) {
+            if (st.getName() != null && st.getName().length() > 0) {
+                names.add(st.getName());
+            }
+        }
+
+        List<YakshaDefStatement> defs = YakshaUtil.findDefs(project);
+        for (YakshaDefStatement st : defs) {
+            if (st.getName() != null && st.getName().length() > 0) {
+                names.add(st.getName());
+            }
+        }
+
+        return names.toArray(new String[names.size()]);
     }
 
-    List<YakshaClassStatement> classes = YakshaUtil.findClasses(project);
-    for (YakshaClassStatement st : classes) {
-      if (st.getName() != null && st.getName().length() > 0) {
-        names.add(st.getName());
-      }
+    @Override
+    public NavigationItem @NotNull [] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
+        // TODO: include non project items
+        List<YakshaNamedElement> navItems = new ArrayList<>();
+        navItems.addAll(YakshaUtil.findDefs(project, name));
+        navItems.addAll(YakshaUtil.findClasses(project, name));
+        navItems.addAll(YakshaUtil.findConsts(project, name));
+        return navItems.toArray(new NavigationItem[navItems.size()]);
     }
-
-    List<YakshaDefStatement> defs = YakshaUtil.findDefs(project);
-    for (YakshaDefStatement st : defs) {
-      if (st.getName() != null && st.getName().length() > 0) {
-        names.add(st.getName());
-      }
-    }
-
-    return names.toArray(new String[names.size()]);
-  }
-
-  @Override
-  public NavigationItem @NotNull [] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
-    // TODO: include non project items
-    List<YakshaNamedElement> navItems = new ArrayList<>();
-    navItems.addAll(YakshaUtil.findDefs(project, name));
-    navItems.addAll(YakshaUtil.findClasses(project, name));
-    navItems.addAll(YakshaUtil.findConsts(project, name));
-    return navItems.toArray(new NavigationItem[navItems.size()]);
-  }
 
 }

@@ -32,7 +32,7 @@ public class YakshaAnnotator implements Annotator {
         } else if (element instanceof YakshaFncall) {
             YakshaFncall fncall = (YakshaFncall) element;
             final String fullName = fncall.getFullName();
-            if (!fullName.contains(".") && YakshaDocs.BUILTIN_FUNCTION_NAMES.contains(fullName)) {
+            if (fullName != null && !fullName.contains(".") && YakshaDocs.BUILTIN_FUNCTION_NAMES.contains(fullName)) {
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                         .range(fncall.getIdentifierExp().getTextRange())
                         .textAttributes(YakshaSyntaxHighlighter.KEYWORD)
