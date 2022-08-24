@@ -3,7 +3,7 @@
 ![Build](https://github.com/YakshaLang/YakshaIntelliJ/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
-
+<!--
 ## Template ToDo list
 - [x] Create a new [IntelliJ Platform Plugin Template][template] project.
 - [ ] Get familiar with the [template documentation][template].
@@ -13,6 +13,7 @@
 - [ ] Set the Plugin ID in the above README badges.
 - [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html).
 - [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
+-->
 
 <!-- Plugin description -->
 # Yaksha Programming Language Plugin
@@ -27,12 +28,12 @@
 <!-- Plugin description end -->
 
 ## Installation
-
+<!-- 
 - Using IDE built-in plugin system:
   
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "YakshaIntelliJ"</kbd> >
   <kbd>Install Plugin</kbd>
-  
+   -->
 - Manually:
 
   Download the [latest release](https://github.com/YakshaLang/YakshaIntelliJ/releases/latest) and install it manually using
