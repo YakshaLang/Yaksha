@@ -17,7 +17,13 @@
 <!-- Plugin description -->
 # Yaksha Programming Language Plugin
 * Simple Syntax Highlighting
-See [here](https://yakshalang.github.io/)
+* Structure View
+* Hover docs (For standard library & auto generated from local code)
+* Auto complete - imoports, . completion for imported libs
+* Find usages
+* CTRL/CMD + Click navigation
+
+🔗 [Yaksha Lang Documentation](https://yakshalang.github.io/)
 <!-- Plugin description end -->
 
 ## Installation
