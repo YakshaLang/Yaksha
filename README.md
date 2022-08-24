@@ -18,12 +18,25 @@
 
 <!-- Plugin description -->
 # Yaksha Programming Language Plugin
-* Simple Syntax Highlighting
-* Structure View
-* Hover docs (For standard library & auto generated from local code)
-* Auto complete - imoports, . completion for imported libs
-* Find usages
-* CTRL/CMD + Click navigation
+
+#### Simple Syntax Highlighting
+![Syntax Highlighting](https://raw.githubusercontent.com/YakshaLang/YakshaIntelliJ/main/screenshots/SyntaxHighLighting.png)
+
+#### Structure View
+![Structure](https://raw.githubusercontent.com/YakshaLang/YakshaIntelliJ/main/screenshots/Structure.png)
+
+#### Hover docs (For standard library & auto generated from local code)
+![Hover Docs](https://raw.githubusercontent.com/YakshaLang/YakshaIntelliJ/main/screenshots/HoverDocs.png)
+
+#### Auto complete - imoports, . completion for imported libs
+![Auto Complete](https://raw.githubusercontent.com/YakshaLang/YakshaIntelliJ/main/screenshots/AutoComplete.gif)
+
+#### Find usages
+![Find Usages](https://raw.githubusercontent.com/YakshaLang/YakshaIntelliJ/main/screenshots/FindUsages.png)
+
+#### CTRL/CMD + Click navigation
+![Click Jump](https://raw.githubusercontent.com/YakshaLang/YakshaIntelliJ/main/screenshots/ClickJump.gif)
+
 
 🔗 [Yaksha Lang Documentation](https://yakshalang.github.io/)
 <!-- Plugin description end -->
