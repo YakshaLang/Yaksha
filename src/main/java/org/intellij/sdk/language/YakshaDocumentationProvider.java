@@ -14,6 +14,24 @@ import java.util.List;
 
 public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
 
+    private static String extractComments(PsiElement element) {
+        StringBuilder sb = new StringBuilder();
+        ASTNode node = element.getNode().findChildByType(YakshaTypes.NL);
+        while (node != null) {
+            node = node.getTreeNext();
+            if (node.getElementType().equals(YakshaTypes.COMMENT)) {
+                try {
+                    final String comment = node.getText();
+                    sb.append(comment.trim().substring(1).trim());
+                    sb.append("<br />");
+                } catch (NullPointerException | StringIndexOutOfBoundsException ignored) {}
+            } else {
+                break;
+            }
+        }
+        return sb.toString();
+    }
+
     @Override
     public @Nullable String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
         if (element instanceof YakshaFncall) {
@@ -58,7 +76,7 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
                     }
                 }
             }
-            b.description("");
+            b.description(extractComments(element));
             return b.build();
         }
         if (element instanceof YakshaDefStatement) {
@@ -80,7 +98,7 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
                     }
                 }
             }
-            b.description("");
+            b.description(extractComments(element));
             YakshaDataType returnType = c.getDataType();
             String rt = "?";
             if (returnType != null) {

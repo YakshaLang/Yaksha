@@ -115,7 +115,7 @@ public class Loader {
         public String genDoc(final String importPath) {
             DocBuilder b= new DocBuilder();
             b.title(importPath + "." + name);
-            b.description(comment);
+            b.description(comment.replace("\n", "<br />"));
             b.keyValue("<b>Kind</b>", "Constant");
             b.keyValue("Data Type", datatype.toString());
             return b.build();
@@ -147,7 +147,7 @@ public class Loader {
         public String genDoc(final String importPath) {
             DocBuilder b= new DocBuilder();
             b.title(importPath + "." + name);
-            b.description(comment);
+            b.description(comment.replace("\n", "<br />"));
             b.keyValue("<b>Kind</b>", "Function");
             if (parameters != null && !parameters.isEmpty()) {
                 parameters.forEach(p -> b.typeKeyValue("Param", p.name, p.datatype.toString()));
@@ -220,7 +220,7 @@ public class Loader {
         public String genDoc(final String importPath) {
             DocBuilder b= new DocBuilder();
             b.title(importPath + "." + name);
-            b.description(comment);
+            b.description(comment.replace("\n", "<br />"));
             b.keyValue("<b>Kind</b>", "Class");
             if (members != null && !members.isEmpty()) {
                 members.forEach(p -> b.typeKeyValue("Member", p.name, p.datatype.toString()));
