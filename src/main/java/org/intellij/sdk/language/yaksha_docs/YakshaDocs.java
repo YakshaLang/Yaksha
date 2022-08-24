@@ -1,5 +1,6 @@
 package org.intellij.sdk.language.yaksha_docs;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -12,20 +13,49 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringJoiner;
 
-public class Loader {
+public class YakshaDocs {
     private static final Type TYPE_OF_HASHMAP = new TypeToken<Map<String, Doc>>() {
     }.getType();
     private static final Gson GSON = new GsonBuilder().create();
+    public static final Map<String, String> BUILTIN_FUNCTIONS = ImmutableMap.<String, String>builder()
+            .put("print", "Print without a new line")
+            .put("println", "Print + new line")
+            .put("len", "Get length of arrays,maps")
+            .put("sizeof", "Size of structures or C data types")
+            .put("tostr", "If it is a string, copy is created. Floats are converted to 2 decimal places")
+            .put("arrput", "Put item to an array")
+            .put("arrpop", "Remove last item from an array and return it")
+            .put("getref", "Get a pointer to given object")
+            .put("unref", "Dereference a pointer")
+            .put("charat", "Get a character at a specific location in string")
+            .put("shnew", "Initialize Array[SMEntry[T]] object")
+            .put("shput", "Put item to a Array[SMEntry[T]]")
+            .put("shget", "Get item from a Array[SMEntry[T]]")
+            .put("shgeti", "Get item index from a Array[SMEntry[T]] (-1 if not found)")
+            .put("hmnew", "Initialize Array[MEntry[T]] object")
+            .put("hmput", "Put item to a Array[MEntry[T]]")
+            .put("hmget", "Get item from a Array[MEntry[T]]")
+            .put("hmgeti", "Get item index from a Array[MEntry[T]] (-1 if not found)")
+            .put("reverse", "Reverse an array creating a new array. New array need to be deleted")
+            .put("sorted", "Sort an array creating a new array. New array need to be deleted")
+            .put("format", "String formatting builtin")
+            .build();
+    public static final Set<String> BUILTIN_FUNCTION_NAMES = BUILTIN_FUNCTIONS.keySet();
+    private final Map<String, Doc> doc;
 
-    public final Map<String, Doc> doc;
+    public static final YakshaDocs INSTANCE = new YakshaDocs();
 
-    public static final Loader INSTANCE = new Loader();
-
-    public Loader() {
+    public YakshaDocs() {
         Map<String, Doc> doc;
-        try (Reader reader = new InputStreamReader(Objects.requireNonNull(this.getClass().getResourceAsStream("/apidocs/docs.json")))) {
+        try (Reader reader = new InputStreamReader(Objects
+                .requireNonNull(this.getClass().getResourceAsStream("/apidocs/docs.json")))) {
             doc = GSON.fromJson(reader, TYPE_OF_HASHMAP);
         } catch (IOException e) {
             doc = new HashMap<>();
@@ -38,14 +68,14 @@ public class Loader {
         if (documentation == null) {
             return false;
         }
-        for (GlobalConstant c: documentation.global_consts) {
+        for (GlobalConstant c : documentation.global_consts) {
             resultSet.addElement(LookupElementBuilder.create(c.name)
                     .withIcon(YakshaIcons.CONSTANT)
                     .withTypeText(c.getTypeText())
                     .withPresentableText(c.getRepr())
             );
         }
-        for (Fn f: documentation.functions) {
+        for (Fn f : documentation.functions) {
             resultSet.addElement(LookupElementBuilder.create(f.name)
                     .withIcon(YakshaIcons.DEF)
                     .withTypeText(f.getTypeText())
@@ -53,7 +83,7 @@ public class Loader {
             );
         }
 
-        for (Cls cl: documentation.classes) {
+        for (Cls cl : documentation.classes) {
             resultSet.addElement(LookupElementBuilder.create(cl.name)
                     .withIcon(YakshaIcons.CLASS)
                     .withTypeText(cl.getTypeText())
@@ -69,18 +99,18 @@ public class Loader {
             return "";
         }
         // TODO hashmap this thing to make it faster
-        for (GlobalConstant c: documentation.global_consts) {
+        for (GlobalConstant c : documentation.global_consts) {
             if (c.name.equals(name)) {
                 return c.genDoc(importPath);
             }
         }
-        for (Fn f: documentation.functions) {
+        for (Fn f : documentation.functions) {
             if (f.name.equals(name)) {
                 return f.genDoc(importPath);
             }
         }
 
-        for (Cls cl: documentation.classes) {
+        for (Cls cl : documentation.classes) {
             if (cl.name.equals(name)) {
                 return cl.genDoc(importPath);
             }
@@ -108,12 +138,13 @@ public class Loader {
         public String getRepr() {
             return name + ": " + datatype.toString();
         }
+
         public String getTypeText() {
             return comment;
         }
 
         public String genDoc(final String importPath) {
-            DocBuilder b= new DocBuilder();
+            DocBuilder b = new DocBuilder();
             b.title(importPath + "." + name);
             b.description(comment.replace("\n", "<br />"));
             b.keyValue("<b>Kind</b>", "Constant");
@@ -140,12 +171,13 @@ public class Loader {
             b.append(") -> ").append(return_type.toString());
             return b.toString();
         }
+
         public String getTypeText() {
             return comment;
         }
 
         public String genDoc(final String importPath) {
-            DocBuilder b= new DocBuilder();
+            DocBuilder b = new DocBuilder();
             b.title(importPath + "." + name);
             b.description(comment.replace("\n", "<br />"));
             b.keyValue("<b>Kind</b>", "Function");
@@ -213,12 +245,13 @@ public class Loader {
             }
             return b.toString();
         }
+
         public String getTypeText() {
             return comment;
         }
 
         public String genDoc(final String importPath) {
-            DocBuilder b= new DocBuilder();
+            DocBuilder b = new DocBuilder();
             b.title(importPath + "." + name);
             b.description(comment.replace("\n", "<br />"));
             b.keyValue("<b>Kind</b>", "Class");

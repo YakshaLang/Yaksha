@@ -6,7 +6,7 @@ import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.presentation.java.SymbolPresentationUtil;
 import org.intellij.sdk.language.psi.*;
-import org.intellij.sdk.language.yaksha_docs.Loader;
+import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,8 +51,14 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
                 }
                 if (whichImport != null && name != null) {
                     final String importPath = whichImport.getImportPath();
-                    return Loader.INSTANCE.generateDoc(importPath, name);
+                    return YakshaDocs.INSTANCE.generateDoc(importPath, name);
                 }
+            } else if (count == 0 && YakshaDocs.BUILTIN_FUNCTION_NAMES.contains(ident)) {
+                final DocBuilder b = new DocBuilder();
+                b.title(ident);
+                b.description(YakshaDocs.BUILTIN_FUNCTIONS.get(ident));
+                b.keyValue("<b>Kind</b>", "Builtin Function");
+                return b.build();
             }
         }
         if (element instanceof YakshaClassStatement) {

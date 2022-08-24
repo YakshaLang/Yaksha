@@ -7,7 +7,9 @@ import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.psi.PsiElement;
 import org.intellij.sdk.language.psi.YakshaAnnotation;
 import org.intellij.sdk.language.psi.YakshaDataType;
+import org.intellij.sdk.language.psi.YakshaFncall;
 import org.intellij.sdk.language.psi.YakshaTypes;
+import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
 import org.jetbrains.annotations.NotNull;
 
 public class YakshaAnnotator implements Annotator {
@@ -24,6 +26,15 @@ public class YakshaAnnotator implements Annotator {
             if (node != null) {
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                         .range(node.getTextRange())
+                        .textAttributes(YakshaSyntaxHighlighter.KEYWORD)
+                        .create();
+            }
+        } else if (element instanceof YakshaFncall) {
+            YakshaFncall fncall = (YakshaFncall) element;
+            final String fullName = fncall.getFullName();
+            if (!fullName.contains(".") && YakshaDocs.BUILTIN_FUNCTION_NAMES.contains(fullName)) {
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                        .range(fncall.getIdentifierExp().getTextRange())
                         .textAttributes(YakshaSyntaxHighlighter.KEYWORD)
                         .create();
             }
