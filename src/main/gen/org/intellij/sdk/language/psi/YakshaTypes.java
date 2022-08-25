@@ -23,6 +23,7 @@ public interface YakshaTypes {
   IElementType DATA_TYPE = new YakshaElementType("DATA_TYPE");
   IElementType DATA_TYPE_ARGS = new YakshaElementType("DATA_TYPE_ARGS");
   IElementType DATA_TYPE_ARG_BITS = new YakshaElementType("DATA_TYPE_ARG_BITS");
+  IElementType DATA_TYPE_BIT = new YakshaElementType("DATA_TYPE_BIT");
   IElementType DATA_TYPE_IDENTIFIER = new YakshaElementType("DATA_TYPE_IDENTIFIER");
   IElementType DEFER_STATEMENT = new YakshaElementType("DEFER_STATEMENT");
   IElementType DEF_BITS = new YakshaElementType("DEF_BITS");
@@ -144,6 +145,9 @@ public interface YakshaTypes {
       }
       else if (type == DATA_TYPE_ARG_BITS) {
         return new YakshaDataTypeArgBitsImpl(node);
+      }
+      else if (type == DATA_TYPE_BIT) {
+        return new YakshaDataTypeBitImpl(node);
       }
       else if (type == DATA_TYPE_IDENTIFIER) {
         return new YakshaDataTypeIdentifierImpl(node);

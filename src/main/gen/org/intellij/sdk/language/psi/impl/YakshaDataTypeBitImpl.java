@@ -10,15 +10,16 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
+import com.intellij.psi.PsiReference;
 
-public class YakshaDataTypeImpl extends ASTWrapperPsiElement implements YakshaDataType {
+public class YakshaDataTypeBitImpl extends ASTWrapperPsiElement implements YakshaDataTypeBit {
 
-  public YakshaDataTypeImpl(@NotNull ASTNode node) {
+  public YakshaDataTypeBitImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YakshaVisitor visitor) {
-    visitor.visitDataType(this);
+    visitor.visitDataTypeBit(this);
   }
 
   @Override
@@ -29,14 +30,13 @@ public class YakshaDataTypeImpl extends ASTWrapperPsiElement implements YakshaDa
 
   @Override
   @Nullable
-  public YakshaDataTypeArgs getDataTypeArgs() {
-    return findChildByClass(YakshaDataTypeArgs.class);
+  public YakshaDataTypeIdentifier getDataTypeIdentifier() {
+    return findChildByClass(YakshaDataTypeIdentifier.class);
   }
 
   @Override
-  @NotNull
-  public YakshaDataTypeBit getDataTypeBit() {
-    return findNotNullChildByClass(YakshaDataTypeBit.class);
+  public PsiReference getReference() {
+    return YakshaPsiImplUtil.getReference(this);
   }
 
 }

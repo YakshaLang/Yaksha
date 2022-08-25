@@ -4,13 +4,13 @@ package org.intellij.sdk.language.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 
-public interface YakshaDataType extends PsiElement {
+public interface YakshaDataTypeBit extends PsiElement {
 
   @Nullable
-  YakshaDataTypeArgs getDataTypeArgs();
+  YakshaDataTypeIdentifier getDataTypeIdentifier();
 
-  @NotNull
-  YakshaDataTypeBit getDataTypeBit();
+  PsiReference getReference();
 
 }

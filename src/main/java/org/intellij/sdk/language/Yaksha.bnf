@@ -93,7 +93,10 @@ annotation_arg ::= S? OPERATOR_OPEN_P S? STRING S? OPERATOR_CLOSE_P
 
 
 // Data Type Recursion
-data_type ::= data_type_identifier data_type_args | data_type_identifier
+data_type ::= data_type_bit data_type_args | data_type_bit
 data_type_args ::= S? OPERATOR_OPEN_SQB S? data_type_arg_bits S? OPERATOR_CLOSE_SQB S?
 data_type_arg_bits ::= data_type (S? OPERATOR_COMMA S? data_type)*
-data_type_identifier ::= IDENTIFIER (OPERATOR_DOT IDENTIFIER)? | PRIMITIVE_DATA_TYPE | KW_NONE
+data_type_bit ::=  data_type_identifier | PRIMITIVE_DATA_TYPE | KW_NONE  {
+    methods=[getReference]
+}
+data_type_identifier ::= IDENTIFIER (OPERATOR_DOT IDENTIFIER)?

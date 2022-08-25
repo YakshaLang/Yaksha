@@ -10,6 +10,8 @@ import org.intellij.sdk.language.YakshaReference;
 import org.intellij.sdk.language.psi.YakshaClassField;
 import org.intellij.sdk.language.psi.YakshaClassStatement;
 import org.intellij.sdk.language.psi.YakshaConstStatement;
+import org.intellij.sdk.language.psi.YakshaDataTypeBit;
+import org.intellij.sdk.language.psi.YakshaDataTypeIdentifier;
 import org.intellij.sdk.language.psi.YakshaDefParam;
 import org.intellij.sdk.language.psi.YakshaDefParams;
 import org.intellij.sdk.language.psi.YakshaDefStatement;
@@ -36,11 +38,6 @@ public class YakshaPsiImplUtil {
         }
         return null;
     }
-
-//    public static int getTextOffset(final YakshaDefStatement statement) {
-//        return statement.getNode().getFirstChildNode().getTextLength()
-//                + statement.getNode().getFirstChildNode().getTreeNext().getTextLength();
-//    }
 
     public static PsiElement setName(final YakshaDefStatement statement, String newName) {
         ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
@@ -387,5 +384,16 @@ public class YakshaPsiImplUtil {
             return nameNode.getPsi();
         }
         return null;
+    }
+
+    /* ============================================================== */
+    // DataType.Identifier
+    /* ============================================================== */
+    public static PsiReference getReference(final YakshaDataTypeBit dtExpr) {
+        final YakshaDataTypeIdentifier def = dtExpr.getDataTypeIdentifier();
+        if (def == null) {
+            return null;
+        }
+        return new YakshaReference(dtExpr, dtExpr.getDataTypeIdentifier().getTextRangeInParent());
     }
 }

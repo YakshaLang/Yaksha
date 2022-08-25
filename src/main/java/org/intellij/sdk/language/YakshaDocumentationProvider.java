@@ -9,6 +9,8 @@ import org.intellij.sdk.language.psi.YakshaClassBits;
 import org.intellij.sdk.language.psi.YakshaClassField;
 import org.intellij.sdk.language.psi.YakshaClassStatement;
 import org.intellij.sdk.language.psi.YakshaDataType;
+import org.intellij.sdk.language.psi.YakshaDataTypeBit;
+import org.intellij.sdk.language.psi.YakshaDataTypeIdentifier;
 import org.intellij.sdk.language.psi.YakshaDefParam;
 import org.intellij.sdk.language.psi.YakshaDefParams;
 import org.intellij.sdk.language.psi.YakshaDefStatement;
@@ -49,20 +51,7 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
             final String name = ((YakshaFncall) element).getDefOrClassName();
             int count = CharMatcher.is('.').countIn(ident);
             if (count == 1) {
-                final String importingName = ident.split("\\.")[0];
-                YakshaImportStatement whichImport = null;
-                List<YakshaImportStatement> imps = ExtractUtils.getChildrenOfTypeAsList(element.getContainingFile(), YakshaImportStatement.class);
-                for (YakshaImportStatement i : imps) {
-                    if (importingName.equals(i.getName())) {
-                        // Found the import
-                        whichImport = i;
-                        break;
-                    }
-                }
-                if (whichImport != null && name != null) {
-                    final String importPath = whichImport.getImportPath();
-                    return YakshaDocs.INSTANCE.generateDoc(importPath, name);
-                }
+                return getImportedDoc(element, ident, name);
             } else if (count == 0 && YakshaDocs.BUILTIN_FUNCTION_NAMES.contains(ident)) {
                 final DocBuilder b = new DocBuilder();
                 b.title(ident);
@@ -123,7 +112,42 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
             b.keyValue("Return Type", rt);
             return b.build();
         }
+        if (element instanceof YakshaDataTypeBit) {
+            final YakshaDataTypeBit bit = (YakshaDataTypeBit) element;
+            final YakshaDataTypeIdentifier identifier = bit.getDataTypeIdentifier();
+            if (identifier != null) {
+                final String ident = identifier.getText();
+                if (ident != null) {
+                    String name = ident;
+                    if (ident.contains(".")) {
+                        name = ident.split("\\.")[1];
+                    }
+                    return getImportedDoc(element, ident, name);
+                }
+            }
+        }
+        System.out.println("Doc gen failed --> " + element);
+
         return null;
+    }
+
+    private static String getImportedDoc(PsiElement element, String ident, String name) {
+        String documentation = null;
+        final String importingName = ident.split("\\.")[0];
+        YakshaImportStatement whichImport = null;
+        List<YakshaImportStatement> imps = ExtractUtils.getChildrenOfTypeAsList(element.getContainingFile(), YakshaImportStatement.class);
+        for (YakshaImportStatement i : imps) {
+            if (importingName.equals(i.getName())) {
+                // Found the import
+                whichImport = i;
+                break;
+            }
+        }
+        if (whichImport != null && name != null) {
+            final String importPath = whichImport.getImportPath();
+            documentation = YakshaDocs.INSTANCE.generateDoc(importPath, name);
+        }
+        return documentation;
     }
 
 

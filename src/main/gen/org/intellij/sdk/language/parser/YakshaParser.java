@@ -482,23 +482,23 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // data_type_identifier data_type_args | data_type_identifier
+  // data_type_bit data_type_args | data_type_bit
   public static boolean data_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "data_type")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, DATA_TYPE, "<data type>");
     r = data_type_0(b, l + 1);
-    if (!r) r = data_type_identifier(b, l + 1);
+    if (!r) r = data_type_bit(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // data_type_identifier data_type_args
+  // data_type_bit data_type_args
   private static boolean data_type_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "data_type_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = data_type_identifier(b, l + 1);
+    r = data_type_bit(b, l + 1);
     r = r && data_type_args(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -601,39 +601,41 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IDENTIFIER (OPERATOR_DOT IDENTIFIER)? | PRIMITIVE_DATA_TYPE | KW_NONE
-  public static boolean data_type_identifier(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "data_type_identifier")) return false;
+  // data_type_identifier | PRIMITIVE_DATA_TYPE | KW_NONE
+  public static boolean data_type_bit(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "data_type_bit")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DATA_TYPE_IDENTIFIER, "<data type identifier>");
-    r = data_type_identifier_0(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, DATA_TYPE_BIT, "<data type bit>");
+    r = data_type_identifier(b, l + 1);
     if (!r) r = consumeToken(b, PRIMITIVE_DATA_TYPE);
     if (!r) r = consumeToken(b, KW_NONE);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
+  /* ********************************************************** */
   // IDENTIFIER (OPERATOR_DOT IDENTIFIER)?
-  private static boolean data_type_identifier_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "data_type_identifier_0")) return false;
+  public static boolean data_type_identifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "data_type_identifier")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, IDENTIFIER);
-    r = r && data_type_identifier_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = r && data_type_identifier_1(b, l + 1);
+    exit_section_(b, m, DATA_TYPE_IDENTIFIER, r);
     return r;
   }
 
   // (OPERATOR_DOT IDENTIFIER)?
-  private static boolean data_type_identifier_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "data_type_identifier_0_1")) return false;
-    data_type_identifier_0_1_0(b, l + 1);
+  private static boolean data_type_identifier_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "data_type_identifier_1")) return false;
+    data_type_identifier_1_0(b, l + 1);
     return true;
   }
 
   // OPERATOR_DOT IDENTIFIER
-  private static boolean data_type_identifier_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "data_type_identifier_0_1_0")) return false;
+  private static boolean data_type_identifier_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "data_type_identifier_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, OPERATOR_DOT, IDENTIFIER);
