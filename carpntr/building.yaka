@@ -35,12 +35,13 @@ def prepare_code(c: carp.Config, code: str) -> str:
     while x < length:
         sbuf.append(buf, "#include \"" + c.c_code.includes[x] + "\"\n")
         x = x + 1
-    # Add raylib.h
+    # Add raylib.h & friends
     if c.compilation.raylib:
         sbuf.append(buf, "#include \"raylib.h\"\n")
         sbuf.append(buf, "#include \"raygui.h\"\n")
         sbuf.append(buf, "#include \"raymath.h\"\n")
         sbuf.append(buf, "#include \"rlgl.h\"\n")
+        sbuf.append(buf, "#include \"rayextras.h\"\n")
     # code itself
     sbuf.append(buf, code)
     sbuf.append(buf, "\n")
@@ -66,7 +67,11 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     # Create arguments for compilation on to a string array
     # This string array need to be deleted
     native: bool = len(target) == 0
-    args: Array[str] = sarr.new(9, c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
+    args: Array[str]
+    if c.compilation.web:
+        args = sarr.new(5, c.emcc_compiler_path, "-std=c99", "-Oz", "-Wno-newline-eof", "-Wno-parentheses-equality")
+    else:
+        args = sarr.new(9, c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
     args = sarr.extend(args, raylib_args)
     # If not macos do link time optimization
     if not is_target_macos(target):
@@ -101,16 +106,18 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     the_yk_main: str = path.join(c.runtime_path, "yk__main.c")
     arrput(args, the_yk_main)
     # Target architecture
-    if not native:
+    if not native and target != "web":
         arrput(args, "-target")
         arrput(args, target)
     # -o bin.exe
     arrput(args, "-o")
     binary: str = c.project.name
-    if not native:
+    if not native and target != "web":
         binary = binary + "-" + target
     if is_target_windows(target):
         binary = binary + ".exe"
+    if target == "web":
+        binary = binary + ".html"
     binary = path.join(build_path, binary)
     arrput(args, binary)
     # ----
@@ -156,7 +163,7 @@ def build(c: carp.Config, code: str) -> int:
         return -1
 
     if c.compilation.raylib:
-        raylib_args = rs.get_raylib_args(c.zig_compiler_path, c.runtime_path)
+        raylib_args = rs.get_raylib_args(c)
 
     print("\nbuilding ")
     print(target_count + 1)
@@ -190,15 +197,18 @@ def build_simple(c: carp.Config, code: str) -> int:
     # Native build only
     code_path: str = path.join(os.cwd(), c.project.name + ".c")
     raylib_args: Array[str]
+    target: str = ""
     if c.compilation.raylib:
-        raylib_args = rs.get_raylib_args(c.zig_compiler_path, c.runtime_path)
+        raylib_args = rs.get_raylib_args(c)
+    if c.compilation.web:
+        target = "web"
 
     if not io.writefile(code_path, prepare_code(c, code)):
         console.red("Failed to write file:")
         println(code_path)
         return -1
 
-    failed_count: int = build_target(c, code_path, os.cwd(), "", raylib_args)
+    failed_count: int = build_target(c, code_path, os.cwd(), target, raylib_args)
 
     if failed_count > 0:
         return -1

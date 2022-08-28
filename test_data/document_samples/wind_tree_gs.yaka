@@ -13,6 +13,7 @@ class State:
     blue: rl.Color
     green: rl.Color
     color3: rl.Color
+    seed: u64
 
 
 def branch(x: float, y: float, length: float, angle: float, s: State) -> None:
@@ -34,10 +35,27 @@ def branch(x: float, y: float, length: float, angle: float, s: State) -> None:
     branch(next_x, next_y, (length * r1), angle - s.angle + wind * 10.0f, s)
 
 
-def update_draw_frame(s: State) -> None:
+@nativemacro
+def todata(s: State) -> utils.Data:
+    # Convert given State object to a utils.Data(void*)
+    ccode """(void*)nn__s"""
+
+@nativemacro
+def tostate(s: utils.Data) -> State:
+    # Note: yy__State name is here because this is the main file
+    # For imports this name is mangled and it is not trivial to guess
+    # So only use this kind of cast if State class is defined in main method
+    ccode """(struct yy__State*)nn__s"""
+
+def game_step(d: utils.Data) -> None:
+    s: State = tostate(d)
+    rl.begin_drawing()
     rl.clear_background(rl.color(255, 255, 255, 255))
     branch(s.width / 2.0f, s.height, s.height / 4.0f, 0.0f, s)
-
+    rl.draw_fps(0, 0)
+    rl.end_drawing()
+    s.frame_count = s.frame_count + num.i2uu(1)
+    random.set_seed(s.seed)
 
 def main() -> int:
     s: State = State()
@@ -48,16 +66,12 @@ def main() -> int:
     s.blue = rl.color(0, 255, 214, 255)
     s.green = rl.color(0, 255, 0, 255)
     s.color3 = rl.color(255, 45, 156, 255)
+    s.seed = random.init_random()
+
     rl.init_window(num.f2i(s.width), num.f2i(s.height), "Fractal Tree in the Wind")
-    #rl.set_target_fps(120)
-    seed: u64 = random.init_random()
-    while not rl.window_should_close():
-        rl.begin_drawing()
-        update_draw_frame(s)
-        rl.draw_fps(0, 0)
-        rl.end_drawing()
-        s.frame_count = s.frame_count + num.i2uu(1)
-        random.set_seed(seed)
-    rl.close_window()
+
+    # Avoid while loop for better performance in WASM/WEB builds
+    utils.run_game_loop(60, todata(s))
+
     del s
     return 0

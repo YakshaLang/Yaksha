@@ -35,6 +35,7 @@ class Compilation:
     compiler: str
     targets: Array[str]
     raylib: bool
+    web: bool
 
 
 class Config:
@@ -43,6 +44,8 @@ class Config:
     compiler_path: str
     libs_path: str
     zig_compiler_path: str
+    emcc_compiler_path: str
+    emrun_path: str
     c_code: CCode
     project: Project
     compilation: Compilation
@@ -89,7 +92,6 @@ def find_libs_path(c: Config) -> None:
     arrput(c.errors, "Failed to find std library in :" + l3)
     c.libs_path = "<not found>"
 
-
 def find_yaksha_compiler(c: Config) -> None:
     # Find yakshac(.exe) binary file
     exe_parent: str = os.exe_path()
@@ -121,8 +123,25 @@ def find_zig_compiler(c: Config) -> None:
     if len(zig) > 0:
         c.zig_compiler_path = zig
         return
-    arrput(c.errors, "Failed to find zig in PATH")
+    # Not finding zig is a problem if we are not building for web
+    if not c.compilation.web:
+        arrput(c.errors, "Failed to find zig in PATH")
     c.zig_compiler_path = "<not found>"
+
+def find_emsdk(c: Config) -> None:
+    # Find zig(.exe) binary file
+    emcc: str = os.which("emcc")
+    emrun: str = os.which("emrun")
+    # we did not find emcc or emrun?
+    not_found: bool = len(emcc) == 0 or len(emrun) == 0
+    # if we need emsdk?
+    if c.compilation.web and not_found:
+        arrput(c.errors, "Failed to find emsdk (emcc, emrun) in PATH")
+        c.emcc_compiler_path = "<not found>"
+        c.emrun_path = "<not found>"
+    else:
+        c.emcc_compiler_path = emcc
+        c.emrun_path = emrun
 
 def load_project(conf: toml.Table, c: Config) -> Project:
     # Load [project] section from yaksha.toml
@@ -147,7 +166,6 @@ def load_project(conf: toml.Table, c: Config) -> Project:
     p.name = project_name
 
     return p
-
 
 def load_c_code(conf: toml.Table, c: Config) -> CCode:
     # Load [ccode] section from yaksha.toml
@@ -174,8 +192,8 @@ def load_compilation(conf: toml.Table, c: Config) -> Compilation:
         return co
     co.targets = toml.get_string_array(co_data, "targets")
     co.raylib = toml.get_bool_default(co_data, "raylib", False)
+    co.web = toml.get_bool_default(co_data, "web", False)
     return co
-
 
 def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     # Add runtime and other defaults to the CCode section
@@ -201,7 +219,10 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
 
     # Add defaults to c_code
     df_c_code: Array[str]
-    arrput(df_c_code, path.join(c.runtime_path, "whereami.c"))
+    if c.compilation.web:
+        arrput(df_c_code, path.join(c.runtime_path, "yk__fake_whereami.c"))
+    else:
+        arrput(df_c_code, path.join(c.runtime_path, "whereami.c"))
     arrput(df_c_code, path.join(c.runtime_path, "yk__system.c"))
     arrput(df_c_code, path.join(c.runtime_path, "utf8proc.c"))
     arrput(df_c_code, path.join(c.runtime_path, "toml.c"))
@@ -218,7 +239,6 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
 
     return cc
 
-
 def load_config() -> Config:
     # Load completed config with injected defaults
     c: Config = Config()
@@ -230,13 +250,17 @@ def load_config() -> Config:
         arrput(c.errors, "Failed to read config file")
         return c
     defer toml.del_table(conf)
-
+    c.compilation = load_compilation(conf, c)
     # Try and find yakshac.exe
     find_yaksha_compiler(c)
     if len(c.errors) > 0:
         return c
     # Try and find zig.exe
     find_zig_compiler(c)
+    if len(c.errors) > 0:
+        return c
+    # Try to find emsdk
+    find_emsdk(c)
     if len(c.errors) > 0:
         return c
     # Try to find a runtime folder with 'yk__lib.h'
@@ -257,20 +281,25 @@ def load_config() -> Config:
     c.c_code = inject_c_code_defaults(load_c_code(conf, c), c)
     if len(c.errors) > 0:
         return c
-    # TODO: Complete this?
-    c.compilation = load_compilation(conf, c)
-
     return c
 
-def create_adhoc_config(name: str, file_path: str, use_raylib: bool) -> Config:
+def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bool) -> Config:
     # Create an adhoc configuration for single file execution mode
     c: Config = Config()
+    c.compilation = Compilation()
+    c.compilation.targets = sarr.new(1, "native")
+    c.compilation.raylib = use_raylib
+    c.compilation.web = use_web
     # Try and find yakshac.exe
     find_yaksha_compiler(c)
     if len(c.errors) > 0:
         return c
     # Try and find zig.exe
     find_zig_compiler(c)
+    if len(c.errors) > 0:
+        return c
+    # Try to find emsdk
+    find_emsdk(c)
     if len(c.errors) > 0:
         return c
     # Try to find a runtime folder with 'yk__lib.h'
@@ -288,12 +317,7 @@ def create_adhoc_config(name: str, file_path: str, use_raylib: bool) -> Config:
     c.c_code = inject_c_code_defaults(CCode(), c)
     if len(c.errors) > 0:
         return c
-    # TODO: Complete this?
-    c.compilation = Compilation()
-    c.compilation.targets = sarr.new(1, "native")
-    c.compilation.raylib = use_raylib
     return c
-
 
 def del_config(c: Config) -> None:
     # Delete a Config object
@@ -325,5 +349,6 @@ def del_config(c: Config) -> None:
     del c.compiler_path
     del c.libs_path
     del c.zig_compiler_path
-
+    del c.emcc_compiler_path
+    del c.emrun_path
     del c

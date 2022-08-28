@@ -43,9 +43,13 @@ def print_errors(er: Array[str]) -> None:
 
 def printkv(k: str, v: str) -> None:
     # Print key value to console in cyan, red and green
+    # <not found> is printed if value is empty
     console.cyan(k)
     console.red(" := ")
-    console.green(v)
+    if len(v) == 0:
+        console.green("<not found>")
+    else:
+        console.green(v)
     print("\n")
 
 def print_config(config: carp.Config) -> None:
@@ -55,6 +59,8 @@ def print_config(config: carp.Config) -> None:
     printkv("runtime", config.runtime_path)
     printkv("compiler", config.compiler_path)
     printkv("zig compiler", config.zig_compiler_path)
+    printkv("emcc compiler", config.emcc_compiler_path)
+    printkv("emrun", config.emrun_path)
     printkv("standard library version", libs.version())
 
 def build_from_config(config: carp.Config, simple: bool) -> int:
@@ -101,10 +107,10 @@ def perform_build() -> int:
     ret: int = build_from_config(config, False)
     return ret
 
-def perform_run(filename: str, use_raylib: bool) -> int:
+def perform_run(filename: str, use_raylib: bool, use_web: bool) -> int:
     # Perform single file project build and execute binary
     name: str = path.remove_extension(path.basename(filename))
-    config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib)
+    config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib, use_web)
     defer carp.del_config(config)
     if len(config.errors) > 0:
         print_errors(config.errors)
@@ -117,13 +123,19 @@ def perform_run(filename: str, use_raylib: bool) -> int:
     print("\n")
     # Try to run binary now
     binary: str = name
-    if os.is_windows():
-        binary = binary + ".exe"
+    if use_web:
+        binary = binary + ".html"
+        em_args: Array[str] = sarr.new(2, config.emrun_path, path.join(os.cwd(), binary))
+        os.run(em_args)
+        sarr.del_str_array(em_args)
     else:
-        binary = "./" + binary
-    binary_cstr: c.CStr = strings.to_cstr(binary)
-    c.system(binary_cstr)
-    del strings.del_str(binary_cstr)
+        if os.is_windows():
+            binary = binary + ".exe"
+        else:
+            binary = "./" + binary
+        binary_cstr: c.CStr = strings.to_cstr(binary)
+        c.system(binary_cstr)
+        del strings.del_str(binary_cstr)
     return 0
 
 
@@ -139,8 +151,8 @@ def handle_args(args: os.arguments) -> int:
     web: int = 0
     arrput(options, argparse.opt_help())
     arrput(options, argparse.opt_boolean("R", "run", getref(run), "run a single file"))
-    arrput(options, argparse.opt_boolean("r", "raylib", getref(raylib), "enable raylib"))
-    arrput(options, argparse.opt_boolean("w", "web", getref(web), "build for web"))
+    arrput(options, argparse.opt_boolean("r", "raylib", getref(raylib), "enable raylib (works only with run)"))
+    arrput(options, argparse.opt_boolean("w", "web", getref(web), "build for web (works only with run & raylib)"))
     arrput(options, argparse.opt_end())
 
     a: argparse.ArgParse = argparse.new(options, usages)
@@ -154,8 +166,14 @@ def handle_args(args: os.arguments) -> int:
         return 1
     single_file: str = remainder.remainder[0]
 
+    if web == 1 and raylib != 1:
+        println("Web is only supported with raylib")
+        return 1
     if run == 1:
-        return perform_run(single_file, raylib == 1)
+        return perform_run(single_file, raylib == 1, web == 1)
+    if raylib == 1:
+        println("Please use -R option for raylib")
+        return 1
     return 0
 
 def main() -> int:

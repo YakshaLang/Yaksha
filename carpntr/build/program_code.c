@@ -97,13 +97,15 @@ struct yy__configuration_Config;
 #define yy__os_get_args yk__get_args
 #define yy__os_ProcessResult struct yk__process_result*
 struct yy__raylib_support_CObject* yy__raylib_support_fill_arguments(yk__sds, struct yy__raylib_support_CObject*);
-struct yy__raylib_support_CObject* yy__raylib_support_co(yk__sds, yk__sds, yk__sds);
+struct yy__raylib_support_CObject* yy__raylib_support_fill_web_arguments(yk__sds, struct yy__raylib_support_CObject*);
+struct yy__raylib_support_CObject* yy__raylib_support_co(yk__sds, yk__sds, yk__sds, bool);
 void yy__raylib_support_del_c_object(struct yy__raylib_support_CObject*);
 void yy__raylib_support_del_objects(struct yy__raylib_support_CObject**);
-struct yy__raylib_support_CObject** yy__raylib_support_get_objects(yk__sds, yk__sds, yk__sds, yk__sds);
+struct yy__raylib_support_CObject** yy__raylib_support_get_objects(yk__sds, yk__sds, yk__sds, yk__sds, bool);
 yk__sds* yy__raylib_support_get_external_libs();
-bool yy__raylib_support_produce_object(struct yy__raylib_support_CObject*, yk__sds);
-yk__sds* yy__raylib_support_get_raylib_args(yk__sds, yk__sds);
+yk__sds* yy__raylib_support_get_web_args();
+bool yy__raylib_support_produce_object(struct yy__raylib_support_CObject*, struct yy__configuration_Config*);
+yk__sds* yy__raylib_support_get_raylib_args(struct yy__configuration_Config*);
 yy__buffer_StringBuffer yy__buffer_new();
 yy__buffer_StringBuffer yy__buffer_new_size(int32_t);
 void yy__buffer_append(yy__buffer_StringBuffer, yk__sds);
@@ -122,12 +124,13 @@ void yy__configuration_find_runtime_path(struct yy__configuration_Config*);
 void yy__configuration_find_libs_path(struct yy__configuration_Config*);
 void yy__configuration_find_yaksha_compiler(struct yy__configuration_Config*);
 void yy__configuration_find_zig_compiler(struct yy__configuration_Config*);
+void yy__configuration_find_emsdk(struct yy__configuration_Config*);
 struct yy__configuration_Project* yy__configuration_load_project(yy__toml_Table, struct yy__configuration_Config*);
 struct yy__configuration_CCode* yy__configuration_load_c_code(yy__toml_Table, struct yy__configuration_Config*);
 struct yy__configuration_Compilation* yy__configuration_load_compilation(yy__toml_Table, struct yy__configuration_Config*);
 struct yy__configuration_CCode* yy__configuration_inject_c_code_defaults(struct yy__configuration_CCode*, struct yy__configuration_Config*);
 struct yy__configuration_Config* yy__configuration_load_config();
-struct yy__configuration_Config* yy__configuration_create_adhoc_config(yk__sds, yk__sds, bool);
+struct yy__configuration_Config* yy__configuration_create_adhoc_config(yk__sds, yk__sds, bool, bool);
 void yy__configuration_del_config(struct yy__configuration_Config*);
 yy__argparse_ArgParse yy__argparse_new_ex(yy__argparse_Option*, yk__sds*, int32_t);
 yy__argparse_ArgParse yy__argparse_new(yy__argparse_Option*, yk__sds*);
@@ -219,7 +222,7 @@ void yy__printkv(yk__sds, yk__sds);
 void yy__print_config(struct yy__configuration_Config*);
 int32_t yy__build_from_config(struct yy__configuration_Config*, bool);
 int32_t yy__perform_build();
-int32_t yy__perform_run(yk__sds, bool);
+int32_t yy__perform_run(yk__sds, bool, bool);
 int32_t yy__handle_args(yy__os_arguments);
 int32_t yy__main();
 // --structs-- 
@@ -250,12 +253,15 @@ struct yy__configuration_Compilation {
     yk__sds yy__configuration_compiler;
     yk__sds* yy__configuration_targets;
     bool yy__configuration_raylib;
+    bool yy__configuration_web;
 };
 struct yy__configuration_Config {
     yk__sds yy__configuration_runtime_path;
     yk__sds yy__configuration_compiler_path;
     yk__sds yy__configuration_libs_path;
     yk__sds yy__configuration_zig_compiler_path;
+    yk__sds yy__configuration_emcc_compiler_path;
+    yk__sds yy__configuration_emrun_path;
     struct yy__configuration_CCode* yy__configuration_c_code;
     struct yy__configuration_Project* yy__configuration_project;
     struct yy__configuration_Compilation* yy__configuration_compilation;
@@ -333,33 +339,75 @@ struct yy__raylib_support_CObject* yy__raylib_support_fill_arguments(yk__sds yy_
     yk__sdsfree(yy__raylib_support_src_path);
     return t__23;
 }
-struct yy__raylib_support_CObject* yy__raylib_support_co(yk__sds yy__raylib_support_filename, yk__sds yy__raylib_support_src_path, yk__sds yy__raylib_support_target_path) 
+struct yy__raylib_support_CObject* yy__raylib_support_fill_web_arguments(yk__sds yy__raylib_support_src_path, struct yy__raylib_support_CObject* yy__raylib_support_c) 
 {
-    struct yy__raylib_support_CObject* yy__raylib_support_obj = calloc(1, sizeof(struct yy__raylib_support_CObject));
-    yk__sds t__24 = yk__sdsnew(".c");
-    yk__sds t__25 = yk__sdscatsds(yk__sdsdup(yy__raylib_support_filename), t__24);
-    yk__sds t__26 = yy__path_join(yk__sdsdup(yy__raylib_support_src_path), yk__sdsdup(t__25));
-    yk__sdsfree(yy__raylib_support_obj->yy__raylib_support_c_file);
-    yy__raylib_support_obj->yy__raylib_support_c_file = yk__sdsdup((t__26));
-    yk__sds t__27 = yk__sdsnew(".o");
-    yk__sds t__28 = yk__sdscatsds(yk__sdsdup(yy__raylib_support_filename), t__27);
-    yk__sds t__29 = yy__path_join(yk__sdsdup(yy__raylib_support_target_path), yk__sdsdup(t__28));
-    yk__sdsfree(yy__raylib_support_obj->yy__raylib_support_o_file);
-    yy__raylib_support_obj->yy__raylib_support_o_file = yk__sdsdup((t__29));
-    yk__sdsfree(yy__raylib_support_obj->yy__raylib_support_base_name);
-    yy__raylib_support_obj->yy__raylib_support_base_name = yk__sdsdup(yy__raylib_support_filename);
-    yy__raylib_support_obj = yy__raylib_support_fill_arguments(yk__sdsdup(yy__raylib_support_src_path), yy__raylib_support_obj);
-    struct yy__raylib_support_CObject* t__30 = yy__raylib_support_obj;
-    yk__sdsfree(t__29);
+    yk__sds t__24 = yk__sdsnew("-std=gnu99");
+    yk__sds t__25 = yk__sdsnew("-DPLATFORM_WEB");
+    yk__sds t__26 = yk__sdsnew("-DGRAPHICS_API_OPENGL_ES2");
+    yk__sds t__27 = yk__sdsnew("-Os");
+    yk__sds* yy__raylib_support_args = yy__array_new(4, yk__sdsdup(t__24), yk__sdsdup(t__25), yk__sdsdup(t__26), yk__sdsdup(t__27));
+    yk__arrput(yy__raylib_support_args, yk__sdsdup(yy__raylib_support_c->yy__raylib_support_c_file));
+    yk__sds t__28 = yk__sdsnew("-o");
+    yk__arrput(yy__raylib_support_args, yk__sdsdup(t__28));
+    yk__arrput(yy__raylib_support_args, yk__sdsdup(yy__raylib_support_c->yy__raylib_support_o_file));
+    yy__raylib_support_c->yy__raylib_support_args = yy__raylib_support_args;
+    struct yy__raylib_support_CObject* t__29 = yy__raylib_support_c;
     yk__sdsfree(t__28);
     yk__sdsfree(t__27);
     yk__sdsfree(t__26);
     yk__sdsfree(t__25);
     yk__sdsfree(t__24);
+    yk__sdsfree(yy__raylib_support_src_path);
+    return t__29;
+}
+struct yy__raylib_support_CObject* yy__raylib_support_co(yk__sds yy__raylib_support_filename, yk__sds yy__raylib_support_src_path, yk__sds yy__raylib_support_target_path, bool yy__raylib_support_web) 
+{
+    struct yy__raylib_support_CObject* yy__raylib_support_obj = calloc(1, sizeof(struct yy__raylib_support_CObject));
+    yk__sds t__30 = yk__sdsnew(".c");
+    yk__sds t__31 = yk__sdscatsds(yk__sdsdup(yy__raylib_support_filename), t__30);
+    yk__sds t__32 = yy__path_join(yk__sdsdup(yy__raylib_support_src_path), yk__sdsdup(t__31));
+    yk__sdsfree(yy__raylib_support_obj->yy__raylib_support_c_file);
+    yy__raylib_support_obj->yy__raylib_support_c_file = yk__sdsdup((t__32));
+    if (yy__raylib_support_web)
+    {
+        yk__sds t__33 = yk__sdsnew("web-");
+        yk__sds t__34 = yk__sdscatsds(yk__sdsdup(t__33), yy__raylib_support_filename);
+        yk__sdsfree(yy__raylib_support_obj->yy__raylib_support_base_name);
+        yy__raylib_support_obj->yy__raylib_support_base_name = yk__sdsdup(t__34);
+        yk__sds t__35 = yk__sdsnew(".o");
+        yk__sds t__36 = yk__sdscatsds(yk__sdsdup(yy__raylib_support_obj->yy__raylib_support_base_name), t__35);
+        yk__sds t__37 = yy__path_join(yk__sdsdup(yy__raylib_support_target_path), yk__sdsdup(t__36));
+        yk__sdsfree(yy__raylib_support_obj->yy__raylib_support_o_file);
+        yy__raylib_support_obj->yy__raylib_support_o_file = yk__sdsdup((t__37));
+        yy__raylib_support_obj = yy__raylib_support_fill_web_arguments(yk__sdsdup(yy__raylib_support_src_path), yy__raylib_support_obj);
+        yk__sdsfree(t__37);
+        yk__sdsfree(t__36);
+        yk__sdsfree(t__35);
+        yk__sdsfree(t__34);
+        yk__sdsfree(t__33);
+    }
+    else
+    {
+        yk__sdsfree(yy__raylib_support_obj->yy__raylib_support_base_name);
+        yy__raylib_support_obj->yy__raylib_support_base_name = yk__sdsdup(yy__raylib_support_filename);
+        yk__sds t__38 = yk__sdsnew(".o");
+        yk__sds t__39 = yk__sdscatsds(yk__sdsdup(yy__raylib_support_filename), t__38);
+        yk__sds t__40 = yy__path_join(yk__sdsdup(yy__raylib_support_target_path), yk__sdsdup(t__39));
+        yk__sdsfree(yy__raylib_support_obj->yy__raylib_support_o_file);
+        yy__raylib_support_obj->yy__raylib_support_o_file = yk__sdsdup((t__40));
+        yy__raylib_support_obj = yy__raylib_support_fill_arguments(yk__sdsdup(yy__raylib_support_src_path), yy__raylib_support_obj);
+        yk__sdsfree(t__40);
+        yk__sdsfree(t__39);
+        yk__sdsfree(t__38);
+    }
+    struct yy__raylib_support_CObject* t__41 = yy__raylib_support_obj;
+    yk__sdsfree(t__32);
+    yk__sdsfree(t__31);
+    yk__sdsfree(t__30);
     yk__sdsfree(yy__raylib_support_target_path);
     yk__sdsfree(yy__raylib_support_src_path);
     yk__sdsfree(yy__raylib_support_filename);
-    return t__30;
+    return t__41;
 }
 void yy__raylib_support_del_c_object(struct yy__raylib_support_CObject* yy__raylib_support_c) 
 {
@@ -391,223 +439,248 @@ void yy__raylib_support_del_objects(struct yy__raylib_support_CObject** yy__rayl
     yk__arrfree(yy__raylib_support_x);
     return;
 }
-struct yy__raylib_support_CObject** yy__raylib_support_get_objects(yk__sds yy__raylib_support_raylib_src_path, yk__sds yy__raylib_support_gui_path, yk__sds yy__raylib_support_extra_path, yk__sds yy__raylib_support_build_path) 
+struct yy__raylib_support_CObject** yy__raylib_support_get_objects(yk__sds yy__raylib_support_raylib_src_path, yk__sds yy__raylib_support_gui_path, yk__sds yy__raylib_support_extra_path, yk__sds yy__raylib_support_build_path, bool yy__raylib_support_web) 
 {
     struct yy__raylib_support_CObject** yy__raylib_support_objects = NULL;
-    yk__sds t__31 = yk__sdsnew("rglfw");
-    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__31), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path)));
-    yk__sds t__32 = yk__sdsnew("raudio");
-    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__32), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path)));
-    yk__sds t__33 = yk__sdsnew("rcore");
-    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__33), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path)));
-    yk__sds t__34 = yk__sdsnew("rmodels");
-    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__34), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path)));
-    yk__sds t__35 = yk__sdsnew("rshapes");
-    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__35), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path)));
-    yk__sds t__36 = yk__sdsnew("rtext");
-    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__36), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path)));
-    yk__sds t__37 = yk__sdsnew("rtextures");
-    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__37), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path)));
-    yk__sds t__38 = yk__sdsnew("utils");
-    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__38), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path)));
-    yk__sds t__39 = yk__sdsnew("rayextras");
-    struct yy__raylib_support_CObject* yy__raylib_support_extra = yy__raylib_support_co(yk__sdsdup(t__39), yk__sdsdup(yy__raylib_support_extra_path), yk__sdsdup(yy__raylib_support_build_path));
-    yk__sds t__40 = yk__sdsnew("-I");
-    yk__sds t__41 = yk__sdscatsds(yk__sdsdup(t__40), yy__raylib_support_raylib_src_path);
-    yk__arrput(yy__raylib_support_extra->yy__raylib_support_args, yk__sdsdup(t__41));
-    yk__sds t__42 = yk__sdsnew("-I");
-    yk__sds t__43 = yk__sdscatsds(yk__sdsdup(t__42), yy__raylib_support_gui_path);
-    yk__arrput(yy__raylib_support_extra->yy__raylib_support_args, yk__sdsdup(t__43));
+    if ((! (yy__raylib_support_web)))
+    {
+        yk__sds t__42 = yk__sdsnew("rglfw");
+        yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__42), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_web));
+        yk__sdsfree(t__42);
+    }
+    yk__sds t__43 = yk__sdsnew("raudio");
+    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__43), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_web));
+    yk__sds t__44 = yk__sdsnew("rcore");
+    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__44), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_web));
+    yk__sds t__45 = yk__sdsnew("rmodels");
+    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__45), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_web));
+    yk__sds t__46 = yk__sdsnew("rshapes");
+    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__46), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_web));
+    yk__sds t__47 = yk__sdsnew("rtext");
+    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__47), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_web));
+    yk__sds t__48 = yk__sdsnew("rtextures");
+    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__48), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_web));
+    yk__sds t__49 = yk__sdsnew("utils");
+    yk__arrput(yy__raylib_support_objects, yy__raylib_support_co(yk__sdsdup(t__49), yk__sdsdup(yy__raylib_support_raylib_src_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_web));
+    yk__sds t__50 = yk__sdsnew("rayextras");
+    struct yy__raylib_support_CObject* yy__raylib_support_extra = yy__raylib_support_co(yk__sdsdup(t__50), yk__sdsdup(yy__raylib_support_extra_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_web);
+    yk__sds t__51 = yk__sdsnew("-I");
+    yk__sds t__52 = yk__sdscatsds(yk__sdsdup(t__51), yy__raylib_support_raylib_src_path);
+    yk__arrput(yy__raylib_support_extra->yy__raylib_support_args, yk__sdsdup(t__52));
+    yk__sds t__53 = yk__sdsnew("-I");
+    yk__sds t__54 = yk__sdscatsds(yk__sdsdup(t__53), yy__raylib_support_gui_path);
+    yk__arrput(yy__raylib_support_extra->yy__raylib_support_args, yk__sdsdup(t__54));
     yk__arrput(yy__raylib_support_objects, yy__raylib_support_extra);
-    struct yy__raylib_support_CObject** t__44 = yy__raylib_support_objects;
+    struct yy__raylib_support_CObject** t__55 = yy__raylib_support_objects;
+    yk__sdsfree(t__54);
+    yk__sdsfree(t__53);
+    yk__sdsfree(t__52);
+    yk__sdsfree(t__51);
+    yk__sdsfree(t__50);
+    yk__sdsfree(t__49);
+    yk__sdsfree(t__48);
+    yk__sdsfree(t__47);
+    yk__sdsfree(t__46);
+    yk__sdsfree(t__45);
+    yk__sdsfree(t__44);
     yk__sdsfree(t__43);
-    yk__sdsfree(t__42);
-    yk__sdsfree(t__41);
-    yk__sdsfree(t__40);
-    yk__sdsfree(t__39);
-    yk__sdsfree(t__38);
-    yk__sdsfree(t__37);
-    yk__sdsfree(t__36);
-    yk__sdsfree(t__35);
-    yk__sdsfree(t__34);
-    yk__sdsfree(t__33);
-    yk__sdsfree(t__32);
-    yk__sdsfree(t__31);
     yk__sdsfree(yy__raylib_support_build_path);
     yk__sdsfree(yy__raylib_support_extra_path);
     yk__sdsfree(yy__raylib_support_gui_path);
     yk__sdsfree(yy__raylib_support_raylib_src_path);
-    return t__44;
+    return t__55;
 }
 yk__sds* yy__raylib_support_get_external_libs() 
 {
     yk__sds* yy__raylib_support_external_libs = NULL;
     if (yy__os_is_windows())
     {
-        yk__sds t__45 = yk__sdsnew("-lwinmm");
-        yk__sds t__46 = yk__sdsnew("-lgdi32");
-        yk__sds t__47 = yk__sdsnew("-lopengl32");
-        yy__raylib_support_external_libs = yy__array_new(3, yk__sdsdup(t__45), yk__sdsdup(t__46), yk__sdsdup(t__47));
-        yk__sdsfree(t__47);
-        yk__sdsfree(t__46);
-        yk__sdsfree(t__45);
+        yk__sds t__56 = yk__sdsnew("-lwinmm");
+        yk__sds t__57 = yk__sdsnew("-lgdi32");
+        yk__sds t__58 = yk__sdsnew("-lopengl32");
+        yy__raylib_support_external_libs = yy__array_new(3, yk__sdsdup(t__56), yk__sdsdup(t__57), yk__sdsdup(t__58));
+        yk__sdsfree(t__58);
+        yk__sdsfree(t__57);
+        yk__sdsfree(t__56);
     }
     else
     {
         if (yy__os_is_macos())
         {
-            yk__sds t__48 = yk__sdsnew("-framework");
-            yk__sds t__49 = yk__sdsnew("Foundation");
-            yk__sds t__50 = yk__sdsnew("-framework");
-            yk__sds t__51 = yk__sdsnew("OpenGL");
-            yk__sds t__52 = yk__sdsnew("-framework");
-            yk__sds t__53 = yk__sdsnew("OpenAL");
-            yk__sds t__54 = yk__sdsnew("-framework");
-            yk__sds t__55 = yk__sdsnew("IOKit");
-            yk__sds t__56 = yk__sdsnew("-framework");
-            yk__sds t__57 = yk__sdsnew("CoreVideo");
-            yk__sds t__58 = yk__sdsnew("-framework");
-            yk__sds t__59 = yk__sdsnew("Cocoa");
-            yy__raylib_support_external_libs = yy__array_new(12, yk__sdsdup(t__48), yk__sdsdup(t__49), yk__sdsdup(t__50), yk__sdsdup(t__51), yk__sdsdup(t__52), yk__sdsdup(t__53), yk__sdsdup(t__54), yk__sdsdup(t__55), yk__sdsdup(t__56), yk__sdsdup(t__57), yk__sdsdup(t__58), yk__sdsdup(t__59));
-            yk__sdsfree(t__59);
-            yk__sdsfree(t__58);
-            yk__sdsfree(t__57);
-            yk__sdsfree(t__56);
-            yk__sdsfree(t__55);
-            yk__sdsfree(t__54);
-            yk__sdsfree(t__53);
-            yk__sdsfree(t__52);
-            yk__sdsfree(t__51);
-            yk__sdsfree(t__50);
-            yk__sdsfree(t__49);
-            yk__sdsfree(t__48);
-        }
-        else
-        {
-            yk__sds t__60 = yk__sdsnew("-lGL");
-            yk__sds t__61 = yk__sdsnew("-lrt");
-            yk__sds t__62 = yk__sdsnew("-ldl");
-            yk__sds t__63 = yk__sdsnew("-lm");
-            yk__sds t__64 = yk__sdsnew("-lX11");
-            yy__raylib_support_external_libs = yy__array_new(5, yk__sdsdup(t__60), yk__sdsdup(t__61), yk__sdsdup(t__62), yk__sdsdup(t__63), yk__sdsdup(t__64));
+            yk__sds t__59 = yk__sdsnew("-framework");
+            yk__sds t__60 = yk__sdsnew("Foundation");
+            yk__sds t__61 = yk__sdsnew("-framework");
+            yk__sds t__62 = yk__sdsnew("OpenGL");
+            yk__sds t__63 = yk__sdsnew("-framework");
+            yk__sds t__64 = yk__sdsnew("OpenAL");
+            yk__sds t__65 = yk__sdsnew("-framework");
+            yk__sds t__66 = yk__sdsnew("IOKit");
+            yk__sds t__67 = yk__sdsnew("-framework");
+            yk__sds t__68 = yk__sdsnew("CoreVideo");
+            yk__sds t__69 = yk__sdsnew("-framework");
+            yk__sds t__70 = yk__sdsnew("Cocoa");
+            yy__raylib_support_external_libs = yy__array_new(12, yk__sdsdup(t__59), yk__sdsdup(t__60), yk__sdsdup(t__61), yk__sdsdup(t__62), yk__sdsdup(t__63), yk__sdsdup(t__64), yk__sdsdup(t__65), yk__sdsdup(t__66), yk__sdsdup(t__67), yk__sdsdup(t__68), yk__sdsdup(t__69), yk__sdsdup(t__70));
+            yk__sdsfree(t__70);
+            yk__sdsfree(t__69);
+            yk__sdsfree(t__68);
+            yk__sdsfree(t__67);
+            yk__sdsfree(t__66);
+            yk__sdsfree(t__65);
             yk__sdsfree(t__64);
             yk__sdsfree(t__63);
             yk__sdsfree(t__62);
             yk__sdsfree(t__61);
             yk__sdsfree(t__60);
+            yk__sdsfree(t__59);
+        }
+        else
+        {
+            yk__sds t__71 = yk__sdsnew("-lGL");
+            yk__sds t__72 = yk__sdsnew("-lrt");
+            yk__sds t__73 = yk__sdsnew("-ldl");
+            yk__sds t__74 = yk__sdsnew("-lm");
+            yk__sds t__75 = yk__sdsnew("-lX11");
+            yy__raylib_support_external_libs = yy__array_new(5, yk__sdsdup(t__71), yk__sdsdup(t__72), yk__sdsdup(t__73), yk__sdsdup(t__74), yk__sdsdup(t__75));
+            yk__sdsfree(t__75);
+            yk__sdsfree(t__74);
+            yk__sdsfree(t__73);
+            yk__sdsfree(t__72);
+            yk__sdsfree(t__71);
         }
     }
-    yk__sds* t__65 = yy__raylib_support_external_libs;
-    return t__65;
+    yk__sds* t__76 = yy__raylib_support_external_libs;
+    return t__76;
 }
-bool yy__raylib_support_produce_object(struct yy__raylib_support_CObject* yy__raylib_support_c, yk__sds yy__raylib_support_compiler) 
+yk__sds* yy__raylib_support_get_web_args() 
 {
-    yk__sds t__66 = yk__sdsnew("raylib::");
-    yy__console_cyan(yk__sdsdup(t__66));
-    yy__console_yellow(yk__sdsdup(yy__raylib_support_c->yy__raylib_support_base_name));
-    yk__sds t__67 = yk__sdsnew(" := ");
-    yy__console_cyan(yk__sdsdup(t__67));
-    if (yy__path_readable(yk__sdsdup(yy__raylib_support_c->yy__raylib_support_o_file)))
-    {
-        yk__sds t__68 = yk__sdsnew("prebuilt.\n");
-        yy__console_green(yk__sdsdup(t__68));
-        yk__sdsfree(t__68);
-        yk__sdsfree(t__67);
-        yk__sdsfree(t__66);
-        yk__sdsfree(yy__raylib_support_compiler);
-        return true;
-        yk__sdsfree(t__68);
-    }
-    yk__sds t__69 = yk__sdsnew("cc");
-    yk__sds t__70 = yk__sdsnew("-c");
-    yk__sds t__71 = yk__sdsnew("-Oz");
-    yk__sds* yy__raylib_support_cmd = yy__array_new(4, yk__sdsdup(yy__raylib_support_compiler), yk__sdsdup(t__69), yk__sdsdup(t__70), yk__sdsdup(t__71));
-    yy__raylib_support_cmd = yy__array_extend(yy__raylib_support_cmd, yy__raylib_support_c->yy__raylib_support_args);
-    yy__os_ProcessResult yy__raylib_support_pr = yy__os_run(yy__raylib_support_cmd);
-    if (yy__raylib_support_pr->ok)
-    {
-        yk__sds t__72 = yk__sdsnew("done.\n");
-        yy__console_green(yk__sdsdup(t__72));
-        yy__os_del_process_result(yy__raylib_support_pr);
-        yy__array_del_str_array(yy__raylib_support_cmd);
-        yk__sdsfree(t__72);
-        yk__sdsfree(t__71);
-        yk__sdsfree(t__70);
-        yk__sdsfree(t__69);
-        yk__sdsfree(t__67);
-        yk__sdsfree(t__66);
-        yk__sdsfree(yy__raylib_support_compiler);
-        return true;
-        yk__sdsfree(t__72);
-    }
-    yk__sds t__73 = yk__sdsnew("failed.\n");
-    yy__console_red(yk__sdsdup(t__73));
-    yk__sds t__74 = yk__sdsnew("--c compiler output---\n");
-    yy__console_cyan(yk__sdsdup(t__74));
-    yk__sds t__75 = yk__sdsnew("command := ");
-    yy__console_red(yk__sdsdup(t__75));
-    yk__sds t__76 = yk__sdsnew(" ");
-    yk__sds t__77 = yy__array_join(yy__raylib_support_cmd, yk__sdsdup(t__76));
-    yk__sds t__78 = yk__sdsnew("\n");
-    yk__sds t__79 = yk__sdscatsds(yk__sdsdup((t__77)), t__78);
-    yy__console_cyan(yk__sdsdup(t__79));
-    yy__console_red(yk__sdsdup(yy__raylib_support_pr->output));
-    yk__sds t__80 = yk__sdsnew("--end c compiler output---\n");
-    yy__console_cyan(yk__sdsdup(t__80));
-    yy__os_del_process_result(yy__raylib_support_pr);
-    yy__array_del_str_array(yy__raylib_support_cmd);
+    yk__sds t__77 = yk__sdsnew("-s");
+    yk__sds t__78 = yk__sdsnew("USE_GLFW=3");
+    yk__sds t__79 = yk__sdsnew("-s");
+    yk__sds t__80 = yk__sdsnew("ASYNCIFY");
+    yk__sds t__81 = yk__sdsnew("-DPLATFORM_WEB");
+    yk__sds* yy__raylib_support_web_args = yy__array_new(5, yk__sdsdup(t__77), yk__sdsdup(t__78), yk__sdsdup(t__79), yk__sdsdup(t__80), yk__sdsdup(t__81));
+    yk__sds* t__82 = yy__raylib_support_web_args;
+    yk__sdsfree(t__81);
     yk__sdsfree(t__80);
     yk__sdsfree(t__79);
     yk__sdsfree(t__78);
     yk__sdsfree(t__77);
-    yk__sdsfree(t__76);
-    yk__sdsfree(t__75);
-    yk__sdsfree(t__74);
-    yk__sdsfree(t__73);
-    yk__sdsfree(t__71);
-    yk__sdsfree(t__70);
-    yk__sdsfree(t__69);
-    yk__sdsfree(t__67);
-    yk__sdsfree(t__66);
-    yk__sdsfree(yy__raylib_support_compiler);
+    return t__82;
+}
+bool yy__raylib_support_produce_object(struct yy__raylib_support_CObject* yy__raylib_support_c, struct yy__configuration_Config* yy__raylib_support_conf) 
+{
+    yk__sds t__83 = yk__sdsnew("raylib::");
+    yy__console_cyan(yk__sdsdup(t__83));
+    yy__console_yellow(yk__sdsdup(yy__raylib_support_c->yy__raylib_support_base_name));
+    yk__sds t__84 = yk__sdsnew(" := ");
+    yy__console_cyan(yk__sdsdup(t__84));
+    if (yy__path_readable(yk__sdsdup(yy__raylib_support_c->yy__raylib_support_o_file)))
+    {
+        yk__sds t__85 = yk__sdsnew("prebuilt.\n");
+        yy__console_green(yk__sdsdup(t__85));
+        yk__sdsfree(t__85);
+        yk__sdsfree(t__84);
+        yk__sdsfree(t__83);
+        return true;
+        yk__sdsfree(t__85);
+    }
+    yk__sds* yy__raylib_support_cmd = NULL;
+    if (yy__raylib_support_conf->yy__configuration_compilation->yy__configuration_web)
+    {
+        yk__sds t__86 = yk__sdsnew("-c");
+        yk__sds t__87 = yk__sdsnew("-Oz");
+        yy__raylib_support_cmd = yy__array_new(3, yk__sdsdup(yy__raylib_support_conf->yy__configuration_emcc_compiler_path), yk__sdsdup(t__86), yk__sdsdup(t__87));
+        yk__sdsfree(t__87);
+        yk__sdsfree(t__86);
+    }
+    else
+    {
+        yk__sds t__88 = yk__sdsnew("cc");
+        yk__sds t__89 = yk__sdsnew("-c");
+        yk__sds t__90 = yk__sdsnew("-Oz");
+        yy__raylib_support_cmd = yy__array_new(4, yk__sdsdup(yy__raylib_support_conf->yy__configuration_zig_compiler_path), yk__sdsdup(t__88), yk__sdsdup(t__89), yk__sdsdup(t__90));
+        yk__sdsfree(t__90);
+        yk__sdsfree(t__89);
+        yk__sdsfree(t__88);
+    }
+    yy__raylib_support_cmd = yy__array_extend(yy__raylib_support_cmd, yy__raylib_support_c->yy__raylib_support_args);
+    yy__os_ProcessResult yy__raylib_support_pr = yy__os_run(yy__raylib_support_cmd);
+    if (yy__raylib_support_pr->ok)
+    {
+        yk__sds t__91 = yk__sdsnew("done.\n");
+        yy__console_green(yk__sdsdup(t__91));
+        yy__os_del_process_result(yy__raylib_support_pr);
+        yy__array_del_str_array(yy__raylib_support_cmd);
+        yk__sdsfree(t__91);
+        yk__sdsfree(t__84);
+        yk__sdsfree(t__83);
+        return true;
+        yk__sdsfree(t__91);
+    }
+    yk__sds t__92 = yk__sdsnew("failed.\n");
+    yy__console_red(yk__sdsdup(t__92));
+    yk__sds t__93 = yk__sdsnew("--c compiler output---\n");
+    yy__console_cyan(yk__sdsdup(t__93));
+    yk__sds t__94 = yk__sdsnew("command := ");
+    yy__console_red(yk__sdsdup(t__94));
+    yk__sds t__95 = yk__sdsnew(" ");
+    yk__sds t__96 = yy__array_join(yy__raylib_support_cmd, yk__sdsdup(t__95));
+    yk__sds t__97 = yk__sdsnew("\n");
+    yk__sds t__98 = yk__sdscatsds(yk__sdsdup((t__96)), t__97);
+    yy__console_cyan(yk__sdsdup(t__98));
+    yy__console_red(yk__sdsdup(yy__raylib_support_pr->output));
+    yk__sds t__99 = yk__sdsnew("--end c compiler output---\n");
+    yy__console_cyan(yk__sdsdup(t__99));
+    yy__os_del_process_result(yy__raylib_support_pr);
+    yy__array_del_str_array(yy__raylib_support_cmd);
+    yk__sdsfree(t__99);
+    yk__sdsfree(t__98);
+    yk__sdsfree(t__97);
+    yk__sdsfree(t__96);
+    yk__sdsfree(t__95);
+    yk__sdsfree(t__94);
+    yk__sdsfree(t__93);
+    yk__sdsfree(t__92);
+    yk__sdsfree(t__84);
+    yk__sdsfree(t__83);
     return false;
 }
-yk__sds* yy__raylib_support_get_raylib_args(yk__sds yy__raylib_support_zig_compiler, yk__sds yy__raylib_support_runtime_path) 
+yk__sds* yy__raylib_support_get_raylib_args(struct yy__configuration_Config* yy__raylib_support_conf) 
 {
     yk__sds* yy__raylib_support_arguments = NULL;
-    yk__sds yy__raylib_support_compiler = yk__sdsdup(yy__raylib_support_zig_compiler);
-    yk__sds t__81 = yy__os_cwd();
-    yk__sds t__82 = yk__sdsnew("build");
-    yk__sds t__83 = yy__path_join(yk__sdsdup((t__81)), yk__sdsdup(t__82));
-    yk__sds yy__raylib_support_build_path = yk__sdsdup((t__83));
+    yk__sds yy__raylib_support_runtime_path = yk__sdsdup(yy__raylib_support_conf->yy__configuration_runtime_path);
+    yk__sds t__100 = yy__os_cwd();
+    yk__sds t__101 = yk__sdsnew("build");
+    yk__sds t__102 = yy__path_join(yk__sdsdup((t__100)), yk__sdsdup(t__101));
+    yk__sds yy__raylib_support_build_path = yk__sdsdup((t__102));
     yy__path_mkdir(yk__sdsdup(yy__raylib_support_build_path));
-    yk__sds t__84 = yk__sdsnew("raylib");
-    yk__sds t__85 = yy__path_join(yk__sdsdup(yy__raylib_support_runtime_path), yk__sdsdup(t__84));
-    yk__sds t__86 = yk__sdsnew("src");
-    yk__sds t__87 = yy__path_join(yk__sdsdup((t__85)), yk__sdsdup(t__86));
-    yk__sds yy__raylib_support_raylib_path = yk__sdsdup((t__87));
-    yk__sds t__88 = yk__sdsnew("raygui");
-    yk__sds t__89 = yy__path_join(yk__sdsdup(yy__raylib_support_runtime_path), yk__sdsdup(t__88));
-    yk__sds t__90 = yk__sdsnew("src");
-    yk__sds t__91 = yy__path_join(yk__sdsdup((t__89)), yk__sdsdup(t__90));
-    yk__sds yy__raylib_support_raygui_path = yk__sdsdup((t__91));
-    yk__sds t__92 = yk__sdsnew("raylib_additional");
-    yk__sds t__93 = yy__path_join(yk__sdsdup(yy__raylib_support_runtime_path), yk__sdsdup(t__92));
-    yk__sds yy__raylib_support_rayextra_path = yk__sdsdup((t__93));
-    struct yy__raylib_support_CObject** yy__raylib_support_objects = yy__raylib_support_get_objects(yk__sdsdup(yy__raylib_support_raylib_path), yk__sdsdup(yy__raylib_support_raygui_path), yk__sdsdup(yy__raylib_support_rayextra_path), yk__sdsdup(yy__raylib_support_build_path));
+    yk__sds t__103 = yk__sdsnew("raylib");
+    yk__sds t__104 = yy__path_join(yk__sdsdup(yy__raylib_support_runtime_path), yk__sdsdup(t__103));
+    yk__sds t__105 = yk__sdsnew("src");
+    yk__sds t__106 = yy__path_join(yk__sdsdup((t__104)), yk__sdsdup(t__105));
+    yk__sds yy__raylib_support_raylib_path = yk__sdsdup((t__106));
+    yk__sds t__107 = yk__sdsnew("raygui");
+    yk__sds t__108 = yy__path_join(yk__sdsdup(yy__raylib_support_runtime_path), yk__sdsdup(t__107));
+    yk__sds t__109 = yk__sdsnew("src");
+    yk__sds t__110 = yy__path_join(yk__sdsdup((t__108)), yk__sdsdup(t__109));
+    yk__sds yy__raylib_support_raygui_path = yk__sdsdup((t__110));
+    yk__sds t__111 = yk__sdsnew("raylib_additional");
+    yk__sds t__112 = yy__path_join(yk__sdsdup(yy__raylib_support_runtime_path), yk__sdsdup(t__111));
+    yk__sds yy__raylib_support_rayextra_path = yk__sdsdup((t__112));
+    struct yy__raylib_support_CObject** yy__raylib_support_objects = yy__raylib_support_get_objects(yk__sdsdup(yy__raylib_support_raylib_path), yk__sdsdup(yy__raylib_support_raygui_path), yk__sdsdup(yy__raylib_support_rayextra_path), yk__sdsdup(yy__raylib_support_build_path), yy__raylib_support_conf->yy__configuration_compilation->yy__configuration_web);
     yk__sds* yy__raylib_support_o_files = NULL;
     int32_t yy__raylib_support_object_count = yk__arrlen(yy__raylib_support_objects);
     int32_t yy__raylib_support_pos = 0;
     bool yy__raylib_support_fail = false;
-    yk__sds t__94 = yk__sdsnew("\nbuilding raylib ...");
-    yk__printlnstr((t__94));
+    yk__sds t__113 = yk__sdsnew("\nbuilding raylib ...");
+    yk__printlnstr((t__113));
     while (1) {
         if (!((yy__raylib_support_pos < yy__raylib_support_object_count))) { break; } // Check
         // Body of while loop
 
         {
             struct yy__raylib_support_CObject* yy__raylib_support_object = yy__raylib_support_objects[yy__raylib_support_pos];
-            if (yy__raylib_support_produce_object(yy__raylib_support_object, yk__sdsdup(yy__raylib_support_compiler)))
+            if (yy__raylib_support_produce_object(yy__raylib_support_object, yy__raylib_support_conf))
             {
                 yk__arrput(yy__raylib_support_o_files, yk__sdsdup(yy__raylib_support_object->yy__raylib_support_o_file));
             }
@@ -621,83 +694,87 @@ yk__sds* yy__raylib_support_get_raylib_args(yk__sds yy__raylib_support_zig_compi
     }
     if (yy__raylib_support_fail)
     {
-        yk__sds* t__95 = yy__raylib_support_arguments;
+        yk__sds* t__114 = yy__raylib_support_arguments;
         yy__raylib_support_del_objects(yy__raylib_support_objects);
         yy__array_del_str_array(yy__raylib_support_o_files);
-        yk__sdsfree(t__94);
+        yk__sdsfree(t__113);
         yk__sdsfree(yy__raylib_support_rayextra_path);
-        yk__sdsfree(t__93);
-        yk__sdsfree(t__92);
+        yk__sdsfree(t__112);
+        yk__sdsfree(t__111);
         yk__sdsfree(yy__raylib_support_raygui_path);
-        yk__sdsfree(t__91);
-        yk__sdsfree(t__90);
-        yk__sdsfree(t__89);
-        yk__sdsfree(t__88);
+        yk__sdsfree(t__110);
+        yk__sdsfree(t__109);
+        yk__sdsfree(t__108);
+        yk__sdsfree(t__107);
         yk__sdsfree(yy__raylib_support_raylib_path);
-        yk__sdsfree(t__87);
-        yk__sdsfree(t__86);
-        yk__sdsfree(t__85);
-        yk__sdsfree(t__84);
-        yk__sdsfree(yy__raylib_support_build_path);
-        yk__sdsfree(t__83);
-        yk__sdsfree(t__82);
-        yk__sdsfree(t__81);
-        yk__sdsfree(yy__raylib_support_compiler);
-        yk__sdsfree(yy__raylib_support_runtime_path);
-        yk__sdsfree(yy__raylib_support_zig_compiler);
-        return t__95;
-    }
-    yy__raylib_support_arguments = yy__raylib_support_get_external_libs();
-    yy__raylib_support_arguments = yy__array_extend(yy__raylib_support_arguments, yy__raylib_support_o_files);
-    yk__sds t__96 = yk__sdsnew("-I");
-    yk__sds t__97 = yk__sdscatsds(yk__sdsdup(t__96), yy__raylib_support_raylib_path);
-    yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__97));
-    yk__sds t__98 = yk__sdsnew("-I");
-    yk__sds t__99 = yk__sdscatsds(yk__sdsdup(t__98), yy__raylib_support_raygui_path);
-    yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__99));
-    yk__sds t__100 = yk__sdsnew("-I");
-    yk__sds t__101 = yk__sdscatsds(yk__sdsdup(t__100), yy__raylib_support_rayextra_path);
-    yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__101));
-    if (yy__os_is_windows())
-    {
-        yk__sds t__102 = yk__sdsnew("-Wl,--subsystem,windows");
-        yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__102));
-        yk__sds t__103 = yk__sdsnew("-DYK__WINDOWS_HIDE_CONSOLE");
-        yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__103));
+        yk__sdsfree(t__106);
+        yk__sdsfree(t__105);
+        yk__sdsfree(t__104);
         yk__sdsfree(t__103);
+        yk__sdsfree(yy__raylib_support_build_path);
         yk__sdsfree(t__102);
+        yk__sdsfree(t__101);
+        yk__sdsfree(t__100);
+        yk__sdsfree(yy__raylib_support_runtime_path);
+        return t__114;
     }
-    yk__sds* t__104 = yy__raylib_support_arguments;
+    if (yy__raylib_support_conf->yy__configuration_compilation->yy__configuration_web)
+    {
+        yy__raylib_support_arguments = yy__raylib_support_get_web_args();
+        yy__raylib_support_arguments = yy__array_extend(yy__raylib_support_arguments, yy__raylib_support_o_files);
+    }
+    else
+    {
+        yy__raylib_support_arguments = yy__raylib_support_get_external_libs();
+        yy__raylib_support_arguments = yy__array_extend(yy__raylib_support_arguments, yy__raylib_support_o_files);
+        if (yy__os_is_windows())
+        {
+            yk__sds t__115 = yk__sdsnew("-Wl,--subsystem,windows");
+            yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__115));
+            yk__sds t__116 = yk__sdsnew("-DYK__WINDOWS_HIDE_CONSOLE");
+            yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__116));
+            yk__sdsfree(t__116);
+            yk__sdsfree(t__115);
+        }
+    }
+    yk__sds t__117 = yk__sdsnew("-I");
+    yk__sds t__118 = yk__sdscatsds(yk__sdsdup(t__117), yy__raylib_support_raylib_path);
+    yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__118));
+    yk__sds t__119 = yk__sdsnew("-I");
+    yk__sds t__120 = yk__sdscatsds(yk__sdsdup(t__119), yy__raylib_support_raygui_path);
+    yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__120));
+    yk__sds t__121 = yk__sdsnew("-I");
+    yk__sds t__122 = yk__sdscatsds(yk__sdsdup(t__121), yy__raylib_support_rayextra_path);
+    yk__arrput(yy__raylib_support_arguments, yk__sdsdup(t__122));
+    yk__sds* t__123 = yy__raylib_support_arguments;
     yy__raylib_support_del_objects(yy__raylib_support_objects);
     yy__array_del_str_array(yy__raylib_support_o_files);
+    yk__sdsfree(t__122);
+    yk__sdsfree(t__121);
+    yk__sdsfree(t__120);
+    yk__sdsfree(t__119);
+    yk__sdsfree(t__118);
+    yk__sdsfree(t__117);
+    yk__sdsfree(t__113);
+    yk__sdsfree(yy__raylib_support_rayextra_path);
+    yk__sdsfree(t__112);
+    yk__sdsfree(t__111);
+    yk__sdsfree(yy__raylib_support_raygui_path);
+    yk__sdsfree(t__110);
+    yk__sdsfree(t__109);
+    yk__sdsfree(t__108);
+    yk__sdsfree(t__107);
+    yk__sdsfree(yy__raylib_support_raylib_path);
+    yk__sdsfree(t__106);
+    yk__sdsfree(t__105);
+    yk__sdsfree(t__104);
+    yk__sdsfree(t__103);
+    yk__sdsfree(yy__raylib_support_build_path);
+    yk__sdsfree(t__102);
     yk__sdsfree(t__101);
     yk__sdsfree(t__100);
-    yk__sdsfree(t__99);
-    yk__sdsfree(t__98);
-    yk__sdsfree(t__97);
-    yk__sdsfree(t__96);
-    yk__sdsfree(t__94);
-    yk__sdsfree(yy__raylib_support_rayextra_path);
-    yk__sdsfree(t__93);
-    yk__sdsfree(t__92);
-    yk__sdsfree(yy__raylib_support_raygui_path);
-    yk__sdsfree(t__91);
-    yk__sdsfree(t__90);
-    yk__sdsfree(t__89);
-    yk__sdsfree(t__88);
-    yk__sdsfree(yy__raylib_support_raylib_path);
-    yk__sdsfree(t__87);
-    yk__sdsfree(t__86);
-    yk__sdsfree(t__85);
-    yk__sdsfree(t__84);
-    yk__sdsfree(yy__raylib_support_build_path);
-    yk__sdsfree(t__83);
-    yk__sdsfree(t__82);
-    yk__sdsfree(t__81);
-    yk__sdsfree(yy__raylib_support_compiler);
     yk__sdsfree(yy__raylib_support_runtime_path);
-    yk__sdsfree(yy__raylib_support_zig_compiler);
-    return t__104;
+    return t__123;
 }
 yy__buffer_StringBuffer yy__buffer_new() 
 {
@@ -815,71 +892,98 @@ yk__sds yy__building_prepare_code(struct yy__configuration_Config* yy__building_
         yy__buffer_append(yy__building_buf, yk__sdsdup(t__14));
         yk__sds t__15 = yk__sdsnew("#include \"rlgl.h\"\n");
         yy__buffer_append(yy__building_buf, yk__sdsdup(t__15));
+        yk__sds t__16 = yk__sdsnew("#include \"rayextras.h\"\n");
+        yy__buffer_append(yy__building_buf, yk__sdsdup(t__16));
+        yk__sdsfree(t__16);
         yk__sdsfree(t__15);
         yk__sdsfree(t__14);
         yk__sdsfree(t__13);
         yk__sdsfree(t__12);
     }
     yy__buffer_append(yy__building_buf, yk__sdsdup(yy__building_code));
-    yk__sds t__16 = yk__sdsnew("\n");
-    yy__buffer_append(yy__building_buf, yk__sdsdup(t__16));
-    yk__sds t__17 = yy__buffer_to_str(yy__building_buf);
-    yk__sds yy__building_result = yk__sdsdup((t__17));
-    yk__sds t__18 = yy__building_result;
+    yk__sds t__17 = yk__sdsnew("\n");
+    yy__buffer_append(yy__building_buf, yk__sdsdup(t__17));
+    yk__sds t__18 = yy__buffer_to_str(yy__building_buf);
+    yk__sds yy__building_result = yk__sdsdup((t__18));
+    yk__sds t__19 = yy__building_result;
     yy__buffer_del_buf(yy__building_buf);
+    yk__sdsfree(t__18);
     yk__sdsfree(t__17);
-    yk__sdsfree(t__16);
     yk__sdsfree(yy__building_code);
-    return t__18;
+    return t__19;
 }
 bool yy__building_is_target_macos(yk__sds yy__building_target_to_check) 
 {
     bool yy__building_native = (yk__sdslen(yy__building_target_to_check) == 0);
     if (yy__building_native)
     {
-        bool t__19 = yy__os_is_macos();
+        bool t__20 = yy__os_is_macos();
         yk__sdsfree(yy__building_target_to_check);
-        return t__19;
+        return t__20;
     }
-    yk__sds t__20 = yk__sdsnew("macos");
-    bool t__21 = yy__strings_contains(yk__sdsdup(yy__building_target_to_check), yk__sdsdup(t__20));
-    yk__sdsfree(t__20);
+    yk__sds t__21 = yk__sdsnew("macos");
+    bool t__22 = yy__strings_contains(yk__sdsdup(yy__building_target_to_check), yk__sdsdup(t__21));
+    yk__sdsfree(t__21);
     yk__sdsfree(yy__building_target_to_check);
-    return t__21;
+    return t__22;
 }
 bool yy__building_is_target_windows(yk__sds yy__building_target_to_check) 
 {
     bool yy__building_native = (yk__sdslen(yy__building_target_to_check) == 0);
     if (yy__building_native)
     {
-        bool t__22 = yy__os_is_windows();
+        bool t__23 = yy__os_is_windows();
         yk__sdsfree(yy__building_target_to_check);
-        return t__22;
+        return t__23;
     }
-    yk__sds t__23 = yk__sdsnew("windows");
-    bool t__24 = yy__strings_contains(yk__sdsdup(yy__building_target_to_check), yk__sdsdup(t__23));
-    yk__sdsfree(t__23);
+    yk__sds t__24 = yk__sdsnew("windows");
+    bool t__25 = yy__strings_contains(yk__sdsdup(yy__building_target_to_check), yk__sdsdup(t__24));
+    yk__sdsfree(t__24);
     yk__sdsfree(yy__building_target_to_check);
-    return t__24;
+    return t__25;
 }
 yk__sds* yy__building_create_args(struct yy__configuration_Config* yy__building_c, yk__sds yy__building_code_path, yk__sds yy__building_build_path, yk__sds yy__building_target, yk__sds* yy__building_raylib_args) 
 {
     bool yy__building_native = (yk__sdslen(yy__building_target) == 0);
-    yk__sds t__25 = yk__sdsnew("cc");
-    yk__sds t__26 = yk__sdsnew("-std=c99");
-    yk__sds t__27 = yk__sdsnew("-Oz");
-    yk__sds t__28 = yk__sdsnew("-pedantic");
-    yk__sds t__29 = yk__sdsnew("-Wall");
-    yk__sds t__30 = yk__sdsnew("-Wno-newline-eof");
-    yk__sds t__31 = yk__sdsnew("-fPIC");
-    yk__sds t__32 = yk__sdsnew("-Wno-parentheses-equality");
-    yk__sds* yy__building_args = yy__array_new(9, yk__sdsdup(yy__building_c->yy__configuration_zig_compiler_path), yk__sdsdup(t__25), yk__sdsdup(t__26), yk__sdsdup(t__27), yk__sdsdup(t__28), yk__sdsdup(t__29), yk__sdsdup(t__30), yk__sdsdup(t__31), yk__sdsdup(t__32));
+    yk__sds* yy__building_args = NULL;
+    if (yy__building_c->yy__configuration_compilation->yy__configuration_web)
+    {
+        yk__sds t__26 = yk__sdsnew("-std=c99");
+        yk__sds t__27 = yk__sdsnew("-Oz");
+        yk__sds t__28 = yk__sdsnew("-Wno-newline-eof");
+        yk__sds t__29 = yk__sdsnew("-Wno-parentheses-equality");
+        yy__building_args = yy__array_new(5, yk__sdsdup(yy__building_c->yy__configuration_emcc_compiler_path), yk__sdsdup(t__26), yk__sdsdup(t__27), yk__sdsdup(t__28), yk__sdsdup(t__29));
+        yk__sdsfree(t__29);
+        yk__sdsfree(t__28);
+        yk__sdsfree(t__27);
+        yk__sdsfree(t__26);
+    }
+    else
+    {
+        yk__sds t__30 = yk__sdsnew("cc");
+        yk__sds t__31 = yk__sdsnew("-std=c99");
+        yk__sds t__32 = yk__sdsnew("-Oz");
+        yk__sds t__33 = yk__sdsnew("-pedantic");
+        yk__sds t__34 = yk__sdsnew("-Wall");
+        yk__sds t__35 = yk__sdsnew("-Wno-newline-eof");
+        yk__sds t__36 = yk__sdsnew("-fPIC");
+        yk__sds t__37 = yk__sdsnew("-Wno-parentheses-equality");
+        yy__building_args = yy__array_new(9, yk__sdsdup(yy__building_c->yy__configuration_zig_compiler_path), yk__sdsdup(t__30), yk__sdsdup(t__31), yk__sdsdup(t__32), yk__sdsdup(t__33), yk__sdsdup(t__34), yk__sdsdup(t__35), yk__sdsdup(t__36), yk__sdsdup(t__37));
+        yk__sdsfree(t__37);
+        yk__sdsfree(t__36);
+        yk__sdsfree(t__35);
+        yk__sdsfree(t__34);
+        yk__sdsfree(t__33);
+        yk__sdsfree(t__32);
+        yk__sdsfree(t__31);
+        yk__sdsfree(t__30);
+    }
     yy__building_args = yy__array_extend(yy__building_args, yy__building_raylib_args);
     if ((! (yy__building_is_target_macos(yk__sdsdup(yy__building_target)))))
     {
-        yk__sds t__33 = yk__sdsnew("-flto=full");
-        yk__arrput(yy__building_args, yk__sdsdup(t__33));
-        yk__sdsfree(t__33);
+        yk__sds t__38 = yk__sdsnew("-flto=full");
+        yk__arrput(yy__building_args, yk__sdsdup(t__38));
+        yk__sdsfree(t__38);
     }
     int32_t yy__building_length = 0;
     int32_t yy__building_x = 0;
@@ -890,14 +994,14 @@ yk__sds* yy__building_create_args(struct yy__configuration_Config* yy__building_
         // Body of while loop
 
         {
-            yk__sds t__34 = yk__sdsnew("-I");
-            yk__sds t__35 = yk__sdscatsds(yk__sdsdup(t__34), yy__building_c->yy__configuration_c_code->yy__configuration_include_paths[yy__building_x]);
-            yk__sds yy__building_include = yk__sdsdup(t__35);
+            yk__sds t__39 = yk__sdsnew("-I");
+            yk__sds t__40 = yk__sdscatsds(yk__sdsdup(t__39), yy__building_c->yy__configuration_c_code->yy__configuration_include_paths[yy__building_x]);
+            yk__sds yy__building_include = yk__sdsdup(t__40);
             yk__arrput(yy__building_args, yk__sdsdup(yy__building_include));
             yy__building_x = (yy__building_x + 1);
             yk__sdsfree(yy__building_include);
-            yk__sdsfree(t__35);
-            yk__sdsfree(t__34);
+            yk__sdsfree(t__40);
+            yk__sdsfree(t__39);
         }
     }
     yy__building_length = yk__arrlen(yy__building_c->yy__configuration_c_code->yy__configuration_compiler_defines);
@@ -907,14 +1011,14 @@ yk__sds* yy__building_create_args(struct yy__configuration_Config* yy__building_
         // Body of while loop
 
         {
-            yk__sds t__36 = yk__sdsnew("-D");
-            yk__sds t__37 = yk__sdscatsds(yk__sdsdup(t__36), yy__building_c->yy__configuration_c_code->yy__configuration_compiler_defines[yy__building_x]);
-            yk__sds yy__building_cdefine = yk__sdsdup(t__37);
+            yk__sds t__41 = yk__sdsnew("-D");
+            yk__sds t__42 = yk__sdscatsds(yk__sdsdup(t__41), yy__building_c->yy__configuration_c_code->yy__configuration_compiler_defines[yy__building_x]);
+            yk__sds yy__building_cdefine = yk__sdsdup(t__42);
             yk__arrput(yy__building_args, yk__sdsdup(yy__building_cdefine));
             yy__building_x = (yy__building_x + 1);
             yk__sdsfree(yy__building_cdefine);
-            yk__sdsfree(t__37);
-            yk__sdsfree(t__36);
+            yk__sdsfree(t__42);
+            yk__sdsfree(t__41);
         }
     }
     yy__building_length = yk__arrlen(yy__building_c->yy__configuration_c_code->yy__configuration_c_code);
@@ -931,63 +1035,70 @@ yk__sds* yy__building_create_args(struct yy__configuration_Config* yy__building_
         }
     }
     yk__arrput(yy__building_args, yk__sdsdup(yy__building_code_path));
-    yk__sds t__38 = yk__sdsnew("yk__main.c");
-    yk__sds t__39 = yy__path_join(yk__sdsdup(yy__building_c->yy__configuration_runtime_path), yk__sdsdup(t__38));
-    yk__sds yy__building_the_yk_main = yk__sdsdup((t__39));
+    yk__sds t__43 = yk__sdsnew("yk__main.c");
+    yk__sds t__44 = yy__path_join(yk__sdsdup(yy__building_c->yy__configuration_runtime_path), yk__sdsdup(t__43));
+    yk__sds yy__building_the_yk_main = yk__sdsdup((t__44));
     yk__arrput(yy__building_args, yk__sdsdup(yy__building_the_yk_main));
-    if ((! (yy__building_native)))
+    yk__sds t__45 = yk__sdsnew("web");
+    if (((! (yy__building_native)) && (yk__sdscmp(yy__building_target , t__45) != 0)))
     {
-        yk__sds t__40 = yk__sdsnew("-target");
-        yk__arrput(yy__building_args, yk__sdsdup(t__40));
+        yk__sds t__46 = yk__sdsnew("-target");
+        yk__arrput(yy__building_args, yk__sdsdup(t__46));
         yk__arrput(yy__building_args, yk__sdsdup(yy__building_target));
-        yk__sdsfree(t__40);
+        yk__sdsfree(t__46);
     }
-    yk__sds t__41 = yk__sdsnew("-o");
-    yk__arrput(yy__building_args, yk__sdsdup(t__41));
+    yk__sds t__47 = yk__sdsnew("-o");
+    yk__arrput(yy__building_args, yk__sdsdup(t__47));
     yk__sds yy__building_binary = yk__sdsdup(yy__building_c->yy__configuration_project->yy__configuration_name);
-    if ((! (yy__building_native)))
+    yk__sds t__48 = yk__sdsnew("web");
+    if (((! (yy__building_native)) && (yk__sdscmp(yy__building_target , t__48) != 0)))
     {
-        yk__sds t__42 = yk__sdsnew("-");
-        yk__sds t__43 = yk__sdscatsds(yk__sdsdup(yy__building_binary), t__42);
-        yk__sds t__44 = yk__sdscatsds(yk__sdsdup(t__43), yy__building_target);
+        yk__sds t__49 = yk__sdsnew("-");
+        yk__sds t__50 = yk__sdscatsds(yk__sdsdup(yy__building_binary), t__49);
+        yk__sds t__51 = yk__sdscatsds(yk__sdsdup(t__50), yy__building_target);
         yk__sdsfree(yy__building_binary);
-        yy__building_binary = yk__sdsdup(t__44);
-        yk__sdsfree(t__44);
-        yk__sdsfree(t__43);
-        yk__sdsfree(t__42);
+        yy__building_binary = yk__sdsdup(t__51);
+        yk__sdsfree(t__51);
+        yk__sdsfree(t__50);
+        yk__sdsfree(t__49);
     }
     if (yy__building_is_target_windows(yk__sdsdup(yy__building_target)))
     {
-        yk__sds t__45 = yk__sdsnew(".exe");
-        yk__sds t__46 = yk__sdscatsds(yk__sdsdup(yy__building_binary), t__45);
+        yk__sds t__52 = yk__sdsnew(".exe");
+        yk__sds t__53 = yk__sdscatsds(yk__sdsdup(yy__building_binary), t__52);
         yk__sdsfree(yy__building_binary);
-        yy__building_binary = yk__sdsdup(t__46);
-        yk__sdsfree(t__46);
-        yk__sdsfree(t__45);
+        yy__building_binary = yk__sdsdup(t__53);
+        yk__sdsfree(t__53);
+        yk__sdsfree(t__52);
     }
-    yk__sds t__47 = yy__path_join(yk__sdsdup(yy__building_build_path), yk__sdsdup(yy__building_binary));
+    yk__sds t__54 = yk__sdsnew("web");
+    if ((yk__sdscmp(yy__building_target , t__54) == 0))
+    {
+        yk__sds t__55 = yk__sdsnew(".html");
+        yk__sds t__56 = yk__sdscatsds(yk__sdsdup(yy__building_binary), t__55);
+        yk__sdsfree(yy__building_binary);
+        yy__building_binary = yk__sdsdup(t__56);
+        yk__sdsfree(t__56);
+        yk__sdsfree(t__55);
+    }
+    yk__sds t__57 = yy__path_join(yk__sdsdup(yy__building_build_path), yk__sdsdup(yy__building_binary));
     yk__sdsfree(yy__building_binary);
-    yy__building_binary = yk__sdsdup((t__47));
+    yy__building_binary = yk__sdsdup((t__57));
     yk__arrput(yy__building_args, yk__sdsdup(yy__building_binary));
-    yk__sds* t__48 = yy__building_args;
-    yk__sdsfree(t__47);
+    yk__sds* t__58 = yy__building_args;
+    yk__sdsfree(t__57);
+    yk__sdsfree(t__54);
+    yk__sdsfree(t__48);
     yk__sdsfree(yy__building_binary);
-    yk__sdsfree(t__41);
+    yk__sdsfree(t__47);
+    yk__sdsfree(t__45);
     yk__sdsfree(yy__building_the_yk_main);
-    yk__sdsfree(t__39);
-    yk__sdsfree(t__38);
-    yk__sdsfree(t__32);
-    yk__sdsfree(t__31);
-    yk__sdsfree(t__30);
-    yk__sdsfree(t__29);
-    yk__sdsfree(t__28);
-    yk__sdsfree(t__27);
-    yk__sdsfree(t__26);
-    yk__sdsfree(t__25);
+    yk__sdsfree(t__44);
+    yk__sdsfree(t__43);
     yk__sdsfree(yy__building_target);
     yk__sdsfree(yy__building_build_path);
     yk__sdsfree(yy__building_code_path);
-    return t__48;
+    return t__58;
 }
 int32_t yy__building_build_target(struct yy__configuration_Config* yy__building_c, yk__sds yy__building_code_path, yk__sds yy__building_build_path, yk__sds yy__building_target, yk__sds* yy__building_raylib_args) 
 {
@@ -996,63 +1107,63 @@ int32_t yy__building_build_target(struct yy__configuration_Config* yy__building_
     yy__os_ProcessResult yy__building_result = yy__os_run(yy__building_a);
     if (yy__building_native)
     {
-        yk__sds t__49 = yk__sdsnew("native");
-        yy__console_yellow(yk__sdsdup(t__49));
-        yk__sdsfree(t__49);
+        yk__sds t__59 = yk__sdsnew("native");
+        yy__console_yellow(yk__sdsdup(t__59));
+        yk__sdsfree(t__59);
     }
     else
     {
         yy__console_yellow(yk__sdsdup(yy__building_target));
     }
-    yk__sds t__50 = yk__sdsnew(" := ");
-    yy__console_cyan(yk__sdsdup(t__50));
+    yk__sds t__60 = yk__sdsnew(" := ");
+    yy__console_cyan(yk__sdsdup(t__60));
     if (yy__building_result->ok)
     {
-        yk__sds t__51 = yk__sdsnew("done.\n");
-        yy__console_green(yk__sdsdup(t__51));
+        yk__sds t__61 = yk__sdsnew("done.\n");
+        yy__console_green(yk__sdsdup(t__61));
         yy__os_del_process_result(yy__building_result);
         yy__array_del_str_array(yy__building_a);
-        yk__sdsfree(t__51);
-        yk__sdsfree(t__50);
+        yk__sdsfree(t__61);
+        yk__sdsfree(t__60);
         yk__sdsfree(yy__building_target);
         yk__sdsfree(yy__building_build_path);
         yk__sdsfree(yy__building_code_path);
         return 0;
-        yk__sdsfree(t__51);
+        yk__sdsfree(t__61);
     }
     else
     {
-        yk__sds t__52 = yk__sdsnew("failed.\n");
-        yy__console_red(yk__sdsdup(t__52));
-        yk__sds t__53 = yk__sdsnew("-------\n");
-        yy__console_cyan(yk__sdsdup(t__53));
-        yk__sds t__54 = yk__sdsnew("command := ");
-        yy__console_red(yk__sdsdup(t__54));
-        yk__sds t__55 = yk__sdsnew(" ");
-        yk__sds t__56 = yy__array_join(yy__building_a, yk__sdsdup(t__55));
-        yy__console_yellow(yk__sdsdup((t__56)));
-        yk__sds t__57 = yk__sdsnew("\n-------\n");
-        yy__console_cyan(yk__sdsdup(t__57));
+        yk__sds t__62 = yk__sdsnew("failed.\n");
+        yy__console_red(yk__sdsdup(t__62));
+        yk__sds t__63 = yk__sdsnew("-------\n");
+        yy__console_cyan(yk__sdsdup(t__63));
+        yk__sds t__64 = yk__sdsnew("command := ");
+        yy__console_red(yk__sdsdup(t__64));
+        yk__sds t__65 = yk__sdsnew(" ");
+        yk__sds t__66 = yy__array_join(yy__building_a, yk__sdsdup(t__65));
+        yy__console_yellow(yk__sdsdup((t__66)));
+        yk__sds t__67 = yk__sdsnew("\n-------\n");
+        yy__console_cyan(yk__sdsdup(t__67));
         yy__console_red(yk__sdsdup(yy__building_result->output));
         yy__os_del_process_result(yy__building_result);
         yy__array_del_str_array(yy__building_a);
-        yk__sdsfree(t__57);
-        yk__sdsfree(t__56);
-        yk__sdsfree(t__55);
-        yk__sdsfree(t__54);
-        yk__sdsfree(t__53);
-        yk__sdsfree(t__52);
-        yk__sdsfree(t__50);
+        yk__sdsfree(t__67);
+        yk__sdsfree(t__66);
+        yk__sdsfree(t__65);
+        yk__sdsfree(t__64);
+        yk__sdsfree(t__63);
+        yk__sdsfree(t__62);
+        yk__sdsfree(t__60);
         yk__sdsfree(yy__building_target);
         yk__sdsfree(yy__building_build_path);
         yk__sdsfree(yy__building_code_path);
         return 1;
-        yk__sdsfree(t__57);
-        yk__sdsfree(t__56);
-        yk__sdsfree(t__55);
-        yk__sdsfree(t__54);
-        yk__sdsfree(t__53);
-        yk__sdsfree(t__52);
+        yk__sdsfree(t__67);
+        yk__sdsfree(t__66);
+        yk__sdsfree(t__65);
+        yk__sdsfree(t__64);
+        yk__sdsfree(t__63);
+        yk__sdsfree(t__62);
     }
 }
 int32_t yy__building_build(struct yy__configuration_Config* yy__building_c, yk__sds yy__building_code) 
@@ -1061,62 +1172,62 @@ int32_t yy__building_build(struct yy__configuration_Config* yy__building_c, yk__
     yk__sds* yy__building_raylib_args = NULL;
     if (((yy__building_target_count != 0) && yy__building_c->yy__configuration_compilation->yy__configuration_raylib))
     {
-        yk__sds t__58 = yk__sdsnew("raylib build only support native builds.\n");
-        yy__console_red(yk__sdsdup(t__58));
-        yk__sds t__59 = yk__sdsnew("Hint: You need to keep [compilation].targets empty\n");
-        yy__console_cyan(yk__sdsdup(t__59));
-        int32_t t__60 = (- (1));
-        yy__array_del_str_array(yy__building_raylib_args);
-        yk__sdsfree(t__59);
-        yk__sdsfree(t__58);
-        yk__sdsfree(yy__building_code);
-        return t__60;
-        yk__sdsfree(t__59);
-        yk__sdsfree(t__58);
-    }
-    if (yy__building_c->yy__configuration_compilation->yy__configuration_raylib)
-    {
-        yy__building_raylib_args = yy__raylib_support_get_raylib_args(yk__sdsdup(yy__building_c->yy__configuration_zig_compiler_path), yk__sdsdup(yy__building_c->yy__configuration_runtime_path));
-    }
-    yk__sds t__61 = yk__sdsnew("\nbuilding ");
-    yk__printstr((t__61));
-    yk__printint(((intmax_t)(yy__building_target_count + 1)));
-    yk__sds t__62 = yk__sdsnew(" target(s) ...");
-    yk__printlnstr((t__62));
-    yk__sds t__63 = yy__os_cwd();
-    yk__sds t__64 = yk__sdsnew("build");
-    yk__sds t__65 = yy__path_join(yk__sdsdup((t__63)), yk__sdsdup(t__64));
-    yk__sds yy__building_build_path = yk__sdsdup((t__65));
-    yy__path_mkdir(yk__sdsdup(yy__building_build_path));
-    yk__sds t__66 = yk__sdsnew("program_code.c");
-    yk__sds t__67 = yy__path_join(yk__sdsdup(yy__building_build_path), yk__sdsdup(t__66));
-    yk__sds yy__building_code_path = yk__sdsdup((t__67));
-    yk__sds t__68 = yy__building_prepare_code(yy__building_c, yk__sdsdup(yy__building_code));
-    if ((! (yy__io_writefile(yk__sdsdup(yy__building_code_path), yk__sdsdup((t__68))))))
-    {
-        yk__sds t__69 = yk__sdsnew("Failed to write file:");
-        yy__console_red(yk__sdsdup(t__69));
-        yk__printlnstr((yy__building_code_path));
+        yk__sds t__68 = yk__sdsnew("raylib build only support native builds.\n");
+        yy__console_red(yk__sdsdup(t__68));
+        yk__sds t__69 = yk__sdsnew("Hint: You need to keep [compilation].targets empty\n");
+        yy__console_cyan(yk__sdsdup(t__69));
         int32_t t__70 = (- (1));
         yy__array_del_str_array(yy__building_raylib_args);
         yk__sdsfree(t__69);
         yk__sdsfree(t__68);
-        yk__sdsfree(yy__building_code_path);
-        yk__sdsfree(t__67);
-        yk__sdsfree(t__66);
-        yk__sdsfree(yy__building_build_path);
-        yk__sdsfree(t__65);
-        yk__sdsfree(t__64);
-        yk__sdsfree(t__63);
-        yk__sdsfree(t__62);
-        yk__sdsfree(t__61);
         yk__sdsfree(yy__building_code);
         return t__70;
         yk__sdsfree(t__69);
+        yk__sdsfree(t__68);
+    }
+    if (yy__building_c->yy__configuration_compilation->yy__configuration_raylib)
+    {
+        yy__building_raylib_args = yy__raylib_support_get_raylib_args(yy__building_c);
+    }
+    yk__sds t__71 = yk__sdsnew("\nbuilding ");
+    yk__printstr((t__71));
+    yk__printint(((intmax_t)(yy__building_target_count + 1)));
+    yk__sds t__72 = yk__sdsnew(" target(s) ...");
+    yk__printlnstr((t__72));
+    yk__sds t__73 = yy__os_cwd();
+    yk__sds t__74 = yk__sdsnew("build");
+    yk__sds t__75 = yy__path_join(yk__sdsdup((t__73)), yk__sdsdup(t__74));
+    yk__sds yy__building_build_path = yk__sdsdup((t__75));
+    yy__path_mkdir(yk__sdsdup(yy__building_build_path));
+    yk__sds t__76 = yk__sdsnew("program_code.c");
+    yk__sds t__77 = yy__path_join(yk__sdsdup(yy__building_build_path), yk__sdsdup(t__76));
+    yk__sds yy__building_code_path = yk__sdsdup((t__77));
+    yk__sds t__78 = yy__building_prepare_code(yy__building_c, yk__sdsdup(yy__building_code));
+    if ((! (yy__io_writefile(yk__sdsdup(yy__building_code_path), yk__sdsdup((t__78))))))
+    {
+        yk__sds t__79 = yk__sdsnew("Failed to write file:");
+        yy__console_red(yk__sdsdup(t__79));
+        yk__printlnstr((yy__building_code_path));
+        int32_t t__80 = (- (1));
+        yy__array_del_str_array(yy__building_raylib_args);
+        yk__sdsfree(t__79);
+        yk__sdsfree(t__78);
+        yk__sdsfree(yy__building_code_path);
+        yk__sdsfree(t__77);
+        yk__sdsfree(t__76);
+        yk__sdsfree(yy__building_build_path);
+        yk__sdsfree(t__75);
+        yk__sdsfree(t__74);
+        yk__sdsfree(t__73);
+        yk__sdsfree(t__72);
+        yk__sdsfree(t__71);
+        yk__sdsfree(yy__building_code);
+        return t__80;
+        yk__sdsfree(t__79);
     }
     int32_t yy__building_failed_count = 0;
-    yk__sds t__71 = yk__sdsempty();
-    yy__building_failed_count = (yy__building_failed_count + yy__building_build_target(yy__building_c, yk__sdsdup(yy__building_code_path), yk__sdsdup(yy__building_build_path), yk__sdsdup(t__71), yy__building_raylib_args));
+    yk__sds t__81 = yk__sdsempty();
+    yy__building_failed_count = (yy__building_failed_count + yy__building_build_target(yy__building_c, yk__sdsdup(yy__building_code_path), yk__sdsdup(yy__building_build_path), yk__sdsdup(t__81), yy__building_raylib_args));
     int32_t yy__building_cnt = 0;
     while (1) {
         if (!((yy__building_cnt < yk__arrlen(yy__building_c->yy__configuration_compilation->yy__configuration_targets)))) { break; } // Check
@@ -1129,98 +1240,110 @@ int32_t yy__building_build(struct yy__configuration_Config* yy__building_c, yk__
             yk__sdsfree(yy__building_target);
         }
     }
-    yk__sds t__72 = yk__sdsnew("\n");
-    yk__printstr((t__72));
-    if ((yy__building_failed_count > 0))
-    {
-        int32_t t__73 = (- (1));
-        yy__array_del_str_array(yy__building_raylib_args);
-        yk__sdsfree(t__72);
-        yk__sdsfree(t__71);
-        yk__sdsfree(t__68);
-        yk__sdsfree(yy__building_code_path);
-        yk__sdsfree(t__67);
-        yk__sdsfree(t__66);
-        yk__sdsfree(yy__building_build_path);
-        yk__sdsfree(t__65);
-        yk__sdsfree(t__64);
-        yk__sdsfree(t__63);
-        yk__sdsfree(t__62);
-        yk__sdsfree(t__61);
-        yk__sdsfree(yy__building_code);
-        return t__73;
-    }
-    yy__array_del_str_array(yy__building_raylib_args);
-    yk__sdsfree(t__72);
-    yk__sdsfree(t__71);
-    yk__sdsfree(t__68);
-    yk__sdsfree(yy__building_code_path);
-    yk__sdsfree(t__67);
-    yk__sdsfree(t__66);
-    yk__sdsfree(yy__building_build_path);
-    yk__sdsfree(t__65);
-    yk__sdsfree(t__64);
-    yk__sdsfree(t__63);
-    yk__sdsfree(t__62);
-    yk__sdsfree(t__61);
-    yk__sdsfree(yy__building_code);
-    return 0;
-}
-int32_t yy__building_build_simple(struct yy__configuration_Config* yy__building_c, yk__sds yy__building_code) 
-{
-    yk__sds t__74 = yy__os_cwd();
-    yk__sds t__75 = yk__sdsnew(".c");
-    yk__sds t__76 = yk__sdscatsds(yk__sdsdup(yy__building_c->yy__configuration_project->yy__configuration_name), t__75);
-    yk__sds t__77 = yy__path_join(yk__sdsdup((t__74)), yk__sdsdup(t__76));
-    yk__sds yy__building_code_path = yk__sdsdup((t__77));
-    yk__sds* yy__building_raylib_args = NULL;
-    if (yy__building_c->yy__configuration_compilation->yy__configuration_raylib)
-    {
-        yy__building_raylib_args = yy__raylib_support_get_raylib_args(yk__sdsdup(yy__building_c->yy__configuration_zig_compiler_path), yk__sdsdup(yy__building_c->yy__configuration_runtime_path));
-    }
-    yk__sds t__78 = yy__building_prepare_code(yy__building_c, yk__sdsdup(yy__building_code));
-    if ((! (yy__io_writefile(yk__sdsdup(yy__building_code_path), yk__sdsdup((t__78))))))
-    {
-        yk__sds t__79 = yk__sdsnew("Failed to write file:");
-        yy__console_red(yk__sdsdup(t__79));
-        yk__printlnstr((yy__building_code_path));
-        int32_t t__80 = (- (1));
-        yk__sdsfree(t__79);
-        yk__sdsfree(t__78);
-        yk__sdsfree(yy__building_code_path);
-        yk__sdsfree(t__77);
-        yk__sdsfree(t__76);
-        yk__sdsfree(t__75);
-        yk__sdsfree(t__74);
-        yk__sdsfree(yy__building_code);
-        return t__80;
-        yk__sdsfree(t__79);
-    }
-    yk__sds t__81 = yy__os_cwd();
-    yk__sds t__82 = yk__sdsempty();
-    int32_t yy__building_failed_count = yy__building_build_target(yy__building_c, yk__sdsdup(yy__building_code_path), yk__sdsdup((t__81)), yk__sdsdup(t__82), yy__building_raylib_args);
+    yk__sds t__82 = yk__sdsnew("\n");
+    yk__printstr((t__82));
     if ((yy__building_failed_count > 0))
     {
         int32_t t__83 = (- (1));
+        yy__array_del_str_array(yy__building_raylib_args);
         yk__sdsfree(t__82);
         yk__sdsfree(t__81);
         yk__sdsfree(t__78);
         yk__sdsfree(yy__building_code_path);
         yk__sdsfree(t__77);
         yk__sdsfree(t__76);
+        yk__sdsfree(yy__building_build_path);
         yk__sdsfree(t__75);
         yk__sdsfree(t__74);
+        yk__sdsfree(t__73);
+        yk__sdsfree(t__72);
+        yk__sdsfree(t__71);
         yk__sdsfree(yy__building_code);
         return t__83;
     }
+    yy__array_del_str_array(yy__building_raylib_args);
     yk__sdsfree(t__82);
     yk__sdsfree(t__81);
     yk__sdsfree(t__78);
     yk__sdsfree(yy__building_code_path);
     yk__sdsfree(t__77);
     yk__sdsfree(t__76);
+    yk__sdsfree(yy__building_build_path);
     yk__sdsfree(t__75);
     yk__sdsfree(t__74);
+    yk__sdsfree(t__73);
+    yk__sdsfree(t__72);
+    yk__sdsfree(t__71);
+    yk__sdsfree(yy__building_code);
+    return 0;
+}
+int32_t yy__building_build_simple(struct yy__configuration_Config* yy__building_c, yk__sds yy__building_code) 
+{
+    yk__sds t__84 = yy__os_cwd();
+    yk__sds t__85 = yk__sdsnew(".c");
+    yk__sds t__86 = yk__sdscatsds(yk__sdsdup(yy__building_c->yy__configuration_project->yy__configuration_name), t__85);
+    yk__sds t__87 = yy__path_join(yk__sdsdup((t__84)), yk__sdsdup(t__86));
+    yk__sds yy__building_code_path = yk__sdsdup((t__87));
+    yk__sds* yy__building_raylib_args = NULL;
+    yk__sds t__88 = yk__sdsempty();
+    yk__sds yy__building_target = yk__sdsdup(t__88);
+    if (yy__building_c->yy__configuration_compilation->yy__configuration_raylib)
+    {
+        yy__building_raylib_args = yy__raylib_support_get_raylib_args(yy__building_c);
+    }
+    if (yy__building_c->yy__configuration_compilation->yy__configuration_web)
+    {
+        yk__sds t__89 = yk__sdsnew("web");
+        yk__sdsfree(yy__building_target);
+        yy__building_target = yk__sdsdup(t__89);
+        yk__sdsfree(t__89);
+    }
+    yk__sds t__90 = yy__building_prepare_code(yy__building_c, yk__sdsdup(yy__building_code));
+    if ((! (yy__io_writefile(yk__sdsdup(yy__building_code_path), yk__sdsdup((t__90))))))
+    {
+        yk__sds t__91 = yk__sdsnew("Failed to write file:");
+        yy__console_red(yk__sdsdup(t__91));
+        yk__printlnstr((yy__building_code_path));
+        int32_t t__92 = (- (1));
+        yk__sdsfree(t__91);
+        yk__sdsfree(t__90);
+        yk__sdsfree(yy__building_target);
+        yk__sdsfree(t__88);
+        yk__sdsfree(yy__building_code_path);
+        yk__sdsfree(t__87);
+        yk__sdsfree(t__86);
+        yk__sdsfree(t__85);
+        yk__sdsfree(t__84);
+        yk__sdsfree(yy__building_code);
+        return t__92;
+        yk__sdsfree(t__91);
+    }
+    yk__sds t__93 = yy__os_cwd();
+    int32_t yy__building_failed_count = yy__building_build_target(yy__building_c, yk__sdsdup(yy__building_code_path), yk__sdsdup((t__93)), yk__sdsdup(yy__building_target), yy__building_raylib_args);
+    if ((yy__building_failed_count > 0))
+    {
+        int32_t t__94 = (- (1));
+        yk__sdsfree(t__93);
+        yk__sdsfree(t__90);
+        yk__sdsfree(yy__building_target);
+        yk__sdsfree(t__88);
+        yk__sdsfree(yy__building_code_path);
+        yk__sdsfree(t__87);
+        yk__sdsfree(t__86);
+        yk__sdsfree(t__85);
+        yk__sdsfree(t__84);
+        yk__sdsfree(yy__building_code);
+        return t__94;
+    }
+    yk__sdsfree(t__93);
+    yk__sdsfree(t__90);
+    yk__sdsfree(yy__building_target);
+    yk__sdsfree(t__88);
+    yk__sdsfree(yy__building_code_path);
+    yk__sdsfree(t__87);
+    yk__sdsfree(t__86);
+    yk__sdsfree(t__85);
+    yk__sdsfree(t__84);
     yk__sdsfree(yy__building_code);
     return 0;
 }
@@ -1636,62 +1759,103 @@ void yy__configuration_find_zig_compiler(struct yy__configuration_Config* yy__co
         yk__sdsfree(t__67);
         return;
     }
-    yk__sds t__69 = yk__sdsnew("Failed to find zig in PATH");
-    yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__69));
+    if ((! (yy__configuration_c->yy__configuration_compilation->yy__configuration_web)))
+    {
+        yk__sds t__69 = yk__sdsnew("Failed to find zig in PATH");
+        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__69));
+        yk__sdsfree(t__69);
+    }
     yk__sds t__70 = yk__sdsnew("<not found>");
     yk__sdsfree(yy__configuration_c->yy__configuration_zig_compiler_path);
     yy__configuration_c->yy__configuration_zig_compiler_path = yk__sdsdup(t__70);
     yk__sdsfree(t__70);
-    yk__sdsfree(t__69);
     yk__sdsfree(yy__configuration_zig);
     yk__sdsfree(t__68);
     yk__sdsfree(t__67);
     return;
 }
+void yy__configuration_find_emsdk(struct yy__configuration_Config* yy__configuration_c) 
+{
+    yk__sds t__71 = yk__sdsnew("emcc");
+    yk__sds t__72 = yy__os_which(yk__sdsdup(t__71));
+    yk__sds yy__configuration_emcc = yk__sdsdup((t__72));
+    yk__sds t__73 = yk__sdsnew("emrun");
+    yk__sds t__74 = yy__os_which(yk__sdsdup(t__73));
+    yk__sds yy__configuration_emrun = yk__sdsdup((t__74));
+    bool yy__configuration_not_found = ((yk__sdslen(yy__configuration_emcc) == 0) || (yk__sdslen(yy__configuration_emrun) == 0));
+    if ((yy__configuration_c->yy__configuration_compilation->yy__configuration_web && yy__configuration_not_found))
+    {
+        yk__sds t__75 = yk__sdsnew("Failed to find emsdk (emcc, emrun) in PATH");
+        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__75));
+        yk__sds t__76 = yk__sdsnew("<not found>");
+        yk__sdsfree(yy__configuration_c->yy__configuration_emcc_compiler_path);
+        yy__configuration_c->yy__configuration_emcc_compiler_path = yk__sdsdup(t__76);
+        yk__sds t__77 = yk__sdsnew("<not found>");
+        yk__sdsfree(yy__configuration_c->yy__configuration_emrun_path);
+        yy__configuration_c->yy__configuration_emrun_path = yk__sdsdup(t__77);
+        yk__sdsfree(t__77);
+        yk__sdsfree(t__76);
+        yk__sdsfree(t__75);
+    }
+    else
+    {
+        yk__sdsfree(yy__configuration_c->yy__configuration_emcc_compiler_path);
+        yy__configuration_c->yy__configuration_emcc_compiler_path = yk__sdsdup(yy__configuration_emcc);
+        yk__sdsfree(yy__configuration_c->yy__configuration_emrun_path);
+        yy__configuration_c->yy__configuration_emrun_path = yk__sdsdup(yy__configuration_emrun);
+    }
+    yk__sdsfree(yy__configuration_emrun);
+    yk__sdsfree(t__74);
+    yk__sdsfree(t__73);
+    yk__sdsfree(yy__configuration_emcc);
+    yk__sdsfree(t__72);
+    yk__sdsfree(t__71);
+    return;
+}
 struct yy__configuration_Project* yy__configuration_load_project(yy__toml_Table yy__configuration_conf, struct yy__configuration_Config* yy__configuration_c) 
 {
     struct yy__configuration_Project* yy__configuration_p = calloc(1, sizeof(struct yy__configuration_Project));
-    yk__sds t__71 = yk__sdsnew("project");
-    yy__toml_Table yy__configuration_project = yy__toml_get_table(yy__configuration_conf, yk__sdsdup(t__71));
+    yk__sds t__78 = yk__sdsnew("project");
+    yy__toml_Table yy__configuration_project = yy__toml_get_table(yy__configuration_conf, yk__sdsdup(t__78));
     if ((! (yy__toml_valid_table(yy__configuration_project))))
     {
-        yk__sds t__72 = yk__sdsnew("Failed to read \'[project]\'");
-        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__72));
-        struct yy__configuration_Project* t__73 = yy__configuration_p;
-        yk__sdsfree(t__72);
-        yk__sdsfree(t__71);
-        return t__73;
-        yk__sdsfree(t__72);
+        yk__sds t__79 = yk__sdsnew("Failed to read \'[project]\'");
+        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__79));
+        struct yy__configuration_Project* t__80 = yy__configuration_p;
+        yk__sdsfree(t__79);
+        yk__sdsfree(t__78);
+        return t__80;
+        yk__sdsfree(t__79);
     }
-    yk__sds t__74 = yk__sdsnew("main");
-    yk__sds t__75 = yy__toml_get_string(yy__configuration_project, yk__sdsdup(t__74));
-    yk__sds yy__configuration_main_code_file = yk__sdsdup((t__75));
-    yk__sds t__76 = yk__sdsnew("name");
-    yk__sds t__77 = yy__toml_get_string(yy__configuration_project, yk__sdsdup(t__76));
-    yk__sds yy__configuration_project_name = yk__sdsdup((t__77));
-    yk__sds t__78 = yk__sdsnew("author");
-    yk__sds t__79 = yy__toml_get_string(yy__configuration_project, yk__sdsdup(t__78));
-    yk__sds yy__configuration_project_author = yk__sdsdup((t__79));
-    yk__sds t__80 = yk__sdsempty();
-    if ((yk__sdscmp(yy__configuration_main_code_file , t__80) == 0))
+    yk__sds t__81 = yk__sdsnew("main");
+    yk__sds t__82 = yy__toml_get_string(yy__configuration_project, yk__sdsdup(t__81));
+    yk__sds yy__configuration_main_code_file = yk__sdsdup((t__82));
+    yk__sds t__83 = yk__sdsnew("name");
+    yk__sds t__84 = yy__toml_get_string(yy__configuration_project, yk__sdsdup(t__83));
+    yk__sds yy__configuration_project_name = yk__sdsdup((t__84));
+    yk__sds t__85 = yk__sdsnew("author");
+    yk__sds t__86 = yy__toml_get_string(yy__configuration_project, yk__sdsdup(t__85));
+    yk__sds yy__configuration_project_author = yk__sdsdup((t__86));
+    yk__sds t__87 = yk__sdsempty();
+    if ((yk__sdscmp(yy__configuration_main_code_file , t__87) == 0))
     {
-        yk__sds t__81 = yk__sdsnew("Invalid \'[project].main\'");
-        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__81));
-        yk__sdsfree(t__81);
+        yk__sds t__88 = yk__sdsnew("Invalid \'[project].main\'");
+        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__88));
+        yk__sdsfree(t__88);
     }
-    yk__sds t__82 = yk__sdsempty();
-    if ((yk__sdscmp(yy__configuration_project_name , t__82) == 0))
+    yk__sds t__89 = yk__sdsempty();
+    if ((yk__sdscmp(yy__configuration_project_name , t__89) == 0))
     {
-        yk__sds t__83 = yk__sdsnew("Invalid \'[project].name\'");
-        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__83));
-        yk__sdsfree(t__83);
+        yk__sds t__90 = yk__sdsnew("Invalid \'[project].name\'");
+        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__90));
+        yk__sdsfree(t__90);
     }
-    yk__sds t__84 = yk__sdsempty();
-    if ((yk__sdscmp(yy__configuration_project_author , t__84) == 0))
+    yk__sds t__91 = yk__sdsempty();
+    if ((yk__sdscmp(yy__configuration_project_author , t__91) == 0))
     {
-        yk__sds t__85 = yk__sdsnew("Invalid \'[project].author\'");
-        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__85));
-        yk__sdsfree(t__85);
+        yk__sds t__92 = yk__sdsnew("Invalid \'[project].author\'");
+        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__92));
+        yk__sdsfree(t__92);
     }
     yk__sdsfree(yy__configuration_p->yy__configuration_main);
     yy__configuration_p->yy__configuration_main = yk__sdsdup(yy__configuration_main_code_file);
@@ -1699,149 +1863,175 @@ struct yy__configuration_Project* yy__configuration_load_project(yy__toml_Table 
     yy__configuration_p->yy__configuration_author = yk__sdsdup(yy__configuration_project_author);
     yk__sdsfree(yy__configuration_p->yy__configuration_name);
     yy__configuration_p->yy__configuration_name = yk__sdsdup(yy__configuration_project_name);
-    struct yy__configuration_Project* t__86 = yy__configuration_p;
-    yk__sdsfree(t__84);
-    yk__sdsfree(t__82);
-    yk__sdsfree(t__80);
+    struct yy__configuration_Project* t__93 = yy__configuration_p;
+    yk__sdsfree(t__91);
+    yk__sdsfree(t__89);
+    yk__sdsfree(t__87);
     yk__sdsfree(yy__configuration_project_author);
-    yk__sdsfree(t__79);
-    yk__sdsfree(t__78);
+    yk__sdsfree(t__86);
+    yk__sdsfree(t__85);
     yk__sdsfree(yy__configuration_project_name);
-    yk__sdsfree(t__77);
-    yk__sdsfree(t__76);
+    yk__sdsfree(t__84);
+    yk__sdsfree(t__83);
     yk__sdsfree(yy__configuration_main_code_file);
-    yk__sdsfree(t__75);
-    yk__sdsfree(t__74);
-    yk__sdsfree(t__71);
-    return t__86;
+    yk__sdsfree(t__82);
+    yk__sdsfree(t__81);
+    yk__sdsfree(t__78);
+    return t__93;
 }
 struct yy__configuration_CCode* yy__configuration_load_c_code(yy__toml_Table yy__configuration_conf, struct yy__configuration_Config* yy__configuration_c) 
 {
     struct yy__configuration_CCode* yy__configuration_cc = calloc(1, sizeof(struct yy__configuration_CCode));
-    yk__sds t__87 = yk__sdsnew("ccode");
-    yy__toml_Table yy__configuration_cc_data = yy__toml_get_table(yy__configuration_conf, yk__sdsdup(t__87));
+    yk__sds t__94 = yk__sdsnew("ccode");
+    yy__toml_Table yy__configuration_cc_data = yy__toml_get_table(yy__configuration_conf, yk__sdsdup(t__94));
     if ((! (yy__toml_valid_table(yy__configuration_cc_data))))
     {
-        struct yy__configuration_CCode* t__88 = yy__configuration_cc;
-        yk__sdsfree(t__87);
-        return t__88;
+        struct yy__configuration_CCode* t__95 = yy__configuration_cc;
+        yk__sdsfree(t__94);
+        return t__95;
     }
-    yk__sds t__89 = yk__sdsnew("include_paths");
-    yy__configuration_cc->yy__configuration_include_paths = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__89));
-    yk__sds t__90 = yk__sdsnew("defines");
-    yy__configuration_cc->yy__configuration_defines = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__90));
-    yk__sds t__91 = yk__sdsnew("compiler_defines");
-    yy__configuration_cc->yy__configuration_compiler_defines = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__91));
-    yk__sds t__92 = yk__sdsnew("includes");
-    yy__configuration_cc->yy__configuration_includes = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__92));
-    yk__sds t__93 = yk__sdsnew("system_includes");
-    yy__configuration_cc->yy__configuration_system_includes = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__93));
-    yk__sds t__94 = yk__sdsnew("c_code");
-    yy__configuration_cc->yy__configuration_c_code = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__94));
-    yk__sds t__95 = yk__sdsnew("cpp_code");
-    yy__configuration_cc->yy__configuration_cpp_code = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__95));
-    struct yy__configuration_CCode* t__96 = yy__configuration_cc;
-    yk__sdsfree(t__95);
+    yk__sds t__96 = yk__sdsnew("include_paths");
+    yy__configuration_cc->yy__configuration_include_paths = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__96));
+    yk__sds t__97 = yk__sdsnew("defines");
+    yy__configuration_cc->yy__configuration_defines = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__97));
+    yk__sds t__98 = yk__sdsnew("compiler_defines");
+    yy__configuration_cc->yy__configuration_compiler_defines = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__98));
+    yk__sds t__99 = yk__sdsnew("includes");
+    yy__configuration_cc->yy__configuration_includes = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__99));
+    yk__sds t__100 = yk__sdsnew("system_includes");
+    yy__configuration_cc->yy__configuration_system_includes = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__100));
+    yk__sds t__101 = yk__sdsnew("c_code");
+    yy__configuration_cc->yy__configuration_c_code = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__101));
+    yk__sds t__102 = yk__sdsnew("cpp_code");
+    yy__configuration_cc->yy__configuration_cpp_code = yy__toml_get_string_array(yy__configuration_cc_data, yk__sdsdup(t__102));
+    struct yy__configuration_CCode* t__103 = yy__configuration_cc;
+    yk__sdsfree(t__102);
+    yk__sdsfree(t__101);
+    yk__sdsfree(t__100);
+    yk__sdsfree(t__99);
+    yk__sdsfree(t__98);
+    yk__sdsfree(t__97);
+    yk__sdsfree(t__96);
     yk__sdsfree(t__94);
-    yk__sdsfree(t__93);
-    yk__sdsfree(t__92);
-    yk__sdsfree(t__91);
-    yk__sdsfree(t__90);
-    yk__sdsfree(t__89);
-    yk__sdsfree(t__87);
-    return t__96;
+    return t__103;
 }
 struct yy__configuration_Compilation* yy__configuration_load_compilation(yy__toml_Table yy__configuration_conf, struct yy__configuration_Config* yy__configuration_c) 
 {
     struct yy__configuration_Compilation* yy__configuration_co = calloc(1, sizeof(struct yy__configuration_Compilation));
-    yk__sds t__97 = yk__sdsnew("compilation");
-    yy__toml_Table yy__configuration_co_data = yy__toml_get_table(yy__configuration_conf, yk__sdsdup(t__97));
+    yk__sds t__104 = yk__sdsnew("compilation");
+    yy__toml_Table yy__configuration_co_data = yy__toml_get_table(yy__configuration_conf, yk__sdsdup(t__104));
     if ((! (yy__toml_valid_table(yy__configuration_co_data))))
     {
-        struct yy__configuration_Compilation* t__98 = yy__configuration_co;
-        yk__sdsfree(t__97);
-        return t__98;
+        struct yy__configuration_Compilation* t__105 = yy__configuration_co;
+        yk__sdsfree(t__104);
+        return t__105;
     }
-    yk__sds t__99 = yk__sdsnew("targets");
-    yy__configuration_co->yy__configuration_targets = yy__toml_get_string_array(yy__configuration_co_data, yk__sdsdup(t__99));
-    yk__sds t__100 = yk__sdsnew("raylib");
-    yy__configuration_co->yy__configuration_raylib = yy__toml_get_bool_default(yy__configuration_co_data, yk__sdsdup(t__100), false);
-    struct yy__configuration_Compilation* t__101 = yy__configuration_co;
-    yk__sdsfree(t__100);
-    yk__sdsfree(t__99);
-    yk__sdsfree(t__97);
-    return t__101;
+    yk__sds t__106 = yk__sdsnew("targets");
+    yy__configuration_co->yy__configuration_targets = yy__toml_get_string_array(yy__configuration_co_data, yk__sdsdup(t__106));
+    yk__sds t__107 = yk__sdsnew("raylib");
+    yy__configuration_co->yy__configuration_raylib = yy__toml_get_bool_default(yy__configuration_co_data, yk__sdsdup(t__107), false);
+    yk__sds t__108 = yk__sdsnew("web");
+    yy__configuration_co->yy__configuration_web = yy__toml_get_bool_default(yy__configuration_co_data, yk__sdsdup(t__108), false);
+    struct yy__configuration_Compilation* t__109 = yy__configuration_co;
+    yk__sdsfree(t__108);
+    yk__sdsfree(t__107);
+    yk__sdsfree(t__106);
+    yk__sdsfree(t__104);
+    return t__109;
 }
 struct yy__configuration_CCode* yy__configuration_inject_c_code_defaults(struct yy__configuration_CCode* yy__configuration_cc, struct yy__configuration_Config* yy__configuration_c) 
 {
-    yk__sds t__102 = yy__os_cwd();
-    yk__sds t__103 = yy__path_dirname(yk__sdsdup((t__102)));
-    yk__sds yy__configuration_current_dir = yk__sdsdup((t__103));
-    yk__sds t__104 = yk__sdsnew("build");
-    yk__sds t__105 = yy__path_join(yk__sdsdup(yy__configuration_current_dir), yk__sdsdup(t__104));
-    yk__sds* yy__configuration_df_include_paths = yy__array_new(2, yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup((t__105)));
+    yk__sds t__110 = yy__os_cwd();
+    yk__sds t__111 = yy__path_dirname(yk__sdsdup((t__110)));
+    yk__sds yy__configuration_current_dir = yk__sdsdup((t__111));
+    yk__sds t__112 = yk__sdsnew("build");
+    yk__sds t__113 = yy__path_join(yk__sdsdup(yy__configuration_current_dir), yk__sdsdup(t__112));
+    yk__sds* yy__configuration_df_include_paths = yy__array_new(2, yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup((t__113)));
     yk__sds* yy__configuration_orig_include_paths = yy__configuration_cc->yy__configuration_include_paths;
     yy__configuration_cc->yy__configuration_include_paths = yy__array_extend(yy__configuration_df_include_paths, yy__configuration_cc->yy__configuration_include_paths);
-    yk__sds t__106 = yk__sdsnew("UTF8PROC_STATIC");
-    yk__sds* yy__configuration_df_compiler_defines = yy__array_new(1, yk__sdsdup(t__106));
+    yk__sds t__114 = yk__sdsnew("UTF8PROC_STATIC");
+    yk__sds* yy__configuration_df_compiler_defines = yy__array_new(1, yk__sdsdup(t__114));
     yk__sds* yy__configuration_orig_compiler_defines = yy__configuration_cc->yy__configuration_compiler_defines;
     yy__configuration_cc->yy__configuration_compiler_defines = yy__array_extend(yy__configuration_df_compiler_defines, yy__configuration_cc->yy__configuration_compiler_defines);
-    yk__sds t__107 = yk__sdsnew("whereami.h");
-    yk__sds t__108 = yk__sdsnew("yk__system.h");
-    yk__sds t__109 = yk__sdsnew("utf8proc.h");
-    yk__sds t__110 = yk__sdsnew("yk__utf8iter.h");
-    yk__sds t__111 = yk__sdsnew("toml.h");
-    yk__sds t__112 = yk__sdsnew("yk__console.h");
-    yk__sds t__113 = yk__sdsnew("mpc.h");
-    yk__sds t__114 = yk__sdsnew("yk__arrayutils.h");
-    yk__sds t__115 = yk__sdsnew("yk__process.h");
-    yk__sds t__116 = yk__sdsnew("yk__graphic_utils.h");
-    yk__sds t__117 = yk__sdsnew("yk__argparse.h");
-    yk__sds t__118 = yk__sdsnew("argparse.h");
-    yk__sds* yy__configuration_df_includes = yy__array_new(12, yk__sdsdup(t__107), yk__sdsdup(t__108), yk__sdsdup(t__109), yk__sdsdup(t__110), yk__sdsdup(t__111), yk__sdsdup(t__112), yk__sdsdup(t__113), yk__sdsdup(t__114), yk__sdsdup(t__115), yk__sdsdup(t__116), yk__sdsdup(t__117), yk__sdsdup(t__118));
+    yk__sds t__115 = yk__sdsnew("whereami.h");
+    yk__sds t__116 = yk__sdsnew("yk__system.h");
+    yk__sds t__117 = yk__sdsnew("utf8proc.h");
+    yk__sds t__118 = yk__sdsnew("yk__utf8iter.h");
+    yk__sds t__119 = yk__sdsnew("toml.h");
+    yk__sds t__120 = yk__sdsnew("yk__console.h");
+    yk__sds t__121 = yk__sdsnew("mpc.h");
+    yk__sds t__122 = yk__sdsnew("yk__arrayutils.h");
+    yk__sds t__123 = yk__sdsnew("yk__process.h");
+    yk__sds t__124 = yk__sdsnew("yk__graphic_utils.h");
+    yk__sds t__125 = yk__sdsnew("yk__argparse.h");
+    yk__sds t__126 = yk__sdsnew("argparse.h");
+    yk__sds* yy__configuration_df_includes = yy__array_new(12, yk__sdsdup(t__115), yk__sdsdup(t__116), yk__sdsdup(t__117), yk__sdsdup(t__118), yk__sdsdup(t__119), yk__sdsdup(t__120), yk__sdsdup(t__121), yk__sdsdup(t__122), yk__sdsdup(t__123), yk__sdsdup(t__124), yk__sdsdup(t__125), yk__sdsdup(t__126));
     yk__sds* yy__configuration_orig_includes = yy__configuration_cc->yy__configuration_includes;
     yy__configuration_cc->yy__configuration_includes = yy__array_extend(yy__configuration_df_includes, yy__configuration_cc->yy__configuration_includes);
     yk__sds* yy__configuration_df_c_code = NULL;
-    yk__sds t__119 = yk__sdsnew("whereami.c");
-    yk__sds t__120 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__119));
-    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__120)));
-    yk__sds t__121 = yk__sdsnew("yk__system.c");
-    yk__sds t__122 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__121));
-    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__122)));
-    yk__sds t__123 = yk__sdsnew("utf8proc.c");
-    yk__sds t__124 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__123));
-    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__124)));
-    yk__sds t__125 = yk__sdsnew("toml.c");
-    yk__sds t__126 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__125));
-    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__126)));
-    yk__sds t__127 = yk__sdsnew("mpc.c");
-    yk__sds t__128 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__127));
-    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__128)));
-    yk__sds t__129 = yk__sdsnew("yk__console.c");
-    yk__sds t__130 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__129));
-    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__130)));
-    yk__sds t__131 = yk__sdsnew("yk__arrayutils.c");
+    if (yy__configuration_c->yy__configuration_compilation->yy__configuration_web)
+    {
+        yk__sds t__127 = yk__sdsnew("yk__fake_whereami.c");
+        yk__sds t__128 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__127));
+        yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__128)));
+        yk__sdsfree(t__128);
+        yk__sdsfree(t__127);
+    }
+    else
+    {
+        yk__sds t__129 = yk__sdsnew("whereami.c");
+        yk__sds t__130 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__129));
+        yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__130)));
+        yk__sdsfree(t__130);
+        yk__sdsfree(t__129);
+    }
+    yk__sds t__131 = yk__sdsnew("yk__system.c");
     yk__sds t__132 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__131));
     yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__132)));
-    yk__sds t__133 = yk__sdsnew("yk__process.c");
+    yk__sds t__133 = yk__sdsnew("utf8proc.c");
     yk__sds t__134 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__133));
     yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__134)));
-    yk__sds t__135 = yk__sdsnew("yk__graphic_utils.c");
+    yk__sds t__135 = yk__sdsnew("toml.c");
     yk__sds t__136 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__135));
     yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__136)));
-    yk__sds t__137 = yk__sdsnew("yk__argparse.c");
+    yk__sds t__137 = yk__sdsnew("mpc.c");
     yk__sds t__138 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__137));
     yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__138)));
-    yk__sds t__139 = yk__sdsnew("argparse.c");
+    yk__sds t__139 = yk__sdsnew("yk__console.c");
     yk__sds t__140 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__139));
     yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__140)));
+    yk__sds t__141 = yk__sdsnew("yk__arrayutils.c");
+    yk__sds t__142 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__141));
+    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__142)));
+    yk__sds t__143 = yk__sdsnew("yk__process.c");
+    yk__sds t__144 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__143));
+    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__144)));
+    yk__sds t__145 = yk__sdsnew("yk__graphic_utils.c");
+    yk__sds t__146 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__145));
+    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__146)));
+    yk__sds t__147 = yk__sdsnew("yk__argparse.c");
+    yk__sds t__148 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__147));
+    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__148)));
+    yk__sds t__149 = yk__sdsnew("argparse.c");
+    yk__sds t__150 = yy__path_join(yk__sdsdup(yy__configuration_c->yy__configuration_runtime_path), yk__sdsdup(t__149));
+    yk__arrput(yy__configuration_df_c_code, yk__sdsdup((t__150)));
     yk__sds* yy__configuration_orig_c_code = yy__configuration_cc->yy__configuration_c_code;
     yy__configuration_cc->yy__configuration_c_code = yy__array_extend(yy__configuration_df_c_code, yy__configuration_cc->yy__configuration_c_code);
-    struct yy__configuration_CCode* t__141 = yy__configuration_cc;
+    struct yy__configuration_CCode* t__151 = yy__configuration_cc;
     yy__array_del_str_array(yy__configuration_orig_c_code);
     yy__array_del_str_array(yy__configuration_orig_includes);
     yy__array_del_str_array(yy__configuration_orig_compiler_defines);
     yy__array_del_str_array(yy__configuration_orig_include_paths);
+    yk__sdsfree(t__150);
+    yk__sdsfree(t__149);
+    yk__sdsfree(t__148);
+    yk__sdsfree(t__147);
+    yk__sdsfree(t__146);
+    yk__sdsfree(t__145);
+    yk__sdsfree(t__144);
+    yk__sdsfree(t__143);
+    yk__sdsfree(t__142);
+    yk__sdsfree(t__141);
     yk__sdsfree(t__140);
     yk__sdsfree(t__139);
     yk__sdsfree(t__138);
@@ -1852,10 +2042,6 @@ struct yy__configuration_CCode* yy__configuration_inject_c_code_defaults(struct 
     yk__sdsfree(t__133);
     yk__sdsfree(t__132);
     yk__sdsfree(t__131);
-    yk__sdsfree(t__130);
-    yk__sdsfree(t__129);
-    yk__sdsfree(t__128);
-    yk__sdsfree(t__127);
     yk__sdsfree(t__126);
     yk__sdsfree(t__125);
     yk__sdsfree(t__124);
@@ -1871,211 +2057,231 @@ struct yy__configuration_CCode* yy__configuration_inject_c_code_defaults(struct 
     yk__sdsfree(t__114);
     yk__sdsfree(t__113);
     yk__sdsfree(t__112);
+    yk__sdsfree(yy__configuration_current_dir);
     yk__sdsfree(t__111);
     yk__sdsfree(t__110);
-    yk__sdsfree(t__109);
-    yk__sdsfree(t__108);
-    yk__sdsfree(t__107);
-    yk__sdsfree(t__106);
-    yk__sdsfree(t__105);
-    yk__sdsfree(t__104);
-    yk__sdsfree(yy__configuration_current_dir);
-    yk__sdsfree(t__103);
-    yk__sdsfree(t__102);
-    return t__141;
+    return t__151;
 }
 struct yy__configuration_Config* yy__configuration_load_config() 
 {
     struct yy__configuration_Config* yy__configuration_c = calloc(1, sizeof(struct yy__configuration_Config));
-    yk__sds t__142 = yy__os_cwd();
-    yk__sds t__143 = yk__sdsnew("yaksha.toml");
-    yk__sds t__144 = yy__path_join(yk__sdsdup((t__142)), yk__sdsdup(t__143));
-    yk__sds yy__configuration_configf = yk__sdsdup((t__144));
-    yk__sds t__145 = yy__io_readfile(yk__sdsdup(yy__configuration_configf));
-    yk__sds yy__configuration_config_text = yk__sdsdup((t__145));
+    yk__sds t__152 = yy__os_cwd();
+    yk__sds t__153 = yk__sdsnew("yaksha.toml");
+    yk__sds t__154 = yy__path_join(yk__sdsdup((t__152)), yk__sdsdup(t__153));
+    yk__sds yy__configuration_configf = yk__sdsdup((t__154));
+    yk__sds t__155 = yy__io_readfile(yk__sdsdup(yy__configuration_configf));
+    yk__sds yy__configuration_config_text = yk__sdsdup((t__155));
     yy__toml_Table yy__configuration_conf = yy__toml_from_str(yk__sdsdup(yy__configuration_config_text));
     if ((! (yy__toml_valid_table(yy__configuration_conf))))
     {
-        yk__sds t__146 = yk__sdsnew("Failed to read config file");
-        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__146));
-        struct yy__configuration_Config* t__147 = yy__configuration_c;
-        yk__sdsfree(t__146);
+        yk__sds t__156 = yk__sdsnew("Failed to read config file");
+        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__156));
+        struct yy__configuration_Config* t__157 = yy__configuration_c;
+        yk__sdsfree(t__156);
         yk__sdsfree(yy__configuration_config_text);
-        yk__sdsfree(t__145);
+        yk__sdsfree(t__155);
         yk__sdsfree(yy__configuration_configf);
-        yk__sdsfree(t__144);
-        yk__sdsfree(t__143);
-        yk__sdsfree(t__142);
-        return t__147;
-        yk__sdsfree(t__146);
+        yk__sdsfree(t__154);
+        yk__sdsfree(t__153);
+        yk__sdsfree(t__152);
+        return t__157;
+        yk__sdsfree(t__156);
     }
+    yy__configuration_c->yy__configuration_compilation = yy__configuration_load_compilation(yy__configuration_conf, yy__configuration_c);
     yy__configuration_find_yaksha_compiler(yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__148 = yy__configuration_c;
+        struct yy__configuration_Config* t__158 = yy__configuration_c;
         yy__toml_del_table(yy__configuration_conf);
         yk__sdsfree(yy__configuration_config_text);
-        yk__sdsfree(t__145);
+        yk__sdsfree(t__155);
         yk__sdsfree(yy__configuration_configf);
-        yk__sdsfree(t__144);
-        yk__sdsfree(t__143);
-        yk__sdsfree(t__142);
-        return t__148;
+        yk__sdsfree(t__154);
+        yk__sdsfree(t__153);
+        yk__sdsfree(t__152);
+        return t__158;
     }
     yy__configuration_find_zig_compiler(yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__149 = yy__configuration_c;
+        struct yy__configuration_Config* t__159 = yy__configuration_c;
         yy__toml_del_table(yy__configuration_conf);
         yk__sdsfree(yy__configuration_config_text);
-        yk__sdsfree(t__145);
+        yk__sdsfree(t__155);
         yk__sdsfree(yy__configuration_configf);
-        yk__sdsfree(t__144);
-        yk__sdsfree(t__143);
-        yk__sdsfree(t__142);
-        return t__149;
+        yk__sdsfree(t__154);
+        yk__sdsfree(t__153);
+        yk__sdsfree(t__152);
+        return t__159;
+    }
+    yy__configuration_find_emsdk(yy__configuration_c);
+    if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
+    {
+        struct yy__configuration_Config* t__160 = yy__configuration_c;
+        yy__toml_del_table(yy__configuration_conf);
+        yk__sdsfree(yy__configuration_config_text);
+        yk__sdsfree(t__155);
+        yk__sdsfree(yy__configuration_configf);
+        yk__sdsfree(t__154);
+        yk__sdsfree(t__153);
+        yk__sdsfree(t__152);
+        return t__160;
     }
     yy__configuration_find_runtime_path(yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__150 = yy__configuration_c;
+        struct yy__configuration_Config* t__161 = yy__configuration_c;
         yy__toml_del_table(yy__configuration_conf);
         yk__sdsfree(yy__configuration_config_text);
-        yk__sdsfree(t__145);
+        yk__sdsfree(t__155);
         yk__sdsfree(yy__configuration_configf);
-        yk__sdsfree(t__144);
-        yk__sdsfree(t__143);
-        yk__sdsfree(t__142);
-        return t__150;
+        yk__sdsfree(t__154);
+        yk__sdsfree(t__153);
+        yk__sdsfree(t__152);
+        return t__161;
     }
     yy__configuration_find_libs_path(yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__151 = yy__configuration_c;
+        struct yy__configuration_Config* t__162 = yy__configuration_c;
         yy__toml_del_table(yy__configuration_conf);
         yk__sdsfree(yy__configuration_config_text);
-        yk__sdsfree(t__145);
+        yk__sdsfree(t__155);
         yk__sdsfree(yy__configuration_configf);
-        yk__sdsfree(t__144);
-        yk__sdsfree(t__143);
-        yk__sdsfree(t__142);
-        return t__151;
+        yk__sdsfree(t__154);
+        yk__sdsfree(t__153);
+        yk__sdsfree(t__152);
+        return t__162;
     }
     yy__configuration_c->yy__configuration_project = yy__configuration_load_project(yy__configuration_conf, yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__152 = yy__configuration_c;
+        struct yy__configuration_Config* t__163 = yy__configuration_c;
         yy__toml_del_table(yy__configuration_conf);
         yk__sdsfree(yy__configuration_config_text);
-        yk__sdsfree(t__145);
+        yk__sdsfree(t__155);
         yk__sdsfree(yy__configuration_configf);
-        yk__sdsfree(t__144);
-        yk__sdsfree(t__143);
-        yk__sdsfree(t__142);
-        return t__152;
+        yk__sdsfree(t__154);
+        yk__sdsfree(t__153);
+        yk__sdsfree(t__152);
+        return t__163;
     }
     if ((! (yy__path_exists(yk__sdsdup(yy__configuration_c->yy__configuration_project->yy__configuration_main)))))
     {
-        yk__sds t__153 = yk__sdsnew("Project main file not found");
-        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__153));
-        struct yy__configuration_Config* t__154 = yy__configuration_c;
+        yk__sds t__164 = yk__sdsnew("Project main file not found");
+        yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsdup(t__164));
+        struct yy__configuration_Config* t__165 = yy__configuration_c;
         yy__toml_del_table(yy__configuration_conf);
-        yk__sdsfree(t__153);
+        yk__sdsfree(t__164);
         yk__sdsfree(yy__configuration_config_text);
-        yk__sdsfree(t__145);
+        yk__sdsfree(t__155);
         yk__sdsfree(yy__configuration_configf);
-        yk__sdsfree(t__144);
-        yk__sdsfree(t__143);
-        yk__sdsfree(t__142);
-        return t__154;
+        yk__sdsfree(t__154);
         yk__sdsfree(t__153);
+        yk__sdsfree(t__152);
+        return t__165;
+        yk__sdsfree(t__164);
     }
     yy__configuration_c->yy__configuration_c_code = yy__configuration_inject_c_code_defaults(yy__configuration_load_c_code(yy__configuration_conf, yy__configuration_c), yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__155 = yy__configuration_c;
+        struct yy__configuration_Config* t__166 = yy__configuration_c;
         yy__toml_del_table(yy__configuration_conf);
         yk__sdsfree(yy__configuration_config_text);
-        yk__sdsfree(t__145);
+        yk__sdsfree(t__155);
         yk__sdsfree(yy__configuration_configf);
-        yk__sdsfree(t__144);
-        yk__sdsfree(t__143);
-        yk__sdsfree(t__142);
-        return t__155;
+        yk__sdsfree(t__154);
+        yk__sdsfree(t__153);
+        yk__sdsfree(t__152);
+        return t__166;
     }
-    yy__configuration_c->yy__configuration_compilation = yy__configuration_load_compilation(yy__configuration_conf, yy__configuration_c);
-    struct yy__configuration_Config* t__156 = yy__configuration_c;
+    struct yy__configuration_Config* t__167 = yy__configuration_c;
     yy__toml_del_table(yy__configuration_conf);
     yk__sdsfree(yy__configuration_config_text);
-    yk__sdsfree(t__145);
+    yk__sdsfree(t__155);
     yk__sdsfree(yy__configuration_configf);
-    yk__sdsfree(t__144);
-    yk__sdsfree(t__143);
-    yk__sdsfree(t__142);
-    return t__156;
+    yk__sdsfree(t__154);
+    yk__sdsfree(t__153);
+    yk__sdsfree(t__152);
+    return t__167;
 }
-struct yy__configuration_Config* yy__configuration_create_adhoc_config(yk__sds yy__configuration_name, yk__sds yy__configuration_file_path, bool yy__configuration_use_raylib) 
+struct yy__configuration_Config* yy__configuration_create_adhoc_config(yk__sds yy__configuration_name, yk__sds yy__configuration_file_path, bool yy__configuration_use_raylib, bool yy__configuration_use_web) 
 {
     struct yy__configuration_Config* yy__configuration_c = calloc(1, sizeof(struct yy__configuration_Config));
+    yy__configuration_c->yy__configuration_compilation = calloc(1, sizeof(struct yy__configuration_Compilation));
+    yk__sds t__168 = yk__sdsnew("native");
+    yy__configuration_c->yy__configuration_compilation->yy__configuration_targets = yy__array_new(1, yk__sdsdup(t__168));
+    yy__configuration_c->yy__configuration_compilation->yy__configuration_raylib = yy__configuration_use_raylib;
+    yy__configuration_c->yy__configuration_compilation->yy__configuration_web = yy__configuration_use_web;
     yy__configuration_find_yaksha_compiler(yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__157 = yy__configuration_c;
+        struct yy__configuration_Config* t__169 = yy__configuration_c;
+        yk__sdsfree(t__168);
         yk__sdsfree(yy__configuration_file_path);
         yk__sdsfree(yy__configuration_name);
-        return t__157;
+        return t__169;
     }
     yy__configuration_find_zig_compiler(yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__158 = yy__configuration_c;
+        struct yy__configuration_Config* t__170 = yy__configuration_c;
+        yk__sdsfree(t__168);
         yk__sdsfree(yy__configuration_file_path);
         yk__sdsfree(yy__configuration_name);
-        return t__158;
+        return t__170;
+    }
+    yy__configuration_find_emsdk(yy__configuration_c);
+    if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
+    {
+        struct yy__configuration_Config* t__171 = yy__configuration_c;
+        yk__sdsfree(t__168);
+        yk__sdsfree(yy__configuration_file_path);
+        yk__sdsfree(yy__configuration_name);
+        return t__171;
     }
     yy__configuration_find_runtime_path(yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__159 = yy__configuration_c;
+        struct yy__configuration_Config* t__172 = yy__configuration_c;
+        yk__sdsfree(t__168);
         yk__sdsfree(yy__configuration_file_path);
         yk__sdsfree(yy__configuration_name);
-        return t__159;
+        return t__172;
     }
     yy__configuration_find_libs_path(yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__160 = yy__configuration_c;
+        struct yy__configuration_Config* t__173 = yy__configuration_c;
+        yk__sdsfree(t__168);
         yk__sdsfree(yy__configuration_file_path);
         yk__sdsfree(yy__configuration_name);
-        return t__160;
+        return t__173;
     }
     yy__configuration_c->yy__configuration_project = calloc(1, sizeof(struct yy__configuration_Project));
     yk__sdsfree(yy__configuration_c->yy__configuration_project->yy__configuration_main);
     yy__configuration_c->yy__configuration_project->yy__configuration_main = yk__sdsdup(yy__configuration_file_path);
-    yk__sds t__161 = yk__sdsnew("unknown");
+    yk__sds t__174 = yk__sdsnew("unknown");
     yk__sdsfree(yy__configuration_c->yy__configuration_project->yy__configuration_author);
-    yy__configuration_c->yy__configuration_project->yy__configuration_author = yk__sdsdup(t__161);
+    yy__configuration_c->yy__configuration_project->yy__configuration_author = yk__sdsdup(t__174);
     yk__sdsfree(yy__configuration_c->yy__configuration_project->yy__configuration_name);
     yy__configuration_c->yy__configuration_project->yy__configuration_name = yk__sdsdup(yy__configuration_name);
     yy__configuration_c->yy__configuration_c_code = yy__configuration_inject_c_code_defaults(calloc(1, sizeof(struct yy__configuration_CCode)), yy__configuration_c);
     if ((yk__arrlen(yy__configuration_c->yy__configuration_errors) > 0))
     {
-        struct yy__configuration_Config* t__162 = yy__configuration_c;
-        yk__sdsfree(t__161);
+        struct yy__configuration_Config* t__175 = yy__configuration_c;
+        yk__sdsfree(t__174);
+        yk__sdsfree(t__168);
         yk__sdsfree(yy__configuration_file_path);
         yk__sdsfree(yy__configuration_name);
-        return t__162;
+        return t__175;
     }
-    yy__configuration_c->yy__configuration_compilation = calloc(1, sizeof(struct yy__configuration_Compilation));
-    yk__sds t__163 = yk__sdsnew("native");
-    yy__configuration_c->yy__configuration_compilation->yy__configuration_targets = yy__array_new(1, yk__sdsdup(t__163));
-    yy__configuration_c->yy__configuration_compilation->yy__configuration_raylib = yy__configuration_use_raylib;
-    struct yy__configuration_Config* t__164 = yy__configuration_c;
-    yk__sdsfree(t__163);
-    yk__sdsfree(t__161);
+    struct yy__configuration_Config* t__176 = yy__configuration_c;
+    yk__sdsfree(t__174);
+    yk__sdsfree(t__168);
     yk__sdsfree(yy__configuration_file_path);
     yk__sdsfree(yy__configuration_name);
-    return t__164;
+    return t__176;
 }
 void yy__configuration_del_config(struct yy__configuration_Config* yy__configuration_c) 
 {
@@ -2109,6 +2315,8 @@ void yy__configuration_del_config(struct yy__configuration_Config* yy__configura
     yk__sdsfree(yy__configuration_c->yy__configuration_compiler_path);
     yk__sdsfree(yy__configuration_c->yy__configuration_libs_path);
     yk__sdsfree(yy__configuration_c->yy__configuration_zig_compiler_path);
+    yk__sdsfree(yy__configuration_c->yy__configuration_emcc_compiler_path);
+    yk__sdsfree(yy__configuration_c->yy__configuration_emrun_path);
     free(yy__configuration_c);
     return;
 }
@@ -2982,10 +3190,19 @@ void yy__printkv(yk__sds yy__k, yk__sds yy__v)
     yy__console_cyan(yk__sdsdup(yy__k));
     yk__sds t__5 = yk__sdsnew(" := ");
     yy__console_red(yk__sdsdup(t__5));
-    yy__console_green(yk__sdsdup(yy__v));
-    yk__sds t__6 = yk__sdsnew("\n");
-    yk__printstr((t__6));
-    yk__sdsfree(t__6);
+    if ((yk__sdslen(yy__v) == 0))
+    {
+        yk__sds t__6 = yk__sdsnew("<not found>");
+        yy__console_green(yk__sdsdup(t__6));
+        yk__sdsfree(t__6);
+    }
+    else
+    {
+        yy__console_green(yk__sdsdup(yy__v));
+    }
+    yk__sds t__7 = yk__sdsnew("\n");
+    yk__printstr((t__7));
+    yk__sdsfree(t__7);
     yk__sdsfree(t__5);
     yk__sdsfree(yy__v);
     yk__sdsfree(yy__k);
@@ -2993,23 +3210,29 @@ void yy__printkv(yk__sds yy__k, yk__sds yy__v)
 }
 void yy__print_config(struct yy__configuration_Config* yy__config) 
 {
-    yk__sds t__7 = yk__sdsnew("libs");
-    yy__printkv(yk__sdsdup(t__7), yk__sdsdup(yy__config->yy__configuration_libs_path));
-    yk__sds t__8 = yk__sdsnew("runtime");
-    yy__printkv(yk__sdsdup(t__8), yk__sdsdup(yy__config->yy__configuration_runtime_path));
-    yk__sds t__9 = yk__sdsnew("compiler");
-    yy__printkv(yk__sdsdup(t__9), yk__sdsdup(yy__config->yy__configuration_compiler_path));
-    yk__sds t__10 = yk__sdsnew("zig compiler");
-    yy__printkv(yk__sdsdup(t__10), yk__sdsdup(yy__config->yy__configuration_zig_compiler_path));
-    yk__sds t__11 = yk__sdsnew("standard library version");
-    yk__sds t__12 = yy__libs_version();
-    yy__printkv(yk__sdsdup(t__11), yk__sdsdup((t__12)));
+    yk__sds t__8 = yk__sdsnew("libs");
+    yy__printkv(yk__sdsdup(t__8), yk__sdsdup(yy__config->yy__configuration_libs_path));
+    yk__sds t__9 = yk__sdsnew("runtime");
+    yy__printkv(yk__sdsdup(t__9), yk__sdsdup(yy__config->yy__configuration_runtime_path));
+    yk__sds t__10 = yk__sdsnew("compiler");
+    yy__printkv(yk__sdsdup(t__10), yk__sdsdup(yy__config->yy__configuration_compiler_path));
+    yk__sds t__11 = yk__sdsnew("zig compiler");
+    yy__printkv(yk__sdsdup(t__11), yk__sdsdup(yy__config->yy__configuration_zig_compiler_path));
+    yk__sds t__12 = yk__sdsnew("emcc compiler");
+    yy__printkv(yk__sdsdup(t__12), yk__sdsdup(yy__config->yy__configuration_emcc_compiler_path));
+    yk__sds t__13 = yk__sdsnew("emrun");
+    yy__printkv(yk__sdsdup(t__13), yk__sdsdup(yy__config->yy__configuration_emrun_path));
+    yk__sds t__14 = yk__sdsnew("standard library version");
+    yk__sds t__15 = yy__libs_version();
+    yy__printkv(yk__sdsdup(t__14), yk__sdsdup((t__15)));
+    yk__sdsfree(t__15);
+    yk__sdsfree(t__14);
+    yk__sdsfree(t__13);
     yk__sdsfree(t__12);
     yk__sdsfree(t__11);
     yk__sdsfree(t__10);
     yk__sdsfree(t__9);
     yk__sdsfree(t__8);
-    yk__sdsfree(t__7);
     return;
 }
 int32_t yy__build_from_config(struct yy__configuration_Config* yy__config, bool yy__simple) 
@@ -3019,33 +3242,33 @@ int32_t yy__build_from_config(struct yy__configuration_Config* yy__config, bool 
     yy__os_ProcessResult yy__result = yy__os_run(yy__yk_args);
     if ((! (yy__result->ok)))
     {
-        yk__sds t__13 = yk__sdsnew("---- running Yaksha compiler ---\n");
-        yy__console_cyan(yk__sdsdup(t__13));
-        yk__sds t__14 = yk__sdsnew("Failed to execute: ");
-        yy__console_red(yk__sdsdup(t__14));
-        yk__sds t__15 = yk__sdsnew(" ");
-        yk__sds t__16 = yy__array_join(yy__yk_args, yk__sdsdup(t__15));
-        yy__console_yellow(yk__sdsdup((t__16)));
-        yk__sds t__17 = yk__sdsnew("\n");
-        yk__printstr((t__17));
+        yk__sds t__16 = yk__sdsnew("---- running Yaksha compiler ---\n");
+        yy__console_cyan(yk__sdsdup(t__16));
+        yk__sds t__17 = yk__sdsnew("Failed to execute: ");
+        yy__console_red(yk__sdsdup(t__17));
+        yk__sds t__18 = yk__sdsnew(" ");
+        yk__sds t__19 = yy__array_join(yy__yk_args, yk__sdsdup(t__18));
+        yy__console_yellow(yk__sdsdup((t__19)));
+        yk__sds t__20 = yk__sdsnew("\n");
+        yk__printstr((t__20));
         yy__console_red(yk__sdsdup(yy__result->output));
-        yk__sds t__18 = yk__sdsnew("\n");
-        yk__printstr((t__18));
+        yk__sds t__21 = yk__sdsnew("\n");
+        yk__printstr((t__21));
         yy__return_val = (- (1));
-        yk__sds t__19 = yk__sdsnew("---- end of compiler run ---\n");
-        yy__console_cyan(yk__sdsdup(t__19));
+        yk__sds t__22 = yk__sdsnew("---- end of compiler run ---\n");
+        yy__console_cyan(yk__sdsdup(t__22));
+        yk__sdsfree(t__22);
+        yk__sdsfree(t__21);
+        yk__sdsfree(t__20);
         yk__sdsfree(t__19);
         yk__sdsfree(t__18);
         yk__sdsfree(t__17);
         yk__sdsfree(t__16);
-        yk__sdsfree(t__15);
-        yk__sdsfree(t__14);
-        yk__sdsfree(t__13);
     }
     else
     {
-        yk__sds t__20 = yk__sdsnew("// YK");
-        if (yy__strings_startswith(yk__sdsdup(yy__result->output), yk__sdsdup(t__20)))
+        yk__sds t__23 = yk__sdsnew("// YK");
+        if (yy__strings_startswith(yk__sdsdup(yy__result->output), yk__sdsdup(t__23)))
         {
             if (yy__simple)
             {
@@ -3058,24 +3281,24 @@ int32_t yy__build_from_config(struct yy__configuration_Config* yy__config, bool 
         }
         else
         {
-            yk__sds t__21 = yk__sdsnew("---- running Yaksha compiler ---\n");
-            yy__console_cyan(yk__sdsdup(t__21));
+            yk__sds t__24 = yk__sdsnew("---- running Yaksha compiler ---\n");
+            yy__console_cyan(yk__sdsdup(t__24));
             yy__console_red(yk__sdsdup(yy__result->output));
-            yk__sds t__22 = yk__sdsnew("\n");
-            yk__printstr((t__22));
+            yk__sds t__25 = yk__sdsnew("\n");
+            yk__printstr((t__25));
             yy__return_val = (- (1));
-            yk__sds t__23 = yk__sdsnew("---- end of compiler run ---\n");
-            yy__console_cyan(yk__sdsdup(t__23));
-            yk__sdsfree(t__23);
-            yk__sdsfree(t__22);
-            yk__sdsfree(t__21);
+            yk__sds t__26 = yk__sdsnew("---- end of compiler run ---\n");
+            yy__console_cyan(yk__sdsdup(t__26));
+            yk__sdsfree(t__26);
+            yk__sdsfree(t__25);
+            yk__sdsfree(t__24);
         }
-        yk__sdsfree(t__20);
+        yk__sdsfree(t__23);
     }
-    int32_t t__24 = yy__return_val;
+    int32_t t__27 = yy__return_val;
     yy__os_del_process_result(yy__result);
     yy__array_del_str_array(yy__yk_args);
-    return t__24;
+    return t__27;
 }
 int32_t yy__perform_build() 
 {
@@ -3083,166 +3306,233 @@ int32_t yy__perform_build()
     if ((yk__arrlen(yy__config->yy__configuration_errors) > 0))
     {
         yy__print_errors(yy__config->yy__configuration_errors);
-        int32_t t__25 = (- (1));
+        int32_t t__28 = (- (1));
         yy__configuration_del_config(yy__config);
-        return t__25;
+        return t__28;
     }
     yy__print_config(yy__config);
     int32_t yy__ret = yy__build_from_config(yy__config, false);
-    int32_t t__26 = yy__ret;
+    int32_t t__29 = yy__ret;
     yy__configuration_del_config(yy__config);
-    return t__26;
+    return t__29;
 }
-int32_t yy__perform_run(yk__sds yy__filename, bool yy__use_raylib) 
+int32_t yy__perform_run(yk__sds yy__filename, bool yy__use_raylib, bool yy__use_web) 
 {
-    yk__sds t__27 = yy__path_basename(yk__sdsdup(yy__filename));
-    yk__sds t__28 = yy__path_remove_extension(yk__sdsdup((t__27)));
-    yk__sds yy__name = yk__sdsdup((t__28));
-    struct yy__configuration_Config* yy__config = yy__configuration_create_adhoc_config(yk__sdsdup(yy__name), yk__sdsdup(yy__filename), yy__use_raylib);
+    yk__sds t__30 = yy__path_basename(yk__sdsdup(yy__filename));
+    yk__sds t__31 = yy__path_remove_extension(yk__sdsdup((t__30)));
+    yk__sds yy__name = yk__sdsdup((t__31));
+    struct yy__configuration_Config* yy__config = yy__configuration_create_adhoc_config(yk__sdsdup(yy__name), yk__sdsdup(yy__filename), yy__use_raylib, yy__use_web);
     if ((yk__arrlen(yy__config->yy__configuration_errors) > 0))
     {
         yy__print_errors(yy__config->yy__configuration_errors);
-        int32_t t__29 = (- (1));
+        int32_t t__32 = (- (1));
         yy__configuration_del_config(yy__config);
         yk__sdsfree(yy__name);
-        yk__sdsfree(t__28);
-        yk__sdsfree(t__27);
+        yk__sdsfree(t__31);
+        yk__sdsfree(t__30);
         yk__sdsfree(yy__filename);
-        return t__29;
+        return t__32;
     }
     yy__print_config(yy__config);
     int32_t yy__ret = yy__build_from_config(yy__config, true);
     if ((yy__ret != 0))
     {
-        int32_t t__30 = yy__ret;
+        int32_t t__33 = yy__ret;
         yy__configuration_del_config(yy__config);
         yk__sdsfree(yy__name);
-        yk__sdsfree(t__28);
-        yk__sdsfree(t__27);
+        yk__sdsfree(t__31);
+        yk__sdsfree(t__30);
         yk__sdsfree(yy__filename);
-        return t__30;
+        return t__33;
     }
-    yk__sds t__31 = yk__sdsnew("-----------------------------");
-    yy__console_cyan(yk__sdsdup(t__31));
-    yk__sds t__32 = yk__sdsnew("\n");
-    yk__printstr((t__32));
+    yk__sds t__34 = yk__sdsnew("-----------------------------");
+    yy__console_cyan(yk__sdsdup(t__34));
+    yk__sds t__35 = yk__sdsnew("\n");
+    yk__printstr((t__35));
     yk__sds yy__binary = yk__sdsdup(yy__name);
-    if (yy__os_is_windows())
+    if (yy__use_web)
     {
-        yk__sds t__33 = yk__sdsnew(".exe");
-        yk__sds t__34 = yk__sdscatsds(yk__sdsdup(yy__binary), t__33);
+        yk__sds t__36 = yk__sdsnew(".html");
+        yk__sds t__37 = yk__sdscatsds(yk__sdsdup(yy__binary), t__36);
         yk__sdsfree(yy__binary);
-        yy__binary = yk__sdsdup(t__34);
-        yk__sdsfree(t__34);
-        yk__sdsfree(t__33);
+        yy__binary = yk__sdsdup(t__37);
+        yk__sds t__38 = yy__os_cwd();
+        yk__sds t__39 = yy__path_join(yk__sdsdup((t__38)), yk__sdsdup(yy__binary));
+        yk__sds* yy__em_args = yy__array_new(2, yk__sdsdup(yy__config->yy__configuration_emrun_path), yk__sdsdup((t__39)));
+        yy__os_run(yy__em_args);
+        yy__array_del_str_array(yy__em_args);
+        yk__sdsfree(t__39);
+        yk__sdsfree(t__38);
+        yk__sdsfree(t__37);
+        yk__sdsfree(t__36);
     }
     else
     {
-        yk__sds t__35 = yk__sdsnew("./");
-        yk__sds t__36 = yk__sdscatsds(yk__sdsdup(t__35), yy__binary);
-        yk__sdsfree(yy__binary);
-        yy__binary = yk__sdsdup(t__36);
-        yk__sdsfree(t__36);
-        yk__sdsfree(t__35);
+        if (yy__os_is_windows())
+        {
+            yk__sds t__40 = yk__sdsnew(".exe");
+            yk__sds t__41 = yk__sdscatsds(yk__sdsdup(yy__binary), t__40);
+            yk__sdsfree(yy__binary);
+            yy__binary = yk__sdsdup(t__41);
+            yk__sdsfree(t__41);
+            yk__sdsfree(t__40);
+        }
+        else
+        {
+            yk__sds t__42 = yk__sdsnew("./");
+            yk__sds t__43 = yk__sdscatsds(yk__sdsdup(t__42), yy__binary);
+            yk__sdsfree(yy__binary);
+            yy__binary = yk__sdsdup(t__43);
+            yk__sdsfree(t__43);
+            yk__sdsfree(t__42);
+        }
+        yy__c_CStr yy__binary_cstr = yy__strings_to_cstr(yk__sdsdup(yy__binary));
+        yy__c_system(yy__binary_cstr);
     }
-    yy__c_CStr yy__binary_cstr = yy__strings_to_cstr(yk__sdsdup(yy__binary));
-    yy__c_system(yy__binary_cstr);
     yy__configuration_del_config(yy__config);
     yk__sdsfree(yy__binary);
-    yk__sdsfree(t__32);
-    yk__sdsfree(t__31);
+    yk__sdsfree(t__35);
+    yk__sdsfree(t__34);
     yk__sdsfree(yy__name);
-    yk__sdsfree(t__28);
-    yk__sdsfree(t__27);
+    yk__sdsfree(t__31);
+    yk__sdsfree(t__30);
     yk__sdsfree(yy__filename);
     return 0;
 }
 int32_t yy__handle_args(yy__os_arguments yy__args) 
 {
     yy__argparse_Option* yy__options = NULL;
-    yk__sds t__37 = yk__sdsnew("carpntr");
-    yk__sds t__38 = yk__sdsnew("carpntr [options] file");
-    yk__sds* yy__usages = yy__array_new(2, yk__sdsdup(t__37), yk__sdsdup(t__38));
+    yk__sds t__44 = yk__sdsnew("carpntr");
+    yk__sds t__45 = yk__sdsnew("carpntr [options] file");
+    yk__sds* yy__usages = yy__array_new(2, yk__sdsdup(t__44), yk__sdsdup(t__45));
     int32_t yy__run = 0;
     int32_t yy__raylib = 0;
     int32_t yy__web = 0;
     yk__arrput(yy__options, yy__argparse_opt_help());
-    yk__sds t__39 = yk__sdsnew("R");
-    yk__sds t__40 = yk__sdsnew("run");
-    yk__sds t__41 = yk__sdsnew("run a single file");
-    yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsdup(t__39), yk__sdsdup(t__40), (&(yy__run)), yk__sdsdup(t__41)));
-    yk__sds t__42 = yk__sdsnew("r");
-    yk__sds t__43 = yk__sdsnew("raylib");
-    yk__sds t__44 = yk__sdsnew("enable raylib");
-    yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsdup(t__42), yk__sdsdup(t__43), (&(yy__raylib)), yk__sdsdup(t__44)));
-    yk__sds t__45 = yk__sdsnew("w");
-    yk__sds t__46 = yk__sdsnew("web");
-    yk__sds t__47 = yk__sdsnew("build for web");
-    yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsdup(t__45), yk__sdsdup(t__46), (&(yy__web)), yk__sdsdup(t__47)));
+    yk__sds t__46 = yk__sdsnew("R");
+    yk__sds t__47 = yk__sdsnew("run");
+    yk__sds t__48 = yk__sdsnew("run a single file");
+    yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsdup(t__46), yk__sdsdup(t__47), (&(yy__run)), yk__sdsdup(t__48)));
+    yk__sds t__49 = yk__sdsnew("r");
+    yk__sds t__50 = yk__sdsnew("raylib");
+    yk__sds t__51 = yk__sdsnew("enable raylib (works only with run)");
+    yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsdup(t__49), yk__sdsdup(t__50), (&(yy__raylib)), yk__sdsdup(t__51)));
+    yk__sds t__52 = yk__sdsnew("w");
+    yk__sds t__53 = yk__sdsnew("web");
+    yk__sds t__54 = yk__sdsnew("build for web (works only with run & raylib)");
+    yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsdup(t__52), yk__sdsdup(t__53), (&(yy__web)), yk__sdsdup(t__54)));
     yk__arrput(yy__options, yy__argparse_opt_end());
     yy__argparse_ArgParse yy__a = yy__argparse_new(yy__options, yy__usages);
     yy__argparse_ArgParseRemainder yy__remainder = yy__argparse_parse(yy__a, yy__args->argv);
     if ((yy__remainder->argc != 1))
     {
-        yk__sds t__48 = yk__sdsnew("One file must be preset for excution");
-        yk__printlnstr((t__48));
+        yk__sds t__55 = yk__sdsnew("One file must be preset for excution");
+        yk__printlnstr((t__55));
         yy__argparse_del_remainder(yy__remainder);
         yy__argparse_del_argparse(yy__a);
         yy__array_del_str_array(yy__usages);
         yk__arrfree(yy__options);
+        yk__sdsfree(t__55);
+        yk__sdsfree(t__54);
+        yk__sdsfree(t__53);
+        yk__sdsfree(t__52);
+        yk__sdsfree(t__51);
+        yk__sdsfree(t__50);
+        yk__sdsfree(t__49);
         yk__sdsfree(t__48);
         yk__sdsfree(t__47);
         yk__sdsfree(t__46);
         yk__sdsfree(t__45);
         yk__sdsfree(t__44);
-        yk__sdsfree(t__43);
-        yk__sdsfree(t__42);
-        yk__sdsfree(t__41);
-        yk__sdsfree(t__40);
-        yk__sdsfree(t__39);
-        yk__sdsfree(t__38);
-        yk__sdsfree(t__37);
         return 1;
-        yk__sdsfree(t__48);
+        yk__sdsfree(t__55);
     }
     yk__sds yy__single_file = yk__sdsdup(yy__remainder->remainder[0]);
+    if (((yy__web == 1) && (yy__raylib != 1)))
+    {
+        yk__sds t__56 = yk__sdsnew("Web is only supported with raylib");
+        yk__printlnstr((t__56));
+        yy__argparse_del_remainder(yy__remainder);
+        yy__argparse_del_argparse(yy__a);
+        yy__array_del_str_array(yy__usages);
+        yk__arrfree(yy__options);
+        yk__sdsfree(t__56);
+        yk__sdsfree(yy__single_file);
+        yk__sdsfree(t__54);
+        yk__sdsfree(t__53);
+        yk__sdsfree(t__52);
+        yk__sdsfree(t__51);
+        yk__sdsfree(t__50);
+        yk__sdsfree(t__49);
+        yk__sdsfree(t__48);
+        yk__sdsfree(t__47);
+        yk__sdsfree(t__46);
+        yk__sdsfree(t__45);
+        yk__sdsfree(t__44);
+        return 1;
+        yk__sdsfree(t__56);
+    }
     if ((yy__run == 1))
     {
-        int32_t t__49 = yy__perform_run(yk__sdsdup(yy__single_file), (yy__raylib == 1));
+        int32_t t__57 = yy__perform_run(yk__sdsdup(yy__single_file), (yy__raylib == 1), (yy__web == 1));
         yy__argparse_del_remainder(yy__remainder);
         yy__argparse_del_argparse(yy__a);
         yy__array_del_str_array(yy__usages);
         yk__arrfree(yy__options);
         yk__sdsfree(yy__single_file);
+        yk__sdsfree(t__54);
+        yk__sdsfree(t__53);
+        yk__sdsfree(t__52);
+        yk__sdsfree(t__51);
+        yk__sdsfree(t__50);
+        yk__sdsfree(t__49);
+        yk__sdsfree(t__48);
         yk__sdsfree(t__47);
         yk__sdsfree(t__46);
         yk__sdsfree(t__45);
         yk__sdsfree(t__44);
-        yk__sdsfree(t__43);
-        yk__sdsfree(t__42);
-        yk__sdsfree(t__41);
-        yk__sdsfree(t__40);
-        yk__sdsfree(t__39);
-        yk__sdsfree(t__38);
-        yk__sdsfree(t__37);
-        return t__49;
+        return t__57;
+    }
+    if ((yy__raylib == 1))
+    {
+        yk__sds t__58 = yk__sdsnew("Please use -R option for raylib");
+        yk__printlnstr((t__58));
+        yy__argparse_del_remainder(yy__remainder);
+        yy__argparse_del_argparse(yy__a);
+        yy__array_del_str_array(yy__usages);
+        yk__arrfree(yy__options);
+        yk__sdsfree(t__58);
+        yk__sdsfree(yy__single_file);
+        yk__sdsfree(t__54);
+        yk__sdsfree(t__53);
+        yk__sdsfree(t__52);
+        yk__sdsfree(t__51);
+        yk__sdsfree(t__50);
+        yk__sdsfree(t__49);
+        yk__sdsfree(t__48);
+        yk__sdsfree(t__47);
+        yk__sdsfree(t__46);
+        yk__sdsfree(t__45);
+        yk__sdsfree(t__44);
+        return 1;
+        yk__sdsfree(t__58);
     }
     yy__argparse_del_remainder(yy__remainder);
     yy__argparse_del_argparse(yy__a);
     yy__array_del_str_array(yy__usages);
     yk__arrfree(yy__options);
     yk__sdsfree(yy__single_file);
+    yk__sdsfree(t__54);
+    yk__sdsfree(t__53);
+    yk__sdsfree(t__52);
+    yk__sdsfree(t__51);
+    yk__sdsfree(t__50);
+    yk__sdsfree(t__49);
+    yk__sdsfree(t__48);
     yk__sdsfree(t__47);
     yk__sdsfree(t__46);
     yk__sdsfree(t__45);
     yk__sdsfree(t__44);
-    yk__sdsfree(t__43);
-    yk__sdsfree(t__42);
-    yk__sdsfree(t__41);
-    yk__sdsfree(t__40);
-    yk__sdsfree(t__39);
-    yk__sdsfree(t__38);
-    yk__sdsfree(t__37);
     return 0;
 }
 int32_t yy__main() 
@@ -3251,11 +3541,11 @@ int32_t yy__main()
     yy__print_banner();
     if ((yy__args->argc <= 1))
     {
-        int32_t t__50 = yy__perform_build();
-        return t__50;
+        int32_t t__59 = yy__perform_build();
+        return t__59;
     }
-    int32_t t__51 = yy__handle_args(yy__args);
-    return t__51;
+    int32_t t__60 = yy__handle_args(yy__args);
+    return t__60;
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

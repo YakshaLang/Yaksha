@@ -243,7 +243,7 @@ def main():
         files.append((yaksha_mod, mod_full_filepath))
 
     with open(os.path.join(OUTPUT_DIR, "docs.json"), "w+", encoding="utf-8") as h:
-        json.dump(structures, h, indent="  ")
+        json.dump(structures, h, indent="  ", sort_keys=True)
 
     # Sort
     files = sorted(files, key=lambda x: x[0])

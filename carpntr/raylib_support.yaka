@@ -4,6 +4,7 @@ import libs.os
 import libs.os.path
 import libs.console
 import libs.strings.array as sarr
+import configuration as carp
 
 
 class CObject:
@@ -37,14 +38,31 @@ def fill_arguments(src_path: str, c: CObject) -> CObject:
     c.args = args
     return c
 
+def fill_web_arguments(src_path: str, c: CObject) -> CObject:
+    # Fill args section of CObject
+    args: Array[str] = sarr.new(4, "-std=gnu99", "-DPLATFORM_WEB", "-DGRAPHICS_API_OPENGL_ES2", "-Oz")
 
-def co(filename: str, src_path: str, target_path: str) -> CObject:
+    arrput(args, c.c_file)
+    arrput(args, "-o")
+    arrput(args, c.o_file)
+
+    c.args = args
+    return c
+
+
+def co(filename: str, src_path: str, target_path: str, web: bool) -> CObject:
     # Create a new CObject
     obj: CObject = CObject()
     obj.c_file = path.join(src_path, filename + ".c")
-    obj.o_file = path.join(target_path, filename + ".o")
-    obj.base_name = filename
-    obj = fill_arguments(src_path, obj)
+    # Prefix web objects so we do not use them together with .o files
+    if web:
+        obj.base_name = "web-" + filename
+        obj.o_file = path.join(target_path, obj.base_name + ".o")
+        obj = fill_web_arguments(src_path, obj)
+    else:
+        obj.base_name = filename
+        obj.o_file = path.join(target_path, filename + ".o")
+        obj = fill_arguments(src_path, obj)
     return obj
 
 
@@ -70,18 +88,20 @@ def del_objects(x: Array[CObject]) -> None:
     del x
 
 
-def get_objects(raylib_src_path: str, gui_path: str, extra_path: str, build_path: str) -> Array[CObject]:
+def get_objects(raylib_src_path: str, gui_path: str, extra_path: str, build_path: str, web: bool) -> Array[CObject]:
     # Get a list of objects for raylib
     objects: Array[CObject]
-    arrput(objects, co("rglfw", raylib_src_path, build_path))
-    arrput(objects, co("raudio", raylib_src_path, build_path))
-    arrput(objects, co("rcore", raylib_src_path, build_path))
-    arrput(objects, co("rmodels", raylib_src_path, build_path))
-    arrput(objects, co("rshapes", raylib_src_path, build_path))
-    arrput(objects, co("rtext", raylib_src_path, build_path))
-    arrput(objects, co("rtextures", raylib_src_path, build_path))
-    arrput(objects, co("utils", raylib_src_path, build_path))
-    extra: CObject = co("rayextras", extra_path, build_path)
+    # rglfw object is not needed for web (provided by emsdk)
+    if not web:
+        arrput(objects, co("rglfw", raylib_src_path, build_path, web))
+    arrput(objects, co("raudio", raylib_src_path, build_path, web))
+    arrput(objects, co("rcore", raylib_src_path, build_path, web))
+    arrput(objects, co("rmodels", raylib_src_path, build_path, web))
+    arrput(objects, co("rshapes", raylib_src_path, build_path, web))
+    arrput(objects, co("rtext", raylib_src_path, build_path, web))
+    arrput(objects, co("rtextures", raylib_src_path, build_path, web))
+    arrput(objects, co("utils", raylib_src_path, build_path, web))
+    extra: CObject = co("rayextras", extra_path, build_path, web)
     arrput(extra.args, "-I" + raylib_src_path)
     arrput(extra.args, "-I" + gui_path)
     arrput(objects, extra)
@@ -101,7 +121,11 @@ def get_external_libs() -> Array[str]:
             external_libs = sarr.new(5, "-lGL", "-lrt", "-ldl", "-lm", "-lX11")
     return external_libs
 
-def produce_object(c: CObject, compiler: str) -> bool:
+def get_web_args() -> Array[str]:
+    web_args: Array[str] = sarr.new(5, "-s", "USE_GLFW=3", "-s", "ASYNCIFY", "-DPLATFORM_WEB")
+    return web_args
+
+def produce_object(c: CObject, conf: carp.Config) -> bool:
     # Creates a new .o file for a raylib source
     # If raylib object already exists do not bother building it again
     # 1) We are only supporting native at the moment
@@ -113,7 +137,11 @@ def produce_object(c: CObject, compiler: str) -> bool:
         console.green("prebuilt.\n")
         return True
 
-    cmd: Array[str] = sarr.new(4, compiler, "cc", "-c", "-Oz")
+    cmd: Array[str]
+    if conf.compilation.web:
+        cmd = sarr.new(3, conf.emcc_compiler_path, "-c", "-Oz")
+    else:
+        cmd = sarr.new(4, conf.zig_compiler_path, "cc", "-c", "-Oz")
     cmd = sarr.extend(cmd, c.args)
     defer sarr.del_str_array(cmd)
     pr: os.ProcessResult = os.run(cmd)
@@ -131,17 +159,17 @@ def produce_object(c: CObject, compiler: str) -> bool:
     return False
 
 
-def get_raylib_args(zig_compiler: str, runtime_path:str) -> Array[str]:
+def get_raylib_args(conf: carp.Config) -> Array[str]:
     # Build raylib objects
     # Return list of objects & libraries that we want to link
     arguments: Array[str]
-    compiler: str = zig_compiler
+    runtime_path: str = conf.runtime_path
     build_path: str = path.join(os.cwd(), "build")
     path.mkdir(build_path)
     raylib_path: str = path.join(path.join(runtime_path, "raylib"), "src")
     raygui_path: str = path.join(path.join(runtime_path, "raygui"), "src")
     rayextra_path: str = path.join(runtime_path, "raylib_additional")
-    objects: Array[CObject] = get_objects(raylib_path, raygui_path, rayextra_path, build_path)
+    objects: Array[CObject] = get_objects(raylib_path, raygui_path, rayextra_path, build_path, conf.compilation.web)
     o_files: Array[str]
     defer sarr.del_str_array(o_files)
     defer del_objects(objects)
@@ -152,7 +180,7 @@ def get_raylib_args(zig_compiler: str, runtime_path:str) -> Array[str]:
     println("\nbuilding raylib ...")
     while pos < object_count:
         object: CObject = objects[pos]
-        if produce_object(object, compiler):
+        if produce_object(object, conf):
             arrput(o_files, object.o_file)
         else:
             fail = True
@@ -162,18 +190,24 @@ def get_raylib_args(zig_compiler: str, runtime_path:str) -> Array[str]:
     if fail:
         return arguments
 
-    # Link external libs + objects
-    arguments = get_external_libs()
-    arguments = sarr.extend(arguments, o_files)
+    if conf.compilation.web:
+        # Add web build arguments
+        arguments = get_web_args()
+        arguments = sarr.extend(arguments, o_files)
+    else:
+        # Link external libs + objects
+        arguments = get_external_libs()
+        arguments = sarr.extend(arguments, o_files)
+        # On windows try and build a gui application so it will not annoy us
+        if os.is_windows():
+            arrput(arguments, "-Wl,--subsystem,windows")
+            # Fix until zig support ^^ Windows subsystem
+            # Basically when this #define is set we hide the console window.
+            # However, this does not work if you are using the new Windows Terminal
+            arrput(arguments, "-DYK__WINDOWS_HIDE_CONSOLE")
+
     # Add includes
     arrput(arguments, "-I" + raylib_path)
     arrput(arguments, "-I" + raygui_path)
     arrput(arguments, "-I" + rayextra_path)
-    # On windows try and build a gui application so it will not annoy us
-    if os.is_windows():
-        arrput(arguments, "-Wl,--subsystem,windows")
-        # Fix until zig support ^^ Windows subsystem
-        # Basically when this #define is set we hide the console window.
-        # However, this does not work if you are using the new Windows Terminal
-        arrput(arguments, "-DYK__WINDOWS_HIDE_CONSOLE")
     return arguments

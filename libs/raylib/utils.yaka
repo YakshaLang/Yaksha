@@ -51,3 +51,35 @@ def lerp_color(a: rl.Color, b: rl.Color, fraction: float) -> rl.Color:
 def clear() -> None:
     # Clear background with RAYWHITE colour
     ccode """ClearBackground(RAYWHITE)"""
+
+@nativedefine("void*")
+class Data:
+    # Arbitary data (void*)
+    pass
+
+@nativedefine("yk__rungameloop")
+def run_game_loop(fps: int, data: Data) -> int:
+    # Run def game_step(d: utils.Data) in a loop
+    # Warning! this assumes you have def game_step(d: utils.Data) present in code
+    # Warning! game_step def must be present in same file as main()
+    # See wind_tree_gs.yaka for a sample of how to use this.
+    # Use only if you run into slowness with standard while loop
+    pass
+
+@native
+def is_web() -> bool:
+    # Are we running in raylib WASM/Web
+    ccode """bool result = false;
+    #if defined(PLATFORM_WEB)
+    result = true;
+    #endif
+    return result"""
+
+@native
+def is_desktop() -> bool:
+    # Are we running in raylib in desktop
+    ccode """bool result = false;
+    #if defined(PLATFORM_DESKOP)
+    result = true;
+    #endif
+    return result"""
