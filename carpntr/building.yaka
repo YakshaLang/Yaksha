@@ -9,6 +9,9 @@ import raylib_support as rs
 import configuration as carp
 
 def prepare_code(c: carp.Config, code: str) -> str:
+    # Prepare code for compilation based on configuration
+    # Injects includes, defines, etc
+    # Then return final code
     buf: sbuf.StringBuffer = sbuf.new()
     defer sbuf.del_buf(buf)
     # --
@@ -45,12 +48,28 @@ def prepare_code(c: carp.Config, code: str) -> str:
     result: str = sbuf.to_str(buf)
     return result
 
+def is_target_macos(target_to_check: str) -> bool:
+    # Check if given target is macos, if target == native, check if we are running macos
+    native: bool = len(target_to_check) == 0
+    if native:
+        return os.is_macos()
+    return strings.contains(target_to_check, "macos")
+
+def is_target_windows(target_to_check: str) -> bool:
+    # Check if given target is windows, if target == native, check if we are running windows
+    native: bool = len(target_to_check) == 0
+    if native:
+        return os.is_windows()
+    return strings.contains(target_to_check, "windows")
+
 def create_args(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> Array[str]:
+    # Create arguments for compilation on to a string array
+    # This string array need to be deleted
     native: bool = len(target) == 0
-    args: Array[str] = sarr.new(8, c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC")
+    args: Array[str] = sarr.new(9, c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
     args = sarr.extend(args, raylib_args)
     # If not macos do link time optimization
-    if (native and (not os.is_macos())) or (not native and not strings.contains(target, "macos")):
+    if not is_target_macos(target):
         arrput(args, "-flto=full")
     # --
     length: int = 0
@@ -90,7 +109,7 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     binary: str = c.project.name
     if not native:
         binary = binary + "-" + target
-    if (native and os.is_windows()) or strings.contains(target, "windows"):
+    if is_target_windows(target):
         binary = binary + ".exe"
     binary = path.join(build_path, binary)
     arrput(args, binary)
@@ -98,11 +117,15 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     return args
 
 def build_target(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> int:
+    # Build a single target (platform)
+    # if target is empty it is considered to be native (current platform)
+    # zero is returned if successful
+    native: bool = len(target) == 0
     a: Array[str] = create_args(c, code_path, build_path, target, raylib_args)
     defer sarr.del_str_array(a)
     result: os.ProcessResult = os.run(a)
     defer os.del_process_result(result)
-    if len(target) == 0:
+    if native:
         console.yellow("native")
     else:
         console.yellow(target)
@@ -120,16 +143,20 @@ def build_target(c: carp.Config, code_path: str, build_path: str, target: str, r
         return 1
 
 def build(c: carp.Config, code: str) -> int:
+    # Cross build all compilation targets
+    # zero is returned if all are successful
+
     target_count: int = len(c.compilation.targets)
     raylib_args: Array[str]
     defer sarr.del_str_array(raylib_args)
+
     if target_count != 0 and c.compilation.raylib:
         console.red("raylib build only support native builds.\n")
         console.cyan("Hint: You need to keep [compilation].targets empty\n")
         return -1
+
     if c.compilation.raylib:
         raylib_args = rs.get_raylib_args(c.zig_compiler_path, c.runtime_path)
-
 
     print("\nbuilding ")
     print(target_count + 1)
@@ -143,6 +170,7 @@ def build(c: carp.Config, code: str) -> int:
         return -1
 
     failed_count: int = 0
+
     # Build current system native binary
     failed_count = failed_count + build_target(c, code_path, build_path, "", raylib_args)
 
@@ -156,10 +184,10 @@ def build(c: carp.Config, code: str) -> int:
     print("\n")
     if failed_count > 0:
         return -1
-    else:
-        return 0
+    return 0
 
 def build_simple(c: carp.Config, code: str) -> int:
+    # Native build only
     code_path: str = path.join(os.cwd(), c.project.name + ".c")
     raylib_args: Array[str]
     if c.compilation.raylib:
@@ -174,5 +202,5 @@ def build_simple(c: carp.Config, code: str) -> int:
 
     if failed_count > 0:
         return -1
-    else:
-        return 0
+
+    return 0

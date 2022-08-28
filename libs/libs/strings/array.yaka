@@ -58,12 +58,13 @@ def extend(a: Array[str], b: Array[str]) -> Array[str]:
     }
     return lhs"""
 
-@native
+@nativedefine("yk__delsdsarray")
 def del_str_array(sa: Array[str]) -> None:
     # Delete a string array by deleting individual string objects and array itself
-    ccode """if (NULL == nn__sa) return;
-    size_t l = yk__arrlenu(nn__sa);
-    for (size_t x = 0; x < l; x++) {
-        yk__sdsfree(nn__sa[x]);
-    }
-    yk__arrfree(nn__sa)"""
+    pass
+
+@nativedefine("yk__sdsarraydup")
+def dup(sa: Array[str]) -> Array[str]:
+    # Duplicate given array to a new array
+    # Both new array and string copies are created
+    pass

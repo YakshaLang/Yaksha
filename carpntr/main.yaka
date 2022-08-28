@@ -7,12 +7,12 @@ import libs.c
 import libs.console
 import libs.strings
 import libs.strings.array as sarr
+import libs.argparse
 import configuration as carp
 import building
 
 def print_banner() -> None:
     # This just print a banner
-    # ASCII art for hammer from https://ascii.co.uk/art/hammer -> author jgs
     art: str = """
     ╔═╗┌─┐┬─┐╔═╗┌┐┌┌┬┐┬─┐
     ║  ├─┤├┬┘╠═╝│││ │ ├┬┘
@@ -22,18 +22,19 @@ def print_banner() -> None:
     Tool for building Yaksha 
     Projects
     """
-
     art2: str = """
        ,
       /(  ___________
      |  >:===========`
       )(
       \"\"\n"""
+    # ASCII art for hammer from https://ascii.co.uk/art/hammer -> author jgs
     console.green(art)
     console.cyan(text)
     console.yellow(art2)
 
 def print_errors(er: Array[str]) -> None:
+    # Print given error strings in red
     length: int = len(er)
     x: int = 0
     while x < length:
@@ -41,12 +42,15 @@ def print_errors(er: Array[str]) -> None:
         x = x + 1
 
 def printkv(k: str, v: str) -> None:
+    # Print key value to console in cyan, red and green
     console.cyan(k)
     console.red(" := ")
     console.green(v)
     print("\n")
 
 def print_config(config: carp.Config) -> None:
+    # Print configuration information
+    # This prints things such as libs path, runtime, zig.exe, etc
     printkv("libs", config.libs_path)
     printkv("runtime", config.runtime_path)
     printkv("compiler", config.compiler_path)
@@ -54,6 +58,7 @@ def print_config(config: carp.Config) -> None:
     printkv("standard library version", libs.version())
 
 def build_from_config(config: carp.Config, simple: bool) -> int:
+    # Build given config, if simple building.build_simple() is called
     return_val: int = 0
     yk_args: Array[str] = sarr.new(3, config.compiler_path, config.project.main, config.libs_path)
     result: os.ProcessResult = os.run(yk_args)
@@ -86,6 +91,7 @@ def build_from_config(config: carp.Config, simple: bool) -> int:
     return return_val
 
 def perform_build() -> int:
+    # Perform a build of a project
     config: carp.Config = carp.load_config()
     defer carp.del_config(config)
     if len(config.errors) > 0:
@@ -96,6 +102,7 @@ def perform_build() -> int:
     return ret
 
 def perform_run(filename: str, use_raylib: bool) -> int:
+    # Perform single file project build and execute binary
     name: str = path.remove_extension(path.basename(filename))
     config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib)
     defer carp.del_config(config)
@@ -120,24 +127,41 @@ def perform_run(filename: str, use_raylib: bool) -> int:
     return 0
 
 
-def usage_print(sample: str, help: str) -> None:
-    console.red("Usage: ")
-    console.cyan(sample)
-    console.red(" -> ")
-    println(help)
+def handle_args(args: os.arguments) -> int:
+    # Multiple arguments trigger how to run the program
+    options: Array[argparse.Option]
+    defer del options
+    usages: Array[str] = sarr.new(2, "carpntr", "carpntr [options] file")
+    defer sarr.del_str_array(usages)
 
+    run: int = 0
+    raylib: int = 0
+    web: int = 0
+    arrput(options, argparse.opt_help())
+    arrput(options, argparse.opt_boolean("R", "run", getref(run), "run a single file"))
+    arrput(options, argparse.opt_boolean("r", "raylib", getref(raylib), "enable raylib"))
+    arrput(options, argparse.opt_boolean("w", "web", getref(web), "build for web"))
+    arrput(options, argparse.opt_end())
+
+    a: argparse.ArgParse = argparse.new(options, usages)
+    defer argparse.del_argparse(a)
+
+    remainder: argparse.ArgParseRemainder = argparse.parse(a, args.argv)
+    defer argparse.del_remainder(remainder)
+
+    if remainder.argc != 1:
+        println("One file must be preset for excution")
+        return 1
+    single_file: str = remainder.remainder[0]
+
+    if run == 1:
+        return perform_run(single_file, raylib == 1)
+    return 0
 
 def main() -> int:
     args: os.arguments = os.get_args()
     print_banner()
+    # No arguments -> default
     if args.argc <= 1:
         return perform_build()
-    if args.argc == 3:
-        if args.argv[1] == "run_file":
-            return perform_run(args.argv[2], False)
-        if args.argv[1] == "ray_file":
-            return perform_run(args.argv[2], True)
-    usage_print("carpntr", "Build program using 'yaksha.toml'")
-    usage_print("carpntr run_file prog.yaka", "Build single file with main() prog.yaka and run it.")
-    usage_print("carpntr ray_file prog.yaka", "Build single file with main() prog.yaka, linked with raylib and run it.")
-    return 1
+    return handle_args(args)

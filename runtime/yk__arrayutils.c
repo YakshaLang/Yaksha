@@ -11,3 +11,20 @@ yk__sds *yk__newsdsarray(size_t count, ...) {
   va_end(args);
   return array_val;
 }
+yk__sds *yk__sdsarraydup(yk__sds *arr) {
+  if (NULL == arr) { return NULL; }
+  size_t length = yk__arrlenu(arr);
+  yk__sds *newarr = NULL;
+  for (size_t i = 0; i < length; i++) {
+    yk__sds current = arr[i];
+    yk__sds copy = yk__sdsdup(current);
+    yk__arrput(newarr, copy);
+  }
+  return newarr;
+}
+void yk__delsdsarray(yk__sds *arr) {
+  if (NULL == arr) return;
+  size_t length = yk__arrlenu(arr);
+  for (size_t x = 0; x < length; x++) { yk__sdsfree(arr[x]); }
+  yk__arrfree(arr);
+}

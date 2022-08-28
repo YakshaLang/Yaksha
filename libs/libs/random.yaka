@@ -38,4 +38,6 @@ def random_betweenf(a: float, b: float) -> float:
 
 @nativedefine("yk__random_u64")
 def random_u64() -> u64:
+    # Random unsigned 64bit
+    # Uses rand() (crypto unsafe)
     pass

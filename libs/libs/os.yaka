@@ -53,6 +53,8 @@ def cwd() -> str:
 
 @nativedefine("struct yk__process_result*")
 class ProcessResult:
+    # Results of run() execution
+    #   Must be deleted
     ok: bool
     output: str
     return_code: int
@@ -60,10 +62,12 @@ class ProcessResult:
 
 @native("yk__run")
 def run(args: Array[str]) -> ProcessResult:
+    # Run give [process, arg1, arg2] command line
     pass
 
 @native("yk__free_process_result")
 def del_process_result(pr: ProcessResult) -> None:
+    # Delete process result object
     pass
 
 @native
@@ -77,12 +81,13 @@ def is_windows() -> bool:
 
 @native
 def is_macos() -> bool:
-    # Are we running macOS?
+    # Are we running MacOS?
     ccode """bool mach_os = false;
     #if defined(__APPLE__) && defined(__MACH__)
     mach_os = true;
     #endif
     return mach_os"""
+
 
 @native("yk__getenv")
 def getenv(name: str) -> str:

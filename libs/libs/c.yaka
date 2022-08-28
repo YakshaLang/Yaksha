@@ -1,13 +1,17 @@
 @nativedefine("void*")
 class VoidPtr:
+    # Any pointer type
+    # void* in C
     pass
 
 @nativedefine("size_t")
 class Size:
+    # size_t in C code
     pass
 
 @nativedefine("char*")
 class CStr:
+    # A char* string
     pass
 
 @nativedefine("double")

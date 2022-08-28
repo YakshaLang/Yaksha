@@ -6,6 +6,11 @@ import libs.os.path
 import libs.io
 
 class CCode:
+    # CCode section of yaksha.toml
+    # defines - Injected defines for the generated c code
+    # compiler_defines - /D or -D arguments
+    # includes - Injected #include "x.h"
+    # includes - Injected #include <x.h>
     include_paths: Array[str]
     defines: Array[str]
     compiler_defines: Array[str]
@@ -16,12 +21,14 @@ class CCode:
 
 
 class Project:
+    # Project section in yaksha.toml
     main: str
     name: str
     author: str
 
 
 class Compilation:
+    # Compilation section of yaksha.toml
     override_alloc: bool
     only_ccode: bool
     libc: str
@@ -31,6 +38,7 @@ class Compilation:
 
 
 class Config:
+    # Full yaksha.toml object
     runtime_path: str
     compiler_path: str
     libs_path: str
@@ -42,6 +50,7 @@ class Config:
 
 
 def find_runtime_path(c: Config) -> None:
+    # Find runtime library path (.c and .h files, raylib source, etc)
     exe_parent: str = os.exe_path()
     l1: str = path.join(path.dirname(exe_parent), "runtime")
     l2: str = path.join(path.dirname(path.dirname(exe_parent)), "runtime")
@@ -61,6 +70,7 @@ def find_runtime_path(c: Config) -> None:
     c.runtime_path = "<not found>"
 
 def find_libs_path(c: Config) -> None:
+    # Find standard library path (libs, raylib wrapper)
     exe_parent: str = os.exe_path()
     l1: str = path.join(path.dirname(exe_parent), "libs")
     l2: str = path.join(path.dirname(path.dirname(exe_parent)), "libs")
@@ -81,6 +91,7 @@ def find_libs_path(c: Config) -> None:
 
 
 def find_yaksha_compiler(c: Config) -> None:
+    # Find yakshac(.exe) binary file
     exe_parent: str = os.exe_path()
     l1: str = path.join(exe_parent, "yakshac")
     if os.is_windows():
@@ -105,6 +116,7 @@ def find_yaksha_compiler(c: Config) -> None:
     c.compiler_path = "<not found>"
 
 def find_zig_compiler(c: Config) -> None:
+    # Find zig(.exe) binary file
     zig: str = os.which("zig")
     if len(zig) > 0:
         c.zig_compiler_path = zig
@@ -113,6 +125,7 @@ def find_zig_compiler(c: Config) -> None:
     c.zig_compiler_path = "<not found>"
 
 def load_project(conf: toml.Table, c: Config) -> Project:
+    # Load [project] section from yaksha.toml
     p: Project = Project()
     project: toml.Table = toml.get_table(conf, "project")
     if not toml.valid_table(project):
@@ -137,6 +150,7 @@ def load_project(conf: toml.Table, c: Config) -> Project:
 
 
 def load_c_code(conf: toml.Table, c: Config) -> CCode:
+    # Load [ccode] section from yaksha.toml
     cc: CCode = CCode()
     cc_data: toml.Table = toml.get_table(conf, "ccode")
     if not toml.valid_table(cc_data):
@@ -152,6 +166,7 @@ def load_c_code(conf: toml.Table, c: Config) -> CCode:
     return cc
 
 def load_compilation(conf: toml.Table, c: Config) -> Compilation:
+    # Load [compilation] section from yaksha.toml
     co: Compilation = Compilation()
     co_data: toml.Table = toml.get_table(conf, "compilation")
     if not toml.valid_table(co_data):
@@ -163,6 +178,7 @@ def load_compilation(conf: toml.Table, c: Config) -> Compilation:
 
 
 def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
+    # Add runtime and other defaults to the CCode section
     current_dir: str = path.dirname(os.cwd())
 
     # Add defaults to cc.include_paths
@@ -178,7 +194,7 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     cc.compiler_defines = sarr.extend(df_compiler_defines, cc.compiler_defines)
 
     # Add defaults to cc.includes
-    df_includes: Array[str] = sarr.new(10, "whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h", "yk__console.h", "mpc.h", "yk__arrayutils.h", "yk__process.h", "yk__graphic_utils.h")
+    df_includes: Array[str] = sarr.new(12, "whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h", "yk__console.h", "mpc.h", "yk__arrayutils.h", "yk__process.h", "yk__graphic_utils.h", "yk__argparse.h", "argparse.h")
     orig_includes: Array[str] = cc.includes
     defer sarr.del_str_array(orig_includes)
     cc.includes = sarr.extend(df_includes, cc.includes)
@@ -194,6 +210,8 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     arrput(df_c_code, path.join(c.runtime_path, "yk__arrayutils.c"))
     arrput(df_c_code, path.join(c.runtime_path, "yk__process.c"))
     arrput(df_c_code, path.join(c.runtime_path, "yk__graphic_utils.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "yk__argparse.c"))
+    arrput(df_c_code, path.join(c.runtime_path, "argparse.c"))
     orig_c_code: Array[str] = cc.c_code
     defer sarr.del_str_array(orig_c_code)
     cc.c_code = sarr.extend(df_c_code, cc.c_code)
@@ -202,6 +220,7 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
 
 
 def load_config() -> Config:
+    # Load completed config with injected defaults
     c: Config = Config()
     configf: str = path.join(os.cwd(), "yaksha.toml")
 
@@ -244,6 +263,7 @@ def load_config() -> Config:
     return c
 
 def create_adhoc_config(name: str, file_path: str, use_raylib: bool) -> Config:
+    # Create an adhoc configuration for single file execution mode
     c: Config = Config()
     # Try and find yakshac.exe
     find_yaksha_compiler(c)
@@ -276,6 +296,7 @@ def create_adhoc_config(name: str, file_path: str, use_raylib: bool) -> Config:
 
 
 def del_config(c: Config) -> None:
+    # Delete a Config object
     if c.c_code != None:
         sarr.del_str_array(c.c_code.include_paths)
         sarr.del_str_array(c.c_code.defines)

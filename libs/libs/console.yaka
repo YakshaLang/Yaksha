@@ -1,16 +1,24 @@
 REWIND: Const[int] = 0
-# Use rewind with set_colour to stop applying colour
+# Use rewind with set_color to stop applying any color
 RED: Const[int] = 1
+# Apply red foreground color
 GREEN: Const[int] = 2
+# Apply green foreground color
 WHITE: Const[int] = 3
+# Apply white foreground color
 BLUE: Const[int] = 4
+# Apply blue foreground color
 PURPLE: Const[int] = 5
+# Apply purple foreground color
 YELLOW: Const[int] = 6
+# Apply yellow foreground color
 CYAN: Const[int] = 7
+# Apply cyan foreground color
 
 
 @native
-def set_colour(c: int) -> None:
+def set_color(c: int) -> None:
+    # Set given color
     ccode """if (nn__c == 0) { // rewind
         yk__set_colour(YK__CONSOLE_REWIND);
     } else if (nn__c == 1) { // red 
@@ -31,35 +39,45 @@ def set_colour(c: int) -> None:
 
 @native
 def getch() -> int:
+    # Get a single character / key press
+    #   Can be used as a pause
     ccode """return yk__getch()"""
 
 @nativedefine("yk__clear")
 def clear() -> None:
+    # Clear console
     pass
 
-def colour_print(colour: int, x: str) -> None:
-    # Print in given colour and then rewind
-    set_colour(colour)
+def color_print(color: int, x: str) -> None:
+    # Print in given color and then rewind
+    set_color(color)
     print(x)
-    set_colour(0)
+    set_color(0)
 
 def red(x: str) -> None:
-    colour_print(1, x)
+    # Print text in console, in red color
+    color_print(1, x)
 
 def green(x: str) -> None:
-    colour_print(2, x)
+    # Print text in console, in green color
+    color_print(2, x)
 
 def white(x: str) -> None:
-    colour_print(3, x)
+    # Print text in console, in white color
+    color_print(3, x)
 
 def blue(x: str) -> None:
-    colour_print(4, x)
+    # Print text in console, in blue color
+    color_print(4, x)
 
 def purple(x: str) -> None:
-    colour_print(5, x)
+    # Print text in console, in purple color
+    color_print(5, x)
 
 def yellow(x: str) -> None:
-    colour_print(6, x)
+    # Print text in console, in yellow color
+    color_print(6, x)
 
 def cyan(x: str) -> None:
-    colour_print(7, x)
+    # Print text in console, in cyan color
+    color_print(7, x)

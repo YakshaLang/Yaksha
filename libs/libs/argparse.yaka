@@ -1,0 +1,110 @@
+import libs.c
+
+ARGPARSE_DEFAULT: Const[int] = 0
+# Default behaviour of argparse
+ARGPARSE_STOP_AT_NON_OPTION: Const[int]  = 1
+# Stop at non option
+ARGPARSE_IGNORE_UNKNOWN_ARGS: Const[int] = 2
+# Ignore unknown arguments
+ARGPARSE_STOP_AT_NON_AND_IGNORE_UNKNWON: Const[int] = 3
+# Do both stopping at unknown options and ignoring unknown arguments
+
+@nativedefine("struct yk__arg_remainder*")
+class ArgParseRemainder:
+    # Remaining arguments after parsing given arguments
+    argc: int
+    remainder: Array[str]
+
+@nativedefine("struct argparse*")
+class ArgParse:
+    # Arg parse state object
+    pass
+
+@nativedefine("struct argparse_option")
+@dotaccess
+class Option:
+    # An argparse option
+    # These are deleted when del_argparse() is called
+    pass
+
+@native("yk__newargparse")
+def new_ex(options: Array[Option], usages: Array[str], flag: int) -> ArgParse:
+    # Initialize a new argument parser (with flags)
+    # Note: options array last element must be opt_end()
+    pass
+
+def new(options: Array[Option], usages: Array[str]) -> ArgParse:
+    # Initialize a new argument parser
+    # Note: options array last element must be opt_end()
+    return new_ex(options, usages, ARGPARSE_DEFAULT)
+
+@native("argparse_describe")
+def set_description(argp: ArgParse, description: str, epilog: str) -> None:
+    # Set description for help message
+    pass
+
+@native("yk__delargparse")
+def del_argparse(object: ArgParse) -> None:
+    # Delete arg parser
+    pass
+
+@native("yk__argparse_parse")
+def parse(argp: ArgParse, arguments: Array[str]) -> ArgParseRemainder:
+    # Parse given arguments with given argparser object
+    # Any remaining values are returned
+    # You need to delete the remainder with del_argparse_remainder()
+    pass
+
+@native("argparse_usage")
+def usage(argp: ArgParse) -> None:
+    # Disaplay usage
+    pass
+
+@native("yk__del_argparse_remainder")
+def del_remainder(a: ArgParseRemainder) -> None:
+    # Delete given argparse remainder object
+    pass
+
+@native
+def opt_help() -> Option:
+    # Help option
+    ccode """return (struct argparse_option)OPT_BOOLEAN('h', yk__sdsnew("help"),
+    NULL, yk__sdsnew("show this help message and exit"), argparse_help_cb, 0, OPT_NONEG)"""
+
+@nativemacro("(struct argparse_option) OPT_GROUP(nn__name)")
+def opt_group(name: str) -> Option:
+    # Create a command group here
+    pass
+
+@native
+def opt_boolean(short: str, large: str, result: Ptr[int], help: str) -> Option:
+    # create a boolean option
+    ccode """struct argparse_option o = ((struct argparse_option) OPT_BOOLEAN(nn__short[0], nn__large, nn__result, nn__help, NULL, 0, 0));
+    yk__sdsfree(nn__short);
+    return o"""
+
+@native
+def opt_string(short: str, large: str, result: c.CStr, help: str) -> Option:
+    # create a boolean option
+    ccode """struct argparse_option o = ((struct argparse_option) OPT_STRING(nn__short[0], nn__large, nn__result, nn__help, NULL, 0, 0));
+    yk__sdsfree(nn__short);
+    return o"""
+
+@native
+def opt_integer(short: str, large: str, result: Ptr[int], help: str) -> Option:
+    # create an integer option
+    ccode """struct argparse_option o = ((struct argparse_option) OPT_INTEGER(nn__short[0], nn__large, nn__result, nn__help, NULL, 0, 0));
+    yk__sdsfree(nn__short);
+    return o"""
+
+@native
+def opt_float(short: str, large: str, result: Ptr[f32], help: str) -> Option:
+    # create a float option
+    ccode """struct argparse_option o = ((struct argparse_option) OPT_FLOAT(nn__short[0], nn__large, nn__result, nn__help, NULL, 0, 0));
+    yk__sdsfree(nn__short);
+    return o"""
+
+@native
+def opt_end() -> Option:
+    # End of options
+    ccode """return (struct argparse_option) OPT_END()"""

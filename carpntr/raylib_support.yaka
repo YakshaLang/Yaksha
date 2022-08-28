@@ -7,6 +7,7 @@ import libs.strings.array as sarr
 
 
 class CObject:
+    # .o object file created by compiling a single .c file
     c_file: str
     o_file: str
     base_name: str
@@ -14,6 +15,7 @@ class CObject:
 
 
 def fill_arguments(src_path: str, c: CObject) -> CObject:
+    # Fill args section of CObject
     args: Array[str] = sarr.new(4, "-std=gnu99", "-DPLATFORM_DESKTOP", "-DGL_SILENCE_DEPRECATION=199309L", "-fno-sanitize=undefined")
 
     arrput(args, "-I" + src_path)
@@ -37,6 +39,7 @@ def fill_arguments(src_path: str, c: CObject) -> CObject:
 
 
 def co(filename: str, src_path: str, target_path: str) -> CObject:
+    # Create a new CObject
     obj: CObject = CObject()
     obj.c_file = path.join(src_path, filename + ".c")
     obj.o_file = path.join(target_path, filename + ".o")
@@ -46,6 +49,7 @@ def co(filename: str, src_path: str, target_path: str) -> CObject:
 
 
 def del_c_object(c: CObject) -> None:
+    # Delete a CObject
     del c.c_file
     del c.o_file
     del c.base_name
@@ -54,6 +58,7 @@ def del_c_object(c: CObject) -> None:
 
 
 def del_objects(x: Array[CObject]) -> None:
+    # Delete CObject object
     if len(x) == 0:
         del x
         return
@@ -66,6 +71,7 @@ def del_objects(x: Array[CObject]) -> None:
 
 
 def get_objects(raylib_src_path: str, gui_path: str, extra_path: str, build_path: str) -> Array[CObject]:
+    # Get a list of objects for raylib
     objects: Array[CObject]
     arrput(objects, co("rglfw", raylib_src_path, build_path))
     arrput(objects, co("raudio", raylib_src_path, build_path))
@@ -83,6 +89,7 @@ def get_objects(raylib_src_path: str, gui_path: str, extra_path: str, build_path
 
 
 def get_external_libs() -> Array[str]:
+    # Get external libraries for native target (current platform)
     external_libs: Array[str]
     if os.is_windows():
         external_libs = sarr.new(3, "-lwinmm", "-lgdi32", "-lopengl32")
