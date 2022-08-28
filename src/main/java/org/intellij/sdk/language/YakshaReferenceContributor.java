@@ -40,8 +40,7 @@ public class YakshaReferenceContributor extends PsiReferenceContributor {
                 if (element instanceof YakshaClassStatement) {
                     return getClassReference((YakshaClassStatement) element);
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (Exception ignored) {
             }
             return PsiReference.EMPTY_ARRAY;
         }

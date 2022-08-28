@@ -18,6 +18,7 @@ import java.util.Map;
 
 public class YakshaCompletionContributor extends CompletionContributor {
     private static final List<String> IMPORTS = ImmutableList.<String>builder()
+            .add("import libs.argparse")
             .add("import libs.strings.array as sarr")
             .add("import libs.strings.array")
             .add("import libs.strings")
