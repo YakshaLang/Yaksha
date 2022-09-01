@@ -1,0 +1,181 @@
+import libs.console
+import libs.strings
+import libs.strings.array as sarr
+import libs.os
+import libs.os.path
+import conf
+
+PADDING: Const[int] = 35
+
+def print_banner() -> None:
+    text: str = """
+    -- HAMMER --
+    Simple tool for building C/C++
+    Projects\n"""
+    art: str = """
+    |_,.,--\\
+       ||
+       ||
+       ##
+       ##\n"""
+    # ASCII art for hammer from https://www.asciiart.eu/miscellaneous/tools -> author Riitta Rasimus
+    console.cyan(art)
+    console.blue(text)
+    console.red("-----------------------------------------\n")
+
+def print_errors(er: Array[str]) -> None:
+    # Print given error strings in red
+    length: int = len(er)
+    x: int = 0
+    while x < length:
+        console.red(er[x] + "\n")
+        x = x + 1
+
+def printkv(k: str, v: str) -> None:
+    # Print key value to console in cyan, red and green
+    # <not found> is printed if value is empty
+    console.cyan(strings.rpad(k, PADDING))
+    console.red(" := ")
+    if len(v) == 0:
+        console.green("<not found>")
+    else:
+        console.green(v)
+    print("\n")
+
+def is_target_macos(target_to_check: str) -> bool:
+    # Check if given target is macos, if target == native, check if we are running macos
+    native: bool = target_to_check == "native"
+    if native:
+        return os.is_macos()
+    return strings.contains(target_to_check, "macos")
+
+def is_target_windows(target_to_check: str) -> bool:
+    # Check if given target is windows, if target == native, check if we are running windows
+    native: bool = target_to_check == "native"
+    if native:
+        return os.is_windows()
+    return strings.contains(target_to_check, "windows")
+
+def print_success(item: str, success: bool) -> None:
+    console.purple(strings.rpad(item, PADDING))
+    console.cyan(" := ")
+    if success:
+        console.green("ok")
+    else:
+        console.red("failed")
+    print("\n")
+
+def get_base_args(c: conf.HammerConfig, target: str, cpp: bool) -> Array[str]:
+    args: Array[str]
+    if cpp:
+        args = sarr.new(2, c.zig, "c++")
+    else:
+        args = sarr.new(2, c.zig, "cc")
+    if not (target == "native"):
+        arrput(args, "-target")
+        arrput(args, target)
+    # FLTO (Link time optimization)
+    if not (is_target_macos(target) or is_target_windows(target)):
+        arrput(args, "-flto=full")
+    args = sarr.extend(args, c.args_c_or_cpp)
+    if cpp:
+        args = sarr.extend(args, c.args_cpp)
+    else:
+        args = sarr.extend(args, c.args_c)
+    length: int = len(c.include_paths)
+    pos: int = 0
+    while pos < length:
+        include: str = "-I" + c.include_paths[pos]
+        arrput(args, include)
+        pos = pos + 1
+    return args
+
+def build_o(c: conf.HammerConfig, source: str, target: str) -> str:
+    cpp: bool = strings.endswith(source, ".cpp")
+    args: Array[str] = get_base_args(c, target, cpp)
+    defer sarr.del_str_array(args)
+    name: str = path.remove_extension(path.basename(source))
+    oname: str = name + "-" + target + ".o"
+    ofile: str = path.join(c.temp_out_dir, oname)
+    arrput(args, "-c")
+    arrput(args, source)
+    arrput(args, "-o")
+    arrput(args, ofile)
+    result: os.ProcessResult = os.run(args)
+    defer os.del_process_result(result)
+    if result.ok:
+        return ofile
+    println(sarr.join(args, " "))
+    console.red(result.output)
+    return ""
+
+def build_binary(c: conf.HammerConfig, b: conf.Binary, objects: Array[str], target: str) -> bool:
+    cpp: bool = b.cpp
+    args: Array[str] = get_base_args(c, target, cpp)
+    defer sarr.del_str_array(args)
+    args = sarr.extend(args, objects)
+    name: str = b.name
+    exe_name: str = name
+    if not (target == "native"):
+        exe_name = exe_name + "-" + target
+    if is_target_windows(target):
+        exe_name = exe_name + ".exe"
+    arrput(args, b.main_file)
+    arrput(args, "-o")
+    arrput(args, path.join(b.out_dir, exe_name))
+    result: os.ProcessResult = os.run(args)
+    defer os.del_process_result(result)
+    print_success(exe_name, result.ok)
+    ret_val: bool = result.ok
+    if not ret_val:
+        println(sarr.join(args, " "))
+        console.red(result.output)
+    return ret_val
+
+def build_target(c: conf.HammerConfig, target: str) -> bool:
+    console.cyan(strings.rpad("Building Target", PADDING))
+    console.cyan(" := ")
+    console.yellow(target + "\n")
+    success: bool = True
+    objects: Array[str]
+    defer sarr.del_str_array(objects)
+    # Build objects
+    length: int = len(c.sources)
+    pos: int = 0
+    while pos < length:
+        object: str = build_o(c, c.sources[pos], target)
+        if len(object) > 0:
+            arrput(objects, object)
+        else:
+            return False
+        pos = pos + 1
+    # Build binaries
+    length = len(c.binaries)
+    pos = 0
+    while pos < length:
+        success = build_binary(c, c.binaries[pos], objects, target) and success
+        pos = pos + 1
+    return success
+
+def build(c: conf.HammerConfig) -> bool:
+    success: bool = True
+    length: int = len(c.targets)
+    pos: int = 0
+    while pos < length:
+        success = build_target(c, c.targets[pos]) and success
+        pos = pos + 1
+    return success
+
+def main() -> int:
+    print_banner()
+    c: conf.HammerConfig = conf.load()
+    defer conf.del_config(c)
+    if len(c.errors) > 0:
+        print_errors(c.errors)
+        return 1
+    printkv("zig compiler", c.zig)
+    all_success: bool = build(c)
+    if all_success:
+        return 0
+    return 1
+

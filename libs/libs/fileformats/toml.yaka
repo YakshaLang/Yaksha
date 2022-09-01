@@ -193,6 +193,6 @@ def get_string_array(x: Table, name: str) -> Array[str]:
 
 @native
 def del_table(x: Table) -> None:
-    # Delete a table
+    # Delete a table. Note that you do not need to delete child tables
     ccode """if (NULL == nn__x) return;
     toml_free(nn__x)"""

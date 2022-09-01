@@ -1,0 +1,25 @@
+[project]
+main="main.yaka"
+name="hammer"
+author="JaDogg"
+
+# C or C++ native code that get compiled
+[ccode]
+include_paths=[]
+defines=[]
+compiler_defines=[]
+includes=[]
+c_code=[]
+# cpp_code is not supported yet
+cpp_code=[]
+
+[compilation]
+override_alloc=false
+# Set this to true if whole project is pure C?
+only_ccode=false
+# libc=native|try_musl|musl|default
+libc="try_musl"
+# Automatically use zig cc & zig c++ to build project
+# We will start with just zig cc, zig c++ support so this is ignored for now
+compiler="zig"
+targets=[]

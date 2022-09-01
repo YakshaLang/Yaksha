@@ -49,6 +49,7 @@ def join(values: Array[str], sep: str) -> str:
 @native
 def extend(a: Array[str], b: Array[str]) -> Array[str]:
     # Copy all strings from b to a and return a
+    # Warning! You must assign this back to a (as 'a' might be reallocated to a new address)
     ccode """yk__sds* lhs = nn__a;
     if (NULL != nn__b) {
         size_t l = yk__arrlenu(nn__b);

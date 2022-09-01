@@ -7,6 +7,7 @@ import os.path
 from typing import List, Tuple
 
 IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp", "utf8proc_data.c", "print_str.c", "dump.cpp",
+          "comp_main.cpp",
           "yk__fake_whereami.c"]
 
 
@@ -65,8 +66,26 @@ def update_cmake_file(headers: List[str], cpp_files: List[str], marker: str):
             lines.append(fmt.format(files=replacement))
         else:
             lines.append(line)
-        with open("CMakeLists.txt", "w+") as h:
-            h.write('\n'.join(lines) + '\n')
+    with open("CMakeLists.txt", "w+") as h:
+        h.write('\n'.join(lines) + '\n')
+
+
+def update_hammer_file(cpp, marker):
+    fmt = "sources={files}" + marker
+    with open("hammer.toml") as h:
+        cmake_file = h.read()
+    lines = []
+    for line in cmake_file.splitlines():
+        if marker in line:
+            sources = ['"' + x + '"' for x in cpp]
+            replacement = ", ".join(sources)
+            replacement = "[" + replacement + "]"
+            replacement = replacement.replace("\\", "/")
+            lines.append(fmt.format(files=replacement))
+        else:
+            lines.append(line)
+    with open("hammer.toml", "w+") as h:
+        h.write('\n'.join(lines) + '\n')
 
 
 def main():
@@ -82,6 +101,9 @@ def main():
     directory, marker = "runtime", "# update_makefile.py YK_RUNTIME"
     cpp_files, headers, _ = find_files_(directory)
     update_cmake_file(headers, cpp_files, marker)
+    # Update hammer.toml
+    files = find_files_2_levels("src")[0]
+    update_hammer_file(files, " # update_makefile.py HAMMER_CPP")
 
 
 if __name__ == "__main__":

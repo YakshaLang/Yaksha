@@ -122,6 +122,53 @@ def del_str(a: c.CStr) -> None:
     ccode """if (NULL == nn__a) return;
     yk__sdsfree(nn__a)"""
 
+@native
+def cut_from(a: str, position: int) -> str:
+    # Cut a string from given position
+    ccode """if (nn__a == NULL || yk__sdslen(nn__a) < nn__position) {
+        yk__sdsfree(nn__a);
+        return yk__sdsempty();
+    }
+    yk__sds s = yk__sdsnewlen(nn__a + nn__position, yk__sdslen(nn__a) - nn__position);
+    yk__sdsfree(nn__a);
+    return s"""
+
+def endswith(a: str, b: str) -> bool:
+    # Does string a ends with string b
+    if len(b) > len(a):
+        return False
+    pos: int = len(a) - len(b)
+    cut_a: str = cut_from(a, pos)
+    result: bool = cut_a == b
+    return result
+
+@native
+def spaces(count: int) -> str:
+    # Get a spaces only string of given count
+    ccode """if (nn__count <= 0) {
+        return yk__sdsempty();
+    }
+    yk__sds s = yk__sdsgrowzero(yk__sdsempty(), nn__count);
+    for (int i = 0; i < nn__count; i++) {
+        s[i] = ' ';
+    }
+    return s"""
+
+def rpad(a: str, count: int) -> str:
+    # Pad string to right to ensure string length is large or equal to count
+    if len(a) > count:
+        return a
+    remainder: int = count - len(a)
+    result: str = a + spaces(remainder)
+    return result
+
+def lpad(a: str, count: int) -> str:
+    # Pad string to left to ensure string length is large or equal to count
+    if len(a) > count:
+        return a
+    remainder: int = count - len(a)
+    result: str = spaces(remainder) + a
+    return result
 
 ############ UTF8 iteration
 

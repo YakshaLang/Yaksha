@@ -38,3 +38,11 @@ test_data/document_samples/*.data
 test_data/document_samples/factorial
 test_data/document_samples/wind_tree
 test_data/document_samples/gui_window
+/hammer/build/hammer
+/hammer/build/hammer-aarch64-linux-musl
+/hammer/build/hammer-aarch64-macos-gnu
+/hammer/build/hammer-i386-linux-musl
+/hammer/build/hammer-x86_64-linux-musl
+/hammer/build/hammer-x86_64-macos-gnu
+/hammer/build/program_code.c
+/bin/hammer.bin/yaksha*

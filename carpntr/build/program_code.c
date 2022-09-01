@@ -344,7 +344,7 @@ struct yy__raylib_support_CObject* yy__raylib_support_fill_web_arguments(yk__sds
     yk__sds t__24 = yk__sdsnew("-std=gnu99");
     yk__sds t__25 = yk__sdsnew("-DPLATFORM_WEB");
     yk__sds t__26 = yk__sdsnew("-DGRAPHICS_API_OPENGL_ES2");
-    yk__sds t__27 = yk__sdsnew("-Os");
+    yk__sds t__27 = yk__sdsnew("-Oz");
     yk__sds* yy__raylib_support_args = yy__array_new(4, yk__sdsdup(t__24), yk__sdsdup(t__25), yk__sdsdup(t__26), yk__sdsdup(t__27));
     yk__arrput(yy__raylib_support_args, yk__sdsdup(yy__raylib_support_c->yy__raylib_support_c_file));
     yk__sds t__28 = yk__sdsnew("-o");

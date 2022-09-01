@@ -1,0 +1,114 @@
+import libs.strings.array as sarr
+import libs.strings
+import libs.fileformats.toml
+import libs.os
+import libs.os.path
+import libs.io
+import libs.console
+
+class Binary:
+    # Single binary that we need to build
+    main_file: str
+    name: str
+    out_dir: str
+    args_link: Array[str]
+    cpp: bool
+
+class HammerConfig:
+    # [compilation]
+    targets: Array[str]
+    args_c_or_cpp: Array[str]
+    args_cpp: Array[str]
+    args_c: Array[str]
+    include_paths: Array[str]
+    sources: Array[str]
+    temp_out_dir: str
+    binaries: Array[Binary]
+    # Additional information
+    zig: str
+    errors: Array[str]
+
+def find_zig_compiler(c: HammerConfig) -> None:
+    # Find zig(.exe) binary file
+    zig: str = os.which("zig")
+    if len(zig) > 0:
+        c.zig = zig
+        return
+    arrput(c.errors, "Failed to find zig in PATH")
+    c.zig = "<not found>"
+
+def load_binary(t: toml.Table, c: HammerConfig, binary_name: str) -> Binary:
+    b: Binary = Binary()
+    if not toml.valid_table(t):
+        arrput(c.errors, "Failed to load binary data from config: " + binary_name)
+        return b
+    b.args_link = toml.get_string_array(t, "args_link")
+    b.name = toml.get_string_default(t, "name", binary_name)
+    b.out_dir = toml.get_string_default(t, "out_dir", ".")
+    b.main_file = toml.get_string_default(t, "main_file", "")
+    if len(b.main_file) == 0:
+        arrput(c.errors, "Empty main file for: " + binary_name)
+    b.cpp = strings.endswith(b.main_file, ".cpp")
+    return b
+
+def load() -> HammerConfig:
+    c: HammerConfig = HammerConfig()
+    find_zig_compiler(c)
+    if len(c.errors) > 0:
+        return c
+    config_file: str = path.join(os.cwd(), "hammer.toml")
+    config_text: str = io.readfile(config_file)
+    outer_table: toml.Table = toml.from_str(config_text)
+    if not toml.valid_table(outer_table):
+        arrput(c.errors, "Failed to read config file: " + config_file)
+        return c
+    defer toml.del_table(outer_table)
+    table: toml.Table = toml.get_table(outer_table, "compilation")
+    if not toml.valid_table(table):
+        arrput(c.errors, "Failed to read config file: " + config_file)
+        return c
+    c.targets = toml.get_string_array(table, "targets")
+    c.args_c_or_cpp = toml.get_string_array(table, "args_c_or_cpp")
+    c.args_cpp = toml.get_string_array(table, "args_cpp")
+    c.args_c = toml.get_string_array(table, "args_c")
+    c.include_paths = toml.get_string_array(table, "include_paths")
+    c.sources = toml.get_string_array(table, "sources")
+    c.temp_out_dir = toml.get_string_default(table, "temp_out_dir", ".")
+    binaries: Array[str] = toml.get_string_array(table, "binaries")
+    length: int = len(binaries)
+    pos: int = 0
+    while pos < length:
+        binary: str = binaries[pos]
+        binary_table: toml.Table = toml.get_table(outer_table, binary)
+        arrput(c.binaries, load_binary(binary_table, c, binary))
+        pos = pos + 1
+    sarr.del_str_array(binaries)
+    return c
+
+def del_binary(b: Binary) -> None:
+    sarr.del_str_array(b.args_link)
+    del b.main_file
+    del b.name
+    del b.out_dir
+    del b
+
+def del_config(c: HammerConfig) -> None:
+    sarr.del_str_array(c.targets)
+    sarr.del_str_array(c.args_c_or_cpp)
+    sarr.del_str_array(c.args_cpp)
+    sarr.del_str_array(c.args_c)
+    sarr.del_str_array(c.include_paths)
+    sarr.del_str_array(c.sources)
+    del c.temp_out_dir
+    # Cleanup c.binaries
+    if c.binaries != None:
+        length: int = len(c.binaries)
+        index: int = 0
+        while index < length:
+            del_binary(c.binaries[index])
+            index = index + 1
+        del c.binaries
+    del c.zig
+    sarr.del_str_array(c.errors)
+    # clean up iteself
+    del c
