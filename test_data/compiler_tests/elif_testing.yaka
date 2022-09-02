@@ -1,0 +1,12 @@
+def main() -> int:
+    x: int = 0
+    y: int = 1
+    if y == 0:
+        x = 0
+    elif y == 1:
+        x = 1
+    elif y == 2:
+        x = 2
+    else:
+        x = 100
+    return x

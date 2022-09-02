@@ -41,6 +41,8 @@ EXPRS = sorted([
     ("set", (("expr*", "lhs"), ("token*", "dot"), ("token*", "item"))),
     ("get", (("expr*", "lhs"), ("token*", "dot"), ("token*", "item"))),
 ], key=lambda x: x[0])
+# Do not add visitor methods for this stmt type
+IGNORE_VISITS_STMT = {"elif"}
 # Different kinds of statements
 STMTS = sorted([
     ("return", (("token*", "return_keyword"), ("expr*", "expression"))),
@@ -51,12 +53,12 @@ STMTS = sorted([
     ("expression", (("expr*", "expression"),)),
     # ccode statement
     ("ccode", (("token*", "ccode_keyword"), ("token*", "code_str"))),
-    # TODO: Replace expression in while and if to condition later on as it make more sense
-    # Note: else_branch is optional here.
-    # Unlike python expression must be a boolean here
-    # TODO add support for elif blocks
+    # If statement contain if, elif*, else?
     ("if", (("token*", "if_keyword"), ("expr*", "expression"), ("stmt*", "if_branch"),
             ("token*", "else_keyword"), ("stmt*", "else_branch"))),
+    # Note that the elif statement is actually used only as a temp data structure
+    # if-elif-else is converted to nested if structures
+    ("elif", (("token*", "elif_keyword"), ("expr*", "expression"), ("stmt*", "elif_branch"))),
     # While loop just got a condition and a body
     ("while", (("token*", "while_keyword"), ("expr*", "expression"), ("stmt*", "while_body"),)),
     # Block -> COLON, NEW_LINE, STATEMENTS+
@@ -67,7 +69,6 @@ STMTS = sorted([
     ("continue", (("token*", "continue_token"),)),
     ("break", (("token*", "break_token"),)),
     # Let statements
-    # TODO we use both declare and let in the code, stick to one terminology
     ("let", (("token*", "name"), ("ykdatatype*", "data_type"), ("expr*", "expression"))),
     ("const", (("token*", "name"), ("ykdatatype*", "data_type"), ("expr*", "expression"))),
     # Function declarations
@@ -98,7 +99,6 @@ struct $R$_expr : expr {
 $STATE$
 };
 """.strip()
-
 # STMT CODE GEN
 H_STMT_SINGLE_FORWARD_DECLARE = H_EXPR_SINGLE_FORWARD_DECLARE.replace("expr", "stmt")
 H_STMT_VISITOR_SINGLE = H_EXPR_VISITOR_SINGLE.replace("expr", "stmt")
@@ -121,7 +121,22 @@ expr *ast_pool::c_$R$_expr($PARAMS$) {
   return o;
 }
 """.strip()
+CPP_EXPR_NO_ACCEPT = """
+$R$_expr::$R$_expr($PARAMS$)
+    : $FILL_STATE_PARAMS$ {}
+ast_type $R$_expr::get_type() {
+  return ast_type::EXPR_$RU$;
+}
+void $R$_expr::accept(expr_visitor *v) {
+}
+expr *ast_pool::c_$R$_expr($PARAMS$) {
+  auto o = new $R$_expr($PARAMS_NO_TYPES$);
+  cleanup_expr_.push_back(o);
+  return o;
+}
+""".strip()
 CPP_STMT = CPP_EXPR.replace("expr", "stmt").replace("EXPR", "STMT")
+CPP_STMT_NO_ACCEPT = CPP_EXPR_NO_ACCEPT.replace("expr", "stmt").replace("EXPR", "STMT")
 H_AST_POOL = """
 struct ast_pool {
   ast_pool();
@@ -292,7 +307,8 @@ def c_impl(types, impl_template: str) -> str:
 
 def c_cpp_file():
     impl_expr = c_impl(EXPRS, CPP_EXPR)
-    impl_stmt = c_impl(STMTS, CPP_STMT)
+    impl_stmt = c_impl([x for x in STMTS if x[0] not in IGNORE_VISITS_STMT], CPP_STMT)
+    impl_stmt += c_impl([x for x in STMTS if x[0] in IGNORE_VISITS_STMT], CPP_STMT_NO_ACCEPT)
     return CPP_FILE.replace("$EXPRESSIONS_IMPL$", impl_expr) \
         .replace("$STATEMENTS_IMPL$", impl_stmt)
 
@@ -301,7 +317,8 @@ def c_header_file():
     forward_decls = c_forward_decls(EXPRS, H_EXPR_SINGLE_FORWARD_DECLARE) \
                     + "\n" + c_forward_decls(STMTS, H_STMT_SINGLE_FORWARD_DECLARE)
     expr_visitor = c_visitor(EXPRS, H_EXPR_VISITOR, H_EXPR_VISITOR_SINGLE)
-    stmt_visitor = c_visitor(STMTS, H_STMT_VISITOR, H_STMT_VISITOR_SINGLE)
+    stmt_visitor = c_visitor([x for x in STMTS if x[0] not in IGNORE_VISITS_STMT], H_STMT_VISITOR,
+                             H_STMT_VISITOR_SINGLE)
     expressions = c_structs(EXPRS, H_EXPR_STRUCT)
     statements = c_structs(STMTS, H_STMT_STRUCT)
     ast_pool = c_ast_pool(EXPRS, STMTS, H_CREATE_AST_POOL_EXPR,

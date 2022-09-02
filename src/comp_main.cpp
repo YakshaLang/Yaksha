@@ -8,12 +8,11 @@ int main(int argc, char *argv[]) {
   }
   multifile_compiler mc{};
   multifile_compiler_result result;
-  if (argc == 2) { // Just script is passed
+  if (argc == 2) {// Just script is passed
     result = mc.compile(argv[1]);
-  } else { // Script + LIBS_PARENT_PATH
+  } else {// Script + LIBS_PARENT_PATH
     result = mc.compile(argv[1], argv[2]);
   }
-
   if (result.failed_) { return EXIT_FAILURE; }
   std::cout << result.code_;
   return EXIT_SUCCESS;

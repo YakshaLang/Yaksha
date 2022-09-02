@@ -17,8 +17,18 @@ parser::parser(std::string filepath, std::vector<token> &tokens,
   magic_return_token_->line_ = 0;
   magic_return_token_->pos_ = 0;
   magic_return_token_->type_ = token_type::KEYWORD_RETURN;
+  sugar_else_ = new token{};
+  sugar_else_->token_ = "else";
+  sugar_else_->file_ = "syntax-sugar";
+  sugar_else_->original_ = "return";
+  sugar_else_->line_ = 0;
+  sugar_else_->pos_ = 0;
+  sugar_else_->type_ = token_type::KEYWORD_ELSE;
 }
-parser::~parser() { delete (magic_return_token_); }
+parser::~parser() {
+  delete (magic_return_token_);
+  delete (sugar_else_);
+}
 token *parser::advance() {
   if (!is_at_end()) { current_++; }
   return previous();
@@ -202,17 +212,55 @@ stmt *parser::pass_statement() {
 }
 stmt *parser::if_statement() {
   // if_stmt   -> KEYWORD_IF EXPRESSION block_stmt
+  // elif*  KEYWORD_ELIF, EXPRESSION block_stmt
   //             (KEYWORD_ELSE block_stmt)?
   auto if_keyword = previous();
   auto exp = expression();
   stmt *if_branch = block_statement();
-  token *else_keyword = nullptr;
-  stmt *else_branch = nullptr;
-  if (match({token_type::KEYWORD_ELSE})) {
-    else_keyword = previous();
-    else_branch = block_statement();
+  token *in_code_else_keyword = nullptr;
+  stmt *in_code_else_branch = nullptr;
+  std::vector<elif_stmt *> elif_statements{};
+  while (match({token_type::KEYWORD_ELIF})) {
+    token *elif_keyword = previous();
+    auto elif_expr = expression();
+    stmt *elif_branch = block_statement();
+    elif_statements.push_back(dynamic_cast<elif_stmt *>(
+        pool_.c_elif_stmt(elif_keyword, elif_expr, elif_branch)));
   }
-  return pool_.c_if_stmt(if_keyword, exp, if_branch, else_keyword, else_branch);
+  if (match({token_type::KEYWORD_ELSE})) {
+    in_code_else_keyword = previous();
+    in_code_else_branch = block_statement();
+  }
+  // No elif statements nothing to do
+  if (elif_statements.empty()) {
+    return pool_.c_if_stmt(if_keyword, exp, if_branch, in_code_else_keyword,
+                           in_code_else_branch);
+  }
+  // found elif statements -> compile elif syntax sugar to if/else
+  std::vector<if_stmt *> ifs{};
+  for (auto it = elif_statements.rbegin(); it != elif_statements.rend(); ++it) {
+    elif_stmt *st = *it;
+    if (ifs.empty()) {
+      // last elif, add else to this
+      ifs.push_back(dynamic_cast<if_stmt *>(
+          pool_.c_if_stmt(st->elif_keyword_, st->expression_, st->elif_branch_,
+                          in_code_else_keyword, in_code_else_branch)));
+    } else {
+      if_stmt *prev = ifs.back();
+      ifs.pop_back();
+      std::vector<stmt *> sugar_else_block{};
+      sugar_else_block.push_back(prev);
+      ifs.push_back(dynamic_cast<if_stmt *>(
+          pool_.c_if_stmt(st->elif_keyword_, st->expression_, st->elif_branch_,
+                          sugar_else_, pool_.c_block_stmt(sugar_else_block))));
+    }
+  }
+  if_stmt *nested_if = ifs.back();
+  ifs.clear();
+  std::vector<stmt *> sugar_else_block{};
+  sugar_else_block.push_back(nested_if);
+  return pool_.c_if_stmt(if_keyword, exp, if_branch, sugar_else_,
+                         pool_.c_block_stmt(sugar_else_block));
 }
 stmt *parser::block_statement() {
   // block_stmt -> COLON NEW_LINE BA_INDENT statement+ BA_DEDENT

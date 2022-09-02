@@ -34,6 +34,7 @@ namespace yaksha {
   struct def_stmt;
   struct defer_stmt;
   struct del_stmt;
+  struct elif_stmt;
   struct expression_stmt;
   struct if_stmt;
   struct import_stmt;
@@ -66,6 +67,7 @@ namespace yaksha {
     STMT_DEF,
     STMT_DEFER,
     STMT_DEL,
+    STMT_ELIF,
     STMT_EXPRESSION,
     STMT_IF,
     STMT_IMPORT,
@@ -301,6 +303,14 @@ namespace yaksha {
     token *del_keyword_;
     expr *expression_;
   };
+  struct elif_stmt : stmt {
+    elif_stmt(token *elif_keyword, expr *expression, stmt *elif_branch);
+    void accept(stmt_visitor *v) override;
+    ast_type get_type() override;
+    token *elif_keyword_;
+    expr *expression_;
+    stmt *elif_branch_;
+  };
   struct expression_stmt : stmt {
     explicit expression_stmt(expr *expression);
     void accept(stmt_visitor *v) override;
@@ -391,6 +401,7 @@ namespace yaksha {
     stmt *c_defer_stmt(token *defer_keyword, expr *expression,
                        stmt *del_statement);
     stmt *c_del_stmt(token *del_keyword, expr *expression);
+    stmt *c_elif_stmt(token *elif_keyword, expr *expression, stmt *elif_branch);
     stmt *c_expression_stmt(expr *expression);
     stmt *c_if_stmt(token *if_keyword, expr *expression, stmt *if_branch,
                     token *else_keyword, stmt *else_branch);

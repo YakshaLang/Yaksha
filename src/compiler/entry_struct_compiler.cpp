@@ -2,7 +2,8 @@
 #include "entry_struct_compiler.h"
 using namespace yaksha;
 entry_struct_compiler::entry_struct_compiler(ykdt_pool *pool)
-    : pool_(pool), counter_(0), autogen_structs_list_(), autogen_structs_(), code_() {}
+    : pool_(pool), counter_(0), autogen_structs_list_(), autogen_structs_(),
+      code_() {}
 std::string entry_struct_compiler::compile(ykdatatype *entry_dt,
                                            datatype_compiler *dtc) {
   std::string repr = entry_dt->as_string();

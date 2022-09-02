@@ -6,8 +6,8 @@ namespace yaksha {
   struct datatype_compiler {
     virtual std::string convert_dt(ykdatatype *entry_dt) = 0;
     virtual ~datatype_compiler() = default;
+
 private:
   };
 }// namespace yaksha
-
 #endif

@@ -484,7 +484,8 @@ void compiler::visit_return_stmt(return_stmt *obj) {
       // First we assign return value to a temp variable
       std::string temp_name = temp();
       write_indent(body_);
-      body_ << convert_dt(rhs.second.datatype_) << " " << temp_name << " = " << rhs.first;
+      body_ << convert_dt(rhs.second.datatype_) << " " << temp_name << " = "
+            << rhs.first;
       write_end_statement(body_);
       return_val = temp_name;
     }

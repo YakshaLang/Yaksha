@@ -157,7 +157,7 @@ void type_checker::visit_literal_expr(literal_expr *obj) {
   } else if (literal_type == token_type::DOUBLE_NUMBER) {
     data = ykobject(1.2, dt_pool_);
   } else if (literal_type == token_type::FLOAT_NUMBER) {
-    data = ykobject((float)1.2f, dt_pool_);
+    data = ykobject((float) 1.2f, dt_pool_);
   }// else - none data type by default
   push(data);
 }
@@ -283,6 +283,8 @@ void type_checker::visit_expression_stmt(expression_stmt *obj) {
   obj->expression_->accept(this);
 }
 void type_checker::visit_if_stmt(if_stmt *obj) {
+  // Note the parser rewrites if statement to not include elif,
+  //    by structuring them in a nested structure
   obj->expression_->accept(this);
   auto bool_expression = pop();
   if (!bool_expression.is_primitive_or_obj() ||
@@ -562,7 +564,8 @@ void type_checker::visit_ccode_stmt(ccode_stmt *obj) {
 }
 void type_checker::visit_import_stmt(import_stmt *obj) {}
 void type_checker::visit_const_stmt(const_stmt *obj) {
-  if (!obj->data_type_->args_[0]->is_bool() && !obj->data_type_->args_[0]->is_a_number()) {
+  if (!obj->data_type_->args_[0]->is_bool() &&
+      !obj->data_type_->args_[0]->is_a_number()) {
     error(obj->name_, "Only number and bool constants are supported");
   }
   if (obj->expression_ == nullptr) {

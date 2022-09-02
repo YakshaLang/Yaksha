@@ -101,3 +101,7 @@ TEST_CASE("compiler: All @native stuff !") {
   TEST_FILE("../test_data/compiler_tests/native_function_type_tests.yaka", "native_function_type_tests.yaka",
             "../test_data/compiler_tests/native_function_type_tests.tokens");
 }
+TEST_CASE("compiler: Test elif") {
+  TEST_FILE("../test_data/compiler_tests/elif_testing.yaka", "elif_testing.yaka",
+            "../test_data/compiler_tests/elif_testing.tokens");
+}

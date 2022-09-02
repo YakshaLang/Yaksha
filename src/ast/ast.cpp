@@ -312,6 +312,17 @@ stmt *ast_pool::c_while_stmt(token *while_keyword, expr *expression,
   cleanup_stmt_.push_back(o);
   return o;
 }
+elif_stmt::elif_stmt(token *elif_keyword, expr *expression, stmt *elif_branch)
+    : elif_keyword_(elif_keyword), expression_(expression),
+      elif_branch_(elif_branch) {}
+ast_type elif_stmt::get_type() { return ast_type::STMT_ELIF; }
+void elif_stmt::accept(stmt_visitor *v) {}
+stmt *ast_pool::c_elif_stmt(token *elif_keyword, expr *expression,
+                            stmt *elif_branch) {
+  auto o = new elif_stmt(elif_keyword, expression, elif_branch);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
 // ------- utils ------
 ast_pool::~ast_pool() {
   for (auto e : cleanup_expr_) { delete e; }

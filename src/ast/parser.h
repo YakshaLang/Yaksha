@@ -91,6 +91,7 @@ private:
     // If this is <= zero do not allow `continue` or `break`
     int control_flow_;
     token *magic_return_token_;
+    token *sugar_else_;
   };
 }// namespace yaksha
 #endif

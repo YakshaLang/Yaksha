@@ -22,7 +22,8 @@ namespace yaksha {
     std::string global_constants_{};
   };
   struct compiler : expr_visitor, stmt_visitor, datatype_compiler {
-    compiler(def_class_visitor &defs_classes, ykdt_pool *pool, entry_struct_compiler* esc);
+    compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
+             entry_struct_compiler *esc);
     ~compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
     compiler_output compile(const std::vector<stmt *> &statements);
@@ -63,7 +64,6 @@ namespace yaksha {
      * @return converted data type.
      */
     std::string convert_dt(ykdatatype *basic_dt) override;
-
 
 private:
     /**
@@ -117,7 +117,7 @@ private:
     // AST pool
     ast_pool *ast_pool_;
     // Entry struct compiler
-    entry_struct_compiler* esc_;
+    entry_struct_compiler *esc_;
     void compile_function_call(fncall_expr *obj, const std::string &name,
                                std::stringstream &code,
                                ykdatatype *return_type);

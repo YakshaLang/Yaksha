@@ -119,8 +119,8 @@ builtins::compile(const std::string &name,
   } else if (name == "len") {
     if (args[0].second.datatype_->is_str()) {
       code << "yk__sdslen(" << args[0].first << ")";
-    } else if (args[0].second.datatype_->is_an_array()
-               && args[0].second.datatype_->args_[0]->is_sm_entry()) {
+    } else if (args[0].second.datatype_->is_an_array() &&
+               args[0].second.datatype_->args_[0]->is_sm_entry()) {
       // Array[SMEntry[?]]
       code << "yk__shlen(" << args[0].first << ")";
     } else {

@@ -21,7 +21,14 @@ namespace yaksha {
     NONE,
     NOT_A_PRIMITIVE,
   };
-  enum class ykbuiltin { ARRAY, SM_ENTRY, M_ENTRY, NOT_A_BUILTIN, CONSTANT, POINTER };
+  enum class ykbuiltin {
+    ARRAY,
+    SM_ENTRY,
+    M_ENTRY,
+    NOT_A_BUILTIN,
+    CONSTANT,
+    POINTER
+  };
   struct ykdatatype {
     explicit ykdatatype(token *primitive_dt);
     explicit ykdatatype(std::string primitive_dt);
