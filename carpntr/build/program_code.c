@@ -203,6 +203,11 @@ yk__sds yy__strings_from_cstrlen_after(yy__c_CStr, int32_t, int32_t);
 yy__c_CStr yy__strings_to_cstr(yk__sds);
 void yy__strings_del_cstr(yy__c_CStr);
 void yy__strings_del_str(yy__c_CStr);
+yk__sds yy__strings_cut_from(yk__sds, int32_t);
+bool yy__strings_endswith(yk__sds, yk__sds);
+yk__sds yy__strings_spaces(int32_t);
+yk__sds yy__strings_rpad(yk__sds, int32_t);
+yk__sds yy__strings_lpad(yk__sds, int32_t);
 yy__strings_Utf8IterateState yy__strings_new_iter(yk__sds);
 void yy__strings_del_iter(yy__strings_Utf8IterateState);
 bool yy__strings_iterate(yy__strings_Utf8IterateState);
@@ -2954,6 +2959,80 @@ void yy__strings_del_str(yy__c_CStr nn__a)
 {
     if (NULL == nn__a) return;
     yk__sdsfree(nn__a);
+}
+yk__sds yy__strings_cut_from(yk__sds nn__a, int32_t nn__position) 
+{
+    if (nn__a == NULL || yk__sdslen(nn__a) < nn__position) {
+        yk__sdsfree(nn__a);
+        return yk__sdsempty();
+    }
+    yk__sds s = yk__sdsnewlen(nn__a + nn__position, yk__sdslen(nn__a) - nn__position);
+    yk__sdsfree(nn__a);
+    return s;
+}
+bool yy__strings_endswith(yk__sds yy__strings_a, yk__sds yy__strings_b) 
+{
+    if ((yk__sdslen(yy__strings_b) > yk__sdslen(yy__strings_a)))
+    {
+        yk__sdsfree(yy__strings_b);
+        yk__sdsfree(yy__strings_a);
+        return false;
+    }
+    int32_t yy__strings_pos = (yk__sdslen(yy__strings_a) - yk__sdslen(yy__strings_b));
+    yk__sds t__1 = yy__strings_cut_from(yk__sdsdup(yy__strings_a), yy__strings_pos);
+    yk__sds yy__strings_cut_a = yk__sdsdup((t__1));
+    bool yy__strings_result = (yk__sdscmp(yy__strings_cut_a , yy__strings_b) == 0);
+    bool t__2 = yy__strings_result;
+    yk__sdsfree(yy__strings_cut_a);
+    yk__sdsfree(t__1);
+    yk__sdsfree(yy__strings_b);
+    yk__sdsfree(yy__strings_a);
+    return t__2;
+}
+yk__sds yy__strings_spaces(int32_t nn__count) 
+{
+    if (nn__count <= 0) {
+        return yk__sdsempty();
+    }
+    yk__sds s = yk__sdsgrowzero(yk__sdsempty(), nn__count);
+    for (int i = 0; i < nn__count; i++) {
+        s[i] = ' ';
+    }
+    return s;
+}
+yk__sds yy__strings_rpad(yk__sds yy__strings_a, int32_t yy__strings_count) 
+{
+    if ((yk__sdslen(yy__strings_a) > yy__strings_count))
+    {
+        yk__sds t__3 = yy__strings_a;
+        return t__3;
+    }
+    int32_t yy__strings_remainder = (yy__strings_count - yk__sdslen(yy__strings_a));
+    yk__sds t__4 = yy__strings_spaces(yy__strings_remainder);
+    yk__sds t__5 = yk__sdscatsds(yk__sdsdup(yy__strings_a), (t__4));
+    yk__sds yy__strings_result = yk__sdsdup(t__5);
+    yk__sds t__6 = yy__strings_result;
+    yk__sdsfree(t__5);
+    yk__sdsfree(t__4);
+    yk__sdsfree(yy__strings_a);
+    return t__6;
+}
+yk__sds yy__strings_lpad(yk__sds yy__strings_a, int32_t yy__strings_count) 
+{
+    if ((yk__sdslen(yy__strings_a) > yy__strings_count))
+    {
+        yk__sds t__7 = yy__strings_a;
+        return t__7;
+    }
+    int32_t yy__strings_remainder = (yy__strings_count - yk__sdslen(yy__strings_a));
+    yk__sds t__8 = yy__strings_spaces(yy__strings_remainder);
+    yk__sds t__9 = yk__sdscatsds(yk__sdsdup((t__8)), yy__strings_a);
+    yk__sds yy__strings_result = yk__sdsdup(t__9);
+    yk__sds t__10 = yy__strings_result;
+    yk__sdsfree(t__9);
+    yk__sdsfree(t__8);
+    yk__sdsfree(yy__strings_a);
+    return t__10;
 }
 yy__strings_Utf8IterateState yy__strings_new_iter(yk__sds nn__s) 
 {
