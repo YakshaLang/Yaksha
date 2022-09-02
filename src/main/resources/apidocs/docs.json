@@ -1913,7 +1913,7 @@
             "name": "@native"
           }
         ],
-        "comment": "Delete a table",
+        "comment": "Delete a table. Note that you do not need to delete child tables",
         "name": "del_table",
         "parameters": [
           {
@@ -3980,6 +3980,33 @@
             "name": "@native"
           }
         ],
+        "comment": "Cut a string from given position",
+        "name": "cut_from",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "position"
+          }
+        ],
+        "return_type": {
+          "type": "str"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
         "comment": "Delete a native c-string created from other other functions (calls free)",
         "name": "del_cstr",
         "parameters": [
@@ -4036,6 +4063,28 @@
         ],
         "return_type": {
           "type": "None"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "Does string a ends with string b",
+        "name": "endswith",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "b"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
         }
       },
       {
@@ -4242,6 +4291,28 @@
         }
       },
       {
+        "annotations": [],
+        "comment": "Pad string to left to ensure string length is large or equal to count",
+        "name": "lpad",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "count"
+          }
+        ],
+        "return_type": {
+          "type": "str"
+        }
+      },
+      {
         "annotations": [
           {
             "argument": "",
@@ -4301,6 +4372,28 @@
         }
       },
       {
+        "annotations": [],
+        "comment": "Pad string to right to ensure string length is large or equal to count",
+        "name": "rpad",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "count"
+          }
+        ],
+        "return_type": {
+          "type": "str"
+        }
+      },
+      {
         "annotations": [
           {
             "argument": "",
@@ -4332,6 +4425,27 @@
         ],
         "return_type": {
           "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Get a spaces only string of given count",
+        "name": "spaces",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "count"
+          }
+        ],
+        "return_type": {
+          "type": "str"
         }
       },
       {
@@ -4516,7 +4630,7 @@
             "name": "@native"
           }
         ],
-        "comment": "Copy all strings from b to a and return a",
+        "comment": "Copy all strings from b to a and return a\nWarning! You must assign this back to a (as 'a' might be reallocated to a new address)",
         "name": "extend",
         "parameters": [
           {
