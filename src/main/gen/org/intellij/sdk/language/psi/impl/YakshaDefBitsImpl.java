@@ -65,6 +65,12 @@ public class YakshaDefBitsImpl extends ASTWrapperPsiElement implements YakshaDef
 
   @Override
   @Nullable
+  public YakshaElifStatement getElifStatement() {
+    return findChildByClass(YakshaElifStatement.class);
+  }
+
+  @Override
+  @Nullable
   public YakshaElseStatement getElseStatement() {
     return findChildByClass(YakshaElseStatement.class);
   }

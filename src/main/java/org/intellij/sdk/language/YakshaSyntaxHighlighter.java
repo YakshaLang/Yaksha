@@ -75,6 +75,7 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
             .add(YakshaTypes.KW_DEL)
             .add(YakshaTypes.KW_DEFER)
             .add(YakshaTypes.KW_ELSE)
+            .add(YakshaTypes.KW_ELIF)
             .add(YakshaTypes.KW_IF)
             .add(YakshaTypes.KW_IMPORT)
             .add(YakshaTypes.KW_PASS)

@@ -31,6 +31,7 @@ public interface YakshaTypes {
   IElementType DEF_PARAMS = new YakshaElementType("DEF_PARAMS");
   IElementType DEF_STATEMENT = new YakshaElementType("DEF_STATEMENT");
   IElementType DEL_STATEMENT = new YakshaElementType("DEL_STATEMENT");
+  IElementType ELIF_STATEMENT = new YakshaElementType("ELIF_STATEMENT");
   IElementType ELSE_STATEMENT = new YakshaElementType("ELSE_STATEMENT");
   IElementType EMPTY_LINE = new YakshaElementType("EMPTY_LINE");
   IElementType EXP = new YakshaElementType("EXP");
@@ -65,6 +66,7 @@ public interface YakshaTypes {
   IElementType KW_DEF = new YakshaTokenType("KW_DEF");
   IElementType KW_DEFER = new YakshaTokenType("KW_DEFER");
   IElementType KW_DEL = new YakshaTokenType("KW_DEL");
+  IElementType KW_ELIF = new YakshaTokenType("KW_ELIF");
   IElementType KW_ELSE = new YakshaTokenType("KW_ELSE");
   IElementType KW_FALSE = new YakshaTokenType("KW_FALSE");
   IElementType KW_IF = new YakshaTokenType("KW_IF");
@@ -169,6 +171,9 @@ public interface YakshaTypes {
       }
       else if (type == DEL_STATEMENT) {
         return new YakshaDelStatementImpl(node);
+      }
+      else if (type == ELIF_STATEMENT) {
+        return new YakshaElifStatementImpl(node);
       }
       else if (type == ELSE_STATEMENT) {
         return new YakshaElseStatementImpl(node);

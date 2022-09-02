@@ -99,6 +99,10 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitElifStatement(@NotNull YakshaElifStatement o) {
+    visitPsiElement(o);
+  }
+
   public void visitElseStatement(@NotNull YakshaElseStatement o) {
     visitPsiElement(o);
   }

@@ -644,7 +644,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // pass_statement | ccode_statement | if_statement | else_statement | while_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | continue_statement | break_statement | COMMENT
+  // pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | continue_statement | break_statement | COMMENT
   public static boolean def_bits(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "def_bits")) return false;
     boolean r;
@@ -652,6 +652,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = pass_statement(b, l + 1);
     if (!r) r = ccode_statement(b, l + 1);
     if (!r) r = if_statement(b, l + 1);
+    if (!r) r = elif_statement(b, l + 1);
     if (!r) r = else_statement(b, l + 1);
     if (!r) r = while_statement(b, l + 1);
     if (!r) r = del_statement(b, l + 1);
@@ -896,6 +897,61 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "del_statement_2")) return false;
     consumeToken(b, S);
     return true;
+  }
+
+  /* ********************************************************** */
+  // I KW_ELIF S? exp S? OPERATOR_COLON S? NL def_bits+
+  public static boolean elif_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "elif_statement")) return false;
+    if (!nextTokenIs(b, I)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, I, KW_ELIF);
+    r = r && elif_statement_2(b, l + 1);
+    r = r && exp(b, l + 1);
+    r = r && elif_statement_4(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_COLON);
+    r = r && elif_statement_6(b, l + 1);
+    r = r && consumeToken(b, NL);
+    r = r && elif_statement_8(b, l + 1);
+    exit_section_(b, m, ELIF_STATEMENT, r);
+    return r;
+  }
+
+  // S?
+  private static boolean elif_statement_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "elif_statement_2")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean elif_statement_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "elif_statement_4")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean elif_statement_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "elif_statement_6")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // def_bits+
+  private static boolean elif_statement_8(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "elif_statement_8")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = def_bits(b, l + 1);
+    while (r) {
+      int c = current_position_(b);
+      if (!def_bits(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "elif_statement_8", c)) break;
+    }
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

@@ -86,13 +86,14 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   "defer"                        { return YakshaTypes.KW_DEFER; }
   "else"                         { return YakshaTypes.KW_ELSE; }
   "if"                           { return YakshaTypes.KW_IF; }
+  "elif"                         { return YakshaTypes.KW_ELIF; }
   "import"                       { return YakshaTypes.KW_IMPORT; }
   "pass"                         { return YakshaTypes.KW_PASS; }
   "return"                       { return YakshaTypes.KW_RETURN; }
   "while"                        { return YakshaTypes.KW_WHILE; }
-  "True"                        { return YakshaTypes.KW_TRUE; }
+  "True"                         { return YakshaTypes.KW_TRUE; }
   "False"                        { return YakshaTypes.KW_FALSE; }
-  "None"                        { return YakshaTypes.KW_NONE; }
+  "None"                         { return YakshaTypes.KW_NONE; }
 
 "int" |
 "i8" |
