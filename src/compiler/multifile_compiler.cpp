@@ -1,7 +1,6 @@
 // multifile_compiler.cpp
 #include "multifile_compiler.h"
 #include "ast/codefiles.h"
-#include "ast/interpreter.h"
 #include "ast/parser.h"
 #include "compiler/compiler.h"
 #include "compiler/type_checker.h"

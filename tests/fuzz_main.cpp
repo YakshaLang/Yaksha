@@ -1,6 +1,5 @@
 #include "ast/ast_printer.h"
 #include "ast/ast_vis.h"
-#include "ast/interpreter.h"
 #include "ast/parser.h"
 #include "compiler/type_checker.h"
 #include "file_formats/tokens_file.h"
@@ -9,7 +8,7 @@
 #include "utilities/error_printer.h"
 #include "compiler/multifile_compiler.h"
 using namespace yaksha;
-void test_interpreter(const std::string &data, const std::string &file_name) {
+void test_ast(const std::string &data, const std::string &file_name) {
   tokenizer t{file_name, data};
   ykdt_pool dt_pool{};
   t.tokenize();
@@ -23,9 +22,6 @@ void test_interpreter(const std::string &data, const std::string &file_name) {
     parser p{file_name, b.tokens_, &dt_pool};
     auto tree = p.parse();
     if (!tree.empty()) {
-      interpreter ip{&dt_pool};
-      ip.calculate(tree);
-      std::cout << "\n\n============================\n";
       ast_printer pr{};
       pr.print(tree);
       std::cout << "\n\n============================\n";
@@ -61,6 +57,6 @@ int main(int argc, char *argv[]) {
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
   test_compiler(argv[1]);
-  test_interpreter(data, file_name);
+  test_ast(data, file_name);
   return EXIT_SUCCESS;
 }

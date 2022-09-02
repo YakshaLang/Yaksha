@@ -3,7 +3,6 @@
 #define UDFUNCTION_H
 #include "ast/ast.h"
 #include "ast/environment.h"
-#include "ast/interpreter.h"
 #include "ykfunction.h"
 namespace yaksha {
   /**

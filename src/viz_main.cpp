@@ -1,8 +1,6 @@
 #include "ast/ast_printer.h"
 #include "ast/ast_vis.h"
-#include "ast/interpreter.h"
 #include "ast/parser.h"
-#include "compiler/compiler.h"
 #include "compiler/type_checker.h"
 #include "file_formats/tokens_file.h"
 #include "tokenizer/block_analyzer.h"
