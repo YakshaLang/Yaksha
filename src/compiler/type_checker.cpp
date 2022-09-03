@@ -1,5 +1,6 @@
 // type_checker.cpp
 #include "type_checker.h"
+#include "ast/parser.h"
 #include "compiler_utils.h"
 #include "utilities/ykfunction.h"
 #include <utility>
@@ -7,7 +8,9 @@ using namespace yaksha;
 type_checker::type_checker(std::string filepath, codefiles *cf,
                            def_class_visitor *dcv, ykdt_pool *pool)
     : cf_(cf), dt_pool_(pool), scope_(pool), builtins_(pool),
-      defs_classes_(dcv), filepath_(std::move(filepath)) {}
+      defs_classes_(dcv), filepath_(std::move(filepath)) {
+  import_stmts_alias_ = cf->get(filepath_)->data_->parser_->import_stmts_alias_;
+}
 type_checker::~type_checker() = default;
 void type_checker::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
@@ -121,7 +124,8 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       arg->accept(this);
       arguments.push_back(pop());
     }
-    auto result = builtins_.verify(name.string_val_, arguments);
+    auto result = builtins_.verify(name.string_val_, arguments, obj->args_,
+                                   import_stmts_alias_, filepath_);
     // Error when calling builtin, if so return None as data type
     if (result.object_type_ == object_type::RUNTIME_ERROR) {
       error(obj->paren_token_, result.string_val_);

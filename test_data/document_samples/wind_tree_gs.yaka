@@ -35,17 +35,15 @@ def branch(x: float, y: float, length: float, angle: float, s: State) -> None:
     branch(next_x, next_y, (length * r1), angle - s.angle + wind * 10.0f, s)
 
 
-@nativemacro
 def todata(s: State) -> utils.Data:
     # Convert given State object to a utils.Data(void*)
-    ccode """(void*)nn__s"""
+    return cast("utils.Data", s)
 
-@nativemacro
 def tostate(s: utils.Data) -> State:
     # Note: yy__State name is here because this is the main file
     # For imports this name is mangled and it is not trivial to guess
     # So only use this kind of cast if State class is defined in main method
-    ccode """(struct yy__State*)nn__s"""
+    return cast("State", s)
 
 def game_step(d: utils.Data) -> None:
     s: State = tostate(d)

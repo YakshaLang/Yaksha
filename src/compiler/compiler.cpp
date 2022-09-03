@@ -73,11 +73,19 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   // Depending on the fact that this is a function or class, we will call or create object
   if (name_pair.second.object_type_ == object_type::BUILTIN_FUNCTION) {
     std::vector<std::pair<std::string, ykobject>> args{};
+    int i = 0;
     for (auto arg : obj->args_) {
-      arg->accept(this);
-      args.emplace_back(pop());
+      if (builtins_.should_compile_argument(name, i)) {
+        arg->accept(this);
+        args.emplace_back(pop());
+      } else {
+        args.emplace_back(
+            std::pair<std::string, ykobject>{"", ykobject(dt_pool)});
+      }
+      i++;
     }
-    auto result = builtins_.compile(name, args);
+    auto result = builtins_.compile(name, args, obj->args_, this,
+                                    import_stmts_alias_, filepath_);
     push(result.first, result.second);
   } else if (name_pair.second.object_type_ == object_type::MODULE_CLASS) {
     auto module_file = name_pair.second.module_file_;
@@ -605,19 +613,6 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   }
   return "void";
 }
-compiler_output compiler::compile(const std::vector<stmt *> &statements) {
-  for (const auto &name : this->defs_classes_.class_names_) {
-    auto cls = defs_classes_.get_class(name);
-    if (!cls->annotations_.native_define_) {
-      struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
-                                   << ";\n";
-    }
-  }
-  for (auto st : statements) { st->accept(this); }
-  return {struct_forward_declarations_.str(),
-          function_forward_declarations_.str(), classes_.str(), body_.str(),
-          global_constants_.str()};
-}
 compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   this->cf_ = cf;
   this->prefix_val_ = fi->prefix_;
@@ -636,6 +631,9 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
     obj.module_name_ = imp_st->name_->token_;
     scope_.define_global(prefix(imp_st->name_->token_, prefix_val_), obj);
   }
+  // Create a copy of import information
+  import_stmts_alias_ = fi->data_->parser_->import_stmts_alias_;
+  filepath_ = fi->filepath_;
   for (auto st : fi->data_->parser_->stmts_) { st->accept(this); }
   return {struct_forward_declarations_.str(),
           function_forward_declarations_.str(), classes_.str(), body_.str(),

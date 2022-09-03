@@ -28,6 +28,7 @@ parser::parser(std::string filepath, std::vector<token> &tokens,
 parser::~parser() {
   delete (magic_return_token_);
   delete (sugar_else_);
+  datatypes_from_modules_.clear();
 }
 token *parser::advance() {
   if (!is_at_end()) { current_++; }
@@ -280,6 +281,7 @@ stmt *parser::block_statement() {
     throw error(colon, "Block cannot be empty. Use 'pass'"
                        " statement for an empty block.");
   }
+  // Discard python style documentation comments
   if (statements.front()->get_type() == ast_type::EXPR_LITERAL) {
     auto first_item = dynamic_cast<literal_expr *>(statements.front());
     if (first_item->literal_token_->type_ == token_type::STRING ||
@@ -634,6 +636,4 @@ void parser::rescan_datatypes() {
     auto module_data = import_stmts_alias_[import_alias];
     dt->module_ = module_data->data_->filepath_.string();
   }
-  // Clean up temporary vector
-  datatypes_from_modules_.clear();
 }

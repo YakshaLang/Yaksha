@@ -1,0 +1,16 @@
+@nativedefine("void*")
+class A:
+    pass
+
+class B:
+    a: int
+
+def toA(b: B) -> A:
+    return cast("A", b)
+
+def main() -> int:
+    b: B = B()
+    b.a = 1
+    a: A = cast("A", b)
+    a2: A = toA(b)
+    return 0

@@ -26,7 +26,6 @@ namespace yaksha {
              entry_struct_compiler *esc);
     ~compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
-    compiler_output compile(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
     void visit_binary_expr(binary_expr *obj) override;
     void visit_fncall_expr(fncall_expr *obj) override;
@@ -118,6 +117,10 @@ private:
     ast_pool *ast_pool_;
     // Entry struct compiler
     entry_struct_compiler *esc_;
+    // Copy of internal stmt_alias to handle dt parsing in builtins
+    std::unordered_map<std::string, import_stmt *> import_stmts_alias_{};
+    // Current file path
+    std::string filepath_{};
     void compile_function_call(fncall_expr *obj, const std::string &name,
                                std::stringstream &code,
                                ykdatatype *return_type);

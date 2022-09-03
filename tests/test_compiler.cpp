@@ -13,11 +13,11 @@ using namespace yaksha;
     c_code.tokenize();                                                         \
     auto token_snapshot = yaksha::load_token_dump(C);                          \
     yaksha::save_token_dump(C, c_code.tokens_);                                \
-    std::string c_code_file{A};                                               \
+    std::string c_code_file{A};                                                \
     c_code_file += ".output.c";                                                \
     std::ofstream save_file(c_code_file);                                      \
     REQUIRE(save_file.is_open() == true);                                      \
-    save_file << result.code_;                                               \
+    save_file << result.code_;                                                 \
     REQUIRE(c_code.tokens_.size() == token_snapshot.size());                   \
     for (int i = 0; i < token_snapshot.size(); i++) {                          \
       auto parsed = c_code.tokens_[i];                                         \
@@ -82,11 +82,13 @@ TEST_CASE("compiler: Native defines") {
             "../test_data/byol/lisp.tokens");
 }
 TEST_CASE("compiler: Do not copy str for getref") {
-  TEST_FILE("../test_data/compiler_tests/do_not_copy_str_getref.yaka", "do_not_copy_str_getref.yaka",
+  TEST_FILE("../test_data/compiler_tests/do_not_copy_str_getref.yaka",
+            "do_not_copy_str_getref.yaka",
             "../test_data/compiler_tests/do_not_copy_str_getref.tokens");
 }
 TEST_CASE("compiler: Str unref and getref hacks!") {
-  TEST_FILE("../test_data/compiler_tests/str_getref_unref.yaka", "str_getref_unref.yaka",
+  TEST_FILE("../test_data/compiler_tests/str_getref_unref.yaka",
+            "str_getref_unref.yaka",
             "../test_data/compiler_tests/str_getref_unref.tokens");
 }
 TEST_CASE("compiler: Test automatic generation for string hashes!") {
@@ -94,14 +96,22 @@ TEST_CASE("compiler: Test automatic generation for string hashes!") {
             "../test_data/compiler_tests/string_hash.tokens");
 }
 TEST_CASE("compiler: Test return calls a function with defer deleted stuff !") {
-  TEST_FILE("../test_data/compiler_tests/defer_return.yaka", "defer_return.yaka",
+  TEST_FILE("../test_data/compiler_tests/defer_return.yaka",
+            "defer_return.yaka",
             "../test_data/compiler_tests/defer_return.tokens");
 }
 TEST_CASE("compiler: All @native stuff !") {
-  TEST_FILE("../test_data/compiler_tests/native_function_type_tests.yaka", "native_function_type_tests.yaka",
+  TEST_FILE("../test_data/compiler_tests/native_function_type_tests.yaka",
+            "native_function_type_tests.yaka",
             "../test_data/compiler_tests/native_function_type_tests.tokens");
 }
 TEST_CASE("compiler: Test elif") {
-  TEST_FILE("../test_data/compiler_tests/elif_testing.yaka", "elif_testing.yaka",
+  TEST_FILE("../test_data/compiler_tests/elif_testing.yaka",
+            "elif_testing.yaka",
             "../test_data/compiler_tests/elif_testing.tokens");
+}
+TEST_CASE("compiler: Casting") {
+  TEST_FILE("../test_data/compiler_tests/casting_test.yaka",
+            "casting_test.yaka",
+            "../test_data/compiler_tests/casting_test.tokens");
 }

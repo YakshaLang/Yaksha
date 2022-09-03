@@ -26,6 +26,8 @@ namespace yaksha {
     std::unordered_map<std::string, import_stmt *> import_stmts_alias_{};
     std::vector<stmt *> stmts_{};
     std::string filepath_{};
+    // parsing data types
+    ykdatatype *parse_datatype();
     void rescan_datatypes();
 
 private:
@@ -63,8 +65,6 @@ private:
     std::vector<parameter> parse_class_members(token *name);
     stmt *expression_statement();
     stmt *declaration_statement();
-    // parsing data types
-    ykdatatype *parse_datatype();
     // parsing annotations
     annotation parse_annotation();
     // utilities

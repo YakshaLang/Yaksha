@@ -82,6 +82,8 @@ private:
     std::vector<std::string> function_name_stack_{};
     // Builtin functions
     builtins builtins_;
+    // Copy of internal stmt_alias to handle dt parsing in builtins
+    std::unordered_map<std::string, import_stmt *> import_stmts_alias_{};
   };
 }// namespace yaksha
 #endif

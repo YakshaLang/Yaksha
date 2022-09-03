@@ -1,6 +1,9 @@
 // builtins.cpp
 #include "compiler/builtins.h"
+#include "ast/parser.h"
+#include "tokenizer/tokenizer.h"
 #include <sstream>
+#include <utility>
 using namespace yaksha;
 builtins::builtins(ykdt_pool *dt_pool) : dt_pool_(dt_pool) {}
 builtins::~builtins() = default;
@@ -17,10 +20,14 @@ bool builtins::has_builtin(const std::string &name) {
   if (name == "shput") { return true; }
   if (name == "shget") { return true; }
   if (name == "shgeti") { return true; }
+  if (name == "cast") { return true; }
   return false;
 }
-ykobject builtins::verify(const std::string &name,
-                          const std::vector<ykobject> &args) {
+ykobject builtins::verify(
+    const std::string &name, const std::vector<ykobject> &args,
+    const std::vector<expr *> &arg_expressions,
+    const std::unordered_map<std::string, import_stmt *> &import_aliases,
+    const std::string &filepath) {
   auto o = ykobject(dt_pool_);
   if (name == "arrput" && args.size() == 2 &&
       args[0].datatype_->is_an_array() &&
@@ -77,14 +84,28 @@ ykobject builtins::verify(const std::string &name,
              (*args[2].datatype_ == *args[0].datatype_->args_[0]->args_[0])) {
     // shput(Array[SMEntry[T]], str, T) -> None
     return o;
+  } else if (name == "cast" && args.size() == 2 &&
+             args[0].datatype_->is_str() &&
+             arg_expressions[0]->get_type() == ast_type::EXPR_LITERAL) {
+    // cast(str !! literal only, any)
+    auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
+    if (lit->literal_token_->type_ == token_type::STRING ||
+        lit->literal_token_->type_ == token_type::THREE_QUOTE_STRING) {
+      auto data_type = lit->literal_token_->token_;
+      ykdatatype *parsed_dt = parse(data_type, import_aliases, filepath);
+      if (parsed_dt != nullptr) { return ykobject(parsed_dt); }
+    }
   }
   o.object_type_ = object_type::RUNTIME_ERROR;
   o.string_val_ = "Invalid arguments for builtin function";
   return o;
 }
-std::pair<std::string, ykobject>
-builtins::compile(const std::string &name,
-                  const std::vector<std::pair<std::string, ykobject>> &args) {
+std::pair<std::string, ykobject> builtins::compile(
+    const std::string &name,
+    const std::vector<std::pair<std::string, ykobject>> &args,
+    const std::vector<expr *> &arg_expressions, datatype_compiler *dt_compiler,
+    const std::unordered_map<std::string, import_stmt *> &import_aliases,
+    const std::string &filepath) {
   std::stringstream code{};
   auto o = ykobject(dt_pool_);
   if (name == "arrput") {
@@ -152,6 +173,37 @@ builtins::compile(const std::string &name,
   } else if (name == "shput") {
     code << "yk__shput(" << args[0].first << ", " << args[1].first << ", "
          << args[2].first << ")";
+  } else if (name == "cast") {
+    auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
+    auto out_dt = parse(dt->literal_token_->token_, import_aliases, filepath);
+    code << "((" << dt_compiler->convert_dt(out_dt) << ")" << args[1].first
+         << ")";
+    o = ykobject(out_dt);
   }
   return {code.str(), o};
+}
+ykdatatype *builtins::parse(
+    std::string data_type_str,
+    const std::unordered_map<std::string, import_stmt *> &import_aliases,
+    const std::string &filepath) {
+  auto t = tokenizer{filepath, std::move(data_type_str)};
+  t.tokenize();
+  if (!t.errors_.empty()) { return nullptr; }
+  auto p = parser{filepath, t.tokens_, dt_pool_};
+  p.import_stmts_alias_ = import_aliases;
+  ykdatatype *dt;
+  try {
+    dt = p.parse_datatype();
+  } catch (parsing_error &ignored) {
+    return nullptr;
+  }
+  if (!p.errors_.empty()) {
+    return nullptr;
+  }
+  p.rescan_datatypes();
+  return dt;
+}
+bool builtins::should_compile_argument(const std::string &name, int arg_index) {
+  if (name == "cast" && arg_index == 0) { return false; }
+  return true;
 }
