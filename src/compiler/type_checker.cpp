@@ -2,7 +2,6 @@
 #include "type_checker.h"
 #include "ast/parser.h"
 #include "compiler_utils.h"
-#include "utilities/ykfunction.h"
 #include <utility>
 using namespace yaksha;
 type_checker::type_checker(std::string filepath, codefiles *cf,
