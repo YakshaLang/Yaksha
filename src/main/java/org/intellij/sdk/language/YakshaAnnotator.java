@@ -5,10 +5,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.psi.PsiElement;
-import org.intellij.sdk.language.psi.YakshaAnnotation;
-import org.intellij.sdk.language.psi.YakshaDataType;
-import org.intellij.sdk.language.psi.YakshaFncall;
-import org.intellij.sdk.language.psi.YakshaTypes;
+import org.intellij.sdk.language.psi.*;
 import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +34,16 @@ public class YakshaAnnotator implements Annotator {
                         .range(fncall.getIdentifierExp().getTextRange())
                         .textAttributes(YakshaSyntaxHighlighter.KEYWORD)
                         .create();
+                if (fullName.equals("cast") && fncall.getArguments() != null
+                        && fncall.getArguments().getExpList() != null
+                        && fncall.getArguments().getExpList().size() > 0) {
+                    YakshaExp dt = fncall.getArguments().getExpList().get(0);
+                    holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                            .range(dt.getTextRange())
+                            .textAttributes(YakshaSyntaxHighlighter.DATA_TYPE)
+                            .create();
+                }
+
             }
         }
     }

@@ -43,6 +43,7 @@ public class YakshaDocs {
             .put("reverse", "Reverse an array creating a new array. New array need to be deleted")
             .put("sorted", "Sort an array creating a new array. New array need to be deleted")
             .put("format", "String formatting builtin")
+            .put("cast", "Data type casting builtin")
             .build();
     public static final Set<String> BUILTIN_FUNCTION_NAMES = BUILTIN_FUNCTIONS.keySet();
     public static final YakshaDocs INSTANCE = new YakshaDocs();
