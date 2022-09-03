@@ -633,7 +633,7 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   }
   // Create a copy of import information
   import_stmts_alias_ = fi->data_->parser_->import_stmts_alias_;
-  filepath_ = fi->filepath_;
+  filepath_ = fi->filepath_.string();
   for (auto st : fi->data_->parser_->stmts_) { st->accept(this); }
   return {struct_forward_declarations_.str(),
           function_forward_declarations_.str(), classes_.str(), body_.str(),
