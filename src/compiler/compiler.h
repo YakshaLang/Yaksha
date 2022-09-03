@@ -9,7 +9,7 @@
 #include "compiler/delete_stack_stack.h"
 #include "datatype_compiler.h"
 #include "def_class_visitor.h"
-#include "entry_struct_compiler.h"
+#include "entry_struct_func_compiler.h"
 #include "tokenizer/token.h"
 #include "utilities/defer_stack_stack.h"
 #include <sstream>
@@ -23,7 +23,7 @@ namespace yaksha {
   };
   struct compiler : expr_visitor, stmt_visitor, datatype_compiler {
     compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
-             entry_struct_compiler *esc);
+             entry_struct_func_compiler *esc);
     ~compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
     void visit_assign_expr(assign_expr *obj) override;
@@ -115,8 +115,8 @@ private:
     ykdt_pool *dt_pool;
     // AST pool
     ast_pool *ast_pool_;
-    // Entry struct compiler
-    entry_struct_compiler *esc_;
+    // Entry struct & function datatypes compiler
+    entry_struct_func_compiler *esc_;
     // Copy of internal stmt_alias to handle dt parsing in builtins
     std::unordered_map<std::string, import_stmt *> import_stmts_alias_{};
     // Current file path

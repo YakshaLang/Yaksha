@@ -115,3 +115,14 @@ TEST_CASE("compiler: Casting") {
             "casting_test.yaka",
             "../test_data/compiler_tests/casting_test.tokens");
 }
+TEST_CASE("compiler: Basic function pointer") {
+  TEST_FILE("../test_data/compiler_tests/function_datatype_test.yaka",
+            "function_datatype_test.yaka",
+            "../test_data/compiler_tests/function_datatype_test.tokens");
+}
+TEST_CASE("compiler: Function pointer passing & calling") {
+  TEST_FILE("../test_data/compiler_tests/function_datatype_passing_calling_test.yaka",
+            "function_datatype_passing_calling_test.yaka",
+            "../test_data/compiler_tests/function_datatype_passing_calling_test.tokens");
+}
+

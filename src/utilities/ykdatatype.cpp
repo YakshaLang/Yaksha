@@ -50,6 +50,12 @@ void ykdatatype::find_builtin_or_primitive() {
     builtin_type_ = ykbuiltin::SM_ENTRY;
   } else if (token_->token_ == "MEntry") {
     builtin_type_ = ykbuiltin::M_ENTRY;
+  } else if (token_->token_ == "Function") {
+    builtin_type_ = ykbuiltin::FUNCTION;
+  } else if (token_->token_ == "In") {
+    builtin_type_ = ykbuiltin::F_IN;
+  } else if (token_->token_ == "Out") {
+    builtin_type_ = ykbuiltin::F_OUT;
   }
 }
 ykdatatype::~ykdatatype() { delete (token_); }
@@ -167,4 +173,13 @@ bool ykdatatype::is_m_entry() const {
 }
 bool ykdatatype::is_sm_entry() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::SM_ENTRY;
+}
+bool ykdatatype::is_function() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::FUNCTION;
+}
+bool ykdatatype::is_function_input() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::F_IN;
+}
+bool ykdatatype::is_function_output() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::F_OUT;
 }

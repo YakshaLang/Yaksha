@@ -45,6 +45,10 @@ ykobject::ykobject(control_flow_change flow_change)
 bool ykobject::is_primitive_or_obj() const {
   return object_type_ == object_type::PRIMITIVE_OR_OBJ;
 }
+bool ykobject::is_a_function() const {
+  return object_type_ == object_type::FUNCTION ||
+         object_type_ == object_type::MODULE_FUNCTION;
+}
 bool ykobject::is_same_datatype(ykobject &other) const {
   if (is_primitive_or_obj() && other.is_primitive_or_obj()) {
     return *datatype_ == *other.datatype_;

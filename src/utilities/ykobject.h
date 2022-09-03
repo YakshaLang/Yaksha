@@ -33,6 +33,7 @@ namespace yaksha {
     explicit ykobject(control_flow_change flow_change);
     explicit ykobject(ykdt_pool *pool);
     [[nodiscard]] bool is_primitive_or_obj() const;
+    [[nodiscard]] bool is_a_function() const;
     bool is_same_datatype(ykobject &other) const;
     int integer_val_{0};
     std::string string_val_{};

@@ -3,7 +3,7 @@
 #include "ast/parser.h"
 using namespace yaksha;
 compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
-                   entry_struct_compiler *esc)
+                   entry_struct_func_compiler *esc)
     : defs_classes_(defs_classes), scope_(pool), dt_pool(pool), builtins_(pool),
       esc_(esc) {
   ast_pool_ = new ast_pool();
@@ -110,8 +110,18 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   } else if (defs_classes_.has_class(name)) {
     compile_obj_creation(prefix(name, prefix_val_), code,
                          dt_pool->create(name));
+  } else if (name_pair.second.datatype_->is_function()) {
+    auto ret_type = name_pair.second.datatype_->args_[1];
+    ykdatatype *return_type;
+    if (ret_type->args_.empty()) {
+      ret_type = dt_pool->create("None");
+    } else {
+      return_type = ret_type->args_[0];
+    }
+    compile_function_call(obj, prefix(name, prefix_val_), code, return_type);
   } else {
-    std::cerr << "\n// Oh no!\n";
+    // Must not happen
+    std::cerr << "<><>";
   }
 }
 void compiler::compile_obj_creation(const std::string &name,
@@ -138,6 +148,16 @@ void compiler::compile_function_call(fncall_expr *obj, const std::string &name,
     if (arg_val.second.is_primitive_or_obj() &&
         arg_val.second.datatype_->is_str()) {
       code << "yk__sdsdup(" << arg_val.first << ")";
+    } else if (arg_val.second.is_a_function()) {
+      if (arg_val.second.object_type_ == object_type::MODULE_FUNCTION) {
+        auto module_file = arg_val.second.module_file_;
+        auto module_fn = arg_val.second.string_val_;
+        auto module_info = cf_->get(module_file);
+        auto module_prefix = module_info->prefix_;
+        code << prefix(module_fn, module_prefix);
+      } else {
+        code << prefix(arg_val.first, prefix_val_);
+      }
     } else {
       code << arg_val.first;
     }
@@ -595,6 +615,8 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   } else if (basic_dt->is_sm_entry() || basic_dt->is_m_entry()) {
     // Handle SMEntry and Entry
     return esc_->compile(basic_dt, this);
+  } else if (basic_dt->is_function()) {
+    return esc_->compile_function_dt(basic_dt, this);
   }
   auto dt = basic_dt->token_->token_;
   if (!basic_dt->module_.empty() && cf_ != nullptr) {

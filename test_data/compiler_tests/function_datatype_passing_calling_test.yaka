@@ -1,0 +1,10 @@
+def world_formatter(item: str) -> str:
+    result: str = item + " World"
+    return result
+
+def formatted_print(formatter: Function[In[str], Out[str]], item: str) -> None:
+    println(formatter(item))
+
+def main() -> int:
+    formatted_print(world_formatter, "Hello")
+    return 0

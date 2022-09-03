@@ -492,13 +492,22 @@ ykdatatype *parser::parse_datatype() {
     if (dt->args_.size() != 1) {
       throw error(
           dt->token_,
-          "Array/Ptr/Const/SMEntry must only have a single data type arg.");
+          "Array/Ptr/Const/SMEntry/Out must only have a single data type arg.");
     }
   }
   if (dt->is_m_entry()) {
     if (dt->args_.size() != 2) {
       throw error(dt->token_, "MEntry must only have a two data types args.");
     }
+  }
+  if (dt->is_function() &&
+      (dt->args_.size() != 2 || !dt->args_[0]->is_function_input() ||
+       !dt->args_[1]->is_function_output())) {
+    throw error(dt->token_, "Function must have both In and Out in order.");
+  }
+  if (dt->is_function_output() && dt->args_.size() > 1) {
+    throw error(dt->token_,
+                "Function's Out datatype must have 0 or 1 arguments.");
   }
   return dt;
 }

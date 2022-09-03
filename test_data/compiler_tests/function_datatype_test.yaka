@@ -1,0 +1,12 @@
+def a(formatter: Function[In[str], Out[str]]) -> None:
+    print("hello")
+
+def b(formatter: Function[In[str], Out[str]]) -> None:
+    print("hello")
+
+def c(formatter: Function[In[Function[In[int], Out]], Out[str]]) -> None:
+    print("hello")
+
+def main() -> int:
+    println("Hello World")
+    return 0

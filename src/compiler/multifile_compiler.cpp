@@ -94,11 +94,14 @@ multifile_compiler::compile(const std::string &main_file,
   c_code << "// --forward declarations-- \n";
   c_code << global_consts.str();
   c_code << struct_forward_decls.str();
-  if (cf.esc_->has()) { cf.esc_->compile_forward_declarations(c_code); }
+  if (cf.esc_->has_structures()) {
+    cf.esc_->compile_forward_declarations(c_code);
+  }
+  if (cf.esc_->has_functions()) { cf.esc_->compile_function_defs(c_code); }
   c_code << function_forward_decls.str();
   c_code << "// --structs-- \n";
   c_code << struct_body.str();
-  if (cf.esc_->has()) { cf.esc_->compile_structures(c_code); }
+  if (cf.esc_->has_structures()) { cf.esc_->compile_structures(c_code); }
   c_code << "// --functions-- \n";
   c_code << function_body.str();
   c_code << "#if defined(YK__MINIMAL_MAIN)\n";

@@ -60,6 +60,10 @@ namespace yaksha {
 
 private:
     ykobject pop();
+    /**
+     * Can we pass argument to given slot?
+     */
+    bool slot_match(const ykobject &arg, ykdatatype *datatype);
     void push(const ykobject &data_type);
     void error(token *tok, const std::string &message);
     void error(const std::string &message);

@@ -96,8 +96,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       if (i == last_param_index && funct->annotations_.varargs_) {
         for (auto j = i; j < arguments.size(); j++) {
           auto arg = arguments[j];
-          if (!(arg.is_primitive_or_obj() &&
-                *arg.datatype_ == *param.data_type_)) {
+          if (!slot_match(arg, param.data_type_)) {
             std::stringstream message{};
             message << "Variable argument: " << (j + 1) << " mismatches";
             error(obj->paren_token_, message.str());
@@ -105,8 +104,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
         }
       } else {
         auto arg = arguments[i];
-        if (!(arg.is_primitive_or_obj() &&
-              *arg.datatype_ == *param.data_type_)) {
+        if (!slot_match(arg, param.data_type_)) {
           std::stringstream message{};
           message << "Parameter & argument " << (i + 1) << " mismatches";
           error(obj->paren_token_, message.str());
@@ -132,6 +130,39 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       return;
     }
     push(result);
+    return;
+  }
+  // Callable function reference can be called
+  if (name.datatype_->is_function()) {
+    std::vector<ykobject> arguments{};
+    for (auto arg : obj->args_) {
+      arg->accept(this);
+      arguments.push_back(pop());
+    }
+    /*Function[In[..*/
+    auto &params = name.datatype_->args_[0]->args_;
+    if (params.size() != arguments.size()) {
+      error(obj->paren_token_, "Too few or too "
+                               "much arguments for function call");
+      push(ykobject(dt_pool_));// Push None here
+      return;
+    }
+    for (auto i = 0; i < params.size(); i++) {
+      auto param = params[i];
+      auto arg = arguments[i];
+      if (!slot_match(arg, param)) {
+        std::stringstream message{};
+        message << "Function[] call parameter & argument " << (i + 1)
+                << " mismatches";
+        error(obj->paren_token_, message.str());
+      }
+    }
+    auto ret_type = name.datatype_->args_[1];
+    if (ret_type->args_.empty()) {
+      push(ykobject(dt_pool_));
+    } else {
+      push(ykobject(ret_type->args_[0]));
+    }
     return;
   }
   error(obj->paren_token_, "Calling a non callable "
@@ -331,8 +362,7 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
   } else {
     // func cannot be null here.
     auto func = this->defs_classes_->get_function(function_name);
-    if (!(return_data_type.is_primitive_or_obj() &&
-          *return_data_type.datatype_ == *func->return_type_)) {
+    if (!slot_match(return_data_type, func->return_type_)) {
       error(obj->return_keyword_, "Invalid return data type");
     }
   }
@@ -548,11 +578,15 @@ void type_checker::visit_assign_arr_expr(assign_arr_expr *obj) {
 }
 void type_checker::handle_assigns(token *oper, const ykobject &lhs,
                                   const ykobject &rhs) {
-  if (lhs.object_type_ != rhs.object_type_ ||
+  // Both are primitive but not equal? then it is a problem
+  if ((lhs.is_primitive_or_obj() && rhs.is_primitive_or_obj()) &&
       *lhs.datatype_ != *rhs.datatype_) {
     error(oper, "Cannot assign between 2 different data types.");
   }
   if (lhs.datatype_->is_const()) { error(oper, "Cannot assign to a constant"); }
+  if (rhs.is_a_function() && !slot_match(rhs, lhs.datatype_)) {
+    error(oper, "You can only assign a function to a Function[In[?],Out[?]]");
+  }
 }
 void type_checker::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
   handle_square_access(obj->index_expr_, obj->sqb_token_, obj->name_);
@@ -585,4 +619,37 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
   }
   // If this is not a global constant define it
   if (!scope_.is_global_level()) { scope_.define(name, placeholder); }
+}
+bool type_checker::slot_match(const ykobject &arg, ykdatatype *datatype) {
+  if (arg.is_a_function() && datatype->is_function()) {
+    // Get function
+    def_stmt *funct;
+    if (arg.object_type_ == object_type::FUNCTION) {
+      funct = defs_classes_->get_function(arg.string_val_);
+    } else {
+      auto imp = cf_->get(arg.module_file_);
+      funct = imp->data_->dsv_->get_function(arg.string_val_);
+    }
+    if (funct->annotations_.varargs_) {
+      // WHY? not yet supported
+      error("@varargs function cannot be used as function pointers");
+      return false;
+    }
+    // Create datatype out of function
+    ykdatatype *fnc = dt_pool_->create("Function");
+    ykdatatype *fin = dt_pool_->create("In");
+    ykdatatype *fout = dt_pool_->create("Out");
+    fnc->args_.emplace_back(fin);
+    fnc->args_.emplace_back(fout);
+    for (auto current_param : funct->params_) {
+      fin->args_.emplace_back(current_param.data_type_);
+    }
+    if (!funct->return_type_->is_none()) {
+      fout->args_.emplace_back(funct->return_type_);
+    }
+    // Compare now
+    return *fnc == *datatype;
+  }
+  if (arg.is_primitive_or_obj() && *arg.datatype_ == *datatype) { return true; }
+  return false;
 }

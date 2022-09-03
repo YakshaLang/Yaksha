@@ -27,7 +27,11 @@ namespace yaksha {
     M_ENTRY,
     NOT_A_BUILTIN,
     CONSTANT,
-    POINTER
+    POINTER,
+    // Function[In[str],Out]
+    FUNCTION,
+    F_IN,
+    F_OUT
   };
   struct ykdatatype {
     explicit ykdatatype(token *primitive_dt);
@@ -64,6 +68,9 @@ namespace yaksha {
     [[nodiscard]] bool is_const() const;
     [[nodiscard]] bool is_m_entry() const;
     [[nodiscard]] bool is_sm_entry() const;
+    [[nodiscard]] bool is_function() const;
+    [[nodiscard]] bool is_function_input() const;
+    [[nodiscard]] bool is_function_output() const;
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
     token *token_{};
     std::string type_{};
