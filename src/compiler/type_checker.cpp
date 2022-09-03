@@ -195,7 +195,7 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
 }
 void type_checker::visit_variable_expr(variable_expr *obj) {
   auto name = obj->name_->token_;
-  if (builtins::has_builtin(name)) {
+  if (builtins_.has_builtin(name)) {
     auto b = ykobject(dt_pool_);
     b.object_type_ = object_type::BUILTIN_FUNCTION;
     b.string_val_ = name;

@@ -4,7 +4,7 @@
 #include "ast/ast.h"
 #include "ast/codefiles.h"
 #include "ast/environment_stack.h"
-#include "builtins.h"
+#include "builtins/builtins.h"
 #include "compiler/compiler_utils.h"
 #include "compiler/delete_stack_stack.h"
 #include "datatype_compiler.h"

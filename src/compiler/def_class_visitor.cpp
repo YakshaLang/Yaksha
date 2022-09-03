@@ -1,9 +1,10 @@
 // def_class_visitor.cpp
 #include "def_class_visitor.h"
-#include "builtins.h"
+#include "builtins/builtins.h"
 #include "compiler_utils.h"
 using namespace yaksha;
-def_class_visitor::def_class_visitor() = default;
+def_class_visitor::def_class_visitor(builtins *builtins)
+    : builtins_(builtins){};
 def_class_visitor::~def_class_visitor() = default;
 void def_class_visitor::visit_assign_expr(assign_expr *obj) {}
 void def_class_visitor::visit_binary_expr(binary_expr *obj) {}
@@ -18,7 +19,7 @@ void def_class_visitor::visit_break_stmt(break_stmt *obj) {}
 void def_class_visitor::visit_continue_stmt(continue_stmt *obj) {}
 void def_class_visitor::visit_def_stmt(def_stmt *obj) {
   auto name = obj->name_->token_;
-  if (builtins::has_builtin(name)) {
+  if (builtins_->has_builtin(name)) {
     error(obj->name_, "Critical!! Redefinition of builtin function");
     return;
   }
@@ -69,7 +70,7 @@ void def_class_visitor::extract(const std::vector<stmt *> &statements) {
 }
 void def_class_visitor::visit_const_stmt(const_stmt *obj) {
   auto name = obj->name_->token_;
-  if (builtins::has_builtin(name)) {
+  if (builtins_->has_builtin(name)) {
     error(obj->name_, "Critical!! Redefinition of builtin function");
     return;
   }
@@ -131,7 +132,7 @@ void def_class_visitor::visit_class_stmt(class_stmt *obj) {
     error(obj->name_, "@nativedefine must have a valid argument");
     return;
   }
-  if (builtins::has_builtin(name)) {
+  if (builtins_->has_builtin(name)) {
     error(obj->name_, "Critical!! Redefinition of builtin function");
     return;
   }

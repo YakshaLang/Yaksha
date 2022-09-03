@@ -2,6 +2,7 @@
 #ifndef DEF_VISITOR_H
 #define DEF_VISITOR_H
 #include "../ast/ast.h"
+#include "builtins/builtins.h"
 #include <unordered_map>
 namespace yaksha {
   /**
@@ -14,7 +15,7 @@ namespace yaksha {
    * We also extract classes in this phase
    */
   struct def_class_visitor : expr_visitor, stmt_visitor {
-    def_class_visitor();
+    explicit def_class_visitor(builtins *builtins);
     ~def_class_visitor() override;
     void extract(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -63,6 +64,7 @@ private:
     std::unordered_map<std::string, def_stmt *> functions_{};
     std::unordered_map<std::string, class_stmt *> classes_{};
     std::unordered_map<std::string, const_stmt *> global_consts_{};
+    builtins *builtins_;
     void error(token *tok, const std::string &message);
   };
 }// namespace yaksha

@@ -279,8 +279,10 @@ int main(int argc, char *argv[]) {
     parser parser_obj{file_name, block_scanner.tokens_, &dt_pool};
     auto tree = parser_obj.parse();
     if (!tree.empty() && parser_obj.errors_.empty()) {
-      def_class_visitor def_visitor{};
+      auto builtins_obj = new builtins{&dt_pool};
+      def_class_visitor def_visitor{builtins_obj};
       def_visitor.extract(tree);
+      delete builtins_obj;
       // def visitor should extract functions, classes & consts
       if (!def_visitor.errors_.empty()) {
         errors::print_errors(def_visitor.errors_);

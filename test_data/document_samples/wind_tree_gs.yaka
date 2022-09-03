@@ -35,18 +35,8 @@ def branch(x: float, y: float, length: float, angle: float, s: State) -> None:
     branch(next_x, next_y, (length * r1), angle - s.angle + wind * 10.0f, s)
 
 
-def todata(s: State) -> utils.Data:
-    # Convert given State object to a utils.Data(void*)
-    return cast("utils.Data", s)
-
-def tostate(s: utils.Data) -> State:
-    # Note: yy__State name is here because this is the main file
-    # For imports this name is mangled and it is not trivial to guess
-    # So only use this kind of cast if State class is defined in main method
-    return cast("State", s)
-
 def game_step(d: utils.Data) -> None:
-    s: State = tostate(d)
+    s: State = cast("State", d)
     rl.begin_drawing()
     rl.clear_background(rl.color(255, 255, 255, 255))
     branch(s.width / 2.0f, s.height, s.height / 4.0f, 0.0f, s)
@@ -69,7 +59,7 @@ def main() -> int:
     rl.init_window(num.f2i(s.width), num.f2i(s.height), "Fractal Tree in the Wind")
 
     # Avoid while loop for better performance in WASM/WEB builds
-    utils.run_game_loop(60, todata(s))
+    utils.run_game_loop(60, cast("utils.Data", s))
 
     del s
     return 0

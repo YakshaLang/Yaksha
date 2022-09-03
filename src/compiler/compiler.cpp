@@ -75,7 +75,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     std::vector<std::pair<std::string, ykobject>> args{};
     int i = 0;
     for (auto arg : obj->args_) {
-      if (builtins_.should_compile_argument(name, i)) {
+      if (builtins_.should_compile_argument(name, i, arg)) {
         arg->accept(this);
         args.emplace_back(pop());
       } else {
@@ -218,7 +218,7 @@ void compiler::visit_unary_expr(unary_expr *obj) {
 void compiler::visit_variable_expr(variable_expr *obj) {
   // Compiler is visiting a variable, can get data type from scope_
   auto name = prefix(obj->name_->token_, prefix_val_);
-  if (builtins::has_builtin(obj->name_->token_)) {
+  if (builtins_.has_builtin(obj->name_->token_)) {
     auto b = ykobject(dt_pool);
     b.object_type_ = object_type::BUILTIN_FUNCTION;
     push(obj->name_->token_, b);

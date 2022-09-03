@@ -26,12 +26,14 @@ multifile_compiler::compile(const std::string &main_file,
   bool has_errors = false;
   // Extract defs and structs
   for (auto f : cf.files_) {
-    f->data_->dsv_ = new def_class_visitor();
+    auto builtins_obj = new builtins(&cf.pool_);
+    f->data_->dsv_ = new def_class_visitor(builtins_obj);
     f->data_->dsv_->extract(f->data_->parser_->stmts_);
     if (!f->data_->dsv_->errors_.empty()) {
       errors::print_errors(f->data_->dsv_->errors_);
       has_errors = true;
     }
+    delete builtins_obj;
   }
   if (!main_file_info->data_->dsv_->has_function("main")) {
     std::cerr << "Critical !! main() function must be present";
