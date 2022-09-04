@@ -23,10 +23,11 @@ else:
 DEFAULT_compiler_defines = ["UTF8PROC_STATIC"]
 DEFAULT_includes = ["whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h",
                     "yk__console.h", "mpc.h",
-                    "yk__arrayutils.h", "yk__process.h", "yk__graphic_utils.h", "yk__argparse.h", "argparse.h"]
+                    "yk__arrayutils.h", "yk__process.h", "yk__graphic_utils.h", "yk__argparse.h", "argparse.h",
+                    "tinycthread.h"]
 DEFAULT_c_code = ["whereami.c", "yk__system.c", "utf8proc.c", "toml.c", "mpc.c",
                   "yk__console.c", "yk__arrayutils.c", "yk__process.c",
-                  "yk__graphic_utils.c", "argparse.c", "yk__argparse.c"]
+                  "yk__graphic_utils.c", "argparse.c", "yk__argparse.c", "tinycthread.c"]
 DEFAULT_c_code = [paths.join(RUNTIME_DIR, x) for x in DEFAULT_c_code]
 DEFAULT_include_paths = [RUNTIME_DIR, "build"]
 

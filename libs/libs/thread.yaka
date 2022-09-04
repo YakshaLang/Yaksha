@@ -1,0 +1,112 @@
+THRD_ERROR: Const[int] = 0
+# The requested operation failed
+THRD_SUCCESS: Const[int] = 1
+# The requested operation succeeded
+THRD_TIMEOUT: Const[int] = 2
+# The time specified in the call was reached without acquiring the requested resource
+THRD_BUSY: Const[int] = 3
+# The requested operation failed because a tesource requested by a test and return function is already in use
+THRD_NOMEM: Const[int] = 4
+# The requested operation failed because it was unable to allocate memory
+
+MTX_PLAIN: Const[int] = 0
+MTX_TIMED: Const[int] = 1
+MTX_RECURSIVE: Const[int] = 2
+
+@nativedefine("mtx_t")
+@dotaccess
+class Mutex:
+    # Mutex Object
+    pass
+
+@nativedefine("cnd_t")
+@dotaccess
+class Condition:
+    # Condition Object
+    pass
+
+@nativedefine("thrd_t")
+@dotaccess
+class Thread:
+    # Thread Object
+    pass
+
+@nativedefine("void*")
+class Data:
+    pass
+
+@native("mtx_init")
+def mtx_init(mtx: Ptr[Mutex], type: int) -> int:
+    pass
+
+@native("mtx_destroy")
+def mtx_destroy(mtx: Ptr[Mutex]) -> None:
+    pass
+
+@native("mtx_lock")
+def mtx_lock(mtx: Ptr[Mutex]) -> int:
+    pass
+
+@native("mtx_trylock")
+def mtx_trylock(mtx: Ptr[Mutex]) -> int:
+    pass
+
+@native("mtx_unlock")
+def mtx_unlock(mtx: Ptr[Mutex]) -> int:
+    pass
+
+@native("cnd_init")
+def cnd_init(cnd: Ptr[Condition]) -> int:
+    pass
+
+@native("cnd_destroy")
+def cnd_destroy(cnd: Ptr[Condition]) -> None:
+    pass
+
+@native("cnd_signal")
+def cnd_signal(cnd: Ptr[Condition]) -> int:
+    pass
+
+@native("cnd_broadcast")
+def cnd_broadcast(cnd: Ptr[Condition]) -> int:
+    pass
+
+@native("cnd_wait")
+def cnd_wait(cnd: Ptr[Condition], mtx: Ptr[Mutex]) -> int:
+    pass
+
+@native("thrd_create")
+def thrd_create_with_arg(thr: Ptr[Thread], func: Function[In[Data], Out[int]], arg: Data) -> int:
+    pass
+
+@native
+def thrd_create(thr: Ptr[Thread], func: Function[In[Data], Out[int]]) -> int:
+    ccode """return thrd_create(nn__thr, nn__func, NULL)"""
+
+@native("thrd_current")
+def thrd_current() -> Thread:
+    pass
+
+@native("thrd_detach")
+def thrd_detach(thr: Thread) -> int:
+    pass
+
+@native("thrd_equal")
+def thrd_equal(thr1: Thread, thr2: Thread) -> int:
+    pass
+
+@native("thrd_exit")
+def thrd_exit(res: int) -> None:
+    pass
+
+@native("thrd_join")
+def thrd_join_with_result(thr: Thread, res: Ptr[int]) -> int:
+    pass
+
+@native
+def thrd_join(thr: Thread) -> int:
+    ccode """return thrd_join(nn__thr, NULL)"""
+
+@native("thrd_yield")
+def thrd_yield() -> None:
+    pass

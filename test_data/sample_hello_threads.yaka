@@ -1,0 +1,11 @@
+import libs.thread
+
+def my_thread(arg: thread.Data) -> int:
+    println("Hello from Thread")
+    return 0
+
+def main() -> int:
+    t: thread.Thread
+    if thread.thrd_create(getref(t), my_thread) == thread.THRD_SUCCESS:
+        thread.thrd_join(t)
+    return 0
