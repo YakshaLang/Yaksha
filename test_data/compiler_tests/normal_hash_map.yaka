@@ -1,0 +1,17 @@
+def main() -> int:
+    m: Array[MEntry[int,int]]
+    hmnew(m)
+    hmput(m, 1, 42)
+    hmput(m, 100, 10000)
+    print("1 = ")
+    println(hmget(m, 1))
+    print("length of this map is = ")
+    println(len(m))
+    print("1 is located at = ")
+    println(hmgeti(m, 1))
+    print("30 is located at = ")
+    println(hmgeti(m, 30))
+    del m
+
+    println("bye!")
+    return 0

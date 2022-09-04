@@ -734,6 +734,8 @@ void compiler::visit_del_stmt(del_stmt *obj) {
   if (name.second.datatype_->is_an_array()) {
     if (name.second.datatype_->args_[0]->is_sm_entry()) {
       body_ << "yk__shfree(" << name.first << ")";
+    } else if (name.second.datatype_->args_[0]->is_m_entry()) {
+      body_ << "yk__hmfree(" << name.first << ")";
     } else {
       body_ << "yk__arrfree(" << name.first << ")";
     }

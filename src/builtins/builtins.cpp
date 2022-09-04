@@ -230,8 +230,12 @@ struct builtin_len : builtin {
       code << "yk__sdslen(" << args[0].first << ")";
     } else if (args[0].second.datatype_->is_an_array() &&
                args[0].second.datatype_->args_[0]->is_sm_entry()) {
-      // Array[SMEntry[?]]
+      // Array[SMEntry[V]]
       code << "yk__shlen(" << args[0].first << ")";
+    } else if (args[0].second.datatype_->is_an_array() &&
+               args[0].second.datatype_->args_[0]->is_m_entry()) {
+      // Array[MEntry[K,V]]
+      code << "yk__hmlen(" << args[0].first << ")";
     } else {
       code << "yk__arrlen(" << args[0].first << ")";
     }
@@ -604,6 +608,186 @@ struct builtin_cast : builtin {
     return {code.str(), o};
   }
 };
+//
+// ┬ ┬┌┬┐┌┐┌┌─┐┬ ┬
+// ├─┤││││││├┤ │││
+// ┴ ┴┴ ┴┘└┘└─┘└┴┘
+//
+struct builtin_hmnew : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 1) {
+      o.string_val_ = "One argument must be provided for hmnew() builtin";
+    } else if (!args[0].datatype_->is_an_array() ||
+               !args[0].datatype_->args_[0]->is_m_entry()) {
+      o.string_val_ = "Argument to hmnew() must match with Array[MEntry[K,V]]";
+    } else {
+      return o;
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return true;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    return {"", o};
+  }
+};
+//
+// ┬ ┬┌┬┐┌─┐┌─┐┌┬┐
+// ├─┤││││ ┬├┤  │
+// ┴ ┴┴ ┴└─┘└─┘ ┴
+//
+struct builtin_hmget : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 2) {
+      o.string_val_ = "Two arguments must be provided for hmget() builtin";
+    } else if (!args[0].datatype_->is_an_array() ||
+               !args[0].datatype_->args_[0]->is_m_entry()) {
+      o.string_val_ =
+          "First argument to hmget() must match with Array[MEntry[K,V]]";
+    } else if (*(args[0].datatype_->args_[0]->args_[0]) !=
+               *(args[1].datatype_)) {
+      o.string_val_ = "Second argument to hmget() must be a valid key matching "
+                      "with Array[MEntry[K,V]]";
+    } else {
+      return ykobject(args[0].datatype_->args_[0]->args_[1]);
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return true;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    code << "yk__hmget(" << args[0].first << ", " << args[1].first << ")";
+    o = ykobject(args[0].second.datatype_->args_[0]->args_[0]);
+    return {code.str(), o};
+  }
+};
+//
+// ┬ ┬┌┬┐┌─┐┌─┐┌┬┐┬
+// ├─┤││││ ┬├┤  │ │
+// ┴ ┴┴ ┴└─┘└─┘ ┴ ┴
+//
+struct builtin_hmgeti : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 2) {
+      o.string_val_ = "Two arguments must be provided for hmgeti() builtin";
+    } else if (!args[0].datatype_->is_an_array() ||
+               !args[0].datatype_->args_[0]->is_m_entry()) {
+      o.string_val_ =
+          "First argument to hmgeti() must match with Array[MEntry[K,V]]";
+    } else if (*(args[0].datatype_->args_[0]->args_[0]) !=
+               *(args[1].datatype_)) {
+      o.string_val_ = "Second argument to hmget() must be a valid key matching "
+                      "with Array[MEntry[K,V]]";
+    } else {
+      return ykobject(dt_pool->create("int"));
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return true;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    code << "yk__hmgeti(" << args[0].first << ", " << args[1].first << ")";
+    o = ykobject(dt_pool->create("int"));
+    return {code.str(), o};
+  }
+};
+//
+// ┬ ┬┌┬┐┌─┐┬ ┬┌┬┐
+// ├─┤│││├─┘│ │ │
+// ┴ ┴┴ ┴┴  └─┘ ┴
+//
+struct builtin_hmput : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 3) {
+      o.string_val_ = "Three arguments must be provided for hmput() builtin";
+    } else if (!args[0].datatype_->is_an_array() ||
+               !args[0].datatype_->args_[0]->is_m_entry()) {
+      o.string_val_ =
+          "First argument to hmput() must match with Array[MEntry[K,V]]";
+    } else if (*(args[0].datatype_->args_[0]->args_[0]) !=
+               *(args[1].datatype_)) {
+      o.string_val_ = "Second argument to hmput() must be a valid key matching "
+                      "with Array[MEntry[K,V]]";
+    } else if (*(args[0].datatype_->args_[0]->args_[1]) !=
+               *(args[2].datatype_)) {
+      o.string_val_ = "Third argument to hmput() must be a valid value "
+                      "matching with Array[MEntry[K,V]]";
+    } else {
+      return o;
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return true;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    code << "yk__hmput(" << args[0].first << ", " << args[1].first << ", "
+         << args[2].first << ")";
+    return {code.str(), o};
+  }
+};
 //=======================================
 builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"arrput", new builtin_arrput{}});
@@ -619,6 +803,10 @@ builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"shgeti", new builtin_shgeti{}});
   builtins_.insert({"shput", new builtin_shput{}});
   builtins_.insert({"cast", new builtin_cast{}});
+  builtins_.insert({"hmnew", new builtin_hmnew{}});
+  builtins_.insert({"hmget", new builtin_hmget{}});
+  builtins_.insert({"hmgeti", new builtin_hmgeti{}});
+  builtins_.insert({"hmput", new builtin_hmput{}});
 }
 builtins::~builtins() {
   for (auto &i : builtins_) { delete i.second; }
