@@ -37,6 +37,7 @@ public class YakshaCompletionContributor extends CompletionContributor {
             .add("import libs.random")
             .add("import libs.strings.buffer as sbuf")
             .add("import libs.strings.buffer")
+            .add("import libs.thread")
             .add("import libs")
             .add("import libs.c")
             .add("import raylib as rl")
@@ -135,6 +136,9 @@ public class YakshaCompletionContributor extends CompletionContributor {
                         resultSet.addElement(LookupElementBuilder.create("Array").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("SMEntry").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("MEntry").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("Function").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("In").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("Out").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("int").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("i8").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("i16").withIcon(YakshaIcons.DATA_TYPE));

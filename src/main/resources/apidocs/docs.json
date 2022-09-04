@@ -4999,6 +4999,688 @@
     "global_consts": [],
     "imports": []
   },
+  "libs.thread": {
+    "classes": [
+      {
+        "annotations": [
+          {
+            "argument": "cnd_t",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Condition Object",
+        "members": [],
+        "name": "Condition"
+      },
+      {
+        "annotations": [
+          {
+            "argument": "void*",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "members": [],
+        "name": "Data"
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_t",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Mutex Object",
+        "members": [],
+        "name": "Mutex"
+      },
+      {
+        "annotations": [
+          {
+            "argument": "thrd_t",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Thread Object",
+        "members": [],
+        "name": "Thread"
+      }
+    ],
+    "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "cnd_broadcast",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "cnd_broadcast",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cnd_destroy",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "cnd_destroy",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cnd_init",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "cnd_init",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cnd_signal",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "cnd_signal",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cnd_wait",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "cnd_wait",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_destroy",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "mtx_destroy",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_init",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "mtx_init",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "type"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_lock",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "mtx_lock",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_trylock",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "mtx_trylock",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_unlock",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "mtx_unlock",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "thrd_create",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Thread"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "thr"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "Data"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "arguments": [
+                    {
+                      "type": "int"
+                    }
+                  ],
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "func"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "thrd_create",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "thrd_create_with_arg",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Thread"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "thr"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "Data"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "arguments": [
+                    {
+                      "type": "int"
+                    }
+                  ],
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "func"
+          },
+          {
+            "datatype": {
+              "type": "Data"
+            },
+            "name": "arg"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "thrd_current",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "thrd_current",
+        "parameters": [],
+        "return_type": {
+          "type": "Thread"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "thrd_detach",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "thrd_detach",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Thread"
+            },
+            "name": "thr"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "thrd_equal",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "thrd_equal",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Thread"
+            },
+            "name": "thr1"
+          },
+          {
+            "datatype": {
+              "type": "Thread"
+            },
+            "name": "thr2"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "thrd_exit",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "thrd_exit",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "res"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "thrd_join",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Thread"
+            },
+            "name": "thr"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "thrd_join",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "thrd_join_with_result",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Thread"
+            },
+            "name": "thr"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "int"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "res"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "thrd_yield",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "thrd_yield",
+        "parameters": [],
+        "return_type": {
+          "type": "None"
+        }
+      }
+    ],
+    "global_consts": [
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "MTX_PLAIN"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "MTX_RECURSIVE"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "MTX_TIMED"
+      },
+      {
+        "comment": "The requested operation failed because a tesource requested by a test and return function is already in use",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "THRD_BUSY"
+      },
+      {
+        "comment": "The requested operation failed",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "THRD_ERROR"
+      },
+      {
+        "comment": "The requested operation failed because it was unable to allocate memory",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "THRD_NOMEM"
+      },
+      {
+        "comment": "The requested operation succeeded",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "THRD_SUCCESS"
+      },
+      {
+        "comment": "The time specified in the call was reached without acquiring the requested resource",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "THRD_TIMEOUT"
+      }
+    ],
+    "imports": []
+  },
   "raylib": {
     "classes": [
       {
