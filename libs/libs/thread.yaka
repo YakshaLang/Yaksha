@@ -1,29 +1,18 @@
-THRD_ERROR: Const[int] = 0
+import libs.timespec
+
+ERROR: Const[int] = 0
 # The requested operation failed
-THRD_SUCCESS: Const[int] = 1
+SUCCESS: Const[int] = 1
 # The requested operation succeeded
-THRD_TIMEOUT: Const[int] = 2
+TIMEOUT: Const[int] = 2
 # The time specified in the call was reached without acquiring the requested resource
-THRD_BUSY: Const[int] = 3
+BUSY: Const[int] = 3
 # The requested operation failed because a tesource requested by a test and return function is already in use
-THRD_NOMEM: Const[int] = 4
+NOMEM: Const[int] = 4
 # The requested operation failed because it was unable to allocate memory
 
-MTX_PLAIN: Const[int] = 0
-MTX_TIMED: Const[int] = 1
-MTX_RECURSIVE: Const[int] = 2
-
-@nativedefine("mtx_t")
-@dotaccess
-class Mutex:
-    # Mutex Object
-    pass
-
-@nativedefine("cnd_t")
-@dotaccess
-class Condition:
-    # Condition Object
-    pass
+SLEEP_SUCCES: Const[int] = 0
+# Sleep is successful
 
 @nativedefine("thrd_t")
 @dotaccess
@@ -33,80 +22,61 @@ class Thread:
 
 @nativedefine("void*")
 class Data:
-    pass
-
-@native("mtx_init")
-def mtx_init(mtx: Ptr[Mutex], type: int) -> int:
-    pass
-
-@native("mtx_destroy")
-def mtx_destroy(mtx: Ptr[Mutex]) -> None:
-    pass
-
-@native("mtx_lock")
-def mtx_lock(mtx: Ptr[Mutex]) -> int:
-    pass
-
-@native("mtx_trylock")
-def mtx_trylock(mtx: Ptr[Mutex]) -> int:
-    pass
-
-@native("mtx_unlock")
-def mtx_unlock(mtx: Ptr[Mutex]) -> int:
-    pass
-
-@native("cnd_init")
-def cnd_init(cnd: Ptr[Condition]) -> int:
-    pass
-
-@native("cnd_destroy")
-def cnd_destroy(cnd: Ptr[Condition]) -> None:
-    pass
-
-@native("cnd_signal")
-def cnd_signal(cnd: Ptr[Condition]) -> int:
-    pass
-
-@native("cnd_broadcast")
-def cnd_broadcast(cnd: Ptr[Condition]) -> int:
-    pass
-
-@native("cnd_wait")
-def cnd_wait(cnd: Ptr[Condition], mtx: Ptr[Mutex]) -> int:
+    # Any data
     pass
 
 @native("thrd_create")
-def thrd_create_with_arg(thr: Ptr[Thread], func: Function[In[Data], Out[int]], arg: Data) -> int:
+def create_with_data(thr: Ptr[Thread], func: Function[In[Data], Out[int]], data: Data) -> int:
+    # Create a new thread with given reference to Thread and a function that takes Data and return int
     pass
 
 @native
-def thrd_create(thr: Ptr[Thread], func: Function[In[Data], Out[int]]) -> int:
+def create(thr: Ptr[Thread], func: Function[In[Data], Out[int]]) -> int:
+    # Create a thread with None data. Otherwise same as create_with_data()
     ccode """return thrd_create(nn__thr, nn__func, NULL)"""
 
 @native("thrd_current")
-def thrd_current() -> Thread:
+def current() -> Thread:
+    # Get current thread object
     pass
 
 @native("thrd_detach")
-def thrd_detach(thr: Thread) -> int:
+def detach(thr: Thread) -> int:
     pass
 
 @native("thrd_equal")
-def thrd_equal(thr1: Thread, thr2: Thread) -> int:
+def equal(thr1: Thread, thr2: Thread) -> int:
+    # Are these two equal?
     pass
 
 @native("thrd_exit")
-def thrd_exit(res: int) -> None:
+def exit(res: int) -> None:
+    # Exit current thread giving result value
     pass
 
 @native("thrd_join")
-def thrd_join_with_result(thr: Thread, res: Ptr[int]) -> int:
+def join_with_result(thr: Thread, res: Ptr[int]) -> int:
     pass
 
 @native
-def thrd_join(thr: Thread) -> int:
+def join(thr: Thread) -> int:
     ccode """return thrd_join(nn__thr, NULL)"""
 
 @native("thrd_yield")
-def thrd_yield() -> None:
+def yield() -> None:
     pass
+
+@native("thrd_sleep")
+def sleep_ex(duration: Ptr[timespec.TimeSpec], remainder: Ptr[timespec.TimeSpec]) -> int:
+    # remainder - this parameter will hold the remaining time until time_point upon return
+    # SLEEP_SUCCES is returned if successful
+    pass
+
+@native
+def sleep(seconds: int) -> int:
+    # Sleep for given seconds
+    # SLEEP_SUCCES is returned if successful
+    ccode """struct timespec t = {0, };
+    t.tv_sec = nn__seconds;
+    t.tv_nsec = 0;
+    return thrd_sleep(&t, &t)"""

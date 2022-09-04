@@ -1,0 +1,89 @@
+@nativedefine("struct timespec")
+@dotaccess
+class TimeSpec:
+    pass
+
+@native
+def get_utc_now(t: Ptr[TimeSpec]) -> bool:
+    # Load UTC now into given pointer
+    # If successful True is returned
+    ccode """return timespec_get(nn__t, TIME_UTC) == TIME_UTC"""
+
+@native
+def compare_ex(a: Ptr[TimeSpec], b: Ptr[TimeSpec]) -> i64:
+    ccode """
+    if (nn__a->tv_sec != nn__b->tv_sec) {
+        return (nn__a->tv_sec - nn__b->tv_sec);
+    } else if (nn__a->tv_nsec != nn__b->tv_nsec) {
+        return (nn__a->tv_nsec - nn__b->tv_nsec);
+    }
+    return 0"""
+
+def greater(a: TimeSpec, b: TimeSpec) -> bool:
+    # is a > b ?
+    return compare_ex(getref(a), getref(b)) > cast("i64", 0)
+
+def lessser(a: TimeSpec, b: TimeSpec) -> bool:
+    # is a < b ?
+    return compare_ex(getref(a), getref(b)) < cast("i64", 0)
+
+def equal(a: TimeSpec, b: TimeSpec) -> bool:
+    # is a == b
+    return compare_ex(getref(a), getref(b)) == cast("i64", 0)
+
+@native
+def add_nanoseconds(a: Ptr[TimeSpec], n: i64) -> None:
+    ccode """
+    #define NSECS_PER_SECOND 1000000000
+    nn__a->tv_sec += nn__n / NSECS_PER_SECOND;
+    nn__a->tv_nsec += nn__n % NSECS_PER_SECOND;
+    while (nn__a->tv_nsec >= NSECS_PER_SECOND) {
+        nn__a->tv_sec++;
+        nn__a->tv_nsec -= NSECS_PER_SECOND;
+    }
+    #undef NSECS_PER_SECOND
+    return"""
+
+@native
+def add_seconds(a: Ptr[TimeSpec], n: int) -> None:
+    ccode """nn__a->tv_sec += nn__n"""
+
+@native
+def create() -> TimeSpec:
+    ccode """struct timespec t = {0, };
+    t.tv_sec = 0;
+    t.tv_nsec = 0;
+    return t"""
+
+@native
+def create_ex(seconds: int) -> TimeSpec:
+    ccode """struct timespec t = {0, };
+    t.tv_sec = nn__seconds;
+    t.tv_nsec = 0;
+    return t"""
+
+def now() -> TimeSpec:
+    t: TimeSpec = create()
+    get_utc_now(getref(t))
+    return t
+
+def in_future(seconds: int) -> TimeSpec:
+    t: TimeSpec = create()
+    get_utc_now(getref(t))
+    add_seconds(getref(t), seconds)
+    return t
+
+def in_future_ex(seconds: int, nanoseconds: i64) -> TimeSpec:
+    t: TimeSpec = create()
+    get_utc_now(getref(t))
+    add_seconds(getref(t), seconds)
+    add_nanoseconds(getref(t), nanoseconds)
+    return t
+
+@native
+def get_seconds(t: TimeSpec) -> int:
+    ccode """return nn__t.tv_sec"""
+
+@native
+def get_nanoseconds(t: TimeSpec) -> i64:
+    ccode """return nn__t.tv_nsec"""

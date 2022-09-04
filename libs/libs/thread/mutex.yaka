@@ -1,0 +1,29 @@
+PLAIN: Const[int] = 0
+TIMED: Const[int] = 1
+RECURSIVE: Const[int] = 2
+
+@nativedefine("mtx_t")
+@dotaccess
+class Mutex:
+    # Mutex Object
+    pass
+
+@native("mtx_init")
+def init(mtx: Ptr[Mutex], type: int) -> int:
+    pass
+
+@native("mtx_destroy")
+def destroy(mtx: Ptr[Mutex]) -> None:
+    pass
+
+@native("mtx_lock")
+def lock(mtx: Ptr[Mutex]) -> int:
+    pass
+
+@native("mtx_trylock")
+def trylock(mtx: Ptr[Mutex]) -> int:
+    pass
+
+@native("mtx_unlock")
+def unlock(mtx: Ptr[Mutex]) -> int:
+    pass

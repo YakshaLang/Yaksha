@@ -47,3 +47,5 @@ test_data/document_samples/gui_window
 /hammer/build/hammer-x86_64-macos-gnu
 /hammer/build/program_code.c
 /bin/hammer.bin/yaksha*
+/test_data/sample_hello_threads.c
+/test_data/sample_hello_threads

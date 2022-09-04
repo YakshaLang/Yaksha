@@ -1,0 +1,28 @@
+import libs.thread
+
+@nativedefine("tss_t")
+@dotaccess
+class Key:
+    # Key to access/create thread specific storage
+    # Declare a variable and use with getref() when calling create()
+    pass
+
+@native("tss_create")
+def create_with_deleter(key: Ptr[Key], deleter: Function[In[thread.Data], Out]) -> int:
+    pass
+
+@native
+def create(key: Ptr[Key]) -> int:
+    ccode """return tss_create(nn__key, NULL)"""
+
+@native("tss_delete")
+def del_data(key: Key) -> None:
+    pass
+
+@native("tss_get")
+def get(key: Key) -> thread.Data:
+    pass
+
+@native("tss_set")
+def set(key: Key, data: thread.Data) -> int:
+    pass

@@ -1,0 +1,32 @@
+import libs.thread.mutex
+import libs.timespec
+
+@nativedefine("cnd_t")
+@dotaccess
+class Condition:
+    # Condition Object
+    pass
+
+@native("cnd_init")
+def init(cnd: Ptr[Condition]) -> int:
+    pass
+
+@native("cnd_destroy")
+def destroy(cnd: Ptr[Condition]) -> None:
+    pass
+
+@native("cnd_signal")
+def signal(cnd: Ptr[Condition]) -> int:
+    pass
+
+@native("cnd_broadcast")
+def broadcast(cnd: Ptr[Condition]) -> int:
+    pass
+
+@native("cnd_wait")
+def wait(cnd: Ptr[Condition], mtx: Ptr[mutex.Mutex]) -> int:
+    pass
+
+@native("cnd_timedwait")
+def timed_wait(cnd: Ptr[Condition], mtx: Ptr[mutex.Mutex], ts: Ptr[timespec.TimeSpec]) -> int:
+    pass
