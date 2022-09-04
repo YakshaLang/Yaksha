@@ -492,6 +492,9 @@ void compiler::visit_let_stmt(let_stmt *obj) {
       write_indent(body_);
       body_ << convert_dt(obj->data_type_) << " " << name;
       body_ << " = " << exp.first;
+    } else {
+      write_indent(body_);
+      body_ << convert_dt(obj->data_type_) << " " << name;
     }
   }
   write_end_statement(body_);
