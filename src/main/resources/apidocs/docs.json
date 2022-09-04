@@ -5004,35 +5004,13 @@
       {
         "annotations": [
           {
-            "argument": "cnd_t",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "Condition Object",
-        "members": [],
-        "name": "Condition"
-      },
-      {
-        "annotations": [
-          {
             "argument": "void*",
             "name": "@nativedefine"
           }
         ],
-        "comment": "",
+        "comment": "Any data",
         "members": [],
         "name": "Data"
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mtx_t",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "Mutex Object",
-        "members": [],
-        "name": "Mutex"
       },
       {
         "annotations": [
@@ -5050,289 +5028,12 @@
       {
         "annotations": [
           {
-            "argument": "cnd_broadcast",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "cnd_broadcast",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Condition"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "cnd"
-          }
-        ],
-        "return_type": {
-          "type": "int"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "cnd_destroy",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "cnd_destroy",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Condition"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "cnd"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "cnd_init",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "cnd_init",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Condition"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "cnd"
-          }
-        ],
-        "return_type": {
-          "type": "int"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "cnd_signal",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "cnd_signal",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Condition"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "cnd"
-          }
-        ],
-        "return_type": {
-          "type": "int"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "cnd_wait",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "cnd_wait",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Condition"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "cnd"
-          },
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Mutex"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "mtx"
-          }
-        ],
-        "return_type": {
-          "type": "int"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mtx_destroy",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "mtx_destroy",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Mutex"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "mtx"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mtx_init",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "mtx_init",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Mutex"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "mtx"
-          },
-          {
-            "datatype": {
-              "type": "int"
-            },
-            "name": "type"
-          }
-        ],
-        "return_type": {
-          "type": "int"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mtx_lock",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "mtx_lock",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Mutex"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "mtx"
-          }
-        ],
-        "return_type": {
-          "type": "int"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mtx_trylock",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "mtx_trylock",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Mutex"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "mtx"
-          }
-        ],
-        "return_type": {
-          "type": "int"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mtx_unlock",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "mtx_unlock",
-        "parameters": [
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Mutex"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "mtx"
-          }
-        ],
-        "return_type": {
-          "type": "int"
-        }
-      },
-      {
-        "annotations": [
-          {
             "argument": "",
             "name": "@native"
           }
         ],
-        "comment": "",
-        "name": "thrd_create",
+        "comment": "Create a thread with None data. Otherwise same as create_with_data()",
+        "name": "create",
         "parameters": [
           {
             "datatype": {
@@ -5381,8 +5082,8 @@
             "name": "@native"
           }
         ],
-        "comment": "",
-        "name": "thrd_create_with_arg",
+        "comment": "Create a new thread with given reference to Thread and a function that takes Data and return int",
+        "name": "create_with_data",
         "parameters": [
           {
             "datatype": {
@@ -5423,7 +5124,7 @@
             "datatype": {
               "type": "Data"
             },
-            "name": "arg"
+            "name": "data"
           }
         ],
         "return_type": {
@@ -5437,8 +5138,8 @@
             "name": "@native"
           }
         ],
-        "comment": "",
-        "name": "thrd_current",
+        "comment": "Get current thread object",
+        "name": "current",
         "parameters": [],
         "return_type": {
           "type": "Thread"
@@ -5452,7 +5153,7 @@
           }
         ],
         "comment": "",
-        "name": "thrd_detach",
+        "name": "detach",
         "parameters": [
           {
             "datatype": {
@@ -5472,8 +5173,8 @@
             "name": "@native"
           }
         ],
-        "comment": "",
-        "name": "thrd_equal",
+        "comment": "Are these two equal?",
+        "name": "equal",
         "parameters": [
           {
             "datatype": {
@@ -5499,8 +5200,8 @@
             "name": "@native"
           }
         ],
-        "comment": "",
-        "name": "thrd_exit",
+        "comment": "Exit current thread giving result value",
+        "name": "exit",
         "parameters": [
           {
             "datatype": {
@@ -5521,7 +5222,7 @@
           }
         ],
         "comment": "",
-        "name": "thrd_join",
+        "name": "join",
         "parameters": [
           {
             "datatype": {
@@ -5542,7 +5243,7 @@
           }
         ],
         "comment": "",
-        "name": "thrd_join_with_result",
+        "name": "join_with_result",
         "parameters": [
           {
             "datatype": {
@@ -5569,15 +5270,538 @@
       {
         "annotations": [
           {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Sleep for given seconds\nSLEEP_SUCCES is returned if successful",
+        "name": "sleep",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "seconds"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "thrd_sleep",
+            "name": "@native"
+          }
+        ],
+        "comment": "remainder - this parameter will hold the remaining time until time_point upon return\nSLEEP_SUCCES is returned if successful",
+        "name": "sleep_ex",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.timespec",
+                  "type": "TimeSpec"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "duration"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.timespec",
+                  "type": "TimeSpec"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "remainder"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
             "argument": "thrd_yield",
             "name": "@native"
           }
         ],
         "comment": "",
-        "name": "thrd_yield",
+        "name": "yield",
         "parameters": [],
         "return_type": {
           "type": "None"
+        }
+      }
+    ],
+    "global_consts": [
+      {
+        "comment": "The requested operation failed because a tesource requested by a test and return function is already in use",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BUSY"
+      },
+      {
+        "comment": "The requested operation failed",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "ERROR"
+      },
+      {
+        "comment": "The requested operation failed because it was unable to allocate memory",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "NOMEM"
+      },
+      {
+        "comment": "Sleep is successful",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "SLEEP_SUCCES"
+      },
+      {
+        "comment": "The requested operation succeeded",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "SUCCESS"
+      },
+      {
+        "comment": "The time specified in the call was reached without acquiring the requested resource",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TIMEOUT"
+      }
+    ],
+    "imports": [
+      {
+        "alias": "timespec",
+        "path": [
+          "libs",
+          "timespec"
+        ]
+      }
+    ]
+  },
+  "libs.thread.condition": {
+    "classes": [
+      {
+        "annotations": [
+          {
+            "argument": "cnd_t",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Condition Object",
+        "members": [],
+        "name": "Condition"
+      }
+    ],
+    "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "cnd_broadcast",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "broadcast",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cnd_destroy",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "destroy",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cnd_init",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "init",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cnd_signal",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "signal",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cnd_timedwait",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "timed_wait",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.thread.mutex",
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.timespec",
+                  "type": "TimeSpec"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "ts"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cnd_wait",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "wait",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Condition"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "cnd"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.thread.mutex",
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      }
+    ],
+    "global_consts": [],
+    "imports": [
+      {
+        "alias": "mutex",
+        "path": [
+          "libs",
+          "thread",
+          "mutex"
+        ]
+      },
+      {
+        "alias": "timespec",
+        "path": [
+          "libs",
+          "timespec"
+        ]
+      }
+    ]
+  },
+  "libs.thread.mutex": {
+    "classes": [
+      {
+        "annotations": [
+          {
+            "argument": "mtx_t",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Mutex Object",
+        "members": [],
+        "name": "Mutex"
+      }
+    ],
+    "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "mtx_destroy",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "destroy",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_init",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "init",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "type"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_lock",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "lock",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_trylock",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "trylock",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "mtx_unlock",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "unlock",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mutex"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mtx"
+          }
+        ],
+        "return_type": {
+          "type": "int"
         }
       }
     ],
@@ -5592,7 +5816,7 @@
           ],
           "type": "Const"
         },
-        "name": "MTX_PLAIN"
+        "name": "PLAIN"
       },
       {
         "comment": "",
@@ -5604,7 +5828,7 @@
           ],
           "type": "Const"
         },
-        "name": "MTX_RECURSIVE"
+        "name": "RECURSIVE"
       },
       {
         "comment": "",
@@ -5616,69 +5840,515 @@
           ],
           "type": "Const"
         },
-        "name": "MTX_TIMED"
-      },
-      {
-        "comment": "The requested operation failed because a tesource requested by a test and return function is already in use",
-        "datatype": {
-          "arguments": [
-            {
-              "type": "int"
-            }
-          ],
-          "type": "Const"
-        },
-        "name": "THRD_BUSY"
-      },
-      {
-        "comment": "The requested operation failed",
-        "datatype": {
-          "arguments": [
-            {
-              "type": "int"
-            }
-          ],
-          "type": "Const"
-        },
-        "name": "THRD_ERROR"
-      },
-      {
-        "comment": "The requested operation failed because it was unable to allocate memory",
-        "datatype": {
-          "arguments": [
-            {
-              "type": "int"
-            }
-          ],
-          "type": "Const"
-        },
-        "name": "THRD_NOMEM"
-      },
-      {
-        "comment": "The requested operation succeeded",
-        "datatype": {
-          "arguments": [
-            {
-              "type": "int"
-            }
-          ],
-          "type": "Const"
-        },
-        "name": "THRD_SUCCESS"
-      },
-      {
-        "comment": "The time specified in the call was reached without acquiring the requested resource",
-        "datatype": {
-          "arguments": [
-            {
-              "type": "int"
-            }
-          ],
-          "type": "Const"
-        },
-        "name": "THRD_TIMEOUT"
+        "name": "TIMED"
       }
     ],
+    "imports": []
+  },
+  "libs.thread.tss": {
+    "classes": [
+      {
+        "annotations": [
+          {
+            "argument": "tss_t",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Key to access/create thread specific storage\nDeclare a variable and use with getref() when calling create()",
+        "members": [],
+        "name": "Key"
+      }
+    ],
+    "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "create",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Key"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "key"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "tss_create",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "create_with_deleter",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Key"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "key"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "module": "libs.thread",
+                      "type": "Data"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "deleter"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "tss_delete",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "del_data",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Key"
+            },
+            "name": "key"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "tss_get",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "get",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Key"
+            },
+            "name": "key"
+          }
+        ],
+        "return_type": {
+          "module": "libs.thread",
+          "type": "Data"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "tss_set",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "set",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Key"
+            },
+            "name": "key"
+          },
+          {
+            "datatype": {
+              "module": "libs.thread",
+              "type": "Data"
+            },
+            "name": "data"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      }
+    ],
+    "global_consts": [],
+    "imports": [
+      {
+        "alias": "thread",
+        "path": [
+          "libs",
+          "thread"
+        ]
+      }
+    ]
+  },
+  "libs.timespec": {
+    "classes": [
+      {
+        "annotations": [
+          {
+            "argument": "struct timespec",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "members": [],
+        "name": "TimeSpec"
+      }
+    ],
+    "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "add_nanoseconds",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "TimeSpec"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "i64"
+            },
+            "name": "n"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "add_seconds",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "TimeSpec"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "n"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "compare_ex",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "TimeSpec"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "TimeSpec"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "b"
+          }
+        ],
+        "return_type": {
+          "type": "i64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "create",
+        "parameters": [],
+        "return_type": {
+          "type": "TimeSpec"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "create_ex",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "seconds"
+          }
+        ],
+        "return_type": {
+          "type": "TimeSpec"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "is a == b",
+        "name": "equal",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "TimeSpec"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "TimeSpec"
+            },
+            "name": "b"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "get_nanoseconds",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "TimeSpec"
+            },
+            "name": "t"
+          }
+        ],
+        "return_type": {
+          "type": "i64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "get_seconds",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "TimeSpec"
+            },
+            "name": "t"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Load UTC now into given pointer\nIf successful True is returned",
+        "name": "get_utc_now",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "TimeSpec"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "t"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "is a > b ?",
+        "name": "greater",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "TimeSpec"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "TimeSpec"
+            },
+            "name": "b"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "in_future",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "seconds"
+          }
+        ],
+        "return_type": {
+          "type": "TimeSpec"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "in_future_ex",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "seconds"
+          },
+          {
+            "datatype": {
+              "type": "i64"
+            },
+            "name": "nanoseconds"
+          }
+        ],
+        "return_type": {
+          "type": "TimeSpec"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "is a < b ?",
+        "name": "lessser",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "TimeSpec"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "TimeSpec"
+            },
+            "name": "b"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "now",
+        "parameters": [],
+        "return_type": {
+          "type": "TimeSpec"
+        }
+      }
+    ],
+    "global_consts": [],
     "imports": []
   },
   "raylib": {
