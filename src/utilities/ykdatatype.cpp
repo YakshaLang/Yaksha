@@ -56,6 +56,8 @@ void ykdatatype::find_builtin_or_primitive() {
     builtin_type_ = ykbuiltin::F_IN;
   } else if (token_->token_ == "Out") {
     builtin_type_ = ykbuiltin::F_OUT;
+  } else if (token_->token_ == "SortArg") {
+    builtin_type_ = ykbuiltin::SORT_ARG;
   }
 }
 ykdatatype::~ykdatatype() { delete (token_); }
@@ -182,4 +184,7 @@ bool ykdatatype::is_function_input() const {
 }
 bool ykdatatype::is_function_output() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::F_OUT;
+}
+bool ykdatatype::is_sort_arg() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::SORT_ARG;
 }

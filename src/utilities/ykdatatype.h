@@ -31,7 +31,8 @@ namespace yaksha {
     // Function[In[str],Out]
     FUNCTION,
     F_IN,
-    F_OUT
+    F_OUT,
+    SORT_ARG
   };
   struct ykdatatype {
     explicit ykdatatype(token *primitive_dt);
@@ -71,6 +72,7 @@ namespace yaksha {
     [[nodiscard]] bool is_function() const;
     [[nodiscard]] bool is_function_input() const;
     [[nodiscard]] bool is_function_output() const;
+    [[nodiscard]] bool is_sort_arg() const;
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
     token *token_{};
     std::string type_{};

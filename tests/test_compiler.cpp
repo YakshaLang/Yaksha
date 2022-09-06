@@ -129,3 +129,7 @@ TEST_CASE("compiler: Test automatic generation for normal hashes!") {
   TEST_FILE("../test_data/compiler_tests/normal_hash_map.yaka", "normal_hash_map.yaka",
             "../test_data/compiler_tests/normal_hash_map.tokens");
 }
+TEST_CASE("compiler: Test sorting functionality using qsort() !") {
+  TEST_FILE("../test_data/compiler_tests/sort_test.yaka", "sort_test.yaka",
+            "../test_data/compiler_tests/sort_test.tokens");
+}

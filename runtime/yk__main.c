@@ -1,6 +1,7 @@
 #define YK__SDS_IMPLEMENTATION
 #define YK__BHALIB_IMPLEMENTATION
 #define YK__STB_DS_IMPLEMENTATION
+#define YK__SORT_IMPLEMENTATION
 #include "yk__system.h"
 #if defined(_WIN32) || defined(_WIN64)
 #include <fcntl.h>

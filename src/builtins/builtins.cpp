@@ -788,6 +788,70 @@ struct builtin_hmput : builtin {
     return {code.str(), o};
   }
 };
+//
+// ┌─┐ ┌─┐┌─┐┬─┐┌┬┐
+// │─┼┐└─┐│ │├┬┘ │
+// └─┘└└─┘└─┘┴└─ ┴
+//
+struct builtin_qsort : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 2) {
+      o.string_val_ = "Two arguments must be provided for sort() builtin";
+    } else if (!args[0].datatype_->is_an_array()) {
+      o.string_val_ = "First argument to sort() must be an Array[T]";
+    } else if (!(args[1].object_type_ == yaksha::object_type::FUNCTION ||
+                 args[1].object_type_ == yaksha::object_type::MODULE_FUNCTION ||
+                 args[1].datatype_->is_function())) {
+      o.string_val_ = "Second argument to sort() must be a Function";
+    } else if (args[1].datatype_->is_function()) {
+      ykdatatype *function_dt = args[1].datatype_;
+      ykdatatype *function_input = function_dt->args_[0];
+      ykdatatype *function_out = function_dt->args_[1];
+      if (!function_out->args_[0]->is_i32()) {
+        o.string_val_ = "Comparison function must return an int";
+      } else if (function_input->args_.size() != 2) {
+        o.string_val_ = "Comparison function must compare two elements";
+      } else if (function_input->args_.size() == 2 &&
+                 !(function_input->args_[0]->is_sort_arg() &&
+                   function_input->args_[1]->is_sort_arg())) {
+        o.string_val_ = "Comparison function must compare two SortArg elements";
+      } else {
+        return ykobject(args[0].datatype_->args_[0]);
+      }
+    } else {
+      // TODO Module Function or Function
+      // TODO Not a Function variable this is a function reference
+      // TODO -> ask compiler.h/cpp to validate this for me
+      return ykobject(args[0].datatype_->args_[0]);
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return true;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath) override {
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    o = ykobject(args[0].second.datatype_->args_[0]);
+    code << "yk__quicksort(" << args[0].first << ",sizeof("
+         << dt_compiler->convert_dt(args[0].second.datatype_->args_[0]) << ")"
+         << ",yk__arrlenu(" << args[0].first << ")," << args[1].first << ")";
+    return {code.str(), o};
+  }
+};
 //=======================================
 builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"arrput", new builtin_arrput{}});
@@ -807,6 +871,7 @@ builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"hmget", new builtin_hmget{}});
   builtins_.insert({"hmgeti", new builtin_hmgeti{}});
   builtins_.insert({"hmput", new builtin_hmput{}});
+  builtins_.insert({"qsort", new builtin_qsort{}});
 }
 builtins::~builtins() {
   for (auto &i : builtins_) { delete i.second; }

@@ -77,7 +77,13 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     for (auto arg : obj->args_) {
       if (builtins_.should_compile_argument(name, i, arg)) {
         arg->accept(this);
-        args.emplace_back(pop());
+        auto val = pop();
+        if (val.second.is_a_function()) {
+          args.emplace_back(std::pair<std::string, ykobject>{
+              prefix_function_arg(val), val.second});
+        } else {
+          args.emplace_back(val);
+        }
       } else {
         args.emplace_back(
             std::pair<std::string, ykobject>{"", ykobject(dt_pool)});
@@ -149,15 +155,8 @@ void compiler::compile_function_call(fncall_expr *obj, const std::string &name,
         arg_val.second.datatype_->is_str()) {
       code << "yk__sdsdup(" << arg_val.first << ")";
     } else if (arg_val.second.is_a_function()) {
-      if (arg_val.second.object_type_ == object_type::MODULE_FUNCTION) {
-        auto module_file = arg_val.second.module_file_;
-        auto module_fn = arg_val.second.string_val_;
-        auto module_info = cf_->get(module_file);
-        auto module_prefix = module_info->prefix_;
-        code << prefix(module_fn, module_prefix);
-      } else {
-        code << prefix(arg_val.first, prefix_val_);
-      }
+      code << prefix_function_arg(arg_val);
+      ;
     } else {
       code << arg_val.first;
     }
@@ -172,6 +171,18 @@ void compiler::compile_function_call(fncall_expr *obj, const std::string &name,
     push("(" + temp_name + ")", ykobject(return_type));
   } else {
     push(code.str(), ykobject(return_type));
+  }
+}
+std::string
+compiler::prefix_function_arg(const std::pair<std::string, ykobject> &arg_val) {
+  if (arg_val.second.object_type_ == object_type::MODULE_FUNCTION) {
+    auto module_file = arg_val.second.module_file_;
+    auto module_fn = arg_val.second.string_val_;
+    auto module_info = cf_->get(module_file);
+    auto module_prefix = module_info->prefix_;
+    return prefix(module_fn, module_prefix);
+  } else {
+    return prefix(arg_val.first, prefix_val_);
   }
 }
 void compiler::visit_grouping_expr(grouping_expr *obj) {
@@ -615,6 +626,8 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "float";
   } else if (basic_dt->is_f64()) {
     return "double";
+  } else if (basic_dt->is_sort_arg()) {
+    return "const void*";
   } else if (basic_dt->is_sm_entry() || basic_dt->is_m_entry()) {
     // Handle SMEntry and Entry
     return esc_->compile(basic_dt, this);

@@ -1,0 +1,42 @@
+def cmp_int(a: SortArg, b: SortArg) -> int:
+    # Compare two given integers
+    val_a: int = unref(cast("Ptr[int]", a))
+    val_b: int = unref(cast("Ptr[int]", b))
+    return val_b - val_a
+
+def main() -> int:
+    x: Array[int]
+    arrput(x, 5)
+    arrput(x, 3)
+    arrput(x, 1)
+    arrput(x, 4)
+    arrput(x, 4)
+    arrput(x, 4)
+    arrput(x, 4)
+    arrput(x, 2)
+    arrput(x, 50)
+    arrput(x, 30)
+    arrput(x, 10)
+    arrput(x, 40)
+    arrput(x, -1)
+    arrput(x, 20)
+    println("before:")
+    print("len=")
+    println(len(x))
+    pos: int = 0
+    while pos < len(x):
+        print(x[pos])
+        print(" ")
+        pos = pos + 1
+    println("")
+    qsort(x, cmp_int)
+    println("after:")
+    pos = 0
+    print("len=")
+    println(len(x))
+    while pos < len(x):
+        print(x[pos])
+        print(" ")
+        pos = pos + 1
+    println("")
+    return 0

@@ -126,6 +126,8 @@ private:
                                ykdatatype *return_type);
     void compile_obj_creation(const std::string &name, std::stringstream &code,
                               ykdatatype *return_type);
+    std::string
+    prefix_function_arg(const std::pair<std::string, ykobject> &arg_val);
   };
 }// namespace yaksha
 #endif
