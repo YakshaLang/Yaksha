@@ -627,7 +627,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   } else if (basic_dt->is_f64()) {
     return "double";
   } else if (basic_dt->is_any_arg()) {
-    return "const void*";
+    return "void*";
   } else if (basic_dt->is_sm_entry() || basic_dt->is_m_entry()) {
     // Handle SMEntry and Entry
     return esc_->compile(basic_dt, this);

@@ -5,6 +5,7 @@
 #include "builtins/builtin.h"
 #include "compiler/datatype_compiler.h"
 #include "compiler/datatype_parser.h"
+#include "compiler/slot_matcher.h"
 #include "utilities/ykobject.h"
 #include <string>
 #include <vector>
@@ -33,7 +34,7 @@ namespace yaksha {
     verify(const std::string &name, const std::vector<ykobject> &args,
            const std::vector<expr *> &arg_expressions,
            const std::unordered_map<std::string, import_stmt *> &import_aliases,
-           const std::string &filepath);
+           const std::string &filepath, slot_matcher *dt_slot_matcher);
     /**
      * Should we compile given argument + arg index
      * This is used to handle <code>cast("c.AnyPtr", state)</code>

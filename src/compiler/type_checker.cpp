@@ -122,7 +122,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       arguments.push_back(pop());
     }
     auto result = builtins_.verify(name.string_val_, arguments, obj->args_,
-                                   import_stmts_alias_, filepath_);
+                                   import_stmts_alias_, filepath_, this);
     // Error when calling builtin, if so return None as data type
     if (result.object_type_ == object_type::RUNTIME_ERROR) {
       error(obj->paren_token_, result.string_val_);

@@ -7,11 +7,13 @@
 #include "builtins/builtins.h"
 #include "compiler/def_class_visitor.h"
 #include "utilities/ykobject.h"
+#include "compiler/slot_matcher.h"
 namespace yaksha {
-  struct type_checker : expr_visitor, stmt_visitor {
+  struct type_checker : expr_visitor, stmt_visitor, slot_matcher {
     explicit type_checker(std::string filepath, codefiles *cf,
                           def_class_visitor *dcv, ykdt_pool *pool);
     ~type_checker() override;
+    bool slot_match(const ykobject &arg, ykdatatype *datatype) override;
     void check(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
     void visit_binary_expr(binary_expr *obj) override;
@@ -60,10 +62,6 @@ namespace yaksha {
 
 private:
     ykobject pop();
-    /**
-     * Can we pass argument to given slot?
-     */
-    bool slot_match(const ykobject &arg, ykdatatype *datatype);
     void push(const ykobject &data_type);
     void error(token *tok, const std::string &message);
     void error(const std::string &message);

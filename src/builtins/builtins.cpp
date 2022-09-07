@@ -16,7 +16,7 @@ struct builtin_arrput : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for arrput() builtin";
@@ -62,7 +62,7 @@ struct builtin_arrpop : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for arrpop() builtin";
@@ -103,7 +103,7 @@ struct builtin_print : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for print() builtin";
@@ -152,7 +152,7 @@ struct builtin_println : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for println() builtin";
@@ -201,7 +201,7 @@ struct builtin_len : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for len() builtin";
@@ -254,7 +254,7 @@ struct builtin_charat : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for charat() builtin";
@@ -296,7 +296,7 @@ struct builtin_getref : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for getref() builtin";
@@ -343,7 +343,7 @@ struct builtin_unref : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for unref() builtin";
@@ -383,7 +383,7 @@ struct builtin_shnew : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for shnew() builtin";
@@ -423,7 +423,7 @@ struct builtin_shget : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for shget() builtin";
@@ -467,7 +467,7 @@ struct builtin_shgeti : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for shgeti() builtin";
@@ -511,7 +511,7 @@ struct builtin_shput : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "Three arguments must be provided for shput() builtin";
@@ -558,7 +558,7 @@ struct builtin_cast : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for cast() builtin";
@@ -619,7 +619,7 @@ struct builtin_hmnew : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for hmnew() builtin";
@@ -657,7 +657,7 @@ struct builtin_hmget : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for hmget() builtin";
@@ -703,7 +703,7 @@ struct builtin_hmgeti : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for hmgeti() builtin";
@@ -749,7 +749,7 @@ struct builtin_hmput : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "Three arguments must be provided for hmput() builtin";
@@ -799,7 +799,7 @@ struct builtin_qsort : builtin {
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath) override {
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for sort() builtin";
@@ -809,26 +809,26 @@ struct builtin_qsort : builtin {
                  args[1].object_type_ == yaksha::object_type::MODULE_FUNCTION ||
                  args[1].datatype_->is_function())) {
       o.string_val_ = "Second argument to sort() must be a Function";
-    } else if (args[1].datatype_->is_function()) {
-      ykdatatype *function_dt = args[1].datatype_;
-      ykdatatype *function_input = function_dt->args_[0];
-      ykdatatype *function_out = function_dt->args_[1];
-      if (!function_out->args_[0]->is_i32()) {
-        o.string_val_ = "Comparison function must return an int";
-      } else if (function_input->args_.size() != 2) {
-        o.string_val_ = "Comparison function must compare two elements";
-      } else if (function_input->args_.size() == 2 &&
-                 !(function_input->args_[0]->is_any_arg() &&
-                   function_input->args_[1]->is_any_arg())) {
-        o.string_val_ = "Comparison function must compare two SortArg elements";
-      } else {
-        return ykobject(args[0].datatype_->args_[0]);
-      }
     } else {
-      // TODO Module Function or Function
-      // TODO Not a Function variable this is a function reference
-      // TODO -> ask compiler.h/cpp to validate this for me
-      return ykobject(args[0].datatype_->args_[0]);
+      auto func = dt_pool->create("Function");
+      auto func_in = dt_pool->create("In");
+      auto func_out = dt_pool->create("Out");
+      func->args_.emplace_back(func_in);
+      func->args_.emplace_back(func_out);
+      func_out->args_.emplace_back(dt_pool->create("int"));
+      auto const_arg1 = dt_pool->create("Const");
+      const_arg1->args_.emplace_back(dt_pool->create("AnyArg"));
+      auto const_arg2 = dt_pool->create("Const");
+      const_arg2->args_.emplace_back(dt_pool->create("AnyArg"));
+      func_in->args_.emplace_back(const_arg1);
+      func_in->args_.emplace_back(const_arg2);
+      // func -> Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]
+      if (dt_slot_matcher->slot_match(args[1], func)) {
+        return ykobject(dt_pool->create("int"));
+      } else {
+        o.string_val_ = "Comparison must match with "
+                        "Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]";
+      }
     }
     o.object_type_ = object_type::RUNTIME_ERROR;
     return o;
@@ -884,9 +884,9 @@ ykobject builtins::verify(
     const std::string &name, const std::vector<ykobject> &args,
     const std::vector<expr *> &arg_expressions,
     const std::unordered_map<std::string, import_stmt *> &import_aliases,
-    const std::string &filepath) {
+    const std::string &filepath, slot_matcher *dt_slot_matcher) {
   return builtins_[name]->verify(args, arg_expressions, this, dt_pool_,
-                                 import_aliases, filepath);
+                                 import_aliases, filepath, dt_slot_matcher);
 }
 std::pair<std::string, ykobject> builtins::compile(
     const std::string &name,

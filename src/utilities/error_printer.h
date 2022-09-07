@@ -7,6 +7,11 @@
 #include <ostream>
 #include <vector>
 namespace yaksha::errors {
+#ifdef TESTING
+  // Note: this is defined in error_printer.cpp
+  // This is used for type checker testing
+  extern std::vector<std::string> error_capture;
+#endif
   /**
    * Print a problematic token
    * @param output where to write the output to
@@ -29,6 +34,9 @@ namespace yaksha::errors {
    */
   static inline void print_error(std::ostream &output,
                                  const parsing_error &err) {
+#ifdef TESTING
+    error_capture.push_back(err.message_);
+#endif
     if (!err.token_set_) {
       output << err.message_;
       return;
@@ -37,6 +45,16 @@ namespace yaksha::errors {
     print_token(output, tok);
     output << " --> " << err.message_;
   }
+#ifdef TESTING
+  static bool has_error(const std::string& error_message) {
+    for (auto& e: error_capture) {
+      if (e == error_message) {
+        return true;
+      }
+    }
+    return false;
+  }
+#endif
   /**
    * Print a vector of errors to std::cerr
    * @param errors errors to print
