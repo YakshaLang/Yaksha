@@ -818,8 +818,8 @@ struct builtin_qsort : builtin {
       } else if (function_input->args_.size() != 2) {
         o.string_val_ = "Comparison function must compare two elements";
       } else if (function_input->args_.size() == 2 &&
-                 !(function_input->args_[0]->is_sort_arg() &&
-                   function_input->args_[1]->is_sort_arg())) {
+                 !(function_input->args_[0]->is_any_arg() &&
+                   function_input->args_[1]->is_any_arg())) {
         o.string_val_ = "Comparison function must compare two SortArg elements";
       } else {
         return ykobject(args[0].datatype_->args_[0]);

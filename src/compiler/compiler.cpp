@@ -626,7 +626,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "float";
   } else if (basic_dt->is_f64()) {
     return "double";
-  } else if (basic_dt->is_sort_arg()) {
+  } else if (basic_dt->is_any_arg()) {
     return "const void*";
   } else if (basic_dt->is_sm_entry() || basic_dt->is_m_entry()) {
     // Handle SMEntry and Entry
@@ -639,9 +639,11 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     auto module = cf_->get(basic_dt->module_);
     auto imported_module_prefix = module->prefix_;
     auto class_info = module->data_->dsv_->get_class(dt);
-    auto class_name = prefix(dt, imported_module_prefix);
-    if (class_info->annotations_.native_define_) { return class_name; }
-    return "struct " + class_name + "*";
+    if (class_info != nullptr) {
+      auto class_name = prefix(dt, imported_module_prefix);
+      if (class_info->annotations_.native_define_) { return class_name; }
+      return "struct " + class_name + "*";
+    }
   }
   if (defs_classes_.has_class(dt)) {
     auto class_info = defs_classes_.get_class(dt);
@@ -649,7 +651,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     if (class_info->annotations_.native_define_) { return class_name; }
     return "struct " + class_name + "*";
   }
-  return "void";
+  return "<data type unknown>";
 }
 compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   this->cf_ = cf;

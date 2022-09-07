@@ -1,4 +1,4 @@
-def cmp_int(a: AnyArg, b: AnyArg) -> int:
+def cmp_int(a: SortArg, b: SortArg) -> int:
     # Compare two given integers
     val_a: int = unref(cast("Ptr[int]", a))
     val_b: int = unref(cast("Ptr[int]", b))
