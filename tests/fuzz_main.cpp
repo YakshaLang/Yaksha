@@ -39,20 +39,20 @@ void test_ast(const std::string &data, const std::string &file_name) {
 }
 void test_compiler(const std::string &filepath) {
   multifile_compiler mc{};
-  auto result = mc.compile(filepath);
+  auto result = mc.compile(filepath, "/app/libs");
   std::cout << "Success : " << (result.failed_ ? "No\n" : "Yes\n");
   std::cout << result.code_ << "\n";
 }
 int main(int argc, char *argv[]) {
   if (argc != 2) {
     std::cerr << "Usage: Yaksha script.yaka\n";
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
   }
   std::string file_name{argv[1]};
   std::ifstream script_file(file_name);
   if (!script_file.good()) {
     std::cerr << "Failed to read file:" << file_name << "\n";
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
   }
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
