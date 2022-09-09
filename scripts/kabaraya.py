@@ -323,10 +323,11 @@ if __name__ == "__main__":
             print(Colors.fail("Crashed on - "), Colors.cyan(os.path.basename(f)))
             shutil.copyfile(f, os.path.join(OUTPUT_PATH, os.path.basename(f)))
     with multiprocessing.Pool(PROCESSES) as p:
-        for outer in prange(range(1000)):
+        for outer in prange(range(100)):
             to_append = []
-            pr = progress(PROCESSES * 2)
-            for r, f, d in p.imap_unordered(run_mutant, [str(outer) + "_" + str(x) for x in range(PROCESSES * 2)]):
+            multiplier = 200
+            pr = progress(PROCESSES * multiplier)
+            for r, f, d in p.imap_unordered(run_mutant, [str(outer) + "_" + str(x) for x in range(PROCESSES * multiplier)]):
                 if pr:
                     pr.update()
                 if r == FAILED:
