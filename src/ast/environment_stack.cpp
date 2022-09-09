@@ -51,3 +51,4 @@ void environment_stack::pop() {
 }
 bool environment_stack::has_inner_scope() { return scope_stack_.size() > 1; }
 environment &environment_stack::peek() { return scope_stack_.back(); }
+bool environment_stack::is_global_level() { return scope_stack_.size() <= 1; }

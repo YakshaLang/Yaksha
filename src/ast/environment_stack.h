@@ -49,7 +49,7 @@ namespace yaksha {
     /**
      * @return true if we are declaring a global
      */
-    bool is_global_level() { return scope_stack_.size() <= 1; }
+    bool is_global_level();
 
 private:
     bool has_inner_scope();
