@@ -85,14 +85,14 @@ file_info *codefiles::scan(import_stmt *st) {
     print_file_not_found_error(path.string());
     return nullptr;
   }
+  // if we have it in our map we return that
+  if (path_to_fi_.find(path.string()) != path_to_fi_.end()) {
+    return path_to_fi_[path.string()];
+  }
   auto parsed_data = parse(path);
   if (parsed_data == nullptr) {
     print_unable_to_process_error(path.string());
     return nullptr;
-  }
-  // if we have it in our map we return that
-  if (path_to_fi_.find(path.string()) != path_to_fi_.end()) {
-    return path_to_fi_[path.string()];
   }
   auto nm = names.back();
   std::string prefix = "yy__" + nm->token_;
