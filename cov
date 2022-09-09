@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # Run coverage & generate html report using Docker & gcovr
 echo "running coverage script..."
 docker build -t yaksha .

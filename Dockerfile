@@ -1,4 +1,4 @@
-FROM ubuntu:21.04
+FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 # TODO do we even use clang? maybe we should use it in addition to gcc?
     # But at the moment this is useless

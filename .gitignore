@@ -16,6 +16,7 @@ bin/*.ilk
 !3rd/WinICD/libOpenCL.dll
 !3rd/WinICD/libOpenCL.dll.a
 bin/coverage/*.html
+bin/coverage/*.css
 bin/fuzz/*.input
 bin/Yaksha
 bin/yakshac

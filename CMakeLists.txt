@@ -57,7 +57,6 @@ add_executable(YakshaTests ${YAKSHA_SOURCE_FILES} ${YAKSHA_TEST_FILES} tests/tes
 target_compile_definitions(YakshaTests PUBLIC TESTING)
 target_link_libraries(YakshaTests PRIVATE Catch2::Catch2)
 target_link_libraries(YakshaTests PUBLIC ${LIBS})
-#target_link_libraries(YakshaTests PUBLIC yaksha)
 target_compile_features(YakshaTests PRIVATE cxx_std_17)
 # Add to CTest
 include(CTest)

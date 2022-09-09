@@ -92,7 +92,11 @@ INPUT_DATA = []
 for i in INPUT_FILES:
     if os.path.isfile(i):
         with open(i, encoding="utf-8") as h:
-            INPUT_DATA.append(h.read().splitlines())
+            try:
+                INPUT_DATA.append(h.read().splitlines())
+            except UnicodeDecodeError:
+                print(Colors.blue(i), "Failed to load as input")
+                pass
 
 
 def random_pos(item, must_have_content=False, max_iterations=100) -> int:
@@ -319,7 +323,7 @@ if __name__ == "__main__":
             print(Colors.fail("Crashed on - "), Colors.cyan(os.path.basename(f)))
             shutil.copyfile(f, os.path.join(OUTPUT_PATH, os.path.basename(f)))
     with multiprocessing.Pool(PROCESSES) as p:
-        for outer in prange(range(100)):
+        for outer in prange(range(1000)):
             to_append = []
             pr = progress(PROCESSES * 2)
             for r, f, d in p.imap_unordered(run_mutant, [str(outer) + "_" + str(x) for x in range(PROCESSES * 2)]):
@@ -335,3 +339,4 @@ if __name__ == "__main__":
             INPUT_DATA += to_append
             if len(INPUT_DATA) > 1000:
                 INPUT_DATA = INPUT_DATA[-999:]
+    print(Colors.cyan("Completed Kabaraya."))

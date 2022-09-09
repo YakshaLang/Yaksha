@@ -17,7 +17,5 @@ cd ../bin || exit 1
 ./YakshaTests
 # Run Fuzzy testing
 cd ../scripts && python3 kabaraya.py && cd ../bin
-# Run sample
-./Yaksha ../test_data/sample1.yaka
 # Calculate code coverage
 gcovr -r .. --exclude ../build --exclude ../tests --exclude ../3rd --html --html-details -o /coverage/index.html
