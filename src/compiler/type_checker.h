@@ -6,8 +6,8 @@
 #include "ast/environment_stack.h"
 #include "builtins/builtins.h"
 #include "compiler/def_class_visitor.h"
-#include "utilities/ykobject.h"
 #include "compiler/slot_matcher.h"
+#include "utilities/ykobject.h"
 namespace yaksha {
   struct type_checker : expr_visitor, stmt_visitor, slot_matcher {
     explicit type_checker(std::string filepath, codefiles *cf,

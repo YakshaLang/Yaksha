@@ -24,6 +24,26 @@ codefiles::~codefiles() {
   }
   delete esc_;
 }
+file_info *codefiles::scan_main(const std::string &code,
+                                const std::string &filename) {
+  std::error_code err{};
+  auto path = std::filesystem::absolute(std::filesystem::path(filename), err);
+  auto p = parse(code, filename);
+  if (p == nullptr) {
+    print_unable_to_process_error(path.string());
+    return nullptr;
+  }
+  auto fi = new file_info{path, "yy__", p};
+  path_to_fi_.insert({path.string(), fi});
+  prefixes_.insert(std::string{"yy__"});
+  files_.emplace_back(fi);
+  for (auto imp : fi->data_->parser_->import_stmts_) {
+    auto import_data = scan(imp);
+    if (import_data == nullptr) { return nullptr; }
+    imp->data_ = import_data;
+  }
+  return path_to_fi_[path.string()];
+}
 file_info *codefiles::scan_main(const std::string &filename) {
   std::error_code err{};
   auto path = std::filesystem::absolute(std::filesystem::path(filename), err);
@@ -124,7 +144,12 @@ file_data *codefiles::parse(std::filesystem::path &file_name) {
   }
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
-  auto *t = new tokenizer{file_name.string(), data};
+  std::string fname = file_name.string();
+  return parse(data, fname);
+}
+file_data *codefiles::parse(const std::string &data,
+                            const std::string &file_name) {
+  auto *t = new tokenizer{file_name, data};
   t->tokenize();
   if (!t->errors_.empty()) {
     errors::print_errors(t->errors_);
@@ -139,7 +164,7 @@ file_data *codefiles::parse(std::filesystem::path &file_name) {
     delete (b);
     return nullptr;
   }
-  auto *p = new parser(file_name.string(), b->tokens_, &pool_);
+  auto *p = new parser(file_name, b->tokens_, &pool_);
   p->parse();
   if (!p->errors_.empty()) {
     errors::print_errors(p->errors_);

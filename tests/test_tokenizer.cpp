@@ -220,8 +220,9 @@ TEST_CASE("tokenizer: Numbers: single number") {
   REQUIRE(t.errors_.empty());
 }
 TEST_CASE("tokenizer: Numbers: Bunch of numbers") {
-  yaksha::tokenizer t("test.py", "0xABCDEF0 0b1111001 "
-                                 "0o123456 1.2e3 123 1.2e+3 1.2e-3 1f 1.2f 1.2e1f");
+  yaksha::tokenizer t("test.py",
+                      "0xABCDEF0 0b1111001 "
+                      "0o123456 1.2e3 123 1.2e+3 1.2e-3 1f 1.2f 1.2e1f");
   t.tokenize();
   REQUIRE(t.tokens_.size() == 10 + 1);
   REQUIRE(t.tokens_[0].token_ == "0xABCDEF0");

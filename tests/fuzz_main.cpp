@@ -1,12 +1,12 @@
 #include "ast/ast_printer.h"
 #include "ast/ast_vis.h"
 #include "ast/parser.h"
+#include "compiler/multifile_compiler.h"
 #include "compiler/type_checker.h"
 #include "file_formats/tokens_file.h"
 #include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
 #include "utilities/error_printer.h"
-#include "compiler/multifile_compiler.h"
 using namespace yaksha;
 void test_ast(const std::string &data, const std::string &file_name) {
   tokenizer t{file_name, data};
@@ -43,6 +43,16 @@ void test_compiler(const std::string &filepath) {
   std::cout << "Success : " << (result.failed_ ? "No\n" : "Yes\n");
   std::cout << result.code_ << "\n";
 }
+#ifdef YAKSHA_LLVM_FUZZ
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
+  std::string code{(char *) Data, Size};
+  std::string fname = "fuzz_dummy.yaka";
+  test_ast(code, fname);
+  multifile_compiler mc{};
+  mc.compile(code, fname, "/app/libs");
+  return 0;
+}
+#else
 int main(int argc, char *argv[]) {
   if (argc != 2) {
     std::cerr << "Usage: Yaksha script.yaka\n";
@@ -60,3 +70,4 @@ int main(int argc, char *argv[]) {
   test_ast(data, file_name);
   return EXIT_SUCCESS;
 }
+#endif

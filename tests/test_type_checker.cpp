@@ -9,7 +9,7 @@ using namespace yaksha;
     auto result = mc.compile(A);                                               \
     REQUIRE(result.failed_ == true);                                           \
     REQUIRE(!yaksha::errors::error_capture.empty());                           \
-    REQUIRE(yaksha::errors::has_error(E));                                    \
+    REQUIRE(yaksha::errors::has_error(E));                                     \
   } while (0)
 TEST_CASE("type checker: Bad function for qsort") {
   TEST_FILE("../test_data/bad_inputs/bad_input_sort_with_wrong_args.yaka",

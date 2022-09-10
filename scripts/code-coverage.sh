@@ -19,3 +19,15 @@ cd ../bin || exit 1
 cd ../scripts && python3 kabaraya.py && cd ../bin
 # Calculate code coverage
 gcovr -r .. --exclude ../build --exclude ../tests --exclude ../3rd --html --html-details -o /coverage/index.html
+# Run LibFuzzer fuzzy testing
+set +e
+echo ========================= Running LibFuzzer fuzzy testing ====
+cd ..
+mkdir fuzz-build
+cd fuzz-build
+export YAKSHA_FUZZ=1
+CC=clang-12 CXX=clang++-12 cmake -S .. -B .
+cmake --build . --target YakshaFuzz
+cd ../bin
+./YakshaFuzz -fork=2 ../test_data
+cp crash-* /fuzz

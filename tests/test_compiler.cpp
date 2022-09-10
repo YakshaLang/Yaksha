@@ -121,12 +121,15 @@ TEST_CASE("compiler: Basic function pointer") {
             "../test_data/compiler_tests/function_datatype_test.tokens");
 }
 TEST_CASE("compiler: Function pointer passing & calling") {
-  TEST_FILE("../test_data/compiler_tests/function_datatype_passing_calling_test.yaka",
-            "function_datatype_passing_calling_test.yaka",
-            "../test_data/compiler_tests/function_datatype_passing_calling_test.tokens");
+  TEST_FILE(
+      "../test_data/compiler_tests/function_datatype_passing_calling_test.yaka",
+      "function_datatype_passing_calling_test.yaka",
+      "../test_data/compiler_tests/"
+      "function_datatype_passing_calling_test.tokens");
 }
 TEST_CASE("compiler: Test automatic generation for normal hashes!") {
-  TEST_FILE("../test_data/compiler_tests/normal_hash_map.yaka", "normal_hash_map.yaka",
+  TEST_FILE("../test_data/compiler_tests/normal_hash_map.yaka",
+            "normal_hash_map.yaka",
             "../test_data/compiler_tests/normal_hash_map.tokens");
 }
 TEST_CASE("compiler: Test sorting functionality using qsort() !") {

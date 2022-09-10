@@ -16,5 +16,5 @@ namespace yaksha {
      */
     virtual bool slot_match(const ykobject &arg, ykdatatype *datatype) = 0;
   };
-}
+}// namespace yaksha
 #endif

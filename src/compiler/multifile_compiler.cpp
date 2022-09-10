@@ -12,13 +12,27 @@ multifile_compiler::compile(const std::string &main_file) {
   auto libs_path = std::filesystem::current_path().string();
   return compile(main_file, libs_path);
 }
+//
 multifile_compiler_result
 multifile_compiler::compile(const std::string &main_file,
+                            const std::string &libs_path) {
+  std::string empty_code{};
+  return compile(empty_code, main_file, libs_path);
+}
+// With input code
+multifile_compiler_result
+multifile_compiler::compile(const std::string &code,
+                            const std::string &main_file,
                             const std::string &libs_path) {
   std::filesystem::path library_parent{libs_path};
   codefiles cf{library_parent};
   // Parse all imports by scanning given main file
-  auto main_file_info = cf.scan_main(main_file);
+  file_info *main_file_info;
+  if (code.empty()) {
+    main_file_info = cf.scan_main(main_file);
+  } else {
+    main_file_info = cf.scan_main(code, main_file);
+  }
   if (main_file_info == nullptr) {
     std::cerr << "Failed to compile:" << main_file << "\n";
     return {true, ""};

@@ -16,6 +16,7 @@ namespace yaksha {
     ~codefiles();
     file_info *get(const std::string &filename);
     file_info *scan_main(const std::string &filename);
+    file_info *scan_main(const std::string &code, const std::string &filename);
     file_info *scan(import_stmt *st);
     std::vector<file_info *> files_;
     ykdt_pool pool_;
@@ -23,6 +24,7 @@ namespace yaksha {
 
 private:
     file_data *parse(std::filesystem::path &fpath);
+    file_data *parse(const std::string &code, const std::string &filename);
     bool has_prefix(std::string &root);
     std::unordered_map<std::string, file_info *> path_to_fi_{};
     std::unordered_set<std::string> prefixes_{};

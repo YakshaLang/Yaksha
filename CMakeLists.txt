@@ -65,7 +65,13 @@ catch_discover_tests(YakshaTests)
 
 # Adding Fuzzer Binary
 # ---------------------
-add_executable(YakshaFuzz tests/fuzz_main.cpp)
+if(DEFINED ENV{YAKSHA_FUZZ})
+    set(CMAKE_CXX_FLAGS "-fsanitize=fuzzer,address -g -O1")
+    add_executable(YakshaFuzz ${YAKSHA_SOURCE_FILES}  tests/fuzz_main.cpp)
+    target_compile_definitions(YakshaFuzz PUBLIC YAKSHA_LLVM_FUZZ)
+else()
+    add_executable(YakshaFuzz tests/fuzz_main.cpp)
+endif()
 target_link_libraries(YakshaFuzz ${LIBS})
 target_link_libraries(YakshaFuzz PUBLIC yaksha)
 target_compile_features(YakshaFuzz PRIVATE cxx_std_17)

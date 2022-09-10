@@ -46,11 +46,9 @@ namespace yaksha::errors {
     output << " --> " << err.message_;
   }
 #ifdef TESTING
-  static bool has_error(const std::string& error_message) {
-    for (auto& e: error_capture) {
-      if (e == error_message) {
-        return true;
-      }
+  static bool has_error(const std::string &error_message) {
+    for (auto &e : error_capture) {
+      if (e == error_message) { return true; }
     }
     return false;
   }

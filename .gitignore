@@ -26,6 +26,7 @@ bin/YakshaFuzz
 bin/YakshaTests
 bin/cmakecarpntr
 bin/raylib-parser
+bin/fuzz/crash-*
 comp_output_test
 __pycache__
 !carpntr/build/program_code.c
@@ -52,3 +53,4 @@ test_data/document_samples/gui_window
 /test_data/sample_hello_threads
 /test_data/compiler_tests/normal_hash_map
 /test_data/compiler_tests/normal_hash_map.c
+.clang

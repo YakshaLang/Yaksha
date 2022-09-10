@@ -326,7 +326,7 @@ if __name__ == "__main__":
     with multiprocessing.Pool(PROCESSES) as p:
         for outer in prange(range(100)):
             to_append = []
-            multiplier = 200
+            multiplier = 2
             pr = progress(PROCESSES * multiplier)
             for r, f, d in p.imap_unordered(run_mutant, [str(outer) + "_" + str(x) for x in range(PROCESSES * multiplier)]):
                 if pr:
