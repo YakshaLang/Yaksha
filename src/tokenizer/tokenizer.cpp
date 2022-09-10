@@ -165,6 +165,13 @@ yaksha::consume_number(std::string &buf, octet_iterator &begin,
 tokenizer::tokenizer(std::string file, std::string data)
     : tokens_(), file_(std::move(file)), data_(std::move(data)), errors_() {}
 void tokenizer::tokenize() {
+  try {
+    tokenize_actual();
+  } catch (utf8::exception& ignored) {
+    errors_.emplace_back(parsing_error{"Invalid UTF-8 detected for input file. Will not continue.", nullptr});
+  }
+}
+void tokenizer::tokenize_actual() {
   auto iterator = data_.begin();
   auto end = data_.end();
   utf8::uint32_t current;

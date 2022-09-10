@@ -55,6 +55,7 @@ private:
     std::string file_;
     std::string data_;
     void handle_error(const parsing_error &err);
+    void tokenize_actual();
   };
 }// namespace yaksha
 #endif
