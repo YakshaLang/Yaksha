@@ -1,0 +1,5 @@
+def main() -> int:
+    a: Array[MEntry[int, int]]
+    hmnew(a)
+    arrpop(a)
+    return 0

@@ -1,0 +1,6 @@
+def main() -> int:
+    a: Array[MEntry[int, int]]
+    hmnew(a)
+    b: MEntry[int, int]
+    arrput(a, b)
+    return 0

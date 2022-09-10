@@ -24,6 +24,8 @@ struct builtin_arrput : builtin {
       o.string_val_ = "First argument to arrput() must be an Array[?]";
     } else if (*(args[0].datatype_->args_[0]) != *args[1].datatype_) {
       o.string_val_ = "Second argument to arrput() must match with Array[?]";
+    } else if (args[0].datatype_->args_[0]->is_m_entry() || args[0].datatype_->args_[0]->is_sm_entry()) {
+      o.string_val_ = "arrput() does not work with maps";
     } else {
       return o;
     }
@@ -68,9 +70,10 @@ struct builtin_arrpop : builtin {
       o.string_val_ = "One argument must be provided for arrpop() builtin";
     } else if (!args[0].datatype_->is_an_array()) {
       o.string_val_ = "Argument to arrpop() must be an Array[?]";
+    } else if (args[0].datatype_->args_[0]->is_m_entry() || args[0].datatype_->args_[0]->is_sm_entry()) {
+      o.string_val_ = "arrpop() does not work with maps";
     } else {
       return ykobject(args[0].datatype_->args_[0]);
-      ;
     }
     o.object_type_ = object_type::RUNTIME_ERROR;
     return o;
