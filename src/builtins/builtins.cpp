@@ -827,7 +827,7 @@ struct builtin_qsort : builtin {
       func_in->args_.emplace_back(const_arg2);
       // func -> Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]
       if (dt_slot_matcher->slot_match(args[1], func)) {
-        return ykobject(dt_pool->create("int"));
+        return ykobject(dt_pool->create("bool"));
       } else {
         o.string_val_ = "Comparison must match with "
                         "Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]";
@@ -849,9 +849,9 @@ struct builtin_qsort : builtin {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     o = ykobject(args[0].second.datatype_->args_[0]);
-    code << "yk__quicksort(" << args[0].first << ",sizeof("
+    code << "(yk__quicksort(" << args[0].first << ",sizeof("
          << dt_compiler->convert_dt(args[0].second.datatype_->args_[0]) << ")"
-         << ",yk__arrlenu(" << args[0].first << ")," << args[1].first << ")";
+         << ",yk__arrlenu(" << args[0].first << ")," << args[1].first << ") == 0)";
     return {code.str(), o};
   }
 };

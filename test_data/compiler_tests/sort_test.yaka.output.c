@@ -49,7 +49,7 @@ int32_t yy__main()
     }
     yk__sds t__4 = yk__sdsempty();
     yk__printlnstr((t__4));
-    yk__quicksort(yy__x,sizeof(int32_t),yk__arrlenu(yy__x),yy__cmp_int);
+    (yk__quicksort(yy__x,sizeof(int32_t),yk__arrlenu(yy__x),yy__cmp_int) == 0);
     yk__sds t__5 = yk__sdsnew("after:");
     yk__printlnstr((t__5));
     yy__pos = 0;
