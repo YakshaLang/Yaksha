@@ -7,6 +7,7 @@
 #include "builtins/builtins.h"
 #include "compiler/compiler_utils.h"
 #include "compiler/delete_stack_stack.h"
+#include "compiler/statement_writer.h"
 #include "datatype_compiler.h"
 #include "def_class_visitor.h"
 #include "entry_struct_func_compiler.h"
@@ -21,7 +22,10 @@ namespace yaksha {
     std::string body_{};
     std::string global_constants_{};
   };
-  struct compiler : expr_visitor, stmt_visitor, datatype_compiler {
+  struct compiler : expr_visitor,
+                    stmt_visitor,
+                    datatype_compiler,
+                    statement_writer {
     compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
              entry_struct_func_compiler *esc);
     ~compiler() override;
@@ -63,12 +67,16 @@ namespace yaksha {
      * @return converted data type.
      */
     std::string convert_dt(ykdatatype *basic_dt) override;
-
-private:
     /**
      * @return unique temp variable name
      */
-    std::string temp();
+    std::string temp() override;
+    /**
+     * Write a statement to code body (in current function)
+     */
+    void write_statement(std::string code_line) override;
+
+private:
     void push_scope_type(ast_type scope_type);
     ast_type peek_scope_type();
     void pop_scope_type();

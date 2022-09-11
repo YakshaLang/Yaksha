@@ -340,9 +340,7 @@ void type_checker::visit_let_stmt(let_stmt *obj) {
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto expression_data = pop();
-    if (expression_data.object_type_ != placeholder.object_type_) {
-      error(obj->name_, "Data type mismatch in expression and declaration.");
-    }
+    handle_assigns(obj->name_, placeholder, expression_data);
   }
   scope_.define(name, placeholder);
 }

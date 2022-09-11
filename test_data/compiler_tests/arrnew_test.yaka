@@ -1,0 +1,10 @@
+def main() -> int:
+    a: Array[int] = arrnew("int", 10)
+    pos: int = 0
+    count: int = len(a)
+    println("Printing garbage int values")
+    while pos < count:
+        println(a[pos])
+        pos = pos + 1
+    println("Success")
+    return 0

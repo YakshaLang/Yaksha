@@ -167,8 +167,9 @@ tokenizer::tokenizer(std::string file, std::string data)
 void tokenizer::tokenize() {
   try {
     tokenize_actual();
-  } catch (utf8::exception& ignored) {
-    errors_.emplace_back(parsing_error{"Invalid UTF-8 detected for input file. Will not continue.", nullptr});
+  } catch (utf8::exception &ignored) {
+    errors_.emplace_back(parsing_error{
+        "Invalid UTF-8 detected for input file. Will not continue.", nullptr});
   }
 }
 void tokenizer::tokenize_actual() {

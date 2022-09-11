@@ -136,3 +136,7 @@ TEST_CASE("compiler: Test sorting functionality using qsort() !") {
   TEST_FILE("../test_data/compiler_tests/sort_test.yaka", "sort_test.yaka",
             "../test_data/compiler_tests/sort_test.tokens");
 }
+TEST_CASE("compiler: Test arrnew() !") {
+  TEST_FILE("../test_data/compiler_tests/arrnew_test.yaka", "arrnew_test.yaka",
+            "../test_data/compiler_tests/arrnew_test.tokens");
+}

@@ -6,6 +6,7 @@
 #include "compiler/datatype_compiler.h"
 #include "compiler/datatype_parser.h"
 #include "compiler/slot_matcher.h"
+#include "compiler/statement_writer.h"
 #include "utilities/ykobject.h"
 #include <string>
 #include <vector>
@@ -63,7 +64,7 @@ namespace yaksha {
         const std::vector<expr *> &arg_expressions,
         datatype_compiler *dt_compiler,
         const std::unordered_map<std::string, import_stmt *> &import_aliases,
-        const std::string &filepath);
+        const std::string &filepath, statement_writer *st_writer);
     /**
      * Data type parser converts given data type string to a ykdatatype*
      * @param data_type_str string containing data type -> Array[str] for example
