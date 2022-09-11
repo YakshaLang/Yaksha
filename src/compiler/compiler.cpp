@@ -22,6 +22,8 @@ void compiler::visit_assign_expr(assign_expr *obj) {
     // do assignment of the duplicate
     write_indent(body_);
     body_ << name << " = yk__sdsdup(" << rhs.first << ")";
+  } else if (rhs.second.is_a_function()) {
+    body_ << name << " = " << prefix_function_arg(rhs);
   } else {
     body_ << name << " = " << rhs.first;
   }
@@ -188,7 +190,11 @@ compiler::prefix_function_arg(const std::pair<std::string, ykobject> &arg_val) {
 void compiler::visit_grouping_expr(grouping_expr *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
-  push("(" + exp.first + ")", exp.second);
+  if (exp.second.is_a_function()) {
+    push("(" + prefix_function_arg(exp) + ")", exp.second);
+  } else {
+    push("(" + exp.first + ")", exp.second);
+  }
 }
 void compiler::visit_literal_expr(literal_expr *obj) {
   auto data_type_tok = obj->literal_token_->type_;
@@ -502,7 +508,11 @@ void compiler::visit_let_stmt(let_stmt *obj) {
       auto exp = pop();
       write_indent(body_);
       body_ << convert_dt(obj->data_type_) << " " << name;
-      body_ << " = " << exp.first;
+      if (exp.second.is_a_function()) {
+        body_ << " = " << prefix_function_arg(exp);
+      } else {
+        body_ << " = " << exp.first;
+      }
     } else {
       write_indent(body_);
       body_ << convert_dt(obj->data_type_) << " " << name;

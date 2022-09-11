@@ -1,0 +1,3 @@
+@native
+def cmp_int(a: Const[AnyArg], b: Const[AnyArg]) -> int:
+    ccode """return *((int32_t*)nn__a) - *((int32_t*)nn__b)"""

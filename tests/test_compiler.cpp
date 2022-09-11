@@ -144,3 +144,7 @@ TEST_CASE("compiler: Test array() !") {
   TEST_FILE("../test_data/compiler_tests/array_test.yaka", "array_test.yaka",
             "../test_data/compiler_tests/array_test.tokens");
 }
+TEST_CASE("compiler: Test sorting with @native functions") {
+  TEST_FILE("../test_data/compiler_tests/native_func_sort.yaka", "native_func_sort.yaka",
+            "../test_data/compiler_tests/native_func_sort.tokens");
+}

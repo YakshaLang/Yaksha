@@ -633,6 +633,11 @@ bool type_checker::slot_match(const ykobject &arg, ykdatatype *datatype) {
       error("@varargs function cannot be used as function pointers");
       return false;
     }
+    if (funct->annotations_.native_macro_ || funct->annotations_.native_define_) {
+      // WHY? not possible as these are macros
+      error("@nativemacro and @nativedefine functions cannot be used as function pointers");
+      return false;
+    }
     // Create datatype out of function
     ykdatatype *fnc = dt_pool_->create("Function");
     ykdatatype *fin = dt_pool_->create("In");

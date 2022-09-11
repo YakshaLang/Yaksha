@@ -1,0 +1,53 @@
+import sorters
+
+def cmp_int(a: Const[AnyArg], b: Const[AnyArg]) -> int:
+    # Compare two given integers
+    val_a: int = unref(cast("Ptr[int]", a))
+    val_b: int = unref(cast("Ptr[int]", b))
+    return val_b - val_a
+
+def print_array(x: Array[int]) -> None:
+    print("len=")
+    println(len(x))
+    pos: int = 0
+    length: int = len(x)
+    while pos < length:
+        print(x[pos])
+        print(" ")
+        pos = pos + 1
+    println("")
+
+def main() -> int:
+    x1: Array[int] = array("int", 1, 2, 3, 3, 2, 1, 5, 4)
+    println("before x1:")
+    print_array(x1)
+    qsort(x1, sorters.cmp_int)
+    println("after x1:")
+    print_array(x1)
+
+    x2: Array[int] = array("int", 1, 2, 3, 3, 2, 1, 5, 4)
+    cmp: Function[In[Const[AnyArg],Const[AnyArg]],Out[int]] = cmp_int
+    println("before x2:")
+    print_array(x2)
+    qsort(x2, cmp)
+    println("after x2:")
+    print_array(x2)
+
+
+    x3: Array[int] = array("int", 1, 2, 3, 3, 2, 1, 5, 4)
+    cmp = sorters.cmp_int
+    println("before x3:")
+    print_array(x3)
+    qsort(x3, cmp)
+    println("after x3:")
+    print_array(x3)
+
+    x4: Array[int] = array("int", 1, 2, 3, 3, 2, 1, 5, 4)
+    cmp4: Function[In[Const[AnyArg],Const[AnyArg]],Out[int]] = sorters.cmp_int
+    println("before x4:")
+    print_array(x4)
+    qsort(x4, cmp4)
+    println("after x4:")
+    print_array(x4)
+
+    return 0
