@@ -23,7 +23,7 @@ set(YAKSHA_TEST_FILES
 
 include_directories("runtime")
 set(YAKSHA_RUNTIME_FILES
-        runtime/argparse.h runtime/ini.h runtime/mpc.h runtime/subprocess.h runtime/tinycthread.h runtime/toml.h runtime/utf8proc.h runtime/whereami.h runtime/yk__argparse.h runtime/yk__arrayutils.h runtime/yk__console.h runtime/yk__graphic_utils.h runtime/yk__lib.h runtime/yk__process.h runtime/yk__system.h runtime/yk__utf8iter.h runtime/argparse.c runtime/mpc.c runtime/tinycthread.c runtime/toml.c runtime/utf8proc.c runtime/whereami.c runtime/yk__argparse.c runtime/yk__arrayutils.c runtime/yk__console.c runtime/yk__graphic_utils.c runtime/yk__main.c runtime/yk__process.c runtime/yk__system.c) # update_makefile.py YK_RUNTIME
+        runtime/argparse.h runtime/ini.h runtime/subprocess.h runtime/tinycthread.h runtime/toml.h runtime/utf8proc.h runtime/whereami.h runtime/yk__argparse.h runtime/yk__arrayutils.h runtime/yk__console.h runtime/yk__graphic_utils.h runtime/yk__lib.h runtime/yk__process.h runtime/yk__system.h runtime/yk__utf8iter.h runtime/argparse.c runtime/tinycthread.c runtime/toml.c runtime/utf8proc.c runtime/whereami.c runtime/yk__argparse.c runtime/yk__arrayutils.c runtime/yk__console.c runtime/yk__graphic_utils.c runtime/yk__main.c runtime/yk__process.c runtime/yk__system.c) # update_makefile.py YK_RUNTIME
 
 add_library(yaksha ${YAKSHA_SOURCE_FILES})
 
