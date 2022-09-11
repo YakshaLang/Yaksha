@@ -84,7 +84,7 @@ def opt_boolean(short: str, large: str, result: Ptr[int], help: str) -> Option:
     return o"""
 
 @native
-def opt_string(short: str, large: str, result: c.CStr, help: str) -> Option:
+def opt_string(short: str, large: str, result: Ptr[c.CStr], help: str) -> Option:
     # create a boolean option
     ccode """struct argparse_option o = ((struct argparse_option) OPT_STRING(nn__short[0], nn__large, nn__result, nn__help, NULL, 0, 0));
     yk__sdsfree(nn__short);
