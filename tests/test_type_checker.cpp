@@ -41,7 +41,7 @@ TEST_CASE("type checker: Builtin arrnew invalid arg count") {
   TEST_SNIPPET("a: Array[int] = arrnew()",
                "Two arguments must be provided for arrnew() builtin");
 }
-TEST_CASE("type checker: First must be a string literal for arrnew()") {
+TEST_CASE("type checker: First argument must be a string literal for arrnew()") {
   TEST_SNIPPET("a: Array[int] = arrnew(1, 10)",
                "First argument to arrnew() must be a string literal");
 }
@@ -62,7 +62,7 @@ TEST_CASE("type checker: Builtin array() invalid arg count") {
   TEST_SNIPPET("a: Array[int] = array()",
                "array() builtin expects >= 1 arguments");
 }
-TEST_CASE("type checker: First must be a string literal for array()") {
+TEST_CASE("type checker: First argument must be a string literal for array()") {
   TEST_SNIPPET("a: Array[int] = array(\"str\", 1)",
                "All arguments must match with data type passed to first "
                "argument for array() builtin");
