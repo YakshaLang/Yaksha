@@ -925,11 +925,98 @@ struct builtin_arrnew : builtin {
     return {code.str(), o};
   }
 };
+struct builtin_array : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() < 1) {
+      o.string_val_ = "array() builtin expects >= 1 arguments";
+    } else if (arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+      o.string_val_ = "First argument to array() must be a string literal";
+    } else {
+      auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
+      if (lit->literal_token_->type_ != token_type::STRING &&
+          lit->literal_token_->type_ != token_type::THREE_QUOTE_STRING) {
+        o.string_val_ = "First argument to array() must be a string literal";
+      } else {
+        auto data_type = lit->literal_token_->token_;
+        ykdatatype *parsed_dt =
+            dt_parser->parse(data_type, import_aliases, filepath);
+        if (parsed_dt == nullptr) {
+          o.string_val_ = "Invalid data type provided to array()";
+        } else {
+          size_t length = args.size();
+          for (size_t i = 1; i < length; i++) {
+            if (!dt_slot_matcher->slot_match(args[i], parsed_dt)) {
+              o.string_val_ = "All arguments must match with data type passed "
+                              "to first argument for array() builtin";
+              o.object_type_ = object_type::RUNTIME_ERROR;
+              return o;
+            }
+          }
+          ykdatatype *array_wrapper = dt_pool->create("Array");
+          array_wrapper->args_.emplace_back(parsed_dt);
+          return ykobject(array_wrapper);
+        }
+      }
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    if (arg_index == 0) { return false; }
+    return true;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer) override {
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
+    auto element_data_type =
+        dt_parser->parse(dt->literal_token_->token_, import_aliases, filepath);
+    auto array_dt = dt_pool->create("Array");
+    array_dt->args_.emplace_back(element_data_type);
+    auto array_var = st_writer->temp();
+    code << dt_compiler->convert_dt(array_dt) << " " << array_var << " = NULL";
+    st_writer->write_statement(code.str());
+    code.str("");
+    code.clear();
+    code << "yk__arrsetcap(" << array_var << ", " << (args.size() - 1) << ")";
+    st_writer->write_statement(code.str());
+    code.str("");
+    code.clear();
+    size_t length = args.size();
+    for (size_t i = 1; i < length; i++) {
+      if (element_data_type->is_str()) {
+        code << "yk__arrput(" << array_var << ", yk__sdsdup(" << args[i].first
+             << "))";
+      } else {
+        code << "yk__arrput(" << array_var << ", " << args[i].first << ")";
+      }
+      st_writer->write_statement(code.str());
+      code.str("");
+      code.clear();
+    }
+    code << array_var;
+    o = ykobject(array_dt);
+    return {code.str(), o};
+  }
+};
 //=======================================
 builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"arrput", new builtin_arrput{}});
   builtins_.insert({"arrpop", new builtin_arrpop{}});
   builtins_.insert({"arrnew", new builtin_arrnew{}});
+  builtins_.insert({"array", new builtin_array{}});
   builtins_.insert({"print", new builtin_print{}});
   builtins_.insert({"println", new builtin_println{}});
   builtins_.insert({"len", new builtin_len{}});

@@ -58,3 +58,26 @@ TEST_CASE("type checker: Must assign to proper data structure for arrnew()") {
   TEST_SNIPPET("a: Array[str] = arrnew(\"int\", 10)",
                "Cannot assign between 2 different data types.");
 }
+TEST_CASE("type checker: Builtin array() invalid arg count") {
+  TEST_SNIPPET("a: Array[int] = array()",
+               "array() builtin expects >= 1 arguments");
+}
+TEST_CASE("type checker: First must be a string literal for array()") {
+  TEST_SNIPPET("a: Array[int] = array(\"str\", 1)",
+               "All arguments must match with data type passed to first "
+               "argument for array() builtin");
+}
+TEST_CASE("type checker: First must be a string literal for array() does not "
+          "work with variables") {
+  TEST_SNIPPET("b: str = \"str\"\n    a: Array[int] = array(b, 10)",
+               "First argument to array() must be a string literal");
+}
+TEST_CASE("type checker: Second argument must be int for array()") {
+  TEST_SNIPPET("a: Array[int] = array(\"int\", \"10\")",
+               "All arguments must match with data type passed to first "
+               "argument for array() builtin");
+}
+TEST_CASE("type checker: Must assign to proper data structure for array()") {
+  TEST_SNIPPET("a: Array[str] = array(\"int\", 10)",
+               "Cannot assign between 2 different data types.");
+}

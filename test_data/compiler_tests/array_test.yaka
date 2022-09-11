@@ -1,0 +1,16 @@
+def main() -> int:
+    a: Array[int] = array("int", 1, 2, 3, 4, 5, 6, 7)
+    b: Array[str] = array("str", "Hello", "World", "Haha")
+    println("Printing [a]")
+    pos: int = 0
+    length: int = len(a)
+    while pos < length:
+        println(a[pos])
+        pos = pos + 1
+    println("Printing [b]")
+    pos = 0
+    length = len(a)
+    while pos < length:
+        println(b[pos])
+        pos = pos + 1
+    return 0

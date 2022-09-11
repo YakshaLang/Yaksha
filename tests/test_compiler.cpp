@@ -140,3 +140,7 @@ TEST_CASE("compiler: Test arrnew() !") {
   TEST_FILE("../test_data/compiler_tests/arrnew_test.yaka", "arrnew_test.yaka",
             "../test_data/compiler_tests/arrnew_test.tokens");
 }
+TEST_CASE("compiler: Test array() !") {
+  TEST_FILE("../test_data/compiler_tests/array_test.yaka", "array_test.yaka",
+            "../test_data/compiler_tests/array_test.tokens");
+}
