@@ -45,7 +45,7 @@ TEST_CASE("type checker: First must be a string literal for arrnew()") {
   TEST_SNIPPET("a: Array[int] = arrnew(1, 10)",
                "First argument to arrnew() must be a string literal");
 }
-TEST_CASE("type checker: First must be a string literal for arrnew() does not "
+TEST_CASE("type checker: First argument must be a string literal for arrnew(). Does not "
           "work with variables") {
   TEST_SNIPPET("b: str = \"str\"\n    a: Array[int] = arrnew(b, 10)",
                "First argument to arrnew() must be a string literal");
@@ -67,7 +67,7 @@ TEST_CASE("type checker: First must be a string literal for array()") {
                "All arguments must match with data type passed to first "
                "argument for array() builtin");
 }
-TEST_CASE("type checker: First must be a string literal for array() does not "
+TEST_CASE("type checker: First argument must be a string literal for array(). Does not "
           "work with variables") {
   TEST_SNIPPET("b: str = \"str\"\n    a: Array[int] = array(b, 10)",
                "First argument to array() must be a string literal");
