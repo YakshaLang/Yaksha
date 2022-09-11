@@ -36,6 +36,7 @@ class Compilation:
     targets: Array[str]
     raylib: bool
     web: bool
+    web_shell: str
 
 
 class Config:
@@ -193,6 +194,7 @@ def load_compilation(conf: toml.Table, c: Config) -> Compilation:
     co.targets = toml.get_string_array(co_data, "targets")
     co.raylib = toml.get_bool_default(co_data, "raylib", False)
     co.web = toml.get_bool_default(co_data, "web", False)
+    co.web_shell = toml.get_string(co_data, "web_shell")
     return co
 
 def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
@@ -283,13 +285,14 @@ def load_config() -> Config:
         return c
     return c
 
-def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bool) -> Config:
+def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bool, web_shell: str) -> Config:
     # Create an adhoc configuration for single file execution mode
     c: Config = Config()
     c.compilation = Compilation()
     c.compilation.targets = sarr.new(1, "native")
     c.compilation.raylib = use_raylib
     c.compilation.web = use_web
+    c.compilation.web_shell = web_shell
     # Try and find yakshac.exe
     find_yaksha_compiler(c)
     if len(c.errors) > 0:
@@ -336,6 +339,7 @@ def del_config(c: Config) -> None:
         sarr.del_str_array(c.compilation.targets)
         del c.compilation.libc
         del c.compilation.compiler
+        del c.compilation.web_shell
 
     if c.project != None:
         del c.project.main

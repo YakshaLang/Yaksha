@@ -19,7 +19,7 @@ def print_banner() -> None:
     ╚═╝┴ ┴┴└─╩  ┘└┘ ┴ ┴└─
     """
     text: str = """
-    Tool for building Yaksha 
+    Tool for building Yaksha
     Projects
     """
     art2: str = """
@@ -107,10 +107,10 @@ def perform_build() -> int:
     ret: int = build_from_config(config, False)
     return ret
 
-def perform_run(filename: str, use_raylib: bool, use_web: bool) -> int:
+def perform_run(filename: str, use_raylib: bool, use_web: bool, web_shell: str) -> int:
     # Perform single file project build and execute binary
     name: str = path.remove_extension(path.basename(filename))
-    config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib, use_web)
+    config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib, use_web, web_shell)
     defer carp.del_config(config)
     if len(config.errors) > 0:
         print_errors(config.errors)
@@ -149,10 +149,13 @@ def handle_args(args: os.arguments) -> int:
     run: int = 0
     raylib: int = 0
     web: int = 0
+    file_path: c.CStr = strings.null_cstr()
+    web_shell: str = ""
     arrput(options, argparse.opt_help())
     arrput(options, argparse.opt_boolean("R", "run", getref(run), "run a single file"))
     arrput(options, argparse.opt_boolean("r", "raylib", getref(raylib), "enable raylib (works only with run)"))
     arrput(options, argparse.opt_boolean("w", "web", getref(web), "build for web (works only with run & raylib)"))
+    arrput(options, argparse.opt_string("s", "shell", getref(file_path), "specify shell file for web builds"))
     arrput(options, argparse.opt_end())
 
     a: argparse.ArgParse = argparse.new(options, usages)
@@ -160,6 +163,7 @@ def handle_args(args: os.arguments) -> int:
 
     remainder: argparse.ArgParseRemainder = argparse.parse(a, args.argv)
     defer argparse.del_remainder(remainder)
+    defer strings.del_cstr(file_path) 
 
     if remainder.argc != 1:
         println("One file must be preset for excution")
@@ -169,8 +173,15 @@ def handle_args(args: os.arguments) -> int:
     if web == 1 and raylib != 1:
         println("Web is only supported with raylib")
         return 1
+    if web != 1 and strings.valid_cstr(file_path):
+        println("Shell is only supported with web")
+        return 1
     if run == 1:
-        return perform_run(single_file, raylib == 1, web == 1)
+        if strings.valid_cstr(file_path):
+            web_shell = strings.from_cstr(file_path)
+            print("Using web-shell:")
+            println(web_shell)
+        return perform_run(single_file, raylib == 1, web == 1, web_shell)
     if raylib == 1:
         println("Please use -R option for raylib")
         return 1

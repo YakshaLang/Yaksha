@@ -70,6 +70,9 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     args: Array[str]
     if c.compilation.web:
         args = sarr.new(5, c.emcc_compiler_path, "-std=c99", "-Oz", "-Wno-newline-eof", "-Wno-parentheses-equality")
+        if len(c.compilation.web_shell) > 0:
+            arrput(args, "--shell-file")
+            arrput(args, c.compilation.web_shell)
     else:
         args = sarr.new(9, c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
     args = sarr.extend(args, raylib_args)
