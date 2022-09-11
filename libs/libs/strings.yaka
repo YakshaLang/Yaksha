@@ -50,7 +50,6 @@ def isempty(s: str) -> bool:
 def isempty_cstr(s: c.CStr) -> bool:
     # Is an empty CStr?
     ccode """bool x = strlen(nn__s) == 0;
-    yk__sdsfree(nn__s);
     return x"""
 
 @native
@@ -104,6 +103,10 @@ def from_cstrlen(a: c.CStr, length: int) -> str:
 def from_cstrlen_after(a: c.CStr, length: int, after: int) -> str:
     # Create a new string from CStr from given after location for given length
     ccode """return yk__sdsnewlen(nn__a + nn__after, nn__length)"""
+
+@native
+def null_cstr() -> c.CStr:
+    ccode """return (char*)NULL"""
 
 @native
 def to_cstr(a: str) -> c.CStr:
