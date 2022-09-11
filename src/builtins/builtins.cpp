@@ -858,6 +858,11 @@ struct builtin_qsort : builtin {
     return {code.str(), o};
   }
 };
+//
+// ┌─┐┬─┐┬─┐┌┐┌┌─┐┬ ┬
+// ├─┤├┬┘├┬┘│││├┤ │││
+// ┴ ┴┴└─┴└─┘└┘└─┘└┴┘
+//
 struct builtin_arrnew : builtin {
   ykobject
   verify(const std::vector<ykobject> &args,
@@ -925,6 +930,11 @@ struct builtin_arrnew : builtin {
     return {code.str(), o};
   }
 };
+//
+// ┌─┐┬─┐┬─┐┌─┐┬ ┬
+// ├─┤├┬┘├┬┘├─┤└┬┘
+// ┴ ┴┴└─┴└─┴ ┴ ┴
+//
 struct builtin_array : builtin {
   ykobject
   verify(const std::vector<ykobject> &args,
