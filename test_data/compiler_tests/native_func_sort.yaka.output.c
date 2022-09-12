@@ -114,10 +114,11 @@ int32_t yy__main()
     yk__arrput(t__13, 4);
     int32_t* yy__x4 = t__13;
     ykfncptr0 yy__cmp4 = yy__sorters_cmp_int;
+    ykfncptr0 yy__cmp4_reassign = yy__cmp4;
     yk__sds t__14 = yk__sdsnew("before x4:");
     yk__printlnstr((t__14));
     yy__print_array(yy__x4);
-    (yk__quicksort(yy__x4,sizeof(int32_t),yk__arrlenu(yy__x4),yy__cmp4) == 0);
+    (yk__quicksort(yy__x4,sizeof(int32_t),yk__arrlenu(yy__x4),yy__cmp4_reassign) == 0);
     yk__sds t__15 = yk__sdsnew("after x4:");
     yk__printlnstr((t__15));
     yy__print_array(yy__x4);

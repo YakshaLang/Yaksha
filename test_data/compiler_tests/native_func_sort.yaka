@@ -44,9 +44,10 @@ def main() -> int:
 
     x4: Array[int] = array("int", 1, 2, 3, 3, 2, 1, 5, 4)
     cmp4: Function[In[Const[AnyArg],Const[AnyArg]],Out[int]] = sorters.cmp_int
+    cmp4_reassign: Function[In[Const[AnyArg],Const[AnyArg]],Out[int]] = cmp4
     println("before x4:")
     print_array(x4)
-    qsort(x4, cmp4)
+    qsort(x4, cmp4_reassign)
     println("after x4:")
     print_array(x4)
 
