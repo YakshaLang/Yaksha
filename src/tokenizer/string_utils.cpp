@@ -2,7 +2,6 @@
 #include "tokenizer/string_utils.h"
 const auto STR_ESCAPE_CHAR = '\\';
 std::string yaksha::string_utils::unescape(const std::string &escaped_string) {
-  // TODO \xh..., \uxxxx, \Uxxxxxxxx -- this is a must before any public release
   std::string buf_{};
   auto buf = std::back_inserter(buf_);
   auto iterator = escaped_string.begin();
@@ -18,12 +17,15 @@ std::string yaksha::string_utils::unescape(const std::string &escaped_string) {
       } else if (next == '\r' &&// windows line format, ignored
                  after_next == '\n') {
         utf8::next(iterator, end);
-      } else if (next == STR_ESCAPE_CHAR || next == '\'' || next == '\"') {
+      } else if (next == STR_ESCAPE_CHAR || next == '\'' || next == '\"' ||
+                 next == '\?') {
         utf8::append(static_cast<char32_t>(next), buf);
       } else if (next == 'a') {
         utf8::append(static_cast<char32_t>('\a'), buf);
       } else if (next == 'b') {
         utf8::append(static_cast<char32_t>('\b'), buf);
+      } else if (next == 'e') {// ansi escape
+        utf8::append(static_cast<char32_t>(0x1b), buf);
       } else if (next == 'f') {
         utf8::append(static_cast<char32_t>('\f'), buf);
       } else if (next == 'n') {
@@ -55,9 +57,61 @@ std::string yaksha::string_utils::unescape(const std::string &escaped_string) {
           utf8::next(iterator, end);
         }
         unsigned long long oct_num = std::stoull(octal, nullptr, 8);
-        utf8::append(static_cast<char32_t>(oct_num), buf);
+        if (oct_num > 255 || oct_num < 0) {
+          throw string_error{"\\ooo must be a valid byte (0-255)"};
+        }
+        // this is a byte not a unicode code point
+        *(buf++) = static_cast<uint8_t>(oct_num);
         // /ooo
         continue;
+      } else if (next == 'x' || next == 'u' || next == 'U') {
+        auto c12 = peek12(iterator, end);
+        int skip = 2;
+        std::string hex_str{};
+        int hex = 0;
+        for (int i = 2; i < 12; i++) {
+          utf8::uint32_t single_char = t12get(c12, i);
+          if (is_hex_digit(single_char)) {
+            hex_str += static_cast<char>(single_char);
+            hex++;
+          } else {
+            break;
+          }
+        }
+        if ((next == 'u' && hex >= 4) || (next == 'U' && hex >= 8) ||
+            (next == 'x' && (hex == 1 || hex == 2))) {
+          if (next == 'u') {
+            hex = 4;
+            hex_str = hex_str.substr(0, 4);
+          } else if (next == 'U') {
+            hex = 8;
+            hex_str = hex_str.substr(0, 8);
+          }
+          // valid escape
+          skip += hex;
+          for (int i = 0; i < skip; i++) {
+            if (iterator == end) { break; }
+            utf8::next(iterator, end);
+          }
+          unsigned long long hex_num = std::stoull(hex_str, nullptr, 16);
+          if (next == 'x') {
+            if (hex_num > 255 || hex_num < 0) {
+              throw string_error{"\\xhh must be a valid byte (0-255)"};
+            }
+            // forcefully convert given byte, this is not a unicode code point
+            *(buf++) = static_cast<uint8_t>(hex_num);
+          } else {
+            if (next == 'u' && hex_num >= 0x10000ULL) {
+              throw string_error{"\\uhhhh must be less than 0x10000)"};
+            }
+            utf8::append(static_cast<char32_t>(hex_num), buf);
+          }
+          continue;
+        } else {
+          throw string_error{"Invalid escape sequence for \\u, \\U, \\x"};
+        }
+      } else {
+        throw string_error{"Unknown escape sequence detected"};
       }
       utf8::next(iterator, end);
     } else {
@@ -101,6 +155,9 @@ std::string yaksha::string_utils::escape(const std::string &raw_string) {
     } else if (current == 0) {
       utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
       utf8::append(static_cast<char32_t>('0'), buf);
+    } else if (current == '\?') {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('\?'), buf);
     } else {
       utf8::append(static_cast<char32_t>(current), buf);
     }

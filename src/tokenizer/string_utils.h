@@ -13,6 +13,9 @@
  * String utilities
  */
 namespace yaksha::string_utils {
+  struct string_error {
+    std::string message_;
+  };
   bool is_alpha(utf8::uint32_t c);
   bool is_digit(utf8::uint32_t c);
   bool is_non_zero_digit(utf8::uint32_t c);
@@ -48,6 +51,92 @@ namespace yaksha::string_utils {
     if (it == end) { return {a, b, c}; }
     c = utf8::next(it, end);
     return {a, b, c};
+  }
+  /**
+ * Get next 12 characters in octet iterator, 0 is returned if nothing is there
+ * @tparam octet_iterator iterator data type
+ * @param it current level of iterator
+ * @param end end of iterator
+ * @return tuple of 12 utf8::uint32_t
+ */
+  template<typename octet_iterator>
+  std::tuple<utf8::uint32_t, utf8::uint32_t, utf8::uint32_t, utf8::uint32_t,
+             utf8::uint32_t, utf8::uint32_t, utf8::uint32_t, utf8::uint32_t,
+             utf8::uint32_t, utf8::uint32_t, utf8::uint32_t,
+             utf8::uint32_t> static inline peek12(octet_iterator it,
+                                                  octet_iterator end) {
+    utf8::uint32_t a = 0;
+    utf8::uint32_t b = 0;
+    utf8::uint32_t c = 0;
+    utf8::uint32_t d = 0;
+    utf8::uint32_t e = 0;
+    utf8::uint32_t f = 0;
+    utf8::uint32_t g = 0;
+    utf8::uint32_t h = 0;
+    utf8::uint32_t i = 0;
+    utf8::uint32_t j = 0;
+    utf8::uint32_t k = 0;
+    utf8::uint32_t l = 0;
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    a = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    b = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    c = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    d = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    e = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    f = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    g = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    h = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    i = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    j = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    k = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d, e, f, g, h, i, j, k, l}; }
+    l = utf8::next(it, end);
+    return {a, b, c, d, e, f, g, h, i, j, k, l};
+  }
+  utf8::uint32_t static inline t12get(
+      std::tuple<utf8::uint32_t, utf8::uint32_t, utf8::uint32_t, utf8::uint32_t,
+                 utf8::uint32_t, utf8::uint32_t, utf8::uint32_t, utf8::uint32_t,
+                 utf8::uint32_t, utf8::uint32_t, utf8::uint32_t, utf8::uint32_t>
+          &v,
+      int index) {
+    switch (index) {
+      case 0:
+        return std::get<0>(v);
+      case 1:
+        return std::get<1>(v);
+      case 2:
+        return std::get<2>(v);
+      case 3:
+        return std::get<3>(v);
+      case 4:
+        return std::get<4>(v);
+      case 5:
+        return std::get<5>(v);
+      case 6:
+        return std::get<6>(v);
+      case 7:
+        return std::get<7>(v);
+      case 8:
+        return std::get<8>(v);
+      case 9:
+        return std::get<9>(v);
+      case 10:
+        return std::get<10>(v);
+      case 11:
+        return std::get<11>(v);
+      default:
+        return 0;
+    }
   }
   /**
  * Consume function that can parse a string until given function is satisfied
