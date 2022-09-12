@@ -2,8 +2,7 @@
 #include "tokenizer/string_utils.h"
 const auto STR_ESCAPE_CHAR = '\\';
 std::string yaksha::string_utils::unescape(const std::string &escaped_string) {
-  // TODO \ooo, \xhh, \uxxxx, \Uxxxxxxxx -- this is a must before any public
-  // release
+  // TODO \xh..., \uxxxx, \Uxxxxxxxx -- this is a must before any public release
   std::string buf_{};
   auto buf = std::back_inserter(buf_);
   auto iterator = escaped_string.begin();
@@ -35,6 +34,30 @@ std::string yaksha::string_utils::unescape(const std::string &escaped_string) {
         utf8::append(static_cast<char32_t>('\t'), buf);
       } else if (next == 'v') {
         utf8::append(static_cast<char32_t>('\v'), buf);
+      } else if (is_oct_digit(next)) {
+        int skip = 2;// skip \o
+        std::string octal{};
+        octal += static_cast<char>(next);
+        if (is_oct_digit(after_next)) {
+          skip++;// skip \oo
+          octal += static_cast<char>(after_next);
+          utf8::next(iterator, end);// skipped one
+          auto oct_chars = peek3(iterator, end);
+          if (is_oct_digit(std::get<2>(oct_chars))) {
+            // just skip 3 to skip \ooo (1 skipped already)
+            octal += static_cast<char>(std::get<2>(oct_chars));
+          } else {
+            skip--;// just skip 2 to skip \oo (1 skipped already)
+          }
+        }
+        for (int i = 0; i < skip; i++) {
+          if (iterator == end) { break; }
+          utf8::next(iterator, end);
+        }
+        unsigned long long oct_num = std::stoull(octal, nullptr, 8);
+        utf8::append(static_cast<char32_t>(oct_num), buf);
+        // /ooo
+        continue;
       }
       utf8::next(iterator, end);
     } else {
@@ -75,6 +98,9 @@ std::string yaksha::string_utils::escape(const std::string &raw_string) {
     } else if (current == '\v') {
       utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
       utf8::append(static_cast<char32_t>('v'), buf);
+    } else if (current == 0) {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('0'), buf);
     } else {
       utf8::append(static_cast<char32_t>(current), buf);
     }
