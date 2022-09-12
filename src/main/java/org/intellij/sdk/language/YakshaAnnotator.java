@@ -34,7 +34,7 @@ public class YakshaAnnotator implements Annotator {
                         .range(fncall.getIdentifierExp().getTextRange())
                         .textAttributes(YakshaSyntaxHighlighter.KEYWORD)
                         .create();
-                if (fullName.equals("cast") && fncall.getArguments() != null
+                if ((fullName.equals("cast") || fullName.equals("arrnew") || fullName.equals("array")) && fncall.getArguments() != null
                         && fncall.getArguments().getExpList() != null
                         && fncall.getArguments().getExpList().size() > 0) {
                     YakshaExp dt = fncall.getArguments().getExpList().get(0);

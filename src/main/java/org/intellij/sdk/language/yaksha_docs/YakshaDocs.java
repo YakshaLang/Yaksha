@@ -29,6 +29,8 @@ public class YakshaDocs {
             .put("tostr", "If it is a string, copy is created. Floats are converted to 2 decimal places")
             .put("arrput", "Put item to an array")
             .put("arrpop", "Remove last item from an array and return it")
+            .put("arrnew", "Create a new array of given size. (Uninitialized elements)")
+            .put("array", "Create a new array from given elements")
             .put("getref", "Get a pointer to given object")
             .put("unref", "Dereference a pointer")
             .put("charat", "Get a character at a specific location in string")
@@ -44,6 +46,7 @@ public class YakshaDocs {
             .put("sorted", "Sort an array creating a new array. New array need to be deleted")
             .put("format", "String formatting builtin")
             .put("cast", "Data type casting builtin")
+            .put("qsort", "Sort an array, returns True if successful")
             .build();
     public static final Set<String> BUILTIN_FUNCTION_NAMES = BUILTIN_FUNCTIONS.keySet();
     public static final YakshaDocs INSTANCE = new YakshaDocs();
