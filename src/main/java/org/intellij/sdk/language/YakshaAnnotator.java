@@ -45,6 +45,11 @@ public class YakshaAnnotator implements Annotator {
                 }
 
             }
+        } else if (element instanceof YakshaRuntimefeatureStatement) {
+            holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                    .range(element.getTextRange())
+                    .textAttributes(YakshaSyntaxHighlighter.COMMENT)
+                    .create();
         }
     }
 

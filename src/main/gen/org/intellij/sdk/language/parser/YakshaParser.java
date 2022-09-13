@@ -1643,48 +1643,27 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // import_statement | const_statement | annotation* class_statement | annotation* def_statement
+  // runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement
   public static boolean outer_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "outer_statement")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, OUTER_STATEMENT, "<outer statement>");
-    r = import_statement(b, l + 1);
+    r = runtimefeature_statement(b, l + 1);
+    if (!r) r = import_statement(b, l + 1);
     if (!r) r = const_statement(b, l + 1);
-    if (!r) r = outer_statement_2(b, l + 1);
     if (!r) r = outer_statement_3(b, l + 1);
+    if (!r) r = outer_statement_4(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   // annotation* class_statement
-  private static boolean outer_statement_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "outer_statement_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = outer_statement_2_0(b, l + 1);
-    r = r && class_statement(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // annotation*
-  private static boolean outer_statement_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "outer_statement_2_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!annotation(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "outer_statement_2_0", c)) break;
-    }
-    return true;
-  }
-
-  // annotation* def_statement
   private static boolean outer_statement_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "outer_statement_3")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = outer_statement_3_0(b, l + 1);
-    r = r && def_statement(b, l + 1);
+    r = r && class_statement(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1696,6 +1675,28 @@ public class YakshaParser implements PsiParser, LightPsiParser {
       int c = current_position_(b);
       if (!annotation(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "outer_statement_3_0", c)) break;
+    }
+    return true;
+  }
+
+  // annotation* def_statement
+  private static boolean outer_statement_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "outer_statement_4")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = outer_statement_4_0(b, l + 1);
+    r = r && def_statement(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // annotation*
+  private static boolean outer_statement_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "outer_statement_4_0")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!annotation(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "outer_statement_4_0", c)) break;
     }
     return true;
   }
@@ -1803,6 +1804,27 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   // S?
   private static boolean return_statement_2_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_statement_2_0_0")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // KW_RUNTIMEFEATURE S STRING S? NL
+  public static boolean runtimefeature_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "runtimefeature_statement")) return false;
+    if (!nextTokenIs(b, KW_RUNTIMEFEATURE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, KW_RUNTIMEFEATURE, S, STRING);
+    r = r && runtimefeature_statement_3(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, m, RUNTIMEFEATURE_STATEMENT, r);
+    return r;
+  }
+
+  // S?
+  private static boolean runtimefeature_statement_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "runtimefeature_statement_3")) return false;
     consumeToken(b, S);
     return true;
   }

@@ -126,6 +126,7 @@ public class YakshaCompletionContributor extends CompletionContributor {
                         resultSet.addElement(LookupElementBuilder.create("None").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("and").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("not").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("runtimefeature").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("or").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("@native").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("@nativedefine").withIcon(YakshaIcons.KEYWORD));

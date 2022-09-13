@@ -21,7 +21,9 @@ private item_ ::= (outer_statement | COMMENT | empty_line)
 
 empty_line ::= S? NL
 
-outer_statement ::= import_statement | const_statement | annotation* class_statement | annotation* def_statement
+outer_statement ::= runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement
+
+runtimefeature_statement ::= KW_RUNTIMEFEATURE S STRING S? NL
 
 import_statement ::= KW_IMPORT S IDENTIFIER (OPERATOR_DOT IDENTIFIER)* (S KW_AS S IDENTIFIER)? S? NL {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"

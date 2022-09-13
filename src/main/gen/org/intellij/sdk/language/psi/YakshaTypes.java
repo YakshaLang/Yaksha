@@ -51,6 +51,7 @@ public interface YakshaTypes {
   IElementType PASS_STATEMENT = new YakshaElementType("PASS_STATEMENT");
   IElementType PRIMARY = new YakshaElementType("PRIMARY");
   IElementType RETURN_STATEMENT = new YakshaElementType("RETURN_STATEMENT");
+  IElementType RUNTIMEFEATURE_STATEMENT = new YakshaElementType("RUNTIMEFEATURE_STATEMENT");
   IElementType TERM = new YakshaElementType("TERM");
   IElementType UNARY = new YakshaElementType("UNARY");
   IElementType WHILE_STATEMENT = new YakshaElementType("WHILE_STATEMENT");
@@ -74,6 +75,7 @@ public interface YakshaTypes {
   IElementType KW_NONE = new YakshaTokenType("KW_NONE");
   IElementType KW_PASS = new YakshaTokenType("KW_PASS");
   IElementType KW_RETURN = new YakshaTokenType("KW_RETURN");
+  IElementType KW_RUNTIMEFEATURE = new YakshaTokenType("KW_RUNTIMEFEATURE");
   IElementType KW_TRUE = new YakshaTokenType("KW_TRUE");
   IElementType KW_WHILE = new YakshaTokenType("KW_WHILE");
   IElementType NL = new YakshaTokenType("NL");
@@ -231,6 +233,9 @@ public interface YakshaTypes {
       }
       else if (type == RETURN_STATEMENT) {
         return new YakshaReturnStatementImpl(node);
+      }
+      else if (type == RUNTIMEFEATURE_STATEMENT) {
+        return new YakshaRuntimefeatureStatementImpl(node);
       }
       else if (type == TERM) {
         return new YakshaTermImpl(node);
