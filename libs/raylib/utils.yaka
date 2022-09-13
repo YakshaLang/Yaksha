@@ -1,3 +1,5 @@
+runtimefeature "raylib"
+
 import raylib as rl
 
 def remap(x: float, a: float, b: float, c: float, d: float) -> float:

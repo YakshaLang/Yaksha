@@ -1,3 +1,5 @@
+runtimefeature "graphicutils"
+
 @nativedefine("yk__init_random")
 def init_random() -> u64:
     # Set a seed to random number generator using time (crypto unsafe)

@@ -55,10 +55,12 @@ namespace yaksha {
     const_stmt *get_const(const std::string &prefixed_name);
     void visit_import_stmt(import_stmt *obj) override;
     void visit_const_stmt(const_stmt *obj) override;
+    void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
     std::vector<std::string> function_names_{};
     std::vector<std::string> class_names_{};
     std::vector<std::string> global_const_names_{};
     std::vector<parsing_error> errors_{};
+    std::unordered_set<std::string> runtime_features_{};
 
 private:
     std::unordered_map<std::string, def_stmt *> functions_{};

@@ -4,13 +4,14 @@ import libs.fileformats.toml
 import libs.os
 import libs.os.path
 import libs.io
+import libs.console
 
 class CCode:
     # CCode section of yaksha.toml
     # defines - Injected defines for the generated c code
     # compiler_defines - /D or -D arguments
     # includes - Injected #include "x.h"
-    # includes - Injected #include <x.h>
+    # system_includes - Injected #include <x.h>
     include_paths: Array[str]
     defines: Array[str]
     compiler_defines: Array[str]
@@ -18,6 +19,10 @@ class CCode:
     system_includes: Array[str]
     c_code: Array[str]
     cpp_code: Array[str]
+    runtime_feature_defines: Array[str]
+    runtime_feature_includes: Array[str]
+    runtime_feature_c_code: Array[str]
+    runtime_feature_compiler_defines: Array[str]
 
 
 class Project:
@@ -207,39 +212,92 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     defer sarr.del_str_array(orig_include_paths)
     cc.include_paths = sarr.extend(df_include_paths, cc.include_paths)
 
-    # Add defaults to cc.compiler_defines
-    df_compiler_defines: Array[str] = sarr.new(1, "UTF8PROC_STATIC")
-    orig_compiler_defines: Array[str] = cc.compiler_defines
-    defer sarr.del_str_array(orig_compiler_defines)
-    cc.compiler_defines = sarr.extend(df_compiler_defines, cc.compiler_defines)
-
-    # Add defaults to cc.includes
-    df_includes: Array[str] = sarr.new(12, "whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h", "yk__console.h", "yk__arrayutils.h", "yk__process.h", "yk__graphic_utils.h", "yk__argparse.h", "argparse.h", "tinycthread.h")
-    orig_includes: Array[str] = cc.includes
-    defer sarr.del_str_array(orig_includes)
-    cc.includes = sarr.extend(df_includes, cc.includes)
-
-    # Add defaults to c_code
-    df_c_code: Array[str]
-    if c.compilation.web:
-        arrput(df_c_code, path.join(c.runtime_path, "yk__fake_whereami.c"))
-    else:
-        arrput(df_c_code, path.join(c.runtime_path, "whereami.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "yk__system.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "utf8proc.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "toml.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "yk__console.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "yk__arrayutils.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "yk__process.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "yk__graphic_utils.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "yk__argparse.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "argparse.c"))
-    arrput(df_c_code, path.join(c.runtime_path, "tinycthread.c"))
-    orig_c_code: Array[str] = cc.c_code
-    defer sarr.del_str_array(orig_c_code)
-    cc.c_code = sarr.extend(df_c_code, cc.c_code)
+    cc.runtime_feature_includes = sarr.new(1, "yk__system.h")
+    cc.runtime_feature_c_code = sarr.new(1, path.join(c.runtime_path, "yk__system.c"))
 
     return cc
+
+def load_runtime_features(c: Config, code: str) -> Config:
+    header: str = "// YK:"
+    has_requirements: bool = strings.startswith(code, header)
+    if not has_requirements:
+        console.cyan("runtime_features")
+        console.red(" := ")
+        console.green("none!")
+        print("\n")
+        return c
+    # Find #
+    until: int = strings.find_char(code, strings.ord("#"))
+    if until == -1:
+        # This must not happen
+        arrput(c.errors, "Failed to extract runtime features. Cannot find # in compiled code first line.")
+        return c
+    temp_features: str = strings.mid(code, len(header), until - len(header))
+    console.cyan("runtime_features")
+    console.red(" := ")
+    console.green(temp_features)
+    print("\n")
+    features: Array[str] = strings.split(temp_features, ",")
+    x: int = 0
+    length: int = len(features)
+    while x < length:
+        feature: str = features[x]
+        x = x + 1
+        if feature == "argparse":
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__argparse.c"))
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "argparse.c"))
+            arrput(c.c_code.runtime_feature_includes, "yk__argparse.h")
+            arrput(c.c_code.runtime_feature_includes, "argparse.h")
+            continue
+        if feature == "arrayutils":
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__arrayutils.c"))
+            arrput(c.c_code.runtime_feature_includes, "yk__arrayutils.h")
+            continue
+        if feature == "console":
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__console.c"))
+            arrput(c.c_code.runtime_feature_includes, "yk__console.h")
+            continue
+        if feature == "graphicutils":
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__graphic_utils.c"))
+            arrput(c.c_code.runtime_feature_includes, "yk__graphic_utils.h")
+            continue
+        if feature == "ini":
+            arrput(c.c_code.runtime_feature_defines, "INI_IMPLEMENTATION")
+            arrput(c.c_code.runtime_feature_includes, "ini.h")
+            continue
+        if feature == "process":
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__process.c"))
+            arrput(c.c_code.runtime_feature_includes, "yk__process.h")
+            continue
+        if feature == "raylib":
+            # Enable raylib building feature !
+            c.compilation.raylib = True
+            continue
+        if feature == "tinycthread":
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "tinycthread.c"))
+            arrput(c.c_code.runtime_feature_includes, "tinycthread.h")
+            continue
+        if feature == "toml":
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "toml.c"))
+            arrput(c.c_code.runtime_feature_includes, "toml.h")
+            continue
+        if feature == "utf8proc":
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "utf8proc.c"))
+            arrput(c.c_code.runtime_feature_compiler_defines, "UTF8PROC_STATIC")
+            arrput(c.c_code.runtime_feature_includes, "utf8proc.h")
+            arrput(c.c_code.runtime_feature_includes, "yk__utf8iter.h")
+            continue
+        if feature == "whereami":
+            if c.compilation.web:
+                arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__fake_whereami.c"))
+            else:
+                arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "whereami.c"))
+            arrput(c.c_code.runtime_feature_includes, "whereami.h")
+            continue
+        # Invalid feature
+        arrput(c.errors, "Invalid runtime feature: " + feature)
+        break
+    return c
 
 def load_config() -> Config:
     # Load completed config with injected defaults
@@ -332,6 +390,10 @@ def del_config(c: Config) -> None:
         sarr.del_str_array(c.c_code.system_includes)
         sarr.del_str_array(c.c_code.c_code)
         sarr.del_str_array(c.c_code.cpp_code)
+        sarr.del_str_array(c.c_code.runtime_feature_defines)
+        sarr.del_str_array(c.c_code.runtime_feature_includes)
+        sarr.del_str_array(c.c_code.runtime_feature_c_code)
+        sarr.del_str_array(c.c_code.runtime_feature_compiler_defines)
 
     sarr.del_str_array(c.errors)
 

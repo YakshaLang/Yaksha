@@ -939,3 +939,4 @@ void compiler::write_statement(std::string code_line) {
   body_ << code_line;
   write_end_statement(body_);
 }
+void compiler::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}

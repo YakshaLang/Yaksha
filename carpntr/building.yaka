@@ -17,6 +17,12 @@ def prepare_code(c: carp.Config, code: str) -> str:
     # --
     length: int = 0
     x: int = 0
+    # write #runtime_defines
+    length = len(c.c_code.runtime_feature_defines)
+    x = 0
+    while x < length:
+        sbuf.append(buf, "#define " + c.c_code.runtime_feature_defines[x] + "\n")
+        x = x + 1
     # write #defines
     length = len(c.c_code.defines)
     x = 0
@@ -29,12 +35,6 @@ def prepare_code(c: carp.Config, code: str) -> str:
     while x < length:
         sbuf.append(buf, "#include <" + c.c_code.system_includes[x] + ">\n")
         x = x + 1
-    # write #include ""
-    length = len(c.c_code.includes)
-    x = 0
-    while x < length:
-        sbuf.append(buf, "#include \"" + c.c_code.includes[x] + "\"\n")
-        x = x + 1
     # Add raylib.h & friends
     if c.compilation.raylib:
         sbuf.append(buf, "#include \"raylib.h\"\n")
@@ -42,6 +42,18 @@ def prepare_code(c: carp.Config, code: str) -> str:
         sbuf.append(buf, "#include \"raymath.h\"\n")
         sbuf.append(buf, "#include \"rlgl.h\"\n")
         sbuf.append(buf, "#include \"rayextras.h\"\n")
+    # write runtime feature #include ""
+    length = len(c.c_code.runtime_feature_includes)
+    x = 0
+    while x < length:
+        sbuf.append(buf, "#include \"" + c.c_code.runtime_feature_includes[x] + "\"\n")
+        x = x + 1
+    # write #include ""
+    length = len(c.c_code.includes)
+    x = 0
+    while x < length:
+        sbuf.append(buf, "#include \"" + c.c_code.includes[x] + "\"\n")
+        x = x + 1
     # code itself
     sbuf.append(buf, code)
     sbuf.append(buf, "\n")
@@ -89,12 +101,26 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         include: str = "-I" + c.c_code.include_paths[x]
         arrput(args, include)
         x = x + 1
+    # runtime feature compiler defines
+    length = len(c.c_code.runtime_feature_compiler_defines)
+    x = 0
+    while x < length:
+        cdefine: str = "-D" + c.c_code.runtime_feature_compiler_defines[x]
+        arrput(args, cdefine)
+        x = x + 1
     # compiler defines
     length = len(c.c_code.compiler_defines)
     x = 0
     while x < length:
         cdefine: str = "-D" + c.c_code.compiler_defines[x]
         arrput(args, cdefine)
+        x = x + 1
+    # runtime c codes
+    length = len(c.c_code.runtime_feature_c_code)
+    x = 0
+    while x < length:
+        rfc: str = c.c_code.runtime_feature_c_code[x]
+        arrput(args, rfc)
         x = x + 1
     # c codes
     length = len(c.c_code.c_code)
@@ -155,6 +181,10 @@ def build_target(c: carp.Config, code_path: str, build_path: str, target: str, r
 def build(c: carp.Config, code: str) -> int:
     # Cross build all compilation targets
     # zero is returned if all are successful
+    carp.load_runtime_features(c, code)
+    if len(c.errors) > 0:
+        # TODO print errors
+        return -1
 
     target_count: int = len(c.compilation.targets)
     raylib_args: Array[str]
@@ -198,6 +228,10 @@ def build(c: carp.Config, code: str) -> int:
 
 def build_simple(c: carp.Config, code: str) -> int:
     # Native build only
+    carp.load_runtime_features(c, code)
+    if len(c.errors) > 0:
+        # TODO print errors
+        return -1
     code_path: str = path.join(os.cwd(), c.project.name + ".c")
     raylib_args: Array[str]
     target: str = ""

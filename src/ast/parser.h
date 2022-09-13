@@ -62,6 +62,7 @@ private:
     stmt *def_statement(annotations ants);
     stmt *class_statement(annotations ants);
     stmt *import_statement();
+    stmt *runtimefeature_statement();
     std::vector<parameter> parse_class_members(token *name);
     stmt *expression_statement();
     stmt *declaration_statement();

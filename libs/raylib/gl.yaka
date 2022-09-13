@@ -1,3 +1,5 @@
+runtimefeature "raylib"
+
 import libs.c
 import raylib as rl
 

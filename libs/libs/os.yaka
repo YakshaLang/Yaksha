@@ -1,3 +1,6 @@
+runtimefeature "whereami"
+runtimefeature "process"
+
 import libs.strings
 import libs.strings.array as sarr
 import libs.os.path as ospath

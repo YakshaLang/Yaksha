@@ -1,3 +1,5 @@
+runtimefeature "tinycthread"
+
 PLAIN: Const[int] = 0
 TIMED: Const[int] = 1
 RECURSIVE: Const[int] = 2

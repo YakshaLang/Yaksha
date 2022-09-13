@@ -656,3 +656,4 @@ bool type_checker::slot_match(const ykobject &arg, ykdatatype *datatype) {
   if (arg.is_primitive_or_obj() && *arg.datatype_ == *datatype) { return true; }
   return false;
 }
+void type_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}

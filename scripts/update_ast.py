@@ -79,7 +79,9 @@ STMTS = sorted([
     ("class", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
     # import io [as io]
     ("import", (("token*", "import_token"), ("std::vector<token*>", "import_names"),
-                ("token*", "name"), ("file_info*", "data")))
+                ("token*", "name"), ("file_info*", "data"))),
+    # runtimefeature statement
+    ("runtimefeature", (("token*", "runtimefeature_token"), ("token*", "feature")))
 ], key=lambda x: x[0])
 
 # EXPR CODE GEN

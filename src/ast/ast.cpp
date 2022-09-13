@@ -301,6 +301,21 @@ stmt *ast_pool::c_return_stmt(token *return_keyword, expr *expression) {
   cleanup_stmt_.push_back(o);
   return o;
 }
+runtimefeature_stmt::runtimefeature_stmt(token *runtimefeature_token,
+                                         token *feature)
+    : runtimefeature_token_(runtimefeature_token), feature_(feature) {}
+void runtimefeature_stmt::accept(stmt_visitor *v) {
+  v->visit_runtimefeature_stmt(this);
+}
+ast_type runtimefeature_stmt::get_type() {
+  return ast_type::STMT_RUNTIMEFEATURE;
+}
+stmt *ast_pool::c_runtimefeature_stmt(token *runtimefeature_token,
+                                      token *feature) {
+  auto o = new runtimefeature_stmt(runtimefeature_token, feature);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
 while_stmt::while_stmt(token *while_keyword, expr *expression, stmt *while_body)
     : while_keyword_(while_keyword), expression_(expression),
       while_body_(while_body) {}

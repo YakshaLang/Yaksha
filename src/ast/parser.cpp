@@ -326,6 +326,9 @@ stmt *parser::declaration_statement() {
   token *data_type = nullptr;
   try {
     if (match({token_type::KEYWORD_IMPORT})) { return import_statement(); }
+    if (match({token_type::KEYWORD_RUNTIMEFEATURE})) {
+      return runtimefeature_statement();
+    }
     if (match({token_type::KEYWORD_DEF})) { return def_statement({}); }
     if (match({token_type::KEYWORD_CLASS})) { return class_statement({}); }
     if (match({token_type::AT})) { return attempt_parse_def_or_class(); }
@@ -646,4 +649,17 @@ void parser::rescan_datatypes() {
     auto module_data = import_stmts_alias_[import_alias];
     dt->module_ = module_data->data_->filepath_.string();
   }
+}
+stmt *parser::runtimefeature_statement() {
+  auto runtime_feature_kw = previous();
+  auto cc = peek();
+  if (cc->type_ != token_type::STRING &&
+      cc->type_ != token_type::THREE_QUOTE_STRING) {
+    throw error(runtime_feature_kw,
+                "Expected runtimefeature statement to have a string literal.");
+  }
+  advance();
+  consume_or_eof(token_type::NEW_LINE,
+                 "Expect new line after value for runtimefeature statement.");
+  return pool_.c_runtimefeature_stmt(runtime_feature_kw, cc);
 }

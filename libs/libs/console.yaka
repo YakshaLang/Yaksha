@@ -1,3 +1,5 @@
+runtimefeature "console"
+
 REWIND: Const[int] = 0
 # Use rewind with set_color to stop applying any color
 RED: Const[int] = 1

@@ -1,4 +1,5 @@
 ######## String arrays
+runtimefeature "arrayutils"
 
 @nativedefine("yk__newsdsarray")
 @varargs

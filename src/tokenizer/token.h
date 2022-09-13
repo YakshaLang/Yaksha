@@ -90,6 +90,7 @@ namespace yaksha {
     KEYWORD_OR,
     KEYWORD_PASS,
     KEYWORD_RETURN,
+    KEYWORD_RUNTIMEFEATURE,
     KEYWORD_TRY,
     KEYWORD_WHILE,
     TK_UNKNOWN_TOKEN_DETECTED
@@ -180,6 +181,8 @@ namespace yaksha {
     if (t == token_type::KEYWORD_OR) return "KEYWORD_OR";
     if (t == token_type::KEYWORD_PASS) return "KEYWORD_PASS";
     if (t == token_type::KEYWORD_RETURN) return "KEYWORD_RETURN";
+    if (t == token_type::KEYWORD_RUNTIMEFEATURE)
+      return "KEYWORD_RUNTIMEFEATURE";
     if (t == token_type::KEYWORD_TRY) return "KEYWORD_TRY";
     if (t == token_type::KEYWORD_WHILE) return "KEYWORD_WHILE";
     return "TK_UNKNOWN_TOKEN_DETECTED";
@@ -265,6 +268,8 @@ namespace yaksha {
     if (t == "KEYWORD_OR") return token_type::KEYWORD_OR;
     if (t == "KEYWORD_PASS") return token_type::KEYWORD_PASS;
     if (t == "KEYWORD_RETURN") return token_type::KEYWORD_RETURN;
+    if (t == "KEYWORD_RUNTIMEFEATURE")
+      return token_type::KEYWORD_RUNTIMEFEATURE;
     if (t == "KEYWORD_TRY") return token_type::KEYWORD_TRY;
     if (t == "KEYWORD_WHILE") return token_type::KEYWORD_WHILE;
     return token_type::TK_UNKNOWN_TOKEN_DETECTED;
@@ -293,6 +298,7 @@ namespace yaksha {
     if (t == "or") return token_type::KEYWORD_OR;
     if (t == "pass") return token_type::KEYWORD_PASS;
     if (t == "return") return token_type::KEYWORD_RETURN;
+    if (t == "runtimefeature") return token_type::KEYWORD_RUNTIMEFEATURE;
     if (t == "try") return token_type::KEYWORD_TRY;
     if (t == "while") return token_type::KEYWORD_WHILE;
     return token_type::TK_UNKNOWN_TOKEN_DETECTED;

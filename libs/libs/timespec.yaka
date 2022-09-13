@@ -1,3 +1,5 @@
+runtimefeature "tinycthread"
+
 @nativedefine("struct timespec")
 @dotaccess
 class TimeSpec:

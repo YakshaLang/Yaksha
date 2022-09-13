@@ -1,3 +1,5 @@
+runtimefeature "toml"
+
 @nativedefine("toml_table_t*")
 class Table:
     # TOML Table object

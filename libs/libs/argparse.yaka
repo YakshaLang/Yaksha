@@ -1,3 +1,5 @@
+runtimefeature "argparse"
+
 import libs.c
 
 ARGPARSE_DEFAULT: Const[int] = 0

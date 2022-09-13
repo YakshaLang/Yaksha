@@ -30,6 +30,8 @@ FILE_BEGIN = """
 # -- Raylib Wrapper for Yaksha --- 
 # This is generated with generate_raylib.py, Uses raylib_parser.c and raylib.h
 
+runtimefeature "raylib"
+
 import libs.c
 
 $REPLACE_ME$
@@ -555,7 +557,7 @@ def build(header, target_file, define="RLAPI", add_base=False):
     print("Building:" + Colors.cyan(os.path.basename(target_file)))
     print(Colors.green("==============="))
     if not add_base:
-        CODE.buf = ["import libs.c\nimport raylib as rl\n\n"]
+        CODE.buf = ["runtimefeature \"raylib\"\n\nimport libs.c\nimport raylib as rl\n\n"]
     else:
         CODE.buf = []
     arg = DUMPER + " " + "--input \"" + header + "\"" + " --define " + define + " --output \"" + OUT + "\" --format JSON"

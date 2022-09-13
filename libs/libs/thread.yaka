@@ -1,3 +1,5 @@
+runtimefeature "tinycthread"
+
 import libs.timespec
 
 ERROR: Const[int] = 0

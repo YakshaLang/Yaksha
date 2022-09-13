@@ -2,6 +2,7 @@
 #include "def_class_visitor.h"
 #include "builtins/builtins.h"
 #include "compiler_utils.h"
+#include <regex>
 using namespace yaksha;
 def_class_visitor::def_class_visitor(builtins *builtins)
     : builtins_(builtins){};
@@ -59,11 +60,13 @@ void def_class_visitor::extract(const std::vector<stmt *> &statements) {
     if (statement_type == ast_type::STMT_DEF ||
         statement_type == ast_type::STMT_CLASS ||
         statement_type == ast_type::STMT_CONST ||
-        statement_type == ast_type::STMT_IMPORT) {
+        statement_type == ast_type::STMT_IMPORT ||
+        statement_type == ast_type::STMT_RUNTIMEFEATURE) {
       st->accept(this);
     } else {
       // TODO can we find out if there's a token for this statement type?
-      error(nullptr, "Invalid statement detected. Only def, class, import"
+      error(nullptr, "Invalid statement detected."
+                     " Only def, class, import, runtimefeature"
                      " or constant statements are supported at module level.");
     }
   }
@@ -175,4 +178,13 @@ bool def_class_visitor::has_const(const std::string &prefixed_name) {
 const_stmt *def_class_visitor::get_const(const std::string &prefixed_name) {
   if (has_const(prefixed_name)) { return global_consts_[prefixed_name]; }
   return nullptr;
+}
+void def_class_visitor::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
+  std::string feature = obj->feature_->token_;
+  if (!std::regex_match(feature, std::regex("[a-z][a-z0-8A-Z_]*"))) {
+    error(obj->runtimefeature_token_,
+          "Critical!! invalid runtime feature. Must match [a-z][a-z0-8A-Z_]*");
+    return;
+  }
+  runtime_features_.emplace(feature);
 }

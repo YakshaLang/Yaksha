@@ -1,3 +1,5 @@
+runtimefeature "tinycthread"
+
 import libs.thread.mutex
 import libs.timespec
 

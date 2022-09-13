@@ -91,6 +91,7 @@ multifile_compiler::compile(const std::string &code,
   std::stringstream struct_body{};
   std::stringstream function_body{};
   std::stringstream global_consts{};
+  std::unordered_set<std::string> runtime_features{};
   int file_count = static_cast<int>(cf.files_.size());
   for (int i = file_count - 1; i >= 0; i--) {
     auto f = cf.files_[i];
@@ -101,10 +102,34 @@ multifile_compiler::compile(const std::string &code,
     struct_body << result.classes_;
     function_body << result.body_;
     global_consts << result.global_constants_;
+    for (const std::string &feature : f->data_->dsv_->runtime_features_) {
+      runtime_features.insert(feature);
+    }
   }
+  std::vector<std::string> rf{};
+  rf.insert(rf.end(), runtime_features.begin(), runtime_features.end());
+  std::sort(rf.begin(), rf.end());
   std::stringstream c_code{};
-  c_code << "// YK\n";
-  c_code << "#include \"yk__lib.h\"\n";
+  // Write the feature requirements
+  // ---
+  // Format: // YK --> no requirements
+  // Format: // YK:a,b,c# --> 'a', 'b', 'c' are requirements
+  // Format: // YK:a# --> 'a' is the only requirement
+  c_code << "// YK";
+  if (!rf.empty()) {
+    c_code << ":";
+    bool first = true;
+    for (auto &feature : rf) {
+      if (first) {
+        first = false;
+      } else {
+        c_code << ",";
+      }
+      c_code << feature;
+    }
+    c_code << "#";
+  }
+  c_code << "\n#include \"yk__lib.h\"\n";
   c_code << "// --forward declarations-- \n";
   c_code << global_consts.str();
   c_code << struct_forward_decls.str();

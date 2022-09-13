@@ -75,6 +75,7 @@ namespace yaksha {
      * Write a statement to code body (in current function)
      */
     void write_statement(std::string code_line) override;
+    void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
 
 private:
     void push_scope_type(ast_type scope_type);

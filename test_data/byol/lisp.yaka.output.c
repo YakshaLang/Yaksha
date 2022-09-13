@@ -236,7 +236,7 @@ int32_t yy__main()
     yy__mpc_Mpc yy__expr = yy__mpc_new(yk__sdsdup(t__17));
     yk__sds t__18 = yk__sdsnew("lispy");
     yy__mpc_Mpc yy__lispy = yy__mpc_new(yk__sdsdup(t__18));
-    yk__sds t__19 = yk__sdsnew("\n      number   : /-?[0-9]+/ ;\n      operator : \'+\' | \'-\' | \'*\' | \'/\' ;\n      expr     : <number> | \'(\' <operator> <expr>+ \')\' ;\n      lispy    : /^/ <operator> <expr>+ /$/ ;\n    ");
+    yk__sds t__19 = yk__sdsnew("\n      number   : /-\?[0-9]+/ ;\n      operator : \'+\' | \'-\' | \'*\' | \'/\' ;\n      expr     : <number> | \'(\' <operator> <expr>+ \')\' ;\n      lispy    : /^/ <operator> <expr>+ /$/ ;\n    ");
     yk__sds yy__lang = yk__sdsdup(t__19);
     yy__mpc_mpca_lang(0, yk__sdsdup(yy__lang), yy__number, yy__operator, yy__expr, yy__lispy);
     yk__sds t__20 = yk__sdsnew("Lispy Version 0.0.0.0.2\n");

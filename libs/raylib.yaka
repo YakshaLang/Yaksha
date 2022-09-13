@@ -1,6 +1,8 @@
 # -- Raylib Wrapper for Yaksha --- 
 # This is generated with generate_raylib.py, Uses raylib_parser.c and raylib.h
 
+runtimefeature "raylib"
+
 import libs.c
 
 FLAG_VSYNC_HINT: Const[int] = 64

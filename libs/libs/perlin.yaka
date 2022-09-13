@@ -1,3 +1,5 @@
+runtimefeature "graphicutils"
+
 @nativedefine("yk__perlin1d")
 def noise1d(x: f64) -> f64:
     # Get perlin noise in 1d (Calls 3d noise with hardcoded y, z values)

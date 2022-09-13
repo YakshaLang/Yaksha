@@ -1,3 +1,5 @@
+runtimefeature "tinycthread"
+
 import libs.thread
 
 @nativedefine("tss_t")
