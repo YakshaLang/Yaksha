@@ -1,10 +1,7 @@
 FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
-# TODO do we even use clang? maybe we should use it in addition to gcc?
-    # But at the moment this is useless
-    # Perhaps we can remove clang-12 install here !
 ARG CMAKE_VERSION=3.22.0
-RUN apt-get update && apt-get -y -q install clang-12 git wget build-essential python3 libssl-dev lcov gcovr dos2unix
+RUN apt-get update && apt-get -y -q install clang-12 clang-tools git wget build-essential python3 libssl-dev lcov gcovr dos2unix
 
 RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz \
   && tar -zxf cmake-${CMAKE_VERSION}.tar.gz \

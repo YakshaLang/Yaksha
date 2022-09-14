@@ -27,57 +27,61 @@ codefiles::~codefiles() {
 file_info *codefiles::scan_main(const std::string &code,
                                 const std::string &filename) {
   std::error_code err{};
-  auto path = std::filesystem::absolute(std::filesystem::path(filename), err);
+  std::filesystem::path f{filename};
+  auto path = std::filesystem::absolute(f, err);
+  std::string str_path = path.string();
   auto p = parse(code, filename);
   if (p == nullptr) {
-    print_unable_to_process_error(path.string());
+    print_unable_to_process_error(str_path);
     return nullptr;
   }
   auto fi = new file_info{path, "yy__", p};
-  path_to_fi_.insert({path.string(), fi});
-  prefixes_.insert(std::string{"yy__"});
+  path_to_fi_[str_path] = fi;
+  prefixes_.insert({"yy__"});
   files_.emplace_back(fi);
   for (auto imp : fi->data_->parser_->import_stmts_) {
     auto import_data = scan(imp);
     if (import_data == nullptr) { return nullptr; }
     imp->data_ = import_data;
   }
-  return path_to_fi_[path.string()];
+  return fi;
 }
 file_info *codefiles::scan_main(const std::string &filename) {
   std::error_code err{};
-  auto path = std::filesystem::absolute(std::filesystem::path(filename), err);
+  std::filesystem::path f{filename};
+  auto path = std::filesystem::absolute(f, err);
+  std::string str_path = path.string();
   if (err) {
-    print_file_not_found_error(path.string());
+    print_file_not_found_error(str_path);
     return nullptr;
   }
   if (!std::filesystem::exists(path, err)) {
-    print_file_not_found_error(path.string());
+    print_file_not_found_error(str_path);
     return nullptr;
   }
   if (err) {
-    print_file_not_found_error(path.string());
+    print_file_not_found_error(str_path);
     return nullptr;
   }
   current_path_ = path.parent_path();
-  if (path_to_fi_.find(path.string()) != path_to_fi_.end()) {// not found
-    return path_to_fi_[path.string()];
+  if (path_to_fi_.find(str_path) != path_to_fi_.end()) {// not found
+    return path_to_fi_[str_path];
   }
   auto p = parse(path);
   if (p == nullptr) {
-    print_unable_to_process_error(path.string());
+    print_unable_to_process_error(str_path);
     return nullptr;
   }
   auto fi = new file_info{path, "yy__", p};
-  path_to_fi_.insert({path.string(), fi});
-  prefixes_.insert(std::string{"yy__"});
+  path_to_fi_[str_path] = fi;
+  prefixes_.insert({"yy__"});
   files_.emplace_back(fi);
   for (auto imp : fi->data_->parser_->import_stmts_) {
     auto import_data = scan(imp);
     if (import_data == nullptr) { return nullptr; }
     imp->data_ = import_data;
   }
-  return path_to_fi_[path.string()];
+  return fi;
 }
 file_info *codefiles::scan(import_stmt *st) {
   auto p = std::filesystem::path{current_path_};

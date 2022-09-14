@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+echo "running fuzzer script..."
+docker build -t yaksha .
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+export COV=$(realpath "./bin/coverage")
+export FUZZ=$(realpath "./bin/fuzz")
+echo "coverage path is $COV"
+echo "fuzz path is $FUZZ"
+docker run -v "$COV:/coverage" -v "$FUZZ:/fuzz" --rm -it --entrypoint /app/scripts/llvm-fuzzer.sh yaksha

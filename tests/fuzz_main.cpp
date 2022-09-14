@@ -47,9 +47,10 @@ void test_compiler(const std::string &filepath) {
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   std::string code{(char *) Data, Size};
   std::string fname = "fuzz_dummy.yaka";
+  std::string lib_path = "/app/libs";
   test_ast(code, fname);
   multifile_compiler mc{};
-  mc.compile(code, fname, "/app/libs");
+  mc.compile(code, true, fname, lib_path);
   return 0;
 }
 #else

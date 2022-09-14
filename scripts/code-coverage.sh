@@ -14,20 +14,19 @@ cd ../test_data || exit 1
 dos2unix *
 cd ../bin || exit 1
 # Run test cases
+echo "██    ██ ███    ██ ██ ████████     ████████ ███████ ███████ ████████"
+echo "██    ██ ████   ██ ██    ██           ██    ██      ██         ██"
+echo "██    ██ ██ ██  ██ ██    ██           ██    █████   ███████    ██"
+echo "██    ██ ██  ██ ██ ██    ██           ██    ██           ██    ██"
+echo " ██████  ██   ████ ██    ██           ██    ███████ ███████    ██"
 ./YakshaTests
 # Run Fuzzy testing
+echo "██   ██  █████  ██████   █████  ██████   █████  ██    ██  █████ "
+echo "██  ██  ██   ██ ██   ██ ██   ██ ██   ██ ██   ██  ██  ██  ██   ██"
+echo "█████   ███████ ██████  ███████ ██████  ███████   ████   ███████"
+echo "██  ██  ██   ██ ██   ██ ██   ██ ██   ██ ██   ██    ██    ██   ██"
+echo "██   ██ ██   ██ ██████  ██   ██ ██   ██ ██   ██    ██    ██   ██"
+echo "--------------------- Simple Fuzzy Testing ---------------------"
 cd ../scripts && python3 kabaraya.py && cd ../bin
 # Calculate code coverage
 gcovr -r .. --exclude ../build --exclude ../tests --exclude ../3rd --html --html-details -o /coverage/index.html
-# Run LibFuzzer fuzzy testing
-set +e
-echo ========================= Running LibFuzzer fuzzy testing ====
-cd ..
-mkdir fuzz-build
-cd fuzz-build
-export YAKSHA_FUZZ=1
-CC=clang-12 CXX=clang++-12 cmake -S .. -B .
-cmake --build . --target YakshaFuzz
-cd ../bin
-./YakshaFuzz -fork=2 ../test_data
-cp crash-* /fuzz

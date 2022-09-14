@@ -27,6 +27,8 @@ bin/YakshaTests
 bin/cmakecarpntr
 bin/raylib-parser
 bin/fuzz/crash-*
+bin/fuzz/leak-*
+bin/fuzz/timeout-*
 bin/fuzz/fuzz_*
 comp_output_test
 __pycache__

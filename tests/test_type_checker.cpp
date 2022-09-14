@@ -19,7 +19,7 @@ using namespace yaksha;
     xa += (S);                                                                 \
     xa += "\n"                                                                 \
           "    return 0";                                                      \
-    auto result = mc.compile(xa, "dummy.yaka", ".");                           \
+    auto result = mc.compile(xa, true, "dummy.yaka", ".");                     \
     REQUIRE(result.failed_ == true);                                           \
     REQUIRE(!yaksha::errors::error_capture.empty());                           \
     REQUIRE(yaksha::errors::has_error(E));                                     \
@@ -41,11 +41,13 @@ TEST_CASE("type checker: Builtin arrnew invalid arg count") {
   TEST_SNIPPET("a: Array[int] = arrnew()",
                "Two arguments must be provided for arrnew() builtin");
 }
-TEST_CASE("type checker: First argument must be a string literal for arrnew()") {
+TEST_CASE(
+    "type checker: First argument must be a string literal for arrnew()") {
   TEST_SNIPPET("a: Array[int] = arrnew(1, 10)",
                "First argument to arrnew() must be a string literal");
 }
-TEST_CASE("type checker: First argument must be a string literal for arrnew(). Does not "
+TEST_CASE("type checker: First argument must be a string literal for arrnew(). "
+          "Does not "
           "work with variables") {
   TEST_SNIPPET("b: str = \"str\"\n    a: Array[int] = arrnew(b, 10)",
                "First argument to arrnew() must be a string literal");
@@ -67,7 +69,8 @@ TEST_CASE("type checker: First argument must be a string literal for array()") {
                "All arguments must match with data type passed to first "
                "argument for array() builtin");
 }
-TEST_CASE("type checker: First argument must be a string literal for array(). Does not "
+TEST_CASE("type checker: First argument must be a string literal for array(). "
+          "Does not "
           "work with variables") {
   TEST_SNIPPET("b: str = \"str\"\n    a: Array[int] = array(b, 10)",
                "First argument to array() must be a string literal");
