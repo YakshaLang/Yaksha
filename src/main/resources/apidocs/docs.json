@@ -392,8 +392,13 @@
           },
           {
             "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CStr"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "result"
           },
@@ -1769,7 +1774,7 @@
             "name": "@native"
           }
         ],
-        "comment": "Get a property in given section",
+        "comment": "Get a property in given section\nEmpty string is returned if we cannot find the section",
         "name": "get",
         "parameters": [
           {
@@ -2429,320 +2434,6 @@
     ],
     "global_consts": [],
     "imports": []
-  },
-  "libs.mpc": {
-    "classes": [
-      {
-        "annotations": [
-          {
-            "argument": "mpc_ast_t*",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "",
-        "members": [
-          {
-            "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
-            },
-            "name": "tag"
-          },
-          {
-            "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
-            },
-            "name": "contents"
-          },
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "Ast"
-                }
-              ],
-              "type": "Array"
-            },
-            "name": "children"
-          },
-          {
-            "datatype": {
-              "type": "int"
-            },
-            "name": "children_num"
-          }
-        ],
-        "name": "Ast"
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mpc_parser_t*",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "",
-        "members": [],
-        "name": "Mpc"
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mpc_result_t*",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "",
-        "members": [
-          {
-            "datatype": {
-              "type": "Ast"
-            },
-            "name": "output"
-          }
-        ],
-        "name": "Result"
-      }
-    ],
-    "functions": [
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "ast_print",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "Result"
-            },
-            "name": "r"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mpc_cleanup",
-            "name": "@nativedefine"
-          },
-          {
-            "argument": "",
-            "name": "@varargs"
-          }
-        ],
-        "comment": "",
-        "name": "cleanup",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "int"
-            },
-            "name": "a"
-          },
-          {
-            "datatype": {
-              "type": "Mpc"
-            },
-            "name": "v"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "del_ast",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "Result"
-            },
-            "name": "r"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "del_err",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "Result"
-            },
-            "name": "r"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "err_print",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "Result"
-            },
-            "name": "r"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mpca_lang",
-            "name": "@nativedefine"
-          },
-          {
-            "argument": "",
-            "name": "@varargs"
-          }
-        ],
-        "comment": "",
-        "name": "mpca_lang",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "int"
-            },
-            "name": "a"
-          },
-          {
-            "datatype": {
-              "type": "str"
-            },
-            "name": "b"
-          },
-          {
-            "datatype": {
-              "type": "Mpc"
-            },
-            "name": "v"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mpc_new",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "",
-        "name": "new",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "str"
-            },
-            "name": "a"
-          }
-        ],
-        "return_type": {
-          "type": "Mpc"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@native"
-          }
-        ],
-        "comment": "",
-        "name": "new_result",
-        "parameters": [],
-        "return_type": {
-          "type": "Result"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "mpc_parse",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "",
-        "name": "parse",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "str"
-            },
-            "name": "a"
-          },
-          {
-            "datatype": {
-              "type": "str"
-            },
-            "name": "b"
-          },
-          {
-            "datatype": {
-              "type": "Mpc"
-            },
-            "name": "v"
-          },
-          {
-            "datatype": {
-              "type": "Result"
-            },
-            "name": "r"
-          }
-        ],
-        "return_type": {
-          "type": "bool"
-        }
-      }
-    ],
-    "global_consts": [],
-    "imports": [
-      {
-        "alias": "c",
-        "path": [
-          "libs",
-          "c"
-        ]
-      }
-    ]
   },
   "libs.numbers": {
     "classes": [],
@@ -4094,6 +3785,33 @@
             "name": "@native"
           }
         ],
+        "comment": "Find first occurance of given character",
+        "name": "find_char",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "value"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "ch"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
         "comment": "Create a string from CStr",
         "name": "from_cstr",
         "parameters": [
@@ -4319,6 +4037,39 @@
             "name": "@native"
           }
         ],
+        "comment": "Cut a string from given position for number characters\nReturns empty() if input is invalid",
+        "name": "mid",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "a"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "position"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "number"
+          }
+        ],
+        "return_type": {
+          "type": "str"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
         "comment": "Create a new iterator from given string",
         "name": "new_iter",
         "parameters": [
@@ -4331,6 +4082,21 @@
         ],
         "return_type": {
           "type": "Utf8IterateState"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "",
+        "name": "null_cstr",
+        "parameters": [],
+        "return_type": {
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
