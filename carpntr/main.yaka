@@ -107,7 +107,7 @@ def perform_build() -> int:
     ret: int = build_from_config(config, False)
     return ret
 
-def perform_run(filename: str, use_raylib: bool, use_web: bool, web_shell: str) -> int:
+def perform_run(filename: str, use_raylib: bool, use_web: bool, web_shell: str, silent: bool) -> int:
     # Perform single file project build and execute binary
     name: str = path.remove_extension(path.basename(filename))
     config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib, use_web, web_shell)
@@ -115,7 +115,8 @@ def perform_run(filename: str, use_raylib: bool, use_web: bool, web_shell: str) 
     if len(config.errors) > 0:
         print_errors(config.errors)
         return -1
-    print_config(config)
+    if not silent:
+        print_config(config)
     ret: int = build_from_config(config, True)
     if ret != 0:
         return ret
@@ -149,6 +150,7 @@ def handle_args(args: os.arguments) -> int:
     run: int = 0
     raylib: int = 0
     web: int = 0
+    silent_mode: int = 0
     file_path: c.CStr = strings.null_cstr()
     web_shell: str = ""
     arrput(options, argparse.opt_help())
@@ -156,6 +158,7 @@ def handle_args(args: os.arguments) -> int:
     arrput(options, argparse.opt_boolean("r", "raylib", getref(raylib), "enable raylib (works only with run)"))
     arrput(options, argparse.opt_boolean("w", "web", getref(web), "build for web (works only with run & raylib)"))
     arrput(options, argparse.opt_string("s", "shell", getref(file_path), "specify shell file for web builds"))
+    arrput(options, argparse.opt_boolean("S", "silent", getref(silent_mode), "do not print anything except errors"))
     arrput(options, argparse.opt_end())
 
     a: argparse.ArgParse = argparse.new(options, usages)
@@ -181,16 +184,17 @@ def handle_args(args: os.arguments) -> int:
             web_shell = strings.from_cstr(file_path)
             print("Using web-shell:")
             println(web_shell)
-        return perform_run(single_file, raylib == 1, web == 1, web_shell)
+        return perform_run(single_file, raylib == 1, web == 1, web_shell, silent_mode == 1)
     if raylib == 1:
         println("Please use -R option for raylib")
         return 1
+    println("Nothing to do")
     return 0
 
 def main() -> int:
     args: os.arguments = os.get_args()
-    print_banner()
     # No arguments -> default
     if args.argc <= 1:
+        print_banner()
         return perform_build()
     return handle_args(args)
