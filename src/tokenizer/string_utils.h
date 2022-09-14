@@ -182,6 +182,8 @@ namespace yaksha::string_utils {
  * @return escaped string (newlines -> \n)
  */
   std::string escape(const std::string &raw_string);
+
+  std::string escape(const std::string &raw_string, bool escape_question_mark);
   /**
  * Convert a raw string to an escaped string
  * @param raw_string String with newlines, etc

@@ -121,7 +121,8 @@ std::string yaksha::string_utils::unescape(const std::string &escaped_string) {
   }
   return buf_;
 }
-std::string yaksha::string_utils::escape(const std::string &raw_string) {
+std::string yaksha::string_utils::escape(const std::string &raw_string,
+                           bool escape_question_mark) {
   std::string buf_{};
   auto buf = std::back_inserter(buf_);
   auto iterator = raw_string.begin();
@@ -155,7 +156,7 @@ std::string yaksha::string_utils::escape(const std::string &raw_string) {
     } else if (current == 0) {
       utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
       utf8::append(static_cast<char32_t>('0'), buf);
-    } else if (current == '\?') {
+    } else if (escape_question_mark && current == '\?') {
       utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
       utf8::append(static_cast<char32_t>('\?'), buf);
     } else {
@@ -164,6 +165,9 @@ std::string yaksha::string_utils::escape(const std::string &raw_string) {
     utf8::next(iterator, end);
   }
   return buf_;
+}
+std::string yaksha::string_utils::escape(const std::string &raw_string) {
+  return escape(raw_string, true);
 }
 std::string yaksha::string_utils::repr_string(const std::string &raw_string) {
   return '"' + escape(raw_string) + '"';

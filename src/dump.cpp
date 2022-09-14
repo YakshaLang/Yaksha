@@ -75,7 +75,7 @@ std::string extract_comments(int definition_line, tokenizer &token_extractor) {
   return comments.str();
 }
 std::string escape_comment(const std::string &v) {
-  std::string escaped = string_utils::escape(v);
+  std::string escaped = string_utils::escape(v, false);
   replace_all(escaped, "\\'", "'");
   return escaped;
 }
@@ -92,10 +92,10 @@ void display_dt_args(std::vector<ykdatatype *> &args) {
   }
 }
 void display_datatype(ykdatatype *dt) {
-  std::cout << "{ \"type\": \"" << string_utils::escape(dt->token_->token_)
-            << "\"";
+  std::cout << "{ \"type\": \""
+            << string_utils::escape(dt->token_->token_, false) << "\"";
   if (!dt->module_.empty()) {
-    std::cout << ", \"module\": \"" << string_utils::escape(dt->module_)
+    std::cout << ", \"module\": \"" << string_utils::escape(dt->module_, false)
               << "\"";
   }
   if (!dt->args_.empty()) {
@@ -109,7 +109,7 @@ void display_const(const_stmt *const_statement, tokenizer &token_extractor) {
   std::string comment =
       extract_comments(const_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
-            << string_utils::escape(const_statement->name_->token_)
+            << string_utils::escape(const_statement->name_->token_, false)
             << "\", \"comment\": \"" << escape_comment(comment)
             << "\", \"datatype\": ";
   display_datatype(const_statement->data_type_);
@@ -123,7 +123,8 @@ void display_params(std::vector<parameter> &params) {
     } else {
       std::cout << ",";
     }
-    std::cout << "{ \"name\": \"" << string_utils::escape(param.name_->token_)
+    std::cout << "{ \"name\": \""
+              << string_utils::escape(param.name_->token_, false)
               << "\", \"datatype\": ";
     display_datatype(param.data_type_);
     std::cout << "}";
@@ -133,25 +134,28 @@ void display_annotations(annotations &annotations) {
   bool first = true;
   if (annotations.native_) {
     std::cout << "{ \"name\": \"@native\", \"argument\": \""
-              << string_utils::escape(annotations.native_arg_) << "\" }";
+              << string_utils::escape(annotations.native_arg_, false) << "\" }";
     first = false;
   }
   if (annotations.native_define_) {
     if (!first) { std::cout << ","; }
     std::cout << "{ \"name\": \"@nativedefine\", \"argument\": \""
-              << string_utils::escape(annotations.native_define_arg_) << "\" }";
+              << string_utils::escape(annotations.native_define_arg_, false)
+              << "\" }";
     first = false;
   }
   if (annotations.native_macro_) {
     if (!first) { std::cout << ","; }
     std::cout << "{ \"name\": \"@nativemacro\", \"argument\": \""
-              << string_utils::escape(annotations.native_macro_arg_) << "\" }";
+              << string_utils::escape(annotations.native_macro_arg_, false)
+              << "\" }";
     first = false;
   }
   if (annotations.template_) {
     if (!first) { std::cout << ","; }
     std::cout << "{ \"name\": \"@template\", \"argument\": \""
-              << string_utils::escape(annotations.template_arg_) << "\" }";
+              << string_utils::escape(annotations.template_arg_, false)
+              << "\" }";
     first = false;
   }
   if (annotations.varargs_) {
@@ -163,7 +167,7 @@ void display_fnc(def_stmt *def_statement, tokenizer &token_extractor) {
   std::string comment =
       extract_comments(def_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
-            << string_utils::escape(def_statement->name_->token_)
+            << string_utils::escape(def_statement->name_->token_, false)
             << "\", \"comment\": \"" << escape_comment(comment)
             << "\", \"return_type\": ";
   display_datatype(def_statement->return_type_);
@@ -177,7 +181,7 @@ void display_cls(class_stmt *class_statement, tokenizer &token_extractor) {
   std::string comment =
       extract_comments(class_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
-            << string_utils::escape(class_statement->name_->token_)
+            << string_utils::escape(class_statement->name_->token_, false)
             << "\", \"comment\": \"" << escape_comment(comment)
             << "\", \"members\": [";
   display_params(class_statement->members_);
@@ -193,12 +197,12 @@ void display_import_path(import_stmt *import_statement) {
     } else {
       std::cout << ",";
     }
-    std::cout << "\"" << string_utils::escape(name->token_) << "\"";
+    std::cout << "\"" << string_utils::escape(name->token_, false) << "\"";
   }
 }
 void display_import(import_stmt *import_statement) {
   std::cout << "\n{ \"alias\": \""
-            << string_utils::escape(import_statement->name_->token_)
+            << string_utils::escape(import_statement->name_->token_, false)
             << "\", \"path\": [";
   display_import_path(import_statement);
   std::cout << "] }";
