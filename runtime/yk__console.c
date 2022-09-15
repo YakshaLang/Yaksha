@@ -12,6 +12,9 @@ void yk__set_colour(int color) {
   if (!out) out = GetStdHandle(STD_OUTPUT_HANDLE);
   SetConsoleTextAttribute(out, FOREGROUND_INTENSITY | color);
 }
+int yk__getch() {
+  return (int)_getwch();
+}
 // https://stackoverflow.com/a/6487534/1355145
 void yk__clear() {
   COORD topLeft = {0, 0};

@@ -10,7 +10,7 @@ void yk__set_colour(int color);
 #define YK__CONSOLE_YELLOW YK__CONSOLE_RED | YK__CONSOLE_GREEN
 #define YK__CONSOLE_CYAN YK__CONSOLE_GREEN | YK__CONSOLE_BLUE
 #define YK__CONSOLE_REWIND YK__CONSOLE_BLUE | YK__CONSOLE_RED | YK__CONSOLE_GREEN
-#define yk__getch _getch
+int yk__getch();
 void yk__clear();
 #else
 #define YK__CONSOLE_RED "\033[0;31m"
