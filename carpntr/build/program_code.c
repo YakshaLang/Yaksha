@@ -3996,8 +3996,8 @@ int32_t yy__handle_args(yy__os_arguments yy__args)
         return 1;
         yk__sdsfree(t__68);
     }
-    yk__sds t__69 = yk__sdsnew("Nothing to do");
-    yk__printlnstr((t__69));
+    yk__sds t__69 = yk__sdsnew("Invalid usage. Please use \'-R\' option if you want to run a program. Try \'carpntr --help\' for more information.\n");
+    yy__console_red(yk__sdsdup(t__69));
     yy__strings_del_cstr(yy__file_path);
     yy__argparse_del_remainder(yy__remainder);
     yy__argparse_del_argparse(yy__a);

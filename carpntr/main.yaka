@@ -188,7 +188,7 @@ def handle_args(args: os.arguments) -> int:
     if raylib == 1:
         println("Please use -R option for raylib")
         return 1
-    println("Nothing to do")
+    console.red("Invalid usage. Please use '-R' option if you want to run a program. Try 'carpntr --help' for more information.\n")
     return 0
 
 def main() -> int:

@@ -176,10 +176,10 @@ def compile_(conf: Config):
     if sys.platform != "darwin":
         c_args = c_args + " -flto=full"
     binary_main = paths.join(RUNTIME_DIR, "yk__main.c")
+    print("----- building target = native -------")
     cmd = "{} {} {} {} {} build/program_code.c runtime/yk__main.c -o build/{}".format(
         C_COMPILER, c_args, " ".join(includes), comp_defines, ccodes, native_binary) \
         .replace("runtime/yk__main.c", binary_main)
-    print(cmd)
     os.system(cmd)
     if C_COMPILER != "clang":
         for target in conf.compilation.targets:
@@ -190,6 +190,7 @@ def compile_(conf: Config):
             c_args = ARGS
             if "macos" not in target:
                 c_args = c_args + " -flto=full"
+            print("----- building target =", target, "-------")
             cmd = "{} {} {} {} {} build/program_code.c runtime/yk__main.c -o build/{} -target {}".format(
                 C_COMPILER, c_args, " ".join(includes), comp_defines, ccodes, name, target) \
                 .replace("runtime/yk__main.c", binary_main)
