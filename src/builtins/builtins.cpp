@@ -808,7 +808,9 @@ struct builtin_qsort : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for sort() builtin";
-    } else if (!args[0].datatype_->is_an_array()) {
+    } else if (!args[0].datatype_->is_an_array() ||
+               (args[0].datatype_->args_[0]->is_m_entry() ||
+                args[0].datatype_->args_[0]->is_m_entry())) {
       o.string_val_ = "First argument to sort() must be an Array[T]";
     } else if (!(args[1].object_type_ == yaksha::object_type::FUNCTION ||
                  args[1].object_type_ == yaksha::object_type::MODULE_FUNCTION ||
