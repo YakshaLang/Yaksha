@@ -37,6 +37,7 @@ public class YakshaCompletionContributor extends CompletionContributor {
             .add("import libs.random")
             .add("import libs.strings.buffer as sbuf")
             .add("import libs.strings.buffer")
+            .add("import libs.strings.utf8")
             .add("import libs.thread")
             .add("import libs")
             .add("import libs.c")

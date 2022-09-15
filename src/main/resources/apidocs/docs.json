@@ -3610,32 +3610,7 @@
     "imports": []
   },
   "libs.strings": {
-    "classes": [
-      {
-        "annotations": [
-          {
-            "argument": "struct utf8proc_iter_state*",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "Iterator state for UTF-8 iteration\nSee the codepoint for current character",
-        "members": [
-          {
-            "datatype": {
-              "type": "int"
-            },
-            "name": "step_size"
-          },
-          {
-            "datatype": {
-              "type": "int"
-            },
-            "name": "codepoint"
-          }
-        ],
-        "name": "Utf8IterateState"
-      }
-    ],
+    "classes": [],
     "functions": [
       {
         "annotations": [
@@ -3707,27 +3682,6 @@
               "type": "CStr"
             },
             "name": "a"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@native"
-          }
-        ],
-        "comment": "Delete the iterator object after done",
-        "name": "del_iter",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "Utf8IterateState"
-            },
-            "name": "s"
           }
         ],
         "return_type": {
@@ -3988,27 +3942,6 @@
         }
       },
       {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@native"
-          }
-        ],
-        "comment": "Go to next character\nReturns false if nothing to read or we ran out of length of string",
-        "name": "iterate",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "Utf8IterateState"
-            },
-            "name": "s"
-          }
-        ],
-        "return_type": {
-          "type": "bool"
-        }
-      },
-      {
         "annotations": [],
         "comment": "Pad string to left to ensure string length is large or equal to count",
         "name": "lpad",
@@ -4061,27 +3994,6 @@
         ],
         "return_type": {
           "type": "str"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@native"
-          }
-        ],
-        "comment": "Create a new iterator from given string",
-        "name": "new_iter",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "str"
-            },
-            "name": "s"
-          }
-        ],
-        "return_type": {
-          "type": "Utf8IterateState"
         }
       },
       {
@@ -4759,6 +4671,101 @@
         ],
         "return_type": {
           "type": "str"
+        }
+      }
+    ],
+    "global_consts": [],
+    "imports": []
+  },
+  "libs.strings.utf8": {
+    "classes": [
+      {
+        "annotations": [
+          {
+            "argument": "struct utf8proc_iter_state*",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Iterator state for UTF-8 iteration\nSee the codepoint for current character",
+        "members": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "step_size"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "codepoint"
+          }
+        ],
+        "name": "Utf8IterateState"
+      }
+    ],
+    "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Delete the iterator object after done",
+        "name": "del_iter",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Utf8IterateState"
+            },
+            "name": "s"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Go to next character\nReturns false if nothing to read or we ran out of length of string",
+        "name": "iterate",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Utf8IterateState"
+            },
+            "name": "s"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Create a new iterator from given string",
+        "name": "new_iter",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "s"
+          }
+        ],
+        "return_type": {
+          "type": "Utf8IterateState"
         }
       }
     ],
