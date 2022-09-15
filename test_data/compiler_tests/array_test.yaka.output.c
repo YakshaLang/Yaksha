@@ -41,7 +41,7 @@ int32_t yy__main()
     yk__sds t__6 = yk__sdsnew("Printing [b]");
     yk__printlnstr((t__6));
     yy__pos = 0;
-    yy__length = yk__arrlen(yy__a);
+    yy__length = yk__arrlen(yy__b);
     while (1) {
         if (!((yy__pos < yy__length))) { break; } // Check
         // Body of while loop

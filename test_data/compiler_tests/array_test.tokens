@@ -321,7 +321,7 @@
     ["output.c",43,16,"=","EQ"],
     ["output.c",43,18,"yk__arrlen","NAME"],
     ["output.c",43,28,"(","PAREN_OPEN"],
-    ["output.c",43,29,"yy__a","NAME"],
+    ["output.c",43,29,"yy__b","NAME"],
     ["output.c",43,34,")","PAREN_CLOSE"],
     ["output.c",43,36,"\n","NEW_LINE"],
     ["output.c",44,1,"    ","INDENT"],

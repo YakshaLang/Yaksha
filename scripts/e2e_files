@@ -3,7 +3,6 @@ test_data/bad_inputs/arrput_map.yaka
 test_data/bad_inputs/bad_input_sort_with_wrong_args.yaka
 test_data/byol/lisp.yaka
 test_data/compiler_tests/array_test.yaka
-test_data/compiler_tests/arrnew_test.yaka
 test_data/compiler_tests/arrstack.yaka
 test_data/compiler_tests/casting_test.yaka
 test_data/compiler_tests/defer_return.yaka

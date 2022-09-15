@@ -9,7 +9,7 @@ def main() -> int:
         pos = pos + 1
     println("Printing [b]")
     pos = 0
-    length = len(a)
+    length = len(b)
     while pos < length:
         println(b[pos])
         pos = pos + 1
