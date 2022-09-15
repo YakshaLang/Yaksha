@@ -5,10 +5,8 @@
 #include "yk__console.h"
 #include "yk__process.h"
 #include "toml.h"
-#include "utf8proc.h"
-#include "yk__utf8iter.h"
 #include "whereami.h"
-// YK:argparse,arrayutils,console,process,toml,utf8proc,whereami#
+// YK:argparse,arrayutils,console,process,toml,whereami#
 #include "yk__lib.h"
 // --forward declarations-- 
 const int32_t yy__argparse_ARGPARSE_DEFAULT = 0;
@@ -90,7 +88,6 @@ struct yy__configuration_Config;
 #define yy__c_memset memset
 #define yy__c_memcmp memcmp
 #define yy__strings_valid_cstr(nn__s) (NULL != nn__s)
-#define yy__strings_Utf8IterateState struct utf8proc_iter_state*
 #define yy__os_arguments struct yk__arguments*
 #define yy__os_get_args yk__get_args
 #define yy__os_ProcessResult struct yk__process_result*
@@ -210,9 +207,6 @@ bool yy__strings_endswith(yk__sds, yk__sds);
 yk__sds yy__strings_spaces(int32_t);
 yk__sds yy__strings_rpad(yk__sds, int32_t);
 yk__sds yy__strings_lpad(yk__sds, int32_t);
-yy__strings_Utf8IterateState yy__strings_new_iter(yk__sds);
-void yy__strings_del_iter(yy__strings_Utf8IterateState);
-bool yy__strings_iterate(yy__strings_Utf8IterateState);
 yk__sds yy__os_exe();
 yk__sds yy__os_exe_path();
 yk__sds yy__os_cwd();
@@ -3335,36 +3329,6 @@ yk__sds yy__strings_lpad(yk__sds yy__strings_a, int32_t yy__strings_count)
     yk__sdsfree(t__8);
     yk__sdsfree(yy__strings_a);
     return t__10;
-}
-yy__strings_Utf8IterateState yy__strings_new_iter(yk__sds nn__s) 
-{
-    struct utf8proc_iter_state* x = calloc(1, sizeof(struct utf8proc_iter_state));
-    if (x == NULL) return x;
-    x->str_original = (utf8proc_uint8_t *) nn__s;
-    x->str_position = (utf8proc_uint8_t *) nn__s;
-    x->length = yk__sdslen(nn__s);
-    x->step_size = 0;
-    x->codepoint = -1;
-    return x;
-}
-void yy__strings_del_iter(yy__strings_Utf8IterateState nn__s) 
-{
-    yk__sdsfree((yk__sds)nn__s->str_original);
-    free(nn__s);
-}
-bool yy__strings_iterate(yy__strings_Utf8IterateState nn__s) 
-{
-    if (nn__s->length <= 0) { return false; }
-    utf8proc_int32_t val;
-    utf8proc_ssize_t read_bytes = utf8proc_iterate(nn__s->str_position, nn__s->length, &val);
-    if (read_bytes <= 0) {
-        return false;
-    } 
-    nn__s->str_position += read_bytes;
-    nn__s->length -= read_bytes;
-    nn__s->step_size = read_bytes;
-    nn__s->codepoint = val;
-    return true;
 }
 yk__sds yy__os_exe() 
 {
