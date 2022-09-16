@@ -193,7 +193,7 @@ def main(test_mode: bool) -> int:
 
     print(Colors.warning("Writing new snapshot.."))
     with open(OUTPUT, "w+", encoding="utf-8") as h:
-        h.write(json.dumps(results))
+        h.write(json.dumps(results, indent="  ", sort_keys=True))
     print(Colors.blue("Done."))
     return EXIT_SUCCESS if success else EXIT_FAILURE
 

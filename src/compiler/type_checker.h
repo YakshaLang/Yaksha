@@ -14,6 +14,7 @@ namespace yaksha {
                           def_class_visitor *dcv, ykdt_pool *pool);
     ~type_checker() override;
     bool slot_match(const ykobject &arg, ykdatatype *datatype) override;
+    ykdatatype *function_to_datatype(const ykobject &arg) override;
     void check(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
     void visit_binary_expr(binary_expr *obj) override;

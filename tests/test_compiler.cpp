@@ -148,3 +148,7 @@ TEST_CASE("compiler: Test sorting with @native functions") {
   TEST_FILE("../test_data/compiler_tests/native_func_sort.yaka", "native_func_sort.yaka",
             "../test_data/compiler_tests/native_func_sort.tokens");
 }
+TEST_CASE("compiler: Test iif() builtin") {
+  TEST_FILE("../test_data/compiler_tests/iif_test.yaka", "iif_test.yaka",
+            "../test_data/compiler_tests/iif_test.tokens");
+}

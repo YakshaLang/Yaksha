@@ -122,7 +122,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     auto ret_type = name_pair.second.datatype_->args_[1];
     ykdatatype *return_type;
     if (ret_type->args_.empty()) {
-      ret_type = dt_pool->create("None");
+      return_type = dt_pool->create("None");
     } else {
       return_type = ret_type->args_[0];
     }

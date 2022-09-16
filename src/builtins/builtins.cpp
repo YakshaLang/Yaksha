@@ -1023,6 +1023,54 @@ struct builtin_array : builtin {
     return {code.str(), o};
   }
 };
+struct builtin_iif : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 3) {
+      o.string_val_ = "iif() builtin expects 3 arguments";
+    } else if (!args[0].datatype_->is_bool()) {
+      o.string_val_ = "First argument to iif() must be a bool";
+    } else if (*args[1].datatype_ != *args[2].datatype_) {
+      o.string_val_ = "Second and third argument to iif() must be of same type";
+    } else if (args[1].is_a_function()) {
+      ykdatatype* arg1_dt = dt_slot_matcher->function_to_datatype(args[1]);
+      ykdatatype* arg2_dt = dt_slot_matcher->function_to_datatype(args[2]);
+      if (arg1_dt != nullptr && arg2_dt != nullptr && *arg1_dt == *arg2_dt) {
+        o = ykobject(arg1_dt);
+        return o;
+      } else {
+        o.string_val_ = "You must use functions of same type for iif() builtin";
+      }
+    } else {
+      o = ykobject(args[1].datatype_);
+      return o;
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return true;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer) override {
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    code << "(" << args[0].first << " ? " << args[1].first << " : "
+         << args[2].first << ")";
+    o = ykobject(args[1].second.datatype_);
+    return {code.str(), o};
+  }
+};
 //=======================================
 builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"arrput", new builtin_arrput{}});
@@ -1045,6 +1093,7 @@ builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"hmgeti", new builtin_hmgeti{}});
   builtins_.insert({"hmput", new builtin_hmput{}});
   builtins_.insert({"qsort", new builtin_qsort{}});
+  builtins_.insert({"iif", new builtin_iif{}});
 }
 builtins::~builtins() {
   for (auto &i : builtins_) { delete i.second; }

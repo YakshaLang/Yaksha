@@ -24,6 +24,15 @@ using namespace yaksha;
     REQUIRE(!yaksha::errors::error_capture.empty());                           \
     REQUIRE(yaksha::errors::has_error(E));                                     \
   } while (0)
+#define TEST_SNIPPET_FULL(S, E)                                                \
+  do {                                                                         \
+    multifile_compiler mc{};                                                   \
+    std::string xa = (S);                                                      \
+    auto result = mc.compile(xa, true, "dummy.yaka", ".");                     \
+    REQUIRE(result.failed_ == true);                                           \
+    REQUIRE(!yaksha::errors::error_capture.empty());                           \
+    REQUIRE(yaksha::errors::has_error(E));                                     \
+  } while (0)
 TEST_CASE("type checker: Bad function for qsort") {
   TEST_FILE("../test_data/bad_inputs/bad_input_sort_with_wrong_args.yaka",
             "Comparison must match with "
@@ -83,4 +92,26 @@ TEST_CASE("type checker: Second argument must be int for array()") {
 TEST_CASE("type checker: Must assign to proper data structure for array()") {
   TEST_SNIPPET("a: Array[str] = array(\"int\", 10)",
                "Cannot assign between 2 different data types.");
+}
+TEST_CASE("type checker: Different type assignment using iif") {
+  TEST_SNIPPET("a: bool = iif(True, False, 1)",
+               "Second and third argument to iif() must be of same type");
+}
+TEST_CASE("type checker: Different type func assignment using iif") {
+  TEST_SNIPPET_FULL("def f1(x: int) -> None:\n"
+                    "    pass\n"
+                    "def f2(y: int, z: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    a: Function[In[int],Out] = iif(True, f1, f2)\n"
+                    "    return 0",
+               "You must use functions of same type for iif() builtin");
+}
+TEST_CASE("type checker: iif using 4 args") {
+  TEST_SNIPPET("a: bool = iif(True, False, True, 2)",
+               "iif() builtin expects 3 arguments");
+}
+TEST_CASE("type checker: iif using no") {
+  TEST_SNIPPET("a: bool = iif()",
+               "iif() builtin expects 3 arguments");
 }

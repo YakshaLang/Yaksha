@@ -620,40 +620,44 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
 }
 bool type_checker::slot_match(const ykobject &arg, ykdatatype *datatype) {
   if (arg.is_a_function() && datatype->is_function()) {
-    // Get function
-    def_stmt *funct;
-    if (arg.object_type_ == object_type::FUNCTION) {
-      funct = defs_classes_->get_function(arg.string_val_);
-    } else {
-      auto imp = cf_->get(arg.module_file_);
-      funct = imp->data_->dsv_->get_function(arg.string_val_);
-    }
-    if (funct->annotations_.varargs_) {
-      // WHY? not yet supported
-      error("@varargs function cannot be used as function pointers");
-      return false;
-    }
-    if (funct->annotations_.native_macro_ || funct->annotations_.native_define_) {
-      // WHY? not possible as these are macros
-      error("@nativemacro and @nativedefine functions cannot be used as function pointers");
-      return false;
-    }
-    // Create datatype out of function
-    ykdatatype *fnc = dt_pool_->create("Function");
-    ykdatatype *fin = dt_pool_->create("In");
-    ykdatatype *fout = dt_pool_->create("Out");
-    fnc->args_.emplace_back(fin);
-    fnc->args_.emplace_back(fout);
-    for (auto current_param : funct->params_) {
-      fin->args_.emplace_back(current_param.data_type_);
-    }
-    if (!funct->return_type_->is_none()) {
-      fout->args_.emplace_back(funct->return_type_);
-    }
-    // Compare now
-    return *fnc == *datatype;
+    ykdatatype *arg_datatype = function_to_datatype(arg);
+    return arg_datatype != nullptr && *arg_datatype == *datatype;
   }
   if (arg.is_primitive_or_obj() && *arg.datatype_ == *datatype) { return true; }
   return false;
+}
+ykdatatype *type_checker::function_to_datatype(const ykobject &arg) {
+  def_stmt *funct;
+  if (arg.object_type_ == object_type::FUNCTION) {
+    funct = defs_classes_->get_function(arg.string_val_);
+  } else {
+    auto imp = cf_->get(arg.module_file_);
+    funct = imp->data_->dsv_->get_function(arg.string_val_);
+  }
+  if (funct->annotations_.varargs_) {
+    // WHY? not yet supported
+    error("@varargs function cannot be used as function pointers");
+    return nullptr;
+  }
+  if (funct->annotations_.native_macro_ || funct->annotations_.native_define_) {
+    // WHY? not possible as these are macros
+    error("@nativemacro and @nativedefine functions cannot be used as function "
+          "pointers");
+    return nullptr;
+  }
+  // Create datatype out of function
+  ykdatatype *fnc = dt_pool_->create("Function");
+  ykdatatype *fin = dt_pool_->create("In");
+  ykdatatype *fout = dt_pool_->create("Out");
+  fnc->args_.emplace_back(fin);
+  fnc->args_.emplace_back(fout);
+  for (auto current_param : funct->params_) {
+    fin->args_.emplace_back(current_param.data_type_);
+  }
+  if (!funct->return_type_->is_none()) {
+    fout->args_.emplace_back(funct->return_type_);
+  }
+  // Compare now
+  return fnc;
 }
 void type_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}

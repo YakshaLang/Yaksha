@@ -28,6 +28,7 @@ test_data/compiler_tests/test5.yaka
 test_data/compiler_tests/test6.yaka
 test_data/compiler_tests/test7.yaka
 test_data/compiler_tests/voidfunc.yaka
+test_data/compiler_tests/iif_test.yaka
 test_data/data_type_test.yaka
 test_data/document_samples/factorial.yaka
 test_data/import_tests/city/house.yaka

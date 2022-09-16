@@ -1,0 +1,14 @@
+def normal(s: str) -> str:
+    return s
+
+def sqb(s: str) -> str:
+    return "[" + s + "]"
+
+def main() -> int:
+    a: Function[In[str],Out[str]]
+    a = iif(True, normal, sqb)
+    println(a("Hello World"))
+    a = iif(False, normal, sqb)
+    println(a(iif(True, "Hello", "World")))
+    return 0
+
