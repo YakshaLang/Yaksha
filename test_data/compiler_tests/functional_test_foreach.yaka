@@ -1,0 +1,29 @@
+def print_str(a: str, b: int) -> bool:
+    print(b)
+    print(" : ")
+    println(a)
+    return True
+
+def print_add_n(a: int, n: int) -> bool:
+    println(a + n)
+    return True
+
+def print_upto_n(a: int, n: int) -> bool:
+    if a > n:
+        return False
+    println(a)
+    return True
+
+def main() -> int:
+    println(">> foreach str test <<")
+    f: Function[In[str, int], Out[bool]] = print_str
+    ar: Array[str] = array("str", "Hello", "World", "How", "Are", "You")
+    foreach(ar, f, 10)
+    foreach(ar, print_str, 20)
+    println(">> foreach int test <<")
+    fi: Function[In[int, int], Out[bool]] = print_add_n
+    ai: Array[int] = array("int", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    foreach(ai, fi, 100)
+    foreach(ai, print_upto_n, 5)
+    println("completed.")
+    return 0

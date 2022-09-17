@@ -42,7 +42,8 @@ struct builtin_arrput : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     if (args[1].second.datatype_->is_str()) {
@@ -89,7 +90,8 @@ struct builtin_arrpop : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     o = ykobject(args[0].second.datatype_->args_[0]);
@@ -130,7 +132,8 @@ struct builtin_print : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto rhs = args[0];
@@ -179,7 +182,8 @@ struct builtin_println : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto rhs = args[0];
@@ -228,7 +232,8 @@ struct builtin_len : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     if (args[0].second.datatype_->is_str()) {
@@ -282,7 +287,8 @@ struct builtin_charat : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "(" << args[0].first << "[" << args[1].first << "])";
@@ -327,7 +333,8 @@ struct builtin_getref : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "(&(" << args[0].first << "))";
@@ -369,7 +376,8 @@ struct builtin_unref : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "(*(" << args[0].first << "))";
@@ -410,7 +418,8 @@ struct builtin_shnew : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__sh_new_strdup(" << args[0].first << ")";
@@ -453,7 +462,8 @@ struct builtin_shget : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__shget(" << args[0].first << ", " << args[1].first << ")";
@@ -497,7 +507,8 @@ struct builtin_shgeti : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__shgeti(" << args[0].first << ", " << args[1].first << ")";
@@ -544,7 +555,8 @@ struct builtin_shput : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__shput(" << args[0].first << ", " << args[1].first << ", "
@@ -601,7 +613,8 @@ struct builtin_cast : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
@@ -646,7 +659,8 @@ struct builtin_hmnew : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     return {"", o};
   }
@@ -689,7 +703,8 @@ struct builtin_hmget : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__hmget(" << args[0].first << ", " << args[1].first << ")";
@@ -735,7 +750,8 @@ struct builtin_hmgeti : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__hmgeti(" << args[0].first << ", " << args[1].first << ")";
@@ -785,7 +801,8 @@ struct builtin_hmput : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__hmput(" << args[0].first << ", " << args[1].first << ", "
@@ -824,9 +841,9 @@ struct builtin_qsort : builtin {
       func->args_.emplace_back(func_out);
       func_out->args_.emplace_back(dt_pool->create("int"));
       auto const_arg1 = dt_pool->create("Const");
-      const_arg1->args_.emplace_back(dt_pool->create("AnyArg"));
+      const_arg1->args_.emplace_back(dt_pool->create("AnyPtr"));
       auto const_arg2 = dt_pool->create("Const");
-      const_arg2->args_.emplace_back(dt_pool->create("AnyArg"));
+      const_arg2->args_.emplace_back(dt_pool->create("AnyPtr"));
       func_in->args_.emplace_back(const_arg1);
       func_in->args_.emplace_back(const_arg2);
       // func -> Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]
@@ -834,7 +851,7 @@ struct builtin_qsort : builtin {
         return ykobject(dt_pool->create("bool"));
       } else {
         o.string_val_ = "Comparison must match with "
-                        "Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]";
+                        "Function[In[Const[AnyPtr],Const[AnyPtr]],Out[int]]";
       }
     }
     o.object_type_ = object_type::RUNTIME_ERROR;
@@ -849,7 +866,8 @@ struct builtin_qsort : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     o = ykobject(args[0].second.datatype_->args_[0]);
@@ -910,7 +928,8 @@ struct builtin_arrnew : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
@@ -945,7 +964,7 @@ struct builtin_array : builtin {
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
-    if (args.size() < 1) {
+    if (args.empty()) {
       o.string_val_ = "array() builtin expects >= 1 arguments";
     } else if (arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
       o.string_val_ = "First argument to array() must be a string literal";
@@ -989,7 +1008,8 @@ struct builtin_array : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
@@ -1023,6 +1043,11 @@ struct builtin_array : builtin {
     return {code.str(), o};
   }
 };
+//
+// ┬┬┌─┐
+// ││├┤
+// ┴┴└
+//
 struct builtin_iif : builtin {
   ykobject
   verify(const std::vector<ykobject> &args,
@@ -1038,8 +1063,8 @@ struct builtin_iif : builtin {
     } else if (*args[1].datatype_ != *args[2].datatype_) {
       o.string_val_ = "Second and third argument to iif() must be of same type";
     } else if (args[1].is_a_function()) {
-      ykdatatype* arg1_dt = dt_slot_matcher->function_to_datatype(args[1]);
-      ykdatatype* arg2_dt = dt_slot_matcher->function_to_datatype(args[2]);
+      ykdatatype *arg1_dt = dt_slot_matcher->function_to_datatype(args[1]);
+      ykdatatype *arg2_dt = dt_slot_matcher->function_to_datatype(args[2]);
       if (arg1_dt != nullptr && arg2_dt != nullptr && *arg1_dt == *arg2_dt) {
         o = ykobject(arg1_dt);
         return o;
@@ -1062,7 +1087,8 @@ struct builtin_iif : builtin {
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer) override {
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "(" << args[0].first << " ? " << args[1].first << " : "
@@ -1070,6 +1096,220 @@ struct builtin_iif : builtin {
     o = ykobject(args[1].second.datatype_);
     return {code.str(), o};
   }
+};
+//
+// ┌─┐┌─┐┬─┐┌─┐┌─┐┌─┐┬ ┬
+// ├┤ │ │├┬┘├┤ ├─┤│  ├─┤
+// └  └─┘┴└─└─┘┴ ┴└─┘┴ ┴
+// ┌─┐┌─┐┬ ┬┌┐┌┌┬┐┬┌─┐
+// │  │ ││ ││││ │ │├┤
+// └─┘└─┘└─┘┘└┘ ┴ ┴└
+// ┌─┐┬┬ ┌┬┐┌─┐┬─┐
+// ├┤ ││  │ ├┤ ├┬┘
+// └  ┴┴─┘┴ └─┘┴└─
+// ┌┬┐┌─┐┌─┐
+// │││├─┤├─┘
+// ┴ ┴┴ ┴┴
+//
+struct builtin_functional : builtin {
+  enum class fnc { FOREACH, COUNTIF, FILTER, MAP };
+  explicit builtin_functional(fnc fnc_type, std::string name)
+      : fnc_type_(fnc_type), name_(std::move(name)) {}
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 3) {
+      o.string_val_ = name_ + "() builtin expects 3 arguments";
+    } else if (!args[0].datatype_->is_an_array() ||
+               args[0].datatype_->args_[0]->is_m_entry() ||
+               args[0].datatype_->args_[0]->is_sm_entry()) {
+      o.string_val_ = "First argument to " + name_ + "() must be a an Array[T]";
+    } else if (!(args[1].is_a_function() || args[1].datatype_->is_function())) {
+      o.string_val_ = "Second argument to " + name_ + "() must be a function";
+    } else {
+      return verify_function(args[0], args[1], dt_slot_matcher, dt_pool,
+                             args[2].datatype_);
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return true;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
+    std::stringstream code{};
+    ykdatatype *dt;
+    ykdatatype *return_val_type;
+    if (args[1].second.is_a_function()) {
+      dt = fnc_dt_extractor->function_to_datatype(args[1].second);
+    } else {
+      dt = args[1].second.datatype_;
+    }
+    ykdatatype *fn_out =
+        dt->args_[1]->args_[0];// Function[In[T, K], Out[O]] access O
+    ykdatatype *template_dt =
+        args[0].second.datatype_->args_[0];// Array[T] access T
+    std::string i = st_writer->temp();
+    std::string len_temp = st_writer->temp();
+    std::string arr_temp = st_writer->temp();
+    std::string elm_temp = st_writer->temp();
+    std::string k_temp = st_writer->temp();
+    std::string return_temp = st_writer->temp();
+    std::string fn_out_temp = st_writer->temp();
+    std::string rt_init = "NULL";
+    ykdatatype *arr1 = dt_pool->create("Array");
+    // Copy pointer to array to a temp
+    code << dt_compiler->convert_dt(args[0].second.datatype_) << " " << arr_temp
+         << " = " << args[0].first;
+    write_statement(code, st_writer);
+    // Copy K value to temp
+    code << dt_compiler->convert_dt(args[2].second.datatype_) << " " << k_temp
+         << " = " << args[2].first;
+    write_statement(code, st_writer);
+    // Get length of this array
+    code << "size_t " << len_temp << " = yk__arrlenu(" << arr_temp << ")";
+    write_statement(code, st_writer);
+    // Create returning value temp
+    switch (fnc_type_) {
+      case fnc::FOREACH:
+        return_val_type = dt_pool->create("bool");
+        rt_init = "true";
+        break;
+      case fnc::COUNTIF:
+        return_val_type = dt_pool->create("int");
+        rt_init = "0";
+        break;
+      case fnc::FILTER:
+        arr1->args_.emplace_back(template_dt);
+        return_val_type = arr1;
+        break;
+      default:// fnc::MAP
+        arr1->args_.emplace_back(fn_out);
+        return_val_type = arr1;
+    }
+    code << dt_compiler->convert_dt(return_val_type) << " " << return_temp
+         << " = " << rt_init;
+    write_statement(code, st_writer);
+    // For each element
+    code << "for (size_t " << i << " = 0; " << i << " < " << len_temp << "; "
+         << i << "++) { ";
+    write_statement_no_end(code, st_writer);
+    st_writer->indent();
+    if (template_dt->is_str()) {
+      code << dt_compiler->convert_dt(template_dt) << " " << elm_temp
+           << " = yk__sdsdup(" << arr_temp << "[" << i << "])";
+    } else {
+      code << dt_compiler->convert_dt(template_dt) << " " << elm_temp << " = "
+           << arr_temp << "[" << i << "]";
+    }
+    write_statement(code, st_writer);
+    code << dt_compiler->convert_dt(fn_out) << " " << fn_out_temp << " = "
+         << args[1].first << "(" << elm_temp << ", " << k_temp << ")";
+    write_statement(code, st_writer);
+    switch (fnc_type_) {
+      case fnc::FOREACH:
+        code << "if (!" << fn_out_temp << ") {" << return_temp
+             << " = false; break; }";
+        break;
+      case fnc::COUNTIF:
+        code << "if (" << fn_out_temp << ") {" << return_temp << "++; }";
+        break;
+      case fnc::FILTER:
+        if (template_dt->is_str()) {
+          // Create a new copy
+          code << elm_temp << " = yk__sdsdup(" << arr_temp << "[" << i << "]);";
+          code << "if (" << fn_out_temp << ") {"
+               << "yk__arrput(" << return_temp << ", " << elm_temp << "); }";
+        } else {
+          code << "if (" << fn_out_temp << ") {"
+               << "yk__arrput(" << return_temp << ", " << elm_temp << "); }";
+        }
+        break;
+      default:// fnc::MAP
+        code << "yk__arrput(" << return_temp << ", " << fn_out_temp << ");";
+    }
+    write_statement_no_end(code, st_writer);
+    st_writer->dedent();
+    code << "}";
+    write_statement_no_end(code, st_writer);
+    // Write work code
+    code.str("");
+    code.clear();
+    code << return_temp;
+    return {code.str(), ykobject(return_val_type)};
+  }
+
+  private:
+  void write_statement(std::stringstream &read_stream,
+                       statement_writer *st_writer) {
+    st_writer->write_statement(read_stream.str());
+    read_stream.str("");
+    read_stream.clear();
+  }
+  void write_statement_no_end(std::stringstream &read_stream,
+                              statement_writer *st_writer) {
+    st_writer->write_statement_no_end(read_stream.str());
+    read_stream.str("");
+    read_stream.clear();
+  }
+  ykobject verify_function(const ykobject &array, const ykobject &function,
+                           slot_matcher *dt_slot_matcher, ykdt_pool *dt_pool,
+                           ykdatatype *context_dt) {
+    ykdatatype *dt;
+    if (function.datatype_->is_function()) {
+      dt = function.datatype_;
+    } else {
+      dt = dt_slot_matcher->function_to_datatype(function);
+    }
+    ykobject o = ykobject(dt_pool);
+    ykdatatype *template_dt = array.datatype_->args_[0];
+    if (dt->args_[1]->args_.size() != 1) {
+      o.string_val_ = "Function argument for builtin " + name_ +
+                      " () must have a return type";
+    } else if (dt->args_[0]->args_.size() != 2) {
+      o.string_val_ =
+          "Function argument for builtin " + name_ + " () must take 2 values";
+    } else if (*template_dt != *dt->args_[0]->args_[0]) {
+      o.string_val_ = "Function argument for builtin " + name_ +
+                      " () must match with provided array";
+    } else if (*dt->args_[0]->args_[1] != *context_dt) {
+      o.string_val_ = "Function argument for builtin " + name_ +
+                      " () must match with context argument";
+    } else if (fnc_type_ != fnc::MAP && !dt->args_[1]->args_[0]->is_bool()) {
+      o.string_val_ = "Function argument for builtin " + name_ +
+                      " () must return a boolean";
+    } else {
+      if (fnc_type_ == fnc::FOREACH) {
+        o = ykobject(dt_pool->create("bool"));
+      } else if (fnc_type_ == fnc::COUNTIF) {
+        o = ykobject(dt_pool->create("int"));
+      } else if (fnc_type_ == fnc::FILTER) {
+        ykdatatype *arr = dt_pool->create("Array");
+        arr->args_.emplace_back(template_dt);
+        o = ykobject(arr);
+      } else {
+        ykdatatype *arr = dt_pool->create("Array");
+        arr->args_.emplace_back(dt->args_[1]->args_[0]);
+        o = ykobject(arr);
+      }
+      return o;
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  fnc fnc_type_;
+  std::string name_;
 };
 //=======================================
 builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
@@ -1094,11 +1334,21 @@ builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"hmput", new builtin_hmput{}});
   builtins_.insert({"qsort", new builtin_qsort{}});
   builtins_.insert({"iif", new builtin_iif{}});
+  builtins_.insert(
+      {"foreach",
+       new builtin_functional{builtin_functional::fnc::FOREACH, "foreach"}});
+  builtins_.insert(
+      {"countif",
+       new builtin_functional{builtin_functional::fnc::COUNTIF, "countif"}});
+  builtins_.insert({"filter", new builtin_functional{
+                                  builtin_functional::fnc::FILTER, "filter"}});
+  builtins_.insert(
+      {"map", new builtin_functional{builtin_functional::fnc::MAP, "map"}});
 }
 builtins::~builtins() {
   for (auto &i : builtins_) { delete i.second; }
   builtins_.clear();
-};
+}
 bool builtins::has_builtin(const std::string &name) {
   return builtins_.find(name) != builtins_.end();
 }
@@ -1115,10 +1365,11 @@ std::pair<std::string, ykobject> builtins::compile(
     const std::vector<std::pair<std::string, ykobject>> &args,
     const std::vector<expr *> &arg_expressions, datatype_compiler *dt_compiler,
     const std::unordered_map<std::string, import_stmt *> &import_aliases,
-    const std::string &filepath, statement_writer *st_writer) {
+    const std::string &filepath, statement_writer *st_writer,
+    function_datatype_extractor *fnc_dt_extractor) {
   return builtins_[name]->compile(args, arg_expressions, dt_compiler, this,
-                                  dt_pool_, import_aliases, filepath,
-                                  st_writer);
+                                  dt_pool_, import_aliases, filepath, st_writer,
+                                  fnc_dt_extractor);
 }
 bool builtins::should_compile_argument(const std::string &name, int arg_index,
                                        expr *arg_expression) {

@@ -7,6 +7,7 @@
 #include "builtins/builtins.h"
 #include "compiler/compiler_utils.h"
 #include "compiler/delete_stack_stack.h"
+#include "compiler/function_datatype_extractor.h"
 #include "compiler/statement_writer.h"
 #include "datatype_compiler.h"
 #include "def_class_visitor.h"
@@ -25,11 +26,13 @@ namespace yaksha {
   struct compiler : expr_visitor,
                     stmt_visitor,
                     datatype_compiler,
-                    statement_writer {
+                    statement_writer,
+                    function_datatype_extractor {
     compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
              entry_struct_func_compiler *esc);
     ~compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
+    ykdatatype *function_to_datatype(const ykobject &arg) override;
     void visit_assign_expr(assign_expr *obj) override;
     void visit_binary_expr(binary_expr *obj) override;
     void visit_fncall_expr(fncall_expr *obj) override;
@@ -61,6 +64,7 @@ namespace yaksha {
     void visit_ccode_stmt(ccode_stmt *obj) override;
     void visit_import_stmt(import_stmt *obj) override;
     void visit_const_stmt(const_stmt *obj) override;
+    void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
     /**
      * Convert Yaksha data type to appropriate C data type.
      * @param basic_dt data type as a token.
@@ -75,7 +79,12 @@ namespace yaksha {
      * Write a statement to code body (in current function)
      */
     void write_statement(std::string code_line) override;
-    void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
+    /**
+     * Write a statement to code body (in current function) without ';'
+     */
+    void write_statement_no_end(std::string code_line) override;
+    void indent() override;
+    void dedent() override;
 
 private:
     void push_scope_type(ast_type scope_type);
@@ -84,8 +93,6 @@ private:
     void write_indent(std::stringstream &where) const;
     void write_prev_indent(std::stringstream &where) const;
     static void write_end_statement(std::stringstream &where);
-    void indent();
-    void dedent();
     void push(const std::string &expr, const ykobject &data_type);
     std::string prefix_val_{};
     codefiles *cf_{nullptr};

@@ -11,8 +11,7 @@ namespace yaksha {
     multifile_compiler_result compile(const std::string &main_file);
     multifile_compiler_result compile(const std::string &main_file,
                                       const std::string &libs_path);
-    multifile_compiler_result compile(const std::string &code,
-                                      bool use_code,
+    multifile_compiler_result compile(const std::string &code, bool use_code,
                                       const std::string &main_file,
                                       const std::string &libs_path);
   };

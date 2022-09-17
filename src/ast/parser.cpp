@@ -476,7 +476,7 @@ ykdatatype *parser::parse_datatype() {
     dt = dt_pool_->create(tk->token_, filepath_);
   }
   if (match({token_type::SQUARE_BRACKET_OPEN})) {
-    if (dt->is_primitive() || dt->is_any_arg()) {
+    if (dt->is_primitive() || dt->is_any_ptr()) {
       throw error(
           dt->token_,
           "Primitive data types / SortArg cannot have internal data types.");

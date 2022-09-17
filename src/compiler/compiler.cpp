@@ -93,7 +93,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
       i++;
     }
     auto result = builtins_.compile(name, args, obj->args_, this,
-                                    import_stmts_alias_, filepath_, this);
+                                    import_stmts_alias_, filepath_, this, this);
     push(result.first, result.second);
   } else if (name_pair.second.object_type_ == object_type::MODULE_CLASS) {
     auto module_file = name_pair.second.module_file_;
@@ -263,6 +263,7 @@ void compiler::visit_variable_expr(variable_expr *obj) {
   } else if (defs_classes_.has_function(obj->name_->token_)) {
     auto b = ykobject(dt_pool);
     b.object_type_ = object_type::FUNCTION;
+    b.string_val_ = obj->name_->token_;
     push(obj->name_->token_, b);
     return;
   } else if (defs_classes_.has_class(obj->name_->token_)) {
@@ -636,7 +637,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "float";
   } else if (basic_dt->is_f64()) {
     return "double";
-  } else if (basic_dt->is_any_arg()) {
+  } else if (basic_dt->is_any_ptr()) {
     return "void*";
   } else if (basic_dt->is_sm_entry() || basic_dt->is_m_entry()) {
     // Handle SMEntry and Entry
@@ -939,4 +940,35 @@ void compiler::write_statement(std::string code_line) {
   body_ << code_line;
   write_end_statement(body_);
 }
+void compiler::write_statement_no_end(std::string code_line) {
+  write_indent(body_);
+  body_ << code_line << "\n";
+}
 void compiler::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
+ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
+  def_stmt *funct;
+  if (arg.object_type_ == object_type::FUNCTION) {
+    funct = defs_classes_.get_function(arg.string_val_);
+  } else {
+    auto imp = cf_->get(arg.module_file_);
+    funct = imp->data_->dsv_->get_function(arg.string_val_);
+  }
+  if (funct->annotations_.varargs_) { return nullptr; }
+  if (funct->annotations_.native_macro_ || funct->annotations_.native_define_) {
+    return nullptr;
+  }
+  // Create datatype out of function
+  ykdatatype *fnc = dt_pool->create("Function");
+  ykdatatype *fin = dt_pool->create("In");
+  ykdatatype *fout = dt_pool->create("Out");
+  fnc->args_.emplace_back(fin);
+  fnc->args_.emplace_back(fout);
+  for (auto current_param : funct->params_) {
+    fin->args_.emplace_back(current_param.data_type_);
+  }
+  if (!funct->return_type_->is_none()) {
+    fout->args_.emplace_back(funct->return_type_);
+  }
+  // Compare now
+  return fnc;
+}

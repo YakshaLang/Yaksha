@@ -36,7 +36,7 @@ using namespace yaksha;
 TEST_CASE("type checker: Bad function for qsort") {
   TEST_FILE("../test_data/bad_inputs/bad_input_sort_with_wrong_args.yaka",
             "Comparison must match with "
-            "Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]");
+            "Function[In[Const[AnyPtr],Const[AnyPtr]],Out[int]]");
 }
 TEST_CASE("type checker: Passing a map to arrput") {
   TEST_FILE("../test_data/bad_inputs/arrput_map.yaka",
@@ -105,13 +105,12 @@ TEST_CASE("type checker: Different type func assignment using iif") {
                     "def main() -> int:\n"
                     "    a: Function[In[int],Out] = iif(True, f1, f2)\n"
                     "    return 0",
-               "You must use functions of same type for iif() builtin");
+                    "You must use functions of same type for iif() builtin");
 }
 TEST_CASE("type checker: iif using 4 args") {
   TEST_SNIPPET("a: bool = iif(True, False, True, 2)",
                "iif() builtin expects 3 arguments");
 }
 TEST_CASE("type checker: iif using no") {
-  TEST_SNIPPET("a: bool = iif()",
-               "iif() builtin expects 3 arguments");
+  TEST_SNIPPET("a: bool = iif()", "iif() builtin expects 3 arguments");
 }

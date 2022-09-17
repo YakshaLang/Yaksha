@@ -33,9 +33,11 @@ int32_t yy__main()
     yk__sds t__7 = yy__a(yk__sdsdup(t__6));
     yk__printlnstr(((t__7)));
     yy__a = (false ? yy__normal : yy__sqb);
-    yk__sds t__8 = yk__sdsnew("Hello World");
-    yk__sds t__9 = yy__a(yk__sdsdup(t__8));
-    yk__printlnstr(((t__9)));
+    yk__sds t__8 = yk__sdsnew("Hello");
+    yk__sds t__9 = yk__sdsnew("World");
+    yk__sds t__10 = yy__a(yk__sdsdup((true ? t__8 : t__9)));
+    yk__printlnstr(((t__10)));
+    yk__sdsfree(t__10);
     yk__sdsfree(t__9);
     yk__sdsfree(t__8);
     yk__sdsfree(t__7);

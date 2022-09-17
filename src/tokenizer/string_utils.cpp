@@ -122,7 +122,7 @@ std::string yaksha::string_utils::unescape(const std::string &escaped_string) {
   return buf_;
 }
 std::string yaksha::string_utils::escape(const std::string &raw_string,
-                           bool escape_question_mark) {
+                                         bool escape_question_mark) {
   std::string buf_{};
   auto buf = std::back_inserter(buf_);
   auto iterator = raw_string.begin();

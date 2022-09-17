@@ -6,7 +6,10 @@ namespace yaksha {
   struct statement_writer {
     virtual ~statement_writer() = default;
     virtual std::string temp() = 0;
+    virtual void indent() = 0;
+    virtual void dedent() = 0;
     virtual void write_statement(std::string code) = 0;
+    virtual void write_statement_no_end(std::string code) = 0;
   };
 }// namespace yaksha
 #endif

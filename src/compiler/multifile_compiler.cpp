@@ -21,8 +21,7 @@ multifile_compiler::compile(const std::string &main_file,
 }
 // With input code
 multifile_compiler_result
-multifile_compiler::compile(const std::string &code,
-                            bool use_code,
+multifile_compiler::compile(const std::string &code, bool use_code,
                             const std::string &main_file,
                             const std::string &libs_path) {
   std::filesystem::path library_parent{libs_path};

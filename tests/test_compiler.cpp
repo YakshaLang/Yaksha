@@ -145,10 +145,31 @@ TEST_CASE("compiler: Test array() !") {
             "../test_data/compiler_tests/array_test.tokens");
 }
 TEST_CASE("compiler: Test sorting with @native functions") {
-  TEST_FILE("../test_data/compiler_tests/native_func_sort.yaka", "native_func_sort.yaka",
+  TEST_FILE("../test_data/compiler_tests/native_func_sort.yaka",
+            "native_func_sort.yaka",
             "../test_data/compiler_tests/native_func_sort.tokens");
 }
 TEST_CASE("compiler: Test iif() builtin") {
   TEST_FILE("../test_data/compiler_tests/iif_test.yaka", "iif_test.yaka",
             "../test_data/compiler_tests/iif_test.tokens");
+}
+TEST_CASE("compiler: Test foreach() builtin") {
+  TEST_FILE("../test_data/compiler_tests/functional_test_foreach.yaka",
+            "functional_test_foreach.yaka",
+            "../test_data/compiler_tests/functional_test_foreach.tokens");
+}
+TEST_CASE("compiler: Test countif() builtin") {
+  TEST_FILE("../test_data/compiler_tests/functional_test_countif.yaka",
+            "functional_test_countif.yaka",
+            "../test_data/compiler_tests/functional_test_countif.tokens");
+}
+TEST_CASE("compiler: Test map() builtin") {
+  TEST_FILE("../test_data/compiler_tests/functional_test_map.yaka",
+            "functional_test_map.yaka",
+            "../test_data/compiler_tests/functional_test_maph.tokens");
+}
+TEST_CASE("compiler: Test filter() builtin") {
+  TEST_FILE("../test_data/compiler_tests/functional_test_filter.yaka",
+            "functional_test_filter.yaka",
+            "../test_data/compiler_tests/functional_test_filter.tokens");
 }
