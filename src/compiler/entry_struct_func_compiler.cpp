@@ -49,7 +49,7 @@ std::string
 entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
                                                 datatype_compiler *dtc) {
   std::string fdt_str = function_dt->as_string();
-  if (autogen_func_typedefs_.find(fdt_str) != autogen_structs_.end()) {
+  if (autogen_func_typedefs_.find(fdt_str) != autogen_func_typedefs_.end()) {
     return "ykfncptr" + std::to_string(autogen_func_typedefs_[fdt_str]);
   }
   // Check assumption that must not happen
