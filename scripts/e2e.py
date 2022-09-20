@@ -200,7 +200,6 @@ def main(test_mode: bool) -> int:
 
 if __name__ == "__main__":
     mode = None
-    print(sys.argv)
     if len(sys.argv) == 1:
         mode = "test"
     if len(sys.argv) == 2:

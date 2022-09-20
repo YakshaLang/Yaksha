@@ -87,7 +87,7 @@ expr *parser::term() {
 }
 expr *parser::factor() {
   expr *ex = unary();
-  while (match({token_type::DIV, token_type::MUL, token_type::INT_DIV})) {
+  while (match({token_type::DIV, token_type::MUL, token_type::MOD})) {
     auto opr = previous();
     expr *right = unary();
     ex = pool_.c_binary_expr(ex, opr, right);

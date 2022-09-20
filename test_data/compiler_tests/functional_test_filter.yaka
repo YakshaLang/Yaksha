@@ -9,6 +9,9 @@ def keep_upto(a: int, n: int) -> bool:
         return False
     return True
 
+def keep_div(a: int, n: int) -> bool:
+    return a % n == 0
+
 def print_str(a: str, ignored: int) -> bool:
     println(a)
     return True
@@ -35,5 +38,7 @@ def main() -> int:
     foreach(filter(ai, keep_upto, 5), print_int, 0)
     println("Keep Upto 7 =>> ")
     foreach(filter(ai, keep_upto, 7), print_int, 0)
+    println("Keep div 2 (even) =>> ")
+    foreach(filter(ai, keep_div, 2), print_int, 0)
     println(">> completed.")
     return 0

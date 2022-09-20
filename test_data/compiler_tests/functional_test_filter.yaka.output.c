@@ -6,6 +6,7 @@ typedef bool (*ykfncptr1)(int32_t, int32_t);
 bool yy__keep_len_n(yk__sds, int32_t);
 bool yy__keep_all(yk__sds, int32_t);
 bool yy__keep_upto(int32_t, int32_t);
+bool yy__keep_div(int32_t, int32_t);
 bool yy__print_str(yk__sds, int32_t);
 bool yy__print_int(int32_t, int32_t);
 int32_t yy__main();
@@ -30,6 +31,11 @@ bool yy__keep_upto(int32_t yy__a, int32_t yy__n)
     }
     return true;
 }
+bool yy__keep_div(int32_t yy__a, int32_t yy__n) 
+{
+    int32_t t__1 = ((yy__a % yy__n) == 0);
+    return t__1;
+}
 bool yy__print_str(yk__sds yy__a, int32_t yy__ignored) 
 {
     yk__printlnstr((yy__a));
@@ -43,150 +49,172 @@ bool yy__print_int(int32_t yy__a, int32_t yy__ignored)
 }
 int32_t yy__main() 
 {
-    yk__sds t__1 = yk__sdsnew(">> filter str test <<");
-    yk__printlnstr((t__1));
+    yk__sds t__2 = yk__sdsnew(">> filter str test <<");
+    yk__printlnstr((t__2));
     ykfncptr0 yy__f = yy__keep_len_n;
-    yk__sds t__2 = yk__sdsnew("Hello");
-    yk__sds t__3 = yk__sdsnew("World");
-    yk__sds t__4 = yk__sdsnew("How");
-    yk__sds t__5 = yk__sdsnew("Are");
-    yk__sds t__6 = yk__sdsnew("You");
-    yk__sds* t__7 = NULL;
-    yk__arrsetcap(t__7, 5);
-    yk__arrput(t__7, yk__sdsdup(t__2));
-    yk__arrput(t__7, yk__sdsdup(t__3));
-    yk__arrput(t__7, yk__sdsdup(t__4));
-    yk__arrput(t__7, yk__sdsdup(t__5));
-    yk__arrput(t__7, yk__sdsdup(t__6));
-    yk__sds* yy__ar = t__7;
-    yk__sds t__8 = yk__sdsnew("Before =>> ");
-    yk__printlnstr((t__8));
-    yk__sds* t__11 = yy__ar;
-    int32_t t__13 = 0;
-    size_t t__10 = yk__arrlenu(t__11);
-    bool t__14 = true;
-    for (size_t t__9 = 0; t__9 < t__10; t__9++) { 
-        yk__sds t__12 = yk__sdsdup(t__11[t__9]);
-        bool t__15 = yy__print_str(t__12, t__13);
-        if (!t__15) {t__14 = false; break; }
+    yk__sds t__3 = yk__sdsnew("Hello");
+    yk__sds t__4 = yk__sdsnew("World");
+    yk__sds t__5 = yk__sdsnew("How");
+    yk__sds t__6 = yk__sdsnew("Are");
+    yk__sds t__7 = yk__sdsnew("You");
+    yk__sds* t__8 = NULL;
+    yk__arrsetcap(t__8, 5);
+    yk__arrput(t__8, yk__sdsdup(t__3));
+    yk__arrput(t__8, yk__sdsdup(t__4));
+    yk__arrput(t__8, yk__sdsdup(t__5));
+    yk__arrput(t__8, yk__sdsdup(t__6));
+    yk__arrput(t__8, yk__sdsdup(t__7));
+    yk__sds* yy__ar = t__8;
+    yk__sds t__9 = yk__sdsnew("Before =>> ");
+    yk__printlnstr((t__9));
+    yk__sds* t__12 = yy__ar;
+    int32_t t__14 = 0;
+    size_t t__11 = yk__arrlenu(t__12);
+    bool t__15 = true;
+    for (size_t t__10 = 0; t__10 < t__11; t__10++) { 
+        yk__sds t__13 = yk__sdsdup(t__12[t__10]);
+        bool t__16 = yy__print_str(t__13, t__14);
+        if (!t__16) {t__15 = false; break; }
     }
-    t__14;
-    yk__sds* t__18 = yy__ar;
-    int32_t t__20 = 3;
-    size_t t__17 = yk__arrlenu(t__18);
-    yk__sds* t__21 = NULL;
-    for (size_t t__16 = 0; t__16 < t__17; t__16++) { 
-        yk__sds t__19 = yk__sdsdup(t__18[t__16]);
-        bool t__22 = yy__keep_len_n(t__19, t__20);
-        t__19 = yk__sdsdup(t__18[t__16]);if (t__22) {yk__arrput(t__21, t__19); }
+    t__15;
+    yk__sds* t__19 = yy__ar;
+    int32_t t__21 = 3;
+    size_t t__18 = yk__arrlenu(t__19);
+    yk__sds* t__22 = NULL;
+    for (size_t t__17 = 0; t__17 < t__18; t__17++) { 
+        yk__sds t__20 = yk__sdsdup(t__19[t__17]);
+        bool t__23 = yy__keep_len_n(t__20, t__21);
+        t__20 = yk__sdsdup(t__19[t__17]);if (t__23) {yk__arrput(t__22, t__20); }
     }
-    yk__sds* yy__ar2 = t__21;
-    yk__sds t__23 = yk__sdsnew("Filtered =>> ");
-    yk__printlnstr((t__23));
-    yk__sds* t__26 = yy__ar2;
-    int32_t t__28 = 0;
-    size_t t__25 = yk__arrlenu(t__26);
-    bool t__29 = true;
-    for (size_t t__24 = 0; t__24 < t__25; t__24++) { 
-        yk__sds t__27 = yk__sdsdup(t__26[t__24]);
-        bool t__30 = yy__print_str(t__27, t__28);
-        if (!t__30) {t__29 = false; break; }
+    yk__sds* yy__ar2 = t__22;
+    yk__sds t__24 = yk__sdsnew("Filtered =>> ");
+    yk__printlnstr((t__24));
+    yk__sds* t__27 = yy__ar2;
+    int32_t t__29 = 0;
+    size_t t__26 = yk__arrlenu(t__27);
+    bool t__30 = true;
+    for (size_t t__25 = 0; t__25 < t__26; t__25++) { 
+        yk__sds t__28 = yk__sdsdup(t__27[t__25]);
+        bool t__31 = yy__print_str(t__28, t__29);
+        if (!t__31) {t__30 = false; break; }
     }
-    t__29;
-    yk__sds t__31 = yk__sdsnew("Keep All =>> ");
-    yk__printlnstr((t__31));
-    yk__sds* t__34 = yy__ar;
-    int32_t t__36 = 0;
-    size_t t__33 = yk__arrlenu(t__34);
-    yk__sds* t__37 = NULL;
-    for (size_t t__32 = 0; t__32 < t__33; t__32++) { 
-        yk__sds t__35 = yk__sdsdup(t__34[t__32]);
-        bool t__38 = yy__keep_all(t__35, t__36);
-        t__35 = yk__sdsdup(t__34[t__32]);if (t__38) {yk__arrput(t__37, t__35); }
+    t__30;
+    yk__sds t__32 = yk__sdsnew("Keep All =>> ");
+    yk__printlnstr((t__32));
+    yk__sds* t__35 = yy__ar;
+    int32_t t__37 = 0;
+    size_t t__34 = yk__arrlenu(t__35);
+    yk__sds* t__38 = NULL;
+    for (size_t t__33 = 0; t__33 < t__34; t__33++) { 
+        yk__sds t__36 = yk__sdsdup(t__35[t__33]);
+        bool t__39 = yy__keep_all(t__36, t__37);
+        t__36 = yk__sdsdup(t__35[t__33]);if (t__39) {yk__arrput(t__38, t__36); }
     }
-    yk__sds* t__41 = t__37;
-    int32_t t__43 = 0;
-    size_t t__40 = yk__arrlenu(t__41);
-    bool t__44 = true;
-    for (size_t t__39 = 0; t__39 < t__40; t__39++) { 
-        yk__sds t__42 = yk__sdsdup(t__41[t__39]);
-        bool t__45 = yy__print_str(t__42, t__43);
-        if (!t__45) {t__44 = false; break; }
+    yk__sds* t__42 = t__38;
+    int32_t t__44 = 0;
+    size_t t__41 = yk__arrlenu(t__42);
+    bool t__45 = true;
+    for (size_t t__40 = 0; t__40 < t__41; t__40++) { 
+        yk__sds t__43 = yk__sdsdup(t__42[t__40]);
+        bool t__46 = yy__print_str(t__43, t__44);
+        if (!t__46) {t__45 = false; break; }
     }
-    t__44;
-    yk__sds t__46 = yk__sdsnew(">> filter int test <<");
-    yk__printlnstr((t__46));
+    t__45;
+    yk__sds t__47 = yk__sdsnew(">> filter int test <<");
+    yk__printlnstr((t__47));
     ykfncptr1 yy__fi = yy__keep_upto;
-    int32_t* t__47 = NULL;
-    yk__arrsetcap(t__47, 10);
-    yk__arrput(t__47, 1);
-    yk__arrput(t__47, 2);
-    yk__arrput(t__47, 3);
-    yk__arrput(t__47, 4);
-    yk__arrput(t__47, 5);
-    yk__arrput(t__47, 6);
-    yk__arrput(t__47, 7);
-    yk__arrput(t__47, 8);
-    yk__arrput(t__47, 9);
-    yk__arrput(t__47, 10);
-    int32_t* yy__ai = t__47;
-    yk__sds t__48 = yk__sdsnew("Keep Upto 5 =>> ");
-    yk__printlnstr((t__48));
-    int32_t* t__51 = yy__ai;
-    int32_t t__53 = 5;
-    size_t t__50 = yk__arrlenu(t__51);
-    int32_t* t__54 = NULL;
-    for (size_t t__49 = 0; t__49 < t__50; t__49++) { 
-        int32_t t__52 = t__51[t__49];
-        bool t__55 = yy__keep_upto(t__52, t__53);
-        if (t__55) {yk__arrput(t__54, t__52); }
+    int32_t* t__48 = NULL;
+    yk__arrsetcap(t__48, 10);
+    yk__arrput(t__48, 1);
+    yk__arrput(t__48, 2);
+    yk__arrput(t__48, 3);
+    yk__arrput(t__48, 4);
+    yk__arrput(t__48, 5);
+    yk__arrput(t__48, 6);
+    yk__arrput(t__48, 7);
+    yk__arrput(t__48, 8);
+    yk__arrput(t__48, 9);
+    yk__arrput(t__48, 10);
+    int32_t* yy__ai = t__48;
+    yk__sds t__49 = yk__sdsnew("Keep Upto 5 =>> ");
+    yk__printlnstr((t__49));
+    int32_t* t__52 = yy__ai;
+    int32_t t__54 = 5;
+    size_t t__51 = yk__arrlenu(t__52);
+    int32_t* t__55 = NULL;
+    for (size_t t__50 = 0; t__50 < t__51; t__50++) { 
+        int32_t t__53 = t__52[t__50];
+        bool t__56 = yy__keep_upto(t__53, t__54);
+        if (t__56) {yk__arrput(t__55, t__53); }
     }
-    int32_t* t__58 = t__54;
-    int32_t t__60 = 0;
-    size_t t__57 = yk__arrlenu(t__58);
-    bool t__61 = true;
-    for (size_t t__56 = 0; t__56 < t__57; t__56++) { 
-        int32_t t__59 = t__58[t__56];
-        bool t__62 = yy__print_int(t__59, t__60);
-        if (!t__62) {t__61 = false; break; }
+    int32_t* t__59 = t__55;
+    int32_t t__61 = 0;
+    size_t t__58 = yk__arrlenu(t__59);
+    bool t__62 = true;
+    for (size_t t__57 = 0; t__57 < t__58; t__57++) { 
+        int32_t t__60 = t__59[t__57];
+        bool t__63 = yy__print_int(t__60, t__61);
+        if (!t__63) {t__62 = false; break; }
     }
-    t__61;
-    yk__sds t__63 = yk__sdsnew("Keep Upto 7 =>> ");
-    yk__printlnstr((t__63));
-    int32_t* t__66 = yy__ai;
-    int32_t t__68 = 7;
-    size_t t__65 = yk__arrlenu(t__66);
-    int32_t* t__69 = NULL;
-    for (size_t t__64 = 0; t__64 < t__65; t__64++) { 
-        int32_t t__67 = t__66[t__64];
-        bool t__70 = yy__keep_upto(t__67, t__68);
-        if (t__70) {yk__arrput(t__69, t__67); }
+    t__62;
+    yk__sds t__64 = yk__sdsnew("Keep Upto 7 =>> ");
+    yk__printlnstr((t__64));
+    int32_t* t__67 = yy__ai;
+    int32_t t__69 = 7;
+    size_t t__66 = yk__arrlenu(t__67);
+    int32_t* t__70 = NULL;
+    for (size_t t__65 = 0; t__65 < t__66; t__65++) { 
+        int32_t t__68 = t__67[t__65];
+        bool t__71 = yy__keep_upto(t__68, t__69);
+        if (t__71) {yk__arrput(t__70, t__68); }
     }
-    int32_t* t__73 = t__69;
-    int32_t t__75 = 0;
-    size_t t__72 = yk__arrlenu(t__73);
-    bool t__76 = true;
-    for (size_t t__71 = 0; t__71 < t__72; t__71++) { 
-        int32_t t__74 = t__73[t__71];
-        bool t__77 = yy__print_int(t__74, t__75);
-        if (!t__77) {t__76 = false; break; }
+    int32_t* t__74 = t__70;
+    int32_t t__76 = 0;
+    size_t t__73 = yk__arrlenu(t__74);
+    bool t__77 = true;
+    for (size_t t__72 = 0; t__72 < t__73; t__72++) { 
+        int32_t t__75 = t__74[t__72];
+        bool t__78 = yy__print_int(t__75, t__76);
+        if (!t__78) {t__77 = false; break; }
     }
-    t__76;
-    yk__sds t__78 = yk__sdsnew(">> completed.");
-    yk__printlnstr((t__78));
-    yk__sdsfree(t__78);
-    yk__sdsfree(t__63);
-    yk__sdsfree(t__48);
-    yk__sdsfree(t__46);
-    yk__sdsfree(t__31);
-    yk__sdsfree(t__23);
-    yk__sdsfree(t__8);
+    t__77;
+    yk__sds t__79 = yk__sdsnew("Keep div 2 (even) =>> ");
+    yk__printlnstr((t__79));
+    int32_t* t__82 = yy__ai;
+    int32_t t__84 = 2;
+    size_t t__81 = yk__arrlenu(t__82);
+    int32_t* t__85 = NULL;
+    for (size_t t__80 = 0; t__80 < t__81; t__80++) { 
+        int32_t t__83 = t__82[t__80];
+        bool t__86 = yy__keep_div(t__83, t__84);
+        if (t__86) {yk__arrput(t__85, t__83); }
+    }
+    int32_t* t__89 = t__85;
+    int32_t t__91 = 0;
+    size_t t__88 = yk__arrlenu(t__89);
+    bool t__92 = true;
+    for (size_t t__87 = 0; t__87 < t__88; t__87++) { 
+        int32_t t__90 = t__89[t__87];
+        bool t__93 = yy__print_int(t__90, t__91);
+        if (!t__93) {t__92 = false; break; }
+    }
+    t__92;
+    yk__sds t__94 = yk__sdsnew(">> completed.");
+    yk__printlnstr((t__94));
+    yk__sdsfree(t__94);
+    yk__sdsfree(t__79);
+    yk__sdsfree(t__64);
+    yk__sdsfree(t__49);
+    yk__sdsfree(t__47);
+    yk__sdsfree(t__32);
+    yk__sdsfree(t__24);
+    yk__sdsfree(t__9);
+    yk__sdsfree(t__7);
     yk__sdsfree(t__6);
     yk__sdsfree(t__5);
     yk__sdsfree(t__4);
     yk__sdsfree(t__3);
     yk__sdsfree(t__2);
-    yk__sdsfree(t__1);
     return 0;
 }
 #if defined(YK__MINIMAL_MAIN)

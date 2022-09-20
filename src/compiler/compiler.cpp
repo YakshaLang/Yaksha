@@ -62,10 +62,17 @@ void compiler::visit_binary_expr(binary_expr *obj) {
       // push the temp
       push(temporary_string, data_type);
     }
-  } else {// Assume it is int
+  } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_f32() &&
+             obj->opr_->type_ == token_type::MOD) {// Float %
+    push("remainderf(" + lhs.first + ", " + rhs.first + ")", data_type);
+  } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_f64() &&
+             obj->opr_->type_ == token_type::MOD) {// Double %
+    push("remainder(" + lhs.first + ", " + rhs.first + ")", data_type);
+  } else {// Other number stuff
     push("(" + lhs.first + " " + obj->opr_->token_ + " " + rhs.first + ")",
          data_type);
   }
+  // Note: type checker prevents compiler coming here with non integer data types
 }
 void compiler::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);

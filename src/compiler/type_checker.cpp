@@ -38,9 +38,9 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
     error(obj->opr_, "Unsupported operation");
   }
   if ((oper == token_type::SUB || oper == token_type::MUL ||
-       oper == token_type::DIV || oper == token_type::GREAT ||
-       oper == token_type::GREAT_EQ || oper == token_type::LESS ||
-       oper == token_type::LESS_EQ) &&
+       oper == token_type::MOD || oper == token_type::DIV ||
+       oper == token_type::GREAT || oper == token_type::GREAT_EQ ||
+       oper == token_type::LESS || oper == token_type::LESS_EQ) &&
       (!rhs.is_primitive_or_obj() || !rhs.datatype_->is_a_number())) {
     error(obj->opr_, "Unsupported operation");
   }
