@@ -54,6 +54,7 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
             .add(YakshaTypes.OPERATOR_MINUS)
             .add(YakshaTypes.OPERATOR_MUL)
             .add(YakshaTypes.OPERATOR_DIV)
+            .add(YakshaTypes.OPERATOR_REMAINDER)
             .add(YakshaTypes.OPERATOR_COMPARISON)
             .add(YakshaTypes.OPERATOR_AT)
             .add(YakshaTypes.OPERATOR_COLON)

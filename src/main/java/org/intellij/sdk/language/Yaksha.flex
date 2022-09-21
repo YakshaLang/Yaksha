@@ -121,6 +121,7 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   "-"                            { return YakshaTypes.OPERATOR_MINUS; }
   "*"                            { return YakshaTypes.OPERATOR_MUL; }
   "/"                            { return YakshaTypes.OPERATOR_DIV; }
+  "%"                            { return YakshaTypes.OPERATOR_REMAINDER; }
 
   "<"                            |
   ">"                            |

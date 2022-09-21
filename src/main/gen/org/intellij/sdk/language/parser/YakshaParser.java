@@ -1070,7 +1070,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // unary (S? (OPERATOR_MUL | OPERATOR_DIV) S? unary)* | unary
+  // unary (S? (OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER) S? unary)* | unary
   public static boolean factor(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "factor")) return false;
     boolean r;
@@ -1081,7 +1081,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // unary (S? (OPERATOR_MUL | OPERATOR_DIV) S? unary)*
+  // unary (S? (OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER) S? unary)*
   private static boolean factor_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "factor_0")) return false;
     boolean r;
@@ -1092,7 +1092,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (S? (OPERATOR_MUL | OPERATOR_DIV) S? unary)*
+  // (S? (OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER) S? unary)*
   private static boolean factor_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "factor_0_1")) return false;
     while (true) {
@@ -1103,7 +1103,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // S? (OPERATOR_MUL | OPERATOR_DIV) S? unary
+  // S? (OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER) S? unary
   private static boolean factor_0_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "factor_0_1_0")) return false;
     boolean r;
@@ -1123,12 +1123,13 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // OPERATOR_MUL | OPERATOR_DIV
+  // OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER
   private static boolean factor_0_1_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "factor_0_1_0_1")) return false;
     boolean r;
     r = consumeToken(b, OPERATOR_MUL);
     if (!r) r = consumeToken(b, OPERATOR_DIV);
+    if (!r) r = consumeToken(b, OPERATOR_REMAINDER);
     return r;
   }
 

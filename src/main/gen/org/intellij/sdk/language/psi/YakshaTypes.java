@@ -98,6 +98,7 @@ public interface YakshaTypes {
   IElementType OPERATOR_OPEN_SQB = new YakshaTokenType("OPERATOR_OPEN_SQB");
   IElementType OPERATOR_OR = new YakshaTokenType("OPERATOR_OR");
   IElementType OPERATOR_PLUS = new YakshaTokenType("OPERATOR_PLUS");
+  IElementType OPERATOR_REMAINDER = new YakshaTokenType("OPERATOR_REMAINDER");
   IElementType PRIMITIVE_DATA_TYPE = new YakshaTokenType("PRIMITIVE_DATA_TYPE");
   IElementType S = new YakshaTokenType("S");
   IElementType STRING = new YakshaTokenType("STRING");
