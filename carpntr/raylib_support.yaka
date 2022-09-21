@@ -17,7 +17,7 @@ class CObject:
 
 def fill_arguments(src_path: str, c: CObject) -> CObject:
     # Fill args section of CObject
-    args: Array[str] = sarr.new(4, "-std=gnu99", "-DPLATFORM_DESKTOP", "-DGL_SILENCE_DEPRECATION=199309L", "-fno-sanitize=undefined")
+    args: Array[str] = array("str", "-std=gnu99", "-DPLATFORM_DESKTOP", "-DGL_SILENCE_DEPRECATION=199309L", "-fno-sanitize=undefined")
 
     arrput(args, "-I" + src_path)
     external: str = path.join(src_path, "external")
@@ -40,7 +40,7 @@ def fill_arguments(src_path: str, c: CObject) -> CObject:
 
 def fill_web_arguments(src_path: str, c: CObject) -> CObject:
     # Fill args section of CObject
-    args: Array[str] = sarr.new(4, "-std=gnu99", "-DPLATFORM_WEB", "-DGRAPHICS_API_OPENGL_ES2", "-Oz")
+    args: Array[str] = array("str", "-std=gnu99", "-DPLATFORM_WEB", "-DGRAPHICS_API_OPENGL_ES2", "-Oz")
 
     arrput(args, c.c_file)
     arrput(args, "-o")
@@ -112,17 +112,17 @@ def get_external_libs() -> Array[str]:
     # Get external libraries for native target (current platform)
     external_libs: Array[str]
     if os.is_windows():
-        external_libs = sarr.new(3, "-lwinmm", "-lgdi32", "-lopengl32")
+        external_libs = array("str", "-lwinmm", "-lgdi32", "-lopengl32")
     else:
         if os.is_macos():
-            external_libs =  sarr.new(12, "-framework", "Foundation", "-framework", "OpenGL", "-framework", "OpenAL", "-framework", "IOKit", "-framework", "CoreVideo", "-framework", "Cocoa")
+            external_libs =  array("str", "-framework", "Foundation", "-framework", "OpenGL", "-framework", "OpenAL", "-framework", "IOKit", "-framework", "CoreVideo", "-framework", "Cocoa")
         else:
             # linux
-            external_libs = sarr.new(5, "-lGL", "-lrt", "-ldl", "-lm", "-lX11")
+            external_libs = array("str", "-lGL", "-lrt", "-ldl", "-lm", "-lX11")
     return external_libs
 
 def get_web_args() -> Array[str]:
-    web_args: Array[str] = sarr.new(5, "-s", "USE_GLFW=3", "-s", "ASYNCIFY", "-DPLATFORM_WEB")
+    web_args: Array[str] = array("str", "-s", "USE_GLFW=3", "-s", "ASYNCIFY", "-DPLATFORM_WEB")
     return web_args
 
 def produce_object(c: CObject, conf: carp.Config) -> bool:
@@ -139,9 +139,9 @@ def produce_object(c: CObject, conf: carp.Config) -> bool:
 
     cmd: Array[str]
     if conf.compilation.web:
-        cmd = sarr.new(3, conf.emcc_compiler_path, "-c", "-Oz")
+        cmd = array("str", conf.emcc_compiler_path, "-c", "-Oz")
     else:
-        cmd = sarr.new(4, conf.zig_compiler_path, "cc", "-c", "-Oz")
+        cmd = array("str", conf.zig_compiler_path, "cc", "-c", "-Oz")
     cmd = sarr.extend(cmd, c.args)
     defer sarr.del_str_array(cmd)
     pr: os.ProcessResult = os.run(cmd)

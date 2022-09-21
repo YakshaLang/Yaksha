@@ -126,7 +126,7 @@ def perform_run(filename: str, use_raylib: bool, use_web: bool, web_shell: str, 
     binary: str = name
     if use_web:
         binary = binary + ".html"
-        em_args: Array[str] = sarr.new(2, config.emrun_path, path.join(os.cwd(), binary))
+        em_args: Array[str] = array("str", config.emrun_path, path.join(os.cwd(), binary))
         os.run(em_args)
         sarr.del_str_array(em_args)
     else:
@@ -144,7 +144,7 @@ def handle_args(args: os.arguments) -> int:
     # Multiple arguments trigger how to run the program
     options: Array[argparse.Option]
     defer del options
-    usages: Array[str] = sarr.new(2, "carpntr", "carpntr [options] file")
+    usages: Array[str] = array("str", "carpntr", "carpntr [options] file")
     defer sarr.del_str_array(usages)
 
     run: int = 0

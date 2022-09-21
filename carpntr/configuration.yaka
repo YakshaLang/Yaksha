@@ -207,13 +207,13 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
     current_dir: str = path.dirname(os.cwd())
 
     # Add defaults to cc.include_paths
-    df_include_paths: Array[str] = sarr.new(2, c.runtime_path, path.join(current_dir, "build"))
+    df_include_paths: Array[str] = array("str", c.runtime_path, path.join(current_dir, "build"))
     orig_include_paths: Array[str] = cc.include_paths
     defer sarr.del_str_array(orig_include_paths)
     cc.include_paths = sarr.extend(df_include_paths, cc.include_paths)
 
-    cc.runtime_feature_includes = sarr.new(1, "yk__system.h")
-    cc.runtime_feature_c_code = sarr.new(1, path.join(c.runtime_path, "yk__system.c"))
+    cc.runtime_feature_includes = array("str", "yk__system.h")
+    cc.runtime_feature_c_code = array("str", path.join(c.runtime_path, "yk__system.c"))
 
     return cc
 
@@ -347,7 +347,7 @@ def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bo
     # Create an adhoc configuration for single file execution mode
     c: Config = Config()
     c.compilation = Compilation()
-    c.compilation.targets = sarr.new(1, "native")
+    c.compilation.targets = array("str", "native")
     c.compilation.raylib = use_raylib
     c.compilation.web = use_web
     c.compilation.web_shell = web_shell
