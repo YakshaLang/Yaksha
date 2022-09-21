@@ -13,7 +13,7 @@ public class YakshaAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull final PsiElement element, @NotNull AnnotationHolder holder) {
-        if (element instanceof YakshaDataType) {
+        if (element instanceof YakshaDataTypeBit) {
             holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                     .range(element.getTextRange())
                     .textAttributes(YakshaSyntaxHighlighter.DATA_TYPE)
