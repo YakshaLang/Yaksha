@@ -66,7 +66,7 @@ def print_config(config: carp.Config) -> None:
 def build_from_config(config: carp.Config, simple: bool) -> int:
     # Build given config, if simple building.build_simple() is called
     return_val: int = 0
-    yk_args: Array[str] = sarr.new(3, config.compiler_path, config.project.main, config.libs_path)
+    yk_args: Array[str] = array("str", config.compiler_path, config.project.main, config.libs_path)
     result: os.ProcessResult = os.run(yk_args)
 
     defer sarr.del_str_array(yk_args)
