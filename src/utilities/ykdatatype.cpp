@@ -58,6 +58,8 @@ void ykdatatype::find_builtin_or_primitive() {
     builtin_type_ = ykbuiltin::F_OUT;
   } else if (token_->token_ == "AnyPtr") {
     builtin_type_ = ykbuiltin::ANY_PTR;
+  } else if (token_->token_ == "Tuple") {
+    builtin_type_ = ykbuiltin::TUPLE;
   }
 }
 ykdatatype::~ykdatatype() { delete (token_); }
@@ -187,4 +189,7 @@ bool ykdatatype::is_function_output() const {
 }
 bool ykdatatype::is_any_ptr() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::ANY_PTR;
+}
+bool ykdatatype::is_tuple() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::TUPLE;
 }

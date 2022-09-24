@@ -513,6 +513,10 @@ ykdatatype *parser::parse_datatype() {
     throw error(dt->token_,
                 "Function's Out datatype must have 0 or 1 arguments.");
   }
+  if (dt->is_tuple() && dt->args_.empty()) {
+    throw error(dt->token_,
+                "Tuple must have at least one argument.");
+  }
   return dt;
 }
 stmt *parser::class_statement(annotations ants) {

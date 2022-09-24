@@ -317,7 +317,7 @@ namespace yaksha {
   /**
  * Content of an error message
  */
-  struct parsing_error {
+  struct parsing_error : std::exception {
     std::string message_;// content of the line this error occurred
     token tok_;
     bool token_set_{};

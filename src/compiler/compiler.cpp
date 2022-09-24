@@ -651,6 +651,8 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return esc_->compile(basic_dt, this);
   } else if (basic_dt->is_function()) {
     return esc_->compile_function_dt(basic_dt, this);
+  } else if (basic_dt->is_tuple()) {
+    return esc_->compile_tuple(basic_dt, this);
   }
   auto dt = basic_dt->token_->token_;
   if (!basic_dt->module_.empty() && cf_ != nullptr) {
@@ -889,20 +891,38 @@ void compiler::visit_assign_member_expr(assign_member_expr *obj) {
 }
 void compiler::visit_square_bracket_access_expr(
     square_bracket_access_expr *obj) {
-  obj->name_->accept(this);
-  auto lhs = pop();
   obj->index_expr_->accept(this);
   auto rhs = pop();
-  auto b = ykobject(lhs.second.datatype_->args_[0]);
-  push(lhs.first + "[" + rhs.first + "]", b);
+  obj->name_->accept(this);
+  auto lhs = pop();
+  if (lhs.second.datatype_->is_an_array()) {
+    auto b = ykobject(lhs.second.datatype_->args_[0]);
+    push(lhs.first + "[" + rhs.first + "]", b);
+  } else if (lhs.second.datatype_->is_tuple()) {
+    auto index = std::stoi(rhs.first);
+    auto b = ykobject(lhs.second.datatype_->args_[index]);
+    push(lhs.first + ".e" + rhs.first, b);
+  } else {
+    // Cannot happen
+    push("<><>", ykobject(dt_pool));
+  }
 }
 void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
-  obj->name_->accept(this);
-  auto lhs = pop();
   obj->index_expr_->accept(this);
   auto rhs = pop();
-  auto b = ykobject(lhs.second.datatype_->args_[0]);
-  push(lhs.first + "[" + rhs.first + "]", b);
+  obj->name_->accept(this);
+  auto lhs = pop();
+  if (lhs.second.datatype_->is_an_array()) {
+    auto b = ykobject(lhs.second.datatype_->args_[0]);
+    push(lhs.first + "[" + rhs.first + "]", b);
+  } else if (lhs.second.datatype_->is_tuple()) {
+    auto index = std::stoi(rhs.first);
+    auto b = ykobject(lhs.second.datatype_->args_[index]);
+    push(lhs.first + ".e" + rhs.first, b);
+  } else {
+    // Cannot happen
+    push("<><>", ykobject(dt_pool));
+  }
 }
 void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
   obj->assign_oper_->accept(this);

@@ -173,3 +173,8 @@ TEST_CASE("compiler: Test filter() builtin") {
             "functional_test_filter.yaka",
             "../test_data/compiler_tests/functional_test_filter.tokens");
 }
+TEST_CASE("compiler: Tuple data type") {
+  TEST_FILE("../test_data/compiler_tests/tuple_test.yaka",
+            "tuple_test.yaka",
+            "../test_data/compiler_tests/tuple_test.tokens");
+}

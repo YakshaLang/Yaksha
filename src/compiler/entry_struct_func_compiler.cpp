@@ -4,7 +4,8 @@ using namespace yaksha;
 entry_struct_func_compiler::entry_struct_func_compiler(ykdt_pool *pool)
     : pool_(pool), counter_(0), autogen_structs_list_(), autogen_structs_(),
       autogen_func_typedefs_(), autogen_func_typedef_list_(),
-      counter_functions_(0), code_(), code_fnc_() {}
+      counter_functions_(0), code_(), code_fnc_(), counter_tuples_(0),
+      autogen_tuple_list_(), autogen_tuples_(), code_tuples_() {}
 std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
                                                 datatype_compiler *dtc) {
   std::string repr = entry_dt->as_string();
@@ -35,15 +36,18 @@ std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
 void entry_struct_func_compiler::compile_forward_declarations(
     std::stringstream &target) {
   for (auto &e : autogen_structs_list_) {
-    // Pre declarations
     target << "struct ykentry" << e.incremented_id_ << ";\n";
+  }
+  for (auto &e : autogen_tuple_list_) {
+    target << "struct yktuple" << e.incremented_id_ << ";\n";
   }
 }
 void entry_struct_func_compiler::compile_structures(std::stringstream &target) {
   target << code_.str();
+  target << code_tuples_.str();
 }
 bool entry_struct_func_compiler::has_structures() {
-  return !autogen_structs_list_.empty();
+  return !autogen_structs_list_.empty() || !autogen_tuple_list_.empty();
 }
 std::string
 entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
@@ -102,5 +106,27 @@ void entry_struct_func_compiler::compile_function_defs(
 }
 bool entry_struct_func_compiler::has_functions() {
   return !autogen_func_typedef_list_.empty();
+}
+std::string entry_struct_func_compiler::compile_tuple(ykdatatype *tuple_dt,
+                                                      datatype_compiler *dtc) {
+  std::string repr = tuple_dt->as_string();
+  if (autogen_tuples_.find(repr) != autogen_tuples_.end()) {
+    return "struct yktuple" + std::to_string(autogen_tuples_[repr]);
+  }
+  tuple_data d{};
+  d.incremented_id_ = counter_++;
+  d.tuple_dt_ = tuple_dt;
+  std::stringstream code{};
+  code << "struct yktuple" << d.incremented_id_ << " {";
+  size_t i = 1;
+  for (ykdatatype *dt_arg : d.tuple_dt_->args_) {
+    code << " " << dtc->convert_dt(dt_arg) << " e" << i << ";";
+    i++;
+  }
+  code << " };\n";
+  code_ << code.str();
+  autogen_tuple_list_.emplace_back(d);
+  autogen_tuples_[repr] = d.incremented_id_;
+  return "struct yktuple" + std::to_string(d.incremented_id_);
 }
 entry_struct_func_compiler::~entry_struct_func_compiler() = default;

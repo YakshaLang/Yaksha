@@ -1,0 +1,8 @@
+def main() -> int:
+    a: Tuple[int, int, int]
+    b: Tuple[int, int, int]
+    a[1] = 1
+    a[1] = 2
+    a[2] = 3
+    return 0
+

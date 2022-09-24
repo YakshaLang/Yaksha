@@ -51,6 +51,11 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
   } else {
     push(rhs);
   }
+  // TODO rewrite this function
+  // TODO Numbers of same type -> All binary operators are allowed.
+  // TODO Str -> + == !=
+  // TODO Ptr -> == & !=
+  // TODO Str, Obj, Ptr, Array -> compare with None -> == & != only
 }
 void type_checker::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
@@ -561,6 +566,25 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
   if (arr_var.datatype_->is_an_array()) {
     auto placeholder = ykobject(dt_pool_);
     placeholder.datatype_ = arr_var.datatype_->args_[0];
+    push(placeholder);
+    return;
+  }
+  if (arr_var.datatype_->is_tuple()) {
+    if (index_expr->get_type() != ast_type::EXPR_LITERAL) {
+      push(ykobject(dt_pool_));
+      error(sqb_token, "Must use a literal for accessing tuple elements");
+      return;
+    }
+    auto lexp = dynamic_cast<literal_expr*>(index_expr);
+    auto item = lexp->literal_token_->token_;
+    auto index = std::stoi(item);
+    if (index < 0 || index >= arr_var.datatype_->args_.size()) {
+      push(ykobject(dt_pool_));
+      error(sqb_token, "Tuple index out of bounds");
+      return;
+    }
+    auto placeholder = ykobject(dt_pool_);
+    placeholder.datatype_ = arr_var.datatype_->args_[index];
     push(placeholder);
     return;
   }
