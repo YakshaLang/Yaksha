@@ -105,29 +105,54 @@ def which(binary: str) -> str:
     # Example find zig compiler path:
     #
     # os.which("zig")
-    actual_bin: str = binary
+    bin1: str = binary
+    bin2: str = binary
+    bin3: str = binary
     env: str = getenv("PATH")
     sep: str = ":"
     if is_windows():
         sep = ";"
         # add .exe to windows
-        actual_bin = actual_bin + ".exe"
+        bin1 = bin1 + ".exe"
+        bin2 = bin2 + ".bat"
+        bin3 = bin3 + ".cmd"
     paths: Array[str] = strings.split(env, sep)
     defer sarr.del_str_array(paths)
     length: int = len(paths)
     while length > 0:
         length = length - 1
         cur_path: str = paths[length]
-        full_path:str = ospath.join(cur_path, actual_bin)
+        full_path:str = ospath.join(cur_path, bin1)
         if ospath.executable(full_path):
             return full_path
+        if is_windows():
+            full_path = ospath.join(cur_path, bin2)
+            if ospath.exists(full_path):
+                return full_path
+            full_path = ospath.join(cur_path, bin3)
+            if ospath.exists(full_path):
+                return full_path
     # Not found from any of the paths, try fallbacks
     # Current path?
-    special: str = ospath.join(cwd(), actual_bin)
+    special: str = ospath.join(cwd(), bin1)
     if ospath.executable(special):
         return special
+    if is_windows():
+        special = ospath.join(cwd(), bin2)
+        if ospath.exists(special):
+            return special
+        special = ospath.join(cwd(), bin3)
+        if ospath.exists(special):
+            return special
     # Exe path?
-    special = ospath.join(exe_path(), actual_bin)
+    special = ospath.join(exe_path(), bin1)
     if ospath.executable(special):
         return special
+    if is_windows():
+        special = ospath.join(exe_path(), bin2)
+        if ospath.exists(special):
+            return special
+        special = ospath.join(exe_path(), bin3)
+        if ospath.exists(special):
+            return special
     return ""
