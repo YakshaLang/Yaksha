@@ -80,3 +80,7 @@ def f2uu(a: float) -> u64:
 @nativemacro
 def uu2f(a: u64) -> float:
     ccode """((float)nn__a)"""
+
+@nativemacro
+def i2s(a: int) -> str:
+    ccode """(yk__sdsfromlonglong(nn__a))"""

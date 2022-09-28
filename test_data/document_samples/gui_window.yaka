@@ -1,19 +1,35 @@
 import raylib as rl
 import raylib.utils
 import raylib.gui
-
+import libs.numbers as num
 
 def main() -> int:
-    width: int = 600
-    height: int = 600
-    rl.init_window(width, height, "Gui Window Sample")
+    width: int = 200
+    height: int = 160
+    counter1: int = 0
+    counter2: int = 0
+    rl.init_window(width, height, "Counter")
     rl.set_target_fps(120)
     while not rl.window_should_close():
         rl.begin_drawing()
         rl.clear_background(rl.color(255, 255, 255, 255))
-        gui.gui_panel(rl.rectangle(10.0f, 10.0f, 100.0f, 160.0f), "Panel Info")
-        gui.gui_panel(rl.rectangle(10.0f, 10.0f, 100.0f, 160.0f), "Panel Info")
-        rl.draw_fps(0, 560)
+        gui.gui_panel(rl.rectangle(10.0f, 10.0f, num.i2f(width) - 20.0f, num.i2f(height) - 20.0f), "<Counter>")
+        widget_width: float = num.i2f(width) - 40.0f
+        # Counter 1
+        gui.gui_label(rl.rectangle(20.0f, 40.0f, widget_width, 20.0f), "Count:" + num.i2s(counter1))
+        if gui.gui_button(rl.rectangle(20.0f, 60.0f, widget_width, 20.0f), "Count"):
+            counter1 = counter1 + 1
+        # Counter 2
+        gui.gui_label(rl.rectangle(20.0f, 80.0f, widget_width, 20.0f), "Count:" + num.i2s(counter2))
+        if gui.gui_button(rl.rectangle(20.0f, 100.0f, widget_width, 20.0f), "Count"):
+            counter2 = counter2 + 1
+        # Asciimoji status bar
+        animation: int = (counter1 + counter2) % 3
+        if animation == 1:
+            gui.gui_status_bar(rl.rectangle(10.0f, num.i2f(height) - 30.0f, num.i2f(width) - 20.0f, 20.0f), " \\- (- _ -) -/")
+        else:
+            gui.gui_status_bar(rl.rectangle(10.0f, num.i2f(height) - 30.0f, num.i2f(width) - 20.0f, 20.0f), " \\- (o _ o) -/")
+        rl.draw_fps(20, 540)
         rl.end_drawing()
     rl.close_window()
     return 0
