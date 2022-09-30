@@ -16,7 +16,7 @@ namespace yaksha {
     [[maybe_unused]] unsigned int increment_id_;
   };
   struct tuple_data {
-    [[maybe_unused]] ykdatatype* tuple_dt_;
+    [[maybe_unused]] ykdatatype *tuple_dt_;
     unsigned int incremented_id_;
   };
   struct entry_struct_func_compiler {

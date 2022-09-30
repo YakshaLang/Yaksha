@@ -50,12 +50,18 @@ namespace yaksha {
    * parsing errors will be present in errors_ field.
    */
     void tokenize();
+    static bool is_integer_token(token_type token_type_value);
 
 private:
     std::string file_;
     std::string data_;
+    token_type specalize_integer_token(token_type token_type_value,
+                                       int integer_size_value);
+    static bool is_unknown_integer_token(token_type token_type_value);
     void handle_error(const parsing_error &err);
     void tokenize_actual();
+    std::pair<int, bool> consider_integer_suffix(uint32_t current, uint32_t next,
+                                 uint32_t after_next);
   };
 }// namespace yaksha
 #endif

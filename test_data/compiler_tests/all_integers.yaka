@@ -1,0 +1,50 @@
+def bin_numbers() -> int:
+    a: i8  = 0b1111i8
+    b: i16 = 0b1110i16
+    c: i32 = 0b1101i32
+    d: i64 = 0b1011i64
+    e: u8  = 0b0111u8
+    f: u16 = 0b1110u16
+    g: u32 = 0b1011u32
+    h: u64 = 0b1101u64
+    return 0
+
+def oct_numbers() -> int:
+    a: i8  = 0o13i8
+    b: i16 = 0o12i16
+    c: i32 = 0o37i32
+    d: i64 = 0o47i64
+    e: u8  = 0o17u8
+    f: u16 = 0o14u16
+    g: u32 = 0o57u32
+    h: u64 = 0o67u64
+    return 0
+
+def dec_numbers() -> int:
+    a: i8  = 1i8
+    b: i16 = 2i16
+    c: i32 = 3i32
+    d: i64 = 4i64
+    e: u8  = 1u8
+    f: u16 = 2u16
+    g: u32 = 3u32
+    h: u64 = 4u64
+    return 0
+
+def hex_numbers() -> int:
+    a: i8  = 0xAi8
+    b: i16 = 0xBi16
+    c: i32 = 0xCi32
+    d: i64 = 0xDi64
+    e: u8  = 0xEu8
+    f: u16 = 0xFu16
+    g: u32 = 0x9u32
+    h: u64 = 0x8u64
+    return 0
+
+def main() -> int:
+    bin_numbers()
+    oct_numbers()
+    dec_numbers()
+    hex_numbers()
+    return 0

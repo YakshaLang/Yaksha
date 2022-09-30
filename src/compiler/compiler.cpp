@@ -1,6 +1,7 @@
 // compiler.cpp
 #include "compiler.h"
 #include "ast/parser.h"
+#include <cinttypes>
 using namespace yaksha;
 compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
                    entry_struct_func_compiler *esc)
@@ -203,6 +204,63 @@ void compiler::visit_grouping_expr(grouping_expr *obj) {
     push("(" + exp.first + ")", exp.second);
   }
 }
+std::string conv_integer_literal(token_type token_type_val,
+                                 std::string &integer_value) {
+  switch (token_type_val) {
+    case token_type::INTEGER_DECIMAL:
+    case token_type::INTEGER_HEX:
+    case token_type::INTEGER_DECIMAL_8:
+    case token_type::INTEGER_HEX_8:
+    case token_type::INTEGER_DECIMAL_16:
+    case token_type::INTEGER_HEX_16:
+    case token_type::INTEGER_DECIMAL_64:
+    case token_type::INTEGER_HEX_64:
+    case token_type::UINTEGER_DECIMAL:
+    case token_type::UINTEGER_HEX:
+    case token_type::UINTEGER_DECIMAL_8:
+    case token_type::UINTEGER_HEX_8:
+    case token_type::UINTEGER_DECIMAL_16:
+    case token_type::UINTEGER_HEX_16:
+    case token_type::UINTEGER_DECIMAL_64:
+    case token_type::UINTEGER_HEX_64:
+      return integer_value;// no need to modify
+    case token_type::INTEGER_BIN:
+    case token_type::INTEGER_BIN_8:
+    case token_type::INTEGER_BIN_16:
+    case token_type::INTEGER_BIN_64: {
+      std::string part = integer_value.substr(2);
+      std::intmax_t number = std::strtoimax(part.c_str(), nullptr, 2);
+      return std::to_string(number);
+    }
+    case token_type::UINTEGER_BIN:
+    case token_type::UINTEGER_BIN_8:
+    case token_type::UINTEGER_BIN_16:
+    case token_type::UINTEGER_BIN_64: {
+      std::string part = integer_value.substr(2);
+      std::uintmax_t number = std::strtoumax(part.c_str(), nullptr, 2);
+      return std::to_string(number);
+    }
+    case token_type::INTEGER_OCT:
+    case token_type::INTEGER_OCT_8:
+    case token_type::INTEGER_OCT_16:
+    case token_type::INTEGER_OCT_64: {
+      std::string part = integer_value.substr(2);
+      std::intmax_t number = std::strtoimax(part.c_str(), nullptr, 8);
+      return std::to_string(number);
+    }
+    case token_type::UINTEGER_OCT:
+    case token_type::UINTEGER_OCT_8:
+    case token_type::UINTEGER_OCT_16:
+    case token_type::UINTEGER_OCT_64: {
+      std::string part = integer_value.substr(2);
+      std::uintmax_t number = std::strtoumax(part.c_str(), nullptr, 8);
+      return std::to_string(number);
+    }
+    default:
+      // Cannot happen
+      return "<><>";
+  }
+}
 void compiler::visit_literal_expr(literal_expr *obj) {
   auto data_type_tok = obj->literal_token_->type_;
   if (data_type_tok == token_type::STRING ||
@@ -233,14 +291,70 @@ void compiler::visit_literal_expr(literal_expr *obj) {
              data_type_tok == token_type::INTEGER_DECIMAL ||
              data_type_tok == token_type::INTEGER_OCT ||
              data_type_tok == token_type::INTEGER_HEX) {
-    push("INT32_C(" + obj->literal_token_->token_ + ")",
+    push("INT32_C(" +
+             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+             ")",
          ykobject(dt_pool->create("int")));
+  } else if (data_type_tok == token_type::INTEGER_BIN_8 ||
+             data_type_tok == token_type::INTEGER_DECIMAL_8 ||
+             data_type_tok == token_type::INTEGER_OCT_8 ||
+             data_type_tok == token_type::INTEGER_HEX_8) {
+    push("INT8_C(" +
+             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+             ")",
+         ykobject(dt_pool->create("i8")));
+  } else if (data_type_tok == token_type::INTEGER_BIN_16 ||
+             data_type_tok == token_type::INTEGER_DECIMAL_16 ||
+             data_type_tok == token_type::INTEGER_OCT_16 ||
+             data_type_tok == token_type::INTEGER_HEX_16) {
+    push("INT16_C(" +
+             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+             ")",
+         ykobject(dt_pool->create("i16")));
+  } else if (data_type_tok == token_type::INTEGER_BIN_64 ||
+             data_type_tok == token_type::INTEGER_DECIMAL_64 ||
+             data_type_tok == token_type::INTEGER_OCT_64 ||
+             data_type_tok == token_type::INTEGER_HEX_64) {
+    push("INT64_C(" +
+             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+             ")",
+         ykobject(dt_pool->create("i64")));
+  } else if (data_type_tok == token_type::UINTEGER_BIN ||
+             data_type_tok == token_type::UINTEGER_DECIMAL ||
+             data_type_tok == token_type::UINTEGER_OCT ||
+             data_type_tok == token_type::UINTEGER_HEX) {
+    push("UINT32_C(" +
+             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+             ")",
+         ykobject(dt_pool->create("u32")));
+  } else if (data_type_tok == token_type::UINTEGER_BIN_8 ||
+             data_type_tok == token_type::UINTEGER_DECIMAL_8 ||
+             data_type_tok == token_type::UINTEGER_OCT_8 ||
+             data_type_tok == token_type::UINTEGER_HEX_8) {
+    push("UINT8_C(" +
+             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+             ")",
+         ykobject(dt_pool->create("i8")));
+  } else if (data_type_tok == token_type::UINTEGER_BIN_16 ||
+             data_type_tok == token_type::UINTEGER_DECIMAL_16 ||
+             data_type_tok == token_type::UINTEGER_OCT_16 ||
+             data_type_tok == token_type::UINTEGER_HEX_16) {
+    push("UINT16_C(" +
+             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+             ")",
+         ykobject(dt_pool->create("i16")));
+  } else if (data_type_tok == token_type::UINTEGER_BIN_64 ||
+             data_type_tok == token_type::UINTEGER_DECIMAL_64 ||
+             data_type_tok == token_type::UINTEGER_OCT_64 ||
+             data_type_tok == token_type::UINTEGER_HEX_64) {
+    push("UINT64_C(" +
+             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+             ")",
+         ykobject(dt_pool->create("i64")));
   } else if (data_type_tok == token_type::FLOAT_NUMBER) {
-    push(obj->literal_token_->token_,
-         ykobject(dt_pool->create("float")));
+    push(obj->literal_token_->token_, ykobject(dt_pool->create("float")));
   } else if (data_type_tok == token_type::DOUBLE_NUMBER) {
-    push(obj->literal_token_->token_,
-         ykobject(dt_pool->create("f64")));
+    push(obj->literal_token_->token_, ykobject(dt_pool->create("f64")));
   } else {
     push("<><>", ykobject(dt_pool));
   }
@@ -909,7 +1023,7 @@ void compiler::visit_square_bracket_access_expr(
     auto b = ykobject(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {
-    auto int_expr = dynamic_cast<literal_expr*>(obj->index_expr_);
+    auto int_expr = dynamic_cast<literal_expr *>(obj->index_expr_);
     auto index = std::stoi(int_expr->literal_token_->token_);
     auto b = ykobject(lhs.second.datatype_->args_[index]);
     push(lhs.first + ".e" + int_expr->literal_token_->token_, b);
@@ -927,7 +1041,7 @@ void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
     auto b = ykobject(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {
-    auto int_expr = dynamic_cast<literal_expr*>(obj->index_expr_);
+    auto int_expr = dynamic_cast<literal_expr *>(obj->index_expr_);
     auto index = std::stoi(int_expr->literal_token_->token_);
     auto b = ykobject(lhs.second.datatype_->args_[index]);
     push(lhs.first + ".e" + int_expr->literal_token_->token_, b);

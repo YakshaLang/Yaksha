@@ -34,9 +34,21 @@ namespace yaksha {
     GREAT_EQ,
     INDENT,
     INTEGER_BIN,
+    INTEGER_BIN_16,
+    INTEGER_BIN_64,
+    INTEGER_BIN_8,
     INTEGER_DECIMAL,
+    INTEGER_DECIMAL_16,
+    INTEGER_DECIMAL_64,
+    INTEGER_DECIMAL_8,
     INTEGER_HEX,
+    INTEGER_HEX_16,
+    INTEGER_HEX_64,
+    INTEGER_HEX_8,
     INTEGER_OCT,
+    INTEGER_OCT_16,
+    INTEGER_OCT_64,
+    INTEGER_OCT_8,
     INT_DIV,
     INT_DIV_EQ,
     LESS,
@@ -65,6 +77,26 @@ namespace yaksha {
     SUB_EQ,
     THREE_QUOTE_STRING,
     TILDE,
+    UINTEGER_BIN,
+    UINTEGER_BIN_16,
+    UINTEGER_BIN_64,
+    UINTEGER_BIN_8,
+    UINTEGER_DECIMAL,
+    UINTEGER_DECIMAL_16,
+    UINTEGER_DECIMAL_64,
+    UINTEGER_DECIMAL_8,
+    UINTEGER_HEX,
+    UINTEGER_HEX_16,
+    UINTEGER_HEX_64,
+    UINTEGER_HEX_8,
+    UINTEGER_OCT,
+    UINTEGER_OCT_16,
+    UINTEGER_OCT_64,
+    UINTEGER_OCT_8,
+    UNKNOWN_BIN,
+    UNKNOWN_DECIMAL,
+    UNKNOWN_HEX,
+    UNKNOWN_OCT,
     XOR,
     XOR_EQ,
     KEYWORD_FALSE,
@@ -125,9 +157,21 @@ namespace yaksha {
     if (t == token_type::GREAT_EQ) return "GREAT_EQ";
     if (t == token_type::INDENT) return "INDENT";
     if (t == token_type::INTEGER_BIN) return "INTEGER_BIN";
+    if (t == token_type::INTEGER_BIN_16) return "INTEGER_BIN_16";
+    if (t == token_type::INTEGER_BIN_64) return "INTEGER_BIN_64";
+    if (t == token_type::INTEGER_BIN_8) return "INTEGER_BIN_8";
     if (t == token_type::INTEGER_DECIMAL) return "INTEGER_DECIMAL";
+    if (t == token_type::INTEGER_DECIMAL_16) return "INTEGER_DECIMAL_16";
+    if (t == token_type::INTEGER_DECIMAL_64) return "INTEGER_DECIMAL_64";
+    if (t == token_type::INTEGER_DECIMAL_8) return "INTEGER_DECIMAL_8";
     if (t == token_type::INTEGER_HEX) return "INTEGER_HEX";
+    if (t == token_type::INTEGER_HEX_16) return "INTEGER_HEX_16";
+    if (t == token_type::INTEGER_HEX_64) return "INTEGER_HEX_64";
+    if (t == token_type::INTEGER_HEX_8) return "INTEGER_HEX_8";
     if (t == token_type::INTEGER_OCT) return "INTEGER_OCT";
+    if (t == token_type::INTEGER_OCT_16) return "INTEGER_OCT_16";
+    if (t == token_type::INTEGER_OCT_64) return "INTEGER_OCT_64";
+    if (t == token_type::INTEGER_OCT_8) return "INTEGER_OCT_8";
     if (t == token_type::INT_DIV) return "INT_DIV";
     if (t == token_type::INT_DIV_EQ) return "INT_DIV_EQ";
     if (t == token_type::LESS) return "LESS";
@@ -156,6 +200,26 @@ namespace yaksha {
     if (t == token_type::SUB_EQ) return "SUB_EQ";
     if (t == token_type::THREE_QUOTE_STRING) return "THREE_QUOTE_STRING";
     if (t == token_type::TILDE) return "TILDE";
+    if (t == token_type::UINTEGER_BIN) return "UINTEGER_BIN";
+    if (t == token_type::UINTEGER_BIN_16) return "UINTEGER_BIN_16";
+    if (t == token_type::UINTEGER_BIN_64) return "UINTEGER_BIN_64";
+    if (t == token_type::UINTEGER_BIN_8) return "UINTEGER_BIN_8";
+    if (t == token_type::UINTEGER_DECIMAL) return "UINTEGER_DECIMAL";
+    if (t == token_type::UINTEGER_DECIMAL_16) return "UINTEGER_DECIMAL_16";
+    if (t == token_type::UINTEGER_DECIMAL_64) return "UINTEGER_DECIMAL_64";
+    if (t == token_type::UINTEGER_DECIMAL_8) return "UINTEGER_DECIMAL_8";
+    if (t == token_type::UINTEGER_HEX) return "UINTEGER_HEX";
+    if (t == token_type::UINTEGER_HEX_16) return "UINTEGER_HEX_16";
+    if (t == token_type::UINTEGER_HEX_64) return "UINTEGER_HEX_64";
+    if (t == token_type::UINTEGER_HEX_8) return "UINTEGER_HEX_8";
+    if (t == token_type::UINTEGER_OCT) return "UINTEGER_OCT";
+    if (t == token_type::UINTEGER_OCT_16) return "UINTEGER_OCT_16";
+    if (t == token_type::UINTEGER_OCT_64) return "UINTEGER_OCT_64";
+    if (t == token_type::UINTEGER_OCT_8) return "UINTEGER_OCT_8";
+    if (t == token_type::UNKNOWN_BIN) return "UNKNOWN_BIN";
+    if (t == token_type::UNKNOWN_DECIMAL) return "UNKNOWN_DECIMAL";
+    if (t == token_type::UNKNOWN_HEX) return "UNKNOWN_HEX";
+    if (t == token_type::UNKNOWN_OCT) return "UNKNOWN_OCT";
     if (t == token_type::XOR) return "XOR";
     if (t == token_type::XOR_EQ) return "XOR_EQ";
     if (t == token_type::KEYWORD_FALSE) return "KEYWORD_FALSE";
@@ -212,9 +276,21 @@ namespace yaksha {
     if (t == "GREAT_EQ") return token_type::GREAT_EQ;
     if (t == "INDENT") return token_type::INDENT;
     if (t == "INTEGER_BIN") return token_type::INTEGER_BIN;
+    if (t == "INTEGER_BIN_16") return token_type::INTEGER_BIN_16;
+    if (t == "INTEGER_BIN_64") return token_type::INTEGER_BIN_64;
+    if (t == "INTEGER_BIN_8") return token_type::INTEGER_BIN_8;
     if (t == "INTEGER_DECIMAL") return token_type::INTEGER_DECIMAL;
+    if (t == "INTEGER_DECIMAL_16") return token_type::INTEGER_DECIMAL_16;
+    if (t == "INTEGER_DECIMAL_64") return token_type::INTEGER_DECIMAL_64;
+    if (t == "INTEGER_DECIMAL_8") return token_type::INTEGER_DECIMAL_8;
     if (t == "INTEGER_HEX") return token_type::INTEGER_HEX;
+    if (t == "INTEGER_HEX_16") return token_type::INTEGER_HEX_16;
+    if (t == "INTEGER_HEX_64") return token_type::INTEGER_HEX_64;
+    if (t == "INTEGER_HEX_8") return token_type::INTEGER_HEX_8;
     if (t == "INTEGER_OCT") return token_type::INTEGER_OCT;
+    if (t == "INTEGER_OCT_16") return token_type::INTEGER_OCT_16;
+    if (t == "INTEGER_OCT_64") return token_type::INTEGER_OCT_64;
+    if (t == "INTEGER_OCT_8") return token_type::INTEGER_OCT_8;
     if (t == "INT_DIV") return token_type::INT_DIV;
     if (t == "INT_DIV_EQ") return token_type::INT_DIV_EQ;
     if (t == "LESS") return token_type::LESS;
@@ -243,6 +319,26 @@ namespace yaksha {
     if (t == "SUB_EQ") return token_type::SUB_EQ;
     if (t == "THREE_QUOTE_STRING") return token_type::THREE_QUOTE_STRING;
     if (t == "TILDE") return token_type::TILDE;
+    if (t == "UINTEGER_BIN") return token_type::UINTEGER_BIN;
+    if (t == "UINTEGER_BIN_16") return token_type::UINTEGER_BIN_16;
+    if (t == "UINTEGER_BIN_64") return token_type::UINTEGER_BIN_64;
+    if (t == "UINTEGER_BIN_8") return token_type::UINTEGER_BIN_8;
+    if (t == "UINTEGER_DECIMAL") return token_type::UINTEGER_DECIMAL;
+    if (t == "UINTEGER_DECIMAL_16") return token_type::UINTEGER_DECIMAL_16;
+    if (t == "UINTEGER_DECIMAL_64") return token_type::UINTEGER_DECIMAL_64;
+    if (t == "UINTEGER_DECIMAL_8") return token_type::UINTEGER_DECIMAL_8;
+    if (t == "UINTEGER_HEX") return token_type::UINTEGER_HEX;
+    if (t == "UINTEGER_HEX_16") return token_type::UINTEGER_HEX_16;
+    if (t == "UINTEGER_HEX_64") return token_type::UINTEGER_HEX_64;
+    if (t == "UINTEGER_HEX_8") return token_type::UINTEGER_HEX_8;
+    if (t == "UINTEGER_OCT") return token_type::UINTEGER_OCT;
+    if (t == "UINTEGER_OCT_16") return token_type::UINTEGER_OCT_16;
+    if (t == "UINTEGER_OCT_64") return token_type::UINTEGER_OCT_64;
+    if (t == "UINTEGER_OCT_8") return token_type::UINTEGER_OCT_8;
+    if (t == "UNKNOWN_BIN") return token_type::UNKNOWN_BIN;
+    if (t == "UNKNOWN_DECIMAL") return token_type::UNKNOWN_DECIMAL;
+    if (t == "UNKNOWN_HEX") return token_type::UNKNOWN_HEX;
+    if (t == "UNKNOWN_OCT") return token_type::UNKNOWN_OCT;
     if (t == "XOR") return token_type::XOR;
     if (t == "XOR_EQ") return token_type::XOR_EQ;
     if (t == "KEYWORD_FALSE") return token_type::KEYWORD_FALSE;
@@ -317,7 +413,7 @@ namespace yaksha {
   /**
  * Content of an error message
  */
-  struct parsing_error : std::exception {
+  struct parsing_error {
     std::string message_;// content of the line this error occurred
     token tok_;
     bool token_set_{};

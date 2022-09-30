@@ -135,12 +135,28 @@ expr *parser::match_array_access(expr *name) {
   return pool_.c_square_bracket_access_expr(name, paren_close, arr_member);
 }
 expr *parser::primary() {
-  if (match({token_type::KEYWORD_FALSE, token_type::KEYWORD_TRUE,
-             token_type::KEYWORD_NONE, token_type::DOUBLE_NUMBER,
-             token_type::FLOAT_NUMBER, token_type::INTEGER_DECIMAL,
-             token_type::INTEGER_BIN, token_type::INTEGER_OCT,
-             token_type::INTEGER_HEX, token_type::STRING,
-             token_type::THREE_QUOTE_STRING})) {
+  if (match({
+          token_type::KEYWORD_FALSE,       token_type::KEYWORD_TRUE,
+          token_type::KEYWORD_NONE,        token_type::DOUBLE_NUMBER,
+          token_type::FLOAT_NUMBER,        token_type::STRING,
+          token_type::THREE_QUOTE_STRING,  token_type::INTEGER_BIN,
+          token_type::INTEGER_BIN_16,      token_type::INTEGER_BIN_64,
+          token_type::INTEGER_BIN_8,       token_type::INTEGER_DECIMAL,
+          token_type::INTEGER_DECIMAL_16,  token_type::INTEGER_DECIMAL_64,
+          token_type::INTEGER_DECIMAL_8,   token_type::INTEGER_HEX,
+          token_type::INTEGER_HEX_16,      token_type::INTEGER_HEX_64,
+          token_type::INTEGER_HEX_8,       token_type::INTEGER_OCT,
+          token_type::INTEGER_OCT_16,      token_type::INTEGER_OCT_64,
+          token_type::INTEGER_OCT_8,       token_type::UINTEGER_BIN,
+          token_type::UINTEGER_BIN_16,     token_type::UINTEGER_BIN_64,
+          token_type::UINTEGER_BIN_8,      token_type::UINTEGER_DECIMAL,
+          token_type::UINTEGER_DECIMAL_16, token_type::UINTEGER_DECIMAL_64,
+          token_type::UINTEGER_DECIMAL_8,  token_type::UINTEGER_HEX,
+          token_type::UINTEGER_HEX_16,     token_type::UINTEGER_HEX_64,
+          token_type::UINTEGER_HEX_8,      token_type::UINTEGER_OCT,
+          token_type::UINTEGER_OCT_16,     token_type::UINTEGER_OCT_64,
+          token_type::UINTEGER_OCT_8,
+      })) {
     return pool_.c_literal_expr(previous());
   }
   if (match({token_type::NAME})) { return pool_.c_variable_expr(previous()); }
@@ -514,8 +530,7 @@ ykdatatype *parser::parse_datatype() {
                 "Function's Out datatype must have 0 or 1 arguments.");
   }
   if (dt->is_tuple() && dt->args_.empty()) {
-    throw error(dt->token_,
-                "Tuple must have at least one argument.");
+    throw error(dt->token_, "Tuple must have at least one argument.");
   }
   return dt;
 }

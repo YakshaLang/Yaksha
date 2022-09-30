@@ -178,3 +178,8 @@ TEST_CASE("compiler: Tuple data type") {
             "tuple_test.yaka",
             "../test_data/compiler_tests/tuple_test.tokens");
 }
+TEST_CASE("compiler: Number literals") {
+  TEST_FILE("../test_data/compiler_tests/all_integers.yaka",
+            "all_integers.yaka",
+            "../test_data/compiler_tests/all_integers.tokens");
+}

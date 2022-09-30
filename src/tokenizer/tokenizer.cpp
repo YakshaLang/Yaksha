@@ -111,7 +111,7 @@ yaksha::consume_number(std::string &buf, octet_iterator &begin,
     next = std::get<1>(characters);
     if (mode == NUMBER_MATCH_NORMAL) {
       if (current == '.') {
-        if (dot_found) { return {-1, 0, token_type::INTEGER_DECIMAL}; }
+        if (dot_found) { return {-1, 0, token_type::UNKNOWN_DECIMAL}; }
         dot_found = true;
         utf8::append(static_cast<char32_t>(current), buf_inserter);
         size++;
@@ -145,11 +145,11 @@ yaksha::consume_number(std::string &buf, octet_iterator &begin,
   // Cannot end with eE+-
   if ((mode == NUMBER_MATCH_EXPO && (current == 'e' || current == 'E' ||
                                      current == '+' || current == '-'))) {
-    return {-1, 0, token_type::INTEGER_DECIMAL};
+    return {-1, 0, token_type::UNKNOWN_DECIMAL};
   }
   // Exponent must follow a number
   if (exponent_found && expo_size <= 0) {
-    return {-1, 0, token_type::INTEGER_DECIMAL};
+    return {-1, 0, token_type::UNKNOWN_DECIMAL};
   }
   if (current == 'f') {
     utf8::next(begin, end);
@@ -160,7 +160,7 @@ yaksha::consume_number(std::string &buf, octet_iterator &begin,
   }
   return {size, current,
           (dot_found || exponent_found) ? token_type::DOUBLE_NUMBER
-                                        : token_type::INTEGER_DECIMAL};
+                                        : token_type::UNKNOWN_DECIMAL};
 }
 tokenizer::tokenizer(std::string file, std::string data)
     : tokens_(), file_(std::move(file)), data_(std::move(data)), errors_() {}
@@ -188,21 +188,33 @@ void tokenizer::tokenize_actual() {
     next = std::get<1>(characters);
     after_next = std::get<2>(characters);
     if (mode == NORMAL_MATCH) {
-      if (::string_utils::is_alpha(current)) {
-        mode = NAME_MATCH;
-        continue;
-      } else if (current == '0' && (next == 'o' || next == 'O')) {
+      if (current == '0' && (next == 'o' || next == 'O')) {
         mode = OCT_MATCH;
         continue;
-      } else if (current == '0' && (next == 'x' || next == 'X')) {
+      }
+      if (current == '0' && (next == 'x' || next == 'X')) {
         mode = HEX_MATCH;
         continue;
-      } else if (current == '0' && (next == 'b' || next == 'B')) {
+      }
+      if (current == '0' && (next == 'b' || next == 'B')) {
         mode = BIN_MATCH;
         continue;
-      } else if (::string_utils::is_digit(current) ||
-                 (current == '.' && ::string_utils::is_digit(next))) {
+      }
+      if (::string_utils::is_digit(current) ||
+          (current == '.' && ::string_utils::is_digit(next))) {
         mode = MATCH_INTEGER_OR_FLOAT;
+        continue;
+      }
+      auto suffix_result = consider_integer_suffix(current, next, after_next);
+      if (suffix_result.first != 0) {
+        for (int i = 0; i < suffix_result.first; i++) {
+          pos++;
+          utf8::next(iterator, end);
+        }
+      }
+      if (suffix_result.second /* suffix found, need to tokenize next */) { continue; }
+      if (::string_utils::is_alpha(current)) {
+        mode = NAME_MATCH;
         continue;
       }
       switch (current) {
@@ -540,15 +552,15 @@ void tokenizer::tokenize_actual() {
       if (mode == HEX_MATCH) {
         result = ::string_utils::consume(::string_utils::allowed_in_hex,
                                          token_buf, iterator_copy, end, false);
-        token_type_number = token_type::INTEGER_HEX;
+        token_type_number = token_type::UNKNOWN_HEX;
       } else if (mode == OCT_MATCH) {
         result = ::string_utils::consume(::string_utils::allowed_in_oct,
                                          token_buf, iterator_copy, end, false);
-        token_type_number = token_type::INTEGER_OCT;
+        token_type_number = token_type::UNKNOWN_OCT;
       } else {
         result = ::string_utils::consume(::string_utils::allowed_in_bin,
                                          token_buf, iterator_copy, end, false);
-        token_type_number = token_type::INTEGER_BIN;
+        token_type_number = token_type::UNKNOWN_BIN;
       }
       if (result.first <= 0) {
         handle_error(
@@ -578,14 +590,215 @@ void tokenizer::tokenize_actual() {
     handle_error(parsing_error{"Tokenizer Error : Invalid end of file", file_,
                                line, pos});
   }
+  consider_integer_suffix(0, 0, 0); // edge case where code ends with a non suffixed integer
   bool last_new_ln =
       !tokens_.empty() && tokens_.back().type_ == token_type::NEW_LINE;
   tokens_.emplace_back(token{file_, line, pos + (last_new_ln ? 0 : 1), "",
                              token_type::END_OF_FILE});
   for (auto &t : tokens_) { t.original_ = t.token_; }
 }
+std::pair<int, bool> tokenizer::consider_integer_suffix(uint32_t current,
+                                                        uint32_t next,
+                                                        uint32_t after_next) {
+  int skip = 0;
+  bool should_continue = false;
+  if (!tokens_.empty() && is_unknown_integer_token(tokens_.back().type_) &&
+      (current == 'i' || current == 'u')) {
+    // Integer prefixes
+    token_type replacement;
+    token_type prev = tokens_.back().type_;
+    int integer_size = 0;
+    if (current == 'i' && next == '8') {
+      skip = 2;
+      integer_size = -8;
+    } else if (current == 'i' && next == '1' && after_next == '6') {
+      skip = 3;
+      integer_size = -16;
+    } else if (current == 'i' && next == '3' && after_next == '2') {
+      skip = 3;
+      integer_size = -32;
+    } else if (current == 'i' && next == '6' && after_next == '4') {
+      skip = 3;
+      integer_size = -64;
+    } else if (current == 'u' && next == '8') {
+      skip = 2;
+      integer_size = 8;
+    } else if (current == 'u' && next == '1' && after_next == '6') {
+      skip = 3;
+      integer_size = 16;
+    } else if (current == 'u' && next == '3' && after_next == '2') {
+      skip = 3;
+      integer_size = 32;
+    } else if (current == 'u' && next == '6' && after_next == '4') {
+      skip = 3;
+      integer_size = 64;
+    }
+    // If skip == 0 this means it is not a valid prefix, we continue as normal
+    if (skip != 0) {
+      replacement = specalize_integer_token(prev, integer_size);
+      token to_update = tokens_.back();
+      tokens_.pop_back();
+      to_update.type_ = replacement;
+      tokens_.emplace_back(to_update);
+      should_continue = true;
+    }
+  } else if (!tokens_.empty() &&
+             is_unknown_integer_token(tokens_.back().type_)) {
+    // i32 is default
+    token_type replacement;
+    token_type prev = tokens_.back().type_;
+    int integer_size = -32;
+    replacement = specalize_integer_token(prev, integer_size);
+    token to_update = tokens_.back();
+    tokens_.pop_back();
+    to_update.type_ = replacement;
+    tokens_.emplace_back(to_update);
+    should_continue = true;
+  }
+  return {skip, should_continue};
+}
 void tokenizer::handle_error(const parsing_error &t) {
   errors_.emplace_back(t);
+}
+bool tokenizer::is_integer_token(token_type token_type_value) {
+  return token_type_value == token_type::INTEGER_DECIMAL_8 ||
+         token_type_value == token_type::INTEGER_BIN_8 ||
+         token_type_value == token_type::INTEGER_HEX_8 ||
+         token_type_value == token_type::INTEGER_OCT_8 ||
+         token_type_value == token_type::INTEGER_DECIMAL_16 ||
+         token_type_value == token_type::INTEGER_BIN_16 ||
+         token_type_value == token_type::INTEGER_HEX_16 ||
+         token_type_value == token_type::INTEGER_OCT_16 ||
+         token_type_value == token_type::INTEGER_DECIMAL ||
+         token_type_value == token_type::INTEGER_BIN ||
+         token_type_value == token_type::INTEGER_HEX ||
+         token_type_value == token_type::INTEGER_OCT ||
+         token_type_value == token_type::INTEGER_DECIMAL_64 ||
+         token_type_value == token_type::INTEGER_BIN_64 ||
+         token_type_value == token_type::INTEGER_HEX_64 ||
+         token_type_value == token_type::INTEGER_OCT_64 ||
+         token_type_value == token_type::UINTEGER_DECIMAL_8 ||
+         token_type_value == token_type::UINTEGER_BIN_8 ||
+         token_type_value == token_type::UINTEGER_HEX_8 ||
+         token_type_value == token_type::UINTEGER_OCT_8 ||
+         token_type_value == token_type::UINTEGER_DECIMAL_16 ||
+         token_type_value == token_type::UINTEGER_BIN_16 ||
+         token_type_value == token_type::UINTEGER_HEX_16 ||
+         token_type_value == token_type::UINTEGER_OCT_16 ||
+         token_type_value == token_type::UINTEGER_DECIMAL ||
+         token_type_value == token_type::UINTEGER_BIN ||
+         token_type_value == token_type::UINTEGER_HEX ||
+         token_type_value == token_type::UINTEGER_OCT ||
+         token_type_value == token_type::UINTEGER_DECIMAL_64 ||
+         token_type_value == token_type::UINTEGER_BIN_64 ||
+         token_type_value == token_type::UINTEGER_HEX_64 ||
+         token_type_value == token_type::UINTEGER_OCT_64;
+}
+token_type tokenizer::specalize_integer_token(token_type token_type_value,
+                                              int integer_size_value) {
+  if (integer_size_value == 8) {
+    switch (token_type_value) {
+      case token_type::UNKNOWN_BIN:
+        return token_type::UINTEGER_BIN_8;
+      case token_type::UNKNOWN_OCT:
+        return token_type::UINTEGER_OCT_8;
+      case token_type::UNKNOWN_HEX:
+        return token_type::UINTEGER_HEX_8;
+      default:
+        return token_type::UINTEGER_DECIMAL_8;
+    }
+  }
+  if (integer_size_value == 16) {
+    switch (token_type_value) {
+      case token_type::UNKNOWN_BIN:
+        return token_type::UINTEGER_BIN_16;
+      case token_type::UNKNOWN_OCT:
+        return token_type::UINTEGER_OCT_16;
+      case token_type::UNKNOWN_HEX:
+        return token_type::UINTEGER_HEX_16;
+      default:
+        return token_type::UINTEGER_DECIMAL_16;
+    }
+  }
+  if (integer_size_value == 32) {
+    switch (token_type_value) {
+      case token_type::UNKNOWN_BIN:
+        return token_type::UINTEGER_BIN;
+      case token_type::UNKNOWN_OCT:
+        return token_type::UINTEGER_OCT;
+      case token_type::UNKNOWN_HEX:
+        return token_type::UINTEGER_HEX;
+      default:
+        return token_type::UINTEGER_DECIMAL;
+    }
+  }
+  if (integer_size_value == 64) {
+    switch (token_type_value) {
+      case token_type::UNKNOWN_BIN:
+        return token_type::UINTEGER_BIN_64;
+      case token_type::UNKNOWN_OCT:
+        return token_type::UINTEGER_OCT_64;
+      case token_type::UNKNOWN_HEX:
+        return token_type::UINTEGER_HEX_64;
+      default:
+        return token_type::UINTEGER_DECIMAL_64;
+    }
+  }
+  if (integer_size_value == -8) {
+    switch (token_type_value) {
+      case token_type::UNKNOWN_BIN:
+        return token_type::INTEGER_BIN_8;
+      case token_type::UNKNOWN_OCT:
+        return token_type::INTEGER_OCT_8;
+      case token_type::UNKNOWN_HEX:
+        return token_type::INTEGER_HEX_8;
+      default:
+        return token_type::INTEGER_DECIMAL_8;
+    }
+  }
+  if (integer_size_value == -16) {
+    switch (token_type_value) {
+      case token_type::UNKNOWN_BIN:
+        return token_type::INTEGER_BIN_16;
+      case token_type::UNKNOWN_OCT:
+        return token_type::INTEGER_OCT_16;
+      case token_type::UNKNOWN_HEX:
+        return token_type::INTEGER_HEX_16;
+      default:
+        return token_type::INTEGER_DECIMAL_16;
+    }
+  }
+  if (integer_size_value == -32) {
+    switch (token_type_value) {
+      case token_type::UNKNOWN_BIN:
+        return token_type::INTEGER_BIN;
+      case token_type::UNKNOWN_OCT:
+        return token_type::INTEGER_OCT;
+      case token_type::UNKNOWN_HEX:
+        return token_type::INTEGER_HEX;
+      default:
+        return token_type::INTEGER_DECIMAL;
+    }
+  }
+  if (integer_size_value == -64) {
+    switch (token_type_value) {
+      case token_type::UNKNOWN_BIN:
+        return token_type::INTEGER_BIN_64;
+      case token_type::UNKNOWN_OCT:
+        return token_type::INTEGER_OCT_64;
+      case token_type::UNKNOWN_HEX:
+        return token_type::INTEGER_HEX_64;
+      default:
+        return token_type::INTEGER_DECIMAL_64;
+    }
+  }
+  return token_type::TK_UNKNOWN_TOKEN_DETECTED;
+}
+bool tokenizer::is_unknown_integer_token(token_type token_type_val) {
+  return token_type_val == token_type::UNKNOWN_DECIMAL ||
+         token_type_val == token_type::UNKNOWN_HEX ||
+         token_type_val == token_type::UNKNOWN_OCT ||
+         token_type_val == token_type::UNKNOWN_BIN;
 }
 parsing_error::parsing_error(std::string message, token *token_)
     : message_(std::move(message)) {

@@ -192,7 +192,42 @@ void type_checker::visit_literal_expr(literal_expr *obj) {
              literal_type == token_type::INTEGER_OCT ||
              literal_type == token_type::INTEGER_DECIMAL ||
              literal_type == token_type::INTEGER_HEX) {
-    data = ykobject(1, dt_pool_);
+    data = ykobject(dt_pool_->create("int"));
+  } else if (literal_type == token_type::INTEGER_BIN_8 ||
+             literal_type == token_type::INTEGER_OCT_8 ||
+             literal_type == token_type::INTEGER_DECIMAL_8 ||
+             literal_type == token_type::INTEGER_HEX_8) {
+    data = ykobject(dt_pool_->create("i8"));
+  } else if (literal_type == token_type::INTEGER_BIN_16 ||
+             literal_type == token_type::INTEGER_OCT_16 ||
+             literal_type == token_type::INTEGER_DECIMAL_16 ||
+             literal_type == token_type::INTEGER_HEX_16) {
+    data = ykobject(dt_pool_->create("i16"));
+  } else if (literal_type == token_type::INTEGER_BIN_64 ||
+             literal_type == token_type::INTEGER_OCT_64 ||
+             literal_type == token_type::INTEGER_DECIMAL_64 ||
+             literal_type == token_type::INTEGER_HEX_64) {
+    data = ykobject(dt_pool_->create("i64"));
+  } else if (literal_type == token_type::UINTEGER_BIN ||
+             literal_type == token_type::UINTEGER_OCT ||
+             literal_type == token_type::UINTEGER_DECIMAL ||
+             literal_type == token_type::UINTEGER_HEX) {
+    data = ykobject(dt_pool_->create("u32"));
+  } else if (literal_type == token_type::UINTEGER_BIN_8 ||
+             literal_type == token_type::UINTEGER_OCT_8 ||
+             literal_type == token_type::UINTEGER_DECIMAL_8 ||
+             literal_type == token_type::UINTEGER_HEX_8) {
+    data = ykobject(dt_pool_->create("u8"));
+  } else if (literal_type == token_type::UINTEGER_BIN_16 ||
+             literal_type == token_type::UINTEGER_OCT_16 ||
+             literal_type == token_type::UINTEGER_DECIMAL_16 ||
+             literal_type == token_type::UINTEGER_HEX_16) {
+    data = ykobject(dt_pool_->create("u16"));
+  } else if (literal_type == token_type::UINTEGER_BIN_64 ||
+             literal_type == token_type::UINTEGER_OCT_64 ||
+             literal_type == token_type::UINTEGER_DECIMAL_64 ||
+             literal_type == token_type::UINTEGER_HEX_64) {
+    data = ykobject(dt_pool_->create("u64"));
   } else if (literal_type == token_type::DOUBLE_NUMBER) {
     data = ykobject(1.2, dt_pool_);
   } else if (literal_type == token_type::FLOAT_NUMBER) {
@@ -575,7 +610,14 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
       error(sqb_token, "Must use a literal for accessing tuple elements");
       return;
     }
-    auto lexp = dynamic_cast<literal_expr*>(index_expr);
+    auto lexp = dynamic_cast<literal_expr *>(index_expr);
+    // TODO support other literal types for tuple access.
+    if (lexp->literal_token_->type_ != token_type::INTEGER_DECIMAL) {
+      push(ykobject(dt_pool_));
+      error(sqb_token,
+            "Must use a integer decimal literal for accessing tuple elements");
+      return;
+    }
     auto item = lexp->literal_token_->token_;
     auto index = std::stoi(item);
     if (index < 0 || index >= arr_var.datatype_->args_.size()) {
