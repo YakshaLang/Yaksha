@@ -228,11 +228,21 @@ void compiler::visit_literal_expr(literal_expr *obj) {
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_FALSE) {
     push("false", ykobject(dt_pool->create("bool")));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_NONE) {
-    push("NULL", ykobject());
-  } else {// Assume this is int for now
-    // TODO support for other data types
+    push("NULL", ykobject(dt_pool));
+  } else if (data_type_tok == token_type::INTEGER_BIN ||
+             data_type_tok == token_type::INTEGER_DECIMAL ||
+             data_type_tok == token_type::INTEGER_OCT ||
+             data_type_tok == token_type::INTEGER_HEX) {
+    push("INT32_C(" + obj->literal_token_->token_ + ")",
+         ykobject(dt_pool->create("int")));
+  } else if (data_type_tok == token_type::FLOAT_NUMBER) {
     push(obj->literal_token_->token_,
-         ykobject(0, dt_pool));// Note dummy value for ykobject
+         ykobject(dt_pool->create("float")));
+  } else if (data_type_tok == token_type::DOUBLE_NUMBER) {
+    push(obj->literal_token_->token_,
+         ykobject(dt_pool->create("f64")));
+  } else {
+    push("<><>", ykobject(dt_pool));
   }
 }
 void compiler::visit_logical_expr(logical_expr *obj) {
@@ -899,9 +909,10 @@ void compiler::visit_square_bracket_access_expr(
     auto b = ykobject(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {
-    auto index = std::stoi(rhs.first);
+    auto int_expr = dynamic_cast<literal_expr*>(obj->index_expr_);
+    auto index = std::stoi(int_expr->literal_token_->token_);
     auto b = ykobject(lhs.second.datatype_->args_[index]);
-    push(lhs.first + ".e" + rhs.first, b);
+    push(lhs.first + ".e" + int_expr->literal_token_->token_, b);
   } else {
     // Cannot happen
     push("<><>", ykobject(dt_pool));
@@ -916,9 +927,10 @@ void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
     auto b = ykobject(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {
-    auto index = std::stoi(rhs.first);
+    auto int_expr = dynamic_cast<literal_expr*>(obj->index_expr_);
+    auto index = std::stoi(int_expr->literal_token_->token_);
     auto b = ykobject(lhs.second.datatype_->args_[index]);
-    push(lhs.first + ".e" + rhs.first, b);
+    push(lhs.first + ".e" + int_expr->literal_token_->token_, b);
   } else {
     // Cannot happen
     push("<><>", ykobject(dt_pool));

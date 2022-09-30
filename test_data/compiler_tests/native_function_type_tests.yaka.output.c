@@ -22,7 +22,7 @@ int32_t yy__main()
     yk__sds t__0 = yk__sdsnew("hello world");
     yk__printlnstr((t__0));
     yk__sdsfree(t__0);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

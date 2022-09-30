@@ -52,7 +52,7 @@ int32_t yy__main()
     yk__arrput(t__7, yk__sdsdup(t__6));
     yk__sds* yy__ar = t__7;
     yk__sds* t__10 = yy__ar;
-    int32_t t__12 = 10;
+    int32_t t__12 = INT32_C(10);
     size_t t__9 = yk__arrlenu(t__10);
     bool t__13 = true;
     for (size_t t__8 = 0; t__8 < t__9; t__8++) { 
@@ -62,7 +62,7 @@ int32_t yy__main()
     }
     t__13;
     yk__sds* t__17 = yy__ar;
-    int32_t t__19 = 20;
+    int32_t t__19 = INT32_C(20);
     size_t t__16 = yk__arrlenu(t__17);
     bool t__20 = true;
     for (size_t t__15 = 0; t__15 < t__16; t__15++) { 
@@ -76,19 +76,19 @@ int32_t yy__main()
     ykfncptr1 yy__fi = yy__print_add_n;
     int32_t* t__23 = NULL;
     yk__arrsetcap(t__23, 10);
-    yk__arrput(t__23, 1);
-    yk__arrput(t__23, 2);
-    yk__arrput(t__23, 3);
-    yk__arrput(t__23, 4);
-    yk__arrput(t__23, 5);
-    yk__arrput(t__23, 6);
-    yk__arrput(t__23, 7);
-    yk__arrput(t__23, 8);
-    yk__arrput(t__23, 9);
-    yk__arrput(t__23, 10);
+    yk__arrput(t__23, INT32_C(1));
+    yk__arrput(t__23, INT32_C(2));
+    yk__arrput(t__23, INT32_C(3));
+    yk__arrput(t__23, INT32_C(4));
+    yk__arrput(t__23, INT32_C(5));
+    yk__arrput(t__23, INT32_C(6));
+    yk__arrput(t__23, INT32_C(7));
+    yk__arrput(t__23, INT32_C(8));
+    yk__arrput(t__23, INT32_C(9));
+    yk__arrput(t__23, INT32_C(10));
     int32_t* yy__ai = t__23;
     int32_t* t__26 = yy__ai;
-    int32_t t__28 = 100;
+    int32_t t__28 = INT32_C(100);
     size_t t__25 = yk__arrlenu(t__26);
     bool t__29 = true;
     for (size_t t__24 = 0; t__24 < t__25; t__24++) { 
@@ -98,7 +98,7 @@ int32_t yy__main()
     }
     t__29;
     int32_t* t__33 = yy__ai;
-    int32_t t__35 = 5;
+    int32_t t__35 = INT32_C(5);
     size_t t__32 = yk__arrlenu(t__33);
     bool t__36 = true;
     for (size_t t__31 = 0; t__31 < t__32; t__31++) { 
@@ -117,7 +117,7 @@ int32_t yy__main()
     yk__sdsfree(t__3);
     yk__sdsfree(t__2);
     yk__sdsfree(t__1);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

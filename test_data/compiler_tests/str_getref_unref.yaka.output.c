@@ -28,20 +28,20 @@ int32_t yy__main()
 {
     yk__sds t__2 = yk__sdsnew("hello");
     yk__sds yy__hello = yk__sdsdup(t__2);
-    int32_t yy__i = 5;
+    int32_t yy__i = INT32_C(5);
     while (1) {
-        if (!((yy__i > 0))) { break; } // Check
+        if (!((yy__i > INT32_C(0)))) { break; } // Check
         // Body of while loop
 
         {
             yy__world1((&(yy__hello)));
             yy__world2((&(yy__hello)));
-            yy__i = (yy__i - 1);
+            yy__i = (yy__i - INT32_C(1));
         }
     }
     yk__sdsfree(yy__hello);
     yk__sdsfree(t__2);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

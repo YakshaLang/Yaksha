@@ -42,7 +42,7 @@ int32_t yy__main()
     yk__sdsfree(t__8);
     yk__sdsfree(t__7);
     yk__sdsfree(t__6);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

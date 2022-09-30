@@ -51,15 +51,15 @@ int32_t yy__main()
     struct yy__MainClass* yy__mc = calloc(1, sizeof(struct yy__MainClass));
     struct yy__house_ColomboHouse* yy__hs = calloc(1, sizeof(struct yy__house_ColomboHouse));
     struct yy__jungle_monkey* yy__m = calloc(1, sizeof(struct yy__jungle_monkey));
-    yy__m->yy__jungle_id = 10;
+    yy__m->yy__jungle_id = INT32_C(10);
     yy__m->yy__jungle_food = calloc(1, sizeof(struct yy__jungle_banana));
-    yy__m->yy__jungle_food->yy__jungle_id = 50;
+    yy__m->yy__jungle_food->yy__jungle_id = INT32_C(50);
     yy__jungle_print_monkey(yy__m);
     free(yy__m->yy__jungle_food);
     free(yy__m);
     free(yy__hs);
     free(yy__mc);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

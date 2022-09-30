@@ -46,7 +46,7 @@ int32_t yy__main()
     yk__sds t__7 = yk__sdsnew("count len 3 ==> ");
     yk__printstr((t__7));
     yk__sds* t__10 = yy__ar;
-    int32_t t__12 = 3;
+    int32_t t__12 = INT32_C(3);
     size_t t__9 = yk__arrlenu(t__10);
     int32_t t__13 = 0;
     for (size_t t__8 = 0; t__8 < t__9; t__8++) { 
@@ -58,7 +58,7 @@ int32_t yy__main()
     yk__sds t__15 = yk__sdsnew("count len 5 ==> ");
     yk__printstr((t__15));
     yk__sds* t__18 = yy__ar;
-    int32_t t__20 = 5;
+    int32_t t__20 = INT32_C(5);
     size_t t__17 = yk__arrlenu(t__18);
     int32_t t__21 = 0;
     for (size_t t__16 = 0; t__16 < t__17; t__16++) { 
@@ -71,21 +71,21 @@ int32_t yy__main()
     yk__printlnstr((t__23));
     int32_t* t__24 = NULL;
     yk__arrsetcap(t__24, 10);
-    yk__arrput(t__24, 1);
-    yk__arrput(t__24, 2);
-    yk__arrput(t__24, 3);
-    yk__arrput(t__24, 4);
-    yk__arrput(t__24, 5);
-    yk__arrput(t__24, 6);
-    yk__arrput(t__24, 7);
-    yk__arrput(t__24, 8);
-    yk__arrput(t__24, 9);
-    yk__arrput(t__24, 10);
+    yk__arrput(t__24, INT32_C(1));
+    yk__arrput(t__24, INT32_C(2));
+    yk__arrput(t__24, INT32_C(3));
+    yk__arrput(t__24, INT32_C(4));
+    yk__arrput(t__24, INT32_C(5));
+    yk__arrput(t__24, INT32_C(6));
+    yk__arrput(t__24, INT32_C(7));
+    yk__arrput(t__24, INT32_C(8));
+    yk__arrput(t__24, INT32_C(9));
+    yk__arrput(t__24, INT32_C(10));
     int32_t* yy__ai = t__24;
     yk__sds t__25 = yk__sdsnew("count up to 5 ==> ");
     yk__printstr((t__25));
     int32_t* t__28 = yy__ai;
-    int32_t t__30 = 5;
+    int32_t t__30 = INT32_C(5);
     size_t t__27 = yk__arrlenu(t__28);
     int32_t t__31 = 0;
     for (size_t t__26 = 0; t__26 < t__27; t__26++) { 
@@ -107,7 +107,7 @@ int32_t yy__main()
     yk__sdsfree(t__2);
     yk__sdsfree(t__1);
     yk__sdsfree(t__0);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

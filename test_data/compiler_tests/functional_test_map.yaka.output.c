@@ -43,7 +43,7 @@ int32_t yy__main()
     yk__sds t__9 = yk__sdsnew("map to_lengths ==> ");
     yk__printlnstr((t__9));
     yk__sds* t__12 = yy__ar;
-    int32_t t__14 = 0;
+    int32_t t__14 = INT32_C(0);
     size_t t__11 = yk__arrlenu(t__12);
     int32_t* t__15 = NULL;
     for (size_t t__10 = 0; t__10 < t__11; t__10++) { 
@@ -52,7 +52,7 @@ int32_t yy__main()
         yk__arrput(t__15, t__16);
     }
     int32_t* t__19 = t__15;
-    int32_t t__21 = 0;
+    int32_t t__21 = INT32_C(0);
     size_t t__18 = yk__arrlenu(t__19);
     bool t__22 = true;
     for (size_t t__17 = 0; t__17 < t__18; t__17++) { 
@@ -65,21 +65,21 @@ int32_t yy__main()
     yk__printlnstr((t__24));
     int32_t* t__25 = NULL;
     yk__arrsetcap(t__25, 10);
-    yk__arrput(t__25, 1);
-    yk__arrput(t__25, 2);
-    yk__arrput(t__25, 3);
-    yk__arrput(t__25, 4);
-    yk__arrput(t__25, 5);
-    yk__arrput(t__25, 6);
-    yk__arrput(t__25, 7);
-    yk__arrput(t__25, 8);
-    yk__arrput(t__25, 9);
-    yk__arrput(t__25, 10);
+    yk__arrput(t__25, INT32_C(1));
+    yk__arrput(t__25, INT32_C(2));
+    yk__arrput(t__25, INT32_C(3));
+    yk__arrput(t__25, INT32_C(4));
+    yk__arrput(t__25, INT32_C(5));
+    yk__arrput(t__25, INT32_C(6));
+    yk__arrput(t__25, INT32_C(7));
+    yk__arrput(t__25, INT32_C(8));
+    yk__arrput(t__25, INT32_C(9));
+    yk__arrput(t__25, INT32_C(10));
     int32_t* yy__ai = t__25;
     yk__sds t__26 = yk__sdsnew("map to_pow2 ==> ");
     yk__printlnstr((t__26));
     int32_t* t__29 = yy__ai;
-    int32_t t__31 = 0;
+    int32_t t__31 = INT32_C(0);
     size_t t__28 = yk__arrlenu(t__29);
     int32_t* t__32 = NULL;
     for (size_t t__27 = 0; t__27 < t__28; t__27++) { 
@@ -88,7 +88,7 @@ int32_t yy__main()
         yk__arrput(t__32, t__33);
     }
     int32_t* t__36 = t__32;
-    int32_t t__38 = 0;
+    int32_t t__38 = INT32_C(0);
     size_t t__35 = yk__arrlenu(t__36);
     bool t__39 = true;
     for (size_t t__34 = 0; t__34 < t__35; t__34++) { 
@@ -109,7 +109,7 @@ int32_t yy__main()
     yk__sdsfree(t__4);
     yk__sdsfree(t__3);
     yk__sdsfree(t__2);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

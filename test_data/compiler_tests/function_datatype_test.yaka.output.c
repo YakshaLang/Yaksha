@@ -36,7 +36,7 @@ int32_t yy__main()
     yk__sds t__3 = yk__sdsnew("Hello World");
     yk__printlnstr((t__3));
     yk__sdsfree(t__3);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

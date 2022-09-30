@@ -16,20 +16,20 @@ struct yy__Spaceship {
 // --functions-- 
 int32_t yy__main() 
 {
-    int32_t yy__a = 10;
+    int32_t yy__a = INT32_C(10);
     while (1) {
-        if (!((yy__a != 0))) { break; } // Check
+        if (!((yy__a != INT32_C(0)))) { break; } // Check
         // Body of while loop
 
         {
             yk__printint(((intmax_t)yy__a));
             yk__sds t__0 = yk__sdsnew("\n");
             yk__printstr((t__0));
-            yy__a = (yy__a - 1);
+            yy__a = (yy__a - INT32_C(1));
             yk__sdsfree(t__0);
         }
     }
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

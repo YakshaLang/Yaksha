@@ -18,10 +18,10 @@ yy__A yy__toA(struct yy__B* yy__b)
 int32_t yy__main() 
 {
     struct yy__B* yy__b = calloc(1, sizeof(struct yy__B));
-    yy__b->yy__a = 1;
+    yy__b->yy__a = INT32_C(1);
     yy__A yy__a = ((yy__A)yy__b);
     yy__A yy__a2 = yy__toA(yy__b);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

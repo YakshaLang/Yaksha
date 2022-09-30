@@ -182,7 +182,7 @@ int32_t yy__eval_op(int32_t yy__x, yk__sds yy__op, int32_t yy__y)
     yk__sdsfree(t__2);
     yk__sdsfree(t__0);
     yk__sdsfree(yy__op);
-    return 0;
+    return INT32_C(0);
 }
 int32_t yy__eval(yy__mpc_Ast yy__t) 
 {
@@ -195,10 +195,10 @@ int32_t yy__eval(yy__mpc_Ast yy__t)
         yk__sdsfree(t__8);
         return t__10;
     }
-    yk__sds t__11 = yy__strings_from_cstr(yy__t->children[1]->contents);
+    yk__sds t__11 = yy__strings_from_cstr(yy__t->children[INT32_C(1)]->contents);
     yk__sds yy__op = yk__sdsdup((t__11));
-    int32_t yy__x = yy__eval(yy__t->children[2]);
-    int32_t yy__i = 3;
+    int32_t yy__x = yy__eval(yy__t->children[INT32_C(2)]);
+    int32_t yy__i = INT32_C(3);
     while (1) {
         if (!(true)) { break; } // Check
         // Body of while loop
@@ -209,7 +209,7 @@ int32_t yy__eval(yy__mpc_Ast yy__t)
             if (yy__strings_startswith(yk__sdsdup((t__12)), yk__sdsdup(t__13)))
             {
                 yy__x = yy__eval_op(yy__x, yk__sdsdup(yy__op), yy__eval(yy__t->children[yy__i]));
-                yy__i = (yy__i + 1);
+                yy__i = (yy__i + INT32_C(1));
             }
             else
             {
@@ -238,7 +238,7 @@ int32_t yy__main()
     yy__mpc_Mpc yy__lispy = yy__mpc_new(yk__sdsdup(t__18));
     yk__sds t__19 = yk__sdsnew("\n      number   : /-\?[0-9]+/ ;\n      operator : \'+\' | \'-\' | \'*\' | \'/\' ;\n      expr     : <number> | \'(\' <operator> <expr>+ \')\' ;\n      lispy    : /^/ <operator> <expr>+ /$/ ;\n    ");
     yk__sds yy__lang = yk__sdsdup(t__19);
-    yy__mpc_mpca_lang(0, yk__sdsdup(yy__lang), yy__number, yy__operator, yy__expr, yy__lispy);
+    yy__mpc_mpca_lang(INT32_C(0), yk__sdsdup(yy__lang), yy__number, yy__operator, yy__expr, yy__lispy);
     yk__sds t__20 = yk__sdsnew("Lispy Version 0.0.0.0.2\n");
     yk__printstr((t__20));
     yk__sds t__21 = yk__sdsnew("Type just \'q\' to exit.\n\n");
@@ -276,7 +276,7 @@ int32_t yy__main()
                 yk__sdsfree(t__17);
                 yk__sdsfree(t__16);
                 yk__sdsfree(t__15);
-                return 0;
+                return INT32_C(0);
             }
             if (yy__mpc_parse(yk__sdsdup(yy__filename), yk__sdsdup(yy__inp), yy__lispy, yy__r))
             {
@@ -294,7 +294,7 @@ int32_t yy__main()
             yk__sdsfree(t__23);
         }
     }
-    yy__mpc_cleanup(4, yy__number, yy__operator, yy__expr, yy__lispy);
+    yy__mpc_cleanup(INT32_C(4), yy__number, yy__operator, yy__expr, yy__lispy);
     yk__sds t__26 = yk__sdsnew(">>>bye!\n");
     yk__printstr((t__26));
     free(yy__r);
@@ -313,7 +313,7 @@ int32_t yy__main()
     yk__sdsfree(t__17);
     yk__sdsfree(t__16);
     yk__sdsfree(t__15);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }

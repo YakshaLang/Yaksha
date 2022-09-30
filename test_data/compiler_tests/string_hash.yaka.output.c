@@ -13,9 +13,9 @@ int32_t yy__main()
     struct ykentry0* yy__m = NULL;
     yk__sh_new_strdup(yy__m);
     yk__sds t__0 = yk__sdsnew("hello");
-    yk__shput(yy__m, t__0, 42);
+    yk__shput(yy__m, t__0, INT32_C(42));
     yk__sds t__1 = yk__sdsnew("world");
-    yk__shput(yy__m, t__1, 10000);
+    yk__shput(yy__m, t__1, INT32_C(10000));
     yk__sds t__2 = yk__sdsnew("hello = ");
     yk__printstr((t__2));
     yk__sds t__3 = yk__sdsnew("hello");
@@ -66,7 +66,7 @@ int32_t yy__main()
     yk__sdsfree(t__2);
     yk__sdsfree(t__1);
     yk__sdsfree(t__0);
-    return 0;
+    return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
 int main(void) { return yy__main(); }
