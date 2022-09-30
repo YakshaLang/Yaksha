@@ -44,7 +44,7 @@ def main() -> int:
     s.angle = random.random_betweenf(30.0f, 45.0f)
     s.width = 600.0f
     s.height = 600.0f
-    s.frame_count = num.i2uu(0)
+    s.frame_count = 0u64
     s.blue = rl.color(0, 255, 214, 255)
     s.green = rl.color(0, 255, 0, 255)
     s.color3 = rl.color(255, 45, 156, 255)
