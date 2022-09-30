@@ -30,15 +30,19 @@ Identifier = [a-zA-Z][a-zA-Z0-9_]*
 
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
-DecLongLiteral    = {DecIntegerLiteral} [lL]
+DecLongLiteral    = {DecIntegerLiteral} [iu] (8|16|32|64)
 
-HexIntegerLiteral = 0 [xX] 0* {HexDigit} {1,8}
-HexLongLiteral    = 0 [xX] 0* {HexDigit} {1,16} [lL]
+HexIntegerLiteral = 0 [xX] 0* {HexDigit}+
+HexLongLiteral    = 0 [xX] 0* {HexDigit}+ [iu] (8|16|32|64)
 HexDigit          = [0-9a-fA-F]
 
-OctIntegerLiteral = 0+ [1-3]? {OctDigit} {1,15}
-OctLongLiteral    = 0+ 1? {OctDigit} {1,21} [lL]
+OctIntegerLiteral = 0 [oO] 0* {OctDigit}+
+OctLongLiteral    = 0 [oO] 0* {OctDigit}+ [iu] (8|16|32|64)
 OctDigit          = [0-7]
+
+BinIntegerLiteral = 0 [ob] 0* {BinDigit}+
+BinLongLiteral    = 0 [ob] 0* {BinDigit}+ [iu] (8|16|32|64)
+BinDigit          = [01]
 
 /* floating point literals */
 FloatLiteral  = ({FLit1}|{FLit2}|{FLit3}) {Exponent}? [fF]
@@ -152,9 +156,11 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   {OctIntegerLiteral}            |
   {OctLongLiteral}               |
 
+  {BinIntegerLiteral}            |
+  {BinLongLiteral}               |
+
   {FloatLiteral}                 |
-  {DoubleLiteral}                |
-  {FloatLiteral}[jJ]             { return YakshaTypes.NUMBER; }
+  {DoubleLiteral}                { return YakshaTypes.NUMBER; }
 
   /* Strings */
   {SINGLE_QUOTED_STRING}         { return YakshaTypes.STRING; }
