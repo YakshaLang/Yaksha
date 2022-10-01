@@ -126,6 +126,11 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   "*"                            { return YakshaTypes.OPERATOR_MUL; }
   "/"                            { return YakshaTypes.OPERATOR_DIV; }
   "%"                            { return YakshaTypes.OPERATOR_REMAINDER; }
+  "<<"                            { return YakshaTypes.OPERATOR_SHL; }
+  ">>"                            { return YakshaTypes.OPERATOR_SHR; }
+  "&"                            { return YakshaTypes.OPERATOR_B_AND; }
+  "|"                            { return YakshaTypes.OPERATOR_B_OR; }
+  "^"                            { return YakshaTypes.OPERATOR_B_XOR; }
 
   "<"                            |
   ">"                            |
@@ -140,7 +145,19 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   ","                              { return YakshaTypes.OPERATOR_COMMA; }
 
   "="                              { return YakshaTypes.OPERATOR_EQ; }
+  "+="                            { return YakshaTypes.OPERATOR_PLUS_EQ; }
+  "-="                            { return YakshaTypes.OPERATOR_MINUS_EQ; }
+  "*="                            { return YakshaTypes.OPERATOR_MUL_EQ; }
+  "/="                            { return YakshaTypes.OPERATOR_DIV_EQ; }
+  "%="                            { return YakshaTypes.OPERATOR_REMAINDER_EQ; }
+  "<<="                            { return YakshaTypes.OPERATOR_SHL_EQ; }
+  ">>="                            { return YakshaTypes.OPERATOR_SHR_EQ; }
+  "&="                            { return YakshaTypes.OPERATOR_B_AND_EQ; }
+  "|="                            { return YakshaTypes.OPERATOR_B_OR_EQ; }
+  "^="                            { return YakshaTypes.OPERATOR_B_XOR_EQ; }
+
   "not"                              { return YakshaTypes.OPERATOR_NOT; }
+  "~"                              { return YakshaTypes.OPERATOR_B_NOT; }
   "or"                              { return YakshaTypes.OPERATOR_OR; }
   "and"                              { return YakshaTypes.OPERATOR_AND; }
 

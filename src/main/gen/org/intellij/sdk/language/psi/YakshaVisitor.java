@@ -23,6 +23,10 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitBitwise(@NotNull YakshaBitwise o) {
+    visitPsiElement(o);
+  }
+
   public void visitBreakStatement(@NotNull YakshaBreakStatement o) {
     visitPsiElement(o);
   }
@@ -152,10 +156,6 @@ public class YakshaVisitor extends PsiElementVisitor {
   }
 
   public void visitLogicOr(@NotNull YakshaLogicOr o) {
-    visitPsiElement(o);
-  }
-
-  public void visitLogicalNot(@NotNull YakshaLogicalNot o) {
     visitPsiElement(o);
   }
 

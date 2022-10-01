@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface YakshaComparison extends PsiElement {
 
   @NotNull
-  List<YakshaTerm> getTermList();
+  List<YakshaBitwise> getBitwiseList();
 
 }

@@ -153,7 +153,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I identifier_exp S? OPERATOR_EQ S? exp S? NL
+  // I identifier_exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ | OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
   public static boolean assignment_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignment_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -162,7 +162,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, I);
     r = r && identifier_exp(b, l + 1);
     r = r && assignment_statement_2(b, l + 1);
-    r = r && consumeToken(b, OPERATOR_EQ);
+    r = r && assignment_statement_3(b, l + 1);
     r = r && assignment_statement_4(b, l + 1);
     r = r && exp(b, l + 1);
     r = r && assignment_statement_6(b, l + 1);
@@ -178,6 +178,24 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ | OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ
+  private static boolean assignment_statement_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment_statement_3")) return false;
+    boolean r;
+    r = consumeToken(b, OPERATOR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_PLUS_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_MINUS_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_MUL_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_DIV_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_REMAINDER_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_SHL_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_SHR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_B_AND_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_B_OR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_B_XOR_EQ);
+    return r;
+  }
+
   // S?
   private static boolean assignment_statement_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignment_statement_4")) return false;
@@ -188,6 +206,79 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   // S?
   private static boolean assignment_statement_6(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignment_statement_6")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // term (S? (OPERATOR_B_OR | OPERATOR_B_AND | OPERATOR_B_XOR | OPERATOR_SHL | OPERATOR_SHR ) S? term)* | term
+  public static boolean bitwise(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitwise")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, BITWISE, "<bitwise>");
+    r = bitwise_0(b, l + 1);
+    if (!r) r = term(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // term (S? (OPERATOR_B_OR | OPERATOR_B_AND | OPERATOR_B_XOR | OPERATOR_SHL | OPERATOR_SHR ) S? term)*
+  private static boolean bitwise_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitwise_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = term(b, l + 1);
+    r = r && bitwise_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (S? (OPERATOR_B_OR | OPERATOR_B_AND | OPERATOR_B_XOR | OPERATOR_SHL | OPERATOR_SHR ) S? term)*
+  private static boolean bitwise_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitwise_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!bitwise_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "bitwise_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // S? (OPERATOR_B_OR | OPERATOR_B_AND | OPERATOR_B_XOR | OPERATOR_SHL | OPERATOR_SHR ) S? term
+  private static boolean bitwise_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitwise_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = bitwise_0_1_0_0(b, l + 1);
+    r = r && bitwise_0_1_0_1(b, l + 1);
+    r = r && bitwise_0_1_0_2(b, l + 1);
+    r = r && term(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean bitwise_0_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitwise_0_1_0_0")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // OPERATOR_B_OR | OPERATOR_B_AND | OPERATOR_B_XOR | OPERATOR_SHL | OPERATOR_SHR
+  private static boolean bitwise_0_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitwise_0_1_0_1")) return false;
+    boolean r;
+    r = consumeToken(b, OPERATOR_B_OR);
+    if (!r) r = consumeToken(b, OPERATOR_B_AND);
+    if (!r) r = consumeToken(b, OPERATOR_B_XOR);
+    if (!r) r = consumeToken(b, OPERATOR_SHL);
+    if (!r) r = consumeToken(b, OPERATOR_SHR);
+    return r;
+  }
+
+  // S?
+  private static boolean bitwise_0_1_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitwise_0_1_0_2")) return false;
     consumeToken(b, S);
     return true;
   }
@@ -343,29 +434,29 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // term (S? OPERATOR_COMPARISON S? term)* | term
+  // bitwise (S? OPERATOR_COMPARISON S? bitwise)* | bitwise
   public static boolean comparison(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "comparison")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, COMPARISON, "<comparison>");
     r = comparison_0(b, l + 1);
-    if (!r) r = term(b, l + 1);
+    if (!r) r = bitwise(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // term (S? OPERATOR_COMPARISON S? term)*
+  // bitwise (S? OPERATOR_COMPARISON S? bitwise)*
   private static boolean comparison_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "comparison_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = term(b, l + 1);
+    r = bitwise(b, l + 1);
     r = r && comparison_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // (S? OPERATOR_COMPARISON S? term)*
+  // (S? OPERATOR_COMPARISON S? bitwise)*
   private static boolean comparison_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "comparison_0_1")) return false;
     while (true) {
@@ -376,7 +467,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // S? OPERATOR_COMPARISON S? term
+  // S? OPERATOR_COMPARISON S? bitwise
   private static boolean comparison_0_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "comparison_0_1_0")) return false;
     boolean r;
@@ -384,7 +475,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = comparison_0_1_0_0(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COMPARISON);
     r = r && comparison_0_1_0_2(b, l + 1);
-    r = r && term(b, l + 1);
+    r = r && bitwise(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1021,13 +1112,13 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // S? logical_not S?
+  // S? logic_or S?
   public static boolean exp(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "exp")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, EXP, "<exp>");
     r = exp_0(b, l + 1);
-    r = r && logical_not(b, l + 1);
+    r = r && logic_or(b, l + 1);
     r = r && exp_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -1613,37 +1704,6 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPERATOR_NOT S? logic_or | logic_or
-  public static boolean logical_not(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "logical_not")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, LOGICAL_NOT, "<logical not>");
-    r = logical_not_0(b, l + 1);
-    if (!r) r = logic_or(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // OPERATOR_NOT S? logic_or
-  private static boolean logical_not_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "logical_not_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, OPERATOR_NOT);
-    r = r && logical_not_0_1(b, l + 1);
-    r = r && logic_or(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // S?
-  private static boolean logical_not_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "logical_not_0_1")) return false;
-    consumeToken(b, S);
-    return true;
-  }
-
-  /* ********************************************************** */
   // runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement
   public static boolean outer_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "outer_statement")) return false;
@@ -1901,7 +1961,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPERATOR_MINUS S? exp | fncall | primary
+  // (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp | fncall | primary
   public static boolean unary(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unary")) return false;
     boolean r;
@@ -1913,15 +1973,25 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // OPERATOR_MINUS S? exp
+  // (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp
   private static boolean unary_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unary_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, OPERATOR_MINUS);
+    r = unary_0_0(b, l + 1);
     r = r && unary_0_1(b, l + 1);
     r = r && exp(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT
+  private static boolean unary_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unary_0_0")) return false;
+    boolean r;
+    r = consumeToken(b, OPERATOR_B_NOT);
+    if (!r) r = consumeToken(b, OPERATOR_MINUS);
+    if (!r) r = consumeToken(b, OPERATOR_NOT);
     return r;
   }
 

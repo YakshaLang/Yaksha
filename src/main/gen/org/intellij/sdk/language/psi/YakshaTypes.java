@@ -12,6 +12,7 @@ public interface YakshaTypes {
   IElementType ANNOTATION_ARG = new YakshaElementType("ANNOTATION_ARG");
   IElementType ARGUMENTS = new YakshaElementType("ARGUMENTS");
   IElementType ASSIGNMENT_STATEMENT = new YakshaElementType("ASSIGNMENT_STATEMENT");
+  IElementType BITWISE = new YakshaElementType("BITWISE");
   IElementType BREAK_STATEMENT = new YakshaElementType("BREAK_STATEMENT");
   IElementType CCODE_STATEMENT = new YakshaElementType("CCODE_STATEMENT");
   IElementType CLASS_BITS = new YakshaElementType("CLASS_BITS");
@@ -43,7 +44,6 @@ public interface YakshaTypes {
   IElementType IMPORT_STATEMENT = new YakshaElementType("IMPORT_STATEMENT");
   IElementType LET_STATEMENT = new YakshaElementType("LET_STATEMENT");
   IElementType LITERAL = new YakshaElementType("LITERAL");
-  IElementType LOGICAL_NOT = new YakshaElementType("LOGICAL_NOT");
   IElementType LOGIC_AND = new YakshaElementType("LOGIC_AND");
   IElementType LOGIC_OR = new YakshaElementType("LOGIC_OR");
   IElementType OUTER_STATEMENT = new YakshaElementType("OUTER_STATEMENT");
@@ -83,22 +83,38 @@ public interface YakshaTypes {
   IElementType OPERATOR_AND = new YakshaTokenType("OPERATOR_AND");
   IElementType OPERATOR_ARROW = new YakshaTokenType("OPERATOR_ARROW");
   IElementType OPERATOR_AT = new YakshaTokenType("OPERATOR_AT");
+  IElementType OPERATOR_B_AND = new YakshaTokenType("OPERATOR_B_AND");
+  IElementType OPERATOR_B_AND_EQ = new YakshaTokenType("OPERATOR_B_AND_EQ");
+  IElementType OPERATOR_B_NOT = new YakshaTokenType("OPERATOR_B_NOT");
+  IElementType OPERATOR_B_OR = new YakshaTokenType("OPERATOR_B_OR");
+  IElementType OPERATOR_B_OR_EQ = new YakshaTokenType("OPERATOR_B_OR_EQ");
+  IElementType OPERATOR_B_XOR = new YakshaTokenType("OPERATOR_B_XOR");
+  IElementType OPERATOR_B_XOR_EQ = new YakshaTokenType("OPERATOR_B_XOR_EQ");
   IElementType OPERATOR_CLOSE_P = new YakshaTokenType("OPERATOR_CLOSE_P");
   IElementType OPERATOR_CLOSE_SQB = new YakshaTokenType("OPERATOR_CLOSE_SQB");
   IElementType OPERATOR_COLON = new YakshaTokenType("OPERATOR_COLON");
   IElementType OPERATOR_COMMA = new YakshaTokenType("OPERATOR_COMMA");
   IElementType OPERATOR_COMPARISON = new YakshaTokenType("OPERATOR_COMPARISON");
   IElementType OPERATOR_DIV = new YakshaTokenType("OPERATOR_DIV");
+  IElementType OPERATOR_DIV_EQ = new YakshaTokenType("OPERATOR_DIV_EQ");
   IElementType OPERATOR_DOT = new YakshaTokenType("OPERATOR_DOT");
   IElementType OPERATOR_EQ = new YakshaTokenType("OPERATOR_EQ");
   IElementType OPERATOR_MINUS = new YakshaTokenType("OPERATOR_MINUS");
+  IElementType OPERATOR_MINUS_EQ = new YakshaTokenType("OPERATOR_MINUS_EQ");
   IElementType OPERATOR_MUL = new YakshaTokenType("OPERATOR_MUL");
+  IElementType OPERATOR_MUL_EQ = new YakshaTokenType("OPERATOR_MUL_EQ");
   IElementType OPERATOR_NOT = new YakshaTokenType("OPERATOR_NOT");
   IElementType OPERATOR_OPEN_P = new YakshaTokenType("OPERATOR_OPEN_P");
   IElementType OPERATOR_OPEN_SQB = new YakshaTokenType("OPERATOR_OPEN_SQB");
   IElementType OPERATOR_OR = new YakshaTokenType("OPERATOR_OR");
   IElementType OPERATOR_PLUS = new YakshaTokenType("OPERATOR_PLUS");
+  IElementType OPERATOR_PLUS_EQ = new YakshaTokenType("OPERATOR_PLUS_EQ");
   IElementType OPERATOR_REMAINDER = new YakshaTokenType("OPERATOR_REMAINDER");
+  IElementType OPERATOR_REMAINDER_EQ = new YakshaTokenType("OPERATOR_REMAINDER_EQ");
+  IElementType OPERATOR_SHL = new YakshaTokenType("OPERATOR_SHL");
+  IElementType OPERATOR_SHL_EQ = new YakshaTokenType("OPERATOR_SHL_EQ");
+  IElementType OPERATOR_SHR = new YakshaTokenType("OPERATOR_SHR");
+  IElementType OPERATOR_SHR_EQ = new YakshaTokenType("OPERATOR_SHR_EQ");
   IElementType PRIMITIVE_DATA_TYPE = new YakshaTokenType("PRIMITIVE_DATA_TYPE");
   IElementType S = new YakshaTokenType("S");
   IElementType STRING = new YakshaTokenType("STRING");
@@ -117,6 +133,9 @@ public interface YakshaTypes {
       }
       else if (type == ASSIGNMENT_STATEMENT) {
         return new YakshaAssignmentStatementImpl(node);
+      }
+      else if (type == BITWISE) {
+        return new YakshaBitwiseImpl(node);
       }
       else if (type == BREAK_STATEMENT) {
         return new YakshaBreakStatementImpl(node);
@@ -210,9 +229,6 @@ public interface YakshaTypes {
       }
       else if (type == LITERAL) {
         return new YakshaLiteralImpl(node);
-      }
-      else if (type == LOGICAL_NOT) {
-        return new YakshaLogicalNotImpl(node);
       }
       else if (type == LOGIC_AND) {
         return new YakshaLogicAndImpl(node);

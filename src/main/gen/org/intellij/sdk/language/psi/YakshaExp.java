@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface YakshaExp extends PsiElement {
 
   @NotNull
-  YakshaLogicalNot getLogicalNot();
+  YakshaLogicOr getLogicOr();
 
 }

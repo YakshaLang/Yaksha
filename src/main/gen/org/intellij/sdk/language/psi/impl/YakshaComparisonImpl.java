@@ -29,8 +29,8 @@ public class YakshaComparisonImpl extends ASTWrapperPsiElement implements Yaksha
 
   @Override
   @NotNull
-  public List<YakshaTerm> getTermList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaTerm.class);
+  public List<YakshaBitwise> getBitwiseList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaBitwise.class);
   }
 
 }

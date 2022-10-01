@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YakshaLogicalNot extends PsiElement {
+public interface YakshaBitwise extends PsiElement {
 
   @NotNull
-  YakshaLogicOr getLogicOr();
+  List<YakshaTerm> getTermList();
 
 }

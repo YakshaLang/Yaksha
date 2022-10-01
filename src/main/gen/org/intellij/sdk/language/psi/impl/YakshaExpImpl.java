@@ -29,8 +29,8 @@ public class YakshaExpImpl extends ASTWrapperPsiElement implements YakshaExp {
 
   @Override
   @NotNull
-  public YakshaLogicalNot getLogicalNot() {
-    return findNotNullChildByClass(YakshaLogicalNot.class);
+  public YakshaLogicOr getLogicOr() {
+    return findNotNullChildByClass(YakshaLogicOr.class);
   }
 
 }

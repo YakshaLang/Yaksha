@@ -71,18 +71,18 @@ del_statement ::= I KW_DEL  S? exp NL
 return_statement ::= I KW_RETURN (S? exp)? NL
 defer_statement ::= I KW_DEFER S? KW_DEL? S? exp NL
 expr_statement ::= I exp S? NL
-assignment_statement ::= I identifier_exp S? OPERATOR_EQ S? exp S? NL
+assignment_statement ::= I identifier_exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ | OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
 let_statement ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? (OPERATOR_EQ S? exp S?)? NL
 
 // Expression Recursion
-exp ::= S? logical_not S?
-logical_not ::= OPERATOR_NOT S? logic_or | logic_or
+exp ::= S? logic_or S?
 logic_or ::= logic_and (S? OPERATOR_OR S? logic_and)* | logic_and
 logic_and ::= comparison (S? OPERATOR_AND S? comparison)* | comparison
-comparison ::= term (S? OPERATOR_COMPARISON S? term)* | term
+comparison ::= bitwise (S? OPERATOR_COMPARISON S? bitwise)* | bitwise
+bitwise ::= term (S? (OPERATOR_B_OR | OPERATOR_B_AND | OPERATOR_B_XOR | OPERATOR_SHL | OPERATOR_SHR ) S? term)* | term
 term ::= factor (S? (OPERATOR_MINUS | OPERATOR_PLUS) S? factor)* | factor
 factor ::= unary (S? (OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER) S? unary)* | unary
-unary ::= OPERATOR_MINUS S? exp | fncall | primary
+unary ::= (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp | fncall | primary
 fncall ::= identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB ) {
     methods=[getDefOrClassName getFullName getReference]
 }

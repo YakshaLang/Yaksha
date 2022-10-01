@@ -11,14 +11,14 @@ import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
 
-public class YakshaLogicalNotImpl extends ASTWrapperPsiElement implements YakshaLogicalNot {
+public class YakshaBitwiseImpl extends ASTWrapperPsiElement implements YakshaBitwise {
 
-  public YakshaLogicalNotImpl(@NotNull ASTNode node) {
+  public YakshaBitwiseImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YakshaVisitor visitor) {
-    visitor.visitLogicalNot(this);
+    visitor.visitBitwise(this);
   }
 
   @Override
@@ -29,8 +29,8 @@ public class YakshaLogicalNotImpl extends ASTWrapperPsiElement implements Yaksha
 
   @Override
   @NotNull
-  public YakshaLogicOr getLogicOr() {
-    return findNotNullChildByClass(YakshaLogicOr.class);
+  public List<YakshaTerm> getTermList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaTerm.class);
   }
 
 }
