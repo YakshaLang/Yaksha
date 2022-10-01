@@ -2680,6 +2680,27 @@
           }
         ],
         "comment": "",
+        "name": "i2s",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "a"
+          }
+        ],
+        "return_type": {
+          "type": "str"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": "",
         "name": "i2u",
         "parameters": [
           {
