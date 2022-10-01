@@ -25,8 +25,6 @@ public class YakshaDocs {
             .put("print", "Print without a new line")
             .put("println", "Print + new line")
             .put("len", "Get length of arrays,maps")
-            .put("sizeof", "Size of structures or C data types")
-            .put("tostr", "If it is a string, copy is created. Floats are converted to 2 decimal places")
             .put("arrput", "Put item to an array")
             .put("arrpop", "Remove last item from an array and return it")
             .put("arrnew", "Create a new array of given size. (Uninitialized elements)")
@@ -42,11 +40,13 @@ public class YakshaDocs {
             .put("hmput", "Put item to a Array[MEntry[T]]")
             .put("hmget", "Get item from a Array[MEntry[T]]")
             .put("hmgeti", "Get item index from a Array[MEntry[T]] (-1 if not found)")
-            .put("reverse", "Reverse an array creating a new array. New array need to be deleted")
-            .put("sorted", "Sort an array creating a new array. New array need to be deleted")
-            .put("format", "String formatting builtin")
             .put("cast", "Data type casting builtin")
             .put("qsort", "Sort an array, returns True if successful")
+            .put("iif", "Ternary functionality")
+            .put("foreach", "For each element in array execute given function")
+            .put("countif", "For each element in array count if function returns true")
+            .put("filter", "Create a new array with filtered elements based on return value of given function")
+            .put("map", "Create a new array with result of given function")
             .build();
     public static final Set<String> BUILTIN_FUNCTION_NAMES = BUILTIN_FUNCTIONS.keySet();
     public static final YakshaDocs INSTANCE = new YakshaDocs();
