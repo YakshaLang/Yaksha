@@ -33,6 +33,9 @@ test_data/compiler_tests/functional_test_foreach.yaka
 test_data/compiler_tests/functional_test_countif.yaka
 test_data/compiler_tests/functional_test_map.yaka
 test_data/compiler_tests/functional_test_filter.yaka
+test_data/compiler_tests/tuple_test.yaka
+test_data/compiler_tests/all_integers.yaka
+test_data/compiler_tests/operator_test.yaka
 test_data/data_type_test.yaka
 test_data/document_samples/factorial.yaka
 test_data/import_tests/city/house.yaka
