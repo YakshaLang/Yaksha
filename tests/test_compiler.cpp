@@ -183,3 +183,8 @@ TEST_CASE("compiler: Number literals") {
             "all_integers.yaka",
             "../test_data/compiler_tests/all_integers.tokens");
 }
+TEST_CASE("compiler: Operator test augment assign and bitwise") {
+  TEST_FILE("../test_data/compiler_tests/operator_test.yaka",
+            "operator_test.yaka",
+            "../test_data/compiler_tests/operator_test.tokens");
+}

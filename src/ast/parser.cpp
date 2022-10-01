@@ -67,9 +67,45 @@ expr *parser::equality() {
   return ex;
 }
 expr *parser::comparison() {
-  expr *ex = term();
+  expr *ex = bit_or();
   while (match({token_type::GREAT, token_type::GREAT_EQ, token_type::LESS,
                 token_type::LESS_EQ})) {
+    auto opr = previous();
+    expr *right = bit_or();
+    ex = pool_.c_binary_expr(ex, opr, right);
+  }
+  return ex;
+}
+expr *parser::bit_or() {
+  expr *ex = bit_xor();
+  while (match({token_type::OR})) {
+    auto opr = previous();
+    expr *right = bit_xor();
+    ex = pool_.c_binary_expr(ex, opr, right);
+  }
+  return ex;
+}
+expr *parser::bit_xor() {
+  expr *ex = bit_and();
+  while (match({token_type::XOR})) {
+    auto opr = previous();
+    expr *right = bit_and();
+    ex = pool_.c_binary_expr(ex, opr, right);
+  }
+  return ex;
+}
+expr *parser::bit_and() {
+  expr *ex = bit_shifts();
+  while (match({token_type::AND})) {
+    auto opr = previous();
+    expr *right = bit_shifts();
+    ex = pool_.c_binary_expr(ex, opr, right);
+  }
+  return ex;
+}
+expr *parser::bit_shifts() {
+  expr *ex = term();
+  while (match({token_type::SHL, token_type::SHR})) {
     auto opr = previous();
     expr *right = term();
     ex = pool_.c_binary_expr(ex, opr, right);
@@ -95,7 +131,7 @@ expr *parser::factor() {
   return ex;
 }
 expr *parser::unary() {
-  if (match({token_type::SUB, token_type::KEYWORD_NOT})) {
+  if (match({token_type::SUB, token_type::KEYWORD_NOT, token_type::TILDE})) {
     auto opr = previous();
     expr *right = unary();
     return pool_.c_unary_expr(opr, right);
@@ -369,24 +405,26 @@ stmt *parser::declaration_statement() {
 }
 expr *parser::assignment() {
   auto exp = or_op();
-  // a = b = 1
-  if (match({token_type::EQ})) {
-    auto equals = previous();
+  if (match({token_type::EQ, token_type::AND_EQ, token_type::XOR_EQ,
+             token_type::OR_EQ, token_type::SHL_EQ, token_type::SHR_EQ,
+             token_type::DIV_EQ, token_type::MOD_EQ, token_type::MUL_EQ,
+             token_type::PLUS_EQ, token_type::SUB_EQ})) {
+    auto assignment_operator = previous();
     auto val = assignment();
     if (exp->get_type() == ast_type::EXPR_VARIABLE) {
       auto name = (dynamic_cast<variable_expr *>(exp))->name_;
-      return pool_.c_assign_expr(name, equals, val);
+      return pool_.c_assign_expr(name, assignment_operator, val);
     } else if (exp->get_type() == ast_type::EXPR_GET) {
       auto get = (dynamic_cast<get_expr *>(exp));
       auto set_expr = pool_.c_set_expr(get->lhs_, get->dot_, get->item_);
-      return pool_.c_assign_member_expr(set_expr, equals, val);
+      return pool_.c_assign_member_expr(set_expr, assignment_operator, val);
     } else if (exp->get_type() == ast_type::EXPR_SQUARE_BRACKET_ACCESS) {
       auto get = (dynamic_cast<square_bracket_access_expr *>(exp));
       auto set_expr = pool_.c_square_bracket_set_expr(
           get->name_, get->sqb_token_, get->index_expr_);
-      return pool_.c_assign_arr_expr(set_expr, equals, val);
+      return pool_.c_assign_arr_expr(set_expr, assignment_operator, val);
     }
-    throw error(equals, "Invalid assignment target!");
+    throw error(assignment_operator, "Invalid assignment target!");
   }
   return exp;
 }
@@ -512,25 +550,28 @@ ykdatatype *parser::parse_datatype() {
     if (dt->args_.size() != 1) {
       throw error(
           dt->token_,
-          "Array/Ptr/Const/SMEntry/Out must only have a single data type arg.");
+          "Array/Ptr/Const/SMEntry/Out must only have a single data type arg");
     }
   }
   if (dt->is_m_entry()) {
     if (dt->args_.size() != 2) {
-      throw error(dt->token_, "MEntry must only have a two data types args.");
+      throw error(dt->token_, "MEntry must only have a two data types args");
     }
   }
   if (dt->is_function() &&
       (dt->args_.size() != 2 || !dt->args_[0]->is_function_input() ||
        !dt->args_[1]->is_function_output())) {
-    throw error(dt->token_, "Function must have both In and Out in order.");
+    throw error(dt->token_, "Function must have both In and Out in order");
   }
   if (dt->is_function_output() && dt->args_.size() > 1) {
     throw error(dt->token_,
-                "Function's Out datatype must have 0 or 1 arguments.");
+                "Function's Out datatype must have 0 or 1 arguments");
   }
   if (dt->is_tuple() && dt->args_.empty()) {
-    throw error(dt->token_, "Tuple must have at least one argument.");
+    throw error(dt->token_, "Tuple must have at least one argument");
+  }
+  if (dt->is_const() && dt->args_[0]->is_const()) {
+    throw error(dt->token_, "Const[Const[?]] is invalid data type");
   }
   return dt;
 }

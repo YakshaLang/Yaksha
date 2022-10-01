@@ -53,6 +53,34 @@ namespace yaksha::string_utils {
     return {a, b, c};
   }
   /**
+ * Get next 4 characters in octet iterator, 0 is returned if nothing is there
+ * @tparam octet_iterator iterator data type
+ * @param it current level of iterator
+ * @param end end of iterator
+ * @return tuple of 4 utf8::uint32_t
+ */
+  template<typename octet_iterator>
+  std::tuple<utf8::uint32_t, utf8::uint32_t,
+             utf8::uint32_t, utf8::uint32_t> static inline peek4(octet_iterator it,
+                                                 octet_iterator end) {
+    utf8::uint32_t a = 0;
+    utf8::uint32_t b = 0;
+    utf8::uint32_t c = 0;
+    utf8::uint32_t d = 0;
+    if (it == end) { return {a, b, c, d}; }
+    a = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d}; }
+    b = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d}; }
+    c = utf8::next(it, end);
+    if (it == end) { return {a, b, c, d}; }
+    d = utf8::next(it, end);
+    return {a, b, c, d};
+  }
+
+
+
+  /**
  * Get next 12 characters in octet iterator, 0 is returned if nothing is there
  * @tparam octet_iterator iterator data type
  * @param it current level of iterator

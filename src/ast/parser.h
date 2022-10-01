@@ -36,6 +36,10 @@ private:
     expr *expression();
     expr *equality();
     expr *comparison();
+    expr *bit_or();
+    expr *bit_xor();
+    expr *bit_and();
+    expr *bit_shifts();
     expr *term();
     expr *factor();
     expr *unary();

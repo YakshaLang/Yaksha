@@ -22,6 +22,24 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
   auto object = scope_.get(name);
   handle_assigns(obj->opr_, object, rhs);
 }
+template<typename Verifier>
+bool dt_match_ignore_const(ykdatatype *lhs, ykdatatype *rhs, Verifier v) {
+  ykdatatype *my_lhs = lhs;
+  ykdatatype *my_rhs = rhs;
+  if (lhs->is_const()) { my_lhs = lhs->args_[0]; }
+  if (rhs->is_const()) { my_rhs = rhs->args_[0]; }
+  return (*my_lhs == *my_rhs) && v(my_lhs) && v(my_rhs);
+}
+#define DT_MATCH(lhs, rhs, fnc)                                                \
+  dt_match_ignore_const(lhs.datatype_, rhs.datatype_,                          \
+                        [](ykdatatype *a) { return fnc; })
+template<typename Matcher>
+bool dt_either_match(ykdatatype *lhs, ykdatatype *rhs, Matcher m) {
+  return m(lhs) || m(rhs);
+}
+#define EITHER_MATCH(lhs, rhs, fnc)                                            \
+  dt_either_match(lhs.datatype_, rhs.datatype_,                                \
+                  [](ykdatatype *a) { return fnc; })
 void type_checker::visit_binary_expr(binary_expr *obj) {
   auto oper = obj->opr_->type_;
   obj->left_->accept(this);
@@ -32,30 +50,80 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
     error(
         obj->opr_,
         "Binary operation between two different data types are not supported");
+    push(rhs);// Try to figure out the rest
+    return;
   }
-  if ((oper == token_type::PLUS) &&
-      !(rhs.is_primitive_or_obj() && rhs.datatype_->support_plus())) {
-    error(obj->opr_, "Unsupported operation");
+  switch (oper) {
+    case token_type::XOR:
+    case token_type::AND:
+    case token_type::OR:
+    case token_type::SHL:
+    case token_type::SHR:
+      if (!(DT_MATCH(lhs, rhs, a->is_an_integer()))) {
+        error(obj->opr_,
+              "^ & | << >> operators work only for integers of same type");
+      }
+      break;
+    case token_type::MOD:
+    case token_type::DIV:
+    case token_type::MUL:
+    case token_type::SUB:
+      if (!(DT_MATCH(lhs, rhs, a->is_a_number()))) {
+        error(obj->opr_,
+              "% - * / operators work only for numbers of same type");
+      }
+      break;
+    case token_type::PLUS:
+      if (!(DT_MATCH(lhs, rhs, (a->is_a_number() || a->is_str())))) {
+        error(obj->opr_,
+              "+ operator works only for numbers of same type or strings");
+      }
+      break;
+    case token_type::LESS:
+    case token_type::LESS_EQ:
+    case token_type::GREAT:
+    case token_type::GREAT_EQ:
+      if (!(DT_MATCH(lhs, rhs, a->is_a_number()))) {
+        error(obj->opr_,
+              "< > <= >= operators work only for numbers of same type");
+      }
+      push(ykobject(dt_pool_->create("bool")));
+      return;
+    case token_type::NOT_EQ:
+    case token_type::EQ_EQ:
+      if (EITHER_MATCH(
+              lhs, rhs,
+              (a->is_m_entry() || a->is_sm_entry() || a->is_tuple()))) {
+        error(obj->opr_,
+              "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
+        break;
+      }
+      if (lhs.datatype_->is_none() || rhs.datatype_->is_none()) {
+        // can compare with array/anyptr/pointer/none/not primitive
+        ykdatatype *to_comp;
+        if (lhs.datatype_->is_none()) {
+          to_comp = rhs.datatype_;
+        } else {
+          to_comp = lhs.datatype_;
+        }
+        if (to_comp->is_const()) { to_comp = to_comp->args_[0]; }
+        if (!(to_comp->is_any_ptr() || to_comp->is_an_array() ||
+              to_comp->is_str() || to_comp->is_a_pointer() ||
+              to_comp->is_none() || !to_comp->is_builtin_or_primitive())) {
+          error(obj->opr_, "Datatype cannot be compared with None");
+          break;
+        }
+      }
+      if (!(DT_MATCH(lhs, rhs, true))) {
+        error(obj->opr_, "Cannot compare between two data types");
+      }
+      push(ykobject(dt_pool_->create("bool")));
+      return;
+    default:
+      error(obj->opr_, "Unhandled boolean operator");
+      break;
   }
-  if ((oper == token_type::SUB || oper == token_type::MUL ||
-       oper == token_type::MOD || oper == token_type::DIV ||
-       oper == token_type::GREAT || oper == token_type::GREAT_EQ ||
-       oper == token_type::LESS || oper == token_type::LESS_EQ) &&
-      (!rhs.is_primitive_or_obj() || !rhs.datatype_->is_a_number())) {
-    error(obj->opr_, "Unsupported operation");
-  }
-  if (oper == token_type::EQ_EQ || oper == token_type::NOT_EQ ||
-      oper == token_type::LESS_EQ || oper == token_type::GREAT_EQ ||
-      oper == token_type::LESS || oper == token_type::GREAT) {
-    push(ykobject(true, dt_pool_));
-  } else {
-    push(rhs);
-  }
-  // TODO rewrite this function
-  // TODO Numbers of same type -> All binary operators are allowed.
-  // TODO Str -> + == !=
-  // TODO Ptr -> == & !=
-  // TODO Str, Obj, Ptr, Array -> compare with None -> == & != only
+  push(rhs);
 }
 void type_checker::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
@@ -257,6 +325,9 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
         !rhs.datatype_->is_bool()) {
       error(obj->opr_,
             "Invalid unary operation. Not operator must follow a boolean.");
+    } else if (obj->opr_->type_ == token_type::TILDE &&
+               !rhs.datatype_->is_an_integer()) {
+      error(obj->opr_, "Bitwise not (~) is only supported for integers");
     }
   } else {
     error(obj->opr_, "Invalid unary operation");
@@ -650,6 +721,34 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
   if (lhs.datatype_->is_const()) { error(oper, "Cannot assign to a constant"); }
   if (rhs.is_a_function() && !slot_match(rhs, lhs.datatype_)) {
     error(oper, "You can only assign a function to a Function[In[?],Out[?]]");
+  }
+  token_type operator_type = oper->type_;
+  switch (operator_type) {
+    case token_type::AND_EQ:
+    case token_type::XOR_EQ:
+    case token_type::OR_EQ:
+    case token_type::SHL_EQ:
+    case token_type::SHR_EQ:
+      if (!lhs.datatype_->is_an_integer()) {
+        error(oper, "Cannot augment assign for non integer values");
+      }
+      break;
+    case token_type::DIV_EQ:
+    case token_type::MOD_EQ:
+    case token_type::MUL_EQ:
+    case token_type::SUB_EQ:
+      if (!lhs.datatype_->is_a_number()) {
+        error(oper, "Cannot augment assign for non number values");
+      }
+      break;
+    case token_type::PLUS_EQ:
+      if (!lhs.datatype_->is_a_number() &&
+          !lhs.datatype_->is_str()) {
+        error(oper, "Cannot use += for data type");
+      }
+      break;
+    default:
+      break;
   }
 }
 void type_checker::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {

@@ -1,0 +1,81 @@
+def print_a(a: int) -> None:
+    print("a is now ")
+    println(a)
+
+def augment_equal_a() -> int:
+    a: int = 0
+    print_a(a)
+    a += 4
+    print_a(a)
+    a -= 2
+    print_a(a)
+    a >>= 1
+    print_a(a)
+    a <<= 1
+    print_a(a)
+    a *= 2
+    print_a(a)
+    a %= 5
+    print_a(a)
+    a /= 2
+    print_a(a)
+    a |= 12
+    print_a(a)
+    a ^= 78
+    print_a(a)
+    a &= 2
+    print_a(a)
+    return 1
+
+def print_b(b: float) -> None:
+    print("b is now ")
+    println(b)
+
+def augment_equal_b() -> int:
+    b: float = 0.0f
+    print_b(b)
+    b += 4.0f
+    print_b(b)
+    b -= 2.0f
+    print_b(b)
+    b *= 2.0f
+    print_b(b)
+    b %= 5.0f
+    print_b(b)
+    b /= 2.0f
+    print_b(b)
+    return 2
+
+def print_c(c: f64) -> None:
+    print("c is now ")
+    println(c)
+
+def augment_equal_c() -> int:
+    c: f64 = 0.0
+    print_c(c)
+    c += 4.0
+    print_c(c)
+    c -= 2.0
+    print_c(c)
+    c *= 2.0
+    print_c(c)
+    c %= 5.0
+    print_c(c)
+    c /= 2.0
+    print_c(c)
+    return 3
+
+def main() -> int:
+    v: int = 0
+    v += augment_equal_a()
+    v += augment_equal_b()
+    v += augment_equal_c()
+    print("v=")
+    println(v)
+    print("r=")
+    r: int = 1 << 2 ^ 0xDEADBEEF & 0xCAFE | 0xBEE0 >> 1
+    println(r)
+    s: str = "Hello"
+    s += " World"
+    println(s)
+    return 0

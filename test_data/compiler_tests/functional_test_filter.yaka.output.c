@@ -14,7 +14,7 @@ int32_t yy__main();
 // --functions-- 
 bool yy__keep_len_n(yk__sds yy__a, int32_t yy__n) 
 {
-    int32_t t__0 = (yk__sdslen(yy__a) == yy__n);
+    bool t__0 = (yk__sdslen(yy__a) == yy__n);
     yk__sdsfree(yy__a);
     return t__0;
 }
@@ -33,7 +33,7 @@ bool yy__keep_upto(int32_t yy__a, int32_t yy__n)
 }
 bool yy__keep_div(int32_t yy__a, int32_t yy__n) 
 {
-    int32_t t__1 = ((yy__a % yy__n) == INT32_C(0));
+    bool t__1 = ((yy__a % yy__n) == INT32_C(0));
     return t__1;
 }
 bool yy__print_str(yk__sds yy__a, int32_t yy__ignored) 

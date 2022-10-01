@@ -14,8 +14,11 @@ void compiler::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
   auto name = prefix(obj->name_->token_, prefix_val_);
   auto rhs = pop();
+  token_type operator_type = obj->opr_->type_;
   write_indent(body_);
-  if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str()) {
+  if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str() &&
+      operator_type == token_type::EQ) {
+    // -- str =
     // free current value.
     body_ << "yk__sdsfree(" << name << ")";
     write_end_statement(body_);
@@ -23,10 +26,27 @@ void compiler::visit_assign_expr(assign_expr *obj) {
     // do assignment of the duplicate
     write_indent(body_);
     body_ << name << " = yk__sdsdup(" << rhs.first << ")";
+  } else if (rhs.second.is_primitive_or_obj() &&
+             rhs.second.datatype_->is_str() &&
+             operator_type == token_type::PLUS_EQ) {
+    // -- str +=
+    body_ << name << " = yk__sdscatsds(" << name << ", " << rhs.first << ")";
   } else if (rhs.second.is_a_function()) {
     body_ << name << " = " << prefix_function_arg(rhs);
-  } else {
-    body_ << name << " = " << rhs.first;
+  } else if (rhs.second.is_primitive_or_obj() &&
+             operator_type == token_type::MOD_EQ &&
+             rhs.second.datatype_->is_f32()) {
+    // f32 %=
+    body_ << name << " = "
+          << "remainderf(" << name + ", " + rhs.first + ")";
+  } else if (rhs.second.is_primitive_or_obj() &&
+             operator_type == token_type::MOD_EQ &&
+             rhs.second.datatype_->is_f64()) {
+    // f64 %=
+    body_ << name << " = "
+          << "remainder(" << name + ", " + rhs.first + ")";
+  } else {// usual case
+    body_ << name << " " << obj->opr_->token_ << " " << rhs.first;
   }
   write_end_statement(body_);
 }
@@ -39,14 +59,29 @@ void compiler::visit_binary_expr(binary_expr *obj) {
   auto rhs = pop();
   // Note: we are assuming data type to be same as first,
   // Since this will be type checked using type_checker.
+  token_type operator_type = obj->opr_->type_;
   auto data_type = lhs.second;
-  if (data_type.is_primitive_or_obj() && data_type.datatype_->is_str()) {
+  if (lhs.second.datatype_->is_none() || rhs.second.datatype_->is_none()) {
+    // both null
+    if (lhs.second.datatype_->is_none() && rhs.second.datatype_->is_none()) {
+      if (operator_type == token_type::EQ_EQ) {
+        push("true", ykobject(dt_pool->create("bool")));// None == None -> True
+      } else {
+        push("false",
+             ykobject(dt_pool->create("bool")));// None != None -> False
+      }
+    } else if (lhs.second.datatype_->is_none()) {
+      push("(NULL == " + rhs.first + ")", ykobject(dt_pool->create("bool")));
+    } else {
+      push("(" + rhs.first + " == NULL)", ykobject(dt_pool->create("bool")));
+    }
+  } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_str()) {
     if (obj->opr_->type_ == token_type::EQ_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") == 0)",
-           data_type);
+           ykobject(dt_pool->create("bool")));
     } else if (obj->opr_->type_ == token_type::NOT_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") != 0)",
-           data_type);
+           ykobject(dt_pool->create("bool")));
     } else {// String concat using + operator
       // new temp needs to be created
       auto temporary_string = temp();
@@ -69,6 +104,14 @@ void compiler::visit_binary_expr(binary_expr *obj) {
   } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_f64() &&
              obj->opr_->type_ == token_type::MOD) {// Double %
     push("remainder(" + lhs.first + ", " + rhs.first + ")", data_type);
+  } else if (operator_type == token_type::LESS ||
+             operator_type == token_type::LESS_EQ ||
+             operator_type == token_type::GREAT ||
+             operator_type == token_type::GREAT_EQ ||
+             operator_type == token_type::NOT_EQ ||
+             operator_type == token_type::EQ_EQ) {
+    push("(" + lhs.first + " " + obj->opr_->token_ + " " + rhs.first + ")",
+         ykobject(dt_pool->create("bool")));
   } else {// Other number stuff
     push("(" + lhs.first + " " + obj->opr_->token_ + " " + rhs.first + ")",
          data_type);

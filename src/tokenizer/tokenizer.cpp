@@ -212,7 +212,9 @@ void tokenizer::tokenize_actual() {
           utf8::next(iterator, end);
         }
       }
-      if (suffix_result.second /* suffix found, need to tokenize next */) { continue; }
+      if (suffix_result.second /* suffix found, need to tokenize next */) {
+        continue;
+      }
       if (::string_utils::is_alpha(current)) {
         mode = NAME_MATCH;
         continue;
@@ -269,8 +271,15 @@ void tokenizer::tokenize_actual() {
             utf8::next(iterator, end);
             pos++;
           } else if (next == '<') {
-            tokens_.emplace_back(
-                token{file_, line, pos, "<<", token_type::SHL});
+            if (after_next == '=') {
+              tokens_.emplace_back(
+                  token{file_, line, pos, "<<=", token_type::SHL_EQ});
+              utf8::next(iterator, end);
+              pos++;
+            } else {
+              tokens_.emplace_back(
+                  token{file_, line, pos, "<<", token_type::SHL});
+            }
             utf8::next(iterator, end);
             pos++;
           } else {
@@ -295,8 +304,15 @@ void tokenizer::tokenize_actual() {
             utf8::next(iterator, end);
             pos++;
           } else if (next == '>') {
-            tokens_.emplace_back(
-                token{file_, line, pos, ">>", token_type::SHR});
+            if (after_next == '=') {
+              tokens_.emplace_back(
+                  token{file_, line, pos, ">>=", token_type::SHR_EQ});
+              utf8::next(iterator, end);
+              pos++;
+            } else {
+              tokens_.emplace_back(
+                  token{file_, line, pos, ">>", token_type::SHR});
+            }
             utf8::next(iterator, end);
             pos++;
           } else {
@@ -590,7 +606,8 @@ void tokenizer::tokenize_actual() {
     handle_error(parsing_error{"Tokenizer Error : Invalid end of file", file_,
                                line, pos});
   }
-  consider_integer_suffix(0, 0, 0); // edge case where code ends with a non suffixed integer
+  consider_integer_suffix(
+      0, 0, 0);// edge case where code ends with a non suffixed integer
   bool last_new_ln =
       !tokens_.empty() && tokens_.back().type_ == token_type::NEW_LINE;
   tokens_.emplace_back(token{file_, line, pos + (last_new_ln ? 0 : 1), "",
