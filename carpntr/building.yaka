@@ -75,16 +75,58 @@ def is_target_windows(target_to_check: str) -> bool:
         return os.is_windows()
     return strings.contains(target_to_check, "windows")
 
+def produce_core_object(args: Array[str], c_file: str, build_path: str, target: str, always_build: bool) -> str:
+    # Copy the arguments so we can add -c and -o of our own
+    my_args: Array[str] = sarr.dup(args)
+    defer sarr.del_str_array(my_args)
+    suffix: str = "-"
+    # native
+    native: bool = len(target) == 0
+    if native:
+        suffix += "native"
+    else:
+        suffix += target
+    object_file: str = path.remove_extension(path.basename(c_file))
+    object_file += suffix
+    object_file += ".o"
+    object_file_path: str = path.join(build_path, object_file)
+
+    console.cyan("runtime::")
+    console.yellow(object_file)
+    console.cyan(" := ")
+    # Skip building if allowed
+    if not always_build and path.readable(object_file_path):
+        console.green("prebuilt.\n")
+        return object_file_path
+
+    arrput(my_args, "-c")
+    arrput(my_args, c_file)
+    arrput(my_args, "-o")
+    arrput(my_args, object_file_path)
+
+    pr: os.ProcessResult = os.run(my_args)
+    defer os.del_process_result(pr)
+
+    if pr.ok:
+        console.green("done.\n")
+    else:
+        console.red("failed.\n")
+        console.cyan("--c compiler output---\n")
+        console.red("command := ")
+        console.cyan(sarr.join(my_args, " ") + "\n")
+        console.red(pr.output)
+        console.cyan("--end c compiler output---\n")
+
+    return object_file_path
+
 def create_args(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> Array[str]:
     # Create arguments for compilation on to a string array
     # This string array need to be deleted
     native: bool = len(target) == 0
     args: Array[str]
+    objects: Array[str]
     if c.compilation.web:
         args = array("str", c.emcc_compiler_path, "-std=c99", "-Oz", "-Wno-newline-eof", "-Wno-parentheses-equality")
-        if len(c.compilation.web_shell) > 0:
-            arrput(args, "--shell-file")
-            arrput(args, c.compilation.web_shell)
     else:
         args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
     args = sarr.extend(args, raylib_args)
@@ -115,29 +157,39 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         cdefine: str = "-D" + c.c_code.compiler_defines[x]
         arrput(args, cdefine)
         x = x + 1
+    if not native and target != "web":
+        arrput(args, "-target")
+        arrput(args, target)
     # runtime c codes
     length = len(c.c_code.runtime_feature_c_code)
     x = 0
     while x < length:
         rfc: str = c.c_code.runtime_feature_c_code[x]
-        arrput(args, rfc)
+        rfc = produce_core_object(args, rfc, build_path, target, False)
+        arrput(objects, rfc)
         x = x + 1
     # c codes
     length = len(c.c_code.c_code)
     x = 0
     while x < length:
         cc: str = c.c_code.c_code[x]
-        arrput(args, cc)
+        cc = produce_core_object(args, cc, build_path, target, True)
+        arrput(objects, cc)
         x = x + 1
-    # program code
-    arrput(args, code_path)
-    # yk__main.c
+    # program code -> this is the yakshac compiled full code
+    program_object: str = produce_core_object(args, code_path, build_path, target, True)
+    arrput(objects, program_object)
+    # yk__main.c -> this has the real main() method
     the_yk_main: str = path.join(c.runtime_path, "yk__main.c")
-    arrput(args, the_yk_main)
+    the_yk_main = produce_core_object(args, the_yk_main, build_path, target, False)
+    arrput(objects, the_yk_main)
+    # add objects to the args to link it
+    args = sarr.extend(args, objects)
+    sarr.del_str_array(objects)
     # Target architecture
-    if not native and target != "web":
-        arrput(args, "-target")
-        arrput(args, target)
+    if c.compilation.web and len(c.compilation.web_shell) > 0:
+        arrput(args, "--shell-file")
+        arrput(args, c.compilation.web_shell)
     # -o bin.exe
     arrput(args, "-o")
     binary: str = c.project.name
@@ -178,12 +230,18 @@ def build_target(c: carp.Config, code_path: str, build_path: str, target: str, r
         console.red(result.output)
         return 1
 
+def print_error(error: str, ignored: int) -> bool:
+    console.red("error")
+    console.yellow(":")
+    println(error)
+    return True
+
 def build(c: carp.Config, code: str) -> int:
     # Cross build all compilation targets
     # zero is returned if all are successful
     carp.load_runtime_features(c, code)
     if len(c.errors) > 0:
-        # TODO print errors
+        foreach(c.errors, print_error, 0)
         return -1
 
     target_count: int = len(c.compilation.targets)
@@ -230,7 +288,7 @@ def build_simple(c: carp.Config, code: str) -> int:
     # Native build only
     carp.load_runtime_features(c, code)
     if len(c.errors) > 0:
-        # TODO print errors
+        foreach(c.errors, print_error, 0)
         return -1
     code_path: str = path.join(os.cwd(), c.project.name + ".c")
     raylib_args: Array[str]
