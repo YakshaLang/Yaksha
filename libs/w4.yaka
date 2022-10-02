@@ -1,0 +1,183 @@
+runtimefeature "wasm4"
+
+SCREEN_SIZE: Const[int] = 160
+# Screen size of wasm4 console
+
+@nativedefine("((uint32_t*)0x04)")
+def palette() -> Ptr[u32]:
+    # Get a pointer to pallet
+    pass
+
+@native
+def set_palette(c1: u32, c2: u32, c3: u32, c4: u32) -> None:
+    # Set palette
+    ccode """
+    ((uint32_t*)0x04)[0] = nn__c1;
+    ((uint32_t*)0x04)[1] = nn__c2;
+    ((uint32_t*)0x04)[2] = nn__c3;
+    ((uint32_t*)0x04)[3] = nn__c4;
+    """
+
+@nativedefine("(*((uint16_t*)0x14))")
+def draw_colors() -> u16:
+    # Read draw colors
+    pass
+
+@nativedefine("*((uint16_t*)0x14) = nn__value")
+def set_draw_colors(value: u16) -> None:
+    # Set draw colors
+    pass
+
+@nativedefine("((int_32t)*((const uint8_t*)0x16))")
+def gamepad1() -> int:
+    # Read gamepad 1 value
+    pass
+
+@nativedefine("((int_32t)*((const uint8_t*)0x17))")
+def gamepad2() -> int:
+    # Read gamepad 2 value
+    pass
+
+@nativedefine("((int_32t)*((const uint8_t*)0x18))")
+def gamepad3() -> int:
+    # Read gamepad 3 value
+    pass
+
+@nativedefine("((int_32t)*((const uint8_t*)0x19))")
+def gamepad4() -> int:
+    # Read gamepad 4 value
+    pass
+
+@nativedefine("((int_32t)*((const int16_t*)0x1a))")
+def mouse_x() -> int:
+    # Read mouse x
+    pass
+
+@nativedefine("((int_32t)*((const int16_t*)0x1c))")
+def mouse_y() -> int:
+    # Read mouse y
+    pass
+
+@nativedefine("((int_32t)*((const uint8_t*)0x1e))")
+def mouse_buttons() -> int:
+    # Read mouse buttons
+    pass
+
+@nativedefine("(*((uint8_t*)0x1f))")
+def system_flags() -> u8:
+    # Read system flags
+    pass
+
+@native
+def set_system_flags(value: u8) -> None:
+    # Set system flags
+    ccode """*((uint8_t*)0x1f) = nn__value"""
+
+@nativedefine("((int_32t)*((const uint8_t*)0x20))")
+def netplay() -> int:
+    # Read mouse buttons
+    pass
+
+@nativedefine("((uint8_t*)0xa0)")
+def framebuffer() -> Ptr[u8]:
+    # Access pointer to framebuffer
+    pass
+
+BUTTON_1: Const[int] = 1
+BUTTON_2: Const[int] = 2
+BUTTON_LEFT: Const[int] = 16
+BUTTON_RIGHT: Const[int] = 32
+BUTTON_UP: Const[int] = 64
+BUTTON_DOWN: Const[int] = 128
+
+MOUSE_LEFT: Const[int] = 1
+MOUSE_RIGHT: Const[int] = 2
+MOUSE_MIDDLE: Const[int] = 4
+
+SYSTEM_PRESERVE_FRAMEBUFFER: Const[u8] = 1u8
+SYSTEM_HIDE_GAMEPAD_OVERLAY: Const[u8] = 2u8
+
+@native("blit")
+def blit(data: Const[Ptr[u8]], x: int, y: int, width: u32, height: u32, flags: u32) -> None:
+    # Copies pixels to the framebuffer
+    pass
+
+@native("blitSub")
+def blit_sub(data: Const[Ptr[u8]], x: int, y: int, width: u32, height: u32, src_x: u32, src_y: u32, stride: u32, flags: u32) -> None:
+    # Copies a subregion within a larger sprite atlas to the framebuffer
+    pass
+
+BLIT_2BPP: Const[u32] = 1u32
+BLIT_1BPP: Const[u32] = 0u32
+BLIT_FLIP_X: Const[u32] = 2u32
+BLIT_FLIP_Y: Const[u32] = 4u32
+BLIT_ROTATE: Const[u32] = 8u32
+
+@native("line")
+def line(x1: int, y1: int, x2: int, y2: int) -> None:
+    # Draws a line between two points
+    pass
+
+@native("hline")
+def hline(x: int, y: int, length: u32) -> None:
+    # Draws a horizontal line
+    pass
+
+@native("vline")
+def vline(x: int, y: int, length: u32) -> None:
+    # Draws a vertical line
+    pass
+
+@native("oval")
+def oval(x: int, y: int, width: u32, height: u32) -> None:
+    # Draws an oval (or circle)
+    pass
+
+@native("rect")
+def rect(x: int, y: int, width: u32, height: u32) -> None:
+    # Draws a rectangle
+    pass
+
+@native
+def text(text_data: str, x: int, y: int) -> None:
+    # Draws text using the built-in system font
+    ccode """text(nn__text_data, nn__x, nn__y);
+    yk__sdsfree(nn__text_data)"""
+
+
+@native("tone")
+def tone(frequency: u32, duration: u32, volume: u32, flags: u32) -> None:
+    # Plays a sound tone
+    pass
+
+TONE_PULSE1: Const[u32] = 0u32
+TONE_PULSE2: Const[u32] = 1u32
+TONE_TRIANGLE: Const[u32] = 2u32
+TONE_NOISE: Const[u32] = 3u32
+TONE_MODE1: Const[u32] = 0u32
+TONE_MODE2: Const[u32] = 4u32
+TONE_MODE3: Const[u32] = 8u32
+TONE_MODE4: Const[u32] = 12u32
+TONE_PAN_LEFT: Const[u32] = 16u32
+TONE_PAN_RIGHT: Const[u32] = 32u32
+
+@native("diskr")
+def diskr(dest: AnyPtr, size: u32) -> u32:
+    # Reads up to `size` bytes from persistent storage into the pointer `dest`
+    pass
+
+@native("diskw")
+def diskw(src: Const[AnyPtr], size: u32) -> u32:
+    # Writes up to `size` bytes from the pointer `src` into persistent storage
+    pass
+
+@native
+def trace(text_data: str) -> None:
+    # Prints a message to the debug console
+    ccode """trace(nn__text_data);
+    yk__sdsfree(nn__text_data)"""
+
+@native
+def set_game_state(data: AnyPtr) -> None:
+    # Set a state value to be passed to game_step() function
+    ccode """yk__w4_game_state = nn__data"""

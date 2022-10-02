@@ -1,6 +1,6 @@
 # Yaksha Runtime
 
-Bunch of `C` code that standard library and main program depend on.
+Bunch of `C` code that standard library depend on.
 
 ## Third Party Libraries
 
@@ -15,6 +15,7 @@ Bunch of `C` code that standard library and main program depend on.
 | `raygui/*`      | Ramon Santamaria and contributors   | Game/GUI development               |
 | `argparse.*`    | Yecheng Fu and contributors         | Argument parsing                   |
 | `tinycthread.*` | Marcus Geelnard, Evan Nemerson      | Thread Library                     |
+| `wash4.h`       | Bruno Garcia                        | wasm4 fantasy console C header     |
 
 ### Minor Patches
 

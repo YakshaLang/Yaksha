@@ -42,6 +42,7 @@ class Compilation:
     raylib: bool
     web: bool
     web_shell: str
+    wasm4: bool
 
 
 class Config:
@@ -52,6 +53,7 @@ class Config:
     zig_compiler_path: str
     emcc_compiler_path: str
     emrun_path: str
+    w4_path: str
     c_code: CCode
     project: Project
     compilation: Compilation
@@ -135,7 +137,7 @@ def find_zig_compiler(c: Config) -> None:
     c.zig_compiler_path = "<not found>"
 
 def find_emsdk(c: Config) -> None:
-    # Find zig(.exe) binary file
+    # Find emcc/emrun(.exe) binary file
     emcc: str = os.which("emcc")
     emrun: str = os.which("emrun")
     # we did not find emcc or emrun?
@@ -148,6 +150,18 @@ def find_emsdk(c: Config) -> None:
     else:
         c.emcc_compiler_path = emcc
         c.emrun_path = emrun
+
+def find_w4(c: Config) -> None:
+    # Find w4(.exe) binary file
+    w4: str = os.which("w4")
+    # we did not w4
+    not_found: bool = len(w4) == 0
+    # if we need emsdk?
+    if c.compilation.wasm4 and not_found:
+        arrput(c.errors, "Failed to find w4 in PATH")
+        c.w4_path = "<not found>"
+    else:
+        c.w4_path = w4
 
 def load_project(conf: toml.Table, c: Config) -> Project:
     # Load [project] section from yaksha.toml
@@ -199,6 +213,7 @@ def load_compilation(conf: toml.Table, c: Config) -> Compilation:
     co.targets = toml.get_string_array(co_data, "targets")
     co.raylib = toml.get_bool_default(co_data, "raylib", False)
     co.web = toml.get_bool_default(co_data, "web", False)
+    co.wasm4 = toml.get_bool_default(co_data, "wasm4", False)
     co.web_shell = toml.get_string(co_data, "web_shell")
     return co
 
@@ -243,6 +258,14 @@ def load_runtime_features(c: Config, code: str) -> Config:
     while x < length:
         feature: str = features[x]
         x = x + 1
+        if feature == "wasm4":
+            arrput(c.c_code.runtime_feature_includes, "wasm4.h")
+            arrput(c.c_code.runtime_feature_includes, "yk__wasm4_extras.h")
+            # Get rid of main() method
+            arrput(c.c_code.runtime_feature_compiler_defines, "YK__WASM4")
+            # Enable wasm4 feature
+            c.compilation.wasm4 = True
+            continue
         if feature == "argparse":
             arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__argparse.c"))
             arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "argparse.c"))
@@ -323,6 +346,10 @@ def load_config() -> Config:
     find_emsdk(c)
     if len(c.errors) > 0:
         return c
+    # Try to find w4
+    find_w4(c)
+    if len(c.errors) > 0:
+        return c
     # Try to find a runtime folder with 'yk__lib.h'
     find_runtime_path(c)
     if len(c.errors) > 0:
@@ -343,7 +370,7 @@ def load_config() -> Config:
         return c
     return c
 
-def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bool, web_shell: str) -> Config:
+def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str) -> Config:
     # Create an adhoc configuration for single file execution mode
     c: Config = Config()
     c.compilation = Compilation()
@@ -351,6 +378,7 @@ def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bo
     c.compilation.raylib = use_raylib
     c.compilation.web = use_web
     c.compilation.web_shell = web_shell
+    c.compilation.wasm4 = wasm4
     # Try and find yakshac.exe
     find_yaksha_compiler(c)
     if len(c.errors) > 0:
@@ -361,6 +389,10 @@ def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bo
         return c
     # Try to find emsdk
     find_emsdk(c)
+    if len(c.errors) > 0:
+        return c
+    # Try to find w4
+    find_w4(c)
     if len(c.errors) > 0:
         return c
     # Try to find a runtime folder with 'yk__lib.h'
@@ -417,4 +449,5 @@ def del_config(c: Config) -> None:
     del c.zig_compiler_path
     del c.emcc_compiler_path
     del c.emrun_path
+    del c.w4_path
     del c

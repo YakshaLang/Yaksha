@@ -10,10 +10,8 @@
 #endif
 ////// Get Arguments implementation that we have in yk__system ///
 static struct yk__arguments *yk__arguments_copy;
-struct yk__arguments *yk__get_args() {
-  return yk__arguments_copy;
-}
-#if !defined(YK__MINIMAL_MAIN)
+struct yk__arguments *yk__get_args() { return yk__arguments_copy; }
+#if !defined(YK__MINIMAL_MAIN) && !defined(YK__WASM4)
 int main(int argc, char *argv[]) {
 #if defined(_WIN32) || defined(_WIN64)
   int result_mode;
@@ -31,5 +29,17 @@ int main(int argc, char *argv[]) {
   yk__arrfree(yk__arguments_copy->argv);
   free(yk__arguments_copy);
   return result;
+}
+#endif
+#if defined(YK__WASM4)
+extern void *yk__w4_game_state;
+void yy__game_step(void*);
+void update() { yy__game_step(yk__w4_game_state); }
+void start() {
+  yk__arguments_copy = malloc(sizeof(struct yk__arguments));
+  yk__arguments_copy->argv = NULL;
+  yk__arguments_copy->argc = 0;
+  yy__main();
+  free(yk__arguments_copy);
 }
 #endif

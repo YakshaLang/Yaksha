@@ -1,5 +1,5 @@
 // ----- This file is to be directly included at the top of raylib game ---
-void* yk__raylib_game_state = (void*)0;
+void *yk__raylib_game_state = (void *) 0;
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
 #define yk__rungameloop(nn__fps, nn__state)                                    \

@@ -125,7 +125,9 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     native: bool = len(target) == 0
     args: Array[str]
     objects: Array[str]
-    if c.compilation.web:
+    if c.compilation.wasm4:
+        args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Wno-newline-eof", "-Wno-parentheses-equality", "-MMD", "-MP", "-Oz")
+    elif c.compilation.web:
         args = array("str", c.emcc_compiler_path, "-std=c99", "-Oz", "-Wno-newline-eof", "-Wno-parentheses-equality")
     else:
         args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
@@ -157,9 +159,12 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         cdefine: str = "-D" + c.c_code.compiler_defines[x]
         arrput(args, cdefine)
         x = x + 1
-    if not native and target != "web":
+    if not native and target != "web" and target != "wasm4":
         arrput(args, "-target")
         arrput(args, target)
+    if target == "wasm4":
+        arrput(args, "-target")
+        arrput(args, "wasm32-wasi-musl")
     # runtime c codes
     length = len(c.c_code.runtime_feature_c_code)
     x = 0
@@ -184,6 +189,10 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     the_yk_main = produce_core_object(args, the_yk_main, build_path, target, False)
     arrput(objects, the_yk_main)
     # add objects to the args to link it
+    if c.compilation.wasm4:
+        # Change args for link time for wasm4
+        sarr.del_str_array(args)
+        args = array("str", c.zig_compiler_path, "build-lib", "-dynamic", "-target", "wasm32-wasi-musl", "-flto", "--strip", "--stack", "14752", "--import-memory", "--initial-memory=65536", "--max-memory=65536", "-ofmt=wasm", "-O", "ReleaseSmall", "--export=start", "--export=update")
     args = sarr.extend(args, objects)
     sarr.del_str_array(objects)
     # Target architecture
@@ -191,16 +200,23 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         arrput(args, "--shell-file")
         arrput(args, c.compilation.web_shell)
     # -o bin.exe
-    arrput(args, "-o")
+    if target != "wasm4":
+        arrput(args, "-o")
     binary: str = c.project.name
-    if not native and target != "web":
+    if not native and target != "web" and target != "wasm4":
         binary = binary + "-" + target
     if is_target_windows(target):
         binary = binary + ".exe"
     if target == "web":
         binary = binary + ".html"
+    if target == "wasm4":
+        binary = binary + ".wasm"
     binary = path.join(build_path, binary)
-    arrput(args, binary)
+    # For wasm4 -o command does not work use -femit-bin=
+    if target == "wasm4":
+        arrput(args, "-femit-bin=" + binary)
+    else:
+        arrput(args, binary)
     # ----
     return args
 
@@ -240,9 +256,19 @@ def build(c: carp.Config, code: str) -> int:
     # Cross build all compilation targets
     # zero is returned if all are successful
     carp.load_runtime_features(c, code)
+    if c.compilation.wasm4 and (c.compilation.web or c.compilation.raylib):
+        arrput(c.errors, "WASM4 builds are not compatible with raylib/web builds")
+
+    # Default native target
+    target: str = ""
     if len(c.errors) > 0:
         foreach(c.errors, print_error, 0)
         return -1
+
+    if c.compilation.wasm4:
+        target = "wasm4"
+    if c.compilation.web:
+        target = "web"
 
     target_count: int = len(c.compilation.targets)
     raylib_args: Array[str]
@@ -250,6 +276,11 @@ def build(c: carp.Config, code: str) -> int:
 
     if target_count != 0 and c.compilation.raylib:
         console.red("raylib build only support native builds.\n")
+        console.cyan("Hint: You need to keep [compilation].targets empty\n")
+        return -1
+
+    if target_count != 0 and c.compilation.raylib:
+        console.red("wasm4 build does not support additional targets.\n")
         console.cyan("Hint: You need to keep [compilation].targets empty\n")
         return -1
 
@@ -270,12 +301,12 @@ def build(c: carp.Config, code: str) -> int:
     failed_count: int = 0
 
     # Build current system native binary
-    failed_count = failed_count + build_target(c, code_path, build_path, "", raylib_args)
+    failed_count = failed_count + build_target(c, code_path, build_path, target, raylib_args)
 
     # Building other targets
     cnt: int = 0
     while cnt < len(c.compilation.targets):
-        target: str = c.compilation.targets[cnt]
+        target = c.compilation.targets[cnt]
         failed_count = failed_count + build_target(c, code_path, build_path, target, raylib_args)
         cnt = cnt + 1
 
@@ -287,6 +318,8 @@ def build(c: carp.Config, code: str) -> int:
 def build_simple(c: carp.Config, code: str) -> int:
     # Native build only
     carp.load_runtime_features(c, code)
+    if c.compilation.wasm4 and (c.compilation.web or c.compilation.raylib):
+        arrput(c.errors, "WASM4 builds are not compatible with raylib/web builds")
     if len(c.errors) > 0:
         foreach(c.errors, print_error, 0)
         return -1
@@ -295,6 +328,8 @@ def build_simple(c: carp.Config, code: str) -> int:
     target: str = ""
     if c.compilation.raylib:
         raylib_args = rs.get_raylib_args(c)
+    if c.compilation.wasm4:
+        target = "wasm4"
     if c.compilation.web:
         target = "web"
 
