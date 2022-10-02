@@ -113,6 +113,8 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
           error(obj->opr_, "Datatype cannot be compared with None");
           break;
         }
+        push(ykobject(dt_pool_->create("bool")));
+        return;
       }
       if (!(DT_MATCH(lhs, rhs, true))) {
         error(obj->opr_, "Cannot compare between two data types");
