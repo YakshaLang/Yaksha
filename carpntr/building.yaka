@@ -119,22 +119,32 @@ def produce_core_object(args: Array[str], c_file: str, build_path: str, target: 
 
     return object_file_path
 
+def keep_ray_objects(element: str, negate: bool) -> bool:
+    obj: bool = strings.endswith(element, ".o")
+    if negate:
+        return not obj
+    return obj
+
 def create_args(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> Array[str]:
     # Create arguments for compilation on to a string array
     # This string array need to be deleted
     native: bool = len(target) == 0
     args: Array[str]
     objects: Array[str]
+    ray_objects: Array[str] = filter(raylib_args, keep_ray_objects, False)
+    ray_other_args: Array[str] = filter(raylib_args, keep_ray_objects, True)
+    defer sarr.del_str_array(ray_objects)
+    defer sarr.del_str_array(ray_other_args)
     if c.compilation.wasm4:
         args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Wno-newline-eof", "-Wno-parentheses-equality", "-MMD", "-MP", "-Oz")
     elif c.compilation.web:
         args = array("str", c.emcc_compiler_path, "-std=c99", "-Oz", "-Wno-newline-eof", "-Wno-parentheses-equality")
     else:
         args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
-    args = sarr.extend(args, raylib_args)
     # If not macos do link time optimization
     if not is_target_macos(target):
         arrput(args, "-flto=full")
+    args = sarr.extend(args, ray_other_args)
     # --
     length: int = 0
     x: int = 0
@@ -159,6 +169,7 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         cdefine: str = "-D" + c.c_code.compiler_defines[x]
         arrput(args, cdefine)
         x = x + 1
+    # add target architecture
     if not native and target != "web" and target != "wasm4":
         arrput(args, "-target")
         arrput(args, target)
@@ -194,8 +205,9 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         sarr.del_str_array(args)
         args = array("str", c.zig_compiler_path, "build-lib", "-dynamic", "-target", "wasm32-wasi-musl", "-flto", "--strip", "--stack", "14752", "--import-memory", "--initial-memory=65536", "--max-memory=65536", "-ofmt=wasm", "-O", "ReleaseSmall", "--export=start", "--export=update")
     args = sarr.extend(args, objects)
+    args = sarr.extend(args, ray_objects)
     sarr.del_str_array(objects)
-    # Target architecture
+    # Add shell file
     if c.compilation.web and len(c.compilation.web_shell) > 0:
         arrput(args, "--shell-file")
         arrput(args, c.compilation.web_shell)

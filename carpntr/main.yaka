@@ -61,6 +61,7 @@ def print_config(config: carp.Config) -> None:
     printkv("zig compiler", config.zig_compiler_path)
     printkv("emcc compiler", config.emcc_compiler_path)
     printkv("emrun", config.emrun_path)
+    printkv("w4", config.w4_path)
     printkv("standard library version", libs.version())
 
 def build_from_config(config: carp.Config, simple: bool) -> int:
