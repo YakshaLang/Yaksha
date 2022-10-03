@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import difflib
+import glob
 import json
 import os
 import re
@@ -155,6 +156,11 @@ def main(test_mode: bool) -> int:
             if not preserve_c_out:
                 try:
                     os.unlink(filename_base + ".c")
+                except OSError:
+                    pass
+            for object_file in glob.glob("*.o"):
+                try:
+                    os.unlink(object_file)
                 except OSError:
                     pass
     print(Colors.blue("Done."))

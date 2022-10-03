@@ -134,7 +134,7 @@ def produce_object(c: CObject, conf: carp.Config) -> bool:
     console.yellow(c.base_name)
     console.cyan(" := ")
     if path.readable(c.o_file):
-        console.green("prebuilt.\n")
+        console.green("ok.\n")
         return True
 
     cmd: Array[str]
@@ -148,7 +148,7 @@ def produce_object(c: CObject, conf: carp.Config) -> bool:
     defer os.del_process_result(pr)
 
     if pr.ok:
-        console.green("done.\n")
+        console.green("ok.\n")
         return True
     console.red("failed.\n")
     console.cyan("--c compiler output---\n")

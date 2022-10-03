@@ -634,7 +634,7 @@ bool yy__raylib_support_produce_object(struct yy__raylib_support_CObject* yy__ra
     yy__console_cyan(yk__sdsdup(t__90));
     if (yy__path_readable(yk__sdsdup(yy__raylib_support_c->yy__raylib_support_o_file)))
     {
-        yk__sds t__91 = yk__sdsnew("prebuilt.\n");
+        yk__sds t__91 = yk__sdsnew("ok.\n");
         yy__console_green(yk__sdsdup(t__91));
         yk__sdsfree(t__91);
         yk__sdsfree(t__90);
@@ -676,7 +676,7 @@ bool yy__raylib_support_produce_object(struct yy__raylib_support_CObject* yy__ra
     yy__os_ProcessResult yy__raylib_support_pr = yy__os_run(yy__raylib_support_cmd);
     if (yy__raylib_support_pr->ok)
     {
-        yk__sds t__99 = yk__sdsnew("done.\n");
+        yk__sds t__99 = yk__sdsnew("ok.\n");
         yy__console_green(yk__sdsdup(t__99));
         yy__os_del_process_result(yy__raylib_support_pr);
         yy__array_del_str_array(yy__raylib_support_cmd);
@@ -1080,7 +1080,7 @@ yk__sds yy__building_produce_core_object(yk__sds* yy__building_args, yk__sds yy_
     yy__console_cyan(yk__sdsdup(t__41));
     if (((! (yy__building_always_build)) && yy__path_readable(yk__sdsdup(yy__building_object_file_path))))
     {
-        yk__sds t__42 = yk__sdsnew("prebuilt.\n");
+        yk__sds t__42 = yk__sdsnew("ok.\n");
         yy__console_green(yk__sdsdup(t__42));
         yk__sds t__43 = yy__building_object_file_path;
         yy__array_del_str_array(yy__building_my_args);
@@ -1109,7 +1109,7 @@ yk__sds yy__building_produce_core_object(yk__sds* yy__building_args, yk__sds yy_
     yy__os_ProcessResult yy__building_pr = yy__os_run(yy__building_my_args);
     if (yy__building_pr->ok)
     {
-        yk__sds t__46 = yk__sdsnew("done.\n");
+        yk__sds t__46 = yk__sdsnew("ok.\n");
         yy__console_green(yk__sdsdup(t__46));
         yk__sdsfree(t__46);
     }

@@ -96,7 +96,7 @@ def produce_core_object(args: Array[str], c_file: str, build_path: str, target: 
     console.cyan(" := ")
     # Skip building if allowed
     if not always_build and path.readable(object_file_path):
-        console.green("prebuilt.\n")
+        console.green("ok.\n")
         return object_file_path
 
     arrput(my_args, "-c")
@@ -108,7 +108,7 @@ def produce_core_object(args: Array[str], c_file: str, build_path: str, target: 
     defer os.del_process_result(pr)
 
     if pr.ok:
-        console.green("done.\n")
+        console.green("ok.\n")
     else:
         console.red("failed.\n")
         console.cyan("--c compiler output---\n")
