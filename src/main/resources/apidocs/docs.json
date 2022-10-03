@@ -60,11 +60,29 @@
       {
         "annotations": [
           {
+            "argument": "struct yk__argparse_wrapper*",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Argument parser wrapper",
+        "members": [
+          {
+            "datatype": {
+              "type": "ArgParse"
+            },
+            "name": "state"
+          }
+        ],
+        "name": "ArgParseWrapper"
+      },
+      {
+        "annotations": [
+          {
             "argument": "struct argparse_option",
             "name": "@nativedefine"
           }
         ],
-        "comment": "An argparse option\nThese are deleted when del_argparse() is called",
+        "comment": "An argparse option\nThese objects are deleted when del_argparse() is called\nHowever, Array[Option] is not",
         "members": [],
         "name": "Option"
       }
@@ -82,7 +100,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "ArgParse"
+              "type": "ArgParseWrapper"
             },
             "name": "object"
           }
@@ -141,7 +159,7 @@
           }
         ],
         "return_type": {
-          "type": "ArgParse"
+          "type": "ArgParseWrapper"
         }
       },
       {
@@ -184,7 +202,7 @@
           }
         ],
         "return_type": {
-          "type": "ArgParse"
+          "type": "ArgParseWrapper"
         }
       },
       {
@@ -2836,6 +2854,35 @@
       {
         "annotations": [
           {
+            "argument": "struct yk__arguments*",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "UTF-8 converted arguments and argument count\nDo not delete, Do not modify",
+        "members": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "argc"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "str"
+                }
+              ],
+              "type": "Array"
+            },
+            "name": "argv"
+          }
+        ],
+        "name": "Arguments"
+      },
+      {
+        "annotations": [
+          {
             "argument": "struct yk__process_result*",
             "name": "@nativedefine"
           }
@@ -2862,35 +2909,6 @@
           }
         ],
         "name": "ProcessResult"
-      },
-      {
-        "annotations": [
-          {
-            "argument": "struct yk__arguments*",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "UTF-8 converted arguments and argument count\nDo not delete, Do not modify",
-        "members": [
-          {
-            "datatype": {
-              "type": "int"
-            },
-            "name": "argc"
-          },
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "type": "str"
-                }
-              ],
-              "type": "Array"
-            },
-            "name": "argv"
-          }
-        ],
-        "name": "arguments"
       }
     ],
     "functions": [
@@ -2968,7 +2986,7 @@
         "name": "get_args",
         "parameters": [],
         "return_type": {
-          "type": "arguments"
+          "type": "Arguments"
         }
       },
       {
@@ -40945,5 +40963,1092 @@
         ]
       }
     ]
+  },
+  "w4": {
+    "classes": [],
+    "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "blit",
+            "name": "@native"
+          }
+        ],
+        "comment": "Copies pixels to the framebuffer",
+        "name": "blit",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "u8"
+                    }
+                  ],
+                  "type": "Ptr"
+                }
+              ],
+              "type": "Const"
+            },
+            "name": "data"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "width"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "height"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "flags"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "blitSub",
+            "name": "@native"
+          }
+        ],
+        "comment": "Copies a subregion within a larger sprite atlas to the framebuffer",
+        "name": "blit_sub",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "u8"
+                    }
+                  ],
+                  "type": "Ptr"
+                }
+              ],
+              "type": "Const"
+            },
+            "name": "data"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "width"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "height"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "src_x"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "src_y"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "stride"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "flags"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "diskr",
+            "name": "@native"
+          }
+        ],
+        "comment": "Reads up to `size` bytes from persistent storage into the pointer `dest`",
+        "name": "diskr",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "AnyPtr"
+            },
+            "name": "dest"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "size"
+          }
+        ],
+        "return_type": {
+          "type": "u32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "diskw",
+            "name": "@native"
+          }
+        ],
+        "comment": "Writes up to `size` bytes from the pointer `src` into persistent storage",
+        "name": "diskw",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "AnyPtr"
+                }
+              ],
+              "type": "Const"
+            },
+            "name": "src"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "size"
+          }
+        ],
+        "return_type": {
+          "type": "u32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "(*((uint16_t*)0x14))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read draw colors",
+        "name": "draw_colors",
+        "parameters": [],
+        "return_type": {
+          "type": "u16"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((uint8_t*)0xa0)",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Access pointer to framebuffer",
+        "name": "framebuffer",
+        "parameters": [],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "u8"
+            }
+          ],
+          "type": "Ptr"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((int_32t)*((const uint8_t*)0x16))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read gamepad 1 value",
+        "name": "gamepad1",
+        "parameters": [],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((int_32t)*((const uint8_t*)0x17))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read gamepad 2 value",
+        "name": "gamepad2",
+        "parameters": [],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((int_32t)*((const uint8_t*)0x18))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read gamepad 3 value",
+        "name": "gamepad3",
+        "parameters": [],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((int_32t)*((const uint8_t*)0x19))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read gamepad 4 value",
+        "name": "gamepad4",
+        "parameters": [],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "hline",
+            "name": "@native"
+          }
+        ],
+        "comment": "Draws a horizontal line",
+        "name": "hline",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "length"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "line",
+            "name": "@native"
+          }
+        ],
+        "comment": "Draws a line between two points",
+        "name": "line",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x1"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y1"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x2"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y2"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((int_32t)*((const uint8_t*)0x1e))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read mouse buttons",
+        "name": "mouse_buttons",
+        "parameters": [],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((int_32t)*((const int16_t*)0x1a))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read mouse x",
+        "name": "mouse_x",
+        "parameters": [],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((int_32t)*((const int16_t*)0x1c))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read mouse y",
+        "name": "mouse_y",
+        "parameters": [],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((int_32t)*((const uint8_t*)0x20))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read mouse buttons",
+        "name": "netplay",
+        "parameters": [],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "oval",
+            "name": "@native"
+          }
+        ],
+        "comment": "Draws an oval (or circle)",
+        "name": "oval",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "width"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "height"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "((uint32_t*)0x04)",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Get a pointer to pallet",
+        "name": "palette",
+        "parameters": [],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Ptr"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "rect",
+            "name": "@native"
+          }
+        ],
+        "comment": "Draws a rectangle",
+        "name": "rect",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "width"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "height"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "*((uint16_t*)0x14) = nn__value",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Set draw colors",
+        "name": "set_draw_colors",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u16"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Set a state value to be passed to game_step() function",
+        "name": "set_game_state",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "AnyPtr"
+            },
+            "name": "data"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Set palette",
+        "name": "set_palette",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "c1"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "c2"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "c3"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "c4"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Set system flags",
+        "name": "set_system_flags",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u8"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "(*((uint8_t*)0x1f))",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Read system flags",
+        "name": "system_flags",
+        "parameters": [],
+        "return_type": {
+          "type": "u8"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Draws text using the built-in system font",
+        "name": "text",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "text_data"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "tone",
+            "name": "@native"
+          }
+        ],
+        "comment": "Plays a sound tone",
+        "name": "tone",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "frequency"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "duration"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "volume"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "flags"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Prints a message to the debug console",
+        "name": "trace",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "text_data"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "vline",
+            "name": "@native"
+          }
+        ],
+        "comment": "Draws a vertical line",
+        "name": "vline",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "length"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      }
+    ],
+    "global_consts": [
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BLIT_1BPP"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BLIT_2BPP"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BLIT_FLIP_X"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BLIT_FLIP_Y"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BLIT_ROTATE"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BUTTON_1"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BUTTON_2"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BUTTON_DOWN"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BUTTON_LEFT"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BUTTON_RIGHT"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "BUTTON_UP"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "MOUSE_LEFT"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "MOUSE_MIDDLE"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "MOUSE_RIGHT"
+      },
+      {
+        "comment": "Screen size of wasm4 console",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "SCREEN_SIZE"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u8"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "SYSTEM_HIDE_GAMEPAD_OVERLAY"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u8"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "SYSTEM_PRESERVE_FRAMEBUFFER"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_MODE1"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_MODE2"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_MODE3"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_MODE4"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_NOISE"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_PAN_LEFT"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_PAN_RIGHT"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_PULSE1"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_PULSE2"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TONE_TRIANGLE"
+      }
+    ],
+    "imports": []
   }
 }

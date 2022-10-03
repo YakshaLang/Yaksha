@@ -48,6 +48,7 @@ public class YakshaCompletionContributor extends CompletionContributor {
             .add("import raylib.gui")
             .add("import raylib.math")
             .add("import raylib.utils")
+            .add("import w4")
             .build();
 
 
