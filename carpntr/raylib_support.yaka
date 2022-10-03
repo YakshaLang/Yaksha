@@ -159,12 +159,11 @@ def produce_object(c: CObject, conf: carp.Config) -> bool:
     return False
 
 
-def get_raylib_args(conf: carp.Config) -> Array[str]:
+def get_raylib_args(conf: carp.Config, build_path: str) -> Array[str]:
     # Build raylib objects
     # Return list of objects & libraries that we want to link
     arguments: Array[str]
     runtime_path: str = conf.runtime_path
-    build_path: str = path.join(os.cwd(), "build")
     path.mkdir(build_path)
     raylib_path: str = path.join(path.join(runtime_path, "raylib"), "src")
     raygui_path: str = path.join(path.join(runtime_path, "raygui"), "src")

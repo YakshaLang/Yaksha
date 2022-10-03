@@ -296,13 +296,13 @@ def build(c: carp.Config, code: str) -> int:
         console.cyan("Hint: You need to keep [compilation].targets empty\n")
         return -1
 
+    build_path: str = path.join(os.cwd(), "build")
     if c.compilation.raylib:
-        raylib_args = rs.get_raylib_args(c)
+        raylib_args = rs.get_raylib_args(c, build_path)
 
     print("\nbuilding ")
     print(target_count + 1)
     println(" target(s) ...")
-    build_path: str = path.join(os.cwd(), "build")
     path.mkdir(build_path)
     code_path: str = path.join(build_path, "program_code.c")
     if not io.writefile(code_path, prepare_code(c, code)):
@@ -339,7 +339,7 @@ def build_simple(c: carp.Config, code: str) -> int:
     raylib_args: Array[str]
     target: str = ""
     if c.compilation.raylib:
-        raylib_args = rs.get_raylib_args(c)
+        raylib_args = rs.get_raylib_args(c, os.cwd())
     if c.compilation.wasm4:
         target = "wasm4"
     if c.compilation.web:
