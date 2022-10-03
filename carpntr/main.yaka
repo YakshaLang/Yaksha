@@ -177,7 +177,10 @@ def handle_args(args: os.Arguments) -> int:
 
     remainder: argparse.ArgParseRemainder = argparse.parse(a.state, arguments)
     defer argparse.del_remainder(remainder)
-    defer strings.del_cstr(file_path) 
+    defer strings.del_cstr(file_path)
+
+    if silent_mode != 1:
+        print_banner()
 
     if help == 1:
         argparse.usage(a.state)

@@ -4575,6 +4575,10 @@ int32_t yy__handle_args(yy__os_Arguments yy__args)
     yk__arrput(yy__options, yy__argparse_opt_end());
     yy__argparse_ArgParseWrapper yy__a = yy__argparse_new(yy__options, yy__usages);
     yy__argparse_ArgParseRemainder yy__remainder = yy__argparse_parse(yy__a->state, yy__arguments);
+    if ((yy__silent_mode != INT32_C(1)))
+    {
+        yy__print_banner();
+    }
     if ((yy__help == INT32_C(1)))
     {
         yy__argparse_usage(yy__a->state);
