@@ -13,6 +13,15 @@
 #include <string.h>
 #define OPT_UNSET 1
 #define OPT_LONG (1 << 1)
+#if defined(_WIN32) || defined(_WIN64)
+#include <wchar.h>
+wchar_t *yk__utf8_to_utf16_null_terminated(const char *str);
+#define fprintf fwprintf
+#define fputc fputwc
+#define str_literal(t) L##t
+#else
+#define str_literal(t) t
+#endif
 static const char *prefix_skip(const char *str, const char *prefix) {
   size_t len = strlen(prefix);
   return strncmp(str, prefix, len) ? NULL : str + len;
@@ -30,9 +39,31 @@ static void argparse_error(struct argparse *self,
                            const char *reason, int flags) {
   (void) self;
   if (flags & OPT_LONG) {
-    fprintf(stderr, "error: option `--%s` %s\n", opt->long_name, reason);
+#if defined(_WIN32) || defined(_WIN64)
+    wchar_t *long_name_copy = yk__utf8_to_utf16_null_terminated(opt->long_name);
+    wchar_t *reason_copy = yk__utf8_to_utf16_null_terminated(reason);
+    if (long_name_copy != NULL && reason_copy != NULL) {
+      fprintf(stderr, str_literal("error: option `--%ls` %ls\n"), long_name_copy,
+              reason_copy);
+    }
+    free(long_name_copy);
+    free(reason_copy);
+#else
+    fprintf(stderr, str_literal("error: option `--%s` %s\n"), opt->long_name,
+            reason);
+#endif
   } else {
-    fprintf(stderr, "error: option `-%c` %s\n", opt->short_name, reason);
+#if defined(_WIN32) || defined(_WIN64)
+    wchar_t *reason_copy = yk__utf8_to_utf16_null_terminated(reason);
+    if (reason_copy != NULL) {
+      fprintf(stderr, str_literal("error: option `-%c` %ls\n"), opt->short_name,
+              reason_copy);
+    }
+    free(reason_copy);
+#else
+    fprintf(stderr, str_literal("error: option `-%c` %s\n"), opt->short_name,
+            reason);
+#endif
   }
   exit(EXIT_FAILURE);
 }
@@ -118,7 +149,7 @@ static void argparse_options_check(const struct argparse_option *options) {
       case ARGPARSE_OPT_GROUP:
         continue;
       default:
-        fprintf(stderr, "wrong option type: %d", options->type);
+        fprintf(stderr, str_literal("wrong option type: %d"), options->type);
         break;
     }
   }
@@ -223,7 +254,19 @@ int argparse_parse(struct argparse *self, int argc, const char **argv) {
     }
     continue;
   unknown:
-    fprintf(stderr, "error: unknown option `%s`\n", self->argv[0]);
+#if defined(_WIN32) || defined(_WIN64)
+  {
+    wchar_t *unknown_arg_copy =
+        yk__utf8_to_utf16_null_terminated(self->argv[0]);
+    if (unknown_arg_copy != NULL) {
+      fprintf(stderr, str_literal("error: unknown option `%ls`\n"),
+              self->argv[0]);
+    }
+    free(unknown_arg_copy);
+  }
+#else
+    fprintf(stderr, str_literal("error: unknown option `%s`\n"), self->argv[0]);
+#endif
     argparse_usage(self);
     if (!(self->flags & ARGPARSE_IGNORE_UNKNOWN_ARGS)) { exit(EXIT_FAILURE); }
   }
@@ -234,15 +277,45 @@ end:
 }
 void argparse_usage(struct argparse *self) {
   if (self->usages) {
-    fprintf(stdout, "Usage: %s\n", *self->usages++);
-    while (*self->usages && **self->usages)
-      fprintf(stdout, "   or: %s\n", *self->usages++);
+#if defined(_WIN32) || defined(_WIN64)
+    const char* usages_orig = *self->usages++;
+    wchar_t *usages_copy = yk__utf8_to_utf16_null_terminated(usages_orig);
+    if (usages_copy != NULL) {
+      fprintf(stdout, str_literal("Usage: %ls\n"), usages_copy);
+    }
+    free(usages_copy);
+#else
+    fprintf(stdout, str_literal("Usage: %s\n"), *self->usages++);
+#endif
+    while (*self->usages && **self->usages) {
+#if defined(_WIN32) || defined(_WIN64)
+      wchar_t *usages_copy_2 =
+          yk__utf8_to_utf16_null_terminated(*self->usages++);
+      if (usages_copy_2 != NULL) {
+        fprintf(stdout, str_literal("   or: %ls\n"), usages_copy_2);
+      }
+      free(usages_copy_2);
+#else
+      fprintf(stdout, str_literal("   or: %s\n"), *self->usages++);
+#endif
+    }
   } else {
-    fprintf(stdout, "Usage:\n");
+    fprintf(stdout, str_literal("Usage:\n"));
   }
   // print description
-  if (self->description) fprintf(stdout, "%s\n", self->description);
-  fputc('\n', stdout);
+  if (self->description) {
+#if defined(_WIN32) || defined(_WIN64)
+    wchar_t *description_copy =
+        yk__utf8_to_utf16_null_terminated(self->description);
+    if (description_copy != NULL) {
+      fprintf(stdout, str_literal("%ls\n"), description_copy);
+    }
+    free(description_copy);
+#else
+    fprintf(stdout, str_literal("%s\n"), self->description);
+#endif
+  }
+  fputc(str_literal('\n'), stdout);
   const struct argparse_option *options;
   // figure out best width
   size_t usage_opts_width = 0;
@@ -270,38 +343,75 @@ void argparse_usage(struct argparse *self) {
     size_t pos = 0;
     size_t pad = 0;
     if (options->type == ARGPARSE_OPT_GROUP) {
-      fputc('\n', stdout);
-      fprintf(stdout, "%s", options->help);
-      fputc('\n', stdout);
+      fputc(str_literal('\n'), stdout);
+#if defined(_WIN32) || defined(_WIN64)
+      wchar_t *help_copy_1 = yk__utf8_to_utf16_null_terminated(options->help);
+      if (help_copy_1 != NULL) {
+        fprintf(stdout, str_literal("%ls"), help_copy_1);
+      }
+      free(help_copy_1);
+#else
+      fprintf(stdout, str_literal("%s"), options->help);
+#endif
+      fputc(str_literal('\n'), stdout);
       continue;
     }
-    pos = fprintf(stdout, "    ");
+    pos = fprintf(stdout, str_literal("    "));
     if (options->short_name) {
-      pos += fprintf(stdout, "-%c", options->short_name);
+      pos += fprintf(stdout, str_literal("-%c"), options->short_name);
     }
     if (options->long_name && options->short_name) {
-      pos += fprintf(stdout, ", ");
+      pos += fprintf(stdout, str_literal(", "));
     }
     if (options->long_name) {
-      pos += fprintf(stdout, "--%s", options->long_name);
+#if defined(_WIN32) || defined(_WIN64)
+      wchar_t *long_name_copy_1 =
+          yk__utf8_to_utf16_null_terminated(options->long_name);
+      if (long_name_copy_1 != NULL) {
+        pos += fprintf(stdout, str_literal("--%ls"), long_name_copy_1);
+      }
+      free(long_name_copy_1);
+#else
+      pos += fprintf(stdout, str_literal("--%s"), options->long_name);
+#endif
     }
     if (options->type == ARGPARSE_OPT_INTEGER) {
-      pos += fprintf(stdout, "=<int>");
+      pos += fprintf(stdout, str_literal("=<int>"));
     } else if (options->type == ARGPARSE_OPT_FLOAT) {
-      pos += fprintf(stdout, "=<flt>");
+      pos += fprintf(stdout, str_literal("=<flt>"));
     } else if (options->type == ARGPARSE_OPT_STRING) {
-      pos += fprintf(stdout, "=<str>");
+      pos += fprintf(stdout, str_literal("=<str>"));
     }
     if (pos <= usage_opts_width) {
       pad = usage_opts_width - pos;
     } else {
-      fputc('\n', stdout);
+      fputc(str_literal('\n'), stdout);
       pad = usage_opts_width;
     }
-    fprintf(stdout, "%*s%s\n", (int) pad + 2, "", options->help);
+#if defined(_WIN32) || defined(_WIN64)
+    wchar_t *help_copy = yk__utf8_to_utf16_null_terminated(options->help);
+    if (help_copy != NULL) {
+      fprintf(stdout, str_literal("%*ls%ls\n"), (int) pad + 2, str_literal(""),
+              help_copy);
+    }
+    free(help_copy);
+#else
+    fprintf(stdout, str_literal("%*s%s\n"), (int) pad + 2, str_literal(""),
+            options->help);
+#endif
   }
   // print epilog
-  if (self->epilog) fprintf(stdout, "%s\n", self->epilog);
+  if (self->epilog) {
+#if defined(_WIN32) || defined(_WIN64)
+    wchar_t *epilog_copy = yk__utf8_to_utf16_null_terminated(self->epilog);
+    if (epilog_copy != NULL) {
+      fprintf(stdout, str_literal("%ls\n"), epilog_copy);
+    }
+    free(epilog_copy);
+#else
+    fprintf(stdout, str_literal("%s\n"), self->epilog);
+#endif
+  }
 }
 int argparse_help_cb_no_exit(struct argparse *self,
                              const struct argparse_option *option) {

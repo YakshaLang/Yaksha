@@ -6,7 +6,7 @@ import libs.strings.array as sarr
 import libs.os.path as ospath
 
 @nativedefine("struct yk__arguments*")
-class arguments:
+class Arguments:
     # UTF-8 converted arguments and argument count
     # Do not delete, Do not modify
     argc: int
@@ -15,7 +15,7 @@ class arguments:
 
 # Get command line arguments
 @nativedefine("yk__get_args")
-def get_args() -> arguments:
+def get_args() -> Arguments:
     # Get arguments
     pass
 

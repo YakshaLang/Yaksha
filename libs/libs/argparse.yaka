@@ -22,20 +22,26 @@ class ArgParse:
     # Arg parse state object
     pass
 
+@nativedefine("struct yk__argparse_wrapper*")
+class ArgParseWrapper:
+    # Argument parser wrapper
+    state: ArgParse
+
 @nativedefine("struct argparse_option")
 @dotaccess
 class Option:
     # An argparse option
-    # These are deleted when del_argparse() is called
+    # These objects are deleted when del_argparse() is called
+    # However, Array[Option] is not
     pass
 
 @native("yk__newargparse")
-def new_ex(options: Array[Option], usages: Array[str], flag: int) -> ArgParse:
+def new_ex(options: Array[Option], usages: Array[str], flag: int) -> ArgParseWrapper:
     # Initialize a new argument parser (with flags)
     # Note: options array last element must be opt_end()
     pass
 
-def new(options: Array[Option], usages: Array[str]) -> ArgParse:
+def new(options: Array[Option], usages: Array[str]) -> ArgParseWrapper:
     # Initialize a new argument parser
     # Note: options array last element must be opt_end()
     return new_ex(options, usages, ARGPARSE_DEFAULT)
@@ -46,7 +52,7 @@ def set_description(argp: ArgParse, description: str, epilog: str) -> None:
     pass
 
 @native("yk__delargparse")
-def del_argparse(object: ArgParse) -> None:
+def del_argparse(object: ArgParseWrapper) -> None:
     # Delete arg parser
     pass
 

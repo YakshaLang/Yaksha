@@ -146,13 +146,16 @@ def perform_run(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web
     return 0
 
 
-def handle_args(args: os.arguments) -> int:
+def handle_args(args: os.Arguments) -> int:
     # Multiple arguments trigger how to run the program
+    arguments: Array[str] = sarr.dup(args.argv)
+    defer sarr.del_str_array(arguments)
     options: Array[argparse.Option]
     defer del options
     usages: Array[str] = array("str", "carpntr", "carpntr [options] file")
     defer sarr.del_str_array(usages)
 
+    help: int = 0
     run: int = 0
     raylib: int = 0
     web: int = 0
@@ -160,7 +163,7 @@ def handle_args(args: os.arguments) -> int:
     silent_mode: int = 0
     file_path: c.CStr = strings.null_cstr()
     web_shell: str = ""
-    arrput(options, argparse.opt_help())
+    arrput(options, argparse.opt_boolean("h", "help", getref(help), "show help and exit"))
     arrput(options, argparse.opt_boolean("R", "run", getref(run), "run a single file"))
     arrput(options, argparse.opt_boolean("r", "raylib", getref(raylib), "enable raylib (works only with run)"))
     arrput(options, argparse.opt_boolean("w", "web", getref(web), "build for web (works only with run & raylib)"))
@@ -169,12 +172,16 @@ def handle_args(args: os.arguments) -> int:
     arrput(options, argparse.opt_boolean("S", "silent", getref(silent_mode), "do not print anything except errors"))
     arrput(options, argparse.opt_end())
 
-    a: argparse.ArgParse = argparse.new(options, usages)
+    a: argparse.ArgParseWrapper = argparse.new(options, usages)
     defer argparse.del_argparse(a)
 
-    remainder: argparse.ArgParseRemainder = argparse.parse(a, args.argv)
+    remainder: argparse.ArgParseRemainder = argparse.parse(a.state, arguments)
     defer argparse.del_remainder(remainder)
     defer strings.del_cstr(file_path) 
+
+    if help == 1:
+        argparse.usage(a.state)
+        return 0
 
     if remainder.argc != 1:
         println("One file must be preset for excution")
@@ -203,7 +210,7 @@ def handle_args(args: os.arguments) -> int:
     return 0
 
 def main() -> int:
-    args: os.arguments = os.get_args()
+    args: os.Arguments = os.get_args()
     # No arguments -> default
     if args.argc <= 1:
         print_banner()

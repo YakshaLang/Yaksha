@@ -8,10 +8,15 @@ struct yk__arg_remainder {
   // Hidden state that we use to delete stuff with
   const char **unreadable_argv;
 };
+struct yk__argparse_wrapper {
+  struct argparse* state;
+  struct argparse_option *options;
+  yk__sds *usages;
+};
 struct yk__arg_remainder *yk__argparse_parse(struct argparse *argparse_obj,
                                              yk__sds *array);
 void yk__del_argparse_remainder(struct yk__arg_remainder *remainder);
-struct argparse *yk__newargparse(struct argparse_option *options,
+struct yk__argparse_wrapper *yk__newargparse(struct argparse_option *options,
                                  yk__sds *usages, int flags);
-void yk__delargparse(struct argparse *);
+void yk__delargparse(struct yk__argparse_wrapper *);
 #endif

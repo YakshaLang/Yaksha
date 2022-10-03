@@ -25,15 +25,19 @@ void yk__del_argparse_remainder(struct yk__arg_remainder *remainder) {
   free(remainder->unreadable_argv);
   free(remainder);
 }
-struct argparse *yk__newargparse(struct argparse_option *options,
+struct yk__argparse_wrapper *yk__newargparse(struct argparse_option *options,
                                  yk__sds *usages, int flags) {
+  struct yk__argparse_wrapper *wrapper = malloc(sizeof (struct yk__argparse_wrapper));
   struct argparse *result = malloc(sizeof(struct argparse));
   yk__sds *usages_copy = yk__sdsarraydup(usages);
   yk__arrput(usages_copy, NULL);
   argparse_init(result, options, (const char *const *) usages_copy, flags);
-  return result;
+  wrapper->state = result;
+  wrapper->usages = usages_copy;
+  wrapper->options = options;
+  return wrapper;
 }
-void yk__delargparse(struct argparse *a) {
+void yk__delargparse(struct yk__argparse_wrapper *a) {
   // Remove usages copy we made
   yk__delsdsarray((yk__sds *) a->usages);
   // Remove option strings (help and long_name)
@@ -43,8 +47,8 @@ void yk__delargparse(struct argparse *a) {
     yk__sdsfree((yk__sds) a->options[i].help);
     yk__sdsfree((yk__sds) a->options[i].long_name);
   }
-  yk__sdsfree((yk__sds) a->description);
-  yk__sdsfree((yk__sds) a->epilog);
+  yk__sdsfree((yk__sds) a->state->description);
+  yk__sdsfree((yk__sds) a->state->epilog);
   // Delete malloc
   free(a);
 }

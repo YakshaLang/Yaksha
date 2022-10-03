@@ -17,9 +17,10 @@ Bunch of `C` code that standard library depend on.
 | `tinycthread.*` | Marcus Geelnard, Evan Nemerson      | Thread Library                     |
 | `wash4.h`       | Bruno Garcia                        | wasm4 fantasy console C header     |
 
-### Minor Patches
+### Patches
 
 * argparse - `const char short_name;` was changed to `char short_name;`
+* argparse - added windows support for argparse help printing/error printing.
 
 ### Third Party Derived
 
