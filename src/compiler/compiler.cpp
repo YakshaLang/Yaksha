@@ -71,9 +71,9 @@ void compiler::visit_binary_expr(binary_expr *obj) {
              ykobject(dt_pool->create("bool")));// None != None -> False
       }
     } else if (lhs.second.datatype_->is_none()) {
-      push("(NULL == " + rhs.first + ")", ykobject(dt_pool->create("bool")));
+      push("(NULL " + obj->opr_->token_ + " " + rhs.first + ")", ykobject(dt_pool->create("bool")));
     } else {
-      push("(" + rhs.first + " == NULL)", ykobject(dt_pool->create("bool")));
+      push("(" + lhs.first + " " + obj->opr_->token_ + " NULL)", ykobject(dt_pool->create("bool")));
     }
   } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_str()) {
     if (obj->opr_->type_ == token_type::EQ_EQ) {
