@@ -1,18 +1,18 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
-typedef int32_t (*ykfncptr0)(const void*, const void*);
-int32_t yy__sorters_cmp_int(const void*, const void*);
-int32_t yy__cmp_int(const void*, const void*);
+typedef int32_t (*ykfncptr0)(void const* const , void const* const );
+int32_t yy__sorters_cmp_int(void const* const , void const* const );
+int32_t yy__cmp_int(void const* const , void const* const );
 void yy__print_array(int32_t*);
 int32_t yy__main();
 // --structs-- 
 // --functions-- 
-int32_t yy__sorters_cmp_int(const void* nn__a, const void* nn__b) 
+int32_t yy__sorters_cmp_int(void const* const  nn__a, void const* const  nn__b) 
 {
     return *((int32_t*)nn__a) - *((int32_t*)nn__b);
 }
-int32_t yy__cmp_int(const void* yy__a, const void* yy__b) 
+int32_t yy__cmp_int(void const* const  yy__a, void const* const  yy__b) 
 {
     int32_t yy__val_a = (*(((int32_t*)yy__a)));
     int32_t yy__val_b = (*(((int32_t*)yy__b)));

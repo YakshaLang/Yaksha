@@ -36,7 +36,7 @@ using namespace yaksha;
 TEST_CASE("type checker: Bad function for qsort") {
   TEST_FILE("../test_data/bad_inputs/bad_input_sort_with_wrong_args.yaka",
             "Comparison must match with "
-            "Function[In[Const[AnyPtr],Const[AnyPtr]],Out[int]]");
+            "Function[In[Const[AnyPtrToConst],Const[AnyPtrToConst]],Out[int]]");
 }
 TEST_CASE("type checker: Passing a map to arrput") {
   TEST_FILE("../test_data/bad_inputs/arrput_map.yaka",

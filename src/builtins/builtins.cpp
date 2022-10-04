@@ -841,9 +841,9 @@ struct builtin_qsort : builtin {
       func->args_.emplace_back(func_out);
       func_out->args_.emplace_back(dt_pool->create("int"));
       auto const_arg1 = dt_pool->create("Const");
-      const_arg1->args_.emplace_back(dt_pool->create("AnyPtr"));
+      const_arg1->args_.emplace_back(dt_pool->create("AnyPtrToConst"));
       auto const_arg2 = dt_pool->create("Const");
-      const_arg2->args_.emplace_back(dt_pool->create("AnyPtr"));
+      const_arg2->args_.emplace_back(dt_pool->create("AnyPtrToConst"));
       func_in->args_.emplace_back(const_arg1);
       func_in->args_.emplace_back(const_arg2);
       // func -> Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]
@@ -851,7 +851,7 @@ struct builtin_qsort : builtin {
         return ykobject(dt_pool->create("bool"));
       } else {
         o.string_val_ = "Comparison must match with "
-                        "Function[In[Const[AnyPtr],Const[AnyPtr]],Out[int]]";
+                        "Function[In[Const[AnyPtrToConst],Const[AnyPtrToConst]],Out[int]]";
       }
     }
     o.object_type_ = object_type::RUNTIME_ERROR;

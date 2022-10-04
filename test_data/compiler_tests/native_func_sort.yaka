@@ -1,6 +1,6 @@
 import sorters
 
-def cmp_int(a: Const[AnyPtr], b: Const[AnyPtr]) -> int:
+def cmp_int(a: Const[AnyPtrToConst], b: Const[AnyPtrToConst]) -> int:
     # Compare two given integers
     val_a: int = unref(cast("Ptr[int]", a))
     val_b: int = unref(cast("Ptr[int]", b))
@@ -26,7 +26,7 @@ def main() -> int:
     print_array(x1)
 
     x2: Array[int] = array("int", 1, 2, 3, 3, 2, 1, 5, 4)
-    cmp: Function[In[Const[AnyPtr],Const[AnyPtr]],Out[int]] = cmp_int
+    cmp: Function[In[Const[AnyPtrToConst],Const[AnyPtrToConst]],Out[int]] = cmp_int
     println("before x2:")
     print_array(x2)
     qsort(x2, cmp)
@@ -43,8 +43,8 @@ def main() -> int:
     print_array(x3)
 
     x4: Array[int] = array("int", 1, 2, 3, 3, 2, 1, 5, 4)
-    cmp4: Function[In[Const[AnyPtr],Const[AnyPtr]],Out[int]] = sorters.cmp_int
-    cmp4_reassign: Function[In[Const[AnyPtr],Const[AnyPtr]],Out[int]] = cmp4
+    cmp4: Function[In[Const[AnyPtrToConst],Const[AnyPtrToConst]],Out[int]] = sorters.cmp_int
+    cmp4_reassign: Function[In[Const[AnyPtrToConst],Const[AnyPtrToConst]],Out[int]] = cmp4
     println("before x4:")
     print_array(x4)
     qsort(x4, cmp4_reassign)

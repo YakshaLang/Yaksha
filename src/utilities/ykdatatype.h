@@ -29,6 +29,7 @@ namespace yaksha {
     CONSTANT,
     POINTER,
     ANY_PTR,
+    ANY_PTR_TO_CONST,
     TUPLE,
     // Function[In[str],Out]
     FUNCTION,
@@ -74,6 +75,7 @@ namespace yaksha {
     [[nodiscard]] bool is_function_input() const;
     [[nodiscard]] bool is_function_output() const;
     [[nodiscard]] bool is_any_ptr() const;
+    [[nodiscard]] bool is_any_ptr_to_const() const;
     [[nodiscard]] bool is_tuple() const;
     [[nodiscard]] bool matches(const ykdatatype &template_) const;
     token *token_{};

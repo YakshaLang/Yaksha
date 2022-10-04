@@ -109,7 +109,8 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
         if (to_comp->is_const()) { to_comp = to_comp->args_[0]; }
         if (!(to_comp->is_any_ptr() || to_comp->is_an_array() ||
               to_comp->is_str() || to_comp->is_a_pointer() ||
-              to_comp->is_none() || !to_comp->is_builtin_or_primitive())) {
+              to_comp->is_any_ptr_to_const() || to_comp->is_none() ||
+              !to_comp->is_builtin_or_primitive())) {
           error(obj->opr_, "Datatype cannot be compared with None");
           break;
         }
@@ -715,6 +716,7 @@ void type_checker::visit_assign_arr_expr(assign_arr_expr *obj) {
 }
 void type_checker::handle_assigns(token *oper, const ykobject &lhs,
                                   const ykobject &rhs) {
+  // TODO you can assign a const to a value?
   // Both are primitive but not equal? then it is a problem
   if ((lhs.is_primitive_or_obj() && rhs.is_primitive_or_obj()) &&
       *lhs.datatype_ != *rhs.datatype_) {
@@ -744,8 +746,7 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
       }
       break;
     case token_type::PLUS_EQ:
-      if (!lhs.datatype_->is_a_number() &&
-          !lhs.datatype_->is_str()) {
+      if (!lhs.datatype_->is_a_number() && !lhs.datatype_->is_str()) {
         error(oper, "Cannot use += for data type");
       }
       break;

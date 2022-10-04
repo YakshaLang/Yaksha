@@ -784,7 +784,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     // int32_t*, yk__sds*, etc
     return convert_dt(basic_dt->args_[0]) + "*";
   } else if (basic_dt->is_const()) {
-    return "const " + convert_dt(basic_dt->args_[0]);
+    return convert_dt(basic_dt->args_[0]) + " const ";
   } else if (basic_dt->is_str()) {
     return "yk__sds";
   } else if (basic_dt->is_i8()) {
@@ -813,6 +813,8 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "double";
   } else if (basic_dt->is_any_ptr()) {
     return "void*";
+  } else if (basic_dt->is_any_ptr_to_const()) {
+    return "void const*";
   } else if (basic_dt->is_sm_entry() || basic_dt->is_m_entry()) {
     // Handle SMEntry and Entry
     return esc_->compile(basic_dt, this);
