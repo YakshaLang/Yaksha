@@ -656,22 +656,22 @@ def rl_load_vertex_array() -> u32:
     ccode """rlLoadVertexArray()"""
 
 @nativemacro
-def rl_load_vertex_buffer(buffer: Const[c.VoidPtr], size: int, dynamic: bool) -> u32:
+def rl_load_vertex_buffer(buffer: AnyPtrToConst, size: int, dynamic: bool) -> u32:
     # Load a vertex buffer attribute
     ccode """rlLoadVertexBuffer(nn__buffer, (int)nn__size, nn__dynamic)"""
 
 @nativemacro
-def rl_load_vertex_buffer_element(buffer: Const[c.VoidPtr], size: int, dynamic: bool) -> u32:
+def rl_load_vertex_buffer_element(buffer: AnyPtrToConst, size: int, dynamic: bool) -> u32:
     # Load a new attributes element buffer
     ccode """rlLoadVertexBufferElement(nn__buffer, (int)nn__size, nn__dynamic)"""
 
 @nativemacro
-def rl_update_vertex_buffer(buffer_id: u32, data: Const[c.VoidPtr], data_size: int, offset: int) -> None:
+def rl_update_vertex_buffer(buffer_id: u32, data: AnyPtrToConst, data_size: int, offset: int) -> None:
     # Update GPU buffer with new data
     ccode """rlUpdateVertexBuffer((unsigned int)nn__buffer_id, nn__data, (int)nn__data_size, (int)nn__offset)"""
 
 @nativemacro
-def rl_update_vertex_buffer_elements(id: u32, data: Const[c.VoidPtr], data_size: int, offset: int) -> None:
+def rl_update_vertex_buffer_elements(id: u32, data: AnyPtrToConst, data_size: int, offset: int) -> None:
     # Update vertex buffer elements with new data
     ccode """rlUpdateVertexBufferElements((unsigned int)nn__id, nn__data, (int)nn__data_size, (int)nn__offset)"""
 
@@ -684,7 +684,7 @@ def rl_unload_vertex_buffer(vbo_id: u32) -> None:
     ccode """rlUnloadVertexBuffer((unsigned int)nn__vbo_id)"""
 
 @nativemacro
-def rl_set_vertex_attribute(index: u32, comp_size: int, type: int, normalized: bool, stride: int, pointer: Const[c.VoidPtr]) -> None:
+def rl_set_vertex_attribute(index: u32, comp_size: int, type: int, normalized: bool, stride: int, pointer: AnyPtrToConst) -> None:
     ccode """rlSetVertexAttribute((unsigned int)nn__index, (int)nn__comp_size, (int)nn__type, nn__normalized, (int)nn__stride, nn__pointer)"""
 
 @nativemacro
@@ -692,7 +692,7 @@ def rl_set_vertex_attribute_divisor(index: u32, divisor: int) -> None:
     ccode """rlSetVertexAttributeDivisor((unsigned int)nn__index, (int)nn__divisor)"""
 
 @nativemacro
-def rl_set_vertex_attribute_default(loc_index: int, value: Const[c.VoidPtr], attrib_type: int, count: int) -> None:
+def rl_set_vertex_attribute_default(loc_index: int, value: AnyPtrToConst, attrib_type: int, count: int) -> None:
     # Set vertex attribute default value
     ccode """rlSetVertexAttributeDefault((int)nn__loc_index, nn__value, (int)nn__attrib_type, (int)nn__count)"""
 
@@ -701,7 +701,7 @@ def rl_draw_vertex_array(offset: int, count: int) -> None:
     ccode """rlDrawVertexArray((int)nn__offset, (int)nn__count)"""
 
 @nativemacro
-def rl_draw_vertex_array_elements(offset: int, count: int, buffer: Const[c.VoidPtr]) -> None:
+def rl_draw_vertex_array_elements(offset: int, count: int, buffer: AnyPtrToConst) -> None:
     ccode """rlDrawVertexArrayElements((int)nn__offset, (int)nn__count, nn__buffer)"""
 
 @nativemacro
@@ -709,11 +709,11 @@ def rl_draw_vertex_array_instanced(offset: int, count: int, instances: int) -> N
     ccode """rlDrawVertexArrayInstanced((int)nn__offset, (int)nn__count, (int)nn__instances)"""
 
 @nativemacro
-def rl_draw_vertex_array_elements_instanced(offset: int, count: int, buffer: Const[c.VoidPtr], instances: int) -> None:
+def rl_draw_vertex_array_elements_instanced(offset: int, count: int, buffer: AnyPtrToConst, instances: int) -> None:
     ccode """rlDrawVertexArrayElementsInstanced((int)nn__offset, (int)nn__count, nn__buffer, (int)nn__instances)"""
 
 @nativemacro
-def rl_load_texture(data: Const[c.VoidPtr], width: int, height: int, format: int, mipmap_count: int) -> u32:
+def rl_load_texture(data: AnyPtrToConst, width: int, height: int, format: int, mipmap_count: int) -> u32:
     # Load texture in GPU
     ccode """rlLoadTexture(nn__data, (int)nn__width, (int)nn__height, (int)nn__format, (int)nn__mipmap_count)"""
 
@@ -723,12 +723,12 @@ def rl_load_texture_depth(width: int, height: int, use_render_buffer: bool) -> u
     ccode """rlLoadTextureDepth((int)nn__width, (int)nn__height, nn__use_render_buffer)"""
 
 @nativemacro
-def rl_load_texture_cubemap(data: Const[c.VoidPtr], size: int, format: int) -> u32:
+def rl_load_texture_cubemap(data: AnyPtrToConst, size: int, format: int) -> u32:
     # Load texture cubemap
     ccode """rlLoadTextureCubemap(nn__data, (int)nn__size, (int)nn__format)"""
 
 @nativemacro
-def rl_update_texture(id: u32, offset_x: int, offset_y: int, width: int, height: int, format: int, data: Const[c.VoidPtr]) -> None:
+def rl_update_texture(id: u32, offset_x: int, offset_y: int, width: int, height: int, format: int, data: AnyPtrToConst) -> None:
     # Update GPU texture with new data
     ccode """rlUpdateTexture((unsigned int)nn__id, (int)nn__offset_x, (int)nn__offset_y, (int)nn__width, (int)nn__height, (int)nn__format, nn__data)"""
 
@@ -738,7 +738,7 @@ def rl_get_gl_texture_formats(format: int, gl_internal_format: Ptr[c.CUInt], gl_
     ccode """rlGetGlTextureFormats((int)nn__format, nn__gl_internal_format, nn__gl_format, nn__gl_type)"""
 
 @native
-def rl_get_pixel_format_name(format: u32) -> Const[c.CStr]:
+def rl_get_pixel_format_name(format: u32) -> Ptr[Const[c.CChar]]:
     # Get name string for pixel format
     ccode """const char * temp_rl = rlGetPixelFormatName((unsigned int)nn__format);
     return temp_rl"""
@@ -823,7 +823,7 @@ def rl_get_location_attrib(shader_id: u32, attrib_name: str) -> int:
     return temp_rl"""
 
 @nativemacro
-def rl_set_uniform(loc_index: int, value: Const[c.VoidPtr], uniform_type: int, count: int) -> None:
+def rl_set_uniform(loc_index: int, value: AnyPtrToConst, uniform_type: int, count: int) -> None:
     # Set shader value uniform
     ccode """rlSetUniform((int)nn__loc_index, nn__value, (int)nn__uniform_type, (int)nn__count)"""
 

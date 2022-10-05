@@ -606,7 +606,7 @@ def gui_list_view(bounds: rl.Rectangle, text: str, scroll_index: Ptr[c.CInt], ac
     return temp_rl"""
 
 @nativemacro
-def gui_list_view_ex(bounds: rl.Rectangle, text: Const[Ptr[Ptr[c.CChar]]], count: int, focus: Ptr[c.CInt], scroll_index: Ptr[c.CInt], active: int) -> int:
+def gui_list_view_ex(bounds: rl.Rectangle, text: Ptr[Ptr[Const[c.CChar]]], count: int, focus: Ptr[c.CInt], scroll_index: Ptr[c.CInt], active: int) -> int:
     # List View with extended parameters
     ccode """GuiListViewEx(nn__bounds, nn__text, (int)nn__count, nn__focus, nn__scroll_index, (int)nn__active)"""
 
@@ -670,7 +670,7 @@ def gui_load_style_default() -> None:
     ccode """GuiLoadStyleDefault()"""
 
 @native
-def gui_icon_text(icon_id: int, text: str) -> Const[c.CStr]:
+def gui_icon_text(icon_id: int, text: str) -> Ptr[Const[c.CChar]]:
     # Get text with icon id prepended (if supported)
     ccode """const char * temp_rl = GuiIconText((int)nn__icon_id, nn__text);
     yk__sdsfree(nn__text);

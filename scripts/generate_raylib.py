@@ -75,23 +75,33 @@ class Colors:
 
     @staticmethod
     def blue(text):
-        return Colors.OKBLUE + str(text) + Colors.ENDC
+        if sys.stdout.isatty():
+            return Colors.OKBLUE + str(text) + Colors.ENDC
+        return str(text)
 
     @staticmethod
     def cyan(text):
-        return Colors.OKCYAN + str(text) + Colors.ENDC
+        if sys.stdout.isatty():
+            return Colors.OKCYAN + str(text) + Colors.ENDC
+        return str(text)
 
     @staticmethod
     def green(text):
-        return Colors.OKGREEN + str(text) + Colors.ENDC
+        if sys.stdout.isatty():
+            return Colors.OKGREEN + str(text) + Colors.ENDC
+        return str(text)
 
     @staticmethod
     def warning(text):
-        return Colors.WARNING + str(text) + Colors.ENDC
+        if sys.stdout.isatty():
+            return Colors.WARNING + str(text) + Colors.ENDC
+        return str(text)
 
     @staticmethod
     def fail(text):
-        return Colors.FAIL + str(text) + Colors.ENDC
+        if sys.stdout.isatty():
+            return Colors.FAIL + str(text) + Colors.ENDC
+        return str(text)
 
 
 def execute(arg: str) -> (str, str, int):
@@ -129,12 +139,12 @@ F_DT = {
     "unsigned short": {"t": "int", "del": None, "conv": "(?)$"},
     "float": {"t": "float", "del": None, "conv": None},
     "double": {"t": "f64", "del": None, "conv": None},
-    "void *": {"t": "c.VoidPtr", "del": None, "conv": None},
+    "void *": {"t": "AnyPtr", "del": None, "conv": None},
     "bool": {"t": "bool", "del": None, "conv": None},
     "void": {"t": "None", "del": None, "conv": None},
 }
 R_DT = {
-    "const char *": "Const[c.CStr]",
+    "const char *": "Ptr[Const[c.CChar]]",
     "char *": "c.CStr",
 }
 S_DT = {
@@ -146,18 +156,18 @@ S_DT = {
     "unsigned long": "c.CULong",
     "short": "c.CShort",
     "unsigned short": "c.CUShort",
-    "void *": "c.VoidPtr",
+    "void *": "AnyPtr",
     "char *": "c.CStr",
     "char **": "Ptr[Ptr[c.CChar]]",
-    "const char **": "Const[Ptr[Ptr[c.CChar]]]",
+    "const char **": "Ptr[Ptr[Const[c.CChar]]]",
     "bool": "bool",
     "float": "float",
     "float *": "Ptr[c.CFloat]",
     "int *": "Ptr[c.CInt]",
-    "const int *": "Const[Ptr[c.CInt]]",
-    "const void *": "Const[c.VoidPtr]",
+    "const int *": "Ptr[Const[c.CInt]]",
+    "const void *": "AnyPtrToConst",
     "unsigned char *": "Ptr[c.CUChar]",
-    "const unsigned char *": "Const[Ptr[c.CUChar]]",
+    "const unsigned char *": "Ptr[Const[c.CUChar]]",
     "unsigned short *": "Ptr[c.CUShort]",
     "unsigned int *": "Ptr[c.CUInt]",
     "float[4]": "CFloat4",
@@ -400,7 +410,7 @@ def get_func_data_type(typ) -> Optional[str]:
     elif typ.endswith(" **") and typ[:-3] in KNOWN_STRUCTURES:
         return "Ptr[Ptr[" + PREFIX + typ[:-2] + "]]"
     elif typ.startswith("const ") and typ.endswith(" *") and typ[6:-2] in KNOWN_STRUCTURES:
-        return "Const[Ptr[" + PREFIX + typ[6:-2] + "]]"
+        return "Ptr[Const[" + PREFIX + typ[6:-2] + "]]"
     elif typ.startswith("const ") and typ[6:] in KNOWN_STRUCTURES:
         return "Const[" + PREFIX + typ[6:] + "]"
     return None

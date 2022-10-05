@@ -714,7 +714,7 @@ def rectangle(x: float, y: float, width: float, height: float) -> Rectangle:
 @nativedefine("Image")
 class Image:
     # Image, pixel data stored in CPU memory (RAM)
-    data: c.VoidPtr
+    data: AnyPtr
     width: c.CInt
     height: c.CInt
     mipmaps: c.CInt
@@ -931,7 +931,7 @@ class Wave:
     sampleRate: c.CUInt
     sampleSize: c.CUInt
     channels: c.CUInt
-    data: c.VoidPtr
+    data: AnyPtr
 
 @nativemacro
 def wave(frame_count: u32, sample_rate: u32, sample_size: u32, channels: u32, data: c.VoidPtr) -> Wave:
@@ -963,7 +963,7 @@ class Music:
     frameCount: c.CUInt
     looping: bool
     ctxType: c.CInt
-    ctxData: c.VoidPtr
+    ctxData: AnyPtr
 
 @nativemacro
 def music(stream: AudioStream, frame_count: u32, looping: bool, ctx_type: int, ctx_data: c.VoidPtr) -> Music:
@@ -1257,7 +1257,7 @@ def get_window_scale_dpi() -> Vector2:
     ccode """GetWindowScaleDPI()"""
 
 @native
-def get_monitor_name(monitor: int) -> Const[c.CStr]:
+def get_monitor_name(monitor: int) -> Ptr[Const[c.CChar]]:
     # Get the human-readable, UTF-8 encoded name of the primary monitor
     ccode """const char * temp_rl = GetMonitorName((int)nn__monitor);
     return temp_rl"""
@@ -1270,7 +1270,7 @@ def set_clipboard_text(text: str) -> None:
     """
 
 @native
-def get_clipboard_text() -> Const[c.CStr]:
+def get_clipboard_text() -> Ptr[Const[c.CChar]]:
     # Get clipboard text content
     ccode """const char * temp_rl = GetClipboardText();
     return temp_rl"""
@@ -1456,12 +1456,12 @@ def get_shader_location_attrib(shader: Shader, attrib_name: str) -> int:
     return temp_rl"""
 
 @nativemacro
-def set_shader_value(shader: Shader, loc_index: int, value: Const[c.VoidPtr], uniform_type: int) -> None:
+def set_shader_value(shader: Shader, loc_index: int, value: AnyPtrToConst, uniform_type: int) -> None:
     # Set shader uniform value
     ccode """SetShaderValue(nn__shader, (int)nn__loc_index, nn__value, (int)nn__uniform_type)"""
 
 @nativemacro
-def set_shader_value_v(shader: Shader, loc_index: int, value: Const[c.VoidPtr], uniform_type: int, count: int) -> None:
+def set_shader_value_v(shader: Shader, loc_index: int, value: AnyPtrToConst, uniform_type: int, count: int) -> None:
     # Set shader uniform value vector
     ccode """SetShaderValueV(nn__shader, (int)nn__loc_index, nn__value, (int)nn__uniform_type, (int)nn__count)"""
 
@@ -1663,48 +1663,48 @@ def get_file_length(file_name: str) -> int:
     return temp_rl"""
 
 @native
-def get_file_extension(file_name: str) -> Const[c.CStr]:
+def get_file_extension(file_name: str) -> Ptr[Const[c.CChar]]:
     # Get pointer to extension for a filename string (includes dot: '.png')
     ccode """const char * temp_rl = GetFileExtension(nn__file_name);
     yk__sdsfree(nn__file_name);
     return temp_rl"""
 
 @native
-def get_file_name(file_path: str) -> Const[c.CStr]:
+def get_file_name(file_path: str) -> Ptr[Const[c.CChar]]:
     # Get pointer to filename for a path string
     ccode """const char * temp_rl = GetFileName(nn__file_path);
     yk__sdsfree(nn__file_path);
     return temp_rl"""
 
 @native
-def get_file_name_without_ext(file_path: str) -> Const[c.CStr]:
+def get_file_name_without_ext(file_path: str) -> Ptr[Const[c.CChar]]:
     # Get filename string without extension (uses static string)
     ccode """const char * temp_rl = GetFileNameWithoutExt(nn__file_path);
     yk__sdsfree(nn__file_path);
     return temp_rl"""
 
 @native
-def get_directory_path(file_path: str) -> Const[c.CStr]:
+def get_directory_path(file_path: str) -> Ptr[Const[c.CChar]]:
     # Get full path for a given fileName with path (uses static string)
     ccode """const char * temp_rl = GetDirectoryPath(nn__file_path);
     yk__sdsfree(nn__file_path);
     return temp_rl"""
 
 @native
-def get_prev_directory_path(dir_path: str) -> Const[c.CStr]:
+def get_prev_directory_path(dir_path: str) -> Ptr[Const[c.CChar]]:
     # Get previous directory path for a given path (uses static string)
     ccode """const char * temp_rl = GetPrevDirectoryPath(nn__dir_path);
     yk__sdsfree(nn__dir_path);
     return temp_rl"""
 
 @native
-def get_working_directory() -> Const[c.CStr]:
+def get_working_directory() -> Ptr[Const[c.CChar]]:
     # Get current working directory (uses static string)
     ccode """const char * temp_rl = GetWorkingDirectory();
     return temp_rl"""
 
 @native
-def get_application_directory() -> Const[c.CStr]:
+def get_application_directory() -> Ptr[Const[c.CChar]]:
     # Get the directory if the running application (uses static string)
     ccode """const char * temp_rl = GetApplicationDirectory();
     return temp_rl"""
@@ -1766,23 +1766,23 @@ def get_file_mod_time(file_name: str) -> i64:
     return temp_rl"""
 
 @nativemacro
-def compress_data(data: Const[Ptr[c.CUChar]], data_size: int, comp_data_size: Ptr[c.CInt]) -> Ptr[c.CUChar]:
+def compress_data(data: Ptr[Const[c.CUChar]], data_size: int, comp_data_size: Ptr[c.CInt]) -> Ptr[c.CUChar]:
     # Compress data (DEFLATE algorithm), memory must be MemFree()
     ccode """CompressData(nn__data, (int)nn__data_size, nn__comp_data_size)"""
 
 @nativemacro
-def decompress_data(comp_data: Const[Ptr[c.CUChar]], comp_data_size: int, data_size: Ptr[c.CInt]) -> Ptr[c.CUChar]:
+def decompress_data(comp_data: Ptr[Const[c.CUChar]], comp_data_size: int, data_size: Ptr[c.CInt]) -> Ptr[c.CUChar]:
     # Decompress data (DEFLATE algorithm), memory must be MemFree()
     ccode """DecompressData(nn__comp_data, (int)nn__comp_data_size, nn__data_size)"""
 
 @native
-def encode_data_base64(data: Const[Ptr[c.CUChar]], data_size: int, output_size: Ptr[c.CInt]) -> c.CStr:
+def encode_data_base64(data: Ptr[Const[c.CUChar]], data_size: int, output_size: Ptr[c.CInt]) -> c.CStr:
     # Encode data to Base64 string, memory must be MemFree()
     ccode """char * temp_rl = EncodeDataBase64(nn__data, (int)nn__data_size, nn__output_size);
     return temp_rl"""
 
 @nativemacro
-def decode_data_base64(data: Const[Ptr[c.CUChar]], output_size: Ptr[c.CInt]) -> Ptr[c.CUChar]:
+def decode_data_base64(data: Ptr[Const[c.CUChar]], output_size: Ptr[c.CInt]) -> Ptr[c.CUChar]:
     # Decode Base64 string data, memory must be MemFree()
     ccode """DecodeDataBase64(nn__data, nn__output_size)"""
 
@@ -1827,7 +1827,7 @@ def is_gamepad_available(gamepad: int) -> bool:
     ccode """IsGamepadAvailable((int)nn__gamepad)"""
 
 @native
-def get_gamepad_name(gamepad: int) -> Const[c.CStr]:
+def get_gamepad_name(gamepad: int) -> Ptr[Const[c.CChar]]:
     # Get gamepad internal name id
     ccode """const char * temp_rl = GetGamepadName((int)nn__gamepad);
     return temp_rl"""
@@ -2296,7 +2296,7 @@ def load_image_anim(file_name: str, frames: Ptr[c.CInt]) -> Image:
     return temp_rl"""
 
 @native
-def load_image_from_memory(file_type: str, file_data: Const[Ptr[c.CUChar]], data_size: int) -> Image:
+def load_image_from_memory(file_type: str, file_data: Ptr[Const[c.CUChar]], data_size: int) -> Image:
     # Load image from memory buffer, fileType refers to extension: i.e. '.png'
     ccode """Image temp_rl = LoadImageFromMemory(nn__file_type, nn__file_data, (int)nn__data_size);
     yk__sdsfree(nn__file_type);
@@ -2637,12 +2637,12 @@ def unload_render_texture(target: RenderTexture2D) -> None:
     ccode """UnloadRenderTexture(nn__target)"""
 
 @nativemacro
-def update_texture(p_texture: Texture2D, pixels: Const[c.VoidPtr]) -> None:
+def update_texture(p_texture: Texture2D, pixels: AnyPtrToConst) -> None:
     # Update GPU texture with new data
     ccode """UpdateTexture(nn__p_texture, nn__pixels)"""
 
 @nativemacro
-def update_texture_rec(p_texture: Texture2D, rec: Rectangle, pixels: Const[c.VoidPtr]) -> None:
+def update_texture_rec(p_texture: Texture2D, rec: Rectangle, pixels: AnyPtrToConst) -> None:
     # Update GPU texture rectangle with new data
     ccode """UpdateTextureRec(nn__p_texture, nn__rec, nn__pixels)"""
 
@@ -2791,19 +2791,19 @@ def load_font_from_image(p_image: Image, key: Color, first_char: int) -> Font:
     ccode """LoadFontFromImage(nn__p_image, nn__key, (int)nn__first_char)"""
 
 @native
-def load_font_from_memory(file_type: str, file_data: Const[Ptr[c.CUChar]], data_size: int, font_size: int, font_chars: Ptr[c.CInt], glyph_count: int) -> Font:
+def load_font_from_memory(file_type: str, file_data: Ptr[Const[c.CUChar]], data_size: int, font_size: int, font_chars: Ptr[c.CInt], glyph_count: int) -> Font:
     # Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
     ccode """Font temp_rl = LoadFontFromMemory(nn__file_type, nn__file_data, (int)nn__data_size, (int)nn__font_size, nn__font_chars, (int)nn__glyph_count);
     yk__sdsfree(nn__file_type);
     return temp_rl"""
 
 @nativemacro
-def load_font_data(file_data: Const[Ptr[c.CUChar]], data_size: int, font_size: int, font_chars: Ptr[c.CInt], glyph_count: int, type: int) -> Ptr[GlyphInfo]:
+def load_font_data(file_data: Ptr[Const[c.CUChar]], data_size: int, font_size: int, font_chars: Ptr[c.CInt], glyph_count: int, type: int) -> Ptr[GlyphInfo]:
     # Load font data for further use
     ccode """LoadFontData(nn__file_data, (int)nn__data_size, (int)nn__font_size, nn__font_chars, (int)nn__glyph_count, (int)nn__type)"""
 
 @nativemacro
-def gen_image_font_atlas(chars: Const[Ptr[GlyphInfo]], recs: Ptr[Ptr[Rectangle ]], glyph_count: int, font_size: int, padding: int, pack_method: int) -> Image:
+def gen_image_font_atlas(chars: Ptr[Const[GlyphInfo]], recs: Ptr[Ptr[Rectangle ]], glyph_count: int, font_size: int, padding: int, pack_method: int) -> Image:
     # Generate image font atlas using chars info
     ccode """GenImageFontAtlas(nn__chars, nn__recs, (int)nn__glyph_count, (int)nn__font_size, (int)nn__padding, (int)nn__pack_method)"""
 
@@ -2856,7 +2856,7 @@ def draw_text_codepoint(p_font: Font, codepoint: int, position: Vector2, font_si
     ccode """DrawTextCodepoint(nn__p_font, (int)nn__codepoint, nn__position, nn__font_size, nn__tint)"""
 
 @nativemacro
-def draw_text_codepoints(p_font: Font, codepoints: Const[Ptr[c.CInt]], count: int, position: Vector2, font_size: float, spacing: float, tint: Color) -> None:
+def draw_text_codepoints(p_font: Font, codepoints: Ptr[Const[c.CInt]], count: int, position: Vector2, font_size: float, spacing: float, tint: Color) -> None:
     # Draw multiple character (codepoint)
     ccode """DrawTextCodepoints(nn__p_font, nn__codepoints, (int)nn__count, nn__position, nn__font_size, nn__spacing, nn__tint)"""
 
@@ -2916,13 +2916,13 @@ def get_codepoint(text: str, bytes_processed: Ptr[c.CInt]) -> int:
     return temp_rl"""
 
 @native
-def codepoint_to_utf8(codepoint: int, byte_size: Ptr[c.CInt]) -> Const[c.CStr]:
+def codepoint_to_utf8(codepoint: int, byte_size: Ptr[c.CInt]) -> Ptr[Const[c.CChar]]:
     # Encode one codepoint into UTF-8 byte array (array length returned as parameter)
     ccode """const char * temp_rl = CodepointToUTF8((int)nn__codepoint, nn__byte_size);
     return temp_rl"""
 
 @native
-def text_codepoints_to_utf8(codepoints: Const[Ptr[c.CInt]], length: int) -> c.CStr:
+def text_codepoints_to_utf8(codepoints: Ptr[Const[c.CInt]], length: int) -> c.CStr:
     # Encode text as codepoints array into UTF-8 text string (WARNING: memory must be freed!)
     ccode """char * temp_rl = TextCodepointsToUTF8(nn__codepoints, (int)nn__length);
     return temp_rl"""
@@ -2951,7 +2951,7 @@ def text_length(text: str) -> u32:
     return temp_rl"""
 
 @native
-def text_subtext(text: str, position: int, length: int) -> Const[c.CStr]:
+def text_subtext(text: str, position: int, length: int) -> Ptr[Const[c.CChar]]:
     # Get a piece of a text string
     ccode """const char * temp_rl = TextSubtext(nn__text, (int)nn__position, (int)nn__length);
     yk__sdsfree(nn__text);
@@ -2975,14 +2975,14 @@ def text_insert(text: str, insert: str, position: int) -> c.CStr:
     return temp_rl"""
 
 @native
-def text_join(text_list: Const[Ptr[Ptr[c.CChar]]], count: int, delimiter: str) -> Const[c.CStr]:
+def text_join(text_list: Ptr[Ptr[Const[c.CChar]]], count: int, delimiter: str) -> Ptr[Const[c.CChar]]:
     # Join text strings with delimiter
     ccode """const char * temp_rl = TextJoin(nn__text_list, (int)nn__count, nn__delimiter);
     yk__sdsfree(nn__delimiter);
     return temp_rl"""
 
 @native
-def text_split(text: str, delimiter: int, count: Ptr[c.CInt]) -> Const[Ptr[Ptr[c.CChar]]]:
+def text_split(text: str, delimiter: int, count: Ptr[c.CInt]) -> Ptr[Ptr[Const[c.CChar]]]:
     # Split text into multiple strings
     ccode """const char ** temp_rl = TextSplit(nn__text, (char)nn__delimiter, nn__count);
     yk__sdsfree(nn__text);
@@ -3005,21 +3005,21 @@ def text_find_index(text: str, find: str) -> int:
     return temp_rl"""
 
 @native
-def text_to_upper(text: str) -> Const[c.CStr]:
+def text_to_upper(text: str) -> Ptr[Const[c.CChar]]:
     # Get upper case version of provided string
     ccode """const char * temp_rl = TextToUpper(nn__text);
     yk__sdsfree(nn__text);
     return temp_rl"""
 
 @native
-def text_to_lower(text: str) -> Const[c.CStr]:
+def text_to_lower(text: str) -> Ptr[Const[c.CChar]]:
     # Get lower case version of provided string
     ccode """const char * temp_rl = TextToLower(nn__text);
     yk__sdsfree(nn__text);
     return temp_rl"""
 
 @native
-def text_to_pascal(text: str) -> Const[c.CStr]:
+def text_to_pascal(text: str) -> Ptr[Const[c.CChar]]:
     # Get Pascal case notation version of provided string
     ccode """const char * temp_rl = TextToPascal(nn__text);
     yk__sdsfree(nn__text);
@@ -3210,7 +3210,7 @@ def upload_mesh(mesh: Ptr[Mesh], dynamic: bool) -> None:
     ccode """UploadMesh(nn__mesh, nn__dynamic)"""
 
 @nativemacro
-def update_mesh_buffer(mesh: Mesh, index: int, data: Const[c.VoidPtr], data_size: int, offset: int) -> None:
+def update_mesh_buffer(mesh: Mesh, index: int, data: AnyPtrToConst, data_size: int, offset: int) -> None:
     # Update mesh vertex data in GPU for a specific buffer index
     ccode """UpdateMeshBuffer(nn__mesh, (int)nn__index, nn__data, (int)nn__data_size, (int)nn__offset)"""
 
@@ -3225,7 +3225,7 @@ def draw_mesh(mesh: Mesh, material: Material, p_transform: Matrix) -> None:
     ccode """DrawMesh(nn__mesh, nn__material, nn__p_transform)"""
 
 @nativemacro
-def draw_mesh_instanced(mesh: Mesh, material: Material, transforms: Const[Ptr[Matrix]], instances: int) -> None:
+def draw_mesh_instanced(mesh: Mesh, material: Material, transforms: Ptr[Const[Matrix]], instances: int) -> None:
     # Draw multiple mesh instances with material and different transforms
     ccode """DrawMeshInstanced(nn__mesh, nn__material, nn__transforms, (int)nn__instances)"""
 
@@ -3423,7 +3423,7 @@ def load_wave(file_name: str) -> Wave:
     return temp_rl"""
 
 @native
-def load_wave_from_memory(file_type: str, file_data: Const[Ptr[c.CUChar]], data_size: int) -> Wave:
+def load_wave_from_memory(file_type: str, file_data: Ptr[Const[c.CUChar]], data_size: int) -> Wave:
     # Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
     ccode """Wave temp_rl = LoadWaveFromMemory(nn__file_type, nn__file_data, (int)nn__data_size);
     yk__sdsfree(nn__file_type);
@@ -3442,7 +3442,7 @@ def load_sound_from_wave(p_wave: Wave) -> Sound:
     ccode """LoadSoundFromWave(nn__p_wave)"""
 
 @nativemacro
-def update_sound(p_sound: Sound, data: Const[c.VoidPtr], sample_count: int) -> None:
+def update_sound(p_sound: Sound, data: AnyPtrToConst, sample_count: int) -> None:
     # Update sound buffer with new data
     ccode """UpdateSound(nn__p_sound, nn__data, (int)nn__sample_count)"""
 
@@ -3558,7 +3558,7 @@ def load_music_stream(file_name: str) -> Music:
     return temp_rl"""
 
 @native
-def load_music_stream_from_memory(file_type: str, data: Const[Ptr[c.CUChar]], data_size: int) -> Music:
+def load_music_stream_from_memory(file_type: str, data: Ptr[Const[c.CUChar]], data_size: int) -> Music:
     # Load music stream from data
     ccode """Music temp_rl = LoadMusicStreamFromMemory(nn__file_type, nn__data, (int)nn__data_size);
     yk__sdsfree(nn__file_type);
@@ -3640,7 +3640,7 @@ def unload_audio_stream(stream: AudioStream) -> None:
     ccode """UnloadAudioStream(nn__stream)"""
 
 @nativemacro
-def update_audio_stream(stream: AudioStream, data: Const[c.VoidPtr], frame_count: int) -> None:
+def update_audio_stream(stream: AudioStream, data: AnyPtrToConst, frame_count: int) -> None:
     # Update audio stream buffers with data
     ccode """UpdateAudioStream(nn__stream, nn__data, (int)nn__frame_count)"""
 
