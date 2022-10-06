@@ -84,7 +84,7 @@ int32_t yy__main()
     for (size_t t__17 = 0; t__17 < t__18; t__17++) { 
         yk__sds t__20 = yk__sdsdup(t__19[t__17]);
         bool t__23 = yy__keep_len_n(t__20, t__21);
-        t__20 = yk__sdsdup(t__19[t__17]);if (t__23) {yk__arrput(t__22, t__20); }
+        t__20 = yk__sdsdup(t__19[t__17]); if (t__23) {yk__arrput(t__22, t__20); } else { yk__sdsfree(t__20); }
     }
     yk__sds* yy__ar2 = t__22;
     yk__sds t__24 = yk__sdsnew("Filtered =>> ");
@@ -108,7 +108,7 @@ int32_t yy__main()
     for (size_t t__33 = 0; t__33 < t__34; t__33++) { 
         yk__sds t__36 = yk__sdsdup(t__35[t__33]);
         bool t__39 = yy__keep_all(t__36, t__37);
-        t__36 = yk__sdsdup(t__35[t__33]);if (t__39) {yk__arrput(t__38, t__36); }
+        t__36 = yk__sdsdup(t__35[t__33]); if (t__39) {yk__arrput(t__38, t__36); } else { yk__sdsfree(t__36); }
     }
     yk__sds* t__42 = t__38;
     int32_t t__44 = INT32_C(0);

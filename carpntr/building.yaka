@@ -337,6 +337,7 @@ def build_simple(c: carp.Config, code: str) -> int:
         return -1
     code_path: str = path.join(os.cwd(), c.project.name + ".c")
     raylib_args: Array[str]
+    defer sarr.del_str_array(raylib_args)
     target: str = ""
     if c.compilation.raylib:
         raylib_args = rs.get_raylib_args(c, os.cwd())

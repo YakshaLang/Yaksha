@@ -128,13 +128,15 @@ def perform_run(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web
     if use_web:
         binary = binary + ".html"
         em_args: Array[str] = array("str", config.emrun_path, path.join(os.cwd(), binary))
-        os.run(em_args)
+        r: os.ProcessResult = os.run(em_args)
         sarr.del_str_array(em_args)
+        os.del_process_result(r)
     elif wasm4:
         binary = binary + ".wasm"
         em_args: Array[str] = array("str", config.w4_path, "run-native", path.join(os.cwd(), binary))
-        os.run(em_args)
+        r: os.ProcessResult = os.run(em_args)
         sarr.del_str_array(em_args)
+        os.del_process_result(r)
     else:
         if os.is_windows():
             binary = binary + ".exe"
@@ -142,7 +144,7 @@ def perform_run(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web
             binary = "./" + binary
         binary_cstr: c.CStr = strings.to_cstr(binary)
         c.system(binary_cstr)
-        del strings.del_str(binary_cstr)
+        strings.del_str(binary_cstr)
     return 0
 
 

@@ -49,6 +49,8 @@ void yk__delargparse(struct yk__argparse_wrapper *a) {
   }
   yk__sdsfree((yk__sds) a->state->description);
   yk__sdsfree((yk__sds) a->state->epilog);
+  // Delete state
+  free(a->state);
   // Delete malloc
   free(a);
 }

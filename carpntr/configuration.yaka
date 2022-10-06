@@ -253,6 +253,7 @@ def load_runtime_features(c: Config, code: str) -> Config:
     console.green(temp_features)
     print("\n")
     features: Array[str] = strings.split(temp_features, ",")
+    defer sarr.del_str_array(features)
     x: int = 0
     length: int = len(features)
     while x < length:

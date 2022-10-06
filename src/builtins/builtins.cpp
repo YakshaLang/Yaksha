@@ -1228,9 +1228,10 @@ struct builtin_functional : builtin {
       case fnc::FILTER:
         if (template_dt->is_str()) {
           // Create a new copy
-          code << elm_temp << " = yk__sdsdup(" << arr_temp << "[" << i << "]);";
+          code << elm_temp << " = yk__sdsdup(" << arr_temp << "[" << i << "]); ";
           code << "if (" << fn_out_temp << ") {"
-               << "yk__arrput(" << return_temp << ", " << elm_temp << "); }";
+               << "yk__arrput(" << return_temp << ", " << elm_temp << "); } else {"
+               << " yk__sdsfree(" << elm_temp << "); }";
         } else {
           code << "if (" << fn_out_temp << ") {"
                << "yk__arrput(" << return_temp << ", " << elm_temp << "); }";

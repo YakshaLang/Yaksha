@@ -9,10 +9,11 @@
 #include <vector>
 namespace yaksha {
   struct defer_stack {
-    defer_stack();
+    explicit defer_stack(ast_type stack_type);
     virtual ~defer_stack();
     virtual void push(defer_stmt *df);
     virtual void write(stmt_visitor *statement_visitor);
+    const ast_type stack_type_;
 
 private:
     std::vector<defer_stmt *> del_stack_{};

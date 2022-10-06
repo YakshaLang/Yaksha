@@ -572,8 +572,21 @@ void type_checker::visit_class_stmt(class_stmt *obj) {
   // TODO check validity of types
 }
 void type_checker::visit_del_stmt(del_stmt *obj) {
-  auto st = expression_stmt{obj->expression_};
-  this->visit_expression_stmt(&st);
+  obj->expression_->accept(this);
+  auto deletable_expression = pop();
+  ykdatatype* dt = deletable_expression.datatype_;
+  if (dt->is_const()) {
+    dt = dt->args_[0];
+  }
+  // Cannot delete int, bool
+  if (deletable_expression.is_primitive_or_obj() &&
+      dt->is_primitive() &&
+      !dt->is_str()) {
+    error(obj->del_keyword_, "Invalid delete statement used on primitives");
+  }
+  if (dt->is_m_entry() || dt->is_sm_entry() || dt->is_tuple() || dt->is_function())  {
+    error(obj->del_keyword_, "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+  }
 }
 void type_checker::visit_get_expr(get_expr *obj) {
   handle_dot_operator(obj->lhs_, obj->dot_, obj->item_);

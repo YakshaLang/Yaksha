@@ -5,12 +5,13 @@
 namespace yaksha {
   struct defer_stack_stack : defer_stack {
     defer_stack_stack();
-    void push_defer_stack();
+    void push_defer_stack(ast_type stack_type);
     void pop_defer_stack();
     ~defer_stack_stack() override;
     void push(defer_stmt *df) override;
     void write(stmt_visitor *statement_visitor) override;
     void write_one(stmt_visitor *statement_visitor);
+    void write_upto_loop(stmt_visitor *statement_visitor);
 
 private:
     std::vector<defer_stack> defer_levels_{};

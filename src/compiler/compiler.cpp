@@ -466,11 +466,15 @@ void compiler::visit_block_stmt(block_stmt *obj) {
   body_ << "}\n";
 }
 void compiler::visit_break_stmt(break_stmt *obj) {
+  defers_.write_upto_loop(this);
+  deletions_.write_upto_loop(body_, indent_);
   write_indent(body_);
   body_ << "break";
   write_end_statement(body_);
 }
 void compiler::visit_continue_stmt(continue_stmt *obj) {
+  defers_.write_upto_loop(this);
+  deletions_.write_upto_loop(body_, indent_);
   write_indent(body_);
   body_ << "continue";
   write_end_statement(body_);
@@ -586,8 +590,8 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   //       }
   // ::================================::
   push_scope_type(ast_type::STMT_DEF);
-  deletions_.push_delete_stack();
-  defers_.push_defer_stack();
+  deletions_.push_delete_stack(ast_type::STMT_DEF);
+  defers_.push_defer_stack(ast_type::STMT_DEF);
   // Schedule string argument deletions.
   for (auto param : function_def->params_) {
     if (param.data_type_->is_str()) {
@@ -617,8 +621,8 @@ void compiler::visit_if_stmt(if_stmt *obj) {
   write_indent(body_);
   body_ << "if (" << if_expr.first << ")";
   scope_.push();
-  deletions_.push_delete_stack();
-  defers_.push_defer_stack();
+  deletions_.push_delete_stack(ast_type::STMT_IF);
+  defers_.push_defer_stack(ast_type::STMT_IF);
   push_scope_type(ast_type::STMT_IF);
   indent();
   obj->if_branch_->accept(this);
@@ -631,8 +635,8 @@ void compiler::visit_if_stmt(if_stmt *obj) {
     write_indent(body_);
     body_ << "else";
     scope_.push();
-    deletions_.push_delete_stack();
-    defers_.push_defer_stack();
+    deletions_.push_delete_stack(ast_type::STMT_IF);
+    defers_.push_defer_stack(ast_type::STMT_IF);
     push_scope_type(ast_type::STMT_IF);
     indent();
     obj->else_branch_->accept(this);
@@ -743,8 +747,8 @@ void compiler::visit_while_stmt(while_stmt *obj) {
   auto code = pop();
   push_scope_type(ast_type::STMT_WHILE);
   scope_.push();
-  deletions_.push_delete_stack();
-  defers_.push_defer_stack();
+  deletions_.push_delete_stack(ast_type::STMT_WHILE);
+  defers_.push_defer_stack(ast_type::STMT_WHILE);
   indent();
   indent();
   write_prev_indent(body_);

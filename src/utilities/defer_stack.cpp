@@ -1,7 +1,7 @@
 // defer_stack.cpp
 #include "defer_stack.h"
 using namespace yaksha;
-defer_stack::defer_stack() = default;
+defer_stack::defer_stack(ast_type stack_type) : stack_type_(stack_type) {}
 defer_stack::~defer_stack() = default;
 void defer_stack::write(stmt_visitor *visitor) {
   auto size = del_stack_.size();

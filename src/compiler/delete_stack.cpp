@@ -1,7 +1,7 @@
 // delete_stack.cpp
 #include "delete_stack.h"
 using namespace yaksha;
-delete_stack::delete_stack() = default;
+delete_stack::delete_stack(ast_type stack_type) : stack_type_(stack_type) {}
 delete_stack::~delete_stack() = default;
 void delete_stack::push(const std::string &name, const std::string &free_code) {
   del_stack_.push_back(name);

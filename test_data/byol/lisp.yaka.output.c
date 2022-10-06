@@ -213,6 +213,8 @@ int32_t yy__eval(yy__mpc_Ast yy__t)
             }
             else
             {
+                yk__sdsfree(t__13);
+                yk__sdsfree(t__12);
                 break;
             }
             yk__sdsfree(t__13);
