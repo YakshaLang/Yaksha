@@ -65,11 +65,26 @@ def augment_equal_c() -> int:
     print_c(c)
     return 3
 
+def additional_operators() -> int:
+    a: str = "Hello"
+    b: str = "World"
+    c: bool = a != b
+    d: float = 5.0f
+    e: float = 4.0f
+    f: f64 = 10.0
+    g: f64 = 20.0
+    if c:
+        e = d % e
+    else:
+        g = f % g
+    return 0
+
 def main() -> int:
     v: int = 0
     v += augment_equal_a()
     v += augment_equal_b()
     v += augment_equal_c()
+    v += additional_operators()
     print("v=")
     println(v)
     print("r=")
