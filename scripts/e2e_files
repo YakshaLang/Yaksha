@@ -36,6 +36,8 @@ test_data/compiler_tests/functional_test_filter.yaka
 test_data/compiler_tests/tuple_test.yaka
 test_data/compiler_tests/all_integers.yaka
 test_data/compiler_tests/operator_test.yaka
+test_data/compiler_tests/global_constants.yaka
+test_data/compiler_tests/none_comparison.yaka
 test_data/data_type_test.yaka
 test_data/document_samples/factorial.yaka
 test_data/import_tests/city/house.yaka

@@ -179,7 +179,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     }
     compile_function_call(obj, prefix(name, prefix_val_), code, return_type);
   } else {
-    // Must not happen
+    // TODO Generate an error here and push it to compiler time error
     std::cerr << "<><>";
   }
 }
@@ -988,8 +988,8 @@ void compiler::visit_get_expr(get_expr *obj) {
       push(prefixed_name, mod_obj);
       return;
     }
-    // Should not happen
-    push("<>", mod_obj);
+    // TODO generate a compiler error if this happens
+    push("<><>", mod_obj);
     return;
   }
   auto item = obj->item_->token_;
@@ -1077,7 +1077,7 @@ void compiler::visit_square_bracket_access_expr(
     auto b = ykobject(lhs.second.datatype_->args_[index]);
     push(lhs.first + ".e" + int_expr->literal_token_->token_, b);
   } else {
-    // Cannot happen
+    // TODO Generate a comp time error if this happens
     push("<><>", ykobject(dt_pool));
   }
 }
@@ -1095,7 +1095,7 @@ void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
     auto b = ykobject(lhs.second.datatype_->args_[index]);
     push(lhs.first + ".e" + int_expr->literal_token_->token_, b);
   } else {
-    // Cannot happen
+    // TODO generate a comp time error if this happens
     push("<><>", ykobject(dt_pool));
   }
 }
