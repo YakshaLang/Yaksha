@@ -28,8 +28,6 @@ ykobject::ykobject(bool i, ykdt_pool *pool)
     : object_type_(object_type::PRIMITIVE_OR_OBJ), bool_val_(i) {
   datatype_ = pool->create("bool");
 }
-ykobject::ykobject(ykfunction *fun)
-    : object_type_(object_type::FUNCTION), fn_val_(fun), datatype_(nullptr) {}
 ykobject::ykobject(const std::string &str, token *bad_token)
     : flow_(control_flow_change::ERROR) {
   std::stringstream error_message{};

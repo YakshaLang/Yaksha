@@ -7,7 +7,6 @@
 #include "ykdt_pool.h"
 #include <string>
 namespace yaksha {
-  struct ykfunction;
   enum class control_flow_change { BREAK, RETURN, CONTINUE, NO_CHANGE, ERROR };
   enum class object_type {
     PRIMITIVE_OR_OBJ,
@@ -29,7 +28,6 @@ namespace yaksha {
     explicit ykobject(const std::string &str, token *bad_token);
     explicit ykobject(double dbl, ykdt_pool *pool);
     explicit ykobject(float dbl, ykdt_pool *pool);
-    explicit ykobject(ykfunction *fun);
     explicit ykobject(control_flow_change flow_change);
     explicit ykobject(ykdt_pool *pool);
     [[nodiscard]] bool is_primitive_or_obj() const;
@@ -44,7 +42,6 @@ namespace yaksha {
     control_flow_change flow_ = control_flow_change::NO_CHANGE;
     object_type object_type_{object_type::PRIMITIVE_OR_OBJ};
     ykdatatype *datatype_{nullptr};
-    ykfunction *fn_val_{};
     /**
      * Write ykobject representation
      * @param out output stream to write to
