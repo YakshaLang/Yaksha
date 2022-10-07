@@ -71,9 +71,11 @@ void compiler::visit_binary_expr(binary_expr *obj) {
              ykobject(dt_pool->create("bool")));// None != None -> False
       }
     } else if (lhs.second.datatype_->is_none()) {
-      push("(NULL " + obj->opr_->token_ + " " + rhs.first + ")", ykobject(dt_pool->create("bool")));
+      push("(NULL " + obj->opr_->token_ + " " + rhs.first + ")",
+           ykobject(dt_pool->create("bool")));
     } else {
-      push("(" + lhs.first + " " + obj->opr_->token_ + " NULL)", ykobject(dt_pool->create("bool")));
+      push("(" + lhs.first + " " + obj->opr_->token_ + " NULL)",
+           ykobject(dt_pool->create("bool")));
     }
   } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_str()) {
     if (obj->opr_->type_ == token_type::EQ_EQ) {
@@ -300,7 +302,7 @@ std::string conv_integer_literal(token_type token_type_val,
       return std::to_string(number);
     }
     default:
-      // Cannot happen
+      // TODO add to comp time errors if this happen
       return "<><>";
   }
 }
@@ -399,6 +401,7 @@ void compiler::visit_literal_expr(literal_expr *obj) {
   } else if (data_type_tok == token_type::DOUBLE_NUMBER) {
     push(obj->literal_token_->token_, ykobject(dt_pool->create("f64")));
   } else {
+    // TODO add to comp time errors if this ever happens
     push("<><>", ykobject(dt_pool));
   }
 }
@@ -413,7 +416,6 @@ void compiler::visit_logical_expr(logical_expr *obj) {
   } else {
     operator_token = " || ";
   }
-  // Note: dummy value is placed inside ykobject
   push("(" + lhs.first + operator_token + rhs.first + ")",
        ykobject(true, dt_pool));
 }
@@ -1157,11 +1159,10 @@ ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
     auto imp = cf_->get(arg.module_file_);
     funct = imp->data_->dsv_->get_function(arg.string_val_);
   }
-  if (funct->annotations_.varargs_) { return nullptr; }
-  if (funct->annotations_.native_macro_ || funct->annotations_.native_define_) {
+  if (funct->annotations_.varargs_ || funct->annotations_.native_macro_ ||
+      funct->annotations_.native_define_) {
     return nullptr;
   }
-  // Create datatype out of function
   ykdatatype *fnc = dt_pool->create("Function");
   ykdatatype *fin = dt_pool->create("In");
   ykdatatype *fout = dt_pool->create("Out");
@@ -1173,6 +1174,5 @@ ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
   if (!funct->return_type_->is_none()) {
     fout->args_.emplace_back(funct->return_type_);
   }
-  // Compare now
   return fnc;
 }

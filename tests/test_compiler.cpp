@@ -198,3 +198,8 @@ TEST_CASE("compiler: None comparison") {
             "none_comparison.yaka",
             "../test_data/compiler_tests/none_comparison.tokens");
 }
+TEST_CASE("compiler: Loops and logical operators") {
+  TEST_FILE("../test_data/compiler_tests/loops_and_logic.yaka",
+            "loops_and_logic.yaka",
+            "../test_data/compiler_tests/loops_and_logic.tokens");
+}

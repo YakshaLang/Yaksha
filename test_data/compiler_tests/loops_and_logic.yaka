@@ -1,0 +1,17 @@
+def main() -> int:
+    a: int = 0
+    b: int = 0
+    c: int = 1
+    while c != 0:
+        d: str = "Hello"
+        a += 1
+        if a % 10 == 0 or b == 0:
+            b += 1
+            continue
+        println(a)
+        println(d)
+        b += 3
+        if b % 3 == 0 and b > 0:
+            break
+        println(b)
+    return c
