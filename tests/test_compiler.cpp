@@ -203,3 +203,8 @@ TEST_CASE("compiler: Loops and logical operators") {
             "loops_and_logic.yaka",
             "../test_data/compiler_tests/loops_and_logic.tokens");
 }
+TEST_CASE("compiler: Class stuff") {
+  TEST_FILE("../test_data/compiler_tests/class_stuff.yaka",
+            "class_stuff.yaka",
+            "../test_data/compiler_tests/class_stuff.tokens");
+}

@@ -7,6 +7,7 @@
   "test_data/compiler_tests/array_test.yaka": "Printing [a]\n1\n2\n3\n4\n5\n6\n7\nPrinting [b]\nHello\nWorld\nHaha\nruntime::yk__system-native.o := ok.\nruntime::array_test-native.o := ok.\nruntime::yk__main-native.o := ok.\n\nreturn := 0",
   "test_data/compiler_tests/arrstack.yaka": "3\n2\n1\nruntime::yk__system-native.o := ok.\nruntime::arrstack-native.o := ok.\nruntime::yk__main-native.o := ok.\n\nreturn := 0",
   "test_data/compiler_tests/casting_test.yaka": "runtime::yk__system-native.o := ok.\nruntime::casting_test-native.o := ok.\nruntime::yk__main-native.o := ok.\n\nreturn := 0",
+  "test_data/compiler_tests/class_stuff.yaka": "1\nruntime::yk__system-native.o := ok.\nruntime::class_stuff-native.o := ok.\nruntime::yk__main-native.o := ok.\n\nreturn := 0",
   "test_data/compiler_tests/defer_return.yaka": "4\nruntime::yk__system-native.o := ok.\nruntime::defer_return-native.o := ok.\nruntime::yk__main-native.o := ok.\n\nreturn := 0",
   "test_data/compiler_tests/do_not_copy_str_getref.yaka": "hello world\nhello world\nhello world\nhello world\nhello world\nhello world\nhello world\nhello world\nhello world\nhello world\nruntime::yk__system-native.o := ok.\nruntime::do_not_copy_str_getref-native.o := ok.\nruntime::yk__main-native.o := ok.\n\nreturn := 0",
   "test_data/compiler_tests/elif_testing.yaka": "runtime::yk__system-native.o := ok.\nruntime::elif_testing-native.o := ok.\nruntime::yk__main-native.o := ok.\n\nreturn := 0",

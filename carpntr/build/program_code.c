@@ -9,18 +9,18 @@
 // YK:argparse,arrayutils,console,process,toml,whereami#
 #include "yk__lib.h"
 // --forward declarations-- 
-int32_t const  yy__argparse_ARGPARSE_DEFAULT = 0;
-int32_t const  yy__argparse_ARGPARSE_STOP_AT_NON_OPTION = 1;
-int32_t const  yy__argparse_ARGPARSE_IGNORE_UNKNOWN_ARGS = 2;
-int32_t const  yy__argparse_ARGPARSE_STOP_AT_NON_AND_IGNORE_UNKNWON = 3;
-int32_t const  yy__console_REWIND = 0;
-int32_t const  yy__console_RED = 1;
-int32_t const  yy__console_GREEN = 2;
-int32_t const  yy__console_WHITE = 3;
-int32_t const  yy__console_BLUE = 4;
-int32_t const  yy__console_PURPLE = 5;
-int32_t const  yy__console_YELLOW = 6;
-int32_t const  yy__console_CYAN = 7;
+int32_t const  yy__argparse_ARGPARSE_DEFAULT = INT32_C(0);
+int32_t const  yy__argparse_ARGPARSE_STOP_AT_NON_OPTION = INT32_C(1);
+int32_t const  yy__argparse_ARGPARSE_IGNORE_UNKNOWN_ARGS = INT32_C(2);
+int32_t const  yy__argparse_ARGPARSE_STOP_AT_NON_AND_IGNORE_UNKNWON = INT32_C(3);
+int32_t const  yy__console_REWIND = INT32_C(0);
+int32_t const  yy__console_RED = INT32_C(1);
+int32_t const  yy__console_GREEN = INT32_C(2);
+int32_t const  yy__console_WHITE = INT32_C(3);
+int32_t const  yy__console_BLUE = INT32_C(4);
+int32_t const  yy__console_PURPLE = INT32_C(5);
+int32_t const  yy__console_YELLOW = INT32_C(6);
+int32_t const  yy__console_CYAN = INT32_C(7);
 struct yy__raylib_support_CObject;
 #define yy__buffer_StringBuffer yk__sds*
 struct yy__configuration_CCode;

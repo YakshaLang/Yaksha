@@ -840,12 +840,6 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
       return "struct " + class_name + "*";
     }
   }
-  if (defs_classes_.has_class(dt)) {
-    auto class_info = defs_classes_.get_class(dt);
-    auto class_name = prefix(dt, prefix_val_);
-    if (class_info->annotations_.native_define_) { return class_name; }
-    return "struct " + class_name + "*";
-  }
   // TODO ensure this throws a comp time error !!
   return "<data type unknown>";
 }

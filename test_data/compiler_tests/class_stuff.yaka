@@ -1,0 +1,15 @@
+class A:
+    a: int
+
+class B:
+    b: int
+
+def main() -> int:
+    a: A = A()
+    defer del a
+    a.a = 1
+    b: B = B()
+    defer del b
+    b.b = 10
+    println(a.a)
+    return b.b
