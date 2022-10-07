@@ -574,18 +574,17 @@ void type_checker::visit_class_stmt(class_stmt *obj) {
 void type_checker::visit_del_stmt(del_stmt *obj) {
   obj->expression_->accept(this);
   auto deletable_expression = pop();
-  ykdatatype* dt = deletable_expression.datatype_;
-  if (dt->is_const()) {
-    dt = dt->args_[0];
-  }
+  ykdatatype *dt = deletable_expression.datatype_;
+  if (dt->is_const()) { dt = dt->args_[0]; }
   // Cannot delete int, bool
-  if (deletable_expression.is_primitive_or_obj() &&
-      dt->is_primitive() &&
+  if (deletable_expression.is_primitive_or_obj() && dt->is_primitive() &&
       !dt->is_str()) {
     error(obj->del_keyword_, "Invalid delete statement used on primitives");
   }
-  if (dt->is_m_entry() || dt->is_sm_entry() || dt->is_tuple() || dt->is_function())  {
-    error(obj->del_keyword_, "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+  if (dt->is_m_entry() || dt->is_sm_entry() || dt->is_tuple() ||
+      dt->is_function()) {
+    error(obj->del_keyword_,
+          "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
   }
 }
 void type_checker::visit_get_expr(get_expr *obj) {
@@ -792,7 +791,9 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto expression_data = pop();
-    if (expression_data.object_type_ != placeholder.object_type_) {
+    ykdatatype *expression_dt = expression_data.datatype_;
+    if (expression_dt->is_const()) { expression_dt = expression_dt->args_[0]; }
+    if (*(obj->data_type_->args_[0]) != *expression_dt) {
       error(obj->name_, "Data type mismatch in expression and declaration.");
     }
   }
