@@ -20,6 +20,15 @@ echo "██    ██ ██ ██  ██ ██    ██           ██  
 echo "██    ██ ██  ██ ██ ██    ██           ██    ██           ██    ██"
 echo " ██████  ██   ████ ██    ██           ██    ███████ ███████    ██"
 ./YakshaTests
+# Build carpntr
+cd ../carpntr
+python3 bootstrap_me.py
+cd ../scripts
+# Run e2e tests
+python3 e2e.py
+# Run libdocs.py
+mkdir ../comp_output_test
+python3 libdocs.py
 # Run Fuzzy testing
 echo "██   ██  █████  ██████   █████  ██████   █████  ██    ██  █████ "
 echo "██  ██  ██   ██ ██   ██ ██   ██ ██   ██ ██   ██  ██  ██  ██   ██"

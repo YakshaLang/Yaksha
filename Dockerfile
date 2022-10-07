@@ -1,6 +1,7 @@
 FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 ARG CMAKE_VERSION=3.22.0
+ARG ZIG_VERSION=0.9.1
 RUN apt-get update && apt-get -y -q install clang-12 clang-tools git wget build-essential python3 libssl-dev lcov gcovr dos2unix
 
 RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz \
@@ -16,6 +17,12 @@ RUN   ln -s /usr/bin/clang-12 /usr/bin/clang \
 
 
 RUN apt-get -y -q install python3-pip && pip3 install tqdm
+
+RUN wget https://ziglang.org/download/0.9.1/zig-linux-x86_64-${ZIG_VERSION}.tar.xz \
+    && tar -xf zig-linux-x86_64-${ZIG_VERSION}.tar.xz \
+    && mv zig-linux-x86_64-${ZIG_VERSION} zig
+
+ENV PATH="${PATH}:/zig"
 
 ADD src /app/src
 ADD 3rd /app/3rd
