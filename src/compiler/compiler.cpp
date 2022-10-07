@@ -1111,12 +1111,9 @@ void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
   auto rhs = pop();
   write_indent(body_);
   if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str()) {
-    // free current value.
-    body_ << "yk__sdsfree(" << lhs.first << ")";
-    write_end_statement(body_);
-    // duplicate the input.
-    // do assignment of the duplicate
-    write_indent(body_);
+    // Note: Do not free the array value, only duplicate input string
+    // Array/Tuple value freeing is left to user to handle for str
+    // As we do not know if it has garbage value or a proper value at comp time
     body_ << lhs.first << " = yk__sdsdup(" << rhs.first << ")";
   } else {
     body_ << lhs.first << " = " << rhs.first;

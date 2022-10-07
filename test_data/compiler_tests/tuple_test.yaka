@@ -8,4 +8,8 @@ def main() -> int:
     println(a[1])
     println(a[2])
     println(a[0])
+    c: Tuple[str]
+    c[0] = "Hello"
+    println(c[0])
+    del c[0]
     return 0
