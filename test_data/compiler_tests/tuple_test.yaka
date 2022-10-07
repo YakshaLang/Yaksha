@@ -4,5 +4,8 @@ def main() -> int:
     a[1] = 1
     a[1] = 2
     a[2] = 3
+    a[0] = 100
+    println(a[1])
+    println(a[2])
+    println(a[0])
     return 0
-

@@ -846,6 +846,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     if (class_info->annotations_.native_define_) { return class_name; }
     return "struct " + class_name + "*";
   }
+  // TODO ensure this throws a comp time error !!
   return "<data type unknown>";
 }
 compiler_output compiler::compile(codefiles *cf, file_info *fi) {
@@ -1077,7 +1078,8 @@ void compiler::visit_square_bracket_access_expr(
     auto int_expr = dynamic_cast<literal_expr *>(obj->index_expr_);
     auto index = std::stoi(int_expr->literal_token_->token_);
     auto b = ykobject(lhs.second.datatype_->args_[index]);
-    push(lhs.first + ".e" + int_expr->literal_token_->token_, b);
+    index++;
+    push(lhs.first + ".e" + std::to_string(index), b);
   } else {
     // TODO Generate a comp time error if this happens
     push("<><>", ykobject(dt_pool));
@@ -1095,7 +1097,8 @@ void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
     auto int_expr = dynamic_cast<literal_expr *>(obj->index_expr_);
     auto index = std::stoi(int_expr->literal_token_->token_);
     auto b = ykobject(lhs.second.datatype_->args_[index]);
-    push(lhs.first + ".e" + int_expr->literal_token_->token_, b);
+    index++;
+    push(lhs.first + ".e" + std::to_string(index), b);
   } else {
     // TODO generate a comp time error if this happens
     push("<><>", ykobject(dt_pool));
