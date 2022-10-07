@@ -3,6 +3,7 @@
 // --forward declarations-- 
 void yy__world1(yk__sds*);
 void yy__world2(yk__sds*);
+void yy__world3(void*);
 int32_t yy__main();
 // --structs-- 
 // --functions-- 
@@ -24,6 +25,12 @@ void yy__world2(yk__sds* yy__a)
     yk__sdsfree(yy__b);
     return;
 }
+void yy__world3(void* yy__a) 
+{
+    yk__sds* yy__b = ((yk__sds*)yy__a);
+    yy__world1(yy__b);
+    return;
+}
 int32_t yy__main() 
 {
     yk__sds yy__my_empty = yk__sdsempty();
@@ -37,6 +44,7 @@ int32_t yy__main()
         {
             yy__world1((&(yy__hello)));
             yy__world2((&(yy__hello)));
+            yy__world3(((void*)(&(yy__hello))));
             yy__i = (yy__i - INT32_C(1));
         }
     }

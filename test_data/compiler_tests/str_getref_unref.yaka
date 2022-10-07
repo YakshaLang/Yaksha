@@ -10,6 +10,9 @@ def world2(a: Ptr[str]) -> None:
     print(b)
     println(" world")
 
+def world3(a: AnyPtr) -> None:
+    b: Ptr[str] = cast("Ptr[str]", a)
+    world1(b)
 
 def main() -> int:
     my_empty: str
@@ -19,6 +22,7 @@ def main() -> int:
         # Basically this avoids copying hello variable when calling world
         world1(getref(hello))
         world2(getref(hello))
+        world3(cast("AnyPtr", getref(hello)))
         i = i - 1
     println(my_empty != None)
     world1(getref(my_empty))
