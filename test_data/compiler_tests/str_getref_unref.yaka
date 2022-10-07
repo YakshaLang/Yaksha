@@ -12,6 +12,7 @@ def world2(a: Ptr[str]) -> None:
 
 
 def main() -> int:
+    my_empty: str
     hello: str = "hello"
     i: int = 5
     while i > 0:
@@ -19,4 +20,6 @@ def main() -> int:
         world1(getref(hello))
         world2(getref(hello))
         i = i - 1
+    println(my_empty != None)
+    world1(getref(my_empty))
     return 0
