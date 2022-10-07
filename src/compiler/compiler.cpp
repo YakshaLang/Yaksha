@@ -1128,8 +1128,10 @@ void compiler::visit_const_stmt(const_stmt *obj) {
   if (scope_.is_global_level()) {// constant is global
     auto name = prefix(obj->name_->token_, prefix_val_);
     auto *literal_expression = dynamic_cast<literal_expr *>(obj->expression_);
+    literal_expression->accept(this);
+    auto exp = pop();
     global_constants_ << this->convert_dt(obj->data_type_) << " " << name
-                      << " = " << literal_expression->literal_token_->token_;
+                      << " = " << exp.first;
     write_end_statement(global_constants_);
   } else {// Compile as you would compile a let statement
     auto let_stmt_obj =

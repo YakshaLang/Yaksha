@@ -1,0 +1,15 @@
+NUM_A: Const[i8]  = 0b1111i8
+NUM_B: Const[i16] = 0b1110i16
+NUM_C: Const[i32] = 0b1101i32
+NUM_D: Const[i64] = 0b1011i64
+NUM_E: Const[u8]  = 0b0111u8
+NUM_F: Const[u16] = 0b1110u16
+NUM_G: Const[u32] = 0b1011u32
+NUM_H: Const[u64] = 0b1101u64
+NUM_I: Const[f32] = 1.34f
+NUM_J: Const[f64] = 0.12
+BOOL_K: Const[bool] = True
+BOOL_L: Const[bool] = False
+
+def main() -> int:
+    return 0

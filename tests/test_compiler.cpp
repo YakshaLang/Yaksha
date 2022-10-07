@@ -188,3 +188,8 @@ TEST_CASE("compiler: Operator test augment assign and bitwise") {
             "operator_test.yaka",
             "../test_data/compiler_tests/operator_test.tokens");
 }
+TEST_CASE("compiler: Global constants") {
+  TEST_FILE("../test_data/compiler_tests/global_constants.yaka",
+            "global_constants.yaka",
+            "../test_data/compiler_tests/global_constants.tokens");
+}
