@@ -14,5 +14,6 @@ BOOL_L: Const[bool] = False
 import constants_file as cf
 
 def main() -> int:
+    local_const: Const[int] = 4
     println(cf.MY_CONST_VAL)
     return 0
