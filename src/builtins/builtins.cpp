@@ -103,8 +103,13 @@ struct builtin_arrpop : builtin {
 // ┌─┐┬─┐┬┌┐┌┌┬┐
 // ├─┘├┬┘││││ │
 // ┴  ┴└─┴┘└┘ ┴
+// ┌─┐┬─┐┬┌┐┌┌┬┐┬  ┌┐┌
+// ├─┘├┬┘││││ │ │  │││
+// ┴  ┴└─┴┘└┘ ┴ ┴─┘┘└┘
 //
 struct builtin_print : builtin {
+  explicit builtin_print(std::string func_name)
+      : func_name_(std::move(func_name)) {}
   ykobject
   verify(const std::vector<ykobject> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
@@ -114,8 +119,10 @@ struct builtin_print : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for print() builtin";
-    } else if (!args[0].is_primitive_or_obj() ||
-               !args[0].datatype_->is_primitive()) {
+    } else if (!(args[0].datatype_->is_primitive() ||
+                 (args[0].datatype_->is_const() &&
+                  args[0].datatype_->args_[0]->is_primitive()))) {
+      // Primitive or Const[primitive]
       o.string_val_ = "Argument to print() must be a primitive";
     } else {
       return o;
@@ -137,75 +144,27 @@ struct builtin_print : builtin {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto rhs = args[0];
-    if (rhs.second.datatype_->is_a_signed_integer()) {
-      code << "yk__printint(((intmax_t)" << rhs.first << "))";
-    } else if (rhs.second.datatype_->is_an_unsigned_integer()) {
-      code << "yk__printuint(((uintmax_t)" << rhs.first << "))";
-    } else if (rhs.second.datatype_->is_str()) {
-      code << "yk__printstr((" << rhs.first << "))";
-    } else if (rhs.second.datatype_->is_a_float()) {
-      code << "yk__printdbl((" << rhs.first << "))";
-    } else if (rhs.second.datatype_->is_none()) {
-      code << "yk__printstr(\"None\")";
-    } else if (rhs.second.datatype_->is_bool()) {
-      code << "yk__printstr((" << rhs.first << ") ? \"True\" : \"False\")";
+    ykdatatype *dt = rhs.second.datatype_;
+    if (dt->is_const()) { dt = dt->args_[0]; }
+    if (dt->is_a_signed_integer()) {
+      code << "yk__" << func_name_ << "int(((intmax_t)" << rhs.first << "))";
+    } else if (dt->is_an_unsigned_integer()) {
+      code << "yk__" << func_name_ << "uint(((uintmax_t)" << rhs.first << "))";
+    } else if (dt->is_str()) {
+      code << "yk__" << func_name_ << "str((" << rhs.first << "))";
+    } else if (dt->is_a_float()) {
+      code << "yk__" << func_name_ << "dbl((" << rhs.first << "))";
+    } else if (dt->is_none()) {
+      code << "yk__" << func_name_ << "str(\"None\")";
+    } else if (dt->is_bool()) {
+      code << "yk__" << func_name_ << "str((" << rhs.first
+           << ") ? \"True\" : \"False\")";
     }
     return {code.str(), o};
   }
-};
-//
-// ┌─┐┬─┐┬┌┐┌┌┬┐┬  ┌┐┌
-// ├─┘├┬┘││││ │ │  │││
-// ┴  ┴└─┴┘└┘ ┴ ┴─┘┘└┘
-//
-struct builtin_println : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
-         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
-         const std::unordered_map<std::string, import_stmt *> &import_aliases,
-         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
-    if (args.size() != 1) {
-      o.string_val_ = "One argument must be provided for println() builtin";
-    } else if (!args[0].is_primitive_or_obj() ||
-               !args[0].datatype_->is_primitive()) {
-      o.string_val_ = "Argument to println() must be a primitive";
-    } else {
-      return o;
-    }
-    o.object_type_ = object_type::RUNTIME_ERROR;
-    return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
-  }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
-          const std::vector<expr *> &arg_expressions,
-          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
-          const std::unordered_map<std::string, import_stmt *> &import_aliases,
-          const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
-    auto o = ykobject(dt_pool);
-    std::stringstream code{};
-    auto rhs = args[0];
-    if (rhs.second.datatype_->is_a_signed_integer()) {
-      code << "yk__printlnint(((intmax_t)" << rhs.first << "))";
-    } else if (rhs.second.datatype_->is_an_unsigned_integer()) {
-      code << "yk__printlnuint(((uintmax_t)" << rhs.first << "))";
-    } else if (rhs.second.datatype_->is_str()) {
-      code << "yk__printlnstr((" << rhs.first << "))";
-    } else if (rhs.second.datatype_->is_a_float()) {
-      code << "yk__printlndbl((" << rhs.first << "))";
-    } else if (rhs.second.datatype_->is_none()) {
-      code << "yk__printlnstr(\"None\")";
-    } else if (rhs.second.datatype_->is_bool()) {
-      code << "yk__printlnstr((" << rhs.first << ") ? \"True\" : \"False\")";
-    }
-    return {code.str(), o};
-  }
+
+  private:
+  std::string func_name_;
 };
 //
 // ┬  ┌─┐┌┐┌
@@ -1329,8 +1288,8 @@ builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"arrpop", new builtin_arrpop{}});
   builtins_.insert({"arrnew", new builtin_arrnew{}});
   builtins_.insert({"array", new builtin_array{}});
-  builtins_.insert({"print", new builtin_print{}});
-  builtins_.insert({"println", new builtin_println{}});
+  builtins_.insert({"print", new builtin_print{"print"}});
+  builtins_.insert({"println", new builtin_print{"println"}});
   builtins_.insert({"len", new builtin_len{}});
   builtins_.insert({"charat", new builtin_charat{}});
   builtins_.insert({"getref", new builtin_getref{}});

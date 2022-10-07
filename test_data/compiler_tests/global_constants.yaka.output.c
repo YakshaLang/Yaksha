@@ -1,6 +1,7 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
+uint32_t const  yy__constants_file_MY_CONST_VAL = UINT32_C(1);
 int8_t const  yy__NUM_A = INT8_C(15);
 int16_t const  yy__NUM_B = INT16_C(14);
 int32_t const  yy__NUM_C = INT32_C(13);
@@ -18,6 +19,7 @@ int32_t yy__main();
 // --functions-- 
 int32_t yy__main() 
 {
+    yk__printlnuint(((uintmax_t)yy__constants_file_MY_CONST_VAL));
     return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)

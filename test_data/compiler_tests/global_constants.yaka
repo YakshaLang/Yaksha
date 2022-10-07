@@ -11,5 +11,8 @@ NUM_J: Const[f64] = 0.12
 BOOL_K: Const[bool] = True
 BOOL_L: Const[bool] = False
 
+import constants_file as cf
+
 def main() -> int:
+    println(cf.MY_CONST_VAL)
     return 0
