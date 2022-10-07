@@ -995,13 +995,9 @@ void compiler::visit_get_expr(get_expr *obj) {
   class_stmt *class_;
   std::string item_prefix = prefix_val_;
   std::string access_ = "->";
-  if (module_file.empty()) {
-    class_ = defs_classes_.get_class(user_defined_type);
-  } else {
-    file_info *module_info = cf_->get(module_file);
-    class_ = module_info->data_->dsv_->get_class(user_defined_type);
-    item_prefix = module_info->prefix_;
-  }
+  file_info *module_info = cf_->get(module_file);
+  class_ = module_info->data_->dsv_->get_class(user_defined_type);
+  item_prefix = module_info->prefix_;
   if (class_->annotations_.native_define_) { item_prefix = ""; }
   if (class_->annotations_.dot_access_) { access_ = "."; }
   for (const auto &member : class_->members_) {
