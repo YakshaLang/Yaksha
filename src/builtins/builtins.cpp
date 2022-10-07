@@ -145,6 +145,10 @@ struct builtin_print : builtin {
       code << "yk__printstr((" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_a_float()) {
       code << "yk__printdbl((" << rhs.first << "))";
+    } else if (rhs.second.datatype_->is_none()) {
+      code << "yk__printstr(\"None\")";
+    } else if (rhs.second.datatype_->is_bool()) {
+      code << "yk__printstr((" << rhs.first << ") ? \"True\" : \"False\")";
     }
     return {code.str(), o};
   }
@@ -195,6 +199,10 @@ struct builtin_println : builtin {
       code << "yk__printlnstr((" << rhs.first << "))";
     } else if (rhs.second.datatype_->is_a_float()) {
       code << "yk__printlndbl((" << rhs.first << "))";
+    } else if (rhs.second.datatype_->is_none()) {
+      code << "yk__printlnstr(\"None\")";
+    } else if (rhs.second.datatype_->is_bool()) {
+      code << "yk__printlnstr((" << rhs.first << ") ? \"True\" : \"False\")";
     }
     return {code.str(), o};
   }
@@ -850,8 +858,9 @@ struct builtin_qsort : builtin {
       if (dt_slot_matcher->slot_match(args[1], func)) {
         return ykobject(dt_pool->create("bool"));
       } else {
-        o.string_val_ = "Comparison must match with "
-                        "Function[In[Const[AnyPtrToConst],Const[AnyPtrToConst]],Out[int]]";
+        o.string_val_ =
+            "Comparison must match with "
+            "Function[In[Const[AnyPtrToConst],Const[AnyPtrToConst]],Out[int]]";
       }
     }
     o.object_type_ = object_type::RUNTIME_ERROR;
@@ -1228,9 +1237,11 @@ struct builtin_functional : builtin {
       case fnc::FILTER:
         if (template_dt->is_str()) {
           // Create a new copy
-          code << elm_temp << " = yk__sdsdup(" << arr_temp << "[" << i << "]); ";
+          code << elm_temp << " = yk__sdsdup(" << arr_temp << "[" << i
+               << "]); ";
           code << "if (" << fn_out_temp << ") {"
-               << "yk__arrput(" << return_temp << ", " << elm_temp << "); } else {"
+               << "yk__arrput(" << return_temp << ", " << elm_temp
+               << "); } else {"
                << " yk__sdsfree(" << elm_temp << "); }";
         } else {
           code << "if (" << fn_out_temp << ") {"
