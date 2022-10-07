@@ -1,0 +1,9 @@
+def main() -> int:
+    a: bool = None == None
+    b: bool = None != None
+    c: str = "Hello Word"
+    println(a)
+    println(b)
+    println(None == c)
+    println(c == None)
+    return 0

@@ -193,3 +193,8 @@ TEST_CASE("compiler: Global constants") {
             "global_constants.yaka",
             "../test_data/compiler_tests/global_constants.tokens");
 }
+TEST_CASE("compiler: None comparison") {
+  TEST_FILE("../test_data/compiler_tests/none_comparison.yaka",
+            "none_comparison.yaka",
+            "../test_data/compiler_tests/none_comparison.tokens");
+}
