@@ -111,6 +111,14 @@ TEST_CASE("type checker: iif using 4 args") {
   TEST_SNIPPET("a: bool = iif(True, False, True, 2)",
                "iif() builtin expects 3 arguments");
 }
-TEST_CASE("type checker: iif using no") {
+TEST_CASE("type checker: iif using no arguments") {
   TEST_SNIPPET("a: bool = iif()", "iif() builtin expects 3 arguments");
+}
+TEST_CASE("type checker: Object creation with argument not allowed") {
+  TEST_SNIPPET_FULL("class A:\n"
+                    "    a: int\n"
+                    "def main() -> int:\n"
+                    "    a: A = A(1)\n"
+                    "    return 0",
+                    "Arguments for object creation is not supported.");
 }

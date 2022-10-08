@@ -16,7 +16,7 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
   auto rhs = pop();
   auto name = obj->name_->token_;
   if (!scope_.is_defined(name)) {
-    error(obj->name_, "This is not defined");
+    error(obj->name_, "Assignment without definition");
     return;
   }
   auto object = scope_.get(name);
@@ -131,8 +131,12 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
 void type_checker::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
   auto name = pop();
+  // Classes
   if (name.object_type_ == object_type::CLASS_ITSELF ||
       name.object_type_ == object_type::MODULE_CLASS) {
+    if (!obj->args_.empty()) {
+      error(obj->paren_token_, "Arguments for object creation is not supported.");
+    }
     auto class_name = name.string_val_;
     ykobject data;
     if (name.object_type_ == object_type::CLASS_ITSELF) {
@@ -144,6 +148,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     // Creating a custom object from user defined type / class;
     return;
   }
+  // Functions
   if (name.object_type_ == object_type::FUNCTION ||
       name.object_type_ == object_type::MODULE_FUNCTION) {
     std::vector<ykobject> arguments{};
