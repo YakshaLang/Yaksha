@@ -125,3 +125,76 @@ TEST_CASE("type checker: Object creation with argument not allowed") {
 TEST_CASE("type checker: assignment without definition") {
   TEST_SNIPPET("a = 1", "Assignment without definition");
 }
+TEST_CASE("type checker: Binary operation between two different data types (meta)") {
+  TEST_SNIPPET_FULL("class A:\n"
+                    "    a: int\n"
+                    "def main() -> int:\n"
+                    "    a: int = 1\n"
+                    "    b: bool = a == A\n"
+                    "    return 0",
+                    "Binary operation between two different data types are not supported");
+}
+TEST_CASE("type checker: different type of numbers used in operators bitwise") {
+  TEST_SNIPPET("a: int = 1\n"
+               "    b: i8 = a & 1i8\n"
+               , "^ & | << >> operators work only for integers of same type");
+}
+TEST_CASE("type checker: different type of numbers used in operators mul/div/rem") {
+  TEST_SNIPPET("a: int = 1\n"
+               "    b: i8 = a * 1i8\n"
+               , "% - * / operators work only for numbers of same type");
+}
+TEST_CASE("type checker: different type of numbers used in operators comparison") {
+  TEST_SNIPPET("a: int = 1\n"
+               "    b: bool = a <= 1i8\n"
+               , "< > <= >= operators work only for numbers of same type");
+}
+TEST_CASE("type checker: + operator does not work for anything other than numbers and str") {
+  TEST_SNIPPET("a: bool = True\n"
+               "    b: bool = a + False\n"
+               , "+ operator works only for numbers of same type or strings");
+}
+TEST_CASE("type checker: cannot compare tuples with ==") {
+  TEST_SNIPPET("a: Tuple[int]\n"
+               "    b: Tuple[int]\n"
+               "    c: bool = a == b\n"
+               , "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
+}
+TEST_CASE("type checker: cannot compare mentry with ==") {
+  TEST_SNIPPET("a: MEntry[int,int]\n"
+               "    b: MEntry[int,int]\n"
+               "    c: bool = a == b\n"
+               , "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
+}
+TEST_CASE("type checker: cannot compare smentry with !=") {
+  TEST_SNIPPET("a: SMEntry[int]\n"
+               "    b: SMEntry[int]\n"
+               "    c: bool = a != b\n"
+               , "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
+}
+TEST_CASE("type checker: cannot compare tuple vs smentry with !=") {
+  TEST_SNIPPET("a: Tuple[int]\n"
+               "    b: SMEntry[int]\n"
+               "    c: bool = a != b\n"
+               , "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
+}
+TEST_CASE("type checker: cannot compare integers with None") {
+  TEST_SNIPPET("a: int = 1\n"
+               "    c: bool = a != None\n"
+               , "Datatype cannot be compared with None");
+}
+TEST_CASE("type checker: cannot compare booleans with None") {
+  TEST_SNIPPET("a: bool = False\n"
+               "    c: bool = a != None\n"
+               , "Datatype cannot be compared with None");
+}
+TEST_CASE("type checker: cannot compare two different kinds of integers with ==") {
+  TEST_SNIPPET("a: int = 1\n"
+               "    c: bool = 1 == 1i8\n"
+               , "Cannot compare between two data types");
+}
+TEST_CASE("type checker: cannot compare two different kinds of integers with !=") {
+  TEST_SNIPPET("a: int = 1\n"
+               "    c: bool = 1 != 1i8\n"
+               , "Cannot compare between two data types");
+}
