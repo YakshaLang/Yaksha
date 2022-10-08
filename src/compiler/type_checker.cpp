@@ -135,7 +135,8 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   if (name.object_type_ == object_type::CLASS_ITSELF ||
       name.object_type_ == object_type::MODULE_CLASS) {
     if (!obj->args_.empty()) {
-      error(obj->paren_token_, "Arguments for object creation is not supported.");
+      error(obj->paren_token_,
+            "Arguments for object creation is not supported");
     }
     auto class_name = name.string_val_;
     ykobject data;

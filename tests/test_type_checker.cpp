@@ -120,5 +120,8 @@ TEST_CASE("type checker: Object creation with argument not allowed") {
                     "def main() -> int:\n"
                     "    a: A = A(1)\n"
                     "    return 0",
-                    "Arguments for object creation is not supported.");
+                    "Arguments for object creation is not supported");
+}
+TEST_CASE("type checker: assignment without definition") {
+  TEST_SNIPPET("a = 1", "Assignment without definition");
 }
