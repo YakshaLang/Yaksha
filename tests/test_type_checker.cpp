@@ -335,3 +335,46 @@ TEST_CASE("type checker: ~ must follow an integer (str used)") {
 TEST_CASE("type checker: access non defined variable") {
   TEST_SNIPPET("a: int = ~1 + b\n", "Undefined name");
 }
+TEST_CASE("type checker: delete an integer") {
+  TEST_SNIPPET("del 1u8", "Invalid delete statement used on primitives");
+}
+TEST_CASE("type checker: delete a float") {
+  TEST_SNIPPET("del 1.0f", "Invalid delete statement used on primitives");
+}
+TEST_CASE("type checker: delete a bool") {
+  TEST_SNIPPET("del False", "Invalid delete statement used on primitives");
+}
+TEST_CASE("type checker: delete a tuple") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: Tuple[int]\n"
+                    "    del a\n"
+                    "    return 0",
+                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+}
+TEST_CASE("type checker: delete MEntry") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: MEntry[int, int]\n"
+                    "    del a\n"
+                    "    return 0",
+                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+}
+TEST_CASE("type checker: delete SMEntry") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: SMEntry[int]\n"
+                    "    del a\n"
+                    "    return 0",
+                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+}
+TEST_CASE("type checker: delete Function") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: Function[In[int],Out]\n"
+                    "    del a\n"
+                    "    return 0",
+                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+}
+TEST_CASE("type checker: delete Function main()") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    del main\n"
+                    "    return 0",
+                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+}
