@@ -306,3 +306,13 @@ TEST_CASE("type checker: calling a non callable") {
                     "    return 0",
                     "Calling a non callable or a non existing function");
 }
+TEST_CASE(
+    "type checker: logical or needs two booleans") {
+  TEST_SNIPPET("a: bool = False or 1\n",
+               "Both LHS and RHS of logical operator need to be boolean");
+}
+TEST_CASE(
+    "type checker: logical and needs two booleans") {
+  TEST_SNIPPET("a: bool = True and 1\n",
+               "Both LHS and RHS of logical operator need to be boolean");
+}
