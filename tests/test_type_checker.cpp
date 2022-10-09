@@ -19,7 +19,7 @@ using namespace yaksha;
     xa += (S);                                                                 \
     xa += "\n"                                                                 \
           "    return 0";                                                      \
-    auto result = mc.compile(xa, true, "dummy.yaka", "../libs");                     \
+    auto result = mc.compile(xa, true, "dummy.yaka", "../libs");               \
     REQUIRE(result.failed_ == true);                                           \
     REQUIRE(!yaksha::errors::error_capture.empty());                           \
     REQUIRE(yaksha::errors::has_error(E));                                     \
@@ -28,7 +28,7 @@ using namespace yaksha;
   do {                                                                         \
     multifile_compiler mc{};                                                   \
     std::string xa = (S);                                                      \
-    auto result = mc.compile(xa, true, "dummy.yaka", "../libs");                     \
+    auto result = mc.compile(xa, true, "dummy.yaka", "../libs");               \
     REQUIRE(result.failed_ == true);                                           \
     REQUIRE(!yaksha::errors::error_capture.empty());                           \
     REQUIRE(yaksha::errors::has_error(E));                                     \
@@ -451,20 +451,24 @@ TEST_CASE("type checker: member not found from imported module") {
                     "Member not found");
 }
 TEST_CASE("type checker: non existent type access") {
-  TEST_SNIPPET_FULL(
-                    "def main() -> int:\n"
+  TEST_SNIPPET_FULL("def main() -> int:\n"
                     "    c: A\n"
                     "    println(c.C)\n"
                     "    return 0",
                     "Cannot find data type of LHS");
 }
 TEST_CASE("type checker: non existent element access") {
-  TEST_SNIPPET_FULL(
-      "class A:\n"
-      "    b: int\n"
-      "def main() -> int:\n"
-      "    c: A\n"
-      "    println(c.B)\n"
-      "    return 0",
-      "Cannot find data type of LHS");
+  TEST_SNIPPET_FULL("class A:\n"
+                    "    b: int\n"
+                    "def main() -> int:\n"
+                    "    c: A\n"
+                    "    println(c.B)\n"
+                    "    return 0",
+                    "Cannot find data type of LHS");
+}
+TEST_CASE("type checker: ccode statement used outside non native function") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    ccode \"\"\"int a = 1;\"\"\"\n"
+                    "    return 0",
+                    "Invalid use of ccode statement outside non native function");
 }
