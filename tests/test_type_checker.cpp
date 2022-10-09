@@ -240,3 +240,48 @@ TEST_CASE("type checker: func call parameter and argument mismatches for varargs
                     "    return 0",
                     "Variable argument: 5 mismatches");
 }
+TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
+  TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    f1: Function[In[int,int],Out] = fnc\n"
+                    "    f1(1, False)\n"
+                    "    return 0",
+                    "Function[] call parameter & argument 2 mismatches");
+}
+TEST_CASE("type checker: func ptr call parameter and argument mismatches first argument") {
+  TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    f1: Function[In[int,int],Out] = fnc\n"
+                    "    f1(False, 1)\n"
+                    "    return 0",
+                    "Function[] call parameter & argument 1 mismatches");
+}
+TEST_CASE("type checker: func ptr call too much arguments") {
+  TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    f1: Function[In[int,int],Out] = fnc\n"
+                    "    f1(1, 1, 1, 2)\n"
+                    "    return 0",
+                    "Too few or too much arguments for function call");
+}
+TEST_CASE("type checker: func ptr call too few arguments") {
+  TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    f1: Function[In[int,int],Out] = fnc\n"
+                    "    f1(1)\n"
+                    "    return 0",
+                    "Too few or too much arguments for function call");
+}
+TEST_CASE("type checker: func ptr call output type mismatches") {
+  TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> int:\n"
+                    "    return a + b\n"
+                    "def main() -> int:\n"
+                    "    f1: Function[In[int,int],Out[int]] = fnc\n"
+                    "    a: bool = f1(1, 2)\n"
+                    "    return 0",
+                    "Cannot assign between 2 different data types.");
+}
