@@ -214,3 +214,29 @@ TEST_CASE("type checker: func call too much arguments") {
                     "    return 0",
                     "Too few or too much arguments for function call");
 }
+TEST_CASE("type checker: func call parameter and argument mismatches") {
+  TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    fnc(1, False)\n"
+                    "    return 0",
+                    "Parameter & argument 2 mismatches");
+}
+TEST_CASE("type checker: func call parameter and argument mismatches first argument") {
+  TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    fnc(False, 3)\n"
+                    "    return 0",
+                    "Parameter & argument 1 mismatches");
+}
+TEST_CASE("type checker: func call parameter and argument mismatches for varargs") {
+  TEST_SNIPPET_FULL("@nativedefine(\"test\")\n"
+                    "@varargs\n"
+                    "def fnc(a: int, b: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    fnc(1, 3, 2, 3, False)\n"
+                    "    return 0",
+                    "Variable argument: 5 mismatches");
+}
