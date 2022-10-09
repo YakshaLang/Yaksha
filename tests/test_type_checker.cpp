@@ -306,13 +306,29 @@ TEST_CASE("type checker: calling a non callable") {
                     "    return 0",
                     "Calling a non callable or a non existing function");
 }
-TEST_CASE(
-    "type checker: logical or needs two booleans") {
+TEST_CASE("type checker: logical or needs two booleans") {
   TEST_SNIPPET("a: bool = False or 1\n",
                "Both LHS and RHS of logical operator need to be boolean");
 }
-TEST_CASE(
-    "type checker: logical and needs two booleans") {
+TEST_CASE("type checker: logical and needs two booleans") {
   TEST_SNIPPET("a: bool = True and 1\n",
                "Both LHS and RHS of logical operator need to be boolean");
+}
+TEST_CASE("type checker: not must follow a boolean") {
+  TEST_SNIPPET("a: bool = not 1\n",
+               "Invalid unary operation. Not operator must follow a boolean.");
+}
+TEST_CASE("type checker: not must follow a boolean (str used)") {
+  TEST_SNIPPET("a: bool = not \"False\"\n", "Invalid unary operation");
+}
+TEST_CASE("type checker: ~ must follow an integer") {
+  TEST_SNIPPET("a: int = ~False\n",
+               "Bitwise not (~) is only supported for integers");
+}
+TEST_CASE("type checker: ~ must follow an integer (f64 used)") {
+  TEST_SNIPPET("a: int = ~1.0\n",
+               "Bitwise not (~) is only supported for integers");
+}
+TEST_CASE("type checker: ~ must follow an integer (str used)") {
+  TEST_SNIPPET("a: int = ~\"Hello\"\n", "Invalid unary operation");
 }
