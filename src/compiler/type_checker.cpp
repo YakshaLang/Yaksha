@@ -588,7 +588,7 @@ void type_checker::visit_del_stmt(del_stmt *obj) {
     error(obj->del_keyword_, "Invalid delete statement used on primitives");
   }
   if (dt->is_m_entry() || dt->is_sm_entry() || dt->is_tuple() ||
-      dt->is_function()) {
+      dt->is_function() || !deletable_expression.is_primitive_or_obj()) {
     error(obj->del_keyword_,
           "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
   }
