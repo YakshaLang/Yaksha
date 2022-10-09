@@ -198,3 +198,19 @@ TEST_CASE("type checker: cannot compare two different kinds of integers with !="
                "    c: bool = 1 != 1i8\n"
                , "Cannot compare between two data types");
 }
+TEST_CASE("type checker: func call too few arguments") {
+  TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    fnc(1)\n"
+                    "    return 0",
+                    "Too few or too much arguments for function call");
+}
+TEST_CASE("type checker: func call too much arguments") {
+  TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
+                    "    pass\n"
+                    "def main() -> int:\n"
+                    "    fnc(1, 2, 3, 4)\n"
+                    "    return 0",
+                    "Too few or too much arguments for function call");
+}
