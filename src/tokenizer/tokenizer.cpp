@@ -504,6 +504,12 @@ void tokenizer::tokenize_actual() {
       }
       line += lines_in_str;
       mode = NORMAL_MATCH;
+      try {
+        string_utils::unescape(token_buf);
+      } catch (string_utils::string_error& str_error) {
+        std::string error_message = "Invalid string: " + str_error.message_;
+        handle_error(parsing_error{error_message, &tokens_.back()});
+      }
     } else if (mode == STRING_MATCH) {
       token_buf = {};
       auto result = consume_string(token_buf, iterator, end);
@@ -527,6 +533,12 @@ void tokenizer::tokenize_actual() {
       pos++;
       utf8::next(iterator, end);// skip last " in string
       mode = NORMAL_MATCH;
+      try {
+        string_utils::unescape(token_buf);
+      } catch (string_utils::string_error& str_error) {
+        std::string error_message = "Invalid string: " + str_error.message_;
+        handle_error(parsing_error{error_message, &tokens_.back()});
+      }
     } else if (mode == NAME_MATCH) {
       token_buf = {};
       auto result = ::string_utils::consume(::string_utils::allowed_in_name,
