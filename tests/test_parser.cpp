@@ -5,6 +5,8 @@
 #include "file_formats/tokens_file.h"
 #include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
+#include "compiler/multifile_compiler.h"
+#include "utilities/error_printer.h"
 using namespace yaksha;
 #define TEST_FILE(A, B, C)                                                     \
   do {                                                                         \
@@ -46,6 +48,15 @@ using namespace yaksha;
     } else {                                                                   \
       REQUIRE(false);                                                          \
     }                                                                          \
+  } while (0)
+#define TEST_SNIPPET_FULL(S, E)                                                \
+  do {                                                                         \
+    multifile_compiler mc{};                                                   \
+    std::string xa = (S);                                                      \
+    auto result = mc.compile(xa, true, "dummy.yaka", ".");                     \
+    REQUIRE(result.failed_ == true);                                           \
+    REQUIRE(!yaksha::errors::error_capture.empty());                           \
+    REQUIRE(yaksha::errors::has_error(E));                                     \
   } while (0)
 TEST_CASE("parser: Hello World") {
   TEST_FILE("../test_data/compiler_tests/test1.yaka", "test1.yaka",
@@ -91,4 +102,18 @@ TEST_CASE("parser: Negative numbers") {
   TEST_FILE("../test_data/sample_negative_numbers.yaka",
             "sample_negative_numbers.yaka",
             "../test_data/sample_negative_numbers.yaka.ast.tokens");
+}
+TEST_CASE("type checker: break used outside loop") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    break\n"
+                    "    b: bool = False\n"
+                    "    return 0",
+                    "Invalid assignment target!");
+}
+TEST_CASE("type checker: continue used outside loop") {
+  TEST_SNIPPET_FULL("continue\n"
+                    "def main() -> int:\n"
+                    "    c: bool = False\n"
+                    "    return 0",
+                    "Invalid assignment target!");
 }
