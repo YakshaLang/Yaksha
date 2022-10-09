@@ -174,8 +174,7 @@ TEST_CASE("compiler: Test filter() builtin") {
             "../test_data/compiler_tests/functional_test_filter.tokens");
 }
 TEST_CASE("compiler: Tuple data type") {
-  TEST_FILE("../test_data/compiler_tests/tuple_test.yaka",
-            "tuple_test.yaka",
+  TEST_FILE("../test_data/compiler_tests/tuple_test.yaka", "tuple_test.yaka",
             "../test_data/compiler_tests/tuple_test.tokens");
 }
 TEST_CASE("compiler: Number literals") {
@@ -204,7 +203,6 @@ TEST_CASE("compiler: Loops and logical operators") {
             "../test_data/compiler_tests/loops_and_logic.tokens");
 }
 TEST_CASE("compiler: Class stuff") {
-  TEST_FILE("../test_data/compiler_tests/class_stuff.yaka",
-            "class_stuff.yaka",
+  TEST_FILE("../test_data/compiler_tests/class_stuff.yaka", "class_stuff.yaka",
             "../test_data/compiler_tests/class_stuff.tokens");
 }

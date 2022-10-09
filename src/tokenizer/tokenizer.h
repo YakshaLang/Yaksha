@@ -60,8 +60,9 @@ private:
     static bool is_unknown_integer_token(token_type token_type_value);
     void handle_error(const parsing_error &err);
     void tokenize_actual();
-    std::pair<int, bool> consider_integer_suffix(uint32_t current, uint32_t next,
-                                 uint32_t after_next);
+    std::pair<int, bool> consider_integer_suffix(uint32_t current,
+                                                 uint32_t next,
+                                                 uint32_t after_next);
   };
 }// namespace yaksha
 #endif

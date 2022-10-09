@@ -506,7 +506,7 @@ void tokenizer::tokenize_actual() {
       mode = NORMAL_MATCH;
       try {
         string_utils::unescape(token_buf);
-      } catch (string_utils::string_error& str_error) {
+      } catch (string_utils::string_error &str_error) {
         std::string error_message = "Invalid string: " + str_error.message_;
         handle_error(parsing_error{error_message, &tokens_.back()});
       }
@@ -535,7 +535,7 @@ void tokenizer::tokenize_actual() {
       mode = NORMAL_MATCH;
       try {
         string_utils::unescape(token_buf);
-      } catch (string_utils::string_error& str_error) {
+      } catch (string_utils::string_error &str_error) {
         std::string error_message = "Invalid string: " + str_error.message_;
         handle_error(parsing_error{error_message, &tokens_.back()});
       }

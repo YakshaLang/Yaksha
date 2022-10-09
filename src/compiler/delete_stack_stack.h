@@ -17,7 +17,7 @@ namespace yaksha {
                    const std::string &return_name);
     void write_upto_loop(std::stringstream &target, int indent_level);
     void write_upto_loop(std::stringstream &target, int indent_level,
-                   const std::string &return_name);
+                         const std::string &return_name);
     ~delete_stack_stack() override;
 
 private:
