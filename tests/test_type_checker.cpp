@@ -125,78 +125,89 @@ TEST_CASE("type checker: Object creation with argument not allowed") {
 TEST_CASE("type checker: assignment without definition") {
   TEST_SNIPPET("a = 1", "Assignment without definition");
 }
-TEST_CASE("type checker: Binary operation between two different data types (meta)") {
-  TEST_SNIPPET_FULL("class A:\n"
-                    "    a: int\n"
-                    "def main() -> int:\n"
-                    "    a: int = 1\n"
-                    "    b: bool = a == A\n"
-                    "    return 0",
-                    "Binary operation between two different data types are not supported");
+TEST_CASE(
+    "type checker: Binary operation between two different data types (meta)") {
+  TEST_SNIPPET_FULL(
+      "class A:\n"
+      "    a: int\n"
+      "def main() -> int:\n"
+      "    a: int = 1\n"
+      "    b: bool = a == A\n"
+      "    return 0",
+      "Binary operation between two different data types are not supported");
 }
 TEST_CASE("type checker: different type of numbers used in operators bitwise") {
   TEST_SNIPPET("a: int = 1\n"
-               "    b: i8 = a & 1i8\n"
-               , "^ & | << >> operators work only for integers of same type");
+               "    b: i8 = a & 1i8\n",
+               "^ & | << >> operators work only for integers of same type");
 }
-TEST_CASE("type checker: different type of numbers used in operators mul/div/rem") {
+TEST_CASE(
+    "type checker: different type of numbers used in operators mul/div/rem") {
   TEST_SNIPPET("a: int = 1\n"
-               "    b: i8 = a * 1i8\n"
-               , "% - * / operators work only for numbers of same type");
+               "    b: i8 = a * 1i8\n",
+               "% - * / operators work only for numbers of same type");
 }
-TEST_CASE("type checker: different type of numbers used in operators comparison") {
+TEST_CASE(
+    "type checker: different type of numbers used in operators comparison") {
   TEST_SNIPPET("a: int = 1\n"
-               "    b: bool = a <= 1i8\n"
-               , "< > <= >= operators work only for numbers of same type");
+               "    b: bool = a <= 1i8\n",
+               "< > <= >= operators work only for numbers of same type");
 }
-TEST_CASE("type checker: + operator does not work for anything other than numbers and str") {
+TEST_CASE("type checker: + operator does not work for anything other than "
+          "numbers and str") {
   TEST_SNIPPET("a: bool = True\n"
-               "    b: bool = a + False\n"
-               , "+ operator works only for numbers of same type or strings");
+               "    b: bool = a + False\n",
+               "+ operator works only for numbers of same type or strings");
 }
 TEST_CASE("type checker: cannot compare tuples with ==") {
-  TEST_SNIPPET("a: Tuple[int]\n"
-               "    b: Tuple[int]\n"
-               "    c: bool = a == b\n"
-               , "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
+  TEST_SNIPPET(
+      "a: Tuple[int]\n"
+      "    b: Tuple[int]\n"
+      "    c: bool = a == b\n",
+      "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
 }
 TEST_CASE("type checker: cannot compare mentry with ==") {
-  TEST_SNIPPET("a: MEntry[int,int]\n"
-               "    b: MEntry[int,int]\n"
-               "    c: bool = a == b\n"
-               , "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
+  TEST_SNIPPET(
+      "a: MEntry[int,int]\n"
+      "    b: MEntry[int,int]\n"
+      "    c: bool = a == b\n",
+      "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
 }
 TEST_CASE("type checker: cannot compare smentry with !=") {
-  TEST_SNIPPET("a: SMEntry[int]\n"
-               "    b: SMEntry[int]\n"
-               "    c: bool = a != b\n"
-               , "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
+  TEST_SNIPPET(
+      "a: SMEntry[int]\n"
+      "    b: SMEntry[int]\n"
+      "    c: bool = a != b\n",
+      "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
 }
 TEST_CASE("type checker: cannot compare tuple vs smentry with !=") {
-  TEST_SNIPPET("a: Tuple[int]\n"
-               "    b: SMEntry[int]\n"
-               "    c: bool = a != b\n"
-               , "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
+  TEST_SNIPPET(
+      "a: Tuple[int]\n"
+      "    b: SMEntry[int]\n"
+      "    c: bool = a != b\n",
+      "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
 }
 TEST_CASE("type checker: cannot compare integers with None") {
   TEST_SNIPPET("a: int = 1\n"
-               "    c: bool = a != None\n"
-               , "Datatype cannot be compared with None");
+               "    c: bool = a != None\n",
+               "Datatype cannot be compared with None");
 }
 TEST_CASE("type checker: cannot compare booleans with None") {
   TEST_SNIPPET("a: bool = False\n"
-               "    c: bool = a != None\n"
-               , "Datatype cannot be compared with None");
+               "    c: bool = a != None\n",
+               "Datatype cannot be compared with None");
 }
-TEST_CASE("type checker: cannot compare two different kinds of integers with ==") {
+TEST_CASE(
+    "type checker: cannot compare two different kinds of integers with ==") {
   TEST_SNIPPET("a: int = 1\n"
-               "    c: bool = 1 == 1i8\n"
-               , "Cannot compare between two data types");
+               "    c: bool = 1 == 1i8\n",
+               "Cannot compare between two data types");
 }
-TEST_CASE("type checker: cannot compare two different kinds of integers with !=") {
+TEST_CASE(
+    "type checker: cannot compare two different kinds of integers with !=") {
   TEST_SNIPPET("a: int = 1\n"
-               "    c: bool = 1 != 1i8\n"
-               , "Cannot compare between two data types");
+               "    c: bool = 1 != 1i8\n",
+               "Cannot compare between two data types");
 }
 TEST_CASE("type checker: func call too few arguments") {
   TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
@@ -222,7 +233,8 @@ TEST_CASE("type checker: func call parameter and argument mismatches") {
                     "    return 0",
                     "Parameter & argument 2 mismatches");
 }
-TEST_CASE("type checker: func call parameter and argument mismatches first argument") {
+TEST_CASE("type checker: func call parameter and argument mismatches first "
+          "argument") {
   TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
                     "    pass\n"
                     "def main() -> int:\n"
@@ -230,7 +242,8 @@ TEST_CASE("type checker: func call parameter and argument mismatches first argum
                     "    return 0",
                     "Parameter & argument 1 mismatches");
 }
-TEST_CASE("type checker: func call parameter and argument mismatches for varargs") {
+TEST_CASE(
+    "type checker: func call parameter and argument mismatches for varargs") {
   TEST_SNIPPET_FULL("@nativedefine(\"test\")\n"
                     "@varargs\n"
                     "def fnc(a: int, b: int) -> None:\n"
@@ -249,7 +262,8 @@ TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
                     "    return 0",
                     "Function[] call parameter & argument 2 mismatches");
 }
-TEST_CASE("type checker: func ptr call parameter and argument mismatches first argument") {
+TEST_CASE("type checker: func ptr call parameter and argument mismatches first "
+          "argument") {
   TEST_SNIPPET_FULL("def fnc(a: int, b: int) -> None:\n"
                     "    pass\n"
                     "def main() -> int:\n"
@@ -284,4 +298,11 @@ TEST_CASE("type checker: func ptr call output type mismatches") {
                     "    a: bool = f1(1, 2)\n"
                     "    return 0",
                     "Cannot assign between 2 different data types.");
+}
+TEST_CASE("type checker: calling a non callable") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: bool = False\n"
+                    "    b: bool = a(1, 2)\n"
+                    "    return 0",
+                    "Calling a non callable or a non existing function");
 }
