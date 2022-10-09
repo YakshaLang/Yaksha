@@ -332,3 +332,6 @@ TEST_CASE("type checker: ~ must follow an integer (f64 used)") {
 TEST_CASE("type checker: ~ must follow an integer (str used)") {
   TEST_SNIPPET("a: int = ~\"Hello\"\n", "Invalid unary operation");
 }
+TEST_CASE("type checker: access non defined variable") {
+  TEST_SNIPPET("a: int = ~1 + b\n", "Undefined name");
+}
