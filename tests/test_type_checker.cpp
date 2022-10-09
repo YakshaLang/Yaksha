@@ -345,36 +345,86 @@ TEST_CASE("type checker: delete a bool") {
   TEST_SNIPPET("del False", "Invalid delete statement used on primitives");
 }
 TEST_CASE("type checker: delete a tuple") {
-  TEST_SNIPPET_FULL("def main() -> int:\n"
-                    "    a: Tuple[int]\n"
-                    "    del a\n"
-                    "    return 0",
-                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+  TEST_SNIPPET_FULL(
+      "def main() -> int:\n"
+      "    a: Tuple[int]\n"
+      "    del a\n"
+      "    return 0",
+      "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
 }
 TEST_CASE("type checker: delete MEntry") {
-  TEST_SNIPPET_FULL("def main() -> int:\n"
-                    "    a: MEntry[int, int]\n"
-                    "    del a\n"
-                    "    return 0",
-                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+  TEST_SNIPPET_FULL(
+      "def main() -> int:\n"
+      "    a: MEntry[int, int]\n"
+      "    del a\n"
+      "    return 0",
+      "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
 }
 TEST_CASE("type checker: delete SMEntry") {
-  TEST_SNIPPET_FULL("def main() -> int:\n"
-                    "    a: SMEntry[int]\n"
-                    "    del a\n"
-                    "    return 0",
-                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+  TEST_SNIPPET_FULL(
+      "def main() -> int:\n"
+      "    a: SMEntry[int]\n"
+      "    del a\n"
+      "    return 0",
+      "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
 }
 TEST_CASE("type checker: delete Function") {
-  TEST_SNIPPET_FULL("def main() -> int:\n"
-                    "    a: Function[In[int],Out]\n"
-                    "    del a\n"
-                    "    return 0",
-                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+  TEST_SNIPPET_FULL(
+      "def main() -> int:\n"
+      "    a: Function[In[int],Out]\n"
+      "    del a\n"
+      "    return 0",
+      "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
 }
 TEST_CASE("type checker: delete Function main()") {
+  TEST_SNIPPET_FULL(
+      "def main() -> int:\n"
+      "    del main\n"
+      "    return 0",
+      "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+}
+TEST_CASE("type checker: tuple [] access must use literal") {
   TEST_SNIPPET_FULL("def main() -> int:\n"
-                    "    del main\n"
+                    "    a: Tuple[int]\n"
+                    "    b: int = 0\n"
+                    "    c: int = a[b]\n"
                     "    return 0",
-                    "Invalid delete statement used on Tuple/MEntry/SMEntry/Function");
+                    "Must use a literal for accessing tuple elements");
+}
+TEST_CASE("type checker: tuple [] access must use integer literal") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: Tuple[int]\n"
+                    "    println(a[0.0])\n"
+                    "    return 0",
+                    "Invalid index expression, must be of a valid integer");
+}
+TEST_CASE(
+    "type checker: tuple [] access must use integer literal used non decimal") {
+  TEST_SNIPPET_FULL(
+      "def main() -> int:\n"
+      "    a: Tuple[int]\n"
+      "    println(a[0x0])\n"
+      "    return 0",
+      "Must use a integer decimal literal for accessing tuple elements");
+}
+TEST_CASE("type checker: tuple [] access tuple index out of bounds") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: Tuple[int]\n"
+                    "    println(a[1])\n"
+                    "    return 0",
+                    "Tuple index out of bounds");
+}
+TEST_CASE("type checker: array [] access non integer") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: Array[int]\n"
+                    "    println(a[1.0])\n"
+                    "    return 0",
+                    "Invalid index expression, must be of a valid integer");
+}
+TEST_CASE("type checker: [] access non array/tuple") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: int = 1\n"
+                    "    println(a[1])\n"
+                    "    return 0",
+                    "Not an array");
 }
