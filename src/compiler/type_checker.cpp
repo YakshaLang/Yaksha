@@ -639,7 +639,8 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
   auto user_defined_type = lhs.datatype_->type_;
   if (!lhs.datatype_->module_.empty()) {
     auto mod_file_info = cf_->get(lhs.datatype_->module_);
-    if (mod_file_info->data_->dsv_->has_class(lhs.datatype_->type_)) {
+    if (mod_file_info != nullptr &&
+        mod_file_info->data_->dsv_->has_class(lhs.datatype_->type_)) {
       auto class_ = mod_file_info->data_->dsv_->get_class(lhs.datatype_->type_);
       for (const auto &member : class_->members_) {
         if (item == member.name_->token_) {
@@ -649,17 +650,6 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
           push(placeholder);
           return;
         }
-      }
-    }
-  } else if (defs_classes_->has_class(user_defined_type)) {
-    auto class_ = defs_classes_->get_class(user_defined_type);
-    for (const auto &member : class_->members_) {
-      if (item == member.name_->token_) {
-        // Found the member
-        auto placeholder = ykobject(dt_pool_);
-        placeholder.datatype_ = member.data_type_;
-        push(placeholder);
-        return;
       }
     }
   }
