@@ -19,7 +19,7 @@ using namespace yaksha;
     xa += (S);                                                                 \
     xa += "\n"                                                                 \
           "    return 0";                                                      \
-    auto result = mc.compile(xa, true, "dummy.yaka", ".");                     \
+    auto result = mc.compile(xa, true, "dummy.yaka", "../libs");                     \
     REQUIRE(result.failed_ == true);                                           \
     REQUIRE(!yaksha::errors::error_capture.empty());                           \
     REQUIRE(yaksha::errors::has_error(E));                                     \
@@ -28,7 +28,7 @@ using namespace yaksha;
   do {                                                                         \
     multifile_compiler mc{};                                                   \
     std::string xa = (S);                                                      \
-    auto result = mc.compile(xa, true, "dummy.yaka", ".");                     \
+    auto result = mc.compile(xa, true, "dummy.yaka", "../libs");                     \
     REQUIRE(result.failed_ == true);                                           \
     REQUIRE(!yaksha::errors::error_capture.empty());                           \
     REQUIRE(yaksha::errors::has_error(E));                                     \
@@ -427,4 +427,44 @@ TEST_CASE("type checker: [] access non array/tuple") {
                     "    println(a[1])\n"
                     "    return 0",
                     "Not an array");
+}
+TEST_CASE("type checker: dot operator from primitive") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: int = 1\n"
+                    "    println(a.item)\n"
+                    "    return 0",
+                    "Invalid dot operator, LHS need to be an object");
+}
+TEST_CASE("type checker: dot operator from class") {
+  TEST_SNIPPET_FULL("class A:\n"
+                    "    a: int\n"
+                    "def main() -> int:\n"
+                    "    println(A.a)\n"
+                    "    return 0",
+                    "Invalid dot operator, LHS need to be an object");
+}
+TEST_CASE("type checker: member not found from imported module") {
+  TEST_SNIPPET_FULL("import libs.c\n"
+                    "def main() -> int:\n"
+                    "    println(c.A)\n"
+                    "    return 0",
+                    "Member not found");
+}
+TEST_CASE("type checker: non existent type access") {
+  TEST_SNIPPET_FULL(
+                    "def main() -> int:\n"
+                    "    c: A\n"
+                    "    println(c.C)\n"
+                    "    return 0",
+                    "Cannot find data type of LHS");
+}
+TEST_CASE("type checker: non existent element access") {
+  TEST_SNIPPET_FULL(
+      "class A:\n"
+      "    b: int\n"
+      "def main() -> int:\n"
+      "    c: A\n"
+      "    println(c.B)\n"
+      "    return 0",
+      "Cannot find data type of LHS");
 }
