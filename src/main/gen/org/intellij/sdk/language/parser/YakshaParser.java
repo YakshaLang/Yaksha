@@ -1570,14 +1570,15 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // NUMBER
+  // NUMBER | KW_TRUE | KW_FALSE
   public static boolean literal(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literal")) return false;
-    if (!nextTokenIs(b, NUMBER)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, LITERAL, "<literal>");
     r = consumeToken(b, NUMBER);
-    exit_section_(b, m, LITERAL, r);
+    if (!r) r = consumeToken(b, KW_TRUE);
+    if (!r) r = consumeToken(b, KW_FALSE);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

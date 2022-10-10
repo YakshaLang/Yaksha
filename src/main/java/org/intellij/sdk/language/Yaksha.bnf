@@ -35,7 +35,7 @@ const_statement ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? 
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
     methods=[getName setName getNameIdentifier getPresentation]
 }
-literal ::= NUMBER
+literal ::= NUMBER | KW_TRUE | KW_FALSE
 
 class_statement ::= KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? NL class_bits+ {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
