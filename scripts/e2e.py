@@ -55,7 +55,7 @@ def bad_start(s) -> bool:
     return False
 
 
-def clean_line(s: str) -> str:
+def clean_line_c_compiler_paths(s: str) -> str:
     match = re.match(r"^([\\a-zA-Z0-9/:_.]+) (.+)$", s)
     if match:
         f = match.group(1)
@@ -66,6 +66,17 @@ def clean_line(s: str) -> str:
         text = f + " " + e
         return text.rstrip()
     return s.rstrip()
+
+
+def clean_line_invalid_data_type_path(s: str) -> str:
+    compiler_error = "Failed to compile data type:"
+    if s.startswith(compiler_error):
+        return compiler_error
+    return s
+
+
+def clean_line(s: str) -> str:
+    return clean_line_invalid_data_type_path(clean_line_c_compiler_paths(s))
 
 
 def get_cleaned_output(sout: str, serr: str) -> str:
