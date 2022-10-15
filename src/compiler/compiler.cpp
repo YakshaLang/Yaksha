@@ -181,8 +181,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     }
     compile_function_call(obj, prefix(name, prefix_val_), code, return_type);
   } else {
-    // TODO Generate an error here and push it to compiler time error
-    std::cerr << "<><>";
+    error(obj->paren_token_, "Invalid function call compilation");
   }
 }
 void compiler::compile_obj_creation(const std::string &name,
@@ -249,8 +248,8 @@ void compiler::visit_grouping_expr(grouping_expr *obj) {
     push("(" + exp.first + ")", exp.second);
   }
 }
-std::string conv_integer_literal(token_type token_type_val,
-                                 std::string &integer_value) {
+std::string compiler::conv_integer_literal(token_type token_type_val,
+                                           token *literal_token) {
   switch (token_type_val) {
     case token_type::INTEGER_DECIMAL:
     case token_type::INTEGER_HEX:
@@ -268,12 +267,12 @@ std::string conv_integer_literal(token_type token_type_val,
     case token_type::UINTEGER_HEX_16:
     case token_type::UINTEGER_DECIMAL_64:
     case token_type::UINTEGER_HEX_64:
-      return integer_value;// no need to modify
+      return literal_token->token_;// no need to modify
     case token_type::INTEGER_BIN:
     case token_type::INTEGER_BIN_8:
     case token_type::INTEGER_BIN_16:
     case token_type::INTEGER_BIN_64: {
-      std::string part = integer_value.substr(2);
+      std::string part = literal_token->token_.substr(2);
       std::intmax_t number = std::strtoimax(part.c_str(), nullptr, 2);
       return std::to_string(number);
     }
@@ -281,7 +280,7 @@ std::string conv_integer_literal(token_type token_type_val,
     case token_type::UINTEGER_BIN_8:
     case token_type::UINTEGER_BIN_16:
     case token_type::UINTEGER_BIN_64: {
-      std::string part = integer_value.substr(2);
+      std::string part = literal_token->token_.substr(2);
       std::uintmax_t number = std::strtoumax(part.c_str(), nullptr, 2);
       return std::to_string(number);
     }
@@ -289,7 +288,7 @@ std::string conv_integer_literal(token_type token_type_val,
     case token_type::INTEGER_OCT_8:
     case token_type::INTEGER_OCT_16:
     case token_type::INTEGER_OCT_64: {
-      std::string part = integer_value.substr(2);
+      std::string part = literal_token->token_.substr(2);
       std::intmax_t number = std::strtoimax(part.c_str(), nullptr, 8);
       return std::to_string(number);
     }
@@ -297,12 +296,12 @@ std::string conv_integer_literal(token_type token_type_val,
     case token_type::UINTEGER_OCT_8:
     case token_type::UINTEGER_OCT_16:
     case token_type::UINTEGER_OCT_64: {
-      std::string part = integer_value.substr(2);
+      std::string part = literal_token->token_.substr(2);
       std::uintmax_t number = std::strtoumax(part.c_str(), nullptr, 8);
       return std::to_string(number);
     }
     default:
-      // TODO add to comp time errors if this happen
+      error(literal_token, "Failed to compile integer literal");
       return "<><>";
   }
 }
@@ -336,32 +335,28 @@ void compiler::visit_literal_expr(literal_expr *obj) {
              data_type_tok == token_type::INTEGER_DECIMAL ||
              data_type_tok == token_type::INTEGER_OCT ||
              data_type_tok == token_type::INTEGER_HEX) {
-    push("INT32_C(" +
-             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+    push("INT32_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
          ykobject(dt_pool->create("int")));
   } else if (data_type_tok == token_type::INTEGER_BIN_8 ||
              data_type_tok == token_type::INTEGER_DECIMAL_8 ||
              data_type_tok == token_type::INTEGER_OCT_8 ||
              data_type_tok == token_type::INTEGER_HEX_8) {
-    push("INT8_C(" +
-             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+    push("INT8_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
          ykobject(dt_pool->create("i8")));
   } else if (data_type_tok == token_type::INTEGER_BIN_16 ||
              data_type_tok == token_type::INTEGER_DECIMAL_16 ||
              data_type_tok == token_type::INTEGER_OCT_16 ||
              data_type_tok == token_type::INTEGER_HEX_16) {
-    push("INT16_C(" +
-             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+    push("INT16_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
          ykobject(dt_pool->create("i16")));
   } else if (data_type_tok == token_type::INTEGER_BIN_64 ||
              data_type_tok == token_type::INTEGER_DECIMAL_64 ||
              data_type_tok == token_type::INTEGER_OCT_64 ||
              data_type_tok == token_type::INTEGER_HEX_64) {
-    push("INT64_C(" +
-             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+    push("INT64_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
          ykobject(dt_pool->create("i64")));
   } else if (data_type_tok == token_type::UINTEGER_BIN ||
@@ -369,15 +364,13 @@ void compiler::visit_literal_expr(literal_expr *obj) {
              data_type_tok == token_type::UINTEGER_OCT ||
              data_type_tok == token_type::UINTEGER_HEX) {
     push("UINT32_C(" +
-             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
-             ")",
+             conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
          ykobject(dt_pool->create("u32")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_8 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_8 ||
              data_type_tok == token_type::UINTEGER_OCT_8 ||
              data_type_tok == token_type::UINTEGER_HEX_8) {
-    push("UINT8_C(" +
-             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
+    push("UINT8_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
          ykobject(dt_pool->create("i8")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_16 ||
@@ -385,23 +378,21 @@ void compiler::visit_literal_expr(literal_expr *obj) {
              data_type_tok == token_type::UINTEGER_OCT_16 ||
              data_type_tok == token_type::UINTEGER_HEX_16) {
     push("UINT16_C(" +
-             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
-             ")",
+             conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
          ykobject(dt_pool->create("i16")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_64 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_64 ||
              data_type_tok == token_type::UINTEGER_OCT_64 ||
              data_type_tok == token_type::UINTEGER_HEX_64) {
     push("UINT64_C(" +
-             conv_integer_literal(data_type_tok, obj->literal_token_->token_) +
-             ")",
+             conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
          ykobject(dt_pool->create("i64")));
   } else if (data_type_tok == token_type::FLOAT_NUMBER) {
     push(obj->literal_token_->token_, ykobject(dt_pool->create("float")));
   } else if (data_type_tok == token_type::DOUBLE_NUMBER) {
     push(obj->literal_token_->token_, ykobject(dt_pool->create("f64")));
   } else {
-    // TODO add to comp time errors if this ever happens
+    error(obj->literal_token_, "Failed to compile literal");
     push("<><>", ykobject(dt_pool));
   }
 }
@@ -840,7 +831,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
       return "struct " + class_name + "*";
     }
   }
-  // TODO ensure this throws a comp time error !!
+  error("Failed to compile data type:" + basic_dt->as_string());
   return "<data type unknown>";
 }
 compiler_output compiler::compile(codefiles *cf, file_info *fi) {
@@ -866,8 +857,11 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   filepath_ = fi->filepath_.string();
   for (auto st : fi->data_->parser_->stmts_) { st->accept(this); }
   return {struct_forward_declarations_.str(),
-          function_forward_declarations_.str(), classes_.str(), body_.str(),
-          global_constants_.str()};
+          function_forward_declarations_.str(),
+          classes_.str(),
+          body_.str(),
+          global_constants_.str(),
+          errors_};
 }
 void compiler::push(const std::string &expr, const ykobject &data_type) {
   expr_stack_.push_back(expr);
@@ -984,8 +978,9 @@ void compiler::visit_get_expr(get_expr *obj) {
       auto prefixed_name = prefix(mod_obj.string_val_, module_info->prefix_);
       push(prefixed_name, mod_obj);
       return;
+    } else {
+      error(obj->dot_, "Failed to compile dot access");
     }
-    // TODO generate a compiler error if this happens
     push("<><>", mod_obj);
     return;
   }
@@ -1008,6 +1003,7 @@ void compiler::visit_get_expr(get_expr *obj) {
       return;
     }
   }
+  error(obj->dot_, "Failed to compile dot access");
 }
 void compiler::visit_set_expr(set_expr *obj) {
   obj->lhs_->accept(this);
@@ -1067,7 +1063,7 @@ void compiler::visit_square_bracket_access_expr(
     index++;
     push(lhs.first + ".e" + std::to_string(index), b);
   } else {
-    // TODO Generate a comp time error if this happens
+    error(obj->sqb_token_, "Failed to compile [] access");
     push("<><>", ykobject(dt_pool));
   }
 }
@@ -1086,7 +1082,7 @@ void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
     index++;
     push(lhs.first + ".e" + std::to_string(index), b);
   } else {
-    // TODO generate a comp time error if this happens
+    error(obj->sqb_token_, "Failed to compile [] set");
     push("<><>", ykobject(dt_pool));
   }
 }
@@ -1161,4 +1157,13 @@ ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
     fout->args_.emplace_back(funct->return_type_);
   }
   return fnc;
+}
+void compiler::error(token *tok, const std::string &message) {
+  auto err = parsing_error{message, tok};
+  errors_.emplace_back(err);
+}
+void compiler::error(const std::string &message) {
+  auto err = parsing_error{message, "", 0, 0};
+  err.token_set_ = false;
+  errors_.emplace_back(err);
 }

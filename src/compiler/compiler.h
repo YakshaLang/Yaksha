@@ -22,6 +22,7 @@ namespace yaksha {
     std::string classes_{};
     std::string body_{};
     std::string global_constants_{};
+    std::vector<parsing_error> errors_;
   };
   struct compiler : expr_visitor,
                     stmt_visitor,
@@ -94,6 +95,10 @@ private:
     void write_prev_indent(std::stringstream &where) const;
     static void write_end_statement(std::stringstream &where);
     void push(const std::string &expr, const ykobject &data_type);
+    void error(token *tok, const std::string &message);
+    void error(const std::string &message);
+    std::string conv_integer_literal(token_type token_type_val,
+                                     token *literal_token);
     std::string prefix_val_{};
     codefiles *cf_{nullptr};
     std::pair<std::string, ykobject> pop();
@@ -137,6 +142,7 @@ private:
     std::unordered_map<std::string, import_stmt *> import_stmts_alias_{};
     // Current file path
     std::string filepath_{};
+    std::vector<parsing_error> errors_;
     void compile_function_call(fncall_expr *obj, const std::string &name,
                                std::stringstream &code,
                                ykdatatype *return_type);

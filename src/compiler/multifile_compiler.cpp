@@ -92,6 +92,7 @@ multifile_compiler::compile(const std::string &code, bool use_code,
   std::stringstream function_body{};
   std::stringstream global_consts{};
   std::unordered_set<std::string> runtime_features{};
+  std::vector<parsing_error> compiler_errors_{};
   int file_count = static_cast<int>(cf.files_.size());
   for (int i = file_count - 1; i >= 0; i--) {
     auto f = cf.files_[i];
@@ -105,6 +106,15 @@ multifile_compiler::compile(const std::string &code, bool use_code,
     for (const std::string &feature : f->data_->dsv_->runtime_features_) {
       runtime_features.insert(feature);
     }
+    for (const auto &err : result.errors_) {
+      compiler_errors_.emplace_back(err);
+      has_errors = true;
+    }
+  }
+  // We found errors during compile time
+  if (has_errors) {
+    errors::print_errors(compiler_errors_);
+    return {true, ""};
   }
   std::vector<std::string> rf{};
   rf.insert(rf.end(), runtime_features.begin(), runtime_features.end());
