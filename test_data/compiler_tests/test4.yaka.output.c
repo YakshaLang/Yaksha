@@ -24,7 +24,7 @@ int32_t yy__main()
 
         {
             yk__printint(((intmax_t)yy__a));
-            yk__sds t__0 = yk__sdsnew("\n");
+            yk__sds t__0 = yk__sdsnewlen("\n", 1);
             yk__printstr((t__0));
             yy__a = (yy__a - INT32_C(1));
             yk__sdsfree(t__0);

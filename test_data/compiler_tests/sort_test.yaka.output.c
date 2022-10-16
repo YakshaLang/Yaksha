@@ -29,9 +29,9 @@ int32_t yy__main()
     yk__arrput(yy__x, INT32_C(40));
     yk__arrput(yy__x, (- (INT32_C(1))));
     yk__arrput(yy__x, INT32_C(20));
-    yk__sds t__1 = yk__sdsnew("before:");
+    yk__sds t__1 = yk__sdsnewlen("before:", 7);
     yk__printlnstr((t__1));
-    yk__sds t__2 = yk__sdsnew("len=");
+    yk__sds t__2 = yk__sdsnewlen("len=", 4);
     yk__printstr((t__2));
     yk__printlnint(((intmax_t)yk__arrlen(yy__x)));
     int32_t yy__pos = INT32_C(0);
@@ -41,7 +41,7 @@ int32_t yy__main()
 
         {
             yk__printint(((intmax_t)yy__x[yy__pos]));
-            yk__sds t__3 = yk__sdsnew(" ");
+            yk__sds t__3 = yk__sdsnewlen(" ", 1);
             yk__printstr((t__3));
             yy__pos = (yy__pos + INT32_C(1));
             yk__sdsfree(t__3);
@@ -50,10 +50,10 @@ int32_t yy__main()
     yk__sds t__4 = yk__sdsempty();
     yk__printlnstr((t__4));
     (yk__quicksort(yy__x,sizeof(int32_t),yk__arrlenu(yy__x),yy__cmp_int) == 0);
-    yk__sds t__5 = yk__sdsnew("after:");
+    yk__sds t__5 = yk__sdsnewlen("after:", 6);
     yk__printlnstr((t__5));
     yy__pos = INT32_C(0);
-    yk__sds t__6 = yk__sdsnew("len=");
+    yk__sds t__6 = yk__sdsnewlen("len=", 4);
     yk__printstr((t__6));
     yk__printlnint(((intmax_t)yk__arrlen(yy__x)));
     while (1) {
@@ -62,7 +62,7 @@ int32_t yy__main()
 
         {
             yk__printint(((intmax_t)yy__x[yy__pos]));
-            yk__sds t__7 = yk__sdsnew(" ");
+            yk__sds t__7 = yk__sdsnewlen(" ", 1);
             yk__printstr((t__7));
             yy__pos = (yy__pos + INT32_C(1));
             yk__sdsfree(t__7);

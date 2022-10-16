@@ -25,13 +25,13 @@ bool yy__print_int(int32_t yy__a, int32_t yy__ignored)
 }
 int32_t yy__main() 
 {
-    yk__sds t__2 = yk__sdsnew(">> map str test <<");
+    yk__sds t__2 = yk__sdsnewlen(">> map str test <<", 18);
     yk__printlnstr((t__2));
-    yk__sds t__3 = yk__sdsnew("Hello");
-    yk__sds t__4 = yk__sdsnew("World");
-    yk__sds t__5 = yk__sdsnew("How");
-    yk__sds t__6 = yk__sdsnew("Are");
-    yk__sds t__7 = yk__sdsnew("You");
+    yk__sds t__3 = yk__sdsnewlen("Hello", 5);
+    yk__sds t__4 = yk__sdsnewlen("World", 5);
+    yk__sds t__5 = yk__sdsnewlen("How", 3);
+    yk__sds t__6 = yk__sdsnewlen("Are", 3);
+    yk__sds t__7 = yk__sdsnewlen("You", 3);
     yk__sds* t__8 = NULL;
     yk__arrsetcap(t__8, 5);
     yk__arrput(t__8, yk__sdsdup(t__3));
@@ -40,7 +40,7 @@ int32_t yy__main()
     yk__arrput(t__8, yk__sdsdup(t__6));
     yk__arrput(t__8, yk__sdsdup(t__7));
     yk__sds* yy__ar = t__8;
-    yk__sds t__9 = yk__sdsnew("map to_lengths ==> ");
+    yk__sds t__9 = yk__sdsnewlen("map to_lengths ==> ", 19);
     yk__printlnstr((t__9));
     yk__sds* t__12 = yy__ar;
     int32_t t__14 = INT32_C(0);
@@ -61,7 +61,7 @@ int32_t yy__main()
         if (!t__23) {t__22 = false; break; }
     }
     t__22;
-    yk__sds t__24 = yk__sdsnew(">> countif int test <<");
+    yk__sds t__24 = yk__sdsnewlen(">> countif int test <<", 22);
     yk__printlnstr((t__24));
     int32_t* t__25 = NULL;
     yk__arrsetcap(t__25, 10);
@@ -76,7 +76,7 @@ int32_t yy__main()
     yk__arrput(t__25, INT32_C(9));
     yk__arrput(t__25, INT32_C(10));
     int32_t* yy__ai = t__25;
-    yk__sds t__26 = yk__sdsnew("map to_pow2 ==> ");
+    yk__sds t__26 = yk__sdsnewlen("map to_pow2 ==> ", 16);
     yk__printlnstr((t__26));
     int32_t* t__29 = yy__ai;
     int32_t t__31 = INT32_C(0);
@@ -97,7 +97,7 @@ int32_t yy__main()
         if (!t__40) {t__39 = false; break; }
     }
     t__39;
-    yk__sds t__41 = yk__sdsnew("completed.");
+    yk__sds t__41 = yk__sdsnewlen("completed.", 10);
     yk__printlnstr((t__41));
     yk__sdsfree(t__41);
     yk__sdsfree(t__26);

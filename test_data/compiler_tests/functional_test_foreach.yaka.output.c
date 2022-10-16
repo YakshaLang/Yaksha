@@ -12,7 +12,7 @@ int32_t yy__main();
 bool yy__print_str(yk__sds yy__a, int32_t yy__b) 
 {
     yk__printint(((intmax_t)yy__b));
-    yk__sds t__0 = yk__sdsnew(" : ");
+    yk__sds t__0 = yk__sdsnewlen(" : ", 3);
     yk__printstr((t__0));
     yk__printlnstr((yy__a));
     yk__sdsfree(t__0);
@@ -35,14 +35,14 @@ bool yy__print_upto_n(int32_t yy__a, int32_t yy__n)
 }
 int32_t yy__main() 
 {
-    yk__sds t__1 = yk__sdsnew(">> foreach str test <<");
+    yk__sds t__1 = yk__sdsnewlen(">> foreach str test <<", 22);
     yk__printlnstr((t__1));
     ykfncptr0 yy__f = yy__print_str;
-    yk__sds t__2 = yk__sdsnew("Hello");
-    yk__sds t__3 = yk__sdsnew("World");
-    yk__sds t__4 = yk__sdsnew("How");
-    yk__sds t__5 = yk__sdsnew("Are");
-    yk__sds t__6 = yk__sdsnew("You");
+    yk__sds t__2 = yk__sdsnewlen("Hello", 5);
+    yk__sds t__3 = yk__sdsnewlen("World", 5);
+    yk__sds t__4 = yk__sdsnewlen("How", 3);
+    yk__sds t__5 = yk__sdsnewlen("Are", 3);
+    yk__sds t__6 = yk__sdsnewlen("You", 3);
     yk__sds* t__7 = NULL;
     yk__arrsetcap(t__7, 5);
     yk__arrput(t__7, yk__sdsdup(t__2));
@@ -71,7 +71,7 @@ int32_t yy__main()
         if (!t__21) {t__20 = false; break; }
     }
     t__20;
-    yk__sds t__22 = yk__sdsnew(">> foreach int test <<");
+    yk__sds t__22 = yk__sdsnewlen(">> foreach int test <<", 22);
     yk__printlnstr((t__22));
     ykfncptr1 yy__fi = yy__print_add_n;
     int32_t* t__23 = NULL;
@@ -107,7 +107,7 @@ int32_t yy__main()
         if (!t__37) {t__36 = false; break; }
     }
     t__36;
-    yk__sds t__38 = yk__sdsnew("completed.");
+    yk__sds t__38 = yk__sdsnewlen("completed.", 10);
     yk__printlnstr((t__38));
     yk__sdsfree(t__38);
     yk__sdsfree(t__22);

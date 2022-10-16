@@ -9,7 +9,7 @@ int32_t yy__main();
 // --functions-- 
 yk__sds yy__world_formatter(yk__sds yy__item) 
 {
-    yk__sds t__0 = yk__sdsnew(" World");
+    yk__sds t__0 = yk__sdsnewlen(" World", 6);
     yk__sds t__1 = yk__sdscatsds(yk__sdsdup(yy__item), t__0);
     yk__sds yy__result = yk__sdsdup(t__1);
     yk__sds t__2 = yy__result;
@@ -28,7 +28,7 @@ void yy__formatted_print(ykfncptr0 yy__formatter, yk__sds yy__item)
 }
 int32_t yy__main() 
 {
-    yk__sds t__4 = yk__sdsnew("Hello");
+    yk__sds t__4 = yk__sdsnewlen("Hello", 5);
     yy__formatted_print(yy__world_formatter, yk__sdsdup(t__4));
     yk__sdsfree(t__4);
     return INT32_C(0);

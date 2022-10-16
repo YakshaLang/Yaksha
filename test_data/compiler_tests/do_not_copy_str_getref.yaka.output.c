@@ -12,7 +12,7 @@ void yy__world(yk__sds* nn__a)
 }
 int32_t yy__main() 
 {
-    yk__sds t__0 = yk__sdsnew("hello");
+    yk__sds t__0 = yk__sdsnewlen("hello", 5);
     yk__sds yy__hello = yk__sdsdup(t__0);
     int32_t yy__i = INT32_C(10);
     while (1) {

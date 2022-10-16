@@ -8,7 +8,7 @@ int32_t yy__main()
 {
     bool yy__a = true;
     bool yy__b = false;
-    yk__sds t__0 = yk__sdsnew("Hello Word");
+    yk__sds t__0 = yk__sdsnewlen("Hello Word", 10);
     yk__sds yy__c = yk__sdsdup(t__0);
     yk__printlnstr((yy__a) ? "True" : "False");
     yk__printlnstr((yy__b) ? "True" : "False");

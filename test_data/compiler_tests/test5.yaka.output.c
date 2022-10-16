@@ -22,10 +22,10 @@ struct yy__Spaceship {
 int32_t yy__print_str_item(yk__sds yy__item, yk__sds yy__value) 
 {
     yk__printstr((yy__item));
-    yk__sds t__0 = yk__sdsnew(":\t");
+    yk__sds t__0 = yk__sdsnewlen(":\t", 2);
     yk__printstr((t__0));
     yk__printstr((yy__value));
-    yk__sds t__1 = yk__sdsnew("\n");
+    yk__sds t__1 = yk__sdsnewlen("\n", 1);
     yk__printstr((t__1));
     yk__sdsfree(t__1);
     yk__sdsfree(t__0);
@@ -36,10 +36,10 @@ int32_t yy__print_str_item(yk__sds yy__item, yk__sds yy__value)
 int32_t yy__print_int_item(yk__sds yy__item, int32_t yy__value) 
 {
     yk__printstr((yy__item));
-    yk__sds t__2 = yk__sdsnew(":\t");
+    yk__sds t__2 = yk__sdsnewlen(":\t", 2);
     yk__printstr((t__2));
     yk__printint(((intmax_t)yy__value));
-    yk__sds t__3 = yk__sdsnew("\n");
+    yk__sds t__3 = yk__sdsnewlen("\n", 1);
     yk__printstr((t__3));
     yk__sdsfree(t__3);
     yk__sdsfree(t__2);
@@ -48,9 +48,9 @@ int32_t yy__print_int_item(yk__sds yy__item, int32_t yy__value)
 }
 int32_t yy__print_captain(struct yy__Captain* yy__c) 
 {
-    yk__sds t__4 = yk__sdsnew("Captain.Name");
+    yk__sds t__4 = yk__sdsnewlen("Captain.Name", 12);
     yy__print_str_item(yk__sdsdup(t__4), yk__sdsdup(yy__c->yy__name));
-    yk__sds t__5 = yk__sdsnew("Captain.Age");
+    yk__sds t__5 = yk__sdsnewlen("Captain.Age", 11);
     yy__print_int_item(yk__sdsdup(t__5), yy__c->yy__age);
     yk__sdsfree(t__5);
     yk__sdsfree(t__4);
@@ -58,9 +58,9 @@ int32_t yy__print_captain(struct yy__Captain* yy__c)
 }
 int32_t yy__print_ship(struct yy__Spaceship* yy__s) 
 {
-    yk__sds t__6 = yk__sdsnew("Name");
+    yk__sds t__6 = yk__sdsnewlen("Name", 4);
     yy__print_str_item(yk__sdsdup(t__6), yk__sdsdup(yy__s->yy__name));
-    yk__sds t__7 = yk__sdsnew("Class");
+    yk__sds t__7 = yk__sdsnewlen("Class", 5);
     yy__print_str_item(yk__sdsdup(t__7), yk__sdsdup(yy__s->yy__class_));
     yy__print_captain(yy__s->yy__captain);
     yk__sdsfree(t__7);
@@ -70,14 +70,14 @@ int32_t yy__print_ship(struct yy__Spaceship* yy__s)
 int32_t yy__main() 
 {
     struct yy__Spaceship* yy__myship = calloc(1, sizeof(struct yy__Spaceship));
-    yk__sds t__8 = yk__sdsnew("USS Enterprise");
+    yk__sds t__8 = yk__sdsnewlen("USS Enterprise", 14);
     yk__sdsfree(yy__myship->yy__name);
     yy__myship->yy__name = yk__sdsdup(t__8);
-    yk__sds t__9 = yk__sdsnew("Galaxy");
+    yk__sds t__9 = yk__sdsnewlen("Galaxy", 6);
     yk__sdsfree(yy__myship->yy__class_);
     yy__myship->yy__class_ = yk__sdsdup(t__9);
     yy__myship->yy__captain = calloc(1, sizeof(struct yy__Captain));
-    yk__sds t__10 = yk__sdsnew("Picard");
+    yk__sds t__10 = yk__sdsnewlen("Picard", 6);
     yk__sdsfree(yy__myship->yy__captain->yy__name);
     yy__myship->yy__captain->yy__name = yk__sdsdup(t__10);
     yy__myship->yy__captain->yy__age = INT32_C(59);

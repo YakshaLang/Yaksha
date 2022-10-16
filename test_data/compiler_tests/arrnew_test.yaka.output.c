@@ -11,7 +11,7 @@ int32_t yy__main()
     int32_t* yy__a = t__0;
     int32_t yy__pos = INT32_C(0);
     int32_t yy__count = yk__arrlen(yy__a);
-    yk__sds t__1 = yk__sdsnew("Printing garbage int values");
+    yk__sds t__1 = yk__sdsnewlen("Printing garbage int values", 27);
     yk__printlnstr((t__1));
     while (1) {
         if (!((yy__pos < yy__count))) { break; } // Check
@@ -22,7 +22,7 @@ int32_t yy__main()
             yy__pos = (yy__pos + INT32_C(1));
         }
     }
-    yk__sds t__2 = yk__sdsnew("Success");
+    yk__sds t__2 = yk__sdsnewlen("Success", 7);
     yk__printlnstr((t__2));
     yk__sdsfree(t__2);
     yk__sdsfree(t__1);

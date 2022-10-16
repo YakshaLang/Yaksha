@@ -19,7 +19,7 @@ yk__sds yy__get_global_arg(int32_t nn__n)
 }
 int32_t yy__main() 
 {
-    yk__sds t__0 = yk__sdsnew("hello world");
+    yk__sds t__0 = yk__sdsnewlen("hello world", 11);
     yk__printlnstr((t__0));
     yk__sdsfree(t__0);
     return INT32_C(0);

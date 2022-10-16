@@ -27,14 +27,14 @@ bool yy__is_empty_str(yk__sds nn__s)
 void yy__leakme(yk__sds nn__a, yk__sds nn__b) { fopen(nn__a, nn__b); }
 int32_t yy__main() 
 {
-    yk__sds t__0 = yk__sdsnew("// ----->>> this is my code <<<<------\n");
+    yk__sds t__0 = yk__sdsnewlen("// ----->>> this is my code <<<<------\n", 39);
     yk__printstr((t__0));
-    yk__sds t__1 = yk__sdsnew("test.c");
+    yk__sds t__1 = yk__sdsnewlen("test.c", 6);
     yk__sds t__2 = yy__readfile(yk__sdsdup(t__1));
     yk__sds yy__a = yk__sdsdup((t__2));
     if (yy__is_empty_str(yk__sdsdup(yy__a)))
     {
-        yk__sds t__3 = yk__sdsnew("test.c is empty or not found");
+        yk__sds t__3 = yk__sdsnewlen("test.c is empty or not found", 28);
         yk__printstr((t__3));
         yk__sdsfree(t__3);
     }

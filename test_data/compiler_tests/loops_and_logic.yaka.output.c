@@ -14,7 +14,7 @@ int32_t yy__main()
         // Body of while loop
 
         {
-            yk__sds t__0 = yk__sdsnew("Hello");
+            yk__sds t__0 = yk__sdsnewlen("Hello", 5);
             yk__sds yy__d = yk__sdsdup(t__0);
             yy__a += INT32_C(1);
             if ((((yy__a % INT32_C(10)) == INT32_C(0)) || (yy__b == INT32_C(0))))

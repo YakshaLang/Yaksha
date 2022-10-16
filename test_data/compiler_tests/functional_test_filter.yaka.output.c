@@ -49,14 +49,14 @@ bool yy__print_int(int32_t yy__a, int32_t yy__ignored)
 }
 int32_t yy__main() 
 {
-    yk__sds t__2 = yk__sdsnew(">> filter str test <<");
+    yk__sds t__2 = yk__sdsnewlen(">> filter str test <<", 21);
     yk__printlnstr((t__2));
     ykfncptr0 yy__f = yy__keep_len_n;
-    yk__sds t__3 = yk__sdsnew("Hello");
-    yk__sds t__4 = yk__sdsnew("World");
-    yk__sds t__5 = yk__sdsnew("How");
-    yk__sds t__6 = yk__sdsnew("Are");
-    yk__sds t__7 = yk__sdsnew("You");
+    yk__sds t__3 = yk__sdsnewlen("Hello", 5);
+    yk__sds t__4 = yk__sdsnewlen("World", 5);
+    yk__sds t__5 = yk__sdsnewlen("How", 3);
+    yk__sds t__6 = yk__sdsnewlen("Are", 3);
+    yk__sds t__7 = yk__sdsnewlen("You", 3);
     yk__sds* t__8 = NULL;
     yk__arrsetcap(t__8, 5);
     yk__arrput(t__8, yk__sdsdup(t__3));
@@ -65,7 +65,7 @@ int32_t yy__main()
     yk__arrput(t__8, yk__sdsdup(t__6));
     yk__arrput(t__8, yk__sdsdup(t__7));
     yk__sds* yy__ar = t__8;
-    yk__sds t__9 = yk__sdsnew("Before =>> ");
+    yk__sds t__9 = yk__sdsnewlen("Before =>> ", 11);
     yk__printlnstr((t__9));
     yk__sds* t__12 = yy__ar;
     int32_t t__14 = INT32_C(0);
@@ -87,7 +87,7 @@ int32_t yy__main()
         t__20 = yk__sdsdup(t__19[t__17]); if (t__23) {yk__arrput(t__22, t__20); } else { yk__sdsfree(t__20); }
     }
     yk__sds* yy__ar2 = t__22;
-    yk__sds t__24 = yk__sdsnew("Filtered =>> ");
+    yk__sds t__24 = yk__sdsnewlen("Filtered =>> ", 13);
     yk__printlnstr((t__24));
     yk__sds* t__27 = yy__ar2;
     int32_t t__29 = INT32_C(0);
@@ -99,7 +99,7 @@ int32_t yy__main()
         if (!t__31) {t__30 = false; break; }
     }
     t__30;
-    yk__sds t__32 = yk__sdsnew("Keep All =>> ");
+    yk__sds t__32 = yk__sdsnewlen("Keep All =>> ", 13);
     yk__printlnstr((t__32));
     yk__sds* t__35 = yy__ar;
     int32_t t__37 = INT32_C(0);
@@ -120,7 +120,7 @@ int32_t yy__main()
         if (!t__46) {t__45 = false; break; }
     }
     t__45;
-    yk__sds t__47 = yk__sdsnew(">> filter int test <<");
+    yk__sds t__47 = yk__sdsnewlen(">> filter int test <<", 21);
     yk__printlnstr((t__47));
     ykfncptr1 yy__fi = yy__keep_upto;
     int32_t* t__48 = NULL;
@@ -136,7 +136,7 @@ int32_t yy__main()
     yk__arrput(t__48, INT32_C(9));
     yk__arrput(t__48, INT32_C(10));
     int32_t* yy__ai = t__48;
-    yk__sds t__49 = yk__sdsnew("Keep Upto 5 =>> ");
+    yk__sds t__49 = yk__sdsnewlen("Keep Upto 5 =>> ", 16);
     yk__printlnstr((t__49));
     int32_t* t__52 = yy__ai;
     int32_t t__54 = INT32_C(5);
@@ -157,7 +157,7 @@ int32_t yy__main()
         if (!t__63) {t__62 = false; break; }
     }
     t__62;
-    yk__sds t__64 = yk__sdsnew("Keep Upto 7 =>> ");
+    yk__sds t__64 = yk__sdsnewlen("Keep Upto 7 =>> ", 16);
     yk__printlnstr((t__64));
     int32_t* t__67 = yy__ai;
     int32_t t__69 = INT32_C(7);
@@ -178,7 +178,7 @@ int32_t yy__main()
         if (!t__78) {t__77 = false; break; }
     }
     t__77;
-    yk__sds t__79 = yk__sdsnew("Keep div 2 (even) =>> ");
+    yk__sds t__79 = yk__sdsnewlen("Keep div 2 (even) =>> ", 22);
     yk__printlnstr((t__79));
     int32_t* t__82 = yy__ai;
     int32_t t__84 = INT32_C(2);
@@ -199,7 +199,7 @@ int32_t yy__main()
         if (!t__93) {t__92 = false; break; }
     }
     t__92;
-    yk__sds t__94 = yk__sdsnew(">> completed.");
+    yk__sds t__94 = yk__sdsnewlen(">> completed.", 13);
     yk__printlnstr((t__94));
     yk__sdsfree(t__94);
     yk__sdsfree(t__79);

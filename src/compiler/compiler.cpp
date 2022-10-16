@@ -316,10 +316,12 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     if (obj->literal_token_->token_.empty()) {
       body_ << " = yk__sdsempty()";
     } else {
-      body_ << " = yk__sdsnew(\""
-            << string_utils::escape(
-                   string_utils::unescape(obj->literal_token_->token_))
-            << "\")";
+      std::string unescaped = string_utils::unescape(obj->literal_token_->token_);
+      body_ << " = yk__sdsnewlen(\""
+            << string_utils::escape(unescaped)
+            << "\", "
+            << unescaped.size()
+            << ")";
     }
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
