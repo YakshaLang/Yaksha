@@ -153,14 +153,14 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I identifier_exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ | OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
+  // I exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ | OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
   public static boolean assignment_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignment_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, I);
-    r = r && identifier_exp(b, l + 1);
+    r = r && exp(b, l + 1);
     r = r && assignment_statement_2(b, l + 1);
     r = r && assignment_statement_3(b, l + 1);
     r = r && assignment_statement_4(b, l + 1);

@@ -29,14 +29,8 @@ public class YakshaAssignmentStatementImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public YakshaExp getExp() {
-    return findNotNullChildByClass(YakshaExp.class);
-  }
-
-  @Override
-  @NotNull
-  public YakshaIdentifierExp getIdentifierExp() {
-    return findNotNullChildByClass(YakshaIdentifierExp.class);
+  public List<YakshaExp> getExpList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaExp.class);
   }
 
 }

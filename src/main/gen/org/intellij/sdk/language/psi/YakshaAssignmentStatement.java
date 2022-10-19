@@ -8,9 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface YakshaAssignmentStatement extends PsiElement {
 
   @NotNull
-  YakshaExp getExp();
-
-  @NotNull
-  YakshaIdentifierExp getIdentifierExp();
+  List<YakshaExp> getExpList();
 
 }
