@@ -15,6 +15,13 @@ void compiler::visit_assign_expr(assign_expr *obj) {
   auto name = prefix(obj->name_->token_, prefix_val_);
   auto rhs = pop();
   token_type operator_type = obj->opr_->type_;
+  std::string &token = obj->opr_->token_;
+  perform_assign(name, rhs, operator_type, token);
+}
+void compiler::perform_assign(const std::string &name,
+                              const std::pair<std::string, ykobject> &rhs,
+                              const token_type &operator_type,
+                              const std::string &token) {
   write_indent(body_);
   if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str() &&
       operator_type == token_type::EQ) {
@@ -46,7 +53,7 @@ void compiler::visit_assign_expr(assign_expr *obj) {
     body_ << name << " = "
           << "remainder(" << name + ", " + rhs.first + ")";
   } else {// usual case
-    body_ << name << " " << obj->opr_->token_ << " " << rhs.first;
+    body_ << name << " " << token << " " << rhs.first;
   }
   write_end_statement(body_);
 }
@@ -316,12 +323,10 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     if (obj->literal_token_->token_.empty()) {
       body_ << " = yk__sdsempty()";
     } else {
-      std::string unescaped = string_utils::unescape(obj->literal_token_->token_);
-      body_ << " = yk__sdsnewlen(\""
-            << string_utils::escape(unescaped)
-            << "\", "
-            << unescaped.size()
-            << ")";
+      std::string unescaped =
+          string_utils::unescape(obj->literal_token_->token_);
+      body_ << " = yk__sdsnewlen(\"" << string_utils::escape(unescaped)
+            << "\", " << unescaped.size() << ")";
     }
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
@@ -1035,19 +1040,7 @@ void compiler::visit_assign_member_expr(assign_member_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
-  write_indent(body_);
-  if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str()) {
-    // free current value.
-    body_ << "yk__sdsfree(" << lhs.first << ")";
-    write_end_statement(body_);
-    // duplicate the input.
-    // do assignment of the duplicate
-    write_indent(body_);
-    body_ << lhs.first << " = yk__sdsdup(" << rhs.first << ")";
-  } else {
-    body_ << lhs.first << " = " << rhs.first;
-  }
-  write_end_statement(body_);
+  perform_assign(lhs.first, rhs, obj->opr_->type_, obj->opr_->token_);
 }
 void compiler::visit_square_bracket_access_expr(
     square_bracket_access_expr *obj) {
@@ -1093,16 +1086,16 @@ void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
-  write_indent(body_);
   if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str()) {
     // Note: Do not free the array value, only duplicate input string
     // Array/Tuple value freeing is left to user to handle for str
     // As we do not know if it has garbage value or a proper value at comp time
+    write_indent(body_);
     body_ << lhs.first << " = yk__sdsdup(" << rhs.first << ")";
+    write_end_statement(body_);
   } else {
-    body_ << lhs.first << " = " << rhs.first;
+    perform_assign(lhs.first, rhs, obj->opr_->type_, obj->opr_->token_);
   }
-  write_end_statement(body_);
 }
 void compiler::visit_ccode_stmt(ccode_stmt *obj) {
   write_indent(body_);

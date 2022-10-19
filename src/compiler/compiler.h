@@ -150,6 +150,10 @@ private:
                               ykdatatype *return_type);
     std::string
     prefix_function_arg(const std::pair<std::string, ykobject> &arg_val);
+    void perform_assign(const std::string &name,
+                        const std::pair<std::string, ykobject> &rhs,
+                        const token_type &operator_type,
+                        const std::string &token);
   };
 }// namespace yaksha
 #endif
