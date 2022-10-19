@@ -587,8 +587,12 @@ struct builtin_cast : builtin {
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
     auto out_dt =
         dt_parser->parse(dt->literal_token_->token_, import_aliases, filepath);
-    code << "((" << dt_compiler->convert_dt(out_dt) << ")" << args[1].first
-         << ")";
+    if (out_dt->is_any_ptr() || out_dt->is_any_ptr_to_const()) {
+      code << "(" << args[1].first << ")";
+    } else {
+      code << "((" << dt_compiler->convert_dt(out_dt) << ")" << args[1].first
+           << ")";
+    }
     o = ykobject(out_dt);
     return {code.str(), o};
   }

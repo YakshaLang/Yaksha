@@ -44,7 +44,7 @@ int32_t yy__main()
         {
             yy__world1((&(yy__hello)));
             yy__world2((&(yy__hello)));
-            yy__world3(((void*)(&(yy__hello))));
+            yy__world3(((&(yy__hello))));
             yy__i = (yy__i - INT32_C(1));
         }
     }
