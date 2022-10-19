@@ -1,8 +1,0 @@
-import w4
-
-def game_step(data: AnyPtr) -> None:
-    w4.rect(10, 10, 32u32, 32u32)
-
-
-def main() -> int:
-    return 0

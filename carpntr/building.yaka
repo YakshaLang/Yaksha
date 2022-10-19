@@ -203,7 +203,7 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     if c.compilation.wasm4:
         # Change args for link time for wasm4
         sarr.del_str_array(args)
-        args = array("str", c.zig_compiler_path, "build-lib", "-dynamic", "-target", "wasm32-wasi-musl", "-flto", "--strip", "--stack", "14752", "--import-memory", "--initial-memory=65536", "--max-memory=65536", "-ofmt=wasm", "-O", "ReleaseSmall", "--export=start", "--export=update")
+        args = array("str", c.zig_compiler_path, "build-lib", "-dynamic", "-flto", "-mexec-model=reactor", "-O", "ReleaseSmall", "-target", "wasm32-wasi-musl", "--strip", "--stack", "50784", "--global-base=6560", "--import-memory", "--initial-memory=65536", "--max-memory=65536", "-ofmt=wasm", "--export=start", "--export=update")
     args = sarr.extend(args, objects)
     args = sarr.extend(args, ray_objects)
     sarr.del_str_array(objects)

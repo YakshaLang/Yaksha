@@ -1,0 +1,144 @@
+import w4
+import libs.random
+
+class Point:
+    # Point (x, y)
+    x: i16
+    y: i16
+
+class Snake:
+    # Snake's body and direction
+    body: Array[Point]
+    direction: Point
+
+class State:
+    # Game state
+    snake: Snake
+    fruit_sprite: str
+    fruit: Point
+    frame_count: u32
+    gamepad_prev: u8
+
+def point(x: i16, y: i16) -> Point:
+    my_point: Point = Point()
+    my_point.x = x
+    my_point.y = y
+    return my_point
+
+def set_random_point(p: Point) -> Point:
+    x: i16 = cast("i16", random.random_u64() % 20u64)
+    y: i16 = cast("i16", random.random_u64() % 20u64)
+    p.x = x
+    p.y = y
+
+def random_point() -> Point:
+    p: Point = Point()
+    return set_random_point(p)
+
+def draw_sprite(color: u16, sprite: str, x: i16, y: i16) -> None:
+    w4.set_draw_colors(color)
+
+def draw_snake(snake: Snake) -> None:
+    # Body
+    w4.set_draw_colors(0x0043u16)
+    i: int = 0
+    while i < len(snake.body):
+        body_part: Point = snake.body[i]
+        x: int = cast("int", body_part.x * 8i16)
+        y: int = cast("int", body_part.y * 8i16)
+        w4.rect(x, y, 8u32, 8u32)
+        i += 1
+    # Head
+    w4.set_draw_colors(0x0004u16)
+    body_part: Point = snake.body[0]
+    x: int = cast("int", body_part.x * 8i16)
+    y: int = cast("int", body_part.y * 8i16)
+    w4.rect(x, y, 8u32, 8u32)
+
+def snake_push(snake: Snake, p: Point) -> None:
+    arrput(snake.body, p)
+
+def snake_update(snake: Snake) -> None:
+    # Move snake a level up
+    position: int = len(snake.body) - 1
+    while position > 0:
+        snake.body[position].x = snake.body[position - 1].x
+        snake.body[position].y = snake.body[position - 1].y
+        position -= 1
+    snake.body[0].x = (snake.body[0].x + snake.direction.x) % 20i16
+    snake.body[0].y = (snake.body[0].y + snake.direction.y) % 20i16
+    if snake.body[0].x < 0i16:
+        snake.body[0].x = 19i16
+    if snake.body[0].y < 0i16:
+        snake.body[0].y = 19i16
+
+def snake_up(snake: Snake) -> None:
+    if snake.direction.y == 0i16:
+        snake.direction.x = 0i16
+        snake.direction.y = -1i16
+
+def snake_down(snake: Snake) -> None:
+    if snake.direction.y == 0i16:
+        snake.direction.x = 0i16
+        snake.direction.y = 1i16
+
+def snake_left(snake: Snake) -> None:
+    if snake.direction.x == 0i16:
+        snake.direction.x = -1i16
+        snake.direction.y = 0i16
+
+def snake_right(snake: Snake) -> None:
+    if snake.direction.x == 0i16:
+        snake.direction.x = 1i16
+        snake.direction.y = 0i16
+
+def handle_input(state: State) -> None:
+    just_pressed: u8 = w4.gamepad1() & (w4.gamepad1() ^ state.gamepad_prev)
+    if just_pressed & w4.BUTTON_UP != 0u8:
+        snake_up(state.snake)
+    if just_pressed & w4.BUTTON_DOWN != 0u8:
+        snake_down(state.snake)
+    if just_pressed & w4.BUTTON_LEFT != 0u8:
+        snake_left(state.snake)
+    if just_pressed & w4.BUTTON_RIGHT != 0u8:
+        snake_right(state.snake)
+    state.gamepad_prev = w4.gamepad1()
+
+def game_step(data: AnyPtr) -> None:
+    state: State = cast("State", data)
+    state.frame_count += 1u32
+    random.set_seed(cast("u64", state.frame_count))
+    x: int = 8 * cast("int", state.fruit.x)
+    y: int = 8 * cast("int", state.fruit.y)
+
+    handle_input(state)
+    if state.frame_count % 15u32 == 0u32:
+        snake_update(state.snake)
+
+        if state.snake.body[0].x == state.fruit.x and state.snake.body[0].y == state.fruit.y:
+            penultimate: int = len(state.snake.body) - 1
+            snake_push(state.snake, point(state.snake.body[penultimate].x, state.snake.body[penultimate].y))
+            state.fruit = set_random_point(state.fruit)
+
+    draw_snake(state.snake)
+    # Draw sprite
+    w4.set_draw_colors(0x4320u16)
+    w4.blit(cast("Ptr[Const[u8]]", state.fruit_sprite), x, y, 8u32, 8u32, w4.BLIT_2BPP)
+
+def main() -> int:
+    random.set_seed(0x20u64)
+    w4.set_palette(0xfbf7f3u32, 0xe5b083u32, 0x426e5du32, 0x20283du32)
+    state: State = State()
+    state.snake = Snake()
+    state.fruit = point(10i16, 8i16)
+    state.snake.direction = point(1i16, 0i16)
+    state.frame_count = 0u32
+    state.gamepad_prev = 0u8
+    body: Array[Point]
+    arrput(body, point(2i16, 0i16))
+    arrput(body, point(1i16, 0i16))
+    arrput(body, point(0i16, 0i16))
+    state.snake.body = body
+    state.fruit_sprite = "\x00\xa0\x02\x00\x0e\xf0\x36\x5c\xd6\x57\xd5\x57\x35\x5c\x0f\xf0"
+    w4.set_game_state(cast("AnyPtr", state))
+    return 0

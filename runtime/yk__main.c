@@ -32,10 +32,12 @@ int main(int argc, char *argv[]) {
 }
 #endif
 #if defined(YK__WASM4)
-extern void *yk__w4_game_state;
+#include "yk__wasm4_libc.h"
 void yy__game_step(void*);
-void update() { yy__game_step(yk__w4_game_state); }
+void wasm4_mem_init();
+void update() { yy__game_step(yk__get_game_state()); }
 void start() {
+  wasm4_mem_init();
   yk__arguments_copy = malloc(sizeof(struct yk__arguments));
   yk__arguments_copy->argv = NULL;
   yk__arguments_copy->argc = 0;

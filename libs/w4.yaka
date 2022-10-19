@@ -3,7 +3,7 @@ runtimefeature "wasm4"
 SCREEN_SIZE: Const[int] = 160
 # Screen size of wasm4 console
 
-@nativedefine("((uint32_t*)0x04)")
+@nativemacro("((uint32_t*)0x04)")
 def palette() -> Ptr[u32]:
     # Get a pointer to pallet
     pass
@@ -12,58 +12,58 @@ def palette() -> Ptr[u32]:
 def set_palette(c1: u32, c2: u32, c3: u32, c4: u32) -> None:
     # Set palette
     ccode """
-    ((uint32_t*)0x04)[0] = nn__c1;
-    ((uint32_t*)0x04)[1] = nn__c2;
-    ((uint32_t*)0x04)[2] = nn__c3;
-    ((uint32_t*)0x04)[3] = nn__c4;
+    PALETTE[0] = nn__c1;
+    PALETTE[1] = nn__c2;
+    PALETTE[2] = nn__c3;
+    PALETTE[3] = nn__c4;
     """
 
-@nativedefine("(*((uint16_t*)0x14))")
+@nativemacro("(*((uint16_t*)0x14))")
 def draw_colors() -> u16:
     # Read draw colors
     pass
 
-@nativedefine("*((uint16_t*)0x14) = nn__value")
+@nativemacro("*((uint16_t*)0x14) = nn__value")
 def set_draw_colors(value: u16) -> None:
     # Set draw colors
     pass
 
-@nativedefine("((int_32t)*((const uint8_t*)0x16))")
-def gamepad1() -> int:
+@nativemacro("(*((const uint8_t*)0x16))")
+def gamepad1() -> u8:
     # Read gamepad 1 value
     pass
 
-@nativedefine("((int_32t)*((const uint8_t*)0x17))")
-def gamepad2() -> int:
+@nativemacro("(*((const uint8_t*)0x17))")
+def gamepad2() -> u8:
     # Read gamepad 2 value
     pass
 
-@nativedefine("((int_32t)*((const uint8_t*)0x18))")
-def gamepad3() -> int:
+@nativemacro("(*((const uint8_t*)0x18))")
+def gamepad3() -> u8:
     # Read gamepad 3 value
     pass
 
-@nativedefine("((int_32t)*((const uint8_t*)0x19))")
-def gamepad4() -> int:
+@nativemacro("(*((const uint8_t*)0x19))")
+def gamepad4() -> u8:
     # Read gamepad 4 value
     pass
 
-@nativedefine("((int_32t)*((const int16_t*)0x1a))")
-def mouse_x() -> int:
+@nativemacro("(*((const int16_t*)0x1a))")
+def mouse_x() -> i16:
     # Read mouse x
     pass
 
-@nativedefine("((int_32t)*((const int16_t*)0x1c))")
-def mouse_y() -> int:
+@nativemacro("(*((const int16_t*)0x1c))")
+def mouse_y() -> i16:
     # Read mouse y
     pass
 
-@nativedefine("((int_32t)*((const uint8_t*)0x1e))")
-def mouse_buttons() -> int:
+@nativemacro("(*((const uint8_t*)0x1e))")
+def mouse_buttons() -> u8:
     # Read mouse buttons
     pass
 
-@nativedefine("(*((uint8_t*)0x1f))")
+@nativemacro("(*((uint8_t*)0x1f))")
 def system_flags() -> u8:
     # Read system flags
     pass
@@ -73,37 +73,37 @@ def set_system_flags(value: u8) -> None:
     # Set system flags
     ccode """*((uint8_t*)0x1f) = nn__value"""
 
-@nativedefine("((int_32t)*((const uint8_t*)0x20))")
+@nativemacro("((int32_t)*((const uint8_t*)0x20))")
 def netplay() -> int:
     # Read mouse buttons
     pass
 
-@nativedefine("((uint8_t*)0xa0)")
+@nativemacro("((uint8_t*)0xa0)")
 def framebuffer() -> Ptr[u8]:
     # Access pointer to framebuffer
     pass
 
-BUTTON_1: Const[int] = 1
-BUTTON_2: Const[int] = 2
-BUTTON_LEFT: Const[int] = 16
-BUTTON_RIGHT: Const[int] = 32
-BUTTON_UP: Const[int] = 64
-BUTTON_DOWN: Const[int] = 128
+BUTTON_1: Const[u8] = 1u8
+BUTTON_2: Const[u8] = 2u8
+BUTTON_LEFT: Const[u8] = 16u8
+BUTTON_RIGHT: Const[u8] = 32u8
+BUTTON_UP: Const[u8] = 64u8
+BUTTON_DOWN: Const[u8] = 128u8
 
-MOUSE_LEFT: Const[int] = 1
-MOUSE_RIGHT: Const[int] = 2
-MOUSE_MIDDLE: Const[int] = 4
+MOUSE_LEFT: Const[u8] = 1u8
+MOUSE_RIGHT: Const[u8] = 2u8
+MOUSE_MIDDLE: Const[u8] = 4u8
 
 SYSTEM_PRESERVE_FRAMEBUFFER: Const[u8] = 1u8
 SYSTEM_HIDE_GAMEPAD_OVERLAY: Const[u8] = 2u8
 
 @native("blit")
-def blit(data: Const[Ptr[u8]], x: int, y: int, width: u32, height: u32, flags: u32) -> None:
+def blit(data: Ptr[Const[u8]], x: int, y: int, width: u32, height: u32, flags: u32) -> None:
     # Copies pixels to the framebuffer
     pass
 
 @native("blitSub")
-def blit_sub(data: Const[Ptr[u8]], x: int, y: int, width: u32, height: u32, src_x: u32, src_y: u32, stride: u32, flags: u32) -> None:
+def blit_sub(data: Ptr[Const[u8]], x: int, y: int, width: u32, height: u32, src_x: u32, src_y: u32, stride: u32, flags: u32) -> None:
     # Copies a subregion within a larger sprite atlas to the framebuffer
     pass
 
@@ -167,7 +167,7 @@ def diskr(dest: AnyPtr, size: u32) -> u32:
     pass
 
 @native("diskw")
-def diskw(src: Const[AnyPtr], size: u32) -> u32:
+def diskw(src: AnyPtrToConst, size: u32) -> u32:
     # Writes up to `size` bytes from the pointer `src` into persistent storage
     pass
 
@@ -180,4 +180,4 @@ def trace(text_data: str) -> None:
 @native
 def set_game_state(data: AnyPtr) -> None:
     # Set a state value to be passed to game_step() function
-    ccode """yk__w4_game_state = nn__data"""
+    ccode """yk__set_game_state(nn__data);"""
