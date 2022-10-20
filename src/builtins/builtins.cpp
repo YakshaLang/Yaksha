@@ -5,6 +5,7 @@
 #include <sstream>
 #include <utility>
 using namespace yaksha;
+// http://patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Type%20Something%20
 //
 // ┌─┐┬─┐┬─┐┌─┐┬ ┬┌┬┐
 // ├─┤├┬┘├┬┘├─┘│ │ │
@@ -1286,6 +1287,52 @@ struct builtin_functional : builtin {
   fnc fnc_type_;
   std::string name_;
 };
+//
+// ┌─┐┌┬┐┬─┐┬  ┬┌┬┐
+// └─┐ │ ├┬┘│  │ │
+// └─┘ ┴ ┴└─┴─┘┴ ┴
+//
+struct builtin_strlit : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 1) {
+      o.string_val_ = "strlit() builtin expects 1 argument";
+    } else if (!args[0].datatype_->is_str() ||
+        arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+      o.string_val_ = "Argument to strlit() must be a str literal";
+    } else {
+      o = ykobject(dt_parser->parse("Ptr[Const[u8]]", import_aliases, filepath));
+      return o;
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return false;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor) override {
+    auto str_expression = dynamic_cast<literal_expr *>(arg_expressions[0]);
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    std::string unescaped =
+        string_utils::unescape(str_expression->literal_token_->token_);
+    code << "((uint8_t const *)\"" << string_utils::escape(unescaped) << "\")";
+    o = ykobject(dt_parser->parse("Ptr[Const[u8]]", import_aliases, filepath));
+    return {code.str(), o};
+  }
+};
 //=======================================
 builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"arrput", new builtin_arrput{}});
@@ -1319,6 +1366,7 @@ builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
                                   builtin_functional::fnc::FILTER, "filter"}});
   builtins_.insert(
       {"map", new builtin_functional{builtin_functional::fnc::MAP, "map"}});
+  builtins_.insert({"strlit", new builtin_strlit{}});
 }
 builtins::~builtins() {
   for (auto &i : builtins_) { delete i.second; }

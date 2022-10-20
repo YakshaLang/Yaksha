@@ -14,7 +14,7 @@ class Snake:
 class State:
     # Game state
     snake: Snake
-    fruit_sprite: str
+    fruit_sprite: Ptr[Const[u8]]
     fruit: Point
     frame_count: u32
     gamepad_prev: u8
@@ -149,7 +149,7 @@ def game_step(data: AnyPtr) -> None:
     draw_snake(state.snake)
     # Draw sprite
     w4.set_draw_colors(0x4320u16)
-    w4.blit(cast("Ptr[Const[u8]]", state.fruit_sprite), x, y, 8u32, 8u32, w4.BLIT_2BPP)
+    w4.blit(state.fruit_sprite, x, y, 8u32, 8u32, w4.BLIT_2BPP)
 
 def main() -> int:
     random.set_seed(0x20u64)
@@ -165,6 +165,6 @@ def main() -> int:
     arrput(body, point(1i16, 0i16))
     arrput(body, point(0i16, 0i16))
     state.snake.body = body
-    state.fruit_sprite = "\x00\xa0\x02\x00\x0e\xf0\x36\x5c\xd6\x57\xd5\x57\x35\x5c\x0f\xf0"
+    state.fruit_sprite = strlit("\x00\xa0\x02\x00\x0e\xf0\x36\x5c\xd6\x57\xd5\x57\x35\x5c\x0f\xf0")
     w4.set_game_state(cast("AnyPtr", state))
     return 0

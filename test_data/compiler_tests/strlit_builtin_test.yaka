@@ -1,0 +1,4 @@
+def main() -> int:
+    a: Ptr[Const[u8]] = strlit("Hello World")
+    println("ok")
+    return 0

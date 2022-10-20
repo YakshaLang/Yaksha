@@ -472,3 +472,13 @@ TEST_CASE("type checker: ccode statement used outside non native function") {
                     "    return 0",
                     "Invalid use of ccode statement outside non native function");
 }
+TEST_CASE(
+    "type checker: argument must be a string literal for strlit()") {
+  TEST_SNIPPET("a: Ptr[Const[u8]] = strlit(1)",
+               "Argument to strlit() must be a str literal");
+}
+TEST_CASE(
+    "type checker: only 1 argument is allowed for strlit strlit()") {
+  TEST_SNIPPET("a: Ptr[Const[u8]] = strlit(1, 2, 3)",
+               "strlit() builtin expects 1 argument");
+}
