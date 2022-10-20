@@ -92,6 +92,29 @@ def snake_right(snake: Snake) -> None:
         snake.direction.x = 1i16
         snake.direction.y = 0i16
 
+def snake_isdead(snake: Snake) -> bool:
+    part: int = 1
+    while part < len(snake.body):
+        if snake.body[part].x == snake.body[0].x and snake.body[part].y == snake.body[0].y:
+            return True
+        part += 1
+    return False
+
+def del_point(p: Point, ignored: int) -> bool:
+    del p
+    return True
+
+def snake_reset(snake: Snake) -> None:
+    foreach(snake.body, del_point, 0)
+    del snake.body
+    body: Array[Point]
+    arrput(body, point(2i16, 0i16))
+    arrput(body, point(1i16, 0i16))
+    arrput(body, point(0i16, 0i16))
+    snake.body = body
+    snake.direction.x = 1i16
+    snake.direction.y = 0i16
+
 def handle_input(state: State) -> None:
     just_pressed: u8 = w4.gamepad1() & (w4.gamepad1() ^ state.gamepad_prev)
     if just_pressed & w4.BUTTON_UP != 0u8:
@@ -114,7 +137,10 @@ def game_step(data: AnyPtr) -> None:
     handle_input(state)
     if state.frame_count % 15u32 == 0u32:
         snake_update(state.snake)
-
+        if snake_isdead(state.snake):
+            snake_reset(state.snake)
+            state.fruit = set_random_point(state.fruit)
+        # Ate fruit
         if state.snake.body[0].x == state.fruit.x and state.snake.body[0].y == state.fruit.y:
             penultimate: int = len(state.snake.body) - 1
             snake_push(state.snake, point(state.snake.body[penultimate].x, state.snake.body[penultimate].y))
