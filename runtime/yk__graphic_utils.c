@@ -150,6 +150,15 @@ uint64_t yk__init_random() {
   return seed_value;
 }
 // Reference - https://stackoverflow.com/a/33021408
+#if defined(YK__WASM4)
+uint64_t yk__random_u64_impl(void) {
+  uint64_t r = 0;
+  for (int i = 5; i > 0; i--) {
+    r = r * (32767 + (uint64_t) 1) + rand();
+  }
+  return r;
+}
+#else
 #define IMAX_BITS(m)                                                           \
   ((m) / ((m) % 255 + 1) / 255 % 255 * 8 + 7 - 86 / ((m) % 255 + 12))
 #define RAND_MAX_WIDTH IMAX_BITS(RAND_MAX)
@@ -184,7 +193,7 @@ uint64_t yk__rand64(void) {
 #else
 #define yk__random_u64_impl yk__rand64
 #endif
-
+#endif
 uint64_t yk__random_u64() {
   return yk__random_u64_impl();
 }
