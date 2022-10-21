@@ -206,7 +206,7 @@ TEST_CASE("compiler: Class stuff") {
   TEST_FILE("../test_data/compiler_tests/class_stuff.yaka", "class_stuff.yaka",
             "../test_data/compiler_tests/class_stuff.tokens");
 }
-TEST_CASE("compiler: Test strlit() builtin") {
-  TEST_FILE("../test_data/compiler_tests/strlit_builtin_test.yaka", "strlit_builtin_test.yaka",
-            "../test_data/compiler_tests/strlit_builtin_test.tokens");
+TEST_CASE("compiler: Test binarydata() builtin") {
+  TEST_FILE("../test_data/compiler_tests/binarydata_builtin_test.yaka", "binarydata_builtin_test.yaka",
+            "../test_data/compiler_tests/binarydata_builtin_test.tokens");
 }

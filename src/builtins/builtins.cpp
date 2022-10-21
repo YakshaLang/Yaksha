@@ -44,7 +44,8 @@ struct builtin_arrput : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     if (args[1].second.datatype_->is_str()) {
@@ -92,7 +93,8 @@ struct builtin_arrpop : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     o = ykobject(args[0].second.datatype_->args_[0]);
@@ -141,7 +143,8 @@ struct builtin_print : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto rhs = args[0];
@@ -201,7 +204,8 @@ struct builtin_len : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     if (args[0].second.datatype_->is_str()) {
@@ -256,7 +260,8 @@ struct builtin_charat : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "(" << args[0].first << "[" << args[1].first << "])";
@@ -302,7 +307,8 @@ struct builtin_getref : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "(&(" << args[0].first << "))";
@@ -345,7 +351,8 @@ struct builtin_unref : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "(*(" << args[0].first << "))";
@@ -387,7 +394,8 @@ struct builtin_shnew : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__sh_new_strdup(" << args[0].first << ")";
@@ -431,7 +439,8 @@ struct builtin_shget : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__shget(" << args[0].first << ", " << args[1].first << ")";
@@ -476,7 +485,8 @@ struct builtin_shgeti : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__shgeti(" << args[0].first << ", " << args[1].first << ")";
@@ -524,7 +534,8 @@ struct builtin_shput : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__shput(" << args[0].first << ", " << args[1].first << ", "
@@ -582,7 +593,8 @@ struct builtin_cast : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
@@ -632,7 +644,8 @@ struct builtin_hmnew : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     return {"", o};
   }
@@ -676,7 +689,8 @@ struct builtin_hmget : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__hmget(" << args[0].first << ", " << args[1].first << ")";
@@ -723,7 +737,8 @@ struct builtin_hmgeti : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__hmgeti(" << args[0].first << ", " << args[1].first << ")";
@@ -774,7 +789,8 @@ struct builtin_hmput : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "yk__hmput(" << args[0].first << ", " << args[1].first << ", "
@@ -840,7 +856,8 @@ struct builtin_qsort : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     o = ykobject(args[0].second.datatype_->args_[0]);
@@ -902,7 +919,8 @@ struct builtin_arrnew : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
@@ -982,7 +1000,8 @@ struct builtin_array : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
@@ -1061,7 +1080,8 @@ struct builtin_iif : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     code << "(" << args[0].first << " ? " << args[1].first << " : "
@@ -1120,7 +1140,8 @@ struct builtin_functional : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     std::stringstream code{};
     ykdatatype *dt;
     ykdatatype *return_val_type;
@@ -1288,11 +1309,11 @@ struct builtin_functional : builtin {
   std::string name_;
 };
 //
-// ┌─┐┌┬┐┬─┐┬  ┬┌┬┐
-// └─┐ │ ├┬┘│  │ │
-// └─┘ ┴ ┴└─┴─┘┴ ┴
+// ┌┐ ┬┌┐┌┌─┐┬─┐┬ ┬┌┬┐┌─┐┌┬┐┌─┐
+// ├┴┐││││├─┤├┬┘└┬┘ ││├─┤ │ ├─┤
+// └─┘┴┘└┘┴ ┴┴└─ ┴ ─┴┘┴ ┴ ┴ ┴ ┴
 //
-struct builtin_strlit : builtin {
+struct builtin_binarydata : builtin {
   ykobject
   verify(const std::vector<ykobject> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
@@ -1301,12 +1322,13 @@ struct builtin_strlit : builtin {
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
-      o.string_val_ = "strlit() builtin expects 1 argument";
+      o.string_val_ = "binarydata() builtin expects 1 argument";
     } else if (!args[0].datatype_->is_str() ||
-        arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
-      o.string_val_ = "Argument to strlit() must be a str literal";
+               arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+      o.string_val_ = "Argument to binarydata() must be a str literal";
     } else {
-      o = ykobject(dt_parser->parse("Ptr[Const[u8]]", import_aliases, filepath));
+      o = ykobject(
+          dt_parser->parse("Const[Ptr[Const[u8]]]", import_aliases, filepath));
       return o;
     }
     o.object_type_ = object_type::RUNTIME_ERROR;
@@ -1322,15 +1344,15 @@ struct builtin_strlit : builtin {
           ykdt_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
-          function_datatype_extractor *fnc_dt_extractor) override {
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
     auto str_expression = dynamic_cast<literal_expr *>(arg_expressions[0]);
     auto o = ykobject(dt_pool);
-    std::stringstream code{};
-    std::string unescaped =
+    std::string raw_string =
         string_utils::unescape(str_expression->literal_token_->token_);
-    code << "((uint8_t const *)\"" << string_utils::escape(unescaped) << "\")";
-    o = ykobject(dt_parser->parse("Ptr[Const[u8]]", import_aliases, filepath));
-    return {code.str(), o};
+    o = ykobject(
+        dt_parser->parse("Const[Ptr[Const[u8]]]", import_aliases, filepath));
+    return {esc->compile_binary_data(raw_string), o};
   }
 };
 //=======================================
@@ -1366,7 +1388,7 @@ builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
                                   builtin_functional::fnc::FILTER, "filter"}});
   builtins_.insert(
       {"map", new builtin_functional{builtin_functional::fnc::MAP, "map"}});
-  builtins_.insert({"strlit", new builtin_strlit{}});
+  builtins_.insert({"binarydata", new builtin_binarydata{}});
 }
 builtins::~builtins() {
   for (auto &i : builtins_) { delete i.second; }
@@ -1389,10 +1411,11 @@ std::pair<std::string, ykobject> builtins::compile(
     const std::vector<expr *> &arg_expressions, datatype_compiler *dt_compiler,
     const std::unordered_map<std::string, import_stmt *> &import_aliases,
     const std::string &filepath, statement_writer *st_writer,
-    function_datatype_extractor *fnc_dt_extractor) {
+    function_datatype_extractor *fnc_dt_extractor,
+    entry_struct_func_compiler *esc) {
   return builtins_[name]->compile(args, arg_expressions, dt_compiler, this,
                                   dt_pool_, import_aliases, filepath, st_writer,
-                                  fnc_dt_extractor);
+                                  fnc_dt_extractor, esc);
 }
 bool builtins::should_compile_argument(const std::string &name, int arg_index,
                                        expr *arg_expression) {

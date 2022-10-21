@@ -473,12 +473,12 @@ TEST_CASE("type checker: ccode statement used outside non native function") {
                     "Invalid use of ccode statement outside non native function");
 }
 TEST_CASE(
-    "type checker: argument must be a string literal for strlit()") {
-  TEST_SNIPPET("a: Ptr[Const[u8]] = strlit(1)",
-               "Argument to strlit() must be a str literal");
+    "type checker: argument must be a string literal for binarydata()") {
+  TEST_SNIPPET("a: Ptr[Const[u8]] = binarydata(1)",
+               "Argument to binarydata() must be a str literal");
 }
 TEST_CASE(
-    "type checker: only 1 argument is allowed for strlit strlit()") {
-  TEST_SNIPPET("a: Ptr[Const[u8]] = strlit(1, 2, 3)",
-               "strlit() builtin expects 1 argument");
+    "type checker: only 1 argument is allowed for binarydata()") {
+  TEST_SNIPPET("a: Ptr[Const[u8]] = binarydata(1, 2, 3)",
+               "binarydata() builtin expects 1 argument");
 }

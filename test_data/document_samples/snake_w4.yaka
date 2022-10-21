@@ -165,6 +165,6 @@ def main() -> int:
     arrput(body, point(1i16, 0i16))
     arrput(body, point(0i16, 0i16))
     state.snake.body = body
-    state.fruit_sprite = strlit("\x00\xa0\x02\x00\x0e\xf0\x36\x5c\xd6\x57\xd5\x57\x35\x5c\x0f\xf0")
+    state.fruit_sprite = binarydata("\x00\xa0\x02\x00\x0e\xf0\x36\x5c\xd6\x57\xd5\x57\x35\x5c\x0f\xf0")
     w4.set_game_state(cast("AnyPtr", state))
     return 0

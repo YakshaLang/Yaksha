@@ -5,7 +5,8 @@ entry_struct_func_compiler::entry_struct_func_compiler(ykdt_pool *pool)
     : pool_(pool), counter_(0), autogen_structs_list_(), autogen_structs_(),
       autogen_func_typedefs_(), autogen_func_typedef_list_(),
       counter_functions_(0), code_(), code_fnc_(), counter_tuples_(0),
-      autogen_tuple_list_(), autogen_tuples_(), code_tuples_() {}
+      autogen_tuple_list_(), autogen_tuples_(), code_tuples_(),
+      counter_bin_data_(0), autogen_bin_data_(), bin_data_() {}
 std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
                                                 datatype_compiler *dtc) {
   std::string repr = entry_dt->as_string();
@@ -114,7 +115,7 @@ std::string entry_struct_func_compiler::compile_tuple(ykdatatype *tuple_dt,
     return "struct yktuple" + std::to_string(autogen_tuples_[repr]);
   }
   tuple_data d{};
-  d.incremented_id_ = counter_++;
+  d.incremented_id_ = counter_tuples_++;
   d.tuple_dt_ = tuple_dt;
   std::stringstream code{};
   code << "struct yktuple" << d.incremented_id_ << " {";
@@ -128,5 +129,41 @@ std::string entry_struct_func_compiler::compile_tuple(ykdatatype *tuple_dt,
   autogen_tuple_list_.emplace_back(d);
   autogen_tuples_[repr] = d.incremented_id_;
   return "struct yktuple" + std::to_string(d.incremented_id_);
+}
+bool entry_struct_func_compiler::has_bin_data() {
+  return !autogen_bin_data_.empty();
+}
+template<typename T>
+std::string int_to_hex(T i) {
+  std::stringstream stream;
+  stream << std::setfill('0') << std::setw(2) << std::hex << (unsigned long) i;
+  return stream.str();
+}
+std::string
+entry_struct_func_compiler::compile_binary_data(const std::string &data) {
+  if (autogen_bin_data_.find(data) != autogen_bin_data_.end()) {
+    return "ykbindata" + std::to_string(autogen_bin_data_[data]);
+  }
+  unsigned int current = counter_bin_data_++;
+  autogen_bin_data_.insert({data, current});
+  bin_data_ << "uint8_t const ykbindata" << current << "[] = {";
+  unsigned long int x = 0;
+  for (const unsigned char current_char : data) {
+    if (x == 0) {
+      bin_data_ << "\n";
+    } else if (x % 4 == 0) {
+      bin_data_ << ",\n";
+    } else {
+      bin_data_ << ", ";
+    }
+    x++;
+    bin_data_ << "UINT8_C(0x" << int_to_hex(current_char) << ")";
+  }
+  bin_data_ << "\n};\n";
+  return "ykbindata" + std::to_string(current);
+}
+void entry_struct_func_compiler::compile_binary_data_to(
+    std::stringstream &target) {
+  target << bin_data_.str();
 }
 entry_struct_func_compiler::~entry_struct_func_compiler() = default;

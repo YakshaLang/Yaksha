@@ -152,8 +152,9 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
       }
       i++;
     }
-    auto result = builtins_.compile(name, args, obj->args_, this,
-                                    import_stmts_alias_, filepath_, this, this);
+    auto result =
+        builtins_.compile(name, args, obj->args_, this, import_stmts_alias_,
+                          filepath_, this, this, esc_);
     push(result.first, result.second);
   } else if (name_pair.second.object_type_ == object_type::MODULE_CLASS) {
     auto module_file = name_pair.second.module_file_;

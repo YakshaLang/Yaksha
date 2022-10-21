@@ -1,0 +1,6 @@
+def main() -> int:
+    a: Ptr[Const[u8]] = binarydata("Hello World")
+    b: Ptr[Const[u8]] = binarydata("Hello World")
+    c: Ptr[Const[u8]] = binarydata("Hello London")
+    println("ok")
+    return 0
