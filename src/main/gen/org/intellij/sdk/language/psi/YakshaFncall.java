@@ -8,11 +8,11 @@ import com.intellij.psi.PsiReference;
 
 public interface YakshaFncall extends PsiElement {
 
-  @Nullable
-  YakshaArguments getArguments();
+  @NotNull
+  List<YakshaArguments> getArgumentsList();
 
-  @Nullable
-  YakshaExp getExp();
+  @NotNull
+  List<YakshaExp> getExpList();
 
   @NotNull
   YakshaIdentifierExp getIdentifierExp();

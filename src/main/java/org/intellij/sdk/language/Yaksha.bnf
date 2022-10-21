@@ -83,7 +83,7 @@ bitwise ::= term (S? (OPERATOR_B_OR | OPERATOR_B_AND | OPERATOR_B_XOR | OPERATOR
 term ::= factor (S? (OPERATOR_MINUS | OPERATOR_PLUS) S? factor)* | factor
 factor ::= unary (S? (OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER) S? unary)* | unary
 unary ::= (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp | fncall | primary
-fncall ::= identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB ) {
+fncall ::= identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER )* {
     methods=[getDefOrClassName getFullName getReference]
 }
 primary ::= KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | identifier_exp | paren_exp

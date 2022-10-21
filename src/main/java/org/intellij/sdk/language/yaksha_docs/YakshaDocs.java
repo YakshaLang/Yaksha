@@ -47,6 +47,7 @@ public class YakshaDocs {
             .put("countif", "For each element in array count if function returns true")
             .put("filter", "Create a new array with filtered elements based on return value of given function")
             .put("map", "Create a new array with result of given function")
+            .put("binarydata", "Create constant binary data. Returns Const[Ptr[Const[u8]]] that does not need to be deleted.")
             .build();
     public static final Set<String> BUILTIN_FUNCTION_NAMES = BUILTIN_FUNCTIONS.keySet();
     public static final YakshaDocs INSTANCE = new YakshaDocs();

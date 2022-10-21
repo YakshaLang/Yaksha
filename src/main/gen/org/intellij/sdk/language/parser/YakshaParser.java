@@ -1232,7 +1232,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB )
+  // identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER )*
   public static boolean fncall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fncall")) return false;
     if (!nextTokenIs(b, IDENTIFIER)) return false;
@@ -1244,92 +1244,104 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB
+  // (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER )*
   private static boolean fncall_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fncall_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = fncall_1_0(b, l + 1);
-    if (!r) r = fncall_1_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    while (true) {
+      int c = current_position_(b);
+      if (!fncall_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "fncall_1", c)) break;
+    }
+    return true;
   }
 
-  // S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P
+  // S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER
   private static boolean fncall_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fncall_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = fncall_1_0_0(b, l + 1);
+    if (!r) r = fncall_1_0_1(b, l + 1);
+    if (!r) r = parseTokens(b, 0, OPERATOR_DOT, IDENTIFIER);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P
+  private static boolean fncall_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = fncall_1_0_0_0(b, l + 1);
     r = r && consumeToken(b, OPERATOR_OPEN_P);
-    r = r && fncall_1_0_2(b, l + 1);
-    r = r && fncall_1_0_3(b, l + 1);
-    r = r && fncall_1_0_4(b, l + 1);
+    r = r && fncall_1_0_0_2(b, l + 1);
+    r = r && fncall_1_0_0_3(b, l + 1);
+    r = r && fncall_1_0_0_4(b, l + 1);
     r = r && consumeToken(b, OPERATOR_CLOSE_P);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // S?
-  private static boolean fncall_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fncall_1_0_0")) return false;
+  private static boolean fncall_1_0_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_0_0")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean fncall_1_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fncall_1_0_2")) return false;
+  private static boolean fncall_1_0_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_0_2")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // arguments?
-  private static boolean fncall_1_0_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fncall_1_0_3")) return false;
+  private static boolean fncall_1_0_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_0_3")) return false;
     arguments(b, l + 1);
     return true;
   }
 
   // S?
-  private static boolean fncall_1_0_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fncall_1_0_4")) return false;
+  private static boolean fncall_1_0_0_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_0_4")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB
-  private static boolean fncall_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fncall_1_1")) return false;
+  private static boolean fncall_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = fncall_1_1_0(b, l + 1);
+    r = fncall_1_0_1_0(b, l + 1);
     r = r && consumeToken(b, OPERATOR_OPEN_SQB);
-    r = r && fncall_1_1_2(b, l + 1);
+    r = r && fncall_1_0_1_2(b, l + 1);
     r = r && exp(b, l + 1);
-    r = r && fncall_1_1_4(b, l + 1);
+    r = r && fncall_1_0_1_4(b, l + 1);
     r = r && consumeToken(b, OPERATOR_CLOSE_SQB);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // S?
-  private static boolean fncall_1_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fncall_1_1_0")) return false;
+  private static boolean fncall_1_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_1_0")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean fncall_1_1_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fncall_1_1_2")) return false;
+  private static boolean fncall_1_0_1_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_1_2")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean fncall_1_1_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fncall_1_1_4")) return false;
+  private static boolean fncall_1_0_1_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_1_4")) return false;
     consumeToken(b, S);
     return true;
   }

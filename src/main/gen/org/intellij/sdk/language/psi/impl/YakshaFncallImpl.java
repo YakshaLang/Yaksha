@@ -29,15 +29,15 @@ public class YakshaFncallImpl extends ASTWrapperPsiElement implements YakshaFnca
   }
 
   @Override
-  @Nullable
-  public YakshaArguments getArguments() {
-    return findChildByClass(YakshaArguments.class);
+  @NotNull
+  public List<YakshaArguments> getArgumentsList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaArguments.class);
   }
 
   @Override
-  @Nullable
-  public YakshaExp getExp() {
-    return findChildByClass(YakshaExp.class);
+  @NotNull
+  public List<YakshaExp> getExpList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaExp.class);
   }
 
   @Override
