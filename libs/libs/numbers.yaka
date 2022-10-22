@@ -5,6 +5,10 @@ def cstr2i(a: c.CStr) -> int:
     # Convert a c-string to an integer
     pass
 
+def s2i(s: str) -> int:
+    # Convert a str to integer
+    return cstr2i(cast("c.CStr", s))
+
 @nativemacro
 def cdbl2d(a: c.CDouble) -> f64:
     # c.CDouble to f64 (double precision)
