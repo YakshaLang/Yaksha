@@ -265,8 +265,9 @@ def load_runtime_features(c: Config, code: str) -> Config:
             arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__wasm4_libc.c"))
             # Get rid of main() method
             arrput(c.c_code.runtime_feature_compiler_defines, "YK__WASM4")
-            # Enable wasm4 feature
-            c.compilation.wasm4 = True
+            # Check that we are actually using wasm4
+            if not c.compilation.wasm4:
+                arrput(c.errors, "wasm4 feature used without configuring it")
             continue
         if feature == "argparse":
             arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__argparse.c"))
@@ -295,8 +296,9 @@ def load_runtime_features(c: Config, code: str) -> Config:
             arrput(c.c_code.runtime_feature_includes, "yk__process.h")
             continue
         if feature == "raylib":
-            # Enable raylib building feature !
-            c.compilation.raylib = True
+            # Verify raylib is enabled
+            if not c.compilation.raylib:
+                arrput(c.errors, "raylib feature used without configuring it")
             continue
         if feature == "tinycthread":
             arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "tinycthread.c"))
