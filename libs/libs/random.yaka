@@ -13,12 +13,24 @@ def set_seed(seed: u64) -> None:
 @native
 def random() -> f64:
     # Get a random value between 0 - 1 (crypto unsafe)
-    ccode """return ((double)rand() / (double)RAND_MAX)"""
+    ccode """double val;
+    #if defined(YK__WASM4)
+    val = ((double)rand() / 32767.0);
+    #else
+    val = ((double)rand() / (double)RAND_MAX);
+    #endif
+    return val"""
 
 @native
 def randomf() -> float:
     # Get a random value between 0 - 1 (crypto unsafe)
-    ccode """return ((float)rand() / (float)RAND_MAX)"""
+    ccode """float val;
+    #if defined(YK__WASM4)
+    val = ((float)rand() / 32767.0f);
+    #else
+    val = ((float)rand() / (float)RAND_MAX);
+    #endif
+    return val"""
 
 def random_between(a: f64, b: f64) -> f64:
     # Get a random value between a and b (crypto unsafe)

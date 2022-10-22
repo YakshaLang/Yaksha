@@ -74,6 +74,10 @@ double yk__perlin3d(double x, double y, double z) {
                yk__lerp(u, yk__grad(p[AB + 1], x, y - 1, z - 1),
                         yk__grad(p[BB + 1], x - 1, y - 1, z - 1))));
 }
+#if defined(YK__WASM4)
+// Use hardcoded values with perlin3d
+double yk__perlin2d(double x, double y) { return yk__perlin3d(x, y, 10.3431123123); }
+#else
 /* Function to linearly interpolate between a0 and a1
  * Weight w should be in the range [0.0, 1.0]
  */
@@ -143,11 +147,17 @@ double yk__perlin2d(double x, double y) {
   value = yk__interpolate(ix0, ix1, sy);
   return value;
 }
+#endif
 double yk__perlin1d(double x) { return yk__perlin3d(x, 1.34345, 3.412); }
 uint64_t yk__init_random() {
+#if defined(YK__WASM4)
+  uint64_t seed_value = 0xDEADBEEF;
+#else
   uint64_t seed_value = time(NULL);
+#endif
   srand((unsigned) seed_value);
   return seed_value;
+
 }
 // Reference - https://stackoverflow.com/a/33021408
 #if defined(YK__WASM4)
