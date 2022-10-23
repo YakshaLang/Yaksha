@@ -29,17 +29,16 @@ def branch(x: float, y: float, length: float, angle: float, s: State) -> None:
     next_x: float = x + length * utils.sin_deg(angle)
     thick: float = utils.remap(length, 0.0f, s.height / 4.0f, 2.0f, 6.0f)
     rl.draw_line_ex(rl.vector2(x, y), rl.vector2(next_x, next_y), thick, rl.color(152, 50, 1, 255))
-    r1: float = random.random_betweenf(0.3f, 0.9f)
+    r1: float = random.random_betweenf(0.5f, 0.9f)
     r2: float = random.random_betweenf(0.5f, 0.8f)
     branch(next_x, next_y, (length * r2), angle + s.angle + wind * 10.0f, s)
     branch(next_x, next_y, (length * r1), angle - s.angle + wind * 10.0f, s)
 
 
 def game_step(d: utils.Data) -> None:
-    print(".")
     s: State = cast("State", d)
     rl.begin_drawing()
-    rl.clear_background(rl.color(255, 255, 255, 255))
+    rl.clear_background(rl.color(220, 255, 196, 255))
     branch(s.width / 2.0f, s.height, s.height / 4.0f, 0.0f, s)
     rl.draw_fps(0, 0)
     rl.end_drawing()
@@ -52,22 +51,20 @@ def init_state() -> State:
     s.width = 600.0f
     s.height = 600.0f
     s.frame_count = 0u64
-    s.blue = rl.color(100, 255, 214, 255)
+    s.blue = rl.color(12, 255, 214, 255)
     s.green = rl.color(0, 255, 0, 255)
     s.color3 = rl.color(100, 150, 156, 255)
     s.seed = random.init_random()
     return s
 
 def del_state(current: utils.Data) -> None:
-    println("del_state()")
     del current
 
 def main() -> int:
-    println("main()")
     s: State = init_state()
     rl.init_window(num.f2i(s.width), num.f2i(s.height), "Fractal Tree in the Wind")
     # Avoid while loop for better performance in WASM/WEB builds
-    utils.run_game_loop(120, cast("utils.Data", s))
+    utils.run_game_loop(0, cast("utils.Data", s))
     # Clean up
     if not utils.is_hot_reload():
         del_state(cast("utils.Data", s))
