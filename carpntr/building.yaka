@@ -144,6 +144,8 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     # If not macos do link time optimization
     if not is_target_macos(target):
         arrput(args, "-flto=full")
+    if c.compilation.raylib_hot_reloading_dll:
+        arrput(args, "-DYK__CR_DLL")
     args = sarr.extend(args, ray_other_args)
     # --
     length: int = 0
@@ -211,14 +213,25 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     if c.compilation.web and len(c.compilation.web_shell) > 0:
         arrput(args, "--shell-file")
         arrput(args, c.compilation.web_shell)
+    # -shared
+    if c.compilation.raylib_hot_reloading_dll:
+        arrput(args, "-shared")
     # -o bin.exe
     if target != "wasm4":
         arrput(args, "-o")
     binary: str = c.project.name
     if not native and target != "web" and target != "wasm4":
         binary = binary + "-" + target
-    if is_target_windows(target):
-        binary = binary + ".exe"
+    if c.compilation.raylib_hot_reloading_dll:
+        if is_target_windows(target):
+            binary = binary + ".dll"
+        elif is_target_macos(target):
+            binary = "lib" + binary + ".dylib"
+        else:
+            binary = "lib" + binary + ".so"
+    else:
+        if is_target_windows(target):
+            binary = binary + ".exe"
     if target == "web":
         binary = binary + ".html"
     if target == "wasm4":

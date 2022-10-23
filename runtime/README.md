@@ -16,6 +16,7 @@ Bunch of `C` code that standard library depend on.
 | `argparse.*`    | Yecheng Fu and contributors         | Argument parsing                   | [argparse](https://github.com/cofyc/argparse)             | MIT                                                                                    |
 | `tinycthread.*` | Marcus Geelnard, Evan Nemerson      | Thread Library                     | [tinycthread](https://github.com/tinycthread/tinycthread) | [Custom?](https://github.com/tinycthread/tinycthread)                                  |
 | `wasm4.h`       | Bruno Garcia                        | wasm4 fantasy console C header     | [wasm4](https://github.com/aduros/wasm4)                  | ISC                                                                                    |
+| `cr.h`          | Bruno Garcia                        | hot reloading capabilities         | [cr.h](https://github.com/fungos/cr)                      | MIT                                                                                    |
 
 ### Patches
 

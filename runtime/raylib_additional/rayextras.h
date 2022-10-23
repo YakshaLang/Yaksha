@@ -1,6 +1,15 @@
 // ----- This file is to be directly included at the top of raylib game ---
 void *yk__raylib_game_state = (void *) 0;
-#if defined(PLATFORM_WEB)
+#if defined(YK__CR_DLL)
+void *yk__get_game_state() { return yk__raylib_game_state; }
+void yk__set_game_state(void *gs) { yk__raylib_game_state = gs; }
+#define yk__rungameloop(nn__fps, nn__state)                                    \
+  do {                                                                         \
+    yk__raylib_game_state = nn__state;                                         \
+    SetTargetFPS(nn__fps);                                                     \
+  } while (0)
+void yy__game_step(void *);
+#elif defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
 #define yk__rungameloop(nn__fps, nn__state)                                    \
   do {                                                                         \

@@ -70,7 +70,7 @@ def run_game_loop(fps: int, data: Data) -> int:
 
 @native
 def is_web() -> bool:
-    # Are we running in raylib WASM/Web
+    # Are we running in raylib WASM/Web?
     ccode """bool result = false;
     #if defined(PLATFORM_WEB)
     result = true;
@@ -79,9 +79,18 @@ def is_web() -> bool:
 
 @native
 def is_desktop() -> bool:
-    # Are we running in raylib in desktop
+    # Are we running in raylib in desktop?
     ccode """bool result = false;
     #if defined(PLATFORM_DESKOP)
+    result = true;
+    #endif
+    return result"""
+
+@native
+def is_hot_reload() -> bool:
+    # Are we running in raylib with hot reload?
+    ccode """bool result = false;
+    #if defined(YK__CR_DLL)
     result = true;
     #endif
     return result"""

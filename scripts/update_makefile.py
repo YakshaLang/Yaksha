@@ -7,7 +7,7 @@ import os.path
 from typing import List, Tuple
 
 IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp", "utf8proc_data.c", "print_str.c", "dump.cpp",
-          "comp_main.cpp",
+          "comp_main.cpp", "reloader.cpp", "yk__wasm4_libc.c",
           "yk__fake_whereami.c"]
 
 

@@ -15,9 +15,13 @@ class CObject:
     args: Array[str]
 
 
-def fill_arguments(src_path: str, c: CObject) -> CObject:
+def fill_arguments(src_path: str, c: CObject, dll: bool) -> CObject:
     # Fill args section of CObject
     args: Array[str] = array("str", "-std=gnu99", "-DPLATFORM_DESKTOP", "-DGL_SILENCE_DEPRECATION=199309L", "-fno-sanitize=undefined")
+
+    # Creating a hot reload DLL with raylib
+    if dll:
+        arrput(args, "-DYK__CR_DLL")
 
     arrput(args, "-I" + src_path)
     external: str = path.join(src_path, "external")
@@ -50,7 +54,7 @@ def fill_web_arguments(src_path: str, c: CObject) -> CObject:
     return c
 
 
-def co(filename: str, src_path: str, target_path: str, web: bool) -> CObject:
+def co(filename: str, src_path: str, target_path: str, web: bool, dll: bool) -> CObject:
     # Create a new CObject
     obj: CObject = CObject()
     obj.c_file = path.join(src_path, filename + ".c")
@@ -62,7 +66,7 @@ def co(filename: str, src_path: str, target_path: str, web: bool) -> CObject:
     else:
         obj.base_name = filename
         obj.o_file = path.join(target_path, filename + ".o")
-        obj = fill_arguments(src_path, obj)
+        obj = fill_arguments(src_path, obj, dll)
     return obj
 
 
@@ -88,20 +92,20 @@ def del_objects(x: Array[CObject]) -> None:
     del x
 
 
-def get_objects(raylib_src_path: str, gui_path: str, extra_path: str, build_path: str, web: bool) -> Array[CObject]:
+def get_objects(raylib_src_path: str, gui_path: str, extra_path: str, build_path: str, web: bool, dll: bool) -> Array[CObject]:
     # Get a list of objects for raylib
     objects: Array[CObject]
     # rglfw object is not needed for web (provided by emsdk)
     if not web:
-        arrput(objects, co("rglfw", raylib_src_path, build_path, web))
-    arrput(objects, co("raudio", raylib_src_path, build_path, web))
-    arrput(objects, co("rcore", raylib_src_path, build_path, web))
-    arrput(objects, co("rmodels", raylib_src_path, build_path, web))
-    arrput(objects, co("rshapes", raylib_src_path, build_path, web))
-    arrput(objects, co("rtext", raylib_src_path, build_path, web))
-    arrput(objects, co("rtextures", raylib_src_path, build_path, web))
-    arrput(objects, co("utils", raylib_src_path, build_path, web))
-    extra: CObject = co("rayextras", extra_path, build_path, web)
+        arrput(objects, co("rglfw", raylib_src_path, build_path, web, dll))
+    arrput(objects, co("raudio", raylib_src_path, build_path, web, dll))
+    arrput(objects, co("rcore", raylib_src_path, build_path, web, dll))
+    arrput(objects, co("rmodels", raylib_src_path, build_path, web, dll))
+    arrput(objects, co("rshapes", raylib_src_path, build_path, web, dll))
+    arrput(objects, co("rtext", raylib_src_path, build_path, web, dll))
+    arrput(objects, co("rtextures", raylib_src_path, build_path, web, dll))
+    arrput(objects, co("utils", raylib_src_path, build_path, web, dll))
+    extra: CObject = co("rayextras", extra_path, build_path, web, dll)
     arrput(extra.args, "-I" + raylib_src_path)
     arrput(extra.args, "-I" + gui_path)
     arrput(objects, extra)
@@ -113,12 +117,11 @@ def get_external_libs() -> Array[str]:
     external_libs: Array[str]
     if os.is_windows():
         external_libs = array("str", "-lwinmm", "-lgdi32", "-lopengl32")
+    elif os.is_macos():
+        external_libs =  array("str", "-framework", "Foundation", "-framework", "OpenGL", "-framework", "OpenAL", "-framework", "IOKit", "-framework", "CoreVideo", "-framework", "Cocoa")
     else:
-        if os.is_macos():
-            external_libs =  array("str", "-framework", "Foundation", "-framework", "OpenGL", "-framework", "OpenAL", "-framework", "IOKit", "-framework", "CoreVideo", "-framework", "Cocoa")
-        else:
-            # linux
-            external_libs = array("str", "-lGL", "-lrt", "-ldl", "-lm", "-lX11")
+        # linux
+        external_libs = array("str", "-lGL", "-lrt", "-ldl", "-lm", "-lX11")
     return external_libs
 
 def get_web_args() -> Array[str]:
@@ -168,7 +171,7 @@ def get_raylib_args(conf: carp.Config, build_path: str) -> Array[str]:
     raylib_path: str = path.join(path.join(runtime_path, "raylib"), "src")
     raygui_path: str = path.join(path.join(runtime_path, "raygui"), "src")
     rayextra_path: str = path.join(runtime_path, "raylib_additional")
-    objects: Array[CObject] = get_objects(raylib_path, raygui_path, rayextra_path, build_path, conf.compilation.web)
+    objects: Array[CObject] = get_objects(raylib_path, raygui_path, rayextra_path, build_path, conf.compilation.web, conf.compilation.raylib_hot_reloading_dll)
     o_files: Array[str]
     defer sarr.del_str_array(o_files)
     defer del_objects(objects)
