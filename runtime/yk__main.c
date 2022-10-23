@@ -49,6 +49,7 @@ void start() {
   free(yk__arguments_copy);
 }
 #endif
+#define YK__CR_DLL
 // ╦ ╦┌─┐┌┬┐  ╦═╗┌─┐┬  ┌─┐┌─┐┌┬┐┬┌┐┌┌─┐
 // ╠═╣│ │ │   ╠╦╝├┤ │  │ │├─┤ │││││││ ┬
 // ╩ ╩└─┘ ┴   ╩╚═└─┘┴─┘└─┘┴ ┴─┴┘┴┘└┘└─┘
@@ -62,7 +63,7 @@ void yy__game_step(void *);
 void yy__del_state(void *);
 void *yk__get_game_state();
 bool WindowShouldClose(void);
-void CloseWindow(void);
+void yk__CloseWindow(void);
 typedef struct Vector2 {
   float x;
   float y;
@@ -101,14 +102,14 @@ CR_EXPORT int cr_main(struct cr_plugin *ctx, enum cr_op operation) {
     ud->x = (int) pos.x;
     ud->y = (int) pos.y;
     ud->window_position_set = true;
-    CloseWindow();
+    yk__CloseWindow();
     return 0;
   } else if (operation == CR_CLOSE) {
     print_message("[CR_CLOSE]\n");
     if (ud != NULL && ud->real_user_data != NULL) {
       yy__del_state(ud->real_user_data);
     }
-    CloseWindow();
+    yk__CloseWindow();
     return 0;
   } else if (operation == CR_STEP) {
     void *game_data = NULL;

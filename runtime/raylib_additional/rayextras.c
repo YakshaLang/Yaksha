@@ -6,3 +6,7 @@
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
+
+void yk__CloseWindow(void) {
+  CloseWindow();
+}
