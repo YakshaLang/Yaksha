@@ -852,6 +852,12 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
                                    << ";\n";
     }
   }
+  // Define globals
+  for (const auto &name : this->defs_classes_.global_const_names_) {
+    auto cls = defs_classes_.get_const(name);
+    auto obj = ykobject(cls->data_type_);
+    scope_.define_global(prefix(cls->name_->token_, prefix_val_), obj);
+  }
   for (auto imp_st : fi->data_->parser_->import_stmts_) {
     auto obj = ykobject(dt_pool);
     obj.object_type_ = yaksha::object_type::MODULE;
