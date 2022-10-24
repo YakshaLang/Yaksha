@@ -1,0 +1,32 @@
+import libs.thread
+import libs.thread.pool
+import libs.os.cpu
+
+def my_thread(arg: AnyPtr) -> int:
+    thread.sleep(1)
+    println("Hello from Thread")
+    thread.sleep(1)
+    println("Hello from Thread Again")
+    return 0
+
+def print_num(arg: AnyPtr) -> None:
+    a: int = cast("int", arg)
+    print("Consumed ")
+    println(a)
+    thread.sleep(1)
+
+def main() -> int:
+    t: thread.Thread
+    println("Hello from main thread")
+    if thread.create(getref(t), my_thread) == thread.SUCCESS:
+        thread.join(t)
+    p: pool.ThreadPool = pool.create(3u8, 1000u32)
+    if p == None:
+        println("Failed to create thread pool")
+        return 0
+    i: int = 0
+    while i < 40:
+        pool.add(p, print_num, cast("AnyPtr", i))
+        i += 1
+    pool.destroy(p, True)
+    return 0

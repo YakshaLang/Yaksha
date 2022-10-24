@@ -1,7 +1,5 @@
 runtimefeature "tinycthread"
 
-import libs.thread
-
 @nativedefine("tss_t")
 @dotaccess
 class Key:
@@ -10,11 +8,13 @@ class Key:
     pass
 
 @native("tss_create")
-def create_with_deleter(key: Ptr[Key], deleter: Function[In[thread.Data], Out]) -> int:
+def create_with_deleter(key: Ptr[Key], deleter: Function[In[AnyPtr], Out]) -> int:
+    # Create TSS with a custom deleter function
     pass
 
 @native
 def create(key: Ptr[Key]) -> int:
+    # Create with no auto deletion
     ccode """return tss_create(nn__key, NULL)"""
 
 @native("tss_delete")
@@ -22,9 +22,9 @@ def del_data(key: Key) -> None:
     pass
 
 @native("tss_get")
-def get(key: Key) -> thread.Data:
+def get(key: Key) -> AnyPtr:
     pass
 
 @native("tss_set")
-def set(key: Key, data: thread.Data) -> int:
+def set(key: Key, data: AnyPtr) -> int:
     pass

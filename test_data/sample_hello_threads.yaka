@@ -1,6 +1,8 @@
 import libs.thread
+import libs.thread.pool
+import os.cpu
 
-def my_thread(arg: thread.Data) -> int:
+def my_thread(arg: AnyPtr) -> int:
     thread.sleep(1)
     println("Hello from Thread")
     thread.sleep(1)

@@ -1,0 +1,181 @@
+import libs.thread
+import libs.thread.condition
+import libs.thread.mutex
+
+IMMEDIATE_SHUTDOWN: Const[int] = 1
+# Default (shutdown all threads forcefully) and close the pool
+GRACEFUL_SHUTDOWN: Const[int] = 2
+# We are waiting for tasks to be completed
+NO_SHUTDOWN: Const[int] = 0
+# Not going to shutdown
+
+MAX_THREAD_SIZE: Const[u8] = 64u8
+# Maximum threads we can create is 64
+MAX_QUEUE_SIZE: Const[u32] = 65536u32
+# Maximum queue size for thread pool
+
+ERROR_INVALID: Const[int] = 10
+ERROR_LOCK_FAILURE: Const[int] = 20
+ERROR_QUEUE_FULL: Const[int] = 30
+ERROR_SHUTDOWN: Const[int] = 40
+ERROR_THREAD_FAILURE: Const[int] = 50
+SUCCESS: Const[int] = 0
+
+class ThreadPool:
+    # Thread pool object
+    lock: mutex.Mutex
+    notify: condition.Condition
+    threads: Array[thread.Thread]
+    # Contains a pre allocated list of threads
+    queue: Array[Tuple[Function[In[AnyPtr],Out],AnyPtr]]
+    # Task --> Tuple[Function[In[AnyPtr],Out], AnyPtr]
+    # Queue contain a pre allocated list of tasks (fixed size)
+    thread_count: int
+    # Total number of threads we have allocated
+    queue_size: int
+    head: int
+    tail: int
+    count: int
+    shutdown: int
+    started: int
+    # Total number of threads that was started
+
+
+def create(thread_count: u8, queue_size: u32) -> ThreadPool:
+    # Create a new thread pool with given thread count and queue size
+    # On success ThreadPool is returned else, it should be equal to None
+    if thread_count == 0u8 or queue_size == 0u32 or thread_count > MAX_THREAD_SIZE or queue_size > MAX_QUEUE_SIZE:
+        # Invalid input
+        return cast("ThreadPool", None)
+    tpool: ThreadPool = ThreadPool()
+    # Failed to allocate a pool
+    if tpool == None:
+        return tpool
+    tpool.thread_count = 0
+    tpool.queue_size = cast("int", queue_size)
+    tpool.head = 0
+    tpool.tail = 0
+    tpool.count = 0
+    tpool.shutdown = 0
+    tpool.started = 0
+    # Allocate
+    arrsetlen(tpool.threads, thread_count)
+    arrsetlen(tpool.queue, queue_size)
+    # Can initialize?
+    locks_ok: bool = mutex.init(getref(tpool.lock), mutex.PLAIN) == thread.SUCCESS and condition.init(getref(tpool.notify)) == thread.SUCCESS
+    print("Locks:")
+    println(locks_ok)
+    arrays_ok: bool = tpool.threads != None and tpool.queue != None
+    if not locks_ok or not arrays_ok:
+        internal_del_pool(tpool)
+        return cast("ThreadPool", None)
+    # Start workers
+    i: int = 0
+    thread_count_i: int = cast("int", thread_count)
+    while i < thread_count_i:
+        ok: bool = thread.create_with_data(getref(tpool.threads[i]), internal_tpool_work, cast("AnyPtr", tpool)) == thread.SUCCESS
+        if not ok:
+            destroy(tpool, True)
+            return cast("ThreadPool", None)
+        i += 1
+        tpool.thread_count += 1
+        tpool.started += 1
+    return tpool
+
+def add(tpool: ThreadPool, func: Function[In[AnyPtr],Out], arg: AnyPtr) -> int:
+    err: int = SUCCESS
+    next: int = 0
+    ## TODO see if func == None
+    if tpool == None:
+        return ERROR_INVALID
+    next = (tpool.tail + 1) % tpool.queue_size
+    while True:
+        if tpool.count == tpool.queue_size:
+            err = ERROR_QUEUE_FULL
+            break
+        if tpool.shutdown != NO_SHUTDOWN:
+            err = ERROR_SHUTDOWN
+            break
+        tpool.queue[tpool.tail][0] = func
+        tpool.queue[tpool.tail][1] = arg
+        tpool.tail = next
+        tpool.count += 1
+        if condition.signal(getref(tpool.notify)) != thread.SUCCESS:
+            err = ERROR_LOCK_FAILURE
+        break
+    if mutex.unlock(getref(tpool.lock)) != thread.SUCCESS:
+        err = ERROR_LOCK_FAILURE
+    return err
+
+def destroy(tpool: ThreadPool, graceful: bool) -> int:
+    # Attempt to destroy thread pool, if SUCCESS is returned pool is deallocated as well
+    if tpool == None:
+        return ERROR_INVALID
+    if mutex.lock(getref(tpool.lock)) != thread.SUCCESS:
+        return ERROR_LOCK_FAILURE
+    err: int = SUCCESS
+    while True:
+        if tpool.shutdown != NO_SHUTDOWN:
+            err = ERROR_SHUTDOWN
+            break
+        tpool.shutdown = iif(graceful, GRACEFUL_SHUTDOWN, IMMEDIATE_SHUTDOWN)
+        if condition.broadcast(getref(tpool.notify)) != thread.SUCCESS or mutex.unlock(getref(tpool.lock)) != thread.SUCCESS:
+            err = ERROR_LOCK_FAILURE
+            break
+        i: int = 0
+        while i < tpool.thread_count:
+            ok: bool = thread.join(tpool.threads[i]) == thread.SUCCESS
+            if not ok:
+                err = ERROR_THREAD_FAILURE
+            i += 1
+        break
+    if err == SUCCESS:
+        internal_del_pool(tpool)
+    return err
+
+#### Internal functions #####
+
+def internal_del_pool(tpool: ThreadPool) -> int:
+    # Clean up thread pool data
+    if tpool == None or tpool.started > 0:
+        return ERROR_INVALID
+    if tpool.threads != None or tpool.queue != None:
+        del tpool.threads
+        del tpool.queue
+        mutex.lock(getref(tpool.lock))
+        mutex.destroy(getref(tpool.lock))
+        condition.destroy(getref(tpool.notify))
+    del tpool
+    return SUCCESS
+
+def internal_tpool_work(tpool_obj: AnyPtr) -> int:
+    # Perform work as a thread in the managed thread pool
+    tpool: ThreadPool = cast("ThreadPool", tpool_obj)
+    task: Tuple[Function[In[AnyPtr],Out], AnyPtr]
+    while True:
+        mutex.lock(getref(tpool.lock))
+        while tpool.count == 0 and tpool.shutdown == NO_SHUTDOWN:
+            condition.wait(getref(tpool.notify), getref(tpool.lock))
+        if (tpool.shutdown == GRACEFUL_SHUTDOWN and tpool.count == 0) or tpool.shutdown == IMMEDIATE_SHUTDOWN:
+            break
+        # Grab
+        task[0] = tpool.queue[tpool.head][0]
+        task[1] = tpool.queue[tpool.head][1]
+        tpool.head = (tpool.head + 1) % tpool.queue_size
+        tpool.count -= 1
+        # Unlock
+        mutex.unlock(getref(tpool.lock))
+        # Do task
+        fnc: Function[In[AnyPtr],Out] = task[0]
+        fnc(task[1])
+    # If we broke out of the loop
+    tpool.started -= 1
+    mutex.unlock(getref(tpool.lock))
+    thread.exit(0)
+    return 0
+
+# ----
+# Based on https://github.com/mbrossard/threadpool
+# Original license (BSD 2 Clause)
+# Copyright (c) 2016, Mathias Brossard. All rights reserved.
+# Link to License - https://github.com/mbrossard/threadpool/blob/master/LICENSE

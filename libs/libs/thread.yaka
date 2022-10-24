@@ -22,18 +22,13 @@ class Thread:
     # Thread Object
     pass
 
-@nativedefine("void*")
-class Data:
-    # Any data
-    pass
-
 @native("thrd_create")
-def create_with_data(thr: Ptr[Thread], func: Function[In[Data], Out[int]], data: Data) -> int:
-    # Create a new thread with given reference to Thread and a function that takes Data and return int
+def create_with_data(thr: Ptr[Thread], func: Function[In[AnyPtr], Out[int]], data: AnyPtr) -> int:
+    # Create a new thread with given reference to Thread and a function that takes AnyPtr and return int
     pass
 
 @native
-def create(thr: Ptr[Thread], func: Function[In[Data], Out[int]]) -> int:
+def create(thr: Ptr[Thread], func: Function[In[AnyPtr], Out[int]]) -> int:
     # Create a thread with None data. Otherwise same as create_with_data()
     ccode """return thrd_create(nn__thr, nn__func, NULL)"""
 
