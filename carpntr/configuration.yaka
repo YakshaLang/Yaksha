@@ -297,6 +297,10 @@ def load_runtime_features(c: Config, code: str) -> Config:
             arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__process.c"))
             arrput(c.c_code.runtime_feature_includes, "yk__process.h")
             continue
+        if feature == "cpu":
+            arrput(c.c_code.runtime_feature_c_code, path.join(c.runtime_path, "yk__cpu.c"))
+            arrput(c.c_code.runtime_feature_includes, "yk__cpu.h")
+            continue
         if feature == "raylib":
             # Verify raylib is enabled
             if not c.compilation.raylib:

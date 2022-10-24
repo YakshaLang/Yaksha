@@ -1,0 +1,18 @@
+runtimefeature "cpu"
+
+@dotaccess
+@nativedefine("struct yk__cpu_info")
+class Cpu:
+    # Extracted CPU information
+    n_processors: int
+    # Active processors
+    n_processors_max: int
+    # Total processors
+    is_guess: bool
+    # Number of processor count is a guess
+
+
+@native("yk__get_cpu_count")
+def info() -> Cpu:
+    # Extract CPU information
+    pass
