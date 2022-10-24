@@ -103,6 +103,63 @@ struct builtin_arrpop : builtin {
   }
 };
 //
+// ┌─┐┬─┐┬─┐┌─┐┌─┐┌┬┐┌─┐┌─┐┌─┐
+// ├─┤├┬┘├┬┘└─┐├┤  │ │  ├─┤├─┘
+// ┴ ┴┴└─┴└─└─┘└─┘ ┴ └─┘┴ ┴┴
+// ┌─┐┬─┐┬─┐┌─┐┌─┐┌┬┐┬  ┌─┐┌┐┌
+// ├─┤├┬┘├┬┘└─┐├┤  │ │  ├┤ │││
+// ┴ ┴┴└─┴└─└─┘└─┘ ┴ ┴─┘└─┘┘└┘
+//
+struct builtin_arrsetlencap : builtin {
+  explicit builtin_arrsetlencap(std::string function_name)
+      : func_name_(std::move(function_name)) {}
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 2) {
+      o.string_val_ =
+          "Two arguments must be provided for " + func_name_ + "() builtin";
+    } else if (!args[0].datatype_->is_an_array()) {
+      o.string_val_ =
+          "First argument to " + func_name_ + "() must be an Array[?]";
+    } else if (args[0].datatype_->args_[0]->is_m_entry() ||
+               args[0].datatype_->args_[0]->is_sm_entry()) {
+      o.string_val_ = func_name_ + "() does not work with maps";
+    } else if (!args[1].datatype_->is_an_integer()) {
+      o.string_val_ = func_name_ + "Second argument to () must be an integer";
+    } else {
+      return ykobject(dt_pool);// None return
+    }
+    o.object_type_ = object_type::RUNTIME_ERROR;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return true;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    code << "yk__" + func_name_ + "(" << args[0].first << ", " << args[1].first
+         << ")";
+    return {code.str(), o};
+  }
+
+  private:
+  std::string func_name_;
+};
+//
 // ┌─┐┬─┐┬┌┐┌┌┬┐
 // ├─┘├┬┘││││ │
 // ┴  ┴└─┴┘└┘ ┴
@@ -162,7 +219,7 @@ struct builtin_print : builtin {
       code << "yk__" << func_name_ << "str(\"None\")";
     } else if (dt->is_bool()) {
       code << "yk__" << func_name_ << "str((" << rhs.first
-           << ") ? \"True\" : \"False\")";
+           << R"() ? "True" : "False"))";
     }
     return {code.str(), o};
   }
@@ -286,9 +343,6 @@ struct builtin_getref : builtin {
       o.string_val_ = "One argument must be provided for getref() builtin";
     } else if (!args[0].is_primitive_or_obj()) {
       o.string_val_ = "Argument to getref() must be an object or primitive";
-    } else if (arg_expressions[0]->get_type() !=
-               yaksha::ast_type::EXPR_VARIABLE) {
-      o.string_val_ = "Argument to getref() must be a named variable";
     } else {
       ykdatatype *dt = dt_pool->create("Ptr");
       dt->args_.emplace_back(args[0].datatype_);
@@ -602,6 +656,8 @@ struct builtin_cast : builtin {
         dt_parser->parse(dt->literal_token_->token_, import_aliases, filepath);
     if (out_dt->is_any_ptr() || out_dt->is_any_ptr_to_const()) {
       code << "(" << args[1].first << ")";
+    } else if (args[1].second.datatype_->is_none()) {
+      code << "NULL";
     } else {
       code << "((" << dt_compiler->convert_dt(out_dt) << ")" << args[1].first
            << ")";
@@ -1360,6 +1416,8 @@ builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
   builtins_.insert({"arrput", new builtin_arrput{}});
   builtins_.insert({"arrpop", new builtin_arrpop{}});
   builtins_.insert({"arrnew", new builtin_arrnew{}});
+  builtins_.insert({"arrsetcap", new builtin_arrsetlencap{"arrsetcap"}});
+  builtins_.insert({"arrsetlen", new builtin_arrsetlencap{"arrsetlen"}});
   builtins_.insert({"array", new builtin_array{}});
   builtins_.insert({"print", new builtin_print{"print"}});
   builtins_.insert({"println", new builtin_print{"println"}});
