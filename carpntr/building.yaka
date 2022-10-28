@@ -208,10 +208,14 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Wno-newline-eof", "-Wno-parentheses-equality", "-MMD", "-MP", "-Oz")
     elif c.compilation.web:
         args = array("str", c.emcc_compiler_path, "-std=c99", "-Oz", "-Wno-newline-eof", "-Wno-parentheses-equality")
+    elif c.compilation.raylib_hot_reloading_dll:
+        # Reduce the compilation level if we are doing hot reloading
+        args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-O1", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
     else:
         args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
     # If not macos do link time optimization
-    if not is_target_macos(target):
+    # If we are hot reloading, do not waste time with actually doing link time optimization and wasting time
+    if not is_target_macos(target) and not c.compilation.raylib_hot_reloading_dll:
         arrput(args, "-flto=full")
     if c.compilation.raylib_hot_reloading_dll:
         arrput(args, "-DYK__CR_DLL")

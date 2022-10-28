@@ -22,7 +22,11 @@ class BuildData:
 
 def fill_arguments(src_path: str, c: CObject, dll: bool) -> CObject:
     # Fill args section of CObject
-    args: Array[str] = array("str", "-std=gnu99", "-DPLATFORM_DESKTOP", "-DGL_SILENCE_DEPRECATION=199309L", "-fno-sanitize=undefined")
+    args: Array[str]
+    if dll:
+        args = array("str", "-std=gnu99", "-DPLATFORM_DESKTOP", "-DGL_SILENCE_DEPRECATION=199309L", "-fno-sanitize=undefined", "-Oz")
+    else:
+        args = array("str", "-std=gnu99", "-DPLATFORM_DESKTOP", "-DGL_SILENCE_DEPRECATION=199309L", "-fno-sanitize=undefined", "-O1")
 
     # Creating a hot reload DLL with raylib
     if dll:
@@ -39,6 +43,11 @@ def fill_arguments(src_path: str, c: CObject, dll: bool) -> CObject:
 
     if os.is_macos() and c.base_name == "rglfw":
         arrput(args, "-ObjC")
+
+    # Enable link time optimization
+    if not os.is_macos() and not dll:
+        arrput(args, "-flto=full")
+
 
     arrput(args, c.c_file)
     arrput(args, "-o")
