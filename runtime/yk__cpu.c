@@ -12,18 +12,23 @@ struct yk__cpu_info yk__get_cpu_count() {
   int32_t nprocs_max = -1;
   bool guess = false;
 #if defined(_WIN32) || defined(_WIN64)
-#ifndef _SC_NPROCESSORS_ONLN
   SYSTEM_INFO info;
   GetSystemInfo(&info);
 #define sysconf(a) info.dwNumberOfProcessors
 #define GET_PROCS
-#endif
-#endif
+#define GET_MAX
+#else
 #ifdef _SC_NPROCESSORS_ONLN
 #define GET_PROCS _SC_NPROCESSORS_ONLN
-  nprocs = sysconf(GET_PROCS);
-  nprocs_max = sysconf(GET_PROCS);
+#define GET_MAX _SC_NPROCESSORS_CONF
+#else
+#define sysconf(a) 2
+#define GET_PROCS
+#define GET_MAX
 #endif
+#endif
+  nprocs = sysconf(GET_PROCS);
+  nprocs_max = sysconf(GET_MAX);
   if (nprocs < 1) {
     nprocs = 2;
     guess = true;
