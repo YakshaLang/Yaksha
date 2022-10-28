@@ -63,8 +63,6 @@ def create(thread_count: u8, queue_size: u32) -> ThreadPool:
     arrsetlen(tpool.queue, queue_size)
     # Can initialize?
     locks_ok: bool = mutex.init(getref(tpool.lock), mutex.PLAIN) == thread.SUCCESS and condition.init(getref(tpool.notify)) == thread.SUCCESS
-    print("Locks:")
-    println(locks_ok)
     arrays_ok: bool = tpool.threads != None and tpool.queue != None
     if not locks_ok or not arrays_ok:
         internal_del_pool(tpool)
@@ -83,11 +81,15 @@ def create(thread_count: u8, queue_size: u32) -> ThreadPool:
     return tpool
 
 def add(tpool: ThreadPool, func: Function[In[AnyPtr],Out], arg: AnyPtr) -> int:
+    # Add given task to the thread pool to be executed
+    # returns SUCCESS if successful
     err: int = SUCCESS
     next: int = 0
     ## TODO see if func == None
     if tpool == None:
         return ERROR_INVALID
+    if mutex.lock(getref(tpool.lock)) != thread.SUCCESS:
+        return ERROR_LOCK_FAILURE
     next = (tpool.tail + 1) % tpool.queue_size
     while True:
         if tpool.count == tpool.queue_size:
@@ -143,6 +145,7 @@ def internal_del_pool(tpool: ThreadPool) -> int:
         del tpool.threads
         del tpool.queue
         mutex.lock(getref(tpool.lock))
+        mutex.unlock(getref(tpool.lock))
         mutex.destroy(getref(tpool.lock))
         condition.destroy(getref(tpool.notify))
     del tpool
