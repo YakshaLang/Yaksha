@@ -5,6 +5,7 @@ import ast
 import configparser
 import os
 import os.path as paths
+import shutil
 import subprocess
 import sys
 from typing import List, Tuple
@@ -24,10 +25,10 @@ DEFAULT_compiler_defines = ["UTF8PROC_STATIC"]
 DEFAULT_includes = ["whereami.h", "yk__system.h", "utf8proc.h", "yk__utf8iter.h", "toml.h",
                     "yk__console.h",
                     "yk__arrayutils.h", "yk__process.h", "yk__graphic_utils.h", "yk__argparse.h", "argparse.h",
-                    "tinycthread.h"]
+                    "tinycthread.h", "yk__cpu.h"]
 DEFAULT_c_code = ["whereami.c", "yk__system.c", "utf8proc.c", "toml.c",
                   "yk__console.c", "yk__arrayutils.c", "yk__process.c",
-                  "yk__graphic_utils.c", "argparse.c", "yk__argparse.c", "tinycthread.c"]
+                  "yk__graphic_utils.c", "argparse.c", "yk__argparse.c", "tinycthread.c", "yk__cpu.c"]
 DEFAULT_c_code = [paths.join(RUNTIME_DIR, x) for x in DEFAULT_c_code]
 DEFAULT_include_paths = [RUNTIME_DIR, "build"]
 
@@ -197,6 +198,16 @@ def compile_(conf: Config):
             os.system(cmd)
     cmd = paths.join("build", native_binary)
     print("-- end of bootstrap --")
+    # backup program code
+    if C_COMPILER == "clang":
+        try:
+            os.unlink("build/program_code_bk.c")
+        except OSError:
+            pass
+        try:
+            shutil.copyfile("build/program_code.c", "build/program_code_bk.c")
+        except OSError:
+            pass
     if C_COMPILER != "clang":
         os.system(cmd)
     else:

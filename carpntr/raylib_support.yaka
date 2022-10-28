@@ -4,8 +4,9 @@ import libs.os
 import libs.os.path
 import libs.console
 import libs.strings.array as sarr
+import libs.thread.pool
+import libs.os.cpu
 import configuration as carp
-
 
 class CObject:
     # .o object file created by compiling a single .c file
@@ -14,6 +15,10 @@ class CObject:
     base_name: str
     args: Array[str]
 
+# TODO remove below class and add carp.Config to CObject it self
+class BuildData:
+    object_data: CObject
+    config: carp.Config
 
 def fill_arguments(src_path: str, c: CObject, dll: bool) -> CObject:
     # Fill args section of CObject
@@ -53,7 +58,6 @@ def fill_web_arguments(src_path: str, c: CObject) -> CObject:
     c.args = args
     return c
 
-
 def co(filename: str, src_path: str, target_path: str, web: bool, dll: bool) -> CObject:
     # Create a new CObject
     obj: CObject = CObject()
@@ -64,11 +68,10 @@ def co(filename: str, src_path: str, target_path: str, web: bool, dll: bool) -> 
         obj.o_file = path.join(target_path, obj.base_name + ".o")
         obj = fill_web_arguments(src_path, obj)
     else:
-        obj.base_name = filename
+        obj.base_name = "native-" + filename
         obj.o_file = path.join(target_path, filename + ".o")
         obj = fill_arguments(src_path, obj, dll)
     return obj
-
 
 def del_c_object(c: CObject) -> None:
     # Delete a CObject
@@ -77,7 +80,6 @@ def del_c_object(c: CObject) -> None:
     del c.base_name
     sarr.del_str_array(c.args)
     del c
-
 
 def del_objects(x: Array[CObject]) -> None:
     # Delete CObject object
@@ -90,7 +92,6 @@ def del_objects(x: Array[CObject]) -> None:
         del_c_object(x[pos])
         pos = pos + 1
     del x
-
 
 def get_objects(raylib_src_path: str, gui_path: str, extra_path: str, build_path: str, web: bool, dll: bool) -> Array[CObject]:
     # Get a list of objects for raylib
@@ -111,7 +112,6 @@ def get_objects(raylib_src_path: str, gui_path: str, extra_path: str, build_path
     arrput(objects, extra)
     return objects
 
-
 def get_external_libs() -> Array[str]:
     # Get external libraries for native target (current platform)
     external_libs: Array[str]
@@ -128,16 +128,18 @@ def get_web_args() -> Array[str]:
     web_args: Array[str] = array("str", "-s", "USE_GLFW=3", "-s", "ASYNCIFY", "-DPLATFORM_WEB")
     return web_args
 
-def produce_object(c: CObject, conf: carp.Config) -> bool:
+def produce_object(c: CObject, conf: carp.Config, print_info: bool) -> bool:
     # Creates a new .o file for a raylib source
     # If raylib object already exists do not bother building it again
     # 1) We are only supporting native at the moment
     # 2) It takes too long to compile it again (zig might cache it though)
-    console.cyan("raylib::")
-    console.yellow(c.base_name)
-    console.cyan(" := ")
+    if print_info:
+        console.cyan("raylib::")
+        console.yellow(c.base_name)
+        console.cyan(" := ")
     if path.readable(c.o_file):
-        console.green("ok.\n")
+        if print_info:
+            console.green("ok.\n")
         return True
 
     cmd: Array[str]
@@ -151,16 +153,58 @@ def produce_object(c: CObject, conf: carp.Config) -> bool:
     defer os.del_process_result(pr)
 
     if pr.ok:
-        console.green("ok.\n")
+        if print_info:
+            console.green("ok.\n")
         return True
-    console.red("failed.\n")
-    console.cyan("--c compiler output---\n")
-    console.red("command := ")
-    console.cyan(sarr.join(cmd, " ") + "\n")
-    console.red(pr.output)
-    console.cyan("--end c compiler output---\n")
+    if print_info:
+        console.red("failed.\n")
+        console.cyan("--c compiler output---\n")
+        console.red("command := ")
+        console.cyan(sarr.join(cmd, " ") + "\n")
+        console.red(pr.output)
+        console.cyan("--end c compiler output---\n")
     return False
 
+def build_object(arg: AnyPtr) -> None:
+    data: BuildData = cast("BuildData", arg)
+    produce_object(data.object_data, data.config, False)
+
+def build_objects_sequential(objects: Array[CObject], conf: carp.Config) -> None:
+    object_count: int = len(objects)
+    pos: int = 0
+    while pos < object_count:
+        object: CObject = objects[pos]
+        produce_object(object, conf, True)
+        pos += 1
+
+def build_objects(objects: Array[CObject], conf: carp.Config) -> None:
+    println("building raylib ...")
+    object_count: int = len(objects)
+    cpu_data: cpu.Cpu = cpu.info()
+    threads: u8 = cast("u8", cpu_data.n_processors)
+    threads = iif(threads > pool.MAX_THREAD_SIZE, pool.MAX_THREAD_SIZE, threads)
+    tpool: pool.ThreadPool = pool.create(threads, cast("u32", object_count + 2))
+    if tpool == None:
+        build_objects_sequential(objects, conf)
+        return
+    to_pass: Array[BuildData]
+    pos: int = 0
+    while pos < object_count:
+        object: CObject = objects[pos]
+        data: BuildData = BuildData()
+        data.object_data = object
+        data.config = conf
+        arrput(to_pass, data)
+        # TODO check if we added it properly
+        pool.add(tpool, build_object, cast("AnyPtr", data))
+        pos += 1
+    # TODO check destroy
+    pool.destroy(tpool, True)
+    pos = 0
+    while pos < object_count:
+        del to_pass[pos]
+        pos += 1
+    del to_pass
 
 def get_raylib_args(conf: carp.Config, build_path: str) -> Array[str]:
     # Build raylib objects
@@ -177,20 +221,14 @@ def get_raylib_args(conf: carp.Config, build_path: str) -> Array[str]:
     defer del_objects(objects)
 
     object_count: int = len(objects)
+
+    # Get .o files to o_files
+    build_objects(objects, conf)
     pos: int = 0
-    fail: bool = False
-    println("\nbuilding raylib ...")
     while pos < object_count:
         object: CObject = objects[pos]
-        if produce_object(object, conf):
-            arrput(o_files, object.o_file)
-        else:
-            fail = True
-            break
-        pos = pos + 1
-
-    if fail:
-        return arguments
+        arrput(o_files, object.o_file)
+        pos += 1
 
     if conf.compilation.web:
         # Add web build arguments

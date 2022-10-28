@@ -5,8 +5,18 @@ import libs.os
 import libs.strings
 import libs.strings.buffer as sbuf
 import libs.strings.array as sarr
+import libs.thread.pool
+import libs.os.cpu
 import raylib_support as rs
 import configuration as carp
+
+class BObject:
+    args: Array[str]
+    c_file: str
+    object_file_path: str
+    always_build: bool
+    print_info: bool
+    # For this object we only keep a reference to str array, everything else can be deleted (except bool)
 
 def prepare_code(c: carp.Config, code: str) -> str:
     # Prepare code for compilation based on configuration
@@ -75,10 +85,47 @@ def is_target_windows(target_to_check: str) -> bool:
         return os.is_windows()
     return strings.contains(target_to_check, "windows")
 
-def produce_core_object(args: Array[str], c_file: str, build_path: str, target: str, always_build: bool) -> str:
+def produce_obj_function(arg: AnyPtr) -> None:
+    # Produce a single object from given build_object
+    data: BObject = cast("BObject", arg)
+    my_args: Array[str] = sarr.dup(data.args)
     # Copy the arguments so we can add -c and -o of our own
-    my_args: Array[str] = sarr.dup(args)
     defer sarr.del_str_array(my_args)
+
+    object_file: str = path.remove_extension(path.basename(data.c_file))
+
+    if data.print_info:
+        console.cyan("runtime::")
+        console.yellow(object_file)
+        console.cyan(" := ")
+
+    if not data.always_build and path.readable(data.object_file_path):
+        if data.print_info:
+            console.green("ok.\n")
+        return
+
+    arrput(my_args, "-c")
+    arrput(my_args, data.c_file)
+    arrput(my_args, "-o")
+    arrput(my_args, data.object_file_path)
+
+    pr: os.ProcessResult = os.run(my_args)
+
+    if data.print_info:
+        if pr.ok:
+            console.green("ok.\n")
+        else:
+            console.red("failed.\n")
+            console.cyan("--c compiler output---\n")
+            console.red("command := ")
+            console.cyan(sarr.join(my_args, " ") + "\n")
+            console.red(pr.output)
+            console.cyan("--end c compiler output---\n")
+
+    os.del_process_result(pr)
+
+def core_object(args: Array[str], c_file: str, build_path: str, target: str, always_build: bool, bobj_array: Ptr[Array[BObject]]) -> str:
+    # Create a new core object and add it to given array
     suffix: str = "-"
     # native
     native: bool = len(target) == 0
@@ -91,33 +138,54 @@ def produce_core_object(args: Array[str], c_file: str, build_path: str, target: 
     object_file += ".o"
     object_file_path: str = path.join(build_path, object_file)
 
-    console.cyan("runtime::")
-    console.yellow(object_file)
-    console.cyan(" := ")
-    # Skip building if allowed
-    if not always_build and path.readable(object_file_path):
-        console.green("ok.\n")
-        return object_file_path
-
-    arrput(my_args, "-c")
-    arrput(my_args, c_file)
-    arrput(my_args, "-o")
-    arrput(my_args, object_file_path)
-
-    pr: os.ProcessResult = os.run(my_args)
-    defer os.del_process_result(pr)
-
-    if pr.ok:
-        console.green("ok.\n")
-    else:
-        console.red("failed.\n")
-        console.cyan("--c compiler output---\n")
-        console.red("command := ")
-        console.cyan(sarr.join(my_args, " ") + "\n")
-        console.red(pr.output)
-        console.cyan("--end c compiler output---\n")
+    bobj: BObject = BObject()
+    bobj.args = args
+    bobj.c_file = c_file
+    bobj.always_build = always_build
+    bobj.object_file_path = object_file_path
+    bobj.print_info = False
+    arrput(unref(bobj_array), bobj)
 
     return object_file_path
+
+def build_objects_sequential(buildables: Array[BObject]) -> None:
+    object_count: int = len(buildables)
+    pos: int = 0
+    while pos < object_count:
+        buildable: BObject = buildables[pos]
+        buildable.print_info = True
+        produce_obj_function(cast("AnyPtr", buildable))
+        pos += 1
+
+def build_objects(buildables: Array[BObject]) -> None:
+    object_count: int = len(buildables)
+    cpu_data: cpu.Cpu = cpu.info()
+    threads: u8 = cast("u8", cpu_data.n_processors)
+    threads = iif(threads > pool.MAX_THREAD_SIZE, pool.MAX_THREAD_SIZE, threads)
+    tpool: pool.ThreadPool = pool.create(threads, cast("u32", object_count + 2))
+    if tpool == None:
+        build_objects_sequential(buildables)
+        return
+    pos: int = 0
+    while pos < object_count:
+        buildable: BObject = buildables[pos]
+        # TODO check if we added it properly
+        pool.add(tpool, produce_obj_function, cast("AnyPtr", buildable))
+        pos += 1
+    # TODO check destroy
+    pool.destroy(tpool, True)
+    # Above wait for all the tasks to be done
+
+def cleanup_buildables(buildables: Array[BObject]) -> None:
+    object_count: int = len(buildables)
+    pos: int = 0
+    while pos < object_count:
+        buildable: BObject = buildables[pos]
+        del buildable.c_file
+        del buildable.object_file_path
+        del buildable
+        pos += 1
+    del buildables
 
 def keep_ray_objects(element: str, negate: bool) -> bool:
     obj: bool = strings.endswith(element, ".o")
@@ -131,6 +199,7 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     native: bool = len(target) == 0
     args: Array[str]
     objects: Array[str]
+    buildable_objects: Array[BObject]
     ray_objects: Array[str] = filter(raylib_args, keep_ray_objects, False)
     ray_other_args: Array[str] = filter(raylib_args, keep_ray_objects, True)
     defer sarr.del_str_array(ray_objects)
@@ -183,7 +252,7 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     x = 0
     while x < length:
         rfc: str = c.c_code.runtime_feature_c_code[x]
-        rfc = produce_core_object(args, rfc, build_path, target, False)
+        rfc = core_object(args, rfc, build_path, target, False, getref(buildable_objects))
         arrput(objects, rfc)
         x = x + 1
     # c codes
@@ -191,16 +260,20 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     x = 0
     while x < length:
         cc: str = c.c_code.c_code[x]
-        cc = produce_core_object(args, cc, build_path, target, True)
+        cc = core_object(args, cc, build_path, target, True, getref(buildable_objects))
         arrput(objects, cc)
         x = x + 1
     # program code -> this is the yakshac compiled full code
-    program_object: str = produce_core_object(args, code_path, build_path, target, True)
+    program_object: str = core_object(args, code_path, build_path, target, True, getref(buildable_objects))
     arrput(objects, program_object)
     # yk__main.c -> this has the real main() method
     the_yk_main: str = path.join(c.runtime_path, "yk__main.c")
-    the_yk_main = produce_core_object(args, the_yk_main, build_path, target, False)
+    the_yk_main = core_object(args, the_yk_main, build_path, target, False, getref(buildable_objects))
     arrput(objects, the_yk_main)
+    # Build the list of buildable_objects
+    build_objects(buildable_objects)
+    # Clean up excess data
+    cleanup_buildables(buildable_objects)
     # add objects to the args to link it
     if c.compilation.wasm4:
         # Change args for link time for wasm4
