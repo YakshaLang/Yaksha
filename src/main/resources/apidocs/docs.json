@@ -2754,6 +2754,22 @@
         }
       },
       {
+        "annotations": [],
+        "comment": "Convert a str to integer",
+        "name": "s2i",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "str"
+            },
+            "name": "s"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
         "annotations": [
           {
             "argument": "",
@@ -3107,6 +3123,58 @@
         ]
       }
     ]
+  },
+  "libs.os.cpu": {
+    "classes": [
+      {
+        "annotations": [
+          {
+            "argument": "struct yk__cpu_info",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "Extracted CPU information",
+        "members": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "n_processors"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "n_processors_max"
+          },
+          {
+            "datatype": {
+              "type": "bool"
+            },
+            "name": "is_guess"
+          }
+        ],
+        "name": "Cpu"
+      }
+    ],
+    "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "yk__get_cpu_count",
+            "name": "@native"
+          }
+        ],
+        "comment": "Extract CPU information",
+        "name": "info",
+        "parameters": [],
+        "return_type": {
+          "type": "Cpu"
+        }
+      }
+    ],
+    "global_consts": [],
+    "imports": []
   },
   "libs.os.path": {
     "classes": [],
@@ -4816,17 +4884,6 @@
       {
         "annotations": [
           {
-            "argument": "void*",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "Any data",
-        "members": [],
-        "name": "Data"
-      },
-      {
-        "annotations": [
-          {
             "argument": "thrd_t",
             "name": "@nativedefine"
           }
@@ -4864,7 +4921,7 @@
                 {
                   "arguments": [
                     {
-                      "type": "Data"
+                      "type": "AnyPtr"
                     }
                   ],
                   "type": "In"
@@ -4894,7 +4951,7 @@
             "name": "@native"
           }
         ],
-        "comment": "Create a new thread with given reference to Thread and a function that takes Data and return int",
+        "comment": "Create a new thread with given reference to Thread and a function that takes AnyPtr and return int",
         "name": "create_with_data",
         "parameters": [
           {
@@ -4914,7 +4971,7 @@
                 {
                   "arguments": [
                     {
-                      "type": "Data"
+                      "type": "AnyPtr"
                     }
                   ],
                   "type": "In"
@@ -4934,7 +4991,7 @@
           },
           {
             "datatype": {
-              "type": "Data"
+              "type": "AnyPtr"
             },
             "name": "data"
           }
@@ -5657,6 +5714,395 @@
     ],
     "imports": []
   },
+  "libs.thread.pool": {
+    "classes": [
+      {
+        "annotations": [],
+        "comment": "Thread pool object",
+        "members": [
+          {
+            "datatype": {
+              "module": "libs.thread.mutex",
+              "type": "Mutex"
+            },
+            "name": "lock"
+          },
+          {
+            "datatype": {
+              "module": "libs.thread.condition",
+              "type": "Condition"
+            },
+            "name": "notify"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.thread",
+                  "type": "Thread"
+                }
+              ],
+              "type": "Array"
+            },
+            "name": "threads"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "arguments": [
+                        {
+                          "arguments": [
+                            {
+                              "type": "AnyPtr"
+                            }
+                          ],
+                          "type": "In"
+                        },
+                        {
+                          "type": "Out"
+                        }
+                      ],
+                      "type": "Function"
+                    },
+                    {
+                      "type": "AnyPtr"
+                    }
+                  ],
+                  "type": "Tuple"
+                }
+              ],
+              "type": "Array"
+            },
+            "name": "queue"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "thread_count"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "queue_size"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "head"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "tail"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "count"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "shutdown"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "started"
+          }
+        ],
+        "name": "ThreadPool"
+      }
+    ],
+    "functions": [
+      {
+        "annotations": [],
+        "comment": "Add given task to the thread pool to be executed\nreturns SUCCESS if successful",
+        "name": "add",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "ThreadPool"
+            },
+            "name": "tpool"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "AnyPtr"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "func"
+          },
+          {
+            "datatype": {
+              "type": "AnyPtr"
+            },
+            "name": "arg"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "Create a new thread pool with given thread count and queue size\nOn success ThreadPool is returned else, it should be equal to None",
+        "name": "create",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u8"
+            },
+            "name": "thread_count"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "queue_size"
+          }
+        ],
+        "return_type": {
+          "type": "ThreadPool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "Attempt to destroy thread pool, if SUCCESS is returned pool is deallocated as well",
+        "name": "destroy",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "ThreadPool"
+            },
+            "name": "tpool"
+          },
+          {
+            "datatype": {
+              "type": "bool"
+            },
+            "name": "graceful"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "Clean up thread pool data",
+        "name": "internal_del_pool",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "ThreadPool"
+            },
+            "name": "tpool"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "Perform work as a thread in the managed thread pool",
+        "name": "internal_tpool_work",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "AnyPtr"
+            },
+            "name": "tpool_obj"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      }
+    ],
+    "global_consts": [
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "ERROR_INVALID"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "ERROR_LOCK_FAILURE"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "ERROR_QUEUE_FULL"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "ERROR_SHUTDOWN"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "ERROR_THREAD_FAILURE"
+      },
+      {
+        "comment": "We are waiting for tasks to be completed",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "GRACEFUL_SHUTDOWN"
+      },
+      {
+        "comment": "Default (shutdown all threads forcefully) and close the pool",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "IMMEDIATE_SHUTDOWN"
+      },
+      {
+        "comment": "Maximum queue size for thread pool",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "MAX_QUEUE_SIZE"
+      },
+      {
+        "comment": "Maximum threads we can create is 64",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "u8"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "MAX_THREAD_SIZE"
+      },
+      {
+        "comment": "Not going to shutdown",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "NO_SHUTDOWN"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "SUCCESS"
+      }
+    ],
+    "imports": [
+      {
+        "alias": "thread",
+        "path": [
+          "libs",
+          "thread"
+        ]
+      },
+      {
+        "alias": "condition",
+        "path": [
+          "libs",
+          "thread",
+          "condition"
+        ]
+      },
+      {
+        "alias": "mutex",
+        "path": [
+          "libs",
+          "thread",
+          "mutex"
+        ]
+      }
+    ]
+  },
   "libs.thread.tss": {
     "classes": [
       {
@@ -5679,7 +6125,7 @@
             "name": "@native"
           }
         ],
-        "comment": "",
+        "comment": "Create with no auto deletion",
         "name": "create",
         "parameters": [
           {
@@ -5705,7 +6151,7 @@
             "name": "@native"
           }
         ],
-        "comment": "",
+        "comment": "Create TSS with a custom deleter function",
         "name": "create_with_deleter",
         "parameters": [
           {
@@ -5725,8 +6171,7 @@
                 {
                   "arguments": [
                     {
-                      "module": "libs.thread",
-                      "type": "Data"
+                      "type": "AnyPtr"
                     }
                   ],
                   "type": "In"
@@ -5783,8 +6228,7 @@
           }
         ],
         "return_type": {
-          "module": "libs.thread",
-          "type": "Data"
+          "type": "AnyPtr"
         }
       },
       {
@@ -5805,8 +6249,7 @@
           },
           {
             "datatype": {
-              "module": "libs.thread",
-              "type": "Data"
+              "type": "AnyPtr"
             },
             "name": "data"
           }
@@ -5817,15 +6260,7 @@
       }
     ],
     "global_consts": [],
-    "imports": [
-      {
-        "alias": "thread",
-        "path": [
-          "libs",
-          "thread"
-        ]
-      }
-    ]
+    "imports": []
   },
   "libs.timespec": {
     "classes": [
@@ -6546,8 +6981,7 @@
         "members": [
           {
             "datatype": {
-              "module": "libs.c",
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "data"
           },
@@ -6801,8 +7235,7 @@
           },
           {
             "datatype": {
-              "module": "libs.c",
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "ctxData"
           }
@@ -7436,8 +7869,7 @@
           },
           {
             "datatype": {
-              "module": "libs.c",
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "data"
           }
@@ -8290,11 +8722,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -8533,10 +8970,10 @@
                       "type": "CUChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "data"
           },
@@ -8589,10 +9026,10 @@
                       "type": "CUChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "data"
           },
@@ -8639,10 +9076,10 @@
                       "type": "CUChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "comp_data"
           },
@@ -10218,10 +10655,10 @@
                       "type": "Matrix"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "transforms"
           },
@@ -11510,10 +11947,10 @@
                       "type": "CInt"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "codepoints"
           },
@@ -12366,10 +12803,10 @@
                       "type": "CUChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "data"
           },
@@ -12949,10 +13386,10 @@
                       "type": "GlyphInfo"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "chars"
           },
@@ -13585,11 +14022,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -13661,11 +14103,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -13804,11 +14251,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -13831,11 +14283,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -13900,11 +14357,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -13927,11 +14389,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -14058,11 +14525,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -14401,11 +14873,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -14747,11 +15224,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -15263,11 +15745,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -17915,10 +18402,10 @@
                       "type": "CUChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "file_data"
           },
@@ -18072,10 +18559,10 @@
                       "type": "CUChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "file_data"
           },
@@ -18220,10 +18707,10 @@
                       "type": "CUChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "file_data"
           },
@@ -18541,10 +19028,10 @@
                       "type": "CUChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "data"
           },
@@ -18819,10 +19306,10 @@
                       "type": "CUChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "file_data"
           },
@@ -20536,13 +21023,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "value"
           },
@@ -20647,13 +21128,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "value"
           },
@@ -21276,10 +21751,10 @@
                       "type": "CInt"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "codepoints"
           },
@@ -21432,13 +21907,13 @@
                           "type": "CChar"
                         }
                       ],
-                      "type": "Ptr"
+                      "type": "Const"
                     }
                   ],
                   "type": "Ptr"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "text_list"
           },
@@ -21458,11 +21933,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -21566,13 +22046,13 @@
                       "type": "CChar"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
               "type": "Ptr"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -21607,11 +22087,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -21655,11 +22140,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -21682,11 +22172,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -21709,11 +22204,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -22491,13 +22991,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "data"
           },
@@ -22562,13 +23056,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "data"
           },
@@ -22661,13 +23149,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "data"
           },
@@ -22700,13 +23182,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "pixels"
           }
@@ -22739,13 +23215,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "pixels"
           }
@@ -27498,13 +27968,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "buffer"
           }
@@ -27537,13 +28001,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "buffer"
           },
@@ -28343,11 +28801,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -28632,13 +29095,7 @@
         "parameters": [
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "data"
           },
@@ -28683,13 +29140,7 @@
         "parameters": [
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "data"
           },
@@ -28769,13 +29220,7 @@
         "parameters": [
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "buffer"
           },
@@ -28808,13 +29253,7 @@
         "parameters": [
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "buffer"
           },
@@ -29560,13 +29999,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "value"
           },
@@ -29684,13 +30117,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "pointer"
           }
@@ -29717,13 +30144,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "value"
           },
@@ -30060,13 +30481,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "data"
           }
@@ -30093,13 +30508,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "data"
           },
@@ -30138,13 +30547,7 @@
           },
           {
             "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "VoidPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "data"
           },
@@ -32305,11 +32708,16 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CStr"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                }
+              ],
+              "type": "Const"
             }
           ],
-          "type": "Const"
+          "type": "Ptr"
         }
       },
       {
@@ -32485,13 +32893,13 @@
                           "type": "CChar"
                         }
                       ],
-                      "type": "Ptr"
+                      "type": "Const"
                     }
                   ],
                   "type": "Ptr"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "text"
           },
@@ -40731,7 +41139,7 @@
             "name": "@native"
           }
         ],
-        "comment": "Are we running in raylib in desktop",
+        "comment": "Are we running in raylib in desktop?",
         "name": "is_desktop",
         "parameters": [],
         "return_type": {
@@ -40745,7 +41153,21 @@
             "name": "@native"
           }
         ],
-        "comment": "Are we running in raylib WASM/Web",
+        "comment": "Are we running in raylib with hot reload?",
+        "name": "is_hot_reload",
+        "parameters": [],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Are we running in raylib WASM/Web?",
         "name": "is_web",
         "parameters": [],
         "return_type": {
@@ -40986,10 +41408,10 @@
                       "type": "u8"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "data"
           },
@@ -41047,10 +41469,10 @@
                       "type": "u8"
                     }
                   ],
-                  "type": "Ptr"
+                  "type": "Const"
                 }
               ],
-              "type": "Const"
+              "type": "Ptr"
             },
             "name": "data"
           },
@@ -41146,12 +41568,7 @@
         "parameters": [
           {
             "datatype": {
-              "arguments": [
-                {
-                  "type": "AnyPtr"
-                }
-              ],
-              "type": "Const"
+              "type": "AnyPtrToConst"
             },
             "name": "src"
           },
@@ -41170,7 +41587,7 @@
         "annotations": [
           {
             "argument": "(*((uint16_t*)0x14))",
-            "name": "@nativedefine"
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read draw colors",
@@ -41184,7 +41601,7 @@
         "annotations": [
           {
             "argument": "((uint8_t*)0xa0)",
-            "name": "@nativedefine"
+            "name": "@nativemacro"
           }
         ],
         "comment": "Access pointer to framebuffer",
@@ -41202,57 +41619,57 @@
       {
         "annotations": [
           {
-            "argument": "((int_32t)*((const uint8_t*)0x16))",
-            "name": "@nativedefine"
+            "argument": "(*((const uint8_t*)0x16))",
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read gamepad 1 value",
         "name": "gamepad1",
         "parameters": [],
         "return_type": {
-          "type": "int"
+          "type": "u8"
         }
       },
       {
         "annotations": [
           {
-            "argument": "((int_32t)*((const uint8_t*)0x17))",
-            "name": "@nativedefine"
+            "argument": "(*((const uint8_t*)0x17))",
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read gamepad 2 value",
         "name": "gamepad2",
         "parameters": [],
         "return_type": {
-          "type": "int"
+          "type": "u8"
         }
       },
       {
         "annotations": [
           {
-            "argument": "((int_32t)*((const uint8_t*)0x18))",
-            "name": "@nativedefine"
+            "argument": "(*((const uint8_t*)0x18))",
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read gamepad 3 value",
         "name": "gamepad3",
         "parameters": [],
         "return_type": {
-          "type": "int"
+          "type": "u8"
         }
       },
       {
         "annotations": [
           {
-            "argument": "((int_32t)*((const uint8_t*)0x19))",
-            "name": "@nativedefine"
+            "argument": "(*((const uint8_t*)0x19))",
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read gamepad 4 value",
         "name": "gamepad4",
         "parameters": [],
         "return_type": {
-          "type": "int"
+          "type": "u8"
         }
       },
       {
@@ -41330,50 +41747,50 @@
       {
         "annotations": [
           {
-            "argument": "((int_32t)*((const uint8_t*)0x1e))",
-            "name": "@nativedefine"
+            "argument": "(*((const uint8_t*)0x1e))",
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read mouse buttons",
         "name": "mouse_buttons",
         "parameters": [],
         "return_type": {
-          "type": "int"
+          "type": "u8"
         }
       },
       {
         "annotations": [
           {
-            "argument": "((int_32t)*((const int16_t*)0x1a))",
-            "name": "@nativedefine"
+            "argument": "(*((const int16_t*)0x1a))",
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read mouse x",
         "name": "mouse_x",
         "parameters": [],
         "return_type": {
-          "type": "int"
+          "type": "i16"
         }
       },
       {
         "annotations": [
           {
-            "argument": "((int_32t)*((const int16_t*)0x1c))",
-            "name": "@nativedefine"
+            "argument": "(*((const int16_t*)0x1c))",
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read mouse y",
         "name": "mouse_y",
         "parameters": [],
         "return_type": {
-          "type": "int"
+          "type": "i16"
         }
       },
       {
         "annotations": [
           {
-            "argument": "((int_32t)*((const uint8_t*)0x20))",
-            "name": "@nativedefine"
+            "argument": "((int32_t)*((const uint8_t*)0x20))",
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read mouse buttons",
@@ -41426,7 +41843,7 @@
         "annotations": [
           {
             "argument": "((uint32_t*)0x04)",
-            "name": "@nativedefine"
+            "name": "@nativemacro"
           }
         ],
         "comment": "Get a pointer to pallet",
@@ -41484,7 +41901,7 @@
         "annotations": [
           {
             "argument": "*((uint16_t*)0x14) = nn__value",
-            "name": "@nativedefine"
+            "name": "@nativemacro"
           }
         ],
         "comment": "Set draw colors",
@@ -41586,7 +42003,7 @@
         "annotations": [
           {
             "argument": "(*((uint8_t*)0x1f))",
-            "name": "@nativedefine"
+            "name": "@nativemacro"
           }
         ],
         "comment": "Read system flags",
@@ -41789,7 +42206,7 @@
         "datatype": {
           "arguments": [
             {
-              "type": "int"
+              "type": "u8"
             }
           ],
           "type": "Const"
@@ -41801,7 +42218,7 @@
         "datatype": {
           "arguments": [
             {
-              "type": "int"
+              "type": "u8"
             }
           ],
           "type": "Const"
@@ -41813,7 +42230,7 @@
         "datatype": {
           "arguments": [
             {
-              "type": "int"
+              "type": "u8"
             }
           ],
           "type": "Const"
@@ -41825,7 +42242,7 @@
         "datatype": {
           "arguments": [
             {
-              "type": "int"
+              "type": "u8"
             }
           ],
           "type": "Const"
@@ -41837,7 +42254,7 @@
         "datatype": {
           "arguments": [
             {
-              "type": "int"
+              "type": "u8"
             }
           ],
           "type": "Const"
@@ -41849,7 +42266,7 @@
         "datatype": {
           "arguments": [
             {
-              "type": "int"
+              "type": "u8"
             }
           ],
           "type": "Const"
@@ -41861,7 +42278,7 @@
         "datatype": {
           "arguments": [
             {
-              "type": "int"
+              "type": "u8"
             }
           ],
           "type": "Const"
@@ -41873,7 +42290,7 @@
         "datatype": {
           "arguments": [
             {
-              "type": "int"
+              "type": "u8"
             }
           ],
           "type": "Const"
@@ -41885,7 +42302,7 @@
         "datatype": {
           "arguments": [
             {
-              "type": "int"
+              "type": "u8"
             }
           ],
           "type": "Const"
