@@ -10,4 +10,4 @@ NotePad++ User Defined Language
 * File type should be yaka
 
 
-Note: Only work with dark themes
+Note: Only work with dark themes. You can also customize the style as you want to get things working.
