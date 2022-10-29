@@ -12,7 +12,7 @@ from typing import List, Tuple
 
 SCRIPT_DIR = paths.abspath(paths.dirname(__file__))
 BIN_DIR = paths.join(paths.dirname(SCRIPT_DIR), "bin")
-COMPILER = paths.join(BIN_DIR, "yakshac")
+COMPILER = paths.join(BIN_DIR, "yaksha")
 RUNTIME_DIR = paths.abspath(paths.join(paths.dirname(BIN_DIR), "runtime"))
 LIBS_PARENT_DIR = paths.abspath(paths.join(paths.dirname(BIN_DIR), "libs"))
 MAX_EXECUTION_TIME_SEC = 2
@@ -144,7 +144,7 @@ def compile_(conf: Config):
     except:
         if not os.path.isdir("build"):
             panic("Failed to create build dir")
-    cmd = "{} {} {}".format(COMPILER, conf.project.main, LIBS_PARENT_DIR)
+    cmd = "{} compile {} {}".format(COMPILER, conf.project.main, LIBS_PARENT_DIR)
     print(cmd)
     code, errors, ret = execute(cmd)
     if ret != 0:

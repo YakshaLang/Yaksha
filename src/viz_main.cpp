@@ -1,4 +1,3 @@
-#include "ast/ast_printer.h"
 #include "ast/ast_vis.h"
 #include "ast/parser.h"
 #include "compiler/type_checker.h"
@@ -7,10 +6,13 @@
 #include "tokenizer/tokenizer.h"
 #include "utilities/error_printer.h"
 using namespace yaksha;
+#ifndef PROGRAM_NAME
+#define PROGRAM_NAME "yakshavz"
+#endif
 // Simple main function to run a script and print the ast.
 int main(int argc, char *argv[]) {
   if (argc != 2) {
-    std::cerr << "Usage: yakshavz script.yaka\n";
+    std::cerr << "Usage: " << PROGRAM_NAME << " script.yaka\n";
     return EXIT_FAILURE;
   }
   std::string file_name{argv[1]};

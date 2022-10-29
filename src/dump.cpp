@@ -4,6 +4,9 @@
 #include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
 #include "utilities/error_printer.h"
+#ifndef PROGRAM_NAME
+#define PROGRAM_NAME "ykashadmp"
+#endif
 using namespace yaksha;
 // trim from start (in place)
 static inline void ltrim(std::string &s) {
@@ -259,7 +262,7 @@ void display(def_class_visitor &df, parser &parser_object,
 // Simple main function to run a script and print the ast.
 int main(int argc, char *argv[]) {
   if (argc != 2) {
-    std::cerr << "Usage: yakshadmp script.yaka\n";
+    std::cerr << "Usage: " << PROGRAM_NAME << " script.yaka\n";
     return EXIT_FAILURE;
   }
   std::string file_name{argv[1]};

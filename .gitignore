@@ -24,6 +24,8 @@ bin/yakshadmp
 bin/yakshavz
 bin/YakshaFuzz
 bin/YakshaTests
+/bin/ykreload
+/bin/yaksha
 bin/cmakecarpntr
 bin/raylib-parser
 bin/fuzz/crash-*
@@ -57,4 +59,3 @@ test_data/document_samples/gui_window
 /test_data/compiler_tests/normal_hash_map
 /test_data/compiler_tests/normal_hash_map.c
 .clang
-/bin/ykreload

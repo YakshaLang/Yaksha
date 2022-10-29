@@ -104,11 +104,11 @@ def find_libs_path(c: Config) -> None:
 def find_yaksha_compiler(c: Config) -> None:
     # Find yakshac(.exe) binary file
     exe_parent: str = os.exe_path()
-    l1: str = path.join(exe_parent, "yakshac")
+    l1: str = path.join(exe_parent, "yaksha")
     if os.is_windows():
         l1 = l1 + ".exe"
     l2: str = path.join(path.dirname(path.dirname(exe_parent)), "bin")
-    l2 = path.join(l2, "yakshac")
+    l2 = path.join(l2, "yaksha")
     if os.is_windows():
         l2 = l2 + ".exe"
     if path.executable(l1):
@@ -117,13 +117,13 @@ def find_yaksha_compiler(c: Config) -> None:
     if path.executable(l2):
         c.compiler_path = l2
         return
-    fallback: str = os.which("yakshac")
+    fallback: str = os.which("yaksha")
     if len(fallback) > 0:
         c.compiler_path = fallback
         return
-    arrput(c.errors, "Failed to find yakshac in :" + l1)
-    arrput(c.errors, "Failed to find yakshac in :" + l2)
-    arrput(c.errors, "Failed to find yakshac in PATH")
+    arrput(c.errors, "Failed to find yaksha in :" + l1)
+    arrput(c.errors, "Failed to find yaksha in :" + l2)
+    arrput(c.errors, "Failed to find yaksha in PATH")
     c.compiler_path = "<not found>"
 
 def find_zig_compiler(c: Config) -> None:

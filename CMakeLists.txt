@@ -25,29 +25,35 @@ include_directories("runtime")
 set(YAKSHA_RUNTIME_FILES
         runtime/argparse.h runtime/cr.h runtime/cr_userdata.h runtime/ini.h runtime/stmmr.h runtime/subprocess.h runtime/tinycthread.h runtime/toml.h runtime/utf8proc.h runtime/wasm4.h runtime/whereami.h runtime/yk__argparse.h runtime/yk__arrayutils.h runtime/yk__console.h runtime/yk__cpu.h runtime/yk__graphic_utils.h runtime/yk__lib.h runtime/yk__process.h runtime/yk__system.h runtime/yk__utf8iter.h runtime/yk__wasm4_libc.h runtime/argparse.c runtime/tinycthread.c runtime/toml.c runtime/utf8proc.c runtime/whereami.c runtime/yk__argparse.c runtime/yk__arrayutils.c runtime/yk__console.c runtime/yk__cpu.c runtime/yk__graphic_utils.c runtime/yk__main.c runtime/yk__process.c runtime/yk__system.c) # update_makefile.py YK_RUNTIME
 
-add_library(yaksha ${YAKSHA_SOURCE_FILES})
+add_library(library_yaksha ${YAKSHA_SOURCE_FILES})
 
 # -- yakshac - compiler --
 add_executable(yakshac src/comp_main.cpp)
 target_link_libraries(yakshac PUBLIC ${LIBS})
-target_link_libraries(yakshac PUBLIC yaksha)
+target_link_libraries(yakshac PUBLIC library_yaksha)
 target_compile_features(yakshac PRIVATE cxx_std_17)
 
 # -- yakshavz - visualizer --
 add_executable(yakshavz src/viz_main.cpp)
 target_link_libraries(yakshavz PUBLIC ${LIBS})
-target_link_libraries(yakshavz PUBLIC yaksha)
+target_link_libraries(yakshavz PUBLIC library_yaksha)
 target_compile_features(yakshavz PRIVATE cxx_std_17)
 
 # -- yakshadmp - syntax extractor --
 add_executable(yakshadmp src/dump.cpp)
 target_link_libraries(yakshadmp PUBLIC ${LIBS})
-target_link_libraries(yakshadmp PUBLIC yaksha)
+target_link_libraries(yakshadmp PUBLIC library_yaksha)
 target_compile_features(yakshadmp PRIVATE cxx_std_17)
 
 # -- ykreload - compiler --
 add_executable(ykreload src/reloader.cpp)
 target_compile_features(yakshac PRIVATE cxx_std_17)
+
+# -- yaksha binary --
+add_executable(yaksha src/yk.cpp)
+target_link_libraries(yaksha PUBLIC ${LIBS})
+target_link_libraries(yaksha PUBLIC library_yaksha)
+target_compile_features(yaksha PRIVATE cxx_std_17)
 
 # -- raylib-parser - raylib-parser --
 add_executable(raylib-parser runtime/raylib/parser/raylib_parser.c)
@@ -77,7 +83,7 @@ else()
     add_executable(YakshaFuzz tests/fuzz_main.cpp)
 endif()
 target_link_libraries(YakshaFuzz ${LIBS})
-target_link_libraries(YakshaFuzz PUBLIC yaksha)
+target_link_libraries(YakshaFuzz PUBLIC library_yaksha)
 target_compile_features(YakshaFuzz PRIVATE cxx_std_17)
 
 # CMake Build for carpntr
@@ -89,4 +95,3 @@ target_compile_definitions(cmakecarpntr PUBLIC UTF8PROC_STATIC)
 if(UNIX AND NOT APPLE)
     target_link_libraries(cmakecarpntr PUBLIC m)
 endif()
-

@@ -2,6 +2,9 @@
 #include <filesystem>
 #include <iostream>
 #include <thread>
+#ifndef PROGRAM_NAME
+#define PROGRAM_NAME "ykreload"
+#endif
 #ifdef YK__CR_DEBUG
 #define CR_DEBUG
 #endif
@@ -10,7 +13,7 @@
 #include "../runtime/cr_userdata.h"
 int main(int argc, char *argv[]) {
   if (argc != 2) {
-    std::cerr << "[YKRELOAD] Invalid usage. Use as: ykreload libgame.so"
+    std::cerr << "Invalid usage. Use as: " << PROGRAM_NAME << " libgame.so"
               << std::endl;
     return -1;
   }
