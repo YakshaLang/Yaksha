@@ -1,0 +1,64 @@
+<NotepadPlus>
+    <UserLang name="yaksha_udl" ext="yaka" udlVersion="2.1">
+        <Settings>
+            <Global caseIgnored="no" allowFoldOfComments="yes" foldCompact="no" forcePureLC="0" decimalSeparator="0" />
+            <Prefix Keywords1="no" Keywords2="yes" Keywords3="no" Keywords4="no" Keywords5="no" Keywords6="no" Keywords7="no" Keywords8="no" />
+        </Settings>
+        <KeywordLists>
+            <Keywords name="Comments">00# 01 02((EOL)) 03 04</Keywords>
+            <Keywords name="Numbers, prefix1"></Keywords>
+            <Keywords name="Numbers, prefix2">0x 0o 0b</Keywords>
+            <Keywords name="Numbers, extras1">A B C D E F a b c d e f</Keywords>
+            <Keywords name="Numbers, extras2"></Keywords>
+            <Keywords name="Numbers, suffix1">f</Keywords>
+            <Keywords name="Numbers, suffix2">i8 u8 i16 u16 i32 u32 i64 u64</Keywords>
+            <Keywords name="Numbers, range"></Keywords>
+            <Keywords name="Operators1">+= -= *= /= %= &amp;= |= ^= &lt;&lt;= &gt;&gt;= -&gt; + - * / % &amp; | ^ &lt;&lt; &gt;&gt; = : , ( ) [ ] .</Keywords>
+            <Keywords name="Operators2">and or</Keywords>
+            <Keywords name="Folders in code1, open"></Keywords>
+            <Keywords name="Folders in code1, middle"></Keywords>
+            <Keywords name="Folders in code1, close"></Keywords>
+            <Keywords name="Folders in code2, open"></Keywords>
+            <Keywords name="Folders in code2, middle"></Keywords>
+            <Keywords name="Folders in code2, close"></Keywords>
+            <Keywords name="Folders in comment, open"></Keywords>
+            <Keywords name="Folders in comment, middle"></Keywords>
+            <Keywords name="Folders in comment, close"></Keywords>
+            <Keywords name="Keywords1">while def import continue break if elif else class return ccode pass defer del as</Keywords>
+            <Keywords name="Keywords2">@nativedefine @varargs @dotaccess @nativemacro @native</Keywords>
+            <Keywords name="Keywords3">int float i8 i16 i32 i64 u8 u16 u32 u64 float f32 f64 Array Function In Const AnyPtr Out SMEntry MEntry str bool Ptr Tuple AnyPtrToConst</Keywords>
+            <Keywords name="Keywords4">print println len arrput arrpop arrnew array getref unref charat shnew shput shget shgeti hmnew hmput hmget hmgeti cast qsort iif foreach countif filter map binarydata arrsetlen arrsetcap</Keywords>
+            <Keywords name="Keywords5">True False None</Keywords>
+            <Keywords name="Keywords6">main</Keywords>
+            <Keywords name="Keywords7">runtimefeature</Keywords>
+            <Keywords name="Keywords8"></Keywords>
+            <Keywords name="Delimiters">00&quot;&quot;&quot; 01\ 02&quot;&quot;&quot; 03 04 05 06&quot; 07\ 08&quot; 09 10 11 12# 13 14((EOL)) 15 16 17 18 19 20 21 22 23</Keywords>
+        </KeywordLists>
+        <Styles>
+            <WordsStyle name="DEFAULT" fgColor="333333" bgColor="FFFFFF" colorStyle="0" fontStyle="0" nesting="0" />
+            <WordsStyle name="COMMENTS" fgColor="808080" bgColor="FFFFFF" colorStyle="1" fontStyle="2" nesting="0" />
+            <WordsStyle name="LINE COMMENTS" fgColor="FF80FF" bgColor="FFFFFF" colorStyle="1" fontStyle="1" nesting="0" />
+            <WordsStyle name="NUMBERS" fgColor="0080FF" bgColor="FFFFFF" colorStyle="1" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS1" fgColor="FFFF00" bgColor="FFFFFF" colorStyle="1" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS2" fgColor="FF8000" bgColor="FFFFFF" colorStyle="1" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS3" fgColor="80FFFF" bgColor="FFFFFF" colorStyle="1" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS4" fgColor="80FF80" bgColor="FFFFFF" colorStyle="1" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS5" fgColor="FF80FF" bgColor="808000" colorStyle="1" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS6" fgColor="FFFF80" bgColor="FFFFFF" colorStyle="1" fontStyle="5" nesting="0" />
+            <WordsStyle name="KEYWORDS7" fgColor="000080" bgColor="FFFFFF" colorStyle="1" fontStyle="3" nesting="0" />
+            <WordsStyle name="KEYWORDS8" fgColor="333333" bgColor="FFFFFF" colorStyle="0" fontStyle="0" nesting="0" />
+            <WordsStyle name="OPERATORS" fgColor="8080FF" bgColor="FFFFFF" colorStyle="1" fontStyle="1" nesting="0" />
+            <WordsStyle name="FOLDER IN CODE1" fgColor="333333" bgColor="FFFFFF" colorStyle="0" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN CODE2" fgColor="333333" bgColor="FFFFFF" colorStyle="0" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN COMMENT" fgColor="333333" bgColor="FFFFFF" colorStyle="0" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS1" fgColor="0080FF" bgColor="FFFF80" colorStyle="1" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS2" fgColor="008000" bgColor="FFFFFF" colorStyle="1" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS3" fgColor="0080FF" bgColor="FFFF80" colorStyle="1" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS4" fgColor="000080" bgColor="FFFFFF" colorStyle="1" fontStyle="1" nesting="65600" />
+            <WordsStyle name="DELIMITERS5" fgColor="000080" bgColor="FFFFFF" colorStyle="1" fontStyle="2" nesting="32800" />
+            <WordsStyle name="DELIMITERS6" fgColor="000080" bgColor="FFFFFF" colorStyle="1" fontStyle="3" nesting="0" />
+            <WordsStyle name="DELIMITERS7" fgColor="000080" bgColor="FFFFFF" colorStyle="1" fontStyle="3" nesting="0" />
+            <WordsStyle name="DELIMITERS8" fgColor="333333" bgColor="FFFFFF" colorStyle="0" fontStyle="0" nesting="0" />
+        </Styles>
+    </UserLang>
+</NotepadPlus>
