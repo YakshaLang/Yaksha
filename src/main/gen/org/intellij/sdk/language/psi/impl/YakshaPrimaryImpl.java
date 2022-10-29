@@ -29,12 +29,6 @@ public class YakshaPrimaryImpl extends ASTWrapperPsiElement implements YakshaPri
 
   @Override
   @Nullable
-  public YakshaIdentifierExp getIdentifierExp() {
-    return findChildByClass(YakshaIdentifierExp.class);
-  }
-
-  @Override
-  @Nullable
   public YakshaParenExp getParenExp() {
     return findChildByClass(YakshaParenExp.class);
   }

@@ -39,7 +39,6 @@ public interface YakshaTypes {
   IElementType EXPR_STATEMENT = new YakshaElementType("EXPR_STATEMENT");
   IElementType FACTOR = new YakshaElementType("FACTOR");
   IElementType FNCALL = new YakshaElementType("FNCALL");
-  IElementType IDENTIFIER_EXP = new YakshaElementType("IDENTIFIER_EXP");
   IElementType IF_STATEMENT = new YakshaElementType("IF_STATEMENT");
   IElementType IMPORT_STATEMENT = new YakshaElementType("IMPORT_STATEMENT");
   IElementType LET_STATEMENT = new YakshaElementType("LET_STATEMENT");
@@ -214,9 +213,6 @@ public interface YakshaTypes {
       }
       else if (type == FNCALL) {
         return new YakshaFncallImpl(node);
-      }
-      else if (type == IDENTIFIER_EXP) {
-        return new YakshaIdentifierExpImpl(node);
       }
       else if (type == IF_STATEMENT) {
         return new YakshaIfStatementImpl(node);

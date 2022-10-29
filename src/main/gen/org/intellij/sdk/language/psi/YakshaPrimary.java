@@ -8,9 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface YakshaPrimary extends PsiElement {
 
   @Nullable
-  YakshaIdentifierExp getIdentifierExp();
-
-  @Nullable
   YakshaParenExp getParenExp();
 
 }

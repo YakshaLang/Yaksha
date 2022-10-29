@@ -31,7 +31,7 @@ public class YakshaAnnotator implements Annotator {
             final String fullName = fncall.getFullName();
             if (fullName != null && !fullName.contains(".") && YakshaDocs.BUILTIN_FUNCTION_NAMES.contains(fullName)) {
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-                        .range(fncall.getIdentifierExp().getTextRange())
+                        .range(fncall.getFirstChild().getTextRange())
                         .textAttributes(YakshaSyntaxHighlighter.KEYWORD)
                         .create();
                 if ((fullName.equals("cast") || fullName.equals("arrnew") || fullName.equals("array")) && fncall.getArgumentsList() != null

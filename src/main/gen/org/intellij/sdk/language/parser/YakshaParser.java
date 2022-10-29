@@ -1232,13 +1232,13 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // identifier_exp (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER )*
+  // IDENTIFIER (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER )*
   public static boolean fncall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fncall")) return false;
     if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = identifier_exp(b, l + 1);
+    r = consumeToken(b, IDENTIFIER);
     r = r && fncall_1(b, l + 1);
     exit_section_(b, m, FNCALL, r);
     return r;
@@ -1344,40 +1344,6 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "fncall_1_0_1_4")) return false;
     consumeToken(b, S);
     return true;
-  }
-
-  /* ********************************************************** */
-  // IDENTIFIER (OPERATOR_DOT IDENTIFIER)*
-  public static boolean identifier_exp(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "identifier_exp")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, IDENTIFIER);
-    r = r && identifier_exp_1(b, l + 1);
-    exit_section_(b, m, IDENTIFIER_EXP, r);
-    return r;
-  }
-
-  // (OPERATOR_DOT IDENTIFIER)*
-  private static boolean identifier_exp_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "identifier_exp_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!identifier_exp_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "identifier_exp_1", c)) break;
-    }
-    return true;
-  }
-
-  // OPERATOR_DOT IDENTIFIER
-  private static boolean identifier_exp_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "identifier_exp_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, OPERATOR_DOT, IDENTIFIER);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -1827,7 +1793,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | identifier_exp | paren_exp
+  // KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | IDENTIFIER | paren_exp
   public static boolean primary(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "primary")) return false;
     boolean r;
@@ -1837,7 +1803,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, KW_NONE);
     if (!r) r = consumeToken(b, NUMBER);
     if (!r) r = consumeToken(b, STRING);
-    if (!r) r = identifier_exp(b, l + 1);
+    if (!r) r = consumeToken(b, IDENTIFIER);
     if (!r) r = paren_exp(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;

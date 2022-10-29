@@ -16,7 +16,6 @@ import org.intellij.sdk.language.psi.YakshaDefParam;
 import org.intellij.sdk.language.psi.YakshaDefParams;
 import org.intellij.sdk.language.psi.YakshaDefStatement;
 import org.intellij.sdk.language.psi.YakshaFncall;
-import org.intellij.sdk.language.psi.YakshaIdentifierExp;
 import org.intellij.sdk.language.psi.YakshaImportStatement;
 import org.intellij.sdk.language.psi.YakshaTypes;
 import org.jetbrains.annotations.NotNull;
@@ -203,9 +202,9 @@ public class YakshaPsiImplUtil {
     /* ============================================================== */
 
     public static String getDefOrClassName(final YakshaFncall fncallExpr) {
-        final YakshaIdentifierExp identifierExp = fncallExpr.getIdentifierExp();
+//        final YakshaIdentifierExp identifierExp = fncallExpr.getIdentifierExp();
         final LinkedList<ASTNode> identifiers = new LinkedList<>();
-        for (ASTNode element = identifierExp.getNode().getFirstChildNode(); element != null; element = element.getTreeNext()) {
+        for (ASTNode element = fncallExpr.getNode().getFirstChildNode(); element != null; element = element.getTreeNext()) {
             if (element.getElementType() == YakshaTypes.IDENTIFIER) {
                 identifiers.add(element);
             }
@@ -217,9 +216,8 @@ public class YakshaPsiImplUtil {
     }
 
     public static String getFullName(final YakshaFncall fncallExpr) {
-        final YakshaIdentifierExp identifierExp = fncallExpr.getIdentifierExp();
         final LinkedList<ASTNode> identifiers = new LinkedList<>();
-        for (ASTNode element = identifierExp.getNode().getFirstChildNode(); element != null; element = element.getTreeNext()) {
+        for (ASTNode element = fncallExpr.getNode().getFirstChildNode(); element != null; element = element.getTreeNext()) {
             if (element.getElementType() == YakshaTypes.IDENTIFIER) {
                 identifiers.add(element);
             }
@@ -245,7 +243,7 @@ public class YakshaPsiImplUtil {
         if (def == null) {
             return null;
         }
-        return new YakshaReference(fnCallExpr, fnCallExpr.getIdentifierExp().getTextRangeInParent());
+        return new YakshaReference(fnCallExpr, fnCallExpr.getFirstChild().getTextRangeInParent());
     }
 
     /* ============================================================== */
