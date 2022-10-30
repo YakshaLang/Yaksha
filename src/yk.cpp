@@ -61,6 +61,7 @@ void display_banner() {
                "\n";
 }
 };
+#ifndef YK_CPP_NO_MAIN
 void display_help() {
   std::cout << "Usage:\n\n";
   std::cout << "yaksha compile file_path.yaka [libs_path]\n";
@@ -90,3 +91,4 @@ int main(int argc, char *argv[]) {
   display_help();
   return EXIT_FAILURE;
 }
+#endif
