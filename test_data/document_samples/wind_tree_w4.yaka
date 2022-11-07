@@ -1,0 +1,104 @@
+import w4
+import libs.numbers as num
+import libs.perlin
+import libs.random
+import libs.c as mini_clib
+
+DEG_TO_RAD: Const[float] = 0.017453292519943295f
+
+class State:
+    width: float
+    height: float
+    angle: float
+    frame_count: u64
+    seed: u64
+    wind: float
+    gamepad_prev: u8
+
+def remap(x: float, a: float, b: float, c: float, d: float) -> float:
+    # Map x to be from 'a to b' range to 'c to d' range
+    if a == b:
+        return 0.0f
+    return (x - a) / (b - a) * (d - c) + c
+
+def sin_deg(x: float) -> float:
+    return cast("float", mini_clib.sin(cast("mini_clib.CDouble", x * DEG_TO_RAD)))
+
+def cos_deg(x: float) -> float:
+    return cast("float", mini_clib.cos(cast("mini_clib.CDouble", x * DEG_TO_RAD)))
+
+def branch(x: float, y: float, length: float, angle: float, s: State) -> None:
+    if length < 3.2f:
+        leaf_width: float = random.random_betweenf(3.0f, 6.0f)
+        leaf_height: float = random.random_betweenf(1.0f, 3.0f)
+        if random.random() < 0.5:
+            w4.set_draw_colors(0x0022u16)
+        else:
+            w4.set_draw_colors(0x0033u16)
+        w4.oval(cast("int", x), cast("int", y), cast("u32", leaf_width), cast("u32", leaf_height))
+        return
+    wind: float = sin_deg(perlin.noise1df(num.uu2f(s.frame_count) / 50.0f)) * 100.0f * sin_deg(num.uu2f(s.frame_count) / 2.0f)
+    next_y: float = y - length * cos_deg(angle)
+    next_x: float = x + length * sin_deg(angle)
+    w4.set_draw_colors(0x0044u16)
+    w4.line(cast("int", x), cast("int", y), cast("int", next_x), cast("int", next_y))
+    r1: float = random.random_betweenf(0.5f, 0.9f)
+    r2: float = random.random_betweenf(0.5f, 0.8f)
+    branch(next_x, next_y, (length * r2), angle + s.angle + wind * s.wind, s)
+    branch(next_x, next_y, (length * r1), angle - s.angle + wind * s.wind, s)
+
+def handle_input(s: State) -> None:
+    just_pressed: u8 = w4.gamepad1() & (w4.gamepad1() ^ s.gamepad_prev)
+    if just_pressed & w4.BUTTON_1 != 0u8:
+        s.seed = s.frame_count
+        random.set_seed(s.seed)
+    if just_pressed & w4.BUTTON_2 != 0u8:
+        s.seed = s.frame_count
+        random.set_seed(s.seed)
+        s.angle = random.random_betweenf(20.0f, 45.0f)
+    if just_pressed & w4.BUTTON_UP != 0u8:
+        s.angle -= 2.0f
+        if s.angle < 20.0f:
+            s.angle = 20.0f
+    if just_pressed & w4.BUTTON_DOWN != 0u8:
+        s.angle += 2.0f
+        if s.angle > 45.0f:
+            s.angle = 45.0f
+    if just_pressed & w4.BUTTON_LEFT != 0u8:
+        s.wind -= 1.0f
+        if s.wind < -20.0f:
+            s.wind = -20.0f
+    if just_pressed & w4.BUTTON_RIGHT != 0u8:
+        s.wind += 1.0f
+        if s.wind > 20.0f:
+            s.wind = 20.0f
+    s.gamepad_prev = w4.gamepad1()
+
+def game_step(d: AnyPtr) -> None:
+    s: State = cast("State", d)
+    handle_input(s)
+    branch(s.width / 2.0f, s.height, s.height / 4.8f, 0.0f, s)
+    s.frame_count += 1u64
+    random.set_seed(s.seed)
+
+def init_state() -> State:
+    s: State = State()
+    s.angle = 35.0f
+    s.width = 160.0f
+    s.height = 160.0f
+    s.frame_count = 0u64
+    s.wind = 10.0f
+    s.seed = random.init_random()
+    s.gamepad_prev = 0u8
+    return s
+
+def del_state(current: AnyPtr) -> None:
+    del current
+
+def main() -> int:
+    # based on palettes
+    # https://lospec.com/palette-list/cga-palette-2-high + https://lospec.com/palette-list/sweet-28
+    w4.set_palette(0xb2cfcdu32, 0x137878u32, 0xFF5555u32, 0x000000u32)
+    s: State = init_state()
+    w4.set_game_state(cast("AnyPtr", s))
+    return 0
