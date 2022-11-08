@@ -75,7 +75,6 @@ def set_system_flags(value: u8) -> None:
 
 @nativemacro("((int32_t)*((const uint8_t*)0x20))")
 def netplay() -> int:
-    # Read mouse buttons
     pass
 
 @nativemacro("((uint8_t*)0xa0)")
@@ -144,6 +143,10 @@ def text(text_data: str, x: int, y: int) -> None:
     ccode """text(nn__text_data, nn__x, nn__y);
     yk__sdsfree(nn__text_data)"""
 
+@native
+def text_u8(text_data: Ptr[Const[u8]], x: int, y: int) -> None:
+    # Draws text from given binarydata("text") (or manually created u8 Ptr) (no string allocation)
+    ccode """text((const char *)nn__text_data, nn__x, nn__y)"""
 
 @native("tone")
 def tone(frequency: u32, duration: u32, volume: u32, flags: u32) -> None:
@@ -176,6 +179,11 @@ def trace(text_data: str) -> None:
     # Prints a message to the debug console
     ccode """trace(nn__text_data);
     yk__sdsfree(nn__text_data)"""
+
+@native
+def trace_u8(text_data: Ptr[Const[u8]]) -> None:
+    # Prints a message to the debug console from given binarydata("text") (or manually created u8 Ptr) (no string allocation)
+    ccode """trace((const char *)nn__text_data)"""
 
 @native
 def set_game_state(data: AnyPtr) -> None:

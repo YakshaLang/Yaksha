@@ -14,12 +14,57 @@ class State:
     seed: u64
     wind: float
     gamepad_prev: u8
+    text_buf: Array[u8]
 
 def remap(x: float, a: float, b: float, c: float, d: float) -> float:
     # Map x to be from 'a to b' range to 'c to d' range
     if a == b:
         return 0.0f
     return (x - a) / (b - a) * (d - c) + c
+
+def i2s(x: int, target: Array[u8]) -> bool:
+    # Convert given integer to a string
+    # Support up to 10 character output (size 11 buffer is required)
+    charset: Ptr[Const[u8]] = binarydata("0123456789- \0")
+    target[0] = 0u8
+    target[1] = 0u8
+    target[2] = 0u8
+    target[3] = 0u8
+    target[4] = 0u8
+    target[5] = 0u8
+    target[6] = 0u8
+    target[7] = 0u8
+    target[8] = 0u8
+    target[9] = 0u8
+    target[10] = 0u8
+    pos: int = 0
+    y: int = x
+    if x > 9999999999 or x < -999999999:
+        target[0] = cast("u8", charat(cast("str", charset), 10))
+        return False
+    if x < 0:
+        y *= -1
+        target[pos] = cast("u8", charat(cast("str", charset), 10))
+    else:
+        target[pos] = cast("u8", charat(cast("str", charset), 11))
+    pos += 1
+    if y == 0:
+        target[pos] = cast("u8", charat(cast("str", charset), 0))
+        pos += 1
+    while y != 0:
+        character: int = y % 10
+        target[pos] = cast("u8", charat(cast("str", charset), character))
+        pos += 1
+        y /= 10
+    # Reverse from 1 to pos
+    rpos: int = 1
+    rmax: int = (pos / 2) + 1
+    while rpos < rmax:
+        temp: u8 = target[rpos]
+        target[rpos] = target[pos - rpos]
+        target[pos - rpos] = temp
+        rpos += 1
+    return True
 
 def sin_deg(x: float) -> float:
     return cast("float", mini_clib.sin(cast("mini_clib.CDouble", x * DEG_TO_RAD)))
@@ -78,6 +123,21 @@ def game_step(d: AnyPtr) -> None:
     s: State = cast("State", d)
     handle_input(s)
     branch(s.width / 2.0f, s.height, s.height / 4.8f, 0.0f, s)
+    # Show labels
+    w4.set_draw_colors(0x0014u16)
+    w4.text_u8(cast("Ptr[Const[u8]]", binarydata("Angle:\0")), 2, 2)
+    w4.text_u8(cast("Ptr[Const[u8]]", binarydata("Wind:\0")), 2, 16)
+    # Show angle
+    angle: int = cast("int", s.angle)
+    i2s(angle, s.text_buf)
+    w4.set_draw_colors(0x0012u16)
+    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), 50, 2)
+    # Show wind
+    wind: int = cast("int", s.wind)
+    i2s(wind, s.text_buf)
+    w4.set_draw_colors(0x0012u16)
+    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), 50, 16)
+    # ------------------------------------------------------
     s.frame_count += 1u64
     random.set_seed(s.seed)
 
@@ -90,6 +150,7 @@ def init_state() -> State:
     s.wind = 10.0f
     s.seed = random.init_random()
     s.gamepad_prev = 0u8
+    s.text_buf = cast("Array[u8]", mini_clib.calloc(cast("mini_clib.Size", 1), cast("mini_clib.Size", 11)))
     return s
 
 def del_state(current: AnyPtr) -> None:
