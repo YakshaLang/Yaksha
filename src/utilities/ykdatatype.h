@@ -46,6 +46,7 @@ namespace yaksha {
     [[nodiscard]] bool is_str() const;
     [[nodiscard]] bool is_float() const;
     [[nodiscard]] bool is_bool() const;
+    [[nodiscard]] bool is_const_bool() const;
     [[nodiscard]] std::string as_string() const;
     [[nodiscard]] bool is_primitive() const;
     [[nodiscard]] bool is_i8() const;
@@ -63,8 +64,11 @@ namespace yaksha {
     [[nodiscard]] bool is_builtin_or_primitive() const;
     [[nodiscard]] bool is_a_number() const;
     [[nodiscard]] bool is_an_integer() const;
+    [[nodiscard]] bool is_a_const_integer() const;
     [[nodiscard]] bool is_a_signed_integer() const;
     [[nodiscard]] bool is_an_unsigned_integer() const;
+    [[nodiscard]] bool is_a_const_signed_integer() const;
+    [[nodiscard]] bool is_a_const_unsigned_integer() const;
     [[nodiscard]] bool is_a_float() const;
     [[nodiscard]] bool is_an_array() const;
     [[nodiscard]] bool is_a_pointer() const;

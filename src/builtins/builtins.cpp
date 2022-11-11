@@ -129,7 +129,7 @@ struct builtin_arrsetlencap : builtin {
     } else if (args[0].datatype_->args_[0]->is_m_entry() ||
                args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ = func_name_ + "() does not work with maps";
-    } else if (!args[1].datatype_->is_an_integer()) {
+    } else if (!(args[1].datatype_->is_an_integer() || args[1].datatype_->is_a_const_integer())) {
       o.string_val_ = func_name_ + "Second argument to () must be an integer";
     } else {
       return ykobject(dt_pool);// None return
@@ -299,7 +299,8 @@ struct builtin_charat : builtin {
       o.string_val_ = "Two arguments must be provided for charat() builtin";
     } else if (!args[0].datatype_->is_str()) {
       o.string_val_ = "Fist argument to charat() must be a str";
-    } else if (!args[1].datatype_->is_an_integer()) {
+    } else if (!(args[1].datatype_->is_an_integer() ||
+                 args[1].datatype_->is_a_const_integer())) {
       o.string_val_ = "Second argument to charat() must be an integer";
     } else {
       return ykobject(dt_pool->create("int"));
@@ -1106,7 +1107,7 @@ struct builtin_iif : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "iif() builtin expects 3 arguments";
-    } else if (!args[0].datatype_->is_bool()) {
+    } else if (!(args[0].datatype_->is_bool() || args[0].datatype_->is_const_bool())) {
       o.string_val_ = "First argument to iif() must be a bool";
     } else if (*args[1].datatype_ != *args[2].datatype_) {
       o.string_val_ = "Second and third argument to iif() must be of same type";
