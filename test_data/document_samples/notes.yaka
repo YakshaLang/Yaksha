@@ -26,6 +26,7 @@ import libs.c as mini_clib
 
 # Total notes allowed
 MAX_NOTES:Const[int]= 256
+FONT_WIDTH:Const[int]= 8
 # ======= Notes ===========
 NOTE_C:   Const[u8] = 1u8
 NOTE_C_S: Const[u8] = 2u8
@@ -358,42 +359,54 @@ def draw_note(s: State, grid_pos: int, note_pos: int, cursor: bool) -> None:
         return
     x: int = 4 + (grid_pos % 4) * 40
     y: int = 12 + (grid_pos / 4) * 10
+    x_delta: int = 0
     clear_buf(s.text_buf)
-    buf_pos: int = 0
     # Put the time indicator to the buffer
-    s.text_buf[buf_pos] = note_data[9] + s.note_buf[note_pos][0]
-    buf_pos += 1
+    s.text_buf[0] = note_data[9] + s.note_buf[note_pos][0]
+    if cursor:
+        w4.set_draw_colors(0x0042u16)
+    else:
+        w4.set_draw_colors(0x0012u16)
+    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), x + x_delta, y)
+    x_delta += FONT_WIDTH
     # Put note indicator
     note: u8 = s.note_buf[note_pos][1]
     if note == NOTE_C or note == NOTE_C_S:
-        s.text_buf[buf_pos] = note_data[0]
+        s.text_buf[0] = note_data[0]
     if note == NOTE_D or note == NOTE_D_S:
-        s.text_buf[buf_pos] = note_data[1]
+        s.text_buf[0] = note_data[1]
     if note == NOTE_E:
-        s.text_buf[buf_pos] = note_data[2]
+        s.text_buf[0] = note_data[2]
     if note == NOTE_F or note == NOTE_F_S:
-        s.text_buf[buf_pos] = note_data[3]
+        s.text_buf[0] = note_data[3]
     if note == NOTE_G or note == NOTE_G_S:
-        s.text_buf[buf_pos] = note_data[4]
+        s.text_buf[0] = note_data[4]
     if note == NOTE_A or note == NOTE_A_S:
-        s.text_buf[buf_pos] = note_data[5]
+        s.text_buf[0] = note_data[5]
     if note == NOTE_B:
-        s.text_buf[buf_pos] = note_data[6]
+        s.text_buf[0] = note_data[6]
     if note == NOTE_REST:
-        s.text_buf[buf_pos] = note_data[7]
-    else:
-        buf_pos += 1
-        if note == NOTE_C_S or note == NOTE_D_S or note == NOTE_F_S or note == NOTE_G_S or note == NOTE_A_S:
-            s.text_buf[buf_pos] = note_data[8]
-            buf_pos += 1
-        # Put octave indicator
-        s.text_buf[buf_pos] = note_data[9] + 1u8 + s.note_buf[note_pos][2]
-    # Draw note text
+        s.text_buf[0] = note_data[7]
+    elif note == NOTE_C_S or note == NOTE_D_S or note == NOTE_F_S or note == NOTE_G_S or note == NOTE_A_S:
+        s.text_buf[1] = note_data[8]
     if cursor:
-        w4.set_draw_colors(0x0012u16)
+        w4.set_draw_colors(0x0043u16)
     else:
-        w4.set_draw_colors(0x0014u16)
-    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), x, y)
+        w4.set_draw_colors(0x0013u16)
+    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), x + x_delta, y)
+    x_delta += FONT_WIDTH
+    if s.text_buf[1] != 0u8:
+        # handle '#' sign
+        x_delta += FONT_WIDTH
+    s.text_buf[1] = 0u8
+    # Put octave indicator
+    if note != NOTE_REST:
+        s.text_buf[0] = note_data[9] + 1u8 + s.note_buf[note_pos][2]
+        if cursor:
+            w4.set_draw_colors(0x0041u16)
+        else:
+            w4.set_draw_colors(0x0014u16)
+        w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), x + x_delta, y)
 
 def draw_notes(s: State) -> None:
     # Nothing to draw
@@ -489,7 +502,7 @@ def del_state(current: AnyPtr) -> None:
 def main() -> int:
     # based on palette
     # https://lospec.com/palette-list/sweet-28
-    w4.set_palette(0xb2cfcdu32, 0x2796dbu32, 0xb62b38u32, 0x0e0e37u32)
+    w4.set_palette(0xfff678u32, 0x923737u32, 0xda4fbcu32, 0x1b1b5cu32)
     s: State = init_state()
     w4.set_game_state(cast("AnyPtr", s))
     return 0
