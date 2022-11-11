@@ -1,0 +1,497 @@
+# =========================================================================================
+#        ________________________________
+#       /    o   oooo ooo oooo   o o o  /\
+#      /    oo  ooo  oo  oooo   o o o  / /
+#     /    _________________________  / /
+#    / // / // /// // /// // /// / / / /
+#   /___ //////////////////////////_/ /
+#   \____\________________________\_\/
+# 
+#  **notes**: Application by -- Bhathiya Perera --
+#        For WASM4 Fantasy Console
+#
+# =========================================================================================
+# ASCII ART by Forrest Cook -- reference https://asciiart.website/index.php?art=music/pianos
+# Note Frequencies          -- reference https://pages.mtu.edu/~suits/notefreqs.html
+# Nokia composer web app    -- reference https://zserge.com/nokia-composer/h/
+# =========================================================================================
+
+import w4
+import libs.numbers as num
+import libs.perlin
+import libs.random
+import libs.c as mini_clib
+
+# Total notes allowed
+MAX_NOTES:Const[int]= 256
+# ======= Notes ===========
+NOTE_C:   Const[u8] = 1u8
+NOTE_C_S: Const[u8] = 2u8
+NOTE_D:   Const[u8] = 3u8
+NOTE_D_S: Const[u8] = 4u8
+NOTE_E:   Const[u8] = 5u8
+NOTE_F:   Const[u8] = 6u8
+NOTE_F_S: Const[u8] = 7u8
+NOTE_G:   Const[u8] = 8u8
+NOTE_G_S: Const[u8] = 9u8
+NOTE_A:   Const[u8] = 10u8
+NOTE_A_S: Const[u8] = 11u8
+NOTE_B:   Const[u8] = 12u8
+NOTE_REST:Const[u8] = 13u8
+# Play until we find this
+NOTE_NULL:Const[u8] = 0u8
+
+# ======= Notes Time ======
+# 1/pow(2, TIME)
+TIME_64:  Const[u8] = 6u8
+TIME_32:  Const[u8] = 5u8
+TIME_16:  Const[u8] = 4u8
+TIME_8:   Const[u8] = 3u8
+TIME_4:   Const[u8] = 2u8
+TIME_HALF:Const[u8] = 1u8
+TIME_FULL:Const[u8] = 0u8
+
+# ====Note Octaves ========
+OCTAVE_1 :Const[u8] = 0u8
+OCTAVE_2 :Const[u8] = 1u8
+OCTAVE_3 :Const[u8] = 2u8
+
+# == Editing Modes ========
+MODE_TIME:Const[u8] = 0u8
+MODE_NOTE:Const[u8] = 1u8
+MODE_OCT :Const[u8] = 2u8
+MODE_DEL :Const[u8] = 3u8
+# max, min mode
+TOTAL_MODES :Const[u8] = 4u8
+
+# 1c 3
+# 0c#1
+# 2c 2
+
+class State:
+    width: int
+    height: int
+    frame_count: u64
+    gamepad_prev: u8
+    text_buf: Array[u8]
+    # Tuple [u8 - time, u8 - note, u8 - octave, u8 - extra]
+    note_buf: Array[Tuple[u8,u8,u8,u8]]
+    note_freq: Array[int]
+    note_time: Array[int]
+    # Cursor position
+    cursor: int
+    prev_cursor: int
+    v_start: int
+    v_end: int
+    note_count: int
+    mode: u8
+    playing: bool
+    play_on: u64
+
+def remap(x: float, a: float, b: float, c: float, d: float) -> float:
+    # Map x to be from 'a to b' range to 'c to d' range
+    if a == b:
+        return 0.0f
+    return (x - a) / (b - a) * (d - c) + c
+
+def fillzero(target: Array[u8], count: int) -> None:
+    position: int = 0
+    while position < count:
+        target[position] = 0u8
+        position += 1
+
+def clear_buf(target: Array[u8]) -> None:
+    target[0] = 0u8
+    target[1] = 0u8
+    target[2] = 0u8
+    target[3] = 0u8
+    target[4] = 0u8
+    target[5] = 0u8
+    target[6] = 0u8
+    target[7] = 0u8
+    target[8] = 0u8
+    target[9] = 0u8
+    target[10] = 0u8
+
+def i2s(x: int, target: Array[u8]) -> bool:
+    # Convert given integer to a string
+    # Support up to 10 character output (size 11 buffer is required)
+    charset: Ptr[Const[u8]] = binarydata("0123456789- \0")
+    clear_buf(target)
+    pos: int = 0
+    y: int = x
+    if x > 9999999999 or x < -999999999:
+        target[0] = cast("u8", charat(cast("str", charset), 10))
+        return False
+    if x < 0:
+        y *= -1
+        target[pos] = cast("u8", charat(cast("str", charset), 10))
+    else:
+        target[pos] = cast("u8", charat(cast("str", charset), 11))
+    pos += 1
+    if y == 0:
+        target[pos] = cast("u8", charat(cast("str", charset), 0))
+        pos += 1
+    while y != 0:
+        character: int = y % 10
+        target[pos] = cast("u8", charat(cast("str", charset), character))
+        pos += 1
+        y /= 10
+    # Reverse from 1 to pos
+    rpos: int = 1
+    rmax: int = (pos / 2) + 1
+    while rpos < rmax:
+        temp: u8 = target[rpos]
+        target[rpos] = target[pos - rpos]
+        target[pos - rpos] = temp
+        rpos += 1
+    return True
+
+def del_note(s: State) -> None:
+    if s.note_count == 0:
+        return
+    x: int = s.cursor + 1
+    last: int = s.note_count - 1
+    while x <= last:
+        s.note_buf[x - 1][0] = s.note_buf[x][0]
+        s.note_buf[x - 1][1] = s.note_buf[x][1]
+        s.note_buf[x - 1][2] = s.note_buf[x][2]
+        s.note_buf[x - 1][3] = s.note_buf[x][3]
+        x += 1
+    s.note_buf[last][0] = NOTE_NULL
+    s.note_buf[last][1] = NOTE_NULL
+    s.note_buf[last][2] = NOTE_NULL
+    s.note_buf[last][3] = NOTE_NULL
+    s.note_count -= 1
+    if s.cursor >= s.note_count:
+        s.cursor = s.note_count - 1
+    if s.cursor < 0:
+        s.cursor = 0
+
+def add_left(s: State) -> None:
+    # We are full
+    if s.note_count == MAX_NOTES:
+        return
+    if s.note_count == 0:
+        s.note_buf[0][0] = TIME_4
+        s.note_buf[0][1] = NOTE_C
+        s.note_buf[0][2] = OCTAVE_2
+        s.note_buf[0][3] = 0u8
+        s.note_count = 1
+        s.cursor = 0
+        return
+    # Add at cursor location + 1
+    # Move everything from right most to + 1 position
+    x: int = s.note_count - 1
+    while x >= s.cursor:
+        s.note_buf[x + 1][0] = s.note_buf[x][0]
+        s.note_buf[x + 1][1] = s.note_buf[x][1]
+        s.note_buf[x + 1][2] = s.note_buf[x][2]
+        s.note_buf[x + 1][3] = s.note_buf[x][3]
+        x -= 1
+    s.note_buf[s.cursor][0] = TIME_4
+    # Alternatively add note c and note rest
+    if s.note_count % 2 != 0:
+        s.note_buf[s.cursor][1] = NOTE_C
+    else:
+        s.note_buf[s.cursor][1] = NOTE_REST
+    s.note_buf[s.cursor][2] = OCTAVE_2
+    s.note_buf[s.cursor][3] = 0u8
+    s.note_count += 1
+
+def add_right(s: State) -> None:
+    # We are full
+    if s.note_count == MAX_NOTES:
+        return
+    if s.note_count == 0:
+        s.note_buf[0][0] = TIME_4
+        s.note_buf[0][1] = NOTE_C
+        s.note_buf[0][2] = OCTAVE_2
+        s.note_buf[0][3] = 0u8
+        s.note_count = 1
+        s.cursor = 0
+        return
+    # Add at cursor location + 1
+    # Move everything from right most to + 1 position
+    x: int = s.note_count - 1
+    while x >= s.cursor + 1:
+        s.note_buf[x + 1][0] = s.note_buf[x][0]
+        s.note_buf[x + 1][1] = s.note_buf[x][1]
+        s.note_buf[x + 1][2] = s.note_buf[x][2]
+        s.note_buf[x + 1][3] = s.note_buf[x][3]
+        x -= 1
+    s.note_buf[s.cursor + 1][0] = TIME_4
+    # Alternatively add note c and note rest
+    if s.note_count % 2 != 0:
+        s.note_buf[s.cursor + 1][1] = NOTE_C
+    else:
+        s.note_buf[s.cursor + 1][1] = NOTE_REST
+    s.note_buf[s.cursor + 1][2] = OCTAVE_2
+    s.note_buf[s.cursor + 1][3] = 0u8
+    s.note_count += 1
+    s.cursor += 1
+
+def up_note(s: State) -> None:
+    if s.note_count == 0:
+        return
+    if s.mode == MODE_TIME:
+        s.note_buf[s.cursor][0] += 1u8
+        if s.note_buf[s.cursor][0] > TIME_64:
+            s.note_buf[s.cursor][0] = TIME_FULL
+    if s.mode == MODE_NOTE:
+        s.note_buf[s.cursor][1] += 1u8
+        if s.note_buf[s.cursor][1] > NOTE_REST:
+            s.note_buf[s.cursor][1] = NOTE_C
+    if s.mode == MODE_OCT:
+        s.note_buf[s.cursor][2] += 1u8
+        if s.note_buf[s.cursor][2] > OCTAVE_3:
+            s.note_buf[s.cursor][2] = OCTAVE_1
+
+def down_note(s: State) -> None:
+    if s.note_count == 0:
+        return
+    if s.mode == MODE_TIME:
+        if s.note_buf[s.cursor][0] == TIME_FULL:
+            s.note_buf[s.cursor][0] = TIME_64
+        else:
+            s.note_buf[s.cursor][0] -= 1u8
+    if s.mode == MODE_NOTE:
+        if s.note_buf[s.cursor][1] == NOTE_C:
+            s.note_buf[s.cursor][1] = NOTE_REST
+        else:
+            s.note_buf[s.cursor][1] -= 1u8
+    if s.mode == MODE_OCT:
+        if s.note_buf[s.cursor][2] == OCTAVE_1:
+            s.note_buf[s.cursor][2] = OCTAVE_3
+        else:
+            s.note_buf[s.cursor][2] -= 1u8
+
+def handle_input(s: State) -> None:
+    just_pressed: u8 = w4.gamepad1() & (w4.gamepad1() ^ s.gamepad_prev)
+    if just_pressed & w4.BUTTON_2 != 0u8:
+        if s.playing:
+            # Stop
+            s.playing = False
+            s.cursor = s.prev_cursor
+            s.mode = MODE_NOTE
+        elif w4.gamepad1() & w4.BUTTON_1 != 0u8:
+            # Play
+            if s.note_count == 0:
+                return
+            s.prev_cursor = s.cursor
+            s.cursor = 0
+            s.playing = True
+        elif s.mode == MODE_DEL:
+            # Delete
+            del_note(s)
+        elif s.mode == MODE_OCT:
+            # Add left
+            add_left(s)
+        else:
+            add_right(s)
+    # Only if we are not playing
+    if not s.playing:
+        if just_pressed & w4.BUTTON_1 != 0u8:
+            s.mode += 1u8
+            s.mode %= TOTAL_MODES
+        if just_pressed & w4.BUTTON_UP != 0u8:
+            up_note(s)
+        if just_pressed & w4.BUTTON_DOWN != 0u8:
+            down_note(s)
+        if just_pressed & w4.BUTTON_LEFT != 0u8:
+            s.cursor -= 1
+            # Wrap around
+            if s.cursor < 0:
+                s.cursor = s.note_count - 1
+        if just_pressed & w4.BUTTON_RIGHT != 0u8:
+            s.cursor += 1
+            # Wrap around
+            if s.cursor > s.note_count - 1:
+                s.cursor = 0
+    s.gamepad_prev = w4.gamepad1()
+
+def draw_board(s: State) -> None:
+    w4.set_draw_colors(0x0014u16)
+    w4.text_u8(binarydata("mode:\0"), 2, 2)
+    i2s(s.note_count, s.text_buf)
+    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), 120, 2)
+    w4.vline(118, 0, 10u32)
+    w4.vline(79, 0, 10u32)
+    w4.set_draw_colors(0x0012u16)
+    if s.note_count == 0:
+        i2s(0, s.text_buf)
+    else:
+        i2s(s.cursor + 1, s.text_buf)
+    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), 80, 2)
+    w4.hline(0, 10, 160u32)
+    w4.hline(0, s.height - 10, 160u32)
+    if s.playing:
+        w4.text_u8(binarydata("play\0"), 44, 2)
+        w4.text_u8(binarydata("stop\0"), 55, s.height - 10 + 2)
+    elif s.mode == MODE_TIME:
+        w4.text_u8(binarydata("time\0"), 44, 2)
+        w4.text_u8(binarydata("add\x85\0"), 55, s.height - 10 + 2)
+    elif s.mode == MODE_NOTE:
+        w4.text_u8(binarydata("note\0"), 44, 2)
+        w4.text_u8(binarydata("add\x85\0"), 55, s.height - 10 + 2)
+    elif s.mode == MODE_OCT:
+        w4.text_u8(binarydata("octa\0"), 44, 2)
+        w4.text_u8(binarydata("add\x84\0"), 55, s.height - 10 + 2)
+    elif s.mode == MODE_DEL:
+        w4.set_draw_colors(0x0013u16)
+        w4.text_u8(binarydata("del \0"), 44, 2)
+        w4.text_u8(binarydata("del \0"), 55, s.height - 10 + 2)
+    w4.set_draw_colors(0x0014u16)
+    if not s.playing:
+        w4.text_u8(binarydata("\x80\0"), 2, s.height - 10 + 2)
+    w4.text_u8(binarydata("\x81\0"), 45, s.height - 10 + 2)
+    if not s.playing:
+        w4.text_u8(binarydata("\x80+\x81\0"), 88, s.height - 10 + 2)
+        w4.set_draw_colors(0x0012u16)
+        w4.text_u8(binarydata("mode\0"), 12, s.height - 10 + 2)
+    if not s.playing:
+        w4.text_u8(binarydata("play\0"), 114, s.height - 10 + 2)
+
+def draw_note(s: State, grid_pos: int, note_pos: int, cursor: bool) -> None:
+    note_data: Array[u8] = cast("Array[u8]", binarydata("cdefgabR#0"))
+    # Do not draw empty notes
+    if s.note_buf[note_pos][1] == NOTE_NULL:
+        return
+    x: int = 4 + (grid_pos % 4) * 40
+    y: int = 12 + (grid_pos / 4) * 10
+    clear_buf(s.text_buf)
+    buf_pos: int = 0
+    # Put the time indicator to the buffer
+    s.text_buf[buf_pos] = note_data[9] + s.note_buf[note_pos][0]
+    buf_pos += 1
+    # Put note indicator
+    note: u8 = s.note_buf[note_pos][1]
+    if note == NOTE_C or note == NOTE_C_S:
+        s.text_buf[buf_pos] = note_data[0]
+    if note == NOTE_D or note == NOTE_D_S:
+        s.text_buf[buf_pos] = note_data[1]
+    if note == NOTE_E:
+        s.text_buf[buf_pos] = note_data[2]
+    if note == NOTE_F or note == NOTE_F_S:
+        s.text_buf[buf_pos] = note_data[3]
+    if note == NOTE_G or note == NOTE_G_S:
+        s.text_buf[buf_pos] = note_data[4]
+    if note == NOTE_A or note == NOTE_A_S:
+        s.text_buf[buf_pos] = note_data[5]
+    if note == NOTE_B:
+        s.text_buf[buf_pos] = note_data[6]
+    if note == NOTE_REST:
+        s.text_buf[buf_pos] = note_data[7]
+    else:
+        buf_pos += 1
+        if note == NOTE_C_S or note == NOTE_D_S or note == NOTE_F_S or note == NOTE_G_S or note == NOTE_A_S:
+            s.text_buf[buf_pos] = note_data[8]
+            buf_pos += 1
+        # Put octave indicator
+        s.text_buf[buf_pos] = note_data[9] + 1u8 + s.note_buf[note_pos][2]
+    # Draw note text
+    if cursor:
+        w4.set_draw_colors(0x0012u16)
+    else:
+        w4.set_draw_colors(0x0014u16)
+    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), x, y)
+
+def draw_notes(s: State) -> None:
+    # Nothing to draw
+    if s.note_count == 0:
+        return
+    if s.cursor < s.v_start:
+        # moved left
+        s.v_start = s.cursor
+        s.v_end = s.v_start + 55
+    elif s.cursor > s.v_end:
+        # moved right
+        s.v_end = s.cursor
+        s.v_start = s.v_end - 55
+    else:
+        s.v_end = s.v_start + 55
+    if s.v_start < 0:
+        s.v_start = 0
+    if s.v_end > s.note_count - 1:
+        s.v_end = s.note_count - 1
+    x: int = s.v_start
+    grid_pos: int  = 0
+    while x < s.note_count and x <= s.v_end:
+        current: bool = x == s.cursor
+        # Show current playing in playing mode
+        if s.playing:
+            prev: int = x - 1
+            if prev < 0:
+                prev = s.note_count - 1
+            current = prev == s.cursor
+        draw_note(s, grid_pos, x, current)
+        x += 1
+        grid_pos += 1
+
+def play_notes(s: State) -> None:
+    if not s.playing:
+        return
+    # Play the next note on nth frame
+    if s.play_on > s.frame_count:
+        return
+    time: u8 = s.note_buf[s.cursor][0]
+    note: u8 = s.note_buf[s.cursor][1]
+    octv: u8 = s.note_buf[s.cursor][2]
+    actual_note: u8 = octv * 12u8 + note
+    note_time: u32 = cast("u32", s.note_time[time])
+    s.play_on = s.frame_count + cast("u64", note_time)
+    if note != NOTE_REST:
+        note_freq: u32 = cast("u32", s.note_freq[actual_note])
+        w4.tone(note_freq, note_time, 50u32, 0u32)
+    s.cursor += 1
+    if s.cursor > s.note_count - 1:
+        s.cursor = 0
+
+def game_step(d: AnyPtr) -> None:
+    s: State = cast("State", d)
+    s.frame_count += 1u64
+    handle_input(s)
+    draw_board(s)
+    draw_notes(s)
+    play_notes(s)
+
+def init_state() -> State:
+    s: State = State()
+    s.width = 160
+    s.height = 160
+    s.frame_count = 0u64
+    s.play_on = 0u64
+    s.gamepad_prev = 0u8
+    s.cursor = 0
+    s.note_count = 0
+    s.v_start = 0
+    s.v_end = 0
+    s.mode = MODE_NOTE
+    s.playing = False
+    s.note_freq = array("int",0,262,277,294,311,330,349,370,392,415,440,466,495,523,554,587,622,659,698,740,784,830,880,932,988,1047,1109,1175,1245,1319,1397,1480,1568,1661,1760,1865,1976)
+    s.note_time = array("int",60,30,15,8,4,2,1)
+    # 11 character buffer for writing stuff
+    s.text_buf = cast("Array[u8]", mini_clib.calloc(cast("mini_clib.Size", 1), cast("mini_clib.Size", 11)))
+    # Set total number of notes to max notes
+    arrsetlen(s.note_buf, 256)
+    # Mark it all as null
+    x: int = 0
+    while x < 256:
+        s.note_buf[x][0] = NOTE_NULL
+        s.note_buf[x][1] = NOTE_NULL
+        s.note_buf[x][2] = NOTE_NULL
+        s.note_buf[x][3] = NOTE_NULL
+        x += 1
+    return s
+
+def del_state(current: AnyPtr) -> None:
+    del current
+
+def main() -> int:
+    # based on palette
+    # https://lospec.com/palette-list/sweet-28
+    w4.set_palette(0xb2cfcdu32, 0x2796dbu32, 0xb62b38u32, 0x0e0e37u32)
+    s: State = init_state()
+    w4.set_game_state(cast("AnyPtr", s))
+    return 0
+
