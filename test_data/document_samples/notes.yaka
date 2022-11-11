@@ -15,7 +15,9 @@
 # Note Frequencies          -- reference https://pages.mtu.edu/~suits/notefreqs.html
 # Nokia composer web app    -- reference https://zserge.com/nokia-composer/h/
 # =========================================================================================
-
+# Nokia Tune:
+# 3e3 3d3 2f#2 2g#2 3c#3 3b2 2d2 2e2 3b2 3a2 2c#2 2e2 1a2 1R
+# =========================================================================================
 import w4
 import libs.numbers as num
 import libs.perlin
@@ -64,9 +66,6 @@ MODE_DEL :Const[u8] = 3u8
 # max, min mode
 TOTAL_MODES :Const[u8] = 4u8
 
-# 1c 3
-# 0c#1
-# 2c 2
 
 class State:
     width: int
@@ -473,10 +472,10 @@ def init_state() -> State:
     # 11 character buffer for writing stuff
     s.text_buf = cast("Array[u8]", mini_clib.calloc(cast("mini_clib.Size", 1), cast("mini_clib.Size", 11)))
     # Set total number of notes to max notes
-    arrsetlen(s.note_buf, 256)
+    arrsetlen(s.note_buf, MAX_NOTES)
     # Mark it all as null
     x: int = 0
-    while x < 256:
+    while x < MAX_NOTES:
         s.note_buf[x][0] = NOTE_NULL
         s.note_buf[x][1] = NOTE_NULL
         s.note_buf[x][2] = NOTE_NULL
@@ -494,4 +493,3 @@ def main() -> int:
     s: State = init_state()
     w4.set_game_state(cast("AnyPtr", s))
     return 0
-
