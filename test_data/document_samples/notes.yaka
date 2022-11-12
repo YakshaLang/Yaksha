@@ -25,8 +25,9 @@ import libs.random
 import libs.c as mini_clib
 
 # Total notes allowed
-MAX_NOTES:Const[int]= 256
-FONT_WIDTH:Const[int]= 8
+MAX_NOTES       :Const[int] = 256
+FONT_WIDTH      :Const[int] = 8
+NOTE_WRAP_AROUND:Const[int] = 55
 # ======= Notes ===========
 NOTE_C:   Const[u8] = 1u8
 NOTE_C_S: Const[u8] = 2u8
@@ -87,18 +88,6 @@ class State:
     mode: u8
     playing: bool
     play_on: u64
-
-def remap(x: float, a: float, b: float, c: float, d: float) -> float:
-    # Map x to be from 'a to b' range to 'c to d' range
-    if a == b:
-        return 0.0f
-    return (x - a) / (b - a) * (d - c) + c
-
-def fillzero(target: Array[u8], count: int) -> None:
-    position: int = 0
-    while position < count:
-        target[position] = 0u8
-        position += 1
 
 def clear_buf(target: Array[u8]) -> None:
     target[0] = 0u8
@@ -415,13 +404,13 @@ def draw_notes(s: State) -> None:
     if s.cursor < s.v_start:
         # moved left
         s.v_start = s.cursor
-        s.v_end = s.v_start + 55
+        s.v_end = s.v_start + NOTE_WRAP_AROUND
     elif s.cursor > s.v_end:
         # moved right
         s.v_end = s.cursor
-        s.v_start = s.v_end - 55
+        s.v_start = s.v_end - NOTE_WRAP_AROUND
     else:
-        s.v_end = s.v_start + 55
+        s.v_end = s.v_start + NOTE_WRAP_AROUND
     if s.v_start < 0:
         s.v_start = 0
     if s.v_end > s.note_count - 1:
@@ -502,7 +491,8 @@ def del_state(current: AnyPtr) -> None:
 def main() -> int:
     # based on palette
     # https://lospec.com/palette-list/sweet-28
-    w4.set_palette(0xfff678u32, 0x923737u32, 0xda4fbcu32, 0x1b1b5cu32)
+    # https://lospec.com/palette-list/bread-berry
+    w4.set_palette(0xfff678u32, 0x1fa4bfu32, 0xda4fbcu32, 0x1b1b5cu32)
     s: State = init_state()
     w4.set_game_state(cast("AnyPtr", s))
     return 0
