@@ -19,7 +19,11 @@
 // reloader_main(int: argc, char** argv)
 #define PROGRAM_NAME "yaksha reload"
 #define main reloader_main
+#if !defined(_MSC_VER) && (defined(_WIN32) || defined(_WIN64))
+#include "reloader_alt.cpp"
+#else
 #include "reloader.cpp"
+#endif
 #undef main
 #undef PROGRAM_NAME
 // viz_main(int: argc, char** argv)

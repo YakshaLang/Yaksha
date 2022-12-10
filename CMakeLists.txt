@@ -46,8 +46,10 @@ target_link_libraries(yakshadmp PUBLIC library_yaksha)
 target_compile_features(yakshadmp PRIVATE cxx_std_17)
 
 # -- ykreload - compiler --
+if(MSVC)
 add_executable(ykreload src/reloader.cpp)
 target_compile_features(yakshac PRIVATE cxx_std_17)
+endif (MSVC)
 
 # -- yaksha binary --
 add_executable(yaksha src/yk.cpp)

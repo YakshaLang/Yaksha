@@ -22,4 +22,4 @@ libc="try_musl"
 # Automatically use zig cc & zig c++ to build project
 # We will start with just zig cc, zig c++ support so this is ignored for now
 compiler="zig"
-targets=[]
+targets=["aarch64-linux-musl", "aarch64-macos-gnu", "i386-linux-musl", "i386-windows-gnu", "x86_64-linux-musl", "x86_64-windows-gnu", "x86_64-macos-gnu"]
