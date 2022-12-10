@@ -8,10 +8,44 @@ import shutil
 from hashlib import sha256
 from typing import List
 
-from scripts.generate_raylib import Colors
-
 ROOT = os.path.realpath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MAX_EXECUTION_TIME_SEC = 60 * 4
+
+
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+    @staticmethod
+    def blue(text):
+        return Colors.OKBLUE + str(text) + Colors.ENDC
+
+    @staticmethod
+    def cyan(text):
+        return Colors.OKCYAN + str(text) + Colors.ENDC
+
+    @staticmethod
+    def green(text):
+        return Colors.OKGREEN + str(text) + Colors.ENDC
+
+    @staticmethod
+    def warning(text):
+        return Colors.WARNING + str(text) + Colors.ENDC
+
+    @staticmethod
+    def fail(text):
+        return Colors.FAIL + str(text) + Colors.ENDC
+
+    @staticmethod
+    def red(text):
+        return Colors.FAIL + str(text) + Colors.ENDC
 
 
 class Section:
@@ -138,10 +172,10 @@ def copy_binaries(section: Section, target_location):
             possible_bin = os.path.join(ROOT, location)
             if os.path.isfile(possible_bin):
                 shutil.copyfile(possible_bin, os.path.join(target_location, bin_name + suffix))
-                print(bin_name, "✔️")
+                print(Colors.red(bin_name), "✔️")
                 break
         else:
-            print(bin_name, "❌")
+            print(Colors.red(bin_name), "❌")
 
 
 def build_release(name: str):
@@ -155,7 +189,7 @@ def build_release(name: str):
     temp = make_directory(name + "_temp")
     extract(zig, temp)
     shutil.move(os.path.join(temp, sec.zig_sub), os.path.join(directory, "bin"))
-    print(Colors.blue("zig"), "✔️")
+    print(Colors.red("zig"), "✔️")
     copy_binaries(sec, os.path.join(directory, "bin"))
     for folder in sec.folders:
         shutil.copytree(in_root(folder), os.path.join(directory, folder))
