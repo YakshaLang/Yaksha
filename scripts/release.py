@@ -199,17 +199,25 @@ def build_release(name: str):
         print(Colors.blue(single_file), "✔️")
     # rename zig license
     shutil.move(os.path.join(directory, "bin", "LICENSE"), os.path.join(directory, "bin", "doc", "ZIG_LICENSE"))
-    # final archive
-    archive = in_temp("yaksha_v" + CONFIG.version + "_" + name + ".7z")
-    if os.path.isfile(archive):
-        os.unlink(archive)
-    package(in_temp(archive), directory)
+    # create package .7z
+    archive = create_package(directory, name, ".7z")
+    print(Colors.blue(os.path.basename(archive)), "✔️")
+    # create package .zip
+    archive = create_package(directory, name, ".zip")
     print(Colors.blue(os.path.basename(archive)), "✔️")
     # clean up
     shutil.rmtree(directory)
     shutil.rmtree(temp)
     # final message
     print(Colors.green("all done."), "🎉")
+
+
+def create_package(directory, name, ext):
+    archive = in_temp("yaksha_v" + CONFIG.version + "_" + name + ext)
+    if os.path.isfile(archive):
+        os.unlink(archive)
+    package(in_temp(archive), directory)
+    return archive
 
 
 def main():
