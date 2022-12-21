@@ -2,14 +2,35 @@ import configparser
 import os
 import ast
 import subprocess
+import sys
 import urllib.request
 import shutil
-
+from contextlib import contextmanager
 from hashlib import sha256
 from typing import List
 
 ROOT = os.path.realpath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MAX_EXECUTION_TIME_SEC = 60 * 4
+PATHS = []
+
+
+@contextmanager
+def updated_path():
+    # ref: https://stackoverflow.com/a/69274881
+    old_env = os.environ.copy()
+    sep: str = os.pathsep
+    path_var = old_env["PATH"] + sep + sep.join(PATHS)
+    os.environ.update({"PATH": path_var})
+    yield
+    os.environ.clear()
+    os.environ.update(old_env)
+
+
+@contextmanager
+def navigate(directory):
+    os.chdir(directory)
+    yield
+    os.chdir(ROOT)
 
 
 class Colors:
@@ -115,7 +136,7 @@ def download(url: str, sha256_hash: str) -> (bool, str):
 
 def execute(args: list):
     fuzz_process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8",
-                                    universal_newlines=True)
+                                    universal_newlines=True, env=dict(os.environ))
     try:
         so, se = fuzz_process.communicate(timeout=MAX_EXECUTION_TIME_SEC)
         return_value = fuzz_process.returncode
@@ -125,9 +146,11 @@ def execute(args: list):
         print("Timed out - ", Colors.fail(repr(args)))
         return -1
     if return_value != 0:
-        print("Found fuzz error", Colors.fail(repr(args)))
+        print("Execution failed", Colors.fail(repr(args)))
         print(so)
         print(se)
+    print(so)
+    print(se)
     return return_value
 
 
@@ -178,9 +201,16 @@ def copy_binaries(section: Section, target_location):
             print(Colors.red(bin_name), "❌")
 
 
+def create_package(directory, name, ext):
+    archive = in_temp("yaksha_v" + CONFIG.version + "_" + name + ext)
+    if os.path.isfile(archive):
+        os.unlink(archive)
+    package(in_temp(archive), directory)
+    return archive
+
+
 def build_release(name: str):
     print(Colors.cyan("building"), "yaksha_" + name, "😎", "...")
-    print("-" * 40)
     sec = CONFIG.section(name)
     success, zig = download(sec.zig, sec.zig_sha256)
     if not success:
@@ -212,20 +242,78 @@ def build_release(name: str):
     print(Colors.green("all done."), "🎉")
 
 
-def create_package(directory, name, ext):
-    archive = in_temp("yaksha_v" + CONFIG.version + "_" + name + ext)
-    if os.path.isfile(archive):
-        os.unlink(archive)
-    package(in_temp(archive), directory)
-    return archive
-
-
-def main():
+def build_releases():
     for release in CONFIG.releases:
         build_release(release)
+
+
+def compile_yaksha():
+    print(Colors.cyan("compiling"), "yaksha", "😎", "...")
+    release_dir = os.path.join(ROOT, "cmake-build-release")
+    if not os.path.isdir(release_dir):
+        os.mkdir(release_dir)
+    if not os.path.isdir(release_dir):
+        print(Colors.fail("Failed to create release dir"))
+        return
+    with navigate(release_dir):
+        execute("cmake -S .. -B .".split(" "))
+        execute("cmake --build . --config Release -j 2".split(" "))
+    PATHS.append(os.path.join(ROOT, "bin", "Release"))
+    # Hack to copy binaries in Release directory
+    for binary in ["yaksha.exe", "yakshac.exe"]:
+        shutil.copyfile(os.path.join(ROOT, "bin", "Release", binary), os.path.join(ROOT, "bin", binary))
+
+
+def extract_zig_for_compilation():
+    global PATHS
+    name = "windows_x86_64"
+    sec = CONFIG.section(name)
+    success, zig = download(sec.zig, sec.zig_sha256)
+    temp = make_directory(name + "_temp")
+    extract(zig, temp)
+    PATHS.append(os.path.join(temp, "zig-windows-x86_64-0.9.1"))
+
+
+def compile_carpntr():
+    print(Colors.cyan("compiling"), "carpntr", "😎", "...")
+    carpntr_path = os.path.join(ROOT, "carpntr")
+    carpntr_build_path = os.path.join(ROOT, "carpntr", "build")
+    with navigate(carpntr_path):
+        with updated_path():
+            execute([sys.executable, "bootstrap_me.py"])
+    global PATHS
+    PATHS.append(carpntr_build_path)
+
+
+def compile_hammer():
+    print(Colors.cyan("compiling"), "hammer", "😎", "...")
+    hammer_path = os.path.join(ROOT, "hammer")
+    hammer_build_path = os.path.join(ROOT, "hammer", "build")
+    with navigate(hammer_path):
+        with updated_path():
+            execute(["carpntr"])
+    global PATHS
+    PATHS.append(hammer_build_path)
+
+
+def cross_compile_compiler():
+    print(Colors.cyan("cross-compiling"), "yakasha", "😎", "...")
+    with navigate(ROOT):
+        with updated_path():
+            execute(["hammer"])
+
+
+def compile_release():
+    compile_yaksha()
+    extract_zig_for_compilation()
+    compile_carpntr()
+    compile_hammer()
+    cross_compile_compiler()
 
 
 if __name__ == "__main__":
     # Set work directory to be that of project root.
     os.chdir(ROOT)
-    main()
+    compile_release()
+    print("-" * 40)
+    build_releases()

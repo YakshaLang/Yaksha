@@ -13,7 +13,7 @@
 # Note that all the paths are relative in current directory
 #
 [compilation]
-targets=["aarch64-linux-musl", "i386-linux-musl", "i386-windows-gnu", "x86_64-linux-musl", "x86_64-windows-gnu"]
+targets=["x86_64-linux-musl", "x86_64-windows-gnu"]
 # -flto will also be added for non macos, non windows targets automatically
 args_c_or_cpp=["-O3", "-fPIC"]
 args_cpp=["-std=c++17"]
