@@ -1,0 +1,25 @@
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    # TODO Add support for running release in macos as well
+    strategy:
+      matrix:
+        os: [windows-latest]
+    steps:
+    - name: Checkout git repo
+      uses: actions/checkout@v2
+      with:
+        path: main
+        submodules: 'true'
+    - name: Build zips & 7zs
+      run: python main/scripts/release.py
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          main/comp_output_test/yaksha_v*.zip
+          main/comp_output_test/yaksha_v*.7z
