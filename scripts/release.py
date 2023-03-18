@@ -311,9 +311,19 @@ def compile_release():
     cross_compile_compiler()
 
 
+def ensure_temp():
+    temp_path = os.path.join(ROOT, CONFIG.temp)
+    if os.path.isdir(temp_path):
+        return
+    os.mkdir(temp_path)
+    if not os.path.isdir(temp_path):
+        print(Colors.fail("Failed to create temp_path:"), temp_path)
+
+
 if __name__ == "__main__":
     # Set work directory to be that of project root.
     os.chdir(ROOT)
+    ensure_temp()
     compile_release()
     print("-" * 40)
     build_releases()
