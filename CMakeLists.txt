@@ -27,21 +27,25 @@ set(YAKSHA_RUNTIME_FILES
 
 add_library(library_yaksha ${YAKSHA_SOURCE_FILES})
 
+if(UNIX AND NOT APPLE)
+    list(APPEND SYS_LIBS m dl pthread)
+endif()
+
 # -- yakshac - compiler --
 add_executable(yakshac src/comp_main.cpp)
-target_link_libraries(yakshac PUBLIC ${LIBS})
+target_link_libraries(yakshac PUBLIC ${SYS_LIBS})
 target_link_libraries(yakshac PUBLIC library_yaksha)
 target_compile_features(yakshac PRIVATE cxx_std_17)
 
 # -- yakshavz - visualizer --
 add_executable(yakshavz src/viz_main.cpp)
-target_link_libraries(yakshavz PUBLIC ${LIBS})
+target_link_libraries(yakshavz PUBLIC ${SYS_LIBS})
 target_link_libraries(yakshavz PUBLIC library_yaksha)
 target_compile_features(yakshavz PRIVATE cxx_std_17)
 
 # -- yakshadmp - syntax extractor --
 add_executable(yakshadmp src/dump.cpp)
-target_link_libraries(yakshadmp PUBLIC ${LIBS})
+target_link_libraries(yakshadmp PUBLIC ${SYS_LIBS})
 target_link_libraries(yakshadmp PUBLIC library_yaksha)
 target_compile_features(yakshadmp PRIVATE cxx_std_17)
 
@@ -53,7 +57,7 @@ endif (MSVC)
 
 # -- yaksha binary --
 add_executable(yaksha src/yk.cpp)
-target_link_libraries(yaksha PUBLIC ${LIBS})
+target_link_libraries(yaksha PUBLIC ${SYS_LIBS})
 target_link_libraries(yaksha PUBLIC library_yaksha)
 target_compile_features(yaksha PRIVATE cxx_std_17)
 
@@ -68,7 +72,7 @@ add_executable(YakshaTests ${YAKSHA_SOURCE_FILES} ${YAKSHA_TEST_FILES} tests/tes
 # #define TESTING
 target_compile_definitions(YakshaTests PUBLIC TESTING)
 target_link_libraries(YakshaTests PRIVATE Catch2::Catch2)
-target_link_libraries(YakshaTests PUBLIC ${LIBS})
+target_link_libraries(YakshaTests PUBLIC ${SYS_LIBS})
 target_compile_features(YakshaTests PRIVATE cxx_std_17)
 # Add to CTest
 include(CTest)
@@ -84,7 +88,7 @@ if(DEFINED ENV{YAKSHA_FUZZ})
 else()
     add_executable(YakshaFuzz tests/fuzz_main.cpp)
 endif()
-target_link_libraries(YakshaFuzz ${LIBS})
+target_link_libraries(YakshaFuzz PUBLIC ${SYS_LIBS})
 target_link_libraries(YakshaFuzz PUBLIC library_yaksha)
 target_compile_features(YakshaFuzz PRIVATE cxx_std_17)
 
@@ -94,6 +98,4 @@ add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 add_executable(cmakecarpntr ${YAKSHA_RUNTIME_FILES} carpntr/build/program_code.c)
 target_compile_features(cmakecarpntr PRIVATE c_std_99)
 target_compile_definitions(cmakecarpntr PUBLIC UTF8PROC_STATIC)
-if(UNIX AND NOT APPLE)
-    target_link_libraries(cmakecarpntr PUBLIC m)
-endif()
+target_link_libraries(cmakecarpntr PUBLIC ${SYS_LIBS})
