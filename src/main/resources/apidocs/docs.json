@@ -41793,7 +41793,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": "Read mouse buttons",
+        "comment": "",
         "name": "netplay",
         "parameters": [],
         "return_type": {
@@ -42049,6 +42049,49 @@
       {
         "annotations": [
           {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Draws text from given binarydata(\"text\") (or manually created u8 Ptr) (no string allocation)",
+        "name": "text_u8",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "u8"
+                    }
+                  ],
+                  "type": "Const"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "text_data"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
             "argument": "tone",
             "name": "@native"
           }
@@ -42098,6 +42141,37 @@
           {
             "datatype": {
               "type": "str"
+            },
+            "name": "text_data"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": "Prints a message to the debug console from given binarydata(\"text\") (or manually created u8 Ptr) (no string allocation)",
+        "name": "trace_u8",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "u8"
+                    }
+                  ],
+                  "type": "Const"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "text_data"
           }
