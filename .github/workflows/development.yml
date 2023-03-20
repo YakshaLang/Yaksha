@@ -1,0 +1,42 @@
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PYTHONIOENCODING: utf-8
+  PYTHONLEGACYWINDOWSSTDIO: utf-8
+
+jobs:
+  check-ubuntu-x86_64:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04]
+    steps:
+    - name: Checkout git repo
+      uses: actions/checkout@v2
+      with:
+        path: main
+    - name: Preparations
+      working-directory: main
+      run: |
+        # The 'submodules' option for actions/checkout@v2 doesn't
+        # seem to work. So we manually sync it just in case.
+        git submodule init
+        git submodule update
+        sudo apt update
+        sudo apt install -y cmake ninja-build g++
+        mkdir -p cmake-build-release
+    - name: Configuring CMake
+      working-directory: main/cmake-build-release
+      run: |
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ../
+    - name: Build
+      working-directory: main/cmake-build-release
+      run: |
+        ninja all
+    - name: Test
+      working-directory: main/cmake-build-release
+      run: |
+        ninja test
