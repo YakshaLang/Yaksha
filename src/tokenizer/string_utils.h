@@ -1,6 +1,7 @@
 // string_utils.h
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H
+#include <cstdint>
 #include <exception>
 #include <fstream>
 #include <functional>
@@ -175,7 +176,7 @@ namespace yaksha::string_utils {
  */
   template<typename octet_iterator>
   static inline std::pair<int, utf8::uint32_t>
-  consume(const std::function<bool(utf8::uint32_t, uint32_t)> &func,
+  consume(const std::function<bool(utf8::uint32_t, std::uint32_t)> &func,
           std::string &buf, octet_iterator &begin, octet_iterator end,
           bool allow_end) {
     octet_iterator begin_copy = begin;
