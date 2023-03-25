@@ -188,6 +188,10 @@ def build_objects_sequential(objects: Array[CObject], conf: carp.Config) -> None
 
 def build_objects(objects: Array[CObject], conf: carp.Config) -> None:
     println("building raylib ...")
+    if conf.compilation.disable_parallel_build:
+        build_objects_sequential(objects, conf)
+        return
+    # Attempt to build parallel
     object_count: int = len(objects)
     cpu_data: cpu.Cpu = cpu.info()
     threads: u8 = cast("u8", cpu_data.n_processors)

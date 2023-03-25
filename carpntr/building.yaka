@@ -275,7 +275,10 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     the_yk_main = core_object(args, the_yk_main, build_path, target, False, getref(buildable_objects))
     arrput(objects, the_yk_main)
     # Build the list of buildable_objects
-    build_objects(buildable_objects)
+    if c.compilation.disable_parallel_build:
+        build_objects_sequential(buildable_objects)
+    else:
+        build_objects(buildable_objects)
     # Clean up excess data
     cleanup_buildables(buildable_objects)
     # add objects to the args to link it

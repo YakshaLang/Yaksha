@@ -108,10 +108,10 @@ def perform_build() -> int:
     ret: int = build_from_config(config, False)
     return ret
 
-def perform_mini_build(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str, silent: bool, actually_run: bool, crdll: bool) -> int:
+def perform_mini_build(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str, silent: bool, actually_run: bool, crdll: bool, no_parallel: bool) -> int:
     # Perform single file project build and execute binary
     name: str = path.remove_extension(path.basename(filename))
-    config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib, use_web, wasm4, web_shell, crdll)
+    config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib, use_web, wasm4, web_shell, crdll, no_parallel)
     defer carp.del_config(config)
     if len(config.errors) > 0:
         print_errors(config.errors)
@@ -167,6 +167,7 @@ def handle_args(args: os.Arguments) -> int:
     web: int = 0
     wasm4: int = 0
     silent_mode: int = 0
+    no_parallel: int = 0
     file_path: c.CStr = strings.null_cstr()
     web_shell: str = ""
     arrput(options, argparse.opt_boolean("h", "help", getref(help), "show help and exit"))
@@ -178,6 +179,7 @@ def handle_args(args: os.Arguments) -> int:
     arrput(options, argparse.opt_string("s", "shell", getref(file_path), "specify shell file for web builds"))
     arrput(options, argparse.opt_boolean("4", "wasm4", getref(wasm4), "wasm4 build"))
     arrput(options, argparse.opt_boolean("S", "silent", getref(silent_mode), "do not print anything except errors"))
+    arrput(options, argparse.opt_boolean("N", "nothread", getref(no_parallel), "no parallel builds (for debugging)"))
     arrput(options, argparse.opt_end())
 
     a: argparse.ArgParseWrapper = argparse.new(options, usages)
@@ -216,7 +218,7 @@ def handle_args(args: os.Arguments) -> int:
             web_shell = strings.from_cstr(file_path)
             print("Using web-shell:")
             println(web_shell)
-        return perform_mini_build(single_file, raylib == 1, web == 1, wasm4 == 1, web_shell, silent_mode == 1, run == 1, crdll == 1)
+        return perform_mini_build(single_file, raylib == 1, web == 1, wasm4 == 1, web_shell, silent_mode == 1, run == 1, crdll == 1, no_parallel == 1)
     console.red("Invalid usage. Please use '-R' option if you want to run a program. Try 'carpntr --help' for more information.\n")
     return 0
 
