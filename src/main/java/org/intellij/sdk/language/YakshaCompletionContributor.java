@@ -158,9 +158,9 @@ public class YakshaCompletionContributor extends CompletionContributor {
                         resultSet.addElement(LookupElementBuilder.create("f32").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("f64").withIcon(YakshaIcons.DATA_TYPE));
 
-                        for (Map.Entry<String, String> e : YakshaDocs.BUILTIN_FUNCTIONS.entrySet()) {
+                        for (Map.Entry<String, YakshaDocs.BuiltinDoc> e : YakshaDocs.BUILTIN_FUNCTIONS.entrySet()) {
                             resultSet.addElement(LookupElementBuilder.create(e.getKey())
-                                    .withIcon(YakshaIcons.BUILT_IN).withTypeText(e.getValue()));
+                                    .withIcon(YakshaIcons.BUILT_IN).withTypeText(e.getValue().typeText()));
                         }
                     }
                 });

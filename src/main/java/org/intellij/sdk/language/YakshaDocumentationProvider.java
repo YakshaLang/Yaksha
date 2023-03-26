@@ -54,8 +54,8 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
                 return getImportedDoc(element, ident, name);
             } else if (count == 0 && YakshaDocs.BUILTIN_FUNCTION_NAMES.contains(ident)) {
                 final DocBuilder b = new DocBuilder();
-                b.title(ident);
-                b.description(YakshaDocs.BUILTIN_FUNCTIONS.get(ident));
+                b.title(YakshaDocs.BUILTIN_FUNCTIONS.get(ident).typeText());
+                b.description(YakshaDocs.BUILTIN_FUNCTIONS.get(ident).comment);
                 b.keyValue("<b>Kind</b>", "Builtin Function");
                 return b.build();
             }
