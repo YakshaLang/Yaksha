@@ -915,7 +915,7 @@ struct builtin_qsort : builtin {
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = ykobject(dt_pool->create("bool"));
     std::stringstream code{};
     o = ykobject(args[0].second.datatype_->args_[0]);
     code << "(yk__quicksort(" << args[0].first << ",sizeof("
