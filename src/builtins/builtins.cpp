@@ -942,7 +942,7 @@ struct builtin_arrnew : builtin {
       o.string_val_ = "Two arguments must be provided for arrnew() builtin";
     } else if (arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
       o.string_val_ = "First argument to arrnew() must be a string literal";
-    } else if (!args[1].datatype_->is_i32()) {
+    } else if (!(args[1].datatype_->is_an_integer() || args[1].datatype_->is_a_const_integer())) {
       o.string_val_ = "Second argument to arrnew() must be an int";
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
