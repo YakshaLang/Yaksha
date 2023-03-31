@@ -53,12 +53,16 @@ namespace yaksha {
     class_stmt *get_class(const std::string &prefixed_name);
     bool has_const(const std::string &prefixed_name);
     const_stmt *get_const(const std::string &prefixed_name);
+    bool has_native_const(const std::string &prefixed_name);
+    nativeconst_stmt *get_native_const(const std::string &prefixed_name);
     void visit_import_stmt(import_stmt *obj) override;
     void visit_const_stmt(const_stmt *obj) override;
     void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
+    void visit_nativeconst_stmt(nativeconst_stmt *obj) override;
     std::vector<std::string> function_names_{};
     std::vector<std::string> class_names_{};
     std::vector<std::string> global_const_names_{};
+    std::vector<std::string> global_native_const_names_{};
     std::vector<parsing_error> errors_{};
     std::unordered_set<std::string> runtime_features_{};
 
@@ -66,6 +70,7 @@ private:
     std::unordered_map<std::string, def_stmt *> functions_{};
     std::unordered_map<std::string, class_stmt *> classes_{};
     std::unordered_map<std::string, const_stmt *> global_consts_{};
+    std::unordered_map<std::string, nativeconst_stmt *> global_native_consts_{};
     builtins *builtins_;
     void error(token *tok, const std::string &message);
   };

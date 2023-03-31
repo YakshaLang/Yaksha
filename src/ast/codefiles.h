@@ -12,7 +12,7 @@
 #include <vector>
 namespace yaksha {
   struct codefiles {
-    codefiles(std::filesystem::path &libs_path);
+    explicit codefiles(std::filesystem::path &libs_path);
     ~codefiles();
     file_info *get(const std::string &filename);
     file_info *scan_main(const std::string &filename);

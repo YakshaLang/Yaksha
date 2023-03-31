@@ -190,6 +190,15 @@ void ast_printer::visit_const_stmt(const_stmt *obj) {
   if (obj->expression_ != nullptr) { obj->expression_->accept(this); }
   text_ << ")";
 }
+void ast_printer::visit_nativeconst_stmt(nativeconst_stmt *obj) {
+  text_ << "(nativeconst " << obj->name_->token_;
+  text_ << ":" << obj->data_type_->as_string() << " ";
+  if (obj->code_str_ != nullptr) {
+    text_ << string_utils::repr_string(
+        string_utils::unescape(obj->code_str_->token_));
+  }
+  text_ << ")";
+}
 void ast_printer::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
   text_ << "(feature "
         << string_utils::repr_string(

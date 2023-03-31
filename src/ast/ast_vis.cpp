@@ -288,6 +288,20 @@ void ast_vis::visit_const_stmt(const_stmt *obj) {
   if (obj->expression_ != nullptr) { field("value", obj->expression_); }
   end_block();
 }
+void ast_vis::visit_nativeconst_stmt(nativeconst_stmt *obj) {
+  begin_block("nativeconst");
+  field("name", obj->name_->token_);
+  if (obj->code_str_ != nullptr) {
+    begin_block("c");
+    text_ << "<pre class=\"cyan-code\">"
+          << ::string_utils::html_escape(
+                 string_utils::unescape(obj->code_str_->token_))
+          << "</pre>"
+          << "<br />";
+    end_block();
+  }
+  end_block();
+}
 void ast_vis::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
   begin_block("feature");
   text_ << "<pre class=\"cyan-code\">"

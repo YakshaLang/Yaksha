@@ -284,6 +284,20 @@ stmt *ast_pool::c_let_stmt(token *name, ykdatatype *data_type,
   cleanup_stmt_.push_back(o);
   return o;
 }
+nativeconst_stmt::nativeconst_stmt(token *name, ykdatatype *data_type,
+                                   token *ccode_keyword, token *code_str)
+    : name_(name), data_type_(data_type), ccode_keyword_(ccode_keyword),
+      code_str_(code_str) {}
+void nativeconst_stmt::accept(stmt_visitor *v) {
+  v->visit_nativeconst_stmt(this);
+}
+ast_type nativeconst_stmt::get_type() { return ast_type::STMT_NATIVECONST; }
+stmt *ast_pool::c_nativeconst_stmt(token *name, ykdatatype *data_type,
+                                   token *ccode_keyword, token *code_str) {
+  auto o = new nativeconst_stmt(name, data_type, ccode_keyword, code_str);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
 pass_stmt::pass_stmt(token *pass_token) : pass_token_(pass_token) {}
 void pass_stmt::accept(stmt_visitor *v) { v->visit_pass_stmt(this); }
 ast_type pass_stmt::get_type() { return ast_type::STMT_PASS; }

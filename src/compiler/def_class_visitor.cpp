@@ -32,7 +32,7 @@ void def_class_visitor::visit_def_stmt(def_stmt *obj) {
     error(obj->name_, "Critical!! Redefinition of class as a function");
     return;
   }
-  if (has_const(name)) {
+  if (has_const(name) || has_native_const(name)) {
     error(obj->name_, "Critical!! Redefinition of global constant");
     return;
   }
@@ -61,7 +61,8 @@ void def_class_visitor::extract(const std::vector<stmt *> &statements) {
         statement_type == ast_type::STMT_CLASS ||
         statement_type == ast_type::STMT_CONST ||
         statement_type == ast_type::STMT_IMPORT ||
-        statement_type == ast_type::STMT_RUNTIMEFEATURE) {
+        statement_type == ast_type::STMT_RUNTIMEFEATURE ||
+        statement_type == ast_type::STMT_NATIVECONST) {
       st->accept(this);
     } else {
       // TODO can we find out if there's a token for this statement type?
@@ -85,7 +86,7 @@ void def_class_visitor::visit_const_stmt(const_stmt *obj) {
     error(obj->name_, "Critical!! Redefinition of class");
     return;
   }
-  if (has_const(name)) {
+  if (has_const(name) || has_native_const(name)) {
     error(obj->name_, "Critical!! Redefinition of global constant");
     return;
   }
@@ -106,6 +107,38 @@ void def_class_visitor::visit_const_stmt(const_stmt *obj) {
   }
   global_const_names_.push_back(name);
   global_consts_.insert({name, obj});
+}
+void def_class_visitor::visit_nativeconst_stmt(nativeconst_stmt *obj) {
+  auto name = obj->name_->token_;
+  if (builtins_->has_builtin(name)) {
+    error(obj->name_, "Critical!! Redefinition of builtin function");
+    return;
+  }
+  if (has_function(name)) {
+    error(obj->name_, "Critical!! Redefinition of function");
+    return;
+  }
+  if (has_class(name)) {
+    error(obj->name_, "Critical!! Redefinition of class");
+    return;
+  }
+  if (has_const(name) || has_native_const(name)) {
+    error(obj->name_, "Critical!! Redefinition of global constant");
+    return;
+  }
+  if (obj->data_type_->args_.size() != 1) {
+    error(obj->name_,
+          "Should be Const[x], only single data type can be specified");
+    return;
+  }
+  // TODO should we support more? // think!
+  if (!obj->data_type_->args_[0]->is_a_number() &&
+      !obj->data_type_->args_[0]->is_bool()) {
+    error(obj->name_, "Only number and boolean constants are supported.");
+    return;
+  }
+  global_native_const_names_.push_back(name);
+  global_native_consts_.insert({name, obj});
 }
 void def_class_visitor::visit_defer_stmt(defer_stmt *obj) {}
 void def_class_visitor::error(token *tok, const std::string &message) {
@@ -172,9 +205,6 @@ void def_class_visitor::visit_square_bracket_set_expr(
     square_bracket_set_expr *obj) {}
 void def_class_visitor::visit_ccode_stmt(ccode_stmt *obj) {}
 void def_class_visitor::visit_import_stmt(import_stmt *obj) {}
-bool def_class_visitor::has_const(const std::string &prefixed_name) {
-  return global_consts_.find(prefixed_name) != global_consts_.end();
-}
 const_stmt *def_class_visitor::get_const(const std::string &prefixed_name) {
   if (has_const(prefixed_name)) { return global_consts_[prefixed_name]; }
   return nullptr;
@@ -187,4 +217,18 @@ void def_class_visitor::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
     return;
   }
   runtime_features_.emplace(feature);
+}
+bool def_class_visitor::has_const(const std::string &prefixed_name) {
+  return global_consts_.find(prefixed_name) != global_consts_.end();
+}
+bool def_class_visitor::has_native_const(const std::string &prefixed_name) {
+  return global_native_consts_.find(prefixed_name) !=
+         global_native_consts_.end();
+}
+nativeconst_stmt *
+def_class_visitor::get_native_const(const std::string &prefixed_name) {
+  if (has_native_const(prefixed_name)) {
+    return global_native_consts_[prefixed_name];
+  }
+  return nullptr;
 }

@@ -71,6 +71,10 @@ STMTS = sorted([
     # Let statements
     ("let", (("token*", "name"), ("ykdatatype*", "data_type"), ("expr*", "expression"))),
     ("const", (("token*", "name"), ("ykdatatype*", "data_type"), ("expr*", "expression"))),
+    # Native constant statement
+    # `ITEM: Const[int] = ccode """1 + 1"""`
+    ("nativeconst", (("token*", "name"), ("ykdatatype*", "data_type"),
+                     ("token*", "ccode_keyword"), ("token*", "code_str"))),
     # Function declarations
     # Make sure we always say the return type
     # `def abc(a: int) -> None:`

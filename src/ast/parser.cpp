@@ -393,7 +393,29 @@ stmt *parser::declaration_statement() {
     }
     auto dt = parse_datatype();
     // `= expression` bit is optional
-    if (match({token_type::EQ})) { exp = expression(); }
+    if (match({token_type::EQ})) {
+      if (check(token_type::KEYWORD_CCODE)) {
+        auto ccode_token = advance();
+        auto cc = peek();
+        if (!(token_type::STRING == cc->type_ ||
+              token_type::THREE_QUOTE_STRING == cc->type_)) {
+          throw error(ccode_token,
+                      "Expected ccode statement to have a string literal.");
+        }
+        if (!dt->is_const()) {
+          throw error(ccode_token,
+                      "Variable on LHS needs to be a const");
+        }
+        advance();
+        // We are in native constant
+        consume_or_eof(
+            token_type::NEW_LINE,
+            "Expect new line after code text for native const declaration.");
+        return pool_.c_nativeconst_stmt(var_name, dt, ccode_token, cc);
+      } else {
+        exp = expression();
+      }
+    }
     consume_or_eof(token_type::NEW_LINE,
                    "Expect new line after value for variable declaration.");
     if (dt->is_const()) { return pool_.c_const_stmt(var_name, dt, exp); }

@@ -25,7 +25,7 @@ namespace yaksha {
     std::string compile_tuple(ykdatatype *tuple_dt, datatype_compiler *dtc);
     std::string compile_function_dt(ykdatatype *function_dt,
                                     datatype_compiler *dtc);
-    std::string compile_binary_data(const std::string& data);
+    std::string compile_binary_data(const std::string &data);
     void compile_forward_declarations(std::stringstream &target);
     void compile_structures(std::stringstream &target);
     void compile_function_defs(std::stringstream &target);

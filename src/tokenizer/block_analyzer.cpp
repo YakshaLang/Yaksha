@@ -14,13 +14,13 @@ inline bool is_open_bracket(token_type possibly_open) {
           possibly_open == token_type::CURLY_BRACKET_OPEN);
 }
 /**
- * @param possibly_open
+ * @param possibly_closed
  * @return is one of } ] )
  */
-inline bool is_close_bracket(token_type possibly_open) {
-  return (possibly_open == token_type::PAREN_CLOSE ||
-          possibly_open == token_type::SQUARE_BRACKET_CLOSE ||
-          possibly_open == token_type::CURLY_BRACKET_CLOSE);
+inline bool is_close_bracket(token_type possibly_closed) {
+  return (possibly_closed == token_type::PAREN_CLOSE ||
+          possibly_closed == token_type::SQUARE_BRACKET_CLOSE ||
+          possibly_closed == token_type::CURLY_BRACKET_CLOSE);
 }
 /**
  * Are the two parens matching?

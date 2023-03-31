@@ -142,9 +142,7 @@ multifile_compiler::compile(const std::string &code, bool use_code,
   c_code << "\n#include \"yk__lib.h\"\n";
   c_code << "// --forward declarations-- \n";
   c_code << global_consts.str();
-  if (cf.esc_->has_bin_data()) {
-    cf.esc_->compile_binary_data_to(c_code);
-  }
+  if (cf.esc_->has_bin_data()) { cf.esc_->compile_binary_data_to(c_code); }
   c_code << struct_forward_decls.str();
   if (cf.esc_->has_structures()) {
     cf.esc_->compile_forward_declarations(c_code);

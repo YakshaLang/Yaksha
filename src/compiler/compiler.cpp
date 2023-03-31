@@ -858,6 +858,11 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
     auto obj = ykobject(cls->data_type_);
     scope_.define_global(prefix(cls->name_->token_, prefix_val_), obj);
   }
+  for (const auto &name : this->defs_classes_.global_native_const_names_) {
+    auto cls = defs_classes_.get_native_const(name);
+    auto obj = ykobject(cls->data_type_);
+    scope_.define_global(prefix(cls->name_->token_, prefix_val_), obj);
+  }
   for (auto imp_st : fi->data_->parser_->import_stmts_) {
     auto obj = ykobject(dt_pool);
     obj.object_type_ = yaksha::object_type::MODULE;
@@ -969,6 +974,8 @@ void compiler::visit_get_expr(get_expr *obj) {
     bool has_func = imported->data_->dsv_->has_function(member_item->token_);
     bool has_class = imported->data_->dsv_->has_class(member_item->token_);
     bool has_const = imported->data_->dsv_->has_const(member_item->token_);
+    bool has_native_const =
+        imported->data_->dsv_->has_native_const(member_item->token_);
     auto mod_obj = ykobject(dt_pool);
     if (has_class) {
       mod_obj.object_type_ = object_type::MODULE_CLASS;
@@ -983,6 +990,17 @@ void compiler::visit_get_expr(get_expr *obj) {
       mod_obj.module_name_ = lhs.second.module_name_;
     } else if (has_const) {
       auto glob = imported->data_->dsv_->get_const(member_item->token_);
+      mod_obj.object_type_ = object_type::PRIMITIVE_OR_OBJ;
+      mod_obj.datatype_ = glob->data_type_;
+      mod_obj.string_val_ = member_item->token_;
+      mod_obj.module_file_ = lhs.second.string_val_;
+      mod_obj.module_name_ = lhs.second.module_name_;
+      auto module_info = cf_->get(mod_obj.module_file_);
+      auto prefixed_name = prefix(mod_obj.string_val_, module_info->prefix_);
+      push(prefixed_name, mod_obj);
+      return;
+    } else if (has_native_const) {
+      auto glob = imported->data_->dsv_->get_native_const(member_item->token_);
       mod_obj.object_type_ = object_type::PRIMITIVE_OR_OBJ;
       mod_obj.datatype_ = glob->data_type_;
       mod_obj.string_val_ = member_item->token_;
@@ -1159,6 +1177,24 @@ ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
     fout->args_.emplace_back(funct->return_type_);
   }
   return fnc;
+}
+void compiler::visit_nativeconst_stmt(nativeconst_stmt *obj) {
+  auto name = prefix(obj->name_->token_, prefix_val_);
+  if (scope_.is_global_level()) {// constant is global
+    global_constants_ << "#define " << name << " (";
+    global_constants_ << ::string_utils::unescape(obj->code_str_->token_);
+    global_constants_ << ")\n";
+  } else {
+    auto object = ykobject(obj->data_type_);
+    write_indent(body_);
+    // something like
+    // a: Const[int] = ccode """1 + 1"""
+    // int yk__a = 1 + 1
+    body_ << convert_dt(obj->data_type_) << " " << name;
+    body_ << " = " << ::string_utils::unescape(obj->code_str_->token_);
+    write_end_statement(body_);
+    scope_.define(name, object);
+  }
 }
 void compiler::error(token *tok, const std::string &message) {
   auto err = parsing_error{message, tok};

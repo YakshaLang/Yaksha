@@ -39,6 +39,7 @@ namespace yaksha {
   struct if_stmt;
   struct import_stmt;
   struct let_stmt;
+  struct nativeconst_stmt;
   struct pass_stmt;
   struct return_stmt;
   struct runtimefeature_stmt;
@@ -73,6 +74,7 @@ namespace yaksha {
     STMT_IF,
     STMT_IMPORT,
     STMT_LET,
+    STMT_NATIVECONST,
     STMT_PASS,
     STMT_RETURN,
     STMT_RUNTIMEFEATURE,
@@ -113,6 +115,7 @@ namespace yaksha {
     virtual void visit_if_stmt(if_stmt *obj) = 0;
     virtual void visit_import_stmt(import_stmt *obj) = 0;
     virtual void visit_let_stmt(let_stmt *obj) = 0;
+    virtual void visit_nativeconst_stmt(nativeconst_stmt *obj) = 0;
     virtual void visit_pass_stmt(pass_stmt *obj) = 0;
     virtual void visit_return_stmt(return_stmt *obj) = 0;
     virtual void visit_runtimefeature_stmt(runtimefeature_stmt *obj) = 0;
@@ -349,6 +352,16 @@ namespace yaksha {
     ykdatatype *data_type_;
     expr *expression_;
   };
+  struct nativeconst_stmt : stmt {
+    nativeconst_stmt(token *name, ykdatatype *data_type, token *ccode_keyword,
+                     token *code_str);
+    void accept(stmt_visitor *v) override;
+    ast_type get_type() override;
+    token *name_;
+    ykdatatype *data_type_;
+    token *ccode_keyword_;
+    token *code_str_;
+  };
   struct pass_stmt : stmt {
     explicit pass_stmt(token *pass_token);
     void accept(stmt_visitor *v) override;
@@ -418,6 +431,8 @@ namespace yaksha {
     stmt *c_import_stmt(token *import_token, std::vector<token *> import_names,
                         token *name, file_info *data);
     stmt *c_let_stmt(token *name, ykdatatype *data_type, expr *expression);
+    stmt *c_nativeconst_stmt(token *name, ykdatatype *data_type,
+                             token *ccode_keyword, token *code_str);
     stmt *c_pass_stmt(token *pass_token);
     stmt *c_return_stmt(token *return_keyword, expr *expression);
     stmt *c_runtimefeature_stmt(token *runtimefeature_token, token *feature);

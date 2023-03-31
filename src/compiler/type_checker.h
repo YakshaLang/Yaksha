@@ -48,6 +48,7 @@ namespace yaksha {
     void visit_import_stmt(import_stmt *obj) override;
     void visit_const_stmt(const_stmt *obj) override;
     void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
+    void visit_nativeconst_stmt(nativeconst_stmt *obj) override;
     /**
      * Errors vector, type checker will try and identify as much errors as possible
      * but after first error, everything else is best guess

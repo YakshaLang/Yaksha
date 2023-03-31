@@ -171,8 +171,7 @@ std::string yaksha::string_utils::escape(const std::string &raw_string,
 template<typename T>
 std::string int_to_oct(T i) {
   std::stringstream stream;
-  stream << std::setfill('0') << std::setw(3) << std::oct
-         << (unsigned long)i;
+  stream << std::setfill('0') << std::setw(3) << std::oct << (unsigned long) i;
   return stream.str();
 }
 std::string

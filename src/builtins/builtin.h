@@ -3,8 +3,8 @@
 #define BUILTIN_H
 #include "compiler/datatype_compiler.h"
 #include "compiler/datatype_parser.h"
-#include "compiler/function_datatype_extractor.h"
 #include "compiler/entry_struct_func_compiler.h"
+#include "compiler/function_datatype_extractor.h"
 #include "compiler/slot_matcher.h"
 #include "compiler/statement_writer.h"
 #include "utilities/ykobject.h"

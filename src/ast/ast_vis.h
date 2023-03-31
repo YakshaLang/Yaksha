@@ -55,6 +55,7 @@ namespace yaksha {
     void visit_import_stmt(import_stmt *obj) override;
     void visit_const_stmt(const_stmt *obj) override;
     void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
+    void visit_nativeconst_stmt(nativeconst_stmt *obj) override;
 
 private:
     std::stringstream text_{};

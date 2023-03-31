@@ -1,0 +1,7 @@
+ITEM: Const[int] = ccode """1 + 1"""
+
+def main() -> int:
+    a: int = ITEM + 1
+    # Should print 3
+    println(a)
+    return 0

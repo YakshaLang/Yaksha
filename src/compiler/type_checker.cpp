@@ -521,6 +521,11 @@ void type_checker::check(const std::vector<stmt *> &statements) {
     auto placeholder_object = ykobject(constant_definition->data_type_);
     scope_.define_global(constant_name, placeholder_object);
   }
+  for (const auto &constant_name : defs_classes_->global_native_const_names_) {
+    auto constant_definition = defs_classes_->get_native_const(constant_name);
+    auto placeholder_object = ykobject(constant_definition->data_type_);
+    scope_.define_global(constant_name, placeholder_object);
+  }
   // Visit all statements
   for (auto st : statements) { st->accept(this); }
 }
@@ -839,3 +844,4 @@ ykdatatype *type_checker::function_to_datatype(const ykobject &arg) {
   return fnc;
 }
 void type_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
+void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {}

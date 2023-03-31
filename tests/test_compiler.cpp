@@ -210,3 +210,8 @@ TEST_CASE("compiler: Test binarydata() builtin") {
   TEST_FILE("../test_data/compiler_tests/binarydata_builtin_test.yaka", "binarydata_builtin_test.yaka",
             "../test_data/compiler_tests/binarydata_builtin_test.tokens");
 }
+TEST_CASE("compiler: Test native constants") {
+  TEST_FILE("../test_data/compiler_tests/native_constants.yaka", "native_constants.yaka",
+            "../test_data/compiler_tests/native_constants.tokens");
+}
+
