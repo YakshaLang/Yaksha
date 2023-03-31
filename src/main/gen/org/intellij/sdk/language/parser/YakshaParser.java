@@ -4,7 +4,7 @@ package org.intellij.sdk.language.parser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
 import static org.intellij.sdk.language.psi.YakshaTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.intellij.sdk.language.parser.YakshaParserUtil.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.TokenSet;
@@ -495,7 +495,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? literal S? NL
+  // IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? KW_CCODE? S? literal S? NL
   public static boolean const_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "const_statement")) return false;
     if (!nextTokenIs(b, IDENTIFIER)) return false;
@@ -509,8 +509,10 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && const_statement_5(b, l + 1);
     r = r && consumeToken(b, OPERATOR_EQ);
     r = r && const_statement_7(b, l + 1);
-    r = r && literal(b, l + 1);
+    r = r && const_statement_8(b, l + 1);
     r = r && const_statement_9(b, l + 1);
+    r = r && literal(b, l + 1);
+    r = r && const_statement_11(b, l + 1);
     r = r && consumeToken(b, NL);
     exit_section_(b, m, CONST_STATEMENT, r);
     return r;
@@ -544,9 +546,23 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // KW_CCODE?
+  private static boolean const_statement_8(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "const_statement_8")) return false;
+    consumeToken(b, KW_CCODE);
+    return true;
+  }
+
   // S?
   private static boolean const_statement_9(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "const_statement_9")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean const_statement_11(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "const_statement_11")) return false;
     consumeToken(b, S);
     return true;
   }
