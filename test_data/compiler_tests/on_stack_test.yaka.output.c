@@ -17,7 +17,9 @@ int32_t yy__main()
     struct yy__Enemy* yy__enemies = t__0;
     yy__enemies[INT32_C(0)].yy__x = INT32_C(1);
     yy__enemies[INT32_C(1)].yy__x = INT32_C(2);
-    yk__printlnint(((intmax_t)(yy__enemies[INT32_C(0)].yy__x + yy__enemies[INT32_C(1)].yy__x)));
+    struct yy__Enemy yy__big_enemy;
+    yy__big_enemy.yy__x = INT32_C(4);
+    yk__printlnint(((intmax_t)((yy__enemies[INT32_C(0)].yy__x + yy__enemies[INT32_C(1)].yy__x) + yy__big_enemy.yy__x)));
     return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)
