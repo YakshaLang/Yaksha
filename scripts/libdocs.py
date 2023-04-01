@@ -180,7 +180,7 @@ def display_comment(buf: Buf, element: dict):
         comment: str = element["comment"]
         comment_lines = comment.splitlines(keepends=False)
         for single_comment in comment_lines:
-            buf.append(os.linesep)
+            buf.append('\n')
             buf.append_yellow("# ")
             buf.append_yellow(single_comment)
 
@@ -210,10 +210,10 @@ def display_class(buf: Buf, fnc: dict):
     display_comment(buf, fnc)
     if fnc["members"]:
         buf.append_red(": ")
-        buf.append(os.linesep)
+        buf.append('\n')
         for i, arg in enumerate(fnc["members"]):
             if i != 0:
-                buf.append_red(os.linesep)
+                buf.append_red('\n')
             buf.append("    ")
             display_param(buf, arg)
 
