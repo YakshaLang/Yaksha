@@ -46,7 +46,7 @@ public class YakshaDocs {
             .put("countif", BuiltinDoc.b("countif(Array[T],Function[In[T,V],Out[bool]],V) -> int", "For each element in array count if function returns true"))
             .put("filter", BuiltinDoc.b("filter(Array[T],Function[In[T,V],Out[bool]],V) -> Array[T]", "Create a new array with filtered elements based on return value of given function"))
             .put("map", BuiltinDoc.b("map(Array[T],Function[In[T,V],Out[K]],V) -> Array[K]", "Create a new array with result of given function"))
-            .put("binarydata", BuiltinDoc.b("binarydata(\"data\") -> Const[Ptr[Const[u8]]]", "Create constant binary data (must pass in a string literal). Returns Const[Ptr[Const[u8]]] that does not need to be deleted."))
+            .put("binarydata", BuiltinDoc.b("binarydata(\"data\") -> Const[Ptr[Const[u8]]]", "Create constant binary data (must pass in a string literal).\nReturns Const[Ptr[Const[u8]]] that does not need to be deleted."))
             .build();
     public static final Set<String> BUILTIN_FUNCTION_NAMES = BUILTIN_FUNCTIONS.keySet();
     public static final YakshaDocs INSTANCE = new YakshaDocs();
@@ -126,9 +126,7 @@ public class YakshaDocs {
         DefaultMutableTreeNode builtins = new DefaultMutableTreeNode("builtins");
         BUILTIN_FUNCTIONS.forEach((k, v) -> {
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(DocWithIcon.dwi(v.typeDoc, YakshaIcons.BUILT_IN));
-            if (!v.comment.isBlank()) {
-                node.add(new DefaultMutableTreeNode(DocWithIcon.dwi(v.comment, YakshaIcons.COMMENT)));
-            }
+            addComments(v.comment, node);
             builtins.add(node);
         });
         root.add(builtins);
@@ -137,6 +135,16 @@ public class YakshaDocs {
             d.fill(lib);
             root.add(lib);
         });
+    }
+
+    private static void addComments(String allComments, DefaultMutableTreeNode node) {
+        if (allComments.isBlank()) {
+            return;
+        }
+        String[] comments = allComments.split("\\n");
+        for (final String commentLine : comments) {
+            node.add(new DefaultMutableTreeNode(DocWithIcon.dwi(commentLine, YakshaIcons.COMMENT)));
+        }
     }
 
     public static class Doc {
@@ -148,16 +156,12 @@ public class YakshaDocs {
         public void fill(DefaultMutableTreeNode lib) {
             global_consts.forEach(c -> {
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(DocWithIcon.dwi(c.getRepr(), YakshaIcons.CONSTANT));
-                if (!c.getTypeText().isBlank()) {
-                    node.add(new DefaultMutableTreeNode(DocWithIcon.dwi(c.getTypeText(), YakshaIcons.COMMENT)));
-                }
+                addComments(c.getTypeText(), node);
                 lib.add(node);
             });
             classes.forEach(c -> {
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(DocWithIcon.dwi(c.name, YakshaIcons.CLASS));
-                if (!c.getTypeText().isBlank()) {
-                    node.add(new DefaultMutableTreeNode(DocWithIcon.dwi(c.getTypeText(), YakshaIcons.COMMENT)));
-                }
+                addComments(c.getTypeText(), node);
                 for (Param p : c.members) {
                     node.add(new DefaultMutableTreeNode(DocWithIcon.dwi(p.toString(), YakshaIcons.SUB_SECTION)));
                 }
@@ -165,9 +169,7 @@ public class YakshaDocs {
             });
             functions.forEach(c -> {
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(DocWithIcon.dwi(c.getRepr(), YakshaIcons.DEF));
-                if (!c.getTypeText().isBlank()) {
-                    node.add(new DefaultMutableTreeNode(DocWithIcon.dwi(c.getTypeText(), YakshaIcons.COMMENT)));
-                }
+                addComments(c.getTypeText(), node);
                 lib.add(node);
             });
         }
