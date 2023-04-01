@@ -1,7 +1,7 @@
 runtimefeature "tinycthread"
 
 @nativedefine("tss_t")
-@dotaccess
+@onstack
 class Key:
     # Key to access/create thread specific storage
     # Declare a variable and use with getref() when calling create()

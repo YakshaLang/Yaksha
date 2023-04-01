@@ -403,8 +403,7 @@ stmt *parser::declaration_statement() {
                       "Expected ccode statement to have a string literal.");
         }
         if (!dt->is_const()) {
-          throw error(ccode_token,
-                      "Variable on LHS needs to be a const");
+          throw error(ccode_token, "Variable on LHS needs to be a const");
         }
         advance();
         // We are in native constant

@@ -4,7 +4,7 @@ import libs.thread.mutex
 import libs.timespec
 
 @nativedefine("cnd_t")
-@dotaccess
+@onstack
 class Condition:
     # Condition Object
     pass

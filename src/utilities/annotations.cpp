@@ -1,6 +1,5 @@
 // annotations.cpp
 #include "utilities/annotations.h"
-#include <utility>
 using namespace yaksha;
 void annotations::validate_native_arg(std::string &arg, bool arg_set) {
   if (arg.empty() && arg_set) {
@@ -91,16 +90,16 @@ void annotations::add(const annotation &a) {
       return;
     }
     varargs_ = true;
-  } else if (a.name_ == "dotaccess") {
-    if (dot_access_) {
-      error_ = "Duplicate annotation: @dotaccess";
+  } else if (a.name_ == "onstack") {
+    if (on_stack_) {
+      error_ = "Duplicate annotation: @onstack";
       return;
     }
     if (a.arg_set_) {
-      error_ = "@dotaccess does not allow any argument";
+      error_ = "@onstack does not allow any argument";
       return;
     }
-    dot_access_ = true;
+    on_stack_ = true;
   } else {
     error_ = "Invalid annotation:" + a.name_;
     return;

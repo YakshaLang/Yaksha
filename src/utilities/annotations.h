@@ -12,8 +12,7 @@ namespace yaksha {
     bool native_define_{false};
     bool template_{false};
     bool varargs_{false};
-    // TODO ensure we only allow dotaccess for @native... stuff
-    bool dot_access_{false};
+    bool on_stack_{false};
     std::string native_arg_{};
     std::string native_macro_arg_{};
     std::string native_define_arg_{};

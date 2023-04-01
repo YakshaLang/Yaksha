@@ -1,6 +1,6 @@
 runtimefeature "cpu"
 
-@dotaccess
+@onstack
 @nativedefine("struct yk__cpu_info")
 class Cpu:
     # Extracted CPU information

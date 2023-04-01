@@ -214,4 +214,7 @@ TEST_CASE("compiler: Test native constants") {
   TEST_FILE("../test_data/compiler_tests/native_constants.yaka", "native_constants.yaka",
             "../test_data/compiler_tests/native_constants.tokens");
 }
-
+TEST_CASE("compiler: Test @onstack class") {
+  TEST_FILE("../test_data/compiler_tests/on_stack_test.yaka", "on_stack_test.yaka",
+            "../test_data/compiler_tests/on_stack_test.tokens");
+}

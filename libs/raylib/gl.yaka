@@ -193,7 +193,7 @@ class rlVertexBuffer:
     # Dynamic vertex buffers (position + texcoords + colors + indices arrays)
     pass
 
-@dotaccess
+@onstack
 @nativedefine("rlDrawCall")
 class rlDrawCall:
     # of those state-change happens (this is done in core module)
@@ -207,7 +207,7 @@ def rl_draw_call(mode: int, vertex_count: int, vertex_alignment: int, texture_id
     # Factory function for: rlDrawCall
     ccode """(rlDrawCall){(int)nn__mode, (int)nn__vertex_count, (int)nn__vertex_alignment, (unsigned int)nn__texture_id}"""
 
-@dotaccess
+@onstack
 @nativedefine("rlRenderBatch")
 class rlRenderBatch:
     # rlRenderBatch type
@@ -371,7 +371,7 @@ def rl_disable_vertex_attribute(index: u32) -> None:
     ccode """rlDisableVertexAttribute((unsigned int)nn__index)"""
 
 @nativemacro
-def rl_enable_state_pointer(vertex_attrib_type: int, buffer: c.VoidPtr) -> None:
+def rl_enable_state_pointer(vertex_attrib_type: int, buffer: AnyPtr) -> None:
     # Enable attribute state pointer
     ccode """rlEnableStatePointer((int)nn__vertex_attrib_type, nn__buffer)"""
 
@@ -571,7 +571,7 @@ def rlgl_close() -> None:
     ccode """rlglClose()"""
 
 @nativemacro
-def rl_load_extensions(loader: c.VoidPtr) -> None:
+def rl_load_extensions(loader: AnyPtr) -> None:
     # Load OpenGL extensions (loader function required)
     ccode """rlLoadExtensions(nn__loader)"""
 
@@ -754,7 +754,7 @@ def rl_gen_texture_mipmaps(id: u32, width: int, height: int, format: int, mipmap
     ccode """rlGenTextureMipmaps((unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__format, nn__mipmaps)"""
 
 @nativemacro
-def rl_read_texture_pixels(id: u32, width: int, height: int, format: int) -> c.VoidPtr:
+def rl_read_texture_pixels(id: u32, width: int, height: int, format: int) -> AnyPtr:
     # Read texture pixel data
     ccode """rlReadTexturePixels((unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__format)"""
 

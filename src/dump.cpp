@@ -118,7 +118,8 @@ void display_const(const_stmt *const_statement, tokenizer &token_extractor) {
   display_datatype(const_statement->data_type_);
   std::cout << " }";
 }
-void display_const(nativeconst_stmt *const_statement, tokenizer &token_extractor) {
+void display_const(nativeconst_stmt *const_statement,
+                   tokenizer &token_extractor) {
   std::string comment =
       extract_comments(const_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""

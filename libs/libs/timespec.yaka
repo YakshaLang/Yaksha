@@ -1,7 +1,7 @@
 runtimefeature "tinycthread"
 
 @nativedefine("struct timespec")
-@dotaccess
+@onstack
 class TimeSpec:
     pass
 

@@ -23,7 +23,7 @@ class Something:
     something_id: int
 
 @nativedefine("Color")
-@dotaccess
+@onstack
 class Color:
     r: int
     g: int

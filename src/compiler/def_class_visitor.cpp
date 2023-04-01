@@ -160,9 +160,6 @@ void def_class_visitor::visit_class_stmt(class_stmt *obj) {
                       "allowed for classes.");
     return;
   }
-  if (obj->annotations_.dot_access_ && !obj->annotations_.native_define_) {
-    error(obj->name_, "@dotaccess must be used with @nativedefine");
-  }
   if (obj->annotations_.native_define_ &&
       obj->annotations_.native_define_arg_.empty()) {
     error(obj->name_, "@nativedefine must have a valid argument");

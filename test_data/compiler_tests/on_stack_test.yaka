@@ -1,0 +1,12 @@
+@onstack
+class Enemy:
+    x: int
+    y: int
+    hp: int
+
+def main() -> int:
+    enemies: Array[Enemy] = arrnew("Enemy", 2)
+    enemies[0].x = 1
+    enemies[1].x = 2
+    println(enemies[0].x + enemies[1].x)
+    return 0

@@ -160,6 +160,10 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     auto module_file = name_pair.second.module_file_;
     auto module_class = name_pair.second.string_val_;
     auto module_prefix = cf_->get(module_file)->prefix_;
+    auto class_ = cf_->get(module_file)->data_->dsv_->get_class(module_class);
+    if (class_->annotations_.on_stack_) {
+      error(obj->paren_token_, "Cannot construct an @onstack object");
+    }
     auto prefixed_class_name = prefix(module_class, module_prefix);
     compile_obj_creation(prefixed_class_name, code,
                          dt_pool->create(module_class, module_file));
@@ -177,6 +181,10 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     auto return_type = fn_def->return_type_;
     compile_function_call(obj, prefix(name, prefix_val_), code, return_type);
   } else if (defs_classes_.has_class(name)) {
+    auto class_ = defs_classes_.get_class(name);
+    if (class_->annotations_.on_stack_) {
+      error(obj->paren_token_, "Cannot construct an @onstack object");
+    }
     compile_obj_creation(prefix(name, prefix_val_), code,
                          dt_pool->create(name));
   } else if (name_pair.second.datatype_->is_function()) {
@@ -836,6 +844,9 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     if (class_info != nullptr) {
       auto class_name = prefix(dt, imported_module_prefix);
       if (class_info->annotations_.native_define_) { return class_name; }
+      if (class_info->annotations_.on_stack_) {
+        return "struct " + class_name;
+      }
       return "struct " + class_name + "*";
     }
   }
@@ -1026,7 +1037,7 @@ void compiler::visit_get_expr(get_expr *obj) {
   class_ = module_info->data_->dsv_->get_class(user_defined_type);
   item_prefix = module_info->prefix_;
   if (class_->annotations_.native_define_) { item_prefix = ""; }
-  if (class_->annotations_.dot_access_) { access_ = "."; }
+  if (class_->annotations_.on_stack_) { access_ = "."; }
   for (const auto &member : class_->members_) {
     if (item == member.name_->token_) {
       auto placeholder = ykobject(dt_pool);
@@ -1050,7 +1061,7 @@ void compiler::visit_set_expr(set_expr *obj) {
   class_ = module_info->data_->dsv_->get_class(user_defined_type);
   item_prefix = module_info->prefix_;
   if (class_->annotations_.native_define_) { item_prefix = ""; }
-  if (class_->annotations_.dot_access_) { access_ = "."; }
+  if (class_->annotations_.on_stack_) { access_ = "."; }
   for (const auto &member : class_->members_) {
     if (item == member.name_->token_) {
       auto placeholder = ykobject(dt_pool);

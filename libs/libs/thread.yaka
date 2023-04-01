@@ -17,7 +17,7 @@ SLEEP_SUCCES: Const[int] = 0
 # Sleep is successful
 
 @nativedefine("thrd_t")
-@dotaccess
+@onstack
 class Thread:
     # Thread Object
     pass

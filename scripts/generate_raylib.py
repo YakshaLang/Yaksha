@@ -347,7 +347,7 @@ def convert_structure(s: dict) -> bool:
         print(Colors.fail(f"{name} is redefined"))
         return False
     comment = s["description"]
-    c.append("@dotaccess").newline()
+    c.append("@onstack").newline()
     c.append("@nativedefine(\"").append(name).append("\")").newline()
     c.append("class ").append(name).append(":").newline().indent()
     if comment:

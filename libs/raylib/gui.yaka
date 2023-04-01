@@ -361,7 +361,7 @@ ICON_252: Const[int] = 252
 ICON_253: Const[int] = 253
 ICON_254: Const[int] = 254
 ICON_255: Const[int] = 255
-@dotaccess
+@onstack
 @nativedefine("GuiStyleProp")
 class GuiStyleProp:
     # Style property

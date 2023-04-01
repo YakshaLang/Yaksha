@@ -5,7 +5,7 @@ TIMED: Const[int] = 1
 RECURSIVE: Const[int] = 2
 
 @nativedefine("mtx_t")
-@dotaccess
+@onstack
 class Mutex:
     # Mutex Object
     pass

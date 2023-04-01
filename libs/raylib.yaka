@@ -617,7 +617,7 @@ class RAudioBufferPtr:
 class RAudioProcessorPtr:
     pass
 
-@dotaccess
+@onstack
 @nativedefine("Vector2")
 class Vector2:
     # Vector2, 2 components
@@ -629,7 +629,7 @@ def vector2(x: float, y: float) -> Vector2:
     # Factory function for: Vector2
     ccode """(Vector2){nn__x, nn__y}"""
 
-@dotaccess
+@onstack
 @nativedefine("Vector3")
 class Vector3:
     # Vector3, 3 components
@@ -642,7 +642,7 @@ def vector3(x: float, y: float, z: float) -> Vector3:
     # Factory function for: Vector3
     ccode """(Vector3){nn__x, nn__y, nn__z}"""
 
-@dotaccess
+@onstack
 @nativedefine("Vector4")
 class Vector4:
     # Vector4, 4 components
@@ -656,7 +656,7 @@ def vector4(x: float, y: float, z: float, w: float) -> Vector4:
     # Factory function for: Vector4
     ccode """(Vector4){nn__x, nn__y, nn__z, nn__w}"""
 
-@dotaccess
+@onstack
 @nativedefine("Matrix")
 class Matrix:
     # Matrix, 4x4 components, column major, OpenGL style, right handed
@@ -682,7 +682,7 @@ def matrix(m0: float, m4: float, m8: float, m12: float, m1: float, m5: float, m9
     # Factory function for: Matrix
     ccode """(Matrix){nn__m0, nn__m4, nn__m8, nn__m12, nn__m1, nn__m5, nn__m9, nn__m13, nn__m2, nn__m6, nn__m10, nn__m14, nn__m3, nn__m7, nn__m11, nn__m15}"""
 
-@dotaccess
+@onstack
 @nativedefine("Color")
 class Color:
     # Color, 4 components, R8G8B8A8 (32bit)
@@ -696,7 +696,7 @@ def color(r: int, g: int, b: int, a: int) -> Color:
     # Factory function for: Color
     ccode """(Color){(unsigned char)nn__r, (unsigned char)nn__g, (unsigned char)nn__b, (unsigned char)nn__a}"""
 
-@dotaccess
+@onstack
 @nativedefine("Rectangle")
 class Rectangle:
     # Rectangle, 4 components
@@ -710,7 +710,7 @@ def rectangle(x: float, y: float, width: float, height: float) -> Rectangle:
     # Factory function for: Rectangle
     ccode """(Rectangle){nn__x, nn__y, nn__width, nn__height}"""
 
-@dotaccess
+@onstack
 @nativedefine("Image")
 class Image:
     # Image, pixel data stored in CPU memory (RAM)
@@ -721,11 +721,11 @@ class Image:
     format: c.CInt
 
 @nativemacro
-def image(data: c.VoidPtr, width: int, height: int, mipmaps: int, format: int) -> Image:
+def image(data: AnyPtr, width: int, height: int, mipmaps: int, format: int) -> Image:
     # Factory function for: Image
     ccode """(Image){nn__data, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
 
-@dotaccess
+@onstack
 @nativedefine("Texture")
 class Texture:
     # Texture, tex data stored in GPU memory (VRAM)
@@ -740,7 +740,7 @@ def texture(id: u32, width: int, height: int, mipmaps: int, format: int) -> Text
     # Factory function for: Texture
     ccode """(Texture){(unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
 
-@dotaccess
+@onstack
 @nativedefine("RenderTexture")
 class RenderTexture:
     # RenderTexture, fbo for texture rendering
@@ -753,7 +753,7 @@ def render_texture(id: u32, p_texture: Texture, depth: Texture) -> RenderTexture
     # Factory function for: RenderTexture
     ccode """(RenderTexture){(unsigned int)nn__id, nn__p_texture, nn__depth}"""
 
-@dotaccess
+@onstack
 @nativedefine("NPatchInfo")
 class NPatchInfo:
     # NPatchInfo, n-patch layout info
@@ -769,7 +769,7 @@ def n_patch_info(source: Rectangle, left: int, top: int, right: int, bottom: int
     # Factory function for: NPatchInfo
     ccode """(NPatchInfo){nn__source, (int)nn__left, (int)nn__top, (int)nn__right, (int)nn__bottom, (int)nn__layout}"""
 
-@dotaccess
+@onstack
 @nativedefine("GlyphInfo")
 class GlyphInfo:
     # GlyphInfo, font characters glyphs info
@@ -784,7 +784,7 @@ def glyph_info(value: int, offset_x: int, offset_y: int, advance_x: int, p_image
     # Factory function for: GlyphInfo
     ccode """(GlyphInfo){(int)nn__value, (int)nn__offset_x, (int)nn__offset_y, (int)nn__advance_x, nn__p_image}"""
 
-@dotaccess
+@onstack
 @nativedefine("Font")
 class Font:
     # Font, font texture and GlyphInfo array data
@@ -800,7 +800,7 @@ def font(base_size: int, glyph_count: int, glyph_padding: int, p_texture: Textur
     # Factory function for: Font
     ccode """(Font){(int)nn__base_size, (int)nn__glyph_count, (int)nn__glyph_padding, nn__p_texture, nn__recs, nn__glyphs}"""
 
-@dotaccess
+@onstack
 @nativedefine("Camera3D")
 class Camera3D:
     # Camera, defines position/orientation in 3d space
@@ -815,7 +815,7 @@ def camera_3d(position: Vector3, target: Vector3, up: Vector3, fovy: float, proj
     # Factory function for: Camera3D
     ccode """(Camera3D){nn__position, nn__target, nn__up, nn__fovy, (int)nn__projection}"""
 
-@dotaccess
+@onstack
 @nativedefine("Camera2D")
 class Camera2D:
     # Camera2D, defines position/orientation in 2d space
@@ -839,7 +839,7 @@ class Shader:
     # Shader
     pass
 
-@dotaccess
+@onstack
 @nativedefine("MaterialMap")
 class MaterialMap:
     # MaterialMap
@@ -857,7 +857,7 @@ class Material:
     # Material, includes shader and maps
     pass
 
-@dotaccess
+@onstack
 @nativedefine("Transform")
 class Transform:
     # Transform, vectex transformation data
@@ -885,7 +885,7 @@ class ModelAnimation:
     # ModelAnimation
     pass
 
-@dotaccess
+@onstack
 @nativedefine("Ray")
 class Ray:
     # Ray, ray for raycasting
@@ -897,7 +897,7 @@ def ray(position: Vector3, direction: Vector3) -> Ray:
     # Factory function for: Ray
     ccode """(Ray){nn__position, nn__direction}"""
 
-@dotaccess
+@onstack
 @nativedefine("RayCollision")
 class RayCollision:
     # RayCollision, ray hit information
@@ -911,7 +911,7 @@ def ray_collision(hit: bool, distance: float, point: Vector3, normal: Vector3) -
     # Factory function for: RayCollision
     ccode """(RayCollision){nn__hit, nn__distance, nn__point, nn__normal}"""
 
-@dotaccess
+@onstack
 @nativedefine("BoundingBox")
 class BoundingBox:
     # BoundingBox
@@ -923,7 +923,7 @@ def bounding_box(min: Vector3, max: Vector3) -> BoundingBox:
     # Factory function for: BoundingBox
     ccode """(BoundingBox){nn__min, nn__max}"""
 
-@dotaccess
+@onstack
 @nativedefine("Wave")
 class Wave:
     # Wave, audio wave data
@@ -934,7 +934,7 @@ class Wave:
     data: AnyPtr
 
 @nativemacro
-def wave(frame_count: u32, sample_rate: u32, sample_size: u32, channels: u32, data: c.VoidPtr) -> Wave:
+def wave(frame_count: u32, sample_rate: u32, sample_size: u32, channels: u32, data: AnyPtr) -> Wave:
     # Factory function for: Wave
     ccode """(Wave){(unsigned int)nn__frame_count, (unsigned int)nn__sample_rate, (unsigned int)nn__sample_size, (unsigned int)nn__channels, nn__data}"""
 
@@ -943,7 +943,7 @@ class AudioStream:
     # AudioStream, custom audio stream
     pass
 
-@dotaccess
+@onstack
 @nativedefine("Sound")
 class Sound:
     # Sound
@@ -955,7 +955,7 @@ def sound(stream: AudioStream, frame_count: u32) -> Sound:
     # Factory function for: Sound
     ccode """(Sound){nn__stream, (unsigned int)nn__frame_count}"""
 
-@dotaccess
+@onstack
 @nativedefine("Music")
 class Music:
     # Music, audio stream, anything longer than ~10 seconds should be streamed
@@ -966,7 +966,7 @@ class Music:
     ctxData: AnyPtr
 
 @nativemacro
-def music(stream: AudioStream, frame_count: u32, looping: bool, ctx_type: int, ctx_data: c.VoidPtr) -> Music:
+def music(stream: AudioStream, frame_count: u32, looping: bool, ctx_type: int, ctx_data: AnyPtr) -> Music:
     # Factory function for: Music
     ccode """(Music){nn__stream, (unsigned int)nn__frame_count, nn__looping, (int)nn__ctx_type, nn__ctx_data}"""
 
@@ -985,7 +985,7 @@ class FilePathList:
     # File path list
     pass
 
-@dotaccess
+@onstack
 @nativedefine("Quaternion")
 class Quaternion:
     # Quaternion, 4 components (Vector4 alias)
@@ -999,7 +999,7 @@ def quaternion(x: float, y: float, z: float, w: float) -> Quaternion:
     # Factory function for: Quaternion
     ccode """(Quaternion){nn__x, nn__y, nn__z, nn__w}"""
 
-@dotaccess
+@onstack
 @nativedefine("Texture2D")
 class Texture2D:
     # Texture2D, same as Texture
@@ -1014,7 +1014,7 @@ def texture_2d(id: u32, width: int, height: int, mipmaps: int, format: int) -> T
     # Factory function for: Texture2D
     ccode """(Texture2D){(unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
 
-@dotaccess
+@onstack
 @nativedefine("TextureCubemap")
 class TextureCubemap:
     # TextureCubemap, same as Texture
@@ -1029,7 +1029,7 @@ def texture_cubemap(id: u32, width: int, height: int, mipmaps: int, format: int)
     # Factory function for: TextureCubemap
     ccode """(TextureCubemap){(unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
 
-@dotaccess
+@onstack
 @nativedefine("RenderTexture2D")
 class RenderTexture2D:
     # RenderTexture2D, same as RenderTexture
@@ -1042,7 +1042,7 @@ def render_texture_2d(id: u32, p_texture: Texture, depth: Texture) -> RenderText
     # Factory function for: RenderTexture2D
     ccode """(RenderTexture2D){(unsigned int)nn__id, nn__p_texture, nn__depth}"""
 
-@dotaccess
+@onstack
 @nativedefine("Camera")
 class Camera:
     # Camera type fallback, defaults to Camera3D
@@ -1182,7 +1182,7 @@ def set_window_opacity(opacity: float) -> None:
     ccode """SetWindowOpacity(nn__opacity)"""
 
 @nativemacro
-def get_window_handle() -> c.VoidPtr:
+def get_window_handle() -> AnyPtr:
     # Get native window handle
     ccode """GetWindowHandle()"""
 
@@ -1563,17 +1563,17 @@ def set_trace_log_level(log_level: int) -> None:
     ccode """SetTraceLogLevel((int)nn__log_level)"""
 
 @nativemacro
-def mem_alloc(size: int) -> c.VoidPtr:
+def mem_alloc(size: int) -> AnyPtr:
     # Internal memory allocator
     ccode """MemAlloc((int)nn__size)"""
 
 @nativemacro
-def mem_realloc(ptr: c.VoidPtr, size: int) -> c.VoidPtr:
+def mem_realloc(ptr: AnyPtr, size: int) -> AnyPtr:
     # Internal memory reallocator
     ccode """MemRealloc(nn__ptr, (int)nn__size)"""
 
 @nativemacro
-def mem_free(ptr: c.VoidPtr) -> None:
+def mem_free(ptr: AnyPtr) -> None:
     # Internal memory free
     ccode """MemFree(nn__ptr)"""
 
@@ -1597,7 +1597,7 @@ def unload_file_data(data: Ptr[c.CUChar]) -> None:
     ccode """UnloadFileData(nn__data)"""
 
 @native
-def save_file_data(file_name: str, data: c.VoidPtr, bytes_to_write: u32) -> bool:
+def save_file_data(file_name: str, data: AnyPtr, bytes_to_write: u32) -> bool:
     # Save data to file from byte array (write), returns true on success
     ccode """bool temp_rl = SaveFileData(nn__file_name, nn__data, (unsigned int)nn__bytes_to_write);
     yk__sdsfree(nn__file_name);
@@ -2752,12 +2752,12 @@ def get_color(hex_value: u32) -> Color:
     ccode """GetColor((unsigned int)nn__hex_value)"""
 
 @nativemacro
-def get_pixel_color(src_ptr: c.VoidPtr, format: int) -> Color:
+def get_pixel_color(src_ptr: AnyPtr, format: int) -> Color:
     # Get Color from a source pixel pointer of certain format
     ccode """GetPixelColor(nn__src_ptr, (int)nn__format)"""
 
 @nativemacro
-def set_pixel_color(dst_ptr: c.VoidPtr, p_color: Color, format: int) -> None:
+def set_pixel_color(dst_ptr: AnyPtr, p_color: Color, format: int) -> None:
     # Set color formatted into destination pixel pointer
     ccode """SetPixelColor(nn__dst_ptr, nn__p_color, (int)nn__format)"""
 

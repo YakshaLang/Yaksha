@@ -28,7 +28,7 @@ class ArgParseWrapper:
     state: ArgParse
 
 @nativedefine("struct argparse_option")
-@dotaccess
+@onstack
 class Option:
     # An argparse option
     # These objects are deleted when del_argparse() is called
