@@ -122,18 +122,34 @@ public class YakshaDocs {
         return "";
     }
 
-    public void fillTo(DefaultMutableTreeNode root) {
+    private static boolean keepOut(final String filter, final String haystack, final String haystack2) {
+        if (filter == null || filter.isBlank()) {
+            return false;
+        }
+        return !((!haystack.isBlank() && haystack.toLowerCase(Locale.ENGLISH).contains(filter))
+                || (!haystack2.isBlank() && haystack2.toLowerCase(Locale.ENGLISH).contains(filter)));
+    }
+
+    public void fillTo(DefaultMutableTreeNode root, final String filter) {
+        final String filterLowerCase = filter.toLowerCase(Locale.ENGLISH);
         DefaultMutableTreeNode builtins = new DefaultMutableTreeNode("builtins");
         BUILTIN_FUNCTIONS.forEach((k, v) -> {
+            if (keepOut(filterLowerCase, v.typeDoc, v.comment)) {
+                return;
+            }
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(DocWithIcon.dwi(v.typeDoc, YakshaIcons.BUILT_IN));
             addComments(v.comment, node);
             builtins.add(node);
         });
-        root.add(builtins);
+        if (builtins.getChildCount() > 0) {
+            root.add(builtins);
+        }
         doc.forEach((k, d) -> {
             DefaultMutableTreeNode lib = new DefaultMutableTreeNode(k);
-            d.fill(lib);
-            root.add(lib);
+            d.fill(lib, filterLowerCase);
+            if (lib.getChildCount() > 0) {
+                root.add(lib);
+            }
         });
     }
 
@@ -153,13 +169,19 @@ public class YakshaDocs {
         public List<Fn> functions;
         public List<Cls> classes;
 
-        public void fill(DefaultMutableTreeNode lib) {
+        public void fill(DefaultMutableTreeNode lib, String filterLowerCase) {
             global_consts.forEach(c -> {
+                if (keepOut(filterLowerCase, c.getRepr(), c.getTypeText())) {
+                    return;
+                }
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(DocWithIcon.dwi(c.getRepr(), YakshaIcons.CONSTANT));
                 addComments(c.getTypeText(), node);
                 lib.add(node);
             });
             classes.forEach(c -> {
+                if (keepOut(filterLowerCase, c.name, c.getTypeText())) {
+                    return;
+                }
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(DocWithIcon.dwi(c.name, YakshaIcons.CLASS));
                 addComments(c.getTypeText(), node);
                 for (Param p : c.members) {
@@ -168,6 +190,9 @@ public class YakshaDocs {
                 lib.add(node);
             });
             functions.forEach(c -> {
+                if (keepOut(filterLowerCase, c.getRepr(), c.getTypeText())) {
+                    return;
+                }
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(DocWithIcon.dwi(c.getRepr(), YakshaIcons.DEF));
                 addComments(c.getTypeText(), node);
                 lib.add(node);
