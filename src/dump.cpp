@@ -118,6 +118,16 @@ void display_const(const_stmt *const_statement, tokenizer &token_extractor) {
   display_datatype(const_statement->data_type_);
   std::cout << " }";
 }
+void display_const(nativeconst_stmt *const_statement, tokenizer &token_extractor) {
+  std::string comment =
+      extract_comments(const_statement->name_->line_, token_extractor);
+  std::cout << "\n{ \"name\": \""
+            << string_utils::escape(const_statement->name_->token_, false)
+            << "\", \"comment\": \"" << escape_comment(comment)
+            << "\", \"datatype\": ";
+  display_datatype(const_statement->data_type_);
+  std::cout << " }";
+}
 void display_params(std::vector<parameter> &params) {
   bool first = true;
   for (auto &param : params) {
@@ -234,6 +244,14 @@ void display(def_class_visitor &df, parser &parser_object,
       std::cout << ",";
     }
     display_const(df.get_const(const_name), token_extractor);
+  }
+  for (auto &const_name : df.global_native_const_names_) {
+    if (first) {
+      first = false;
+    } else {
+      std::cout << ",";
+    }
+    display_const(df.get_native_const(const_name), token_extractor);
   }
   // Dump Functions
   std::cout << "\n], \"functions\": [";
