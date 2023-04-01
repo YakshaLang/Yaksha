@@ -42,17 +42,19 @@
 <!-- Plugin description end -->
 
 ## Installation
-<!-- 
-- Using IDE built-in plugin system:
-  
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "YakshaIntelliJ"</kbd> >
-  <kbd>Install Plugin</kbd>
-   -->
-- Manually:
 
-  Download the [latest release](https://github.com/YakshaLang/YakshaIntelliJ/releases/latest) and install it manually using
+- Download the [latest release](https://github.com/YakshaLang/YakshaIntelliJ/releases/latest) and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
-
+  - You might need to uninstall current version if install fails
+  - (Optional) Setup alternative colouring for operators/etc
+    - Editor > Color Scheme > Yaksha
+    - (Recommended)You should update the operator colour to something else
+      - (Some themes does not display operator in a different colour)
+- How to build manually
+  - Open plugin in IntelliJ
+  - Do a build (this takes a while first time)
+  - Run gradle task buildPlugin
+  - Find .zip file in build/distributions directory
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
