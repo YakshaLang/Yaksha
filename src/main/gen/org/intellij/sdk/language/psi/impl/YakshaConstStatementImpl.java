@@ -34,9 +34,9 @@ public class YakshaConstStatementImpl extends YakshaNamedElementImpl implements 
   }
 
   @Override
-  @NotNull
+  @Nullable
   public YakshaLiteral getLiteral() {
-    return findNotNullChildByClass(YakshaLiteral.class);
+    return findChildByClass(YakshaLiteral.class);
   }
 
   @Override

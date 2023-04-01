@@ -11,7 +11,7 @@ public interface YakshaConstStatement extends YakshaNamedElement {
   @NotNull
   YakshaDataType getDataType();
 
-  @NotNull
+  @Nullable
   YakshaLiteral getLiteral();
 
   String getName();
