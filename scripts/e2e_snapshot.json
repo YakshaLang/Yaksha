@@ -52,7 +52,7 @@
   "test_data/sample4.yaka": "Invalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\nCritical !! main() function must be present\n\nreturn := 255",
   "test_data/sample5.yaka": "Invalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\nInvalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\nCritical !! main() function must be present\n\nreturn := 255",
   "test_data/sample6.yaka": "Invalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\nInvalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\nCritical !! main() function must be present\n\nreturn := 255",
-  "test_data/sample_hello_threads.yaka": "File not found or unable to read:/home/jadoggx86/Projects/Yaksha/test_data/os/cpu.yaka\nFailed to compile:sample_hello_threads.yaka\n\nreturn := 255",
+  "test_data/sample_hello_threads.yaka": "File not found or unable to read:cpu.yaka\nFailed to compile:sample_hello_threads.yaka\n\nreturn := 255",
   "test_data/sample_negative_numbers.yaka": "Invalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\nCritical !! main() function must be present\n\nreturn := 255",
   "test_data/test_compiler.yaka": "3628800\n362880\n40320\n5040\n720\n120\n24\n6\n2\n1\naaaaaaaaaab\n2 From defer --> Program Completed\n1 From defer --> Program Completed\n\nreturn := 0"
 }

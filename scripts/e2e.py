@@ -17,7 +17,12 @@ SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 LIBS_DIR = os.path.abspath(os.path.join(os.path.dirname(SCRIPT_DIR), "libs"))
 CARPNTR = os.path.abspath(os.path.join(os.path.dirname(SCRIPT_DIR), "carpntr", "build", "carpntr"))
 MAX_EXECUTION_TIME_SEC = 30
-OUTPUT = os.path.join(SCRIPT_DIR, "e2e_snapshot.json")
+if os.name == 'nt':
+    WINDOWS = True
+    OUTPUT = os.path.join(SCRIPT_DIR, "e2e_snapshot_windows.json")
+else:
+    WINDOWS = False
+    OUTPUT = os.path.join(SCRIPT_DIR, "e2e_snapshot.json")
 E2E_FILES = os.path.join(SCRIPT_DIR, "e2e_files")
 
 
@@ -27,9 +32,8 @@ def execute(arg: Union[str, List[str]]) -> (str, str, int):
         arg,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        encoding="utf-8",
+        encoding="utf-16le" if WINDOWS else "utf-8",
         universal_newlines=True,
-        # shell=True,
         env=d)
     try:
         so, se = proc.communicate(timeout=MAX_EXECUTION_TIME_SEC)
@@ -56,6 +60,9 @@ def bad_start(s) -> bool:
 
 
 def clean_line_c_compiler_paths(s: str) -> str:
+    if WINDOWS:
+        s = re.sub(r"[A-Z]:\\", r"\\", s)
+        s = re.sub(r"\\", "/", s)
     match = re.match(r"^([\\a-zA-Z0-9/:_.]+) (.+)$", s)
     if match:
         f = match.group(1)
@@ -64,7 +71,8 @@ def clean_line_c_compiler_paths(s: str) -> str:
         path_items[0] = os.path.basename(path_items[0])
         f = ":".join(path_items)
         text = f + " " + e
-        return text.rstrip()
+        s = text.rstrip()
+    s = re.sub(r"/([a-zA-Z0-9_]+/)+", "", s)
     return s.rstrip()
 
 
@@ -139,7 +147,7 @@ def main(test_mode: bool) -> int:
 ------ Tester ---------"""))
     results = {}
     print(Colors.warning("Generating new snapshot..."))
-    with open(E2E_FILES, "r", encoding="utf=8") as h:
+    with open(E2E_FILES, "r", encoding="utf-8") as h:
         for path in h:
             full_path = os.path.abspath(os.path.join(os.path.dirname(SCRIPT_DIR), path.strip()))
             parent = os.path.dirname(full_path)
