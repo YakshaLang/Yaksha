@@ -183,6 +183,18 @@ stmt *ast_pool::c_class_stmt(token *name, std::vector<parameter> members,
   cleanup_stmt_.push_back(o);
   return o;
 }
+compins_stmt::compins_stmt(token *name, ykdatatype *data_type, token *meta1,
+                           ykdatatype *meta2, void *meta3)
+    : name_(name), data_type_(data_type), meta1_(meta1), meta2_(meta2),
+      meta3_(meta3) {}
+void compins_stmt::accept(stmt_visitor *v) { v->visit_compins_stmt(this); }
+ast_type compins_stmt::get_type() { return ast_type::STMT_COMPINS; }
+stmt *ast_pool::c_compins_stmt(token *name, ykdatatype *data_type, token *meta1,
+                               ykdatatype *meta2, void *meta3) {
+  auto o = new compins_stmt(name, data_type, meta1, meta2, meta3);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
 const_stmt::const_stmt(token *name, ykdatatype *data_type, expr *expression)
     : name_(name), data_type_(data_type), expression_(expression) {}
 void const_stmt::accept(stmt_visitor *v) { v->visit_const_stmt(this); }
@@ -245,6 +257,32 @@ void expression_stmt::accept(stmt_visitor *v) {
 ast_type expression_stmt::get_type() { return ast_type::STMT_EXPRESSION; }
 stmt *ast_pool::c_expression_stmt(expr *expression) {
   auto o = new expression_stmt(expression);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
+foreach_stmt::foreach_stmt(token *for_keyword, token *name,
+                           ykdatatype *data_type, token *in_keyword,
+                           expr *expression, stmt *for_body)
+    : for_keyword_(for_keyword), name_(name), data_type_(data_type),
+      in_keyword_(in_keyword), expression_(expression), for_body_(for_body) {}
+void foreach_stmt::accept(stmt_visitor *v) { v->visit_foreach_stmt(this); }
+ast_type foreach_stmt::get_type() { return ast_type::STMT_FOREACH; }
+stmt *ast_pool::c_foreach_stmt(token *for_keyword, token *name,
+                               ykdatatype *data_type, token *in_keyword,
+                               expr *expression, stmt *for_body) {
+  auto o = new foreach_stmt(for_keyword, name, data_type, in_keyword,
+                            expression, for_body);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
+forendless_stmt::forendless_stmt(token *for_keyword, stmt *for_body)
+    : for_keyword_(for_keyword), for_body_(for_body) {}
+void forendless_stmt::accept(stmt_visitor *v) {
+  v->visit_forendless_stmt(this);
+}
+ast_type forendless_stmt::get_type() { return ast_type::STMT_FORENDLESS; }
+stmt *ast_pool::c_forendless_stmt(token *for_keyword, stmt *for_body) {
+  auto o = new forendless_stmt(for_keyword, for_body);
   cleanup_stmt_.push_back(o);
   return o;
 }

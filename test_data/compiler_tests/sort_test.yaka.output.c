@@ -35,17 +35,17 @@ int32_t yy__main()
     yk__printstr((t__2));
     yk__printlnint(((intmax_t)yk__arrlen(yy__x)));
     int32_t yy__pos = INT32_C(0);
-    while (1) {
-        if (!((yy__pos < yk__arrlen(yy__x)))) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        if ((! (((yy__pos < yk__arrlen(yy__x))))))
         {
-            yk__printint(((intmax_t)yy__x[yy__pos]));
-            yk__sds t__3 = yk__sdsnewlen(" ", 1);
-            yk__printstr((t__3));
-            yy__pos = (yy__pos + INT32_C(1));
-            yk__sdsfree(t__3);
+            break;
         }
+        yk__printint(((intmax_t)yy__x[yy__pos]));
+        yk__sds t__3 = yk__sdsnewlen(" ", 1);
+        yk__printstr((t__3));
+        yy__pos = (yy__pos + INT32_C(1));
+        yk__sdsfree(t__3);
     }
     yk__sds t__4 = yk__sdsempty();
     yk__printlnstr((t__4));
@@ -56,17 +56,17 @@ int32_t yy__main()
     yk__sds t__6 = yk__sdsnewlen("len=", 4);
     yk__printstr((t__6));
     yk__printlnint(((intmax_t)yk__arrlen(yy__x)));
-    while (1) {
-        if (!((yy__pos < yk__arrlen(yy__x)))) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        if ((! (((yy__pos < yk__arrlen(yy__x))))))
         {
-            yk__printint(((intmax_t)yy__x[yy__pos]));
-            yk__sds t__7 = yk__sdsnewlen(" ", 1);
-            yk__printstr((t__7));
-            yy__pos = (yy__pos + INT32_C(1));
-            yk__sdsfree(t__7);
+            break;
         }
+        yk__printint(((intmax_t)yy__x[yy__pos]));
+        yk__sds t__7 = yk__sdsnewlen(" ", 1);
+        yk__printstr((t__7));
+        yy__pos = (yy__pos + INT32_C(1));
+        yk__sdsfree(t__7);
     }
     yk__sds t__8 = yk__sdsempty();
     yk__printlnstr((t__8));

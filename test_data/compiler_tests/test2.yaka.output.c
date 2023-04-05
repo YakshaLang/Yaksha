@@ -28,23 +28,23 @@ int32_t yy__main()
     int32_t yy__a = INT32_C(10);
     yk__sds t__2 = yk__sdsnewlen("b", 1);
     yk__sds yy__b = yk__sdsdup(t__2);
-    while (1) {
-        if (!((yy__a > INT32_C(0)))) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        if ((! (((yy__a > INT32_C(0))))))
         {
-            yk__printint(((intmax_t)yy__factorial(yy__a)));
-            yk__sds t__3 = yk__sdsnewlen("\n", 1);
-            yk__printstr((t__3));
-            yy__a = (yy__a - INT32_C(1));
-            yk__sds t__4 = yk__sdsnewlen("a", 1);
-            yk__sds t__5 = yk__sdscatsds(yk__sdsdup(t__4), yy__b);
-            yk__sdsfree(yy__b);
-            yy__b = yk__sdsdup(t__5);
-            yk__sdsfree(t__5);
-            yk__sdsfree(t__4);
-            yk__sdsfree(t__3);
+            break;
         }
+        yk__printint(((intmax_t)yy__factorial(yy__a)));
+        yk__sds t__3 = yk__sdsnewlen("\n", 1);
+        yk__printstr((t__3));
+        yy__a = (yy__a - INT32_C(1));
+        yk__sds t__4 = yk__sdsnewlen("a", 1);
+        yk__sds t__5 = yk__sdscatsds(yk__sdsdup(t__4), yy__b);
+        yk__sdsfree(yy__b);
+        yy__b = yk__sdsdup(t__5);
+        yk__sdsfree(t__5);
+        yk__sdsfree(t__4);
+        yk__sdsfree(t__3);
     }
     yk__printstr((yy__b));
     yk__sds t__6 = yk__sdsnewlen("\n", 1);

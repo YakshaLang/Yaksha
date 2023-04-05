@@ -59,6 +59,9 @@ namespace yaksha {
     void visit_const_stmt(const_stmt *obj) override;
     void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
     void visit_nativeconst_stmt(nativeconst_stmt *obj) override;
+    void visit_foreach_stmt(foreach_stmt *obj) override;
+    void visit_forendless_stmt(forendless_stmt *obj) override;
+    void visit_compins_stmt(compins_stmt *obj) override;
     std::vector<std::string> function_names_{};
     std::vector<std::string> class_names_{};
     std::vector<std::string> global_const_names_{};

@@ -1,0 +1,11 @@
+def main() -> int:
+    e1: Array[int] = array("int", 1, 2, 3)
+    e2: Array[int] = array("int", 4, 5, 6, 7)
+    for i: int in e1:
+        for j: int in e2:
+            print(i)
+            print(" - ")
+            println(j)
+    del e1
+    del e2
+    return 0

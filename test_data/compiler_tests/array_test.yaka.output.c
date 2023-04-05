@@ -29,27 +29,27 @@ int32_t yy__main()
     yk__printlnstr((t__5));
     int32_t yy__pos = INT32_C(0);
     int32_t yy__length = yk__arrlen(yy__a);
-    while (1) {
-        if (!((yy__pos < yy__length))) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        if ((! (((yy__pos < yy__length)))))
         {
-            yk__printlnint(((intmax_t)yy__a[yy__pos]));
-            yy__pos = (yy__pos + INT32_C(1));
+            break;
         }
+        yk__printlnint(((intmax_t)yy__a[yy__pos]));
+        yy__pos = (yy__pos + INT32_C(1));
     }
     yk__sds t__6 = yk__sdsnewlen("Printing [b]", 12);
     yk__printlnstr((t__6));
     yy__pos = INT32_C(0);
     yy__length = yk__arrlen(yy__b);
-    while (1) {
-        if (!((yy__pos < yy__length))) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        if ((! (((yy__pos < yy__length)))))
         {
-            yk__printlnstr((yy__b[yy__pos]));
-            yy__pos = (yy__pos + INT32_C(1));
+            break;
         }
+        yk__printlnstr((yy__b[yy__pos]));
+        yy__pos = (yy__pos + INT32_C(1));
     }
     yk__sdsfree(t__6);
     yk__sdsfree(t__5);

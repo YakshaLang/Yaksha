@@ -145,6 +145,9 @@ bool ykdatatype::support_plus() const {
   return is_str() || is_a_float() || is_an_integer();
 }
 bool ykdatatype::is_a_number() const { return is_an_integer() || is_a_float(); }
+bool ykdatatype::is_a_number_or_const_number() const {
+  return (is_a_number() || (is_const() && args_[0]->is_a_number()));
+}
 bool ykdatatype::is_an_integer() const {
   return is_int() || is_i8() || is_i16() || is_i32() || is_i64() || is_u8() ||
          is_u16() || is_u32() || is_u64();
@@ -203,4 +206,7 @@ bool ykdatatype::is_any_ptr_to_const() const {
 }
 bool ykdatatype::is_tuple() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::TUPLE;
+}
+bool ykdatatype::is_bool_or_const_bool() const {
+  return is_bool() || is_const_bool();
 }

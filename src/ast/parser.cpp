@@ -6,20 +6,21 @@
 using namespace yaksha;
 parser::parser(std::string filepath, std::vector<token> &tokens,
                ykdt_pool *pool)
-    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0}, dt_pool_(pool),
-      import_stmts_(), filepath_(std::move(filepath)) {
+    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0},
+      magic_return_token_(new token{}), sugar_else_(new token{}),
+      dt_pool_(pool), import_stmts_(), filepath_(std::move(filepath)) {
   // Create a fake return token to be injected at end of void functions.
   // WHY?: This ensures that defer + string freeing work
-  magic_return_token_ = new token{};
+  // --
   magic_return_token_->token_ = "return";
-  magic_return_token_->file_ = "syntax-sugar";
+  magic_return_token_->file_ = "desugar";
   magic_return_token_->original_ = "return";
   magic_return_token_->line_ = 0;
   magic_return_token_->pos_ = 0;
   magic_return_token_->type_ = token_type::KEYWORD_RETURN;
-  sugar_else_ = new token{};
+  // --
   sugar_else_->token_ = "else";
-  sugar_else_->file_ = "syntax-sugar";
+  sugar_else_->file_ = "desugar";
   sugar_else_->original_ = "return";
   sugar_else_->line_ = 0;
   sugar_else_->pos_ = 0;
@@ -249,6 +250,7 @@ stmt *parser::statement() {
   if (match({token_type::KEYWORD_IF})) { return if_statement(); }
   if (match({token_type::KEYWORD_PASS})) { return pass_statement(); }
   if (match({token_type::KEYWORD_WHILE})) { return while_statement(); }
+  if (match({token_type::KEYWORD_FOR})) { return for_statement(); }
   if (match({token_type::KEYWORD_CONTINUE})) { return continue_statement(); }
   if (match({token_type::KEYWORD_BREAK})) { return break_statement(); }
   if (match({token_type::KEYWORD_RETURN})) { return return_statement(); }
@@ -475,6 +477,33 @@ stmt *parser::while_statement() {
   stmt *while_body = block_statement();
   control_flow_--;
   return pool_.c_while_stmt(while_keyword, exp, while_body);
+}
+stmt *parser::for_statement() {
+  control_flow_++;
+  auto for_keyword = previous();
+  if (check(token_type::COLON)) {// forendless_stmt -> FOR: block_stmt
+    stmt *for_body = block_statement();
+    control_flow_--;
+    return pool_.c_forendless_stmt(for_keyword, for_body);
+  } else if (
+      check(
+          token_type::
+              NAME)) {// foreach_stmt -> FOR name: datatype in array: block_stmt
+    auto name = consume(token_type::NAME, "Name must be present");
+    consume(token_type::COLON, "Colon must be present");
+    auto dt = parse_datatype();
+    auto in_k =
+        consume(token_type::KEYWORD_IN,
+                "in must follow the data type declaration in for each loop.");
+    auto for_source = expression();
+    auto for_body = block_statement();
+    control_flow_--;
+    return pool_.c_foreach_stmt(for_keyword, name, dt, in_k, for_source,
+                                for_body);
+  }
+  control_flow_--;
+  throw error(for_keyword, "invalid for loop");
+  return nullptr;
 }
 stmt *parser::continue_statement() {
   auto tok = previous();

@@ -6,6 +6,7 @@ namespace yaksha {
   struct statement_writer {
     virtual ~statement_writer() = default;
     virtual std::string temp() = 0;
+    virtual std::string temp(const std::string &custom_prefix) = 0;
     virtual void indent() = 0;
     virtual void dedent() = 0;
     virtual void write_statement(std::string code) = 0;

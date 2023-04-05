@@ -26,17 +26,17 @@ void yy__print_array(int32_t* yy__x)
     yk__printlnint(((intmax_t)yk__arrlen(yy__x)));
     int32_t yy__pos = INT32_C(0);
     int32_t yy__length = yk__arrlen(yy__x);
-    while (1) {
-        if (!((yy__pos < yy__length))) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        if ((! (((yy__pos < yy__length)))))
         {
-            yk__printint(((intmax_t)yy__x[yy__pos]));
-            yk__sds t__2 = yk__sdsnewlen(" ", 1);
-            yk__printstr((t__2));
-            yy__pos = (yy__pos + INT32_C(1));
-            yk__sdsfree(t__2);
+            break;
         }
+        yk__printint(((intmax_t)yy__x[yy__pos]));
+        yk__sds t__2 = yk__sdsnewlen(" ", 1);
+        yk__printstr((t__2));
+        yy__pos = (yy__pos + INT32_C(1));
+        yk__sdsfree(t__2);
     }
     yk__sds t__3 = yk__sdsempty();
     yk__printlnstr((t__3));

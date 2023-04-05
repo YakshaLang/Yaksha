@@ -29,6 +29,7 @@ namespace yaksha {
   struct break_stmt;
   struct ccode_stmt;
   struct class_stmt;
+  struct compins_stmt;
   struct const_stmt;
   struct continue_stmt;
   struct def_stmt;
@@ -36,6 +37,8 @@ namespace yaksha {
   struct del_stmt;
   struct elif_stmt;
   struct expression_stmt;
+  struct foreach_stmt;
+  struct forendless_stmt;
   struct if_stmt;
   struct import_stmt;
   struct let_stmt;
@@ -64,6 +67,7 @@ namespace yaksha {
     STMT_BREAK,
     STMT_CCODE,
     STMT_CLASS,
+    STMT_COMPINS,
     STMT_CONST,
     STMT_CONTINUE,
     STMT_DEF,
@@ -71,6 +75,8 @@ namespace yaksha {
     STMT_DEL,
     STMT_ELIF,
     STMT_EXPRESSION,
+    STMT_FOREACH,
+    STMT_FORENDLESS,
     STMT_IF,
     STMT_IMPORT,
     STMT_LET,
@@ -106,12 +112,15 @@ namespace yaksha {
     virtual void visit_break_stmt(break_stmt *obj) = 0;
     virtual void visit_ccode_stmt(ccode_stmt *obj) = 0;
     virtual void visit_class_stmt(class_stmt *obj) = 0;
+    virtual void visit_compins_stmt(compins_stmt *obj) = 0;
     virtual void visit_const_stmt(const_stmt *obj) = 0;
     virtual void visit_continue_stmt(continue_stmt *obj) = 0;
     virtual void visit_def_stmt(def_stmt *obj) = 0;
     virtual void visit_defer_stmt(defer_stmt *obj) = 0;
     virtual void visit_del_stmt(del_stmt *obj) = 0;
     virtual void visit_expression_stmt(expression_stmt *obj) = 0;
+    virtual void visit_foreach_stmt(foreach_stmt *obj) = 0;
+    virtual void visit_forendless_stmt(forendless_stmt *obj) = 0;
     virtual void visit_if_stmt(if_stmt *obj) = 0;
     virtual void visit_import_stmt(import_stmt *obj) = 0;
     virtual void visit_let_stmt(let_stmt *obj) = 0;
@@ -269,6 +278,17 @@ namespace yaksha {
     std::vector<parameter> members_;
     annotations annotations_;
   };
+  struct compins_stmt : stmt {
+    compins_stmt(token *name, ykdatatype *data_type, token *meta1,
+                 ykdatatype *meta2, void *meta3);
+    void accept(stmt_visitor *v) override;
+    ast_type get_type() override;
+    token *name_;
+    ykdatatype *data_type_;
+    token *meta1_;
+    ykdatatype *meta2_;
+    void *meta3_;
+  };
   struct const_stmt : stmt {
     const_stmt(token *name, ykdatatype *data_type, expr *expression);
     void accept(stmt_visitor *v) override;
@@ -322,6 +342,25 @@ namespace yaksha {
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     expr *expression_;
+  };
+  struct foreach_stmt : stmt {
+    foreach_stmt(token *for_keyword, token *name, ykdatatype *data_type,
+                 token *in_keyword, expr *expression, stmt *for_body);
+    void accept(stmt_visitor *v) override;
+    ast_type get_type() override;
+    token *for_keyword_;
+    token *name_;
+    ykdatatype *data_type_;
+    token *in_keyword_;
+    expr *expression_;
+    stmt *for_body_;
+  };
+  struct forendless_stmt : stmt {
+    forendless_stmt(token *for_keyword, stmt *for_body);
+    void accept(stmt_visitor *v) override;
+    ast_type get_type() override;
+    token *for_keyword_;
+    stmt *for_body_;
   };
   struct if_stmt : stmt {
     if_stmt(token *if_keyword, expr *expression, stmt *if_branch,
@@ -416,6 +455,8 @@ namespace yaksha {
     stmt *c_ccode_stmt(token *ccode_keyword, token *code_str);
     stmt *c_class_stmt(token *name, std::vector<parameter> members,
                        annotations annotations);
+    stmt *c_compins_stmt(token *name, ykdatatype *data_type, token *meta1,
+                         ykdatatype *meta2, void *meta3);
     stmt *c_const_stmt(token *name, ykdatatype *data_type, expr *expression);
     stmt *c_continue_stmt(token *continue_token);
     stmt *c_def_stmt(token *name, std::vector<parameter> params,
@@ -426,6 +467,9 @@ namespace yaksha {
     stmt *c_del_stmt(token *del_keyword, expr *expression);
     stmt *c_elif_stmt(token *elif_keyword, expr *expression, stmt *elif_branch);
     stmt *c_expression_stmt(expr *expression);
+    stmt *c_foreach_stmt(token *for_keyword, token *name, ykdatatype *data_type,
+                         token *in_keyword, expr *expression, stmt *for_body);
+    stmt *c_forendless_stmt(token *for_keyword, stmt *for_body);
     stmt *c_if_stmt(token *if_keyword, expr *expression, stmt *if_branch,
                     token *else_keyword, stmt *else_branch);
     stmt *c_import_stmt(token *import_token, std::vector<token *> import_names,

@@ -5,10 +5,9 @@
 using namespace yaksha;
 compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
                    entry_struct_func_compiler *esc)
-    : defs_classes_(defs_classes), scope_(pool), dt_pool(pool), builtins_(pool),
-      esc_(esc) {
-  ast_pool_ = new ast_pool();
-}
+    : defs_classes_(defs_classes), scope_(pool), dt_pool_(pool),
+      builtins_(pool), ast_pool_(new ast_pool()), esc_(esc),
+      desugar_(new desugaring_compiler{ast_pool_, dt_pool_}) {}
 compiler::~compiler() { delete ast_pool_; }
 void compiler::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
@@ -72,25 +71,25 @@ void compiler::visit_binary_expr(binary_expr *obj) {
     // both null
     if (lhs.second.datatype_->is_none() && rhs.second.datatype_->is_none()) {
       if (operator_type == token_type::EQ_EQ) {
-        push("true", ykobject(dt_pool->create("bool")));// None == None -> True
+        push("true", ykobject(dt_pool_->create("bool")));// None == None -> True
       } else {
         push("false",
-             ykobject(dt_pool->create("bool")));// None != None -> False
+             ykobject(dt_pool_->create("bool")));// None != None -> False
       }
     } else if (lhs.second.datatype_->is_none()) {
       push("(NULL " + obj->opr_->token_ + " " + rhs.first + ")",
-           ykobject(dt_pool->create("bool")));
+           ykobject(dt_pool_->create("bool")));
     } else {
       push("(" + lhs.first + " " + obj->opr_->token_ + " NULL)",
-           ykobject(dt_pool->create("bool")));
+           ykobject(dt_pool_->create("bool")));
     }
   } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_str()) {
     if (obj->opr_->type_ == token_type::EQ_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") == 0)",
-           ykobject(dt_pool->create("bool")));
+           ykobject(dt_pool_->create("bool")));
     } else if (obj->opr_->type_ == token_type::NOT_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") != 0)",
-           ykobject(dt_pool->create("bool")));
+           ykobject(dt_pool_->create("bool")));
     } else {// String concat using + operator
       // new temp needs to be created
       auto temporary_string = temp();
@@ -120,7 +119,7 @@ void compiler::visit_binary_expr(binary_expr *obj) {
              operator_type == token_type::NOT_EQ ||
              operator_type == token_type::EQ_EQ) {
     push("(" + lhs.first + " " + obj->opr_->token_ + " " + rhs.first + ")",
-         ykobject(dt_pool->create("bool")));
+         ykobject(dt_pool_->create("bool")));
   } else {// Other number stuff
     push("(" + lhs.first + " " + obj->opr_->token_ + " " + rhs.first + ")",
          data_type);
@@ -148,7 +147,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
         }
       } else {
         args.emplace_back(
-            std::pair<std::string, ykobject>{"", ykobject(dt_pool)});
+            std::pair<std::string, ykobject>{"", ykobject(dt_pool_)});
       }
       i++;
     }
@@ -166,7 +165,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     }
     auto prefixed_class_name = prefix(module_class, module_prefix);
     compile_obj_creation(prefixed_class_name, code,
-                         dt_pool->create(module_class, module_file));
+                         dt_pool_->create(module_class, module_file));
   } else if (name_pair.second.object_type_ == object_type::MODULE_FUNCTION) {
     auto module_file = name_pair.second.module_file_;
     auto module_fn = name_pair.second.string_val_;
@@ -186,12 +185,12 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
       error(obj->paren_token_, "Cannot construct an @onstack object");
     }
     compile_obj_creation(prefix(name, prefix_val_), code,
-                         dt_pool->create(name));
+                         dt_pool_->create(name));
   } else if (name_pair.second.datatype_->is_function()) {
     auto ret_type = name_pair.second.datatype_->args_[1];
     ykdatatype *return_type;
     if (ret_type->args_.empty()) {
-      return_type = dt_pool->create("None");
+      return_type = dt_pool_->create("None");
     } else {
       return_type = ret_type->args_[0];
     }
@@ -332,7 +331,7 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     if (obj->literal_token_->token_.empty()) {
       body_ << " = yk__sdsempty()";
     } else {
-      std::string unescaped =
+      const std::string unescaped =
           string_utils::unescape(obj->literal_token_->token_);
       body_ << " = yk__sdsnewlen(\"" << string_utils::escape(unescaped)
             << "\", " << unescaped.size() << ")";
@@ -340,76 +339,76 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
     push(temp_name, ykobject(std::string{"str"},
-                             dt_pool));// Note: dummy value for ykobject
+                             dt_pool_));// Note: dummy value for ykobject
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_TRUE) {
-    push("true", ykobject(dt_pool->create("bool")));
+    push("true", ykobject(dt_pool_->create("bool")));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_FALSE) {
-    push("false", ykobject(dt_pool->create("bool")));
+    push("false", ykobject(dt_pool_->create("bool")));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_NONE) {
-    push("NULL", ykobject(dt_pool));
+    push("NULL", ykobject(dt_pool_));
   } else if (data_type_tok == token_type::INTEGER_BIN ||
              data_type_tok == token_type::INTEGER_DECIMAL ||
              data_type_tok == token_type::INTEGER_OCT ||
              data_type_tok == token_type::INTEGER_HEX) {
     push("INT32_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool->create("int")));
+         ykobject(dt_pool_->create("int")));
   } else if (data_type_tok == token_type::INTEGER_BIN_8 ||
              data_type_tok == token_type::INTEGER_DECIMAL_8 ||
              data_type_tok == token_type::INTEGER_OCT_8 ||
              data_type_tok == token_type::INTEGER_HEX_8) {
     push("INT8_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool->create("i8")));
+         ykobject(dt_pool_->create("i8")));
   } else if (data_type_tok == token_type::INTEGER_BIN_16 ||
              data_type_tok == token_type::INTEGER_DECIMAL_16 ||
              data_type_tok == token_type::INTEGER_OCT_16 ||
              data_type_tok == token_type::INTEGER_HEX_16) {
     push("INT16_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool->create("i16")));
+         ykobject(dt_pool_->create("i16")));
   } else if (data_type_tok == token_type::INTEGER_BIN_64 ||
              data_type_tok == token_type::INTEGER_DECIMAL_64 ||
              data_type_tok == token_type::INTEGER_OCT_64 ||
              data_type_tok == token_type::INTEGER_HEX_64) {
     push("INT64_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool->create("i64")));
+         ykobject(dt_pool_->create("i64")));
   } else if (data_type_tok == token_type::UINTEGER_BIN ||
              data_type_tok == token_type::UINTEGER_DECIMAL ||
              data_type_tok == token_type::UINTEGER_OCT ||
              data_type_tok == token_type::UINTEGER_HEX) {
     push("UINT32_C(" +
              conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
-         ykobject(dt_pool->create("u32")));
+         ykobject(dt_pool_->create("u32")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_8 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_8 ||
              data_type_tok == token_type::UINTEGER_OCT_8 ||
              data_type_tok == token_type::UINTEGER_HEX_8) {
     push("UINT8_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool->create("i8")));
+         ykobject(dt_pool_->create("i8")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_16 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_16 ||
              data_type_tok == token_type::UINTEGER_OCT_16 ||
              data_type_tok == token_type::UINTEGER_HEX_16) {
     push("UINT16_C(" +
              conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
-         ykobject(dt_pool->create("i16")));
+         ykobject(dt_pool_->create("i16")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_64 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_64 ||
              data_type_tok == token_type::UINTEGER_OCT_64 ||
              data_type_tok == token_type::UINTEGER_HEX_64) {
     push("UINT64_C(" +
              conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
-         ykobject(dt_pool->create("i64")));
+         ykobject(dt_pool_->create("i64")));
   } else if (data_type_tok == token_type::FLOAT_NUMBER) {
-    push(obj->literal_token_->token_, ykobject(dt_pool->create("float")));
+    push(obj->literal_token_->token_, ykobject(dt_pool_->create("float")));
   } else if (data_type_tok == token_type::DOUBLE_NUMBER) {
-    push(obj->literal_token_->token_, ykobject(dt_pool->create("f64")));
+    push(obj->literal_token_->token_, ykobject(dt_pool_->create("f64")));
   } else {
     error(obj->literal_token_, "Failed to compile literal");
-    push("<><>", ykobject(dt_pool));
+    push("<><>", ykobject(dt_pool_));
   }
 }
 void compiler::visit_logical_expr(logical_expr *obj) {
@@ -424,7 +423,7 @@ void compiler::visit_logical_expr(logical_expr *obj) {
     operator_token = " || ";
   }
   push("(" + lhs.first + operator_token + rhs.first + ")",
-       ykobject(true, dt_pool));
+       ykobject(true, dt_pool_));
 }
 void compiler::visit_unary_expr(unary_expr *obj) {
   // Note: this is not supported by strings only numbers/floats
@@ -439,18 +438,18 @@ void compiler::visit_variable_expr(variable_expr *obj) {
   // Compiler is visiting a variable, can get data type from scope_
   auto name = prefix(obj->name_->token_, prefix_val_);
   if (builtins_.has_builtin(obj->name_->token_)) {
-    auto b = ykobject(dt_pool);
+    auto b = ykobject(dt_pool_);
     b.object_type_ = object_type::BUILTIN_FUNCTION;
     push(obj->name_->token_, b);
     return;
   } else if (defs_classes_.has_function(obj->name_->token_)) {
-    auto b = ykobject(dt_pool);
+    auto b = ykobject(dt_pool_);
     b.object_type_ = object_type::FUNCTION;
     b.string_val_ = obj->name_->token_;
     push(obj->name_->token_, b);
     return;
   } else if (defs_classes_.has_class(obj->name_->token_)) {
-    auto b = ykobject(dt_pool);
+    auto b = ykobject(dt_pool_);
     b.object_type_ = object_type::CLASS_ITSELF;
     push(obj->name_->token_, b);
     return;
@@ -582,7 +581,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   // Create code body
   // ::================================::
   // Define parameters in nested scope for function
-  ykobject func_placeholder{dt_pool};
+  ykobject func_placeholder{dt_pool_};
   func_placeholder.object_type_ = object_type::FUNCTION;
   scope_.define_global(name, func_placeholder);
   scope_.push();
@@ -658,9 +657,9 @@ void compiler::visit_if_stmt(if_stmt *obj) {
 }
 void compiler::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_, prefix_val_);
-  auto object = ykobject(dt_pool);
+  auto object = ykobject(dt_pool_);
   if (obj->data_type_->is_str()) {
-    object = ykobject(std::string("str"), dt_pool);
+    object = ykobject(std::string("str"), dt_pool_);
     if (obj->expression_ != nullptr) {
       obj->expression_->accept(this);
       auto exp = pop();
@@ -745,32 +744,22 @@ void compiler::visit_return_stmt(return_stmt *obj) {
   }
 }
 void compiler::visit_while_stmt(while_stmt *obj) {
-  //  while (1) {
-  //    if (!((yy__a > 0))) { break; } // expression
-  //    { // block
-  //    }
-  //  }
-  write_indent(body_);
-  body_ << "while (1) {\n";
+  // NOTE: desugar compiler rewrites all loops to
+  // while True|False:
+  //    if not expr:
+  //        break
+  //    rest of the stuff
   obj->expression_->accept(this);
   auto code = pop();
+  write_indent(body_);
+  body_ << "while (" << code.first << ")";
   push_scope_type(ast_type::STMT_WHILE);
   scope_.push();
   deletions_.push_delete_stack(ast_type::STMT_WHILE);
   defers_.push_defer_stack(ast_type::STMT_WHILE);
   indent();
-  indent();
-  write_prev_indent(body_);
-  // TODO if we allocate memory expression we need to free it.
-  // TODO Extra string objects need to be freed here.
-  body_ << "if (!(" << code.first << ")) { break; } // Check\n";
-  write_prev_indent(body_);
-  body_ << "// Body of while loop\n";
   obj->while_body_->accept(this);
   dedent();
-  dedent();
-  write_indent(body_);
-  body_ << "}\n";
   pop_scope_type();
   scope_.pop();
   defers_.pop_defer_stack();
@@ -788,6 +777,13 @@ void compiler::dedent() {
 std::string compiler::temp() {
   // temp names will start with t__, so they will look like t__0, t__1, ...
   std::string name = "t__";
+  name += std::to_string(temp_);
+  temp_++;
+  return name;
+}
+std::string compiler::temp(const std::string &custom_prefix) {
+  // temp names will start with prefix, so they will look like prefix0, prefix1, ...
+  std::string name = custom_prefix;
   name += std::to_string(temp_);
   temp_++;
   return name;
@@ -844,9 +840,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     if (class_info != nullptr) {
       auto class_name = prefix(dt, imported_module_prefix);
       if (class_info->annotations_.native_define_) { return class_name; }
-      if (class_info->annotations_.on_stack_) {
-        return "struct " + class_name;
-      }
+      if (class_info->annotations_.on_stack_) { return "struct " + class_name; }
       return "struct " + class_name + "*";
     }
   }
@@ -854,16 +848,10 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   return "<data type unknown>";
 }
 compiler_output compiler::compile(codefiles *cf, file_info *fi) {
+  // ------ Set to members for ease of access ---------
   this->cf_ = cf;
   this->prefix_val_ = fi->prefix_;
-  for (const auto &name : this->defs_classes_.class_names_) {
-    auto cls = defs_classes_.get_class(name);
-    if (!cls->annotations_.native_define_) {
-      struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
-                                   << ";\n";
-    }
-  }
-  // Define globals
+  // -------- Define forward declarations ---------------
   for (const auto &name : this->defs_classes_.global_const_names_) {
     auto cls = defs_classes_.get_const(name);
     auto obj = ykobject(cls->data_type_);
@@ -875,17 +863,30 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
     scope_.define_global(prefix(cls->name_->token_, prefix_val_), obj);
   }
   for (auto imp_st : fi->data_->parser_->import_stmts_) {
-    auto obj = ykobject(dt_pool);
+    auto obj = ykobject(dt_pool_);
     obj.object_type_ = yaksha::object_type::MODULE;
     obj.string_val_ = imp_st->data_->filepath_.string();
     obj.module_file_ = imp_st->data_->filepath_.string();
     obj.module_name_ = imp_st->name_->token_;
     scope_.define_global(prefix(imp_st->name_->token_, prefix_val_), obj);
   }
-  // Create a copy of import information
+  // ---------- Create a copy of import information -------------
   import_stmts_alias_ = fi->data_->parser_->import_stmts_alias_;
   filepath_ = fi->filepath_.string();
-  for (auto st : fi->data_->parser_->stmts_) { st->accept(this); }
+  //
+  // ----- Compile structure forward declarations ------
+  for (const auto &name : this->defs_classes_.class_names_) {
+    auto cls = defs_classes_.get_class(name);
+    if (!cls->annotations_.native_define_) {
+      struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
+                                   << ";\n";
+    }
+  }
+  // -------- Desugar statements -------------------
+  auto desugared = desugar_->desugar(fi->data_->parser_->stmts_, this);
+  // ------- Compile statements ---------------------
+  for (auto st : desugared) { st->accept(this); }
+  // ---------- Produce result object -------------
   return {struct_forward_declarations_.str(),
           function_forward_declarations_.str(),
           classes_.str(),
@@ -987,7 +988,7 @@ void compiler::visit_get_expr(get_expr *obj) {
     bool has_const = imported->data_->dsv_->has_const(member_item->token_);
     bool has_native_const =
         imported->data_->dsv_->has_native_const(member_item->token_);
-    auto mod_obj = ykobject(dt_pool);
+    auto mod_obj = ykobject(dt_pool_);
     if (has_class) {
       mod_obj.object_type_ = object_type::MODULE_CLASS;
       /* for jungle.Banana */
@@ -1040,7 +1041,7 @@ void compiler::visit_get_expr(get_expr *obj) {
   if (class_->annotations_.on_stack_) { access_ = "."; }
   for (const auto &member : class_->members_) {
     if (item == member.name_->token_) {
-      auto placeholder = ykobject(dt_pool);
+      auto placeholder = ykobject(dt_pool_);
       placeholder.datatype_ = member.data_type_;
       push(lhs.first + access_ + prefix(item, item_prefix), placeholder);
       return;
@@ -1064,7 +1065,7 @@ void compiler::visit_set_expr(set_expr *obj) {
   if (class_->annotations_.on_stack_) { access_ = "."; }
   for (const auto &member : class_->members_) {
     if (item == member.name_->token_) {
-      auto placeholder = ykobject(dt_pool);
+      auto placeholder = ykobject(dt_pool_);
       placeholder.datatype_ = member.data_type_;
       push(lhs.first + access_ + prefix(item, item_prefix), placeholder);
       return;
@@ -1095,7 +1096,7 @@ void compiler::visit_square_bracket_access_expr(
     push(lhs.first + ".e" + std::to_string(index), b);
   } else {
     error(obj->sqb_token_, "Failed to compile [] access");
-    push("<><>", ykobject(dt_pool));
+    push("<><>", ykobject(dt_pool_));
   }
 }
 void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
@@ -1114,7 +1115,7 @@ void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
     push(lhs.first + ".e" + std::to_string(index), b);
   } else {
     error(obj->sqb_token_, "Failed to compile [] set");
-    push("<><>", ykobject(dt_pool));
+    push("<><>", ykobject(dt_pool_));
   }
 }
 void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
@@ -1176,9 +1177,9 @@ ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
       funct->annotations_.native_define_) {
     return nullptr;
   }
-  ykdatatype *fnc = dt_pool->create("Function");
-  ykdatatype *fin = dt_pool->create("In");
-  ykdatatype *fout = dt_pool->create("Out");
+  ykdatatype *fnc = dt_pool_->create("Function");
+  ykdatatype *fin = dt_pool_->create("In");
+  ykdatatype *fout = dt_pool_->create("Out");
   fnc->args_.emplace_back(fin);
   fnc->args_.emplace_back(fout);
   for (auto current_param : funct->params_) {
@@ -1215,4 +1216,19 @@ void compiler::error(const std::string &message) {
   auto err = parsing_error{message, "", 0, 0};
   err.token_set_ = false;
   errors_.emplace_back(err);
+}
+void compiler::visit_foreach_stmt(foreach_stmt *obj) {
+  // Not supported directly by compiler
+}
+void compiler::visit_forendless_stmt(forendless_stmt *obj) {
+  // Not supported directly by compiler
+}
+std::string compiler::prefix_token(token *pToken) {
+  return ::prefix(pToken->token_, prefix_val_);
+}
+void compiler::visit_compins_stmt(compins_stmt *obj) {
+  // Add given item to scope
+  auto name = prefix(obj->name_->token_, prefix_val_);
+  auto object = ykobject(obj->data_type_);
+  scope_.define(name, object);
 }

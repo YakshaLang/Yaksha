@@ -7,6 +7,7 @@
 #include "builtins/builtins.h"
 #include "compiler/compiler_utils.h"
 #include "compiler/delete_stack_stack.h"
+#include "compiler/desugaring_compiler.h"
 #include "compiler/function_datatype_extractor.h"
 #include "compiler/statement_writer.h"
 #include "datatype_compiler.h"
@@ -22,7 +23,7 @@ namespace yaksha {
     std::string classes_{};
     std::string body_{};
     std::string global_constants_{};
-    std::vector<parsing_error> errors_;
+    std::vector<parsing_error> errors_{};
   };
   struct compiler : expr_visitor,
                     stmt_visitor,
@@ -77,6 +78,7 @@ namespace yaksha {
      * @return unique temp variable name
      */
     std::string temp() override;
+    std::string temp(const std::string &custom_prefix) override;
     /**
      * Write a statement to code body (in current function)
      */
@@ -87,6 +89,10 @@ namespace yaksha {
     void write_statement_no_end(std::string code_line) override;
     void indent() override;
     void dedent() override;
+    void visit_foreach_stmt(foreach_stmt *obj) override;
+    void visit_forendless_stmt(forendless_stmt *obj) override;
+    std::string prefix_token(token *pToken);
+    void visit_compins_stmt(compins_stmt *obj) override;
 
 private:
     void push_scope_type(ast_type scope_type);
@@ -134,9 +140,11 @@ private:
     // Defer stack
     defer_stack_stack defers_{};
     // Data type pool
-    ykdt_pool *dt_pool;
+    ykdt_pool *dt_pool_;
     // AST pool
     ast_pool *ast_pool_;
+    // Desugaring compiler
+    desugaring_compiler *desugar_;
     // Entry struct & function datatypes compiler
     entry_struct_func_compiler *esc_;
     // Copy of internal stmt_alias to handle dt parsing in builtins

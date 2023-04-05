@@ -1,0 +1,8 @@
+def main() -> int:
+    c: int = 0
+    for:
+        if c == 2:
+            break
+        println(1)
+        c += 1
+    return 0

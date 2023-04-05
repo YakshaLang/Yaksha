@@ -32,6 +32,7 @@
 #include "viz_main.cpp"
 #undef main
 #undef PROGRAM_NAME
+// -------- Yaksha C API ---------
 extern "C" {
 struct yk_compile_result {
   char *output;
@@ -65,7 +66,9 @@ void display_banner() {
                "\n";
 }
 };
+// ------ End of Yaksha C API --------
 #ifndef YK_CPP_NO_MAIN
+// --- Main ---
 void display_help() {
   std::cout << "Usage:\n\n";
   std::cout << "yaksha compile file_path.yaka [libs_path]\n";
@@ -85,7 +88,7 @@ int main(int argc, char *argv[]) {
     display_help();
     return EXIT_FAILURE;
   }
-  std::string first_arg{argv[1]};
+  const std::string first_arg{argv[1]};
   if (first_arg == "compile") { return compiler_main(argc - 1, &argv[1]); }
   if (first_arg == "reload") { return reloader_main(argc - 1, &argv[1]); }
   if (first_arg == "viz") { return viz_main(argc - 1, &argv[1]); }

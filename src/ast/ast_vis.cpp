@@ -311,3 +311,18 @@ void ast_vis::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
         << "<br />";
   end_block();
 }
+void ast_vis::visit_foreach_stmt(foreach_stmt *obj) {
+  begin_block("for");
+  field("let", obj->name_->token_);
+  field("condition", obj->expression_);
+  text_ << "\n<br />";
+  field("body", obj->for_body_);
+  end_block();
+}
+void ast_vis::visit_forendless_stmt(forendless_stmt *obj) {
+  begin_block("for");
+  text_ << "\n<br />";
+  field("body", obj->for_body_);
+  end_block();
+}
+void ast_vis::visit_compins_stmt(compins_stmt *obj) {}

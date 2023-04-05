@@ -199,27 +199,23 @@ int32_t yy__eval(yy__mpc_Ast yy__t)
     yk__sds yy__op = yk__sdsdup((t__11));
     int32_t yy__x = yy__eval(yy__t->children[INT32_C(2)]);
     int32_t yy__i = INT32_C(3);
-    while (1) {
-        if (!(true)) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        yk__sds t__12 = yy__strings_from_cstr(yy__t->children[yy__i]->tag);
+        yk__sds t__13 = yk__sdsnewlen("expr", 4);
+        if (yy__strings_startswith(yk__sdsdup((t__12)), yk__sdsdup(t__13)))
         {
-            yk__sds t__12 = yy__strings_from_cstr(yy__t->children[yy__i]->tag);
-            yk__sds t__13 = yk__sdsnewlen("expr", 4);
-            if (yy__strings_startswith(yk__sdsdup((t__12)), yk__sdsdup(t__13)))
-            {
-                yy__x = yy__eval_op(yy__x, yk__sdsdup(yy__op), yy__eval(yy__t->children[yy__i]));
-                yy__i = (yy__i + INT32_C(1));
-            }
-            else
-            {
-                yk__sdsfree(t__13);
-                yk__sdsfree(t__12);
-                break;
-            }
+            yy__x = yy__eval_op(yy__x, yk__sdsdup(yy__op), yy__eval(yy__t->children[yy__i]));
+            yy__i = (yy__i + INT32_C(1));
+        }
+        else
+        {
             yk__sdsfree(t__13);
             yk__sdsfree(t__12);
+            break;
         }
+        yk__sdsfree(t__13);
+        yk__sdsfree(t__12);
     }
     int32_t t__14 = yy__x;
     yk__sdsfree(yy__op);
@@ -248,53 +244,49 @@ int32_t yy__main()
     yk__sds t__22 = yk__sdsnewlen("<stdin>", 7);
     yk__sds yy__filename = yk__sdsdup(t__22);
     yy__mpc_Result yy__r = yy__mpc_new_result();
-    while (1) {
-        if (!(true)) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        yk__sds t__23 = yk__sdsnewlen("lispy> ", 7);
+        yk__sds t__24 = yy__io_readline(yk__sdsdup(t__23));
+        yk__sds yy__inp = yk__sdsdup((t__24));
+        yk__sds t__25 = yk__sdsnewlen("q", 1);
+        if ((yk__sdscmp(yy__inp , t__25) == 0))
         {
-            yk__sds t__23 = yk__sdsnewlen("lispy> ", 7);
-            yk__sds t__24 = yy__io_readline(yk__sdsdup(t__23));
-            yk__sds yy__inp = yk__sdsdup((t__24));
-            yk__sds t__25 = yk__sdsnewlen("q", 1);
-            if ((yk__sdscmp(yy__inp , t__25) == 0))
-            {
-                free(yy__r);
-                free(yy__lispy);
-                free(yy__expr);
-                free(yy__operator);
-                free(yy__number);
-                yk__sdsfree(t__25);
-                yk__sdsfree(yy__inp);
-                yk__sdsfree(t__24);
-                yk__sdsfree(t__23);
-                yk__sdsfree(yy__filename);
-                yk__sdsfree(t__22);
-                yk__sdsfree(t__21);
-                yk__sdsfree(t__20);
-                yk__sdsfree(yy__lang);
-                yk__sdsfree(t__19);
-                yk__sdsfree(t__18);
-                yk__sdsfree(t__17);
-                yk__sdsfree(t__16);
-                yk__sdsfree(t__15);
-                return INT32_C(0);
-            }
-            if (yy__mpc_parse(yk__sdsdup(yy__filename), yk__sdsdup(yy__inp), yy__lispy, yy__r))
-            {
-                yk__printlnint(((intmax_t)yy__eval(yy__r->output)));
-                yy__mpc_ast_del(yy__r);
-            }
-            else
-            {
-                yy__mpc_err_print(yy__r);
-                yy__mpc_err_del(yy__r);
-            }
+            free(yy__r);
+            free(yy__lispy);
+            free(yy__expr);
+            free(yy__operator);
+            free(yy__number);
             yk__sdsfree(t__25);
             yk__sdsfree(yy__inp);
             yk__sdsfree(t__24);
             yk__sdsfree(t__23);
+            yk__sdsfree(yy__filename);
+            yk__sdsfree(t__22);
+            yk__sdsfree(t__21);
+            yk__sdsfree(t__20);
+            yk__sdsfree(yy__lang);
+            yk__sdsfree(t__19);
+            yk__sdsfree(t__18);
+            yk__sdsfree(t__17);
+            yk__sdsfree(t__16);
+            yk__sdsfree(t__15);
+            return INT32_C(0);
         }
+        if (yy__mpc_parse(yk__sdsdup(yy__filename), yk__sdsdup(yy__inp), yy__lispy, yy__r))
+        {
+            yk__printlnint(((intmax_t)yy__eval(yy__r->output)));
+            yy__mpc_ast_del(yy__r);
+        }
+        else
+        {
+            yy__mpc_err_print(yy__r);
+            yy__mpc_err_del(yy__r);
+        }
+        yk__sdsfree(t__25);
+        yk__sdsfree(yy__inp);
+        yk__sdsfree(t__24);
+        yk__sdsfree(t__23);
     }
     yy__mpc_cleanup(INT32_C(4), yy__number, yy__operator, yy__expr, yy__lispy);
     yk__sds t__26 = yk__sdsnewlen(">>>bye!\n", 8);

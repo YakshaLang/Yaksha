@@ -1109,8 +1109,7 @@ struct builtin_iif : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "iif() builtin expects 3 arguments";
-    } else if (!(args[0].datatype_->is_bool() ||
-                 args[0].datatype_->is_const_bool())) {
+    } else if (!(args[0].datatype_->is_bool_or_const_bool())) {
       o.string_val_ = "First argument to iif() must be a bool";
     } else if (*args[1].datatype_ != *args[2].datatype_) {
       o.string_val_ = "Second and third argument to iif() must be of same type";

@@ -56,6 +56,7 @@ private:
     stmt *del_statement_base();
     stmt *if_statement();
     stmt *while_statement();
+    stmt *for_statement();
     stmt *block_statement();
     stmt *pass_statement();
     stmt *ccode_statement();

@@ -37,16 +37,16 @@ int32_t yy__main()
     yk__sds t__2 = yk__sdsnewlen("hello", 5);
     yk__sds yy__hello = yk__sdsdup(t__2);
     int32_t yy__i = INT32_C(5);
-    while (1) {
-        if (!((yy__i > INT32_C(0)))) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        if ((! (((yy__i > INT32_C(0))))))
         {
-            yy__world1((&(yy__hello)));
-            yy__world2((&(yy__hello)));
-            yy__world3(((&(yy__hello))));
-            yy__i = (yy__i - INT32_C(1));
+            break;
         }
+        yy__world1((&(yy__hello)));
+        yy__world2((&(yy__hello)));
+        yy__world3(((&(yy__hello))));
+        yy__i = (yy__i - INT32_C(1));
     }
     yk__printlnstr(((yy__my_empty != NULL)) ? "True" : "False");
     yy__world1((&(yy__my_empty)));

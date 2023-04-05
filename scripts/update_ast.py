@@ -61,6 +61,15 @@ STMTS = sorted([
     ("elif", (("token*", "elif_keyword"), ("expr*", "expression"), ("stmt*", "elif_branch"))),
     # While loop just got a condition and a body
     ("while", (("token*", "while_keyword"), ("expr*", "expression"), ("stmt*", "while_body"),)),
+    # For loop
+    # for x: int in expr:
+    #     println(x)
+    ("foreach", (("token*", "for_keyword"), ("token*", "name"), ("ykdatatype*", "data_type"),
+                 ("token*", "in_keyword"), ("expr*", "expression"), ("stmt*", "for_body"),)),
+    # For loop - endless loop
+    # for:
+    #     println("endless")
+    ("forendless", (("token*", "for_keyword"), ("stmt*", "for_body"),)),
     # Block -> COLON, NEW_LINE, STATEMENTS+
     ("block", (("std::vector<stmt*>", "statements"),)),
     # Pass statement is needed to allow for empty blocks
@@ -84,8 +93,14 @@ STMTS = sorted([
     # import io [as io]
     ("import", (("token*", "import_token"), ("std::vector<token*>", "import_names"),
                 ("token*", "name"), ("file_info*", "data"))),
+    # --------------------- Special instructions in code -----------------
     # runtimefeature statement
-    ("runtimefeature", (("token*", "runtimefeature_token"), ("token*", "feature")))
+    ("runtimefeature", (("token*", "runtimefeature_token"), ("token*", "feature"))),
+    # ------------ Hidden special instructions for compiler --------------
+    ("compins", (
+        ("token*", "name"), ("ykdatatype*", "data_type"), ("token*", "meta1"), ("ykdatatype*", "meta2"),
+        ("void*", "meta3"))
+     )
 ], key=lambda x: x[0])
 
 # EXPR CODE GEN

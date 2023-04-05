@@ -229,3 +229,6 @@ def_class_visitor::get_native_const(const std::string &prefixed_name) {
   }
   return nullptr;
 }
+void def_class_visitor::visit_foreach_stmt(foreach_stmt *obj) {}
+void def_class_visitor::visit_forendless_stmt(forendless_stmt *obj) {}
+void def_class_visitor::visit_compins_stmt(compins_stmt *obj) {}

@@ -205,3 +205,18 @@ void ast_printer::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
                string_utils::unescape(obj->feature_->token_))
         << ")";
 }
+void ast_printer::visit_foreach_stmt(foreach_stmt *obj) {
+  text_ << "(for " << obj->name_->token_;
+  text_ << ":" << obj->data_type_->as_string() << " ";
+  parenthesize("expr", {obj->expression_});
+  text_ << " do ";
+  obj->for_body_->accept(this);
+  text_ << ")";
+}
+void ast_printer::visit_forendless_stmt(forendless_stmt *obj) {
+  text_ << "(for ";
+  text_ << " do ";
+  obj->for_body_->accept(this);
+  text_ << ")";
+}
+void ast_printer::visit_compins_stmt(compins_stmt *obj) {}

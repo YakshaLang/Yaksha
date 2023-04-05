@@ -13,14 +13,14 @@ int32_t yy__main()
     int32_t yy__count = yk__arrlen(yy__a);
     yk__sds t__1 = yk__sdsnewlen("Printing garbage int values", 27);
     yk__printlnstr((t__1));
-    while (1) {
-        if (!((yy__pos < yy__count))) { break; } // Check
-        // Body of while loop
-
+    while (true)
+    {
+        if ((! (((yy__pos < yy__count)))))
         {
-            yk__printlnint(((intmax_t)yy__a[yy__pos]));
-            yy__pos = (yy__pos + INT32_C(1));
+            break;
         }
+        yk__printlnint(((intmax_t)yy__a[yy__pos]));
+        yy__pos = (yy__pos + INT32_C(1));
     }
     yk__sds t__2 = yk__sdsnewlen("Success", 7);
     yk__printlnstr((t__2));

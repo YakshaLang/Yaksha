@@ -317,8 +317,8 @@ void type_checker::visit_logical_expr(logical_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
-  if (!(lhs.is_primitive_or_obj() && lhs.datatype_->is_bool() &&
-        rhs.is_primitive_or_obj() && rhs.datatype_->is_bool())) {
+  if (!(lhs.is_primitive_or_obj() && lhs.datatype_->is_bool_or_const_bool() &&
+        rhs.is_primitive_or_obj() && rhs.datatype_->is_bool_or_const_bool())) {
     error(obj->opr_, "Both LHS and RHS of logical"
                      " operator need to be boolean");
   }
@@ -329,9 +329,10 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
   obj->right_->accept(this);
   auto rhs = pop();
   if (rhs.is_primitive_or_obj() &&
-      (rhs.datatype_->is_a_number() || rhs.datatype_->is_bool())) {
+      (rhs.datatype_->is_a_number_or_const_number() ||
+       rhs.datatype_->is_bool_or_const_bool())) {
     if (obj->opr_->type_ == token_type::KEYWORD_NOT &&
-        !rhs.datatype_->is_bool()) {
+        !rhs.datatype_->is_bool_or_const_bool()) {
       error(obj->opr_,
             "Invalid unary operation. Not operator must follow a boolean.");
     } else if (obj->opr_->type_ == token_type::TILDE &&
@@ -442,7 +443,7 @@ void type_checker::visit_if_stmt(if_stmt *obj) {
   obj->expression_->accept(this);
   auto bool_expression = pop();
   if (!bool_expression.is_primitive_or_obj() ||
-      !bool_expression.datatype_->is_bool()) {
+      !bool_expression.datatype_->is_bool_or_const_bool()) {
     error(obj->if_keyword_, "Invalid boolean expression used");
   }
   scope_.push();
@@ -488,7 +489,7 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
 void type_checker::visit_while_stmt(while_stmt *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
-  if (!exp.is_primitive_or_obj() || !exp.datatype_->is_bool()) {
+  if (!exp.is_primitive_or_obj() || !exp.datatype_->is_bool_or_const_bool()) {
     error(obj->while_keyword_,
           "While statement expression need to be a boolean");
   }
@@ -845,3 +846,36 @@ ykdatatype *type_checker::function_to_datatype(const ykobject &arg) {
 }
 void type_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
 void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {}
+void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
+  obj->expression_->accept(this);
+  auto exp = pop();
+  if (!exp.datatype_->is_an_array()) {
+    error(obj->for_keyword_, "foreach iteration must use an array");
+  }
+  if ((exp.datatype_->is_an_array() &&
+       (exp.datatype_->args_[0]->is_sm_entry() ||
+        exp.datatype_->args_[0]->is_m_entry()))) {
+    error(obj->for_keyword_,
+          "Cannot use foreach iteration for SMEntry and MEntry.");
+  }
+  auto lhs = exp.datatype_->args_[0];
+  auto rhs = obj->data_type_;
+  if ((*lhs != *rhs)) {
+    error(obj->for_keyword_,
+          "foreach statement expression and element data type does not match.");
+  }
+  push_scope_type(ast_type::STMT_WHILE);
+  scope_.push();
+  scope_.define(obj->name_->token_, ykobject(obj->data_type_));
+  obj->for_body_->accept(this);
+  scope_.pop();
+  pop_scope_type();
+}
+void type_checker::visit_forendless_stmt(forendless_stmt *obj) {
+  push_scope_type(ast_type::STMT_WHILE);
+  scope_.push();
+  obj->for_body_->accept(this);
+  scope_.pop();
+  pop_scope_type();
+}
+void type_checker::visit_compins_stmt(compins_stmt *obj) {}

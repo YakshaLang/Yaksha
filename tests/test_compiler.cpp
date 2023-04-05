@@ -218,3 +218,11 @@ TEST_CASE("compiler: Test @onstack class") {
   TEST_FILE("../test_data/compiler_tests/on_stack_test.yaka", "on_stack_test.yaka",
             "../test_data/compiler_tests/on_stack_test.tokens");
 }
+TEST_CASE("compiler: Test endless for") {
+  TEST_FILE("../test_data/compiler_tests/endless_for.yaka", "endless_for.yaka",
+            "../test_data/compiler_tests/endless_for.tokens");
+}
+TEST_CASE("compiler: Test println each element in for") {
+  TEST_FILE("../test_data/compiler_tests/eachelem_for.yaka", "eachelem_for.yaka",
+            "../test_data/compiler_tests/eachelem_for.tokens");
+}

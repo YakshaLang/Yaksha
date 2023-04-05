@@ -120,6 +120,7 @@ namespace yaksha {
     KEYWORD_FROM,
     KEYWORD_IF,
     KEYWORD_IMPORT,
+    KEYWORD_IN,
     KEYWORD_NOT,
     KEYWORD_OR,
     KEYWORD_PASS,
@@ -245,6 +246,7 @@ namespace yaksha {
     if (t == token_type::KEYWORD_FROM) return "KEYWORD_FROM";
     if (t == token_type::KEYWORD_IF) return "KEYWORD_IF";
     if (t == token_type::KEYWORD_IMPORT) return "KEYWORD_IMPORT";
+    if (t == token_type::KEYWORD_IN) return "KEYWORD_IN";
     if (t == token_type::KEYWORD_NOT) return "KEYWORD_NOT";
     if (t == token_type::KEYWORD_OR) return "KEYWORD_OR";
     if (t == token_type::KEYWORD_PASS) return "KEYWORD_PASS";
@@ -366,6 +368,7 @@ namespace yaksha {
     if (t == "KEYWORD_FROM") return token_type::KEYWORD_FROM;
     if (t == "KEYWORD_IF") return token_type::KEYWORD_IF;
     if (t == "KEYWORD_IMPORT") return token_type::KEYWORD_IMPORT;
+    if (t == "KEYWORD_IN") return token_type::KEYWORD_IN;
     if (t == "KEYWORD_NOT") return token_type::KEYWORD_NOT;
     if (t == "KEYWORD_OR") return token_type::KEYWORD_OR;
     if (t == "KEYWORD_PASS") return token_type::KEYWORD_PASS;
@@ -396,6 +399,7 @@ namespace yaksha {
     if (t == "from") return token_type::KEYWORD_FROM;
     if (t == "if") return token_type::KEYWORD_IF;
     if (t == "import") return token_type::KEYWORD_IMPORT;
+    if (t == "in") return token_type::KEYWORD_IN;
     if (t == "not") return token_type::KEYWORD_NOT;
     if (t == "or") return token_type::KEYWORD_OR;
     if (t == "pass") return token_type::KEYWORD_PASS;
