@@ -26,9 +26,9 @@ int execute_carpntr(int argc, char **arguments) {
     carpntr = exe_path.parent_path() / "cmakecarpntr.exe";
   }
 #else
-  std::filesystem::path carpntr = exe_path / "carpntr";
+  std::filesystem::path carpntr = exe_path.parent_path() / "carpntr";
   if (!std::filesystem::exists(carpntr)) {
-    carpntr = exe_path / "cmakecarpntr";
+    carpntr = exe_path.parent_path() / "cmakecarpntr";
   }
 #endif
   int result = execute_process(carpntr, argc, arguments);
@@ -126,7 +126,6 @@ int execute_process(std::filesystem::path carpntr_path, int argc,
     argument.push_back(' ');
     ArgvQuote(arg_cpp, argument, false);
   }
-
   return (int) std::system(argument.c_str());
 }
 std::string get_my_exe_path() {
@@ -160,8 +159,10 @@ int execute_process(std::filesystem::path carpntr_path, int argc,
   // Now arguments are copied
   // Create subproc
   struct subprocess_s subprocess {};
-  int sp_res = subprocess_create(
-      arguments_copy, subprocess_option_inherit_environment, &subprocess);
+  int sp_res = subprocess_create(arguments_copy,
+                                 subprocess_option_inherit_environment |
+                                     subprocess_option_combined_stdout_stderr,
+                                 &subprocess);
   if (0 != sp_res) {
     std::cerr << "Failed to create proc \n";
     return ERR_CREATE_SUB;
@@ -172,6 +173,13 @@ int execute_process(std::filesystem::path carpntr_path, int argc,
     std::cerr << "Failed to join proc \n";
     return ERR_CREATE_SUB;
   }
+  auto const buffer_size = 4096;
+  FILE *ptr = subprocess_stdout(&subprocess);
+  if (ptr != nullptr) {
+    char str[buffer_size];
+    while (fgets(str, buffer_size, ptr) != nullptr) { printf("%s", str); }
+  }
+  subprocess_destroy(&subprocess);
   // TODO clean
   return process_return;
 }
@@ -181,6 +189,6 @@ std::string get_my_exe_path() {
   if (path == nullptr) { return nullptr; }
   wai_getModulePath(path, length, nullptr);
   path[length] = '\0';
-  return std : string{path, length};
+  return std::string{path, length};
 }
 #endif
