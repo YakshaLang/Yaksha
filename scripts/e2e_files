@@ -40,6 +40,11 @@ test_data/compiler_tests/global_constants.yaka
 test_data/compiler_tests/none_comparison.yaka
 test_data/compiler_tests/loops_and_logic.yaka
 test_data/compiler_tests/class_stuff.yaka
+test_data/compiler_tests/binarydata_builtin_test.yaka
+test_data/compiler_tests/native_constants.yaka
+test_data/compiler_tests/on_stack_test.yaka
+test_data/compiler_tests/endless_for.yaka
+test_data/compiler_tests/eachelem_for.yaka
 test_data/data_type_test.yaka
 test_data/document_samples/factorial.yaka
 test_data/import_tests/city/house.yaka
