@@ -3,29 +3,16 @@ runtimefeature "raylib"
 import libs.c
 import raylib as rl
 
-OPENGL_11: Const[int] = 1
-OPENGL_21: Const[int] = 2
-OPENGL_33: Const[int] = 3
-OPENGL_43: Const[int] = 4
-OPENGL_ES_20: Const[int] = 5
-RL_ATTACHMENT_COLOR_CHANNEL0: Const[int] = 0
-RL_ATTACHMENT_COLOR_CHANNEL1: Const[int] = 1
-RL_ATTACHMENT_COLOR_CHANNEL2: Const[int] = 2
-RL_ATTACHMENT_COLOR_CHANNEL3: Const[int] = 3
-RL_ATTACHMENT_COLOR_CHANNEL4: Const[int] = 4
-RL_ATTACHMENT_COLOR_CHANNEL5: Const[int] = 5
-RL_ATTACHMENT_COLOR_CHANNEL6: Const[int] = 6
-RL_ATTACHMENT_COLOR_CHANNEL7: Const[int] = 7
-RL_ATTACHMENT_DEPTH: Const[int] = 100
-RL_ATTACHMENT_STENCIL: Const[int] = 200
-RL_ATTACHMENT_CUBEMAP_POSITIVE_X: Const[int] = 0
-RL_ATTACHMENT_CUBEMAP_NEGATIVE_X: Const[int] = 1
-RL_ATTACHMENT_CUBEMAP_POSITIVE_Y: Const[int] = 2
-RL_ATTACHMENT_CUBEMAP_NEGATIVE_Y: Const[int] = 3
-RL_ATTACHMENT_CUBEMAP_POSITIVE_Z: Const[int] = 4
-RL_ATTACHMENT_CUBEMAP_NEGATIVE_Z: Const[int] = 5
-RL_ATTACHMENT_TEXTURE2D: Const[int] = 100
-RL_ATTACHMENT_RENDERBUFFER: Const[int] = 200
+RL_OPENGL_11: Const[int] = 1
+# OpenGL 1.1
+RL_OPENGL_21: Const[int] = 2
+# OpenGL 2.1 (GLSL 120)
+RL_OPENGL_33: Const[int] = 3
+# OpenGL 3.3 (GLSL 330)
+RL_OPENGL_43: Const[int] = 4
+# OpenGL 4.3 (using GLSL 330)
+RL_OPENGL_ES_20: Const[int] = 5
+# OpenGL ES 2.0 (GLSL 100)
 RL_LOG_ALL: Const[int] = 0
 # Display all logs
 RL_LOG_TRACE: Const[int] = 1
@@ -110,6 +97,8 @@ RL_BLEND_ALPHA_PREMULTIPLY: Const[int] = 5
 # Blend premultiplied textures considering alpha
 RL_BLEND_CUSTOM: Const[int] = 6
 # Blend textures using custom src/dst factors (use rlSetBlendFactors())
+RL_BLEND_CUSTOM_SEPARATE: Const[int] = 7
+# Blend textures using custom src/dst factors (use rlSetBlendFactorsSeparate())
 RL_SHADER_LOC_VERTEX_POSITION: Const[int] = 0
 # Shader location: vertex attribute: position
 RL_SHADER_LOC_VERTEX_TEXCOORD01: Const[int] = 1
@@ -188,6 +177,44 @@ RL_SHADER_ATTRIB_VEC3: Const[int] = 2
 # Shader attribute type: vec3 (3 float)
 RL_SHADER_ATTRIB_VEC4: Const[int] = 3
 # Shader attribute type: vec4 (4 float)
+RL_ATTACHMENT_COLOR_CHANNEL0: Const[int] = 0
+# Framebuffer attachment type: color 0
+RL_ATTACHMENT_COLOR_CHANNEL1: Const[int] = 1
+# Framebuffer attachment type: color 1
+RL_ATTACHMENT_COLOR_CHANNEL2: Const[int] = 2
+# Framebuffer attachment type: color 2
+RL_ATTACHMENT_COLOR_CHANNEL3: Const[int] = 3
+# Framebuffer attachment type: color 3
+RL_ATTACHMENT_COLOR_CHANNEL4: Const[int] = 4
+# Framebuffer attachment type: color 4
+RL_ATTACHMENT_COLOR_CHANNEL5: Const[int] = 5
+# Framebuffer attachment type: color 5
+RL_ATTACHMENT_COLOR_CHANNEL6: Const[int] = 6
+# Framebuffer attachment type: color 6
+RL_ATTACHMENT_COLOR_CHANNEL7: Const[int] = 7
+# Framebuffer attachment type: color 7
+RL_ATTACHMENT_DEPTH: Const[int] = 100
+# Framebuffer attachment type: depth
+RL_ATTACHMENT_STENCIL: Const[int] = 200
+# Framebuffer attachment type: stencil
+RL_ATTACHMENT_CUBEMAP_POSITIVE_X: Const[int] = 0
+# Framebuffer texture attachment type: cubemap, +X side
+RL_ATTACHMENT_CUBEMAP_NEGATIVE_X: Const[int] = 1
+# Framebuffer texture attachment type: cubemap, -X side
+RL_ATTACHMENT_CUBEMAP_POSITIVE_Y: Const[int] = 2
+# Framebuffer texture attachment type: cubemap, +Y side
+RL_ATTACHMENT_CUBEMAP_NEGATIVE_Y: Const[int] = 3
+# Framebuffer texture attachment type: cubemap, -Y side
+RL_ATTACHMENT_CUBEMAP_POSITIVE_Z: Const[int] = 4
+# Framebuffer texture attachment type: cubemap, +Z side
+RL_ATTACHMENT_CUBEMAP_NEGATIVE_Z: Const[int] = 5
+# Framebuffer texture attachment type: cubemap, -Z side
+RL_ATTACHMENT_TEXTURE2D: Const[int] = 100
+# Framebuffer texture attachment type: texture2d
+RL_ATTACHMENT_RENDERBUFFER: Const[int] = 200
+# Framebuffer texture attachment type: renderbuffer
+RL_CULL_FACE_FRONT: Const[int] = 0
+RL_CULL_FACE_BACK: Const[int] = 1
 @nativedefine("rlVertexBuffer")
 class rlVertexBuffer:
     # Dynamic vertex buffers (position + texcoords + colors + indices arrays)
@@ -239,7 +266,7 @@ def rl_push_matrix() -> None:
 
 @nativemacro
 def rl_pop_matrix() -> None:
-    # Pop lattest inserted matrix from stack
+    # Pop latest inserted matrix from stack
     ccode """rlPopMatrix()"""
 
 @nativemacro
@@ -261,11 +288,6 @@ def rl_rotatef(angle: float, x: float, y: float, z: float) -> None:
 def rl_scalef(x: float, y: float, z: float) -> None:
     # Multiply the current matrix by a scaling matrix
     ccode """rlScalef(nn__x, nn__y, nn__z)"""
-
-@nativemacro
-def rl_mult_matrixf(matf: Ptr[c.CFloat]) -> None:
-    # Multiply the current matrix by another matrix
-    ccode """rlMultMatrixf(nn__matf)"""
 
 @nativemacro
 def rl_frustum(left: f64, right: f64, bottom: f64, top: f64, znear: f64, zfar: f64) -> None:
@@ -411,6 +433,11 @@ def rl_texture_parameters(id: u32, param: int, value: int) -> None:
     ccode """rlTextureParameters((unsigned int)nn__id, (int)nn__param, (int)nn__value)"""
 
 @nativemacro
+def rl_cubemap_parameters(id: u32, param: int, value: int) -> None:
+    # Set cubemap parameters (filter, wrap)
+    ccode """rlCubemapParameters((unsigned int)nn__id, (int)nn__param, (int)nn__value)"""
+
+@nativemacro
 def rl_enable_shader(id: u32) -> None:
     # Enable shader program
     ccode """rlEnableShader((unsigned int)nn__id)"""
@@ -474,6 +501,11 @@ def rl_enable_backface_culling() -> None:
 def rl_disable_backface_culling() -> None:
     # Disable backface culling
     ccode """rlDisableBackfaceCulling()"""
+
+@nativemacro
+def rl_set_cull_face(mode: int) -> None:
+    # Set face culling mode
+    ccode """rlSetCullFace((int)nn__mode)"""
 
 @nativemacro
 def rl_enable_scissor_test() -> None:
@@ -561,13 +593,18 @@ def rl_set_blend_factors(gl_src_factor: int, gl_dst_factor: int, gl_equation: in
     ccode """rlSetBlendFactors((int)nn__gl_src_factor, (int)nn__gl_dst_factor, (int)nn__gl_equation)"""
 
 @nativemacro
+def rl_set_blend_factors_separate(gl_src_rgb: int, gl_dst_rgb: int, gl_src_alpha: int, gl_dst_alpha: int, gl_eq_rgb: int, gl_eq_alpha: int) -> None:
+    # Set blending mode factors and equations separately (using OpenGL factors)
+    ccode """rlSetBlendFactorsSeparate((int)nn__gl_src_rgb, (int)nn__gl_dst_rgb, (int)nn__gl_src_alpha, (int)nn__gl_dst_alpha, (int)nn__gl_eq_rgb, (int)nn__gl_eq_alpha)"""
+
+@nativemacro
 def rlgl_init(width: int, height: int) -> None:
     # Initialize rlgl (buffers, shaders, textures, states)
     ccode """rlglInit((int)nn__width, (int)nn__height)"""
 
 @nativemacro
 def rlgl_close() -> None:
-    # De-inititialize rlgl (buffers, shaders, textures)
+    # De-initialize rlgl (buffers, shaders, textures)
     ccode """rlglClose()"""
 
 @nativemacro
@@ -849,8 +886,13 @@ def rl_load_compute_shader_program(shader_id: u32) -> u32:
 
 @nativemacro
 def rl_compute_shader_dispatch(group_x: u32, group_y: u32, group_z: u32) -> None:
-    # Dispatch compute shader (equivalent to *draw* for graphics pilepine)
+    # Dispatch compute shader (equivalent to *draw* for graphics pipeline)
     ccode """rlComputeShaderDispatch((unsigned int)nn__group_x, (unsigned int)nn__group_y, (unsigned int)nn__group_z)"""
+
+@nativemacro
+def rl_load_shader_buffer(size: u32, data: AnyPtrToConst, usage_hint: int) -> u32:
+    # Load shader storage buffer object (SSBO)
+    ccode """rlLoadShaderBuffer((unsigned int)nn__size, nn__data, (int)nn__usage_hint)"""
 
 @nativemacro
 def rl_unload_shader_buffer(ssbo_id: u32) -> None:
@@ -858,14 +900,34 @@ def rl_unload_shader_buffer(ssbo_id: u32) -> None:
     ccode """rlUnloadShaderBuffer((unsigned int)nn__ssbo_id)"""
 
 @nativemacro
+def rl_update_shader_buffer(id: u32, data: AnyPtrToConst, data_size: u32, offset: u32) -> None:
+    # Update SSBO buffer data
+    ccode """rlUpdateShaderBuffer((unsigned int)nn__id, nn__data, (unsigned int)nn__data_size, (unsigned int)nn__offset)"""
+
+@nativemacro
 def rl_bind_shader_buffer(id: u32, index: u32) -> None:
-    # Copy SSBO buffer data
+    # Bind SSBO buffer
     ccode """rlBindShaderBuffer((unsigned int)nn__id, (unsigned int)nn__index)"""
 
 @nativemacro
-def rl_bind_image_texture(id: u32, index: u32, format: u32, readonly: int) -> None:
+def rl_read_shader_buffer(id: u32, dest: AnyPtr, count: u32, offset: u32) -> None:
+    # Read SSBO buffer data (GPU->CPU)
+    ccode """rlReadShaderBuffer((unsigned int)nn__id, nn__dest, (unsigned int)nn__count, (unsigned int)nn__offset)"""
+
+@nativemacro
+def rl_copy_shader_buffer(dest_id: u32, src_id: u32, dest_offset: u32, src_offset: u32, count: u32) -> None:
+    # Copy SSBO data between buffers
+    ccode """rlCopyShaderBuffer((unsigned int)nn__dest_id, (unsigned int)nn__src_id, (unsigned int)nn__dest_offset, (unsigned int)nn__src_offset, (unsigned int)nn__count)"""
+
+@nativemacro
+def rl_get_shader_buffer_size(id: u32) -> u32:
+    # Get SSBO buffer size
+    ccode """rlGetShaderBufferSize((unsigned int)nn__id)"""
+
+@nativemacro
+def rl_bind_image_texture(id: u32, index: u32, format: int, readonly: bool) -> None:
     # Bind image texture
-    ccode """rlBindImageTexture((unsigned int)nn__id, (unsigned int)nn__index, (unsigned int)nn__format, (int)nn__readonly)"""
+    ccode """rlBindImageTexture((unsigned int)nn__id, (unsigned int)nn__index, (int)nn__format, nn__readonly)"""
 
 @nativemacro
 def rl_get_matrix_modelview() -> rl.Matrix:

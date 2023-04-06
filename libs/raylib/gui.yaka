@@ -311,19 +311,19 @@ ICON_SHIELD: Const[int] = 202
 ICON_FILE_NEW: Const[int] = 203
 ICON_FOLDER_ADD: Const[int] = 204
 ICON_ALARM: Const[int] = 205
-ICON_206: Const[int] = 206
-ICON_207: Const[int] = 207
-ICON_208: Const[int] = 208
-ICON_209: Const[int] = 209
-ICON_210: Const[int] = 210
-ICON_211: Const[int] = 211
-ICON_212: Const[int] = 212
-ICON_213: Const[int] = 213
-ICON_214: Const[int] = 214
-ICON_215: Const[int] = 215
-ICON_216: Const[int] = 216
-ICON_217: Const[int] = 217
-ICON_218: Const[int] = 218
+ICON_CPU: Const[int] = 206
+ICON_ROM: Const[int] = 207
+ICON_STEP_OVER: Const[int] = 208
+ICON_STEP_INTO: Const[int] = 209
+ICON_STEP_OUT: Const[int] = 210
+ICON_RESTART: Const[int] = 211
+ICON_BREAKPOINT_ON: Const[int] = 212
+ICON_BREAKPOINT_OFF: Const[int] = 213
+ICON_BURGER_MENU: Const[int] = 214
+ICON_CASE_SENSITIVE: Const[int] = 215
+ICON_REG_EXP: Const[int] = 216
+ICON_FOLDER: Const[int] = 217
+ICON_FILE: Const[int] = 218
 ICON_219: Const[int] = 219
 ICON_220: Const[int] = 220
 ICON_221: Const[int] = 221
@@ -461,6 +461,11 @@ def gui_panel(bounds: rl.Rectangle, text: str) -> None:
     ccode """GuiPanel(nn__bounds, nn__text);
     yk__sdsfree(nn__text);
     """
+
+@nativemacro
+def gui_tab_bar(bounds: rl.Rectangle, text: Ptr[Ptr[Const[c.CChar]]], count: int, active: Ptr[c.CInt]) -> int:
+    # Tab Bar control, returns TAB to be closed or -1
+    ccode """GuiTabBar(nn__bounds, nn__text, (int)nn__count, nn__active)"""
 
 @native
 def gui_scroll_panel(bounds: rl.Rectangle, text: str, content: rl.Rectangle, scroll: Ptr[rl.Vector2]) -> rl.Rectangle:
@@ -669,6 +674,23 @@ def gui_load_style_default() -> None:
     # Load style default over global style
     ccode """GuiLoadStyleDefault()"""
 
+@nativemacro
+def gui_enable_tooltip() -> None:
+    # Enable gui tooltips (global state)
+    ccode """GuiEnableTooltip()"""
+
+@nativemacro
+def gui_disable_tooltip() -> None:
+    # Disable gui tooltips (global state)
+    ccode """GuiDisableTooltip()"""
+
+@native
+def gui_set_tooltip(tooltip: str) -> None:
+    # Set tooltip string
+    ccode """GuiSetTooltip(nn__tooltip);
+    yk__sdsfree(nn__tooltip);
+    """
+
 @native
 def gui_icon_text(icon_id: int, text: str) -> Ptr[Const[c.CChar]]:
     # Get text with icon id prepended (if supported)
@@ -677,41 +699,23 @@ def gui_icon_text(icon_id: int, text: str) -> Ptr[Const[c.CChar]]:
     return temp_rl"""
 
 @nativemacro
+def gui_get_icons() -> Ptr[c.CUInt]:
+    # Get raygui icons data pointer
+    ccode """GuiGetIcons()"""
+
+@native
+def gui_load_icons(file_name: str, load_icons_name: bool) -> Ptr[Ptr[c.CChar]]:
+    # Load raygui icons file (.rgi) into internal icons data
+    ccode """char ** temp_rl = GuiLoadIcons(nn__file_name, nn__load_icons_name);
+    yk__sdsfree(nn__file_name);
+    return temp_rl"""
+
+@nativemacro
 def gui_draw_icon(icon_id: int, pos_x: int, pos_y: int, pixel_size: int, p_color: rl.Color) -> None:
     ccode """GuiDrawIcon((int)nn__icon_id, (int)nn__pos_x, (int)nn__pos_y, (int)nn__pixel_size, nn__p_color)"""
 
 @nativemacro
-def gui_get_icons() -> Ptr[c.CUInt]:
-    # Get full icons data pointer
-    ccode """GuiGetIcons()"""
-
-@nativemacro
-def gui_get_icon_data(icon_id: int) -> Ptr[c.CUInt]:
-    # Get icon bit data
-    ccode """GuiGetIconData((int)nn__icon_id)"""
-
-@nativemacro
-def gui_set_icon_data(icon_id: int, data: Ptr[c.CUInt]) -> None:
-    # Set icon bit data
-    ccode """GuiSetIconData((int)nn__icon_id, nn__data)"""
-
-@nativemacro
-def gui_set_icon_scale(scale: u32) -> None:
-    # Set icon scale (1 by default)
-    ccode """GuiSetIconScale((unsigned int)nn__scale)"""
-
-@nativemacro
-def gui_set_icon_pixel(icon_id: int, x: int, y: int) -> None:
-    # Set icon pixel value
-    ccode """GuiSetIconPixel((int)nn__icon_id, (int)nn__x, (int)nn__y)"""
-
-@nativemacro
-def gui_clear_icon_pixel(icon_id: int, x: int, y: int) -> None:
-    # Clear icon pixel value
-    ccode """GuiClearIconPixel((int)nn__icon_id, (int)nn__x, (int)nn__y)"""
-
-@nativemacro
-def gui_check_icon_pixel(icon_id: int, x: int, y: int) -> bool:
-    # Check icon pixel value
-    ccode """GuiCheckIconPixel((int)nn__icon_id, (int)nn__x, (int)nn__y)"""
+def gui_set_icon_scale(scale: int) -> None:
+    # Set icon drawing size
+    ccode """GuiSetIconScale((int)nn__scale)"""
 
