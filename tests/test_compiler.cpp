@@ -226,3 +226,7 @@ TEST_CASE("compiler: Test println each element in for") {
   TEST_FILE("../test_data/compiler_tests/eachelem_for.yaka", "eachelem_for.yaka",
             "../test_data/compiler_tests/eachelem_for.tokens");
 }
+TEST_CASE("compiler: bug-fix comment break indent") {
+  TEST_FILE("../test_data/bug_fixes/comment_break_indent.yaka", "comment_break_indent.yaka",
+            "../test_data/bug_fixes/comment_break_indent.tokens");
+}
