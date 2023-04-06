@@ -8,7 +8,7 @@ from typing import List, Tuple
 
 IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp", "utf8proc_data.c", "print_str.c", "dump.cpp",
           "comp_main.cpp", "reloader.cpp",  "reloader_alt.cpp", "yk__wasm4_libc.c",
-          "yk__fake_whereami.c", "yk.cpp"]
+          "yk__fake_whereami.c", "yk.cpp", "carpntr_wrapper.cpp"]
 
 
 def get_immediate_sub_dirs(directory: str) -> List[str]:

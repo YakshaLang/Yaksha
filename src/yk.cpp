@@ -32,6 +32,7 @@
 #include "viz_main.cpp"
 #undef main
 #undef PROGRAM_NAME
+int execute_carpntr(int argc, char **arguments);
 // -------- Yaksha C API ---------
 extern "C" {
 struct yk_compile_result {
@@ -80,6 +81,8 @@ void display_help() {
   std::cout << " # Visualize given file as HTML structure\n";
   std::cout << "yaksha dump file_path.yaka\n";
   std::cout << " # Dump structure of the file to JSON\n";
+  std::cout << "yaksha build -R my_code.yaka\n";
+  std::cout << " # Build (and/or run) project/file using carpntr\n";
 }
 int main(int argc, char *argv[]) {
   if (argc <= 1) {
@@ -93,6 +96,7 @@ int main(int argc, char *argv[]) {
   if (first_arg == "reload") { return reloader_main(argc - 1, &argv[1]); }
   if (first_arg == "viz") { return viz_main(argc - 1, &argv[1]); }
   if (first_arg == "dump") { return dump_main(argc - 1, &argv[1]); }
+  if (first_arg == "build") { return execute_carpntr(argc - 1, &argv[1]); }
   display_banner();
   std::cerr << "Invalid sub command.\n";
   display_help();

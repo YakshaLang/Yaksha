@@ -56,7 +56,7 @@ target_compile_features(yakshac PRIVATE cxx_std_17)
 endif (MSVC)
 
 # -- yaksha binary --
-add_executable(yaksha src/yk.cpp)
+add_executable(yaksha src/yk.cpp src/carpntr_wrapper.cpp runtime/whereami.c)
 target_link_libraries(yaksha PUBLIC ${SYS_LIBS})
 target_link_libraries(yaksha PUBLIC library_yaksha)
 target_compile_features(yaksha PRIVATE cxx_std_17)
