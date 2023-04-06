@@ -48,20 +48,22 @@ class_field ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL {
     methods=[getName getNameIdentifier getPresentation]
 }
 
-def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON NL def_bits+ {
+def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON S? NL def_bits+ {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
     methods=[getName setName getNameIdentifier getPresentation]
 }
 def_params ::= def_param (S? OPERATOR_COMMA S? def_param)*
 def_param ::= IDENTIFIER S? OPERATOR_COLON S? data_type
-def_bits ::= pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | continue_statement | break_statement | COMMENT
+def_bits ::= pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | continue_statement | break_statement | COMMENT
 
 // Compound statements
 if_statement ::= I KW_IF S? exp S? OPERATOR_COLON S? NL def_bits+
 elif_statement ::= I KW_ELIF S? exp S? OPERATOR_COLON S? NL def_bits+
 else_statement ::= I KW_ELSE S? OPERATOR_COLON S? NL def_bits+
 while_statement ::= I KW_WHILE S? exp S? OPERATOR_COLON S? NL def_bits+
+foreach_statement ::= I KW_FOR S? IDENTIFIER S? OPERATOR_COLON S? data_type S? KW_IN S? exp S? OPERATOR_COLON S? NL def_bits+
+forendless_statement ::= I KW_FOR S? OPERATOR_COLON S? NL def_bits+
 
 // Simple statements
 pass_statement ::= I KW_PASS S? NL

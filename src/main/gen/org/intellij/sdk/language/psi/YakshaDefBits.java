@@ -38,6 +38,12 @@ public interface YakshaDefBits extends PsiElement {
   YakshaExprStatement getExprStatement();
 
   @Nullable
+  YakshaForeachStatement getForeachStatement();
+
+  @Nullable
+  YakshaForendlessStatement getForendlessStatement();
+
+  @Nullable
   YakshaIfStatement getIfStatement();
 
   @Nullable

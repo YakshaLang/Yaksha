@@ -131,6 +131,14 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitForeachStatement(@NotNull YakshaForeachStatement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitForendlessStatement(@NotNull YakshaForendlessStatement o) {
+    visitPsiElement(o);
+  }
+
   public void visitIfStatement(@NotNull YakshaIfStatement o) {
     visitPsiElement(o);
   }

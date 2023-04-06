@@ -98,6 +98,8 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
             .add(YakshaTypes.KW_PASS)
             .add(YakshaTypes.KW_RETURN)
             .add(YakshaTypes.KW_WHILE)
+            .add(YakshaTypes.KW_FOR)
+            .add(YakshaTypes.KW_IN)
             .add(YakshaTypes.KW_TRUE)
             .add(YakshaTypes.KW_FALSE)
             .add(YakshaTypes.KW_NONE)

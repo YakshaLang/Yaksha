@@ -99,6 +99,8 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   "False"                        { return YakshaTypes.KW_FALSE; }
   "None"                         { return YakshaTypes.KW_NONE; }
   "runtimefeature"               { return YakshaTypes.KW_RUNTIMEFEATURE; }
+  "for"                          { return YakshaTypes.KW_FOR; }
+  "in"                           { return YakshaTypes.KW_IN; }
 
 "int" |
 "i8" |

@@ -39,6 +39,8 @@ public interface YakshaTypes {
   IElementType EXPR_STATEMENT = new YakshaElementType("EXPR_STATEMENT");
   IElementType FACTOR = new YakshaElementType("FACTOR");
   IElementType FNCALL = new YakshaElementType("FNCALL");
+  IElementType FOREACH_STATEMENT = new YakshaElementType("FOREACH_STATEMENT");
+  IElementType FORENDLESS_STATEMENT = new YakshaElementType("FORENDLESS_STATEMENT");
   IElementType IF_STATEMENT = new YakshaElementType("IF_STATEMENT");
   IElementType IMPORT_STATEMENT = new YakshaElementType("IMPORT_STATEMENT");
   IElementType LET_STATEMENT = new YakshaElementType("LET_STATEMENT");
@@ -69,8 +71,10 @@ public interface YakshaTypes {
   IElementType KW_ELIF = new YakshaTokenType("KW_ELIF");
   IElementType KW_ELSE = new YakshaTokenType("KW_ELSE");
   IElementType KW_FALSE = new YakshaTokenType("KW_FALSE");
+  IElementType KW_FOR = new YakshaTokenType("KW_FOR");
   IElementType KW_IF = new YakshaTokenType("KW_IF");
   IElementType KW_IMPORT = new YakshaTokenType("KW_IMPORT");
+  IElementType KW_IN = new YakshaTokenType("KW_IN");
   IElementType KW_NONE = new YakshaTokenType("KW_NONE");
   IElementType KW_PASS = new YakshaTokenType("KW_PASS");
   IElementType KW_RETURN = new YakshaTokenType("KW_RETURN");
@@ -213,6 +217,12 @@ public interface YakshaTypes {
       }
       else if (type == FNCALL) {
         return new YakshaFncallImpl(node);
+      }
+      else if (type == FOREACH_STATEMENT) {
+        return new YakshaForeachStatementImpl(node);
+      }
+      else if (type == FORENDLESS_STATEMENT) {
+        return new YakshaForendlessStatementImpl(node);
       }
       else if (type == IF_STATEMENT) {
         return new YakshaIfStatementImpl(node);
