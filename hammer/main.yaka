@@ -111,8 +111,10 @@ def build_o(c: conf.HammerConfig, source: str, target: str) -> None:
     arrput(args, ofile)
     result: os.ProcessResult = os.run(args)
     defer os.del_process_result(result)
-    if result.ok:
-        return
+    if not result.ok and c.disable_parallel:
+        print("--------")
+        println(result.output)
+        print("--------")
 
 def build_bobj(a: AnyPtr) -> None:
     b: BObject = cast("BObject", a)
@@ -129,6 +131,24 @@ def build_binary(c: conf.HammerConfig, b: conf.Binary, objects: Array[str], targ
         exe_name = exe_name + "-" + target
     if is_target_windows(target):
         exe_name = exe_name + ".exe"
+    # Add additional sources
+    extra_buildables: Array[BObject]
+    extra_files: int = len(b.sources)
+    ec: int = 0
+    while ec < extra_files:
+        # build logic
+        buildable: BObject = BObject()
+        buildable.config  = c
+        buildable.source = getref(b.sources[ec])
+        buildable.target = getref(target)
+        arrput(extra_buildables, buildable)
+        fname: str = path.remove_extension(path.basename(b.sources[ec]))
+        oname: str = fname + "-" + target + ".o"
+        ofile: str = path.join(c.temp_out_dir, oname)
+        arrput(args, ofile)
+        ec += 1
+    build_objects(c, extra_buildables)
+    cleanup_buildables(extra_buildables)
     arrput(args, b.main_file)
     arrput(args, "-o")
     arrput(args, path.join(b.out_dir, exe_name))
@@ -141,8 +161,18 @@ def build_binary(c: conf.HammerConfig, b: conf.Binary, objects: Array[str], targ
         console.red(result.output)
     return ret_val
 
-def build_objects(buildables: Array[BObject]) -> None:
+def build_objects(c: conf.HammerConfig, buildables: Array[BObject]) -> None:
     object_count: int = len(buildables)
+
+    if c.disable_parallel:
+        pos: int = 0
+        while pos < object_count:
+            buildable: BObject = buildables[pos]
+            build_bobj(cast("AnyPtr", buildable))
+            pos += 1
+        return
+
+
     cpu_data: cpu.Cpu = cpu.info()
     threads: u8 = cast("u8", cpu_data.n_processors)
     threads = iif(threads > pool.MAX_THREAD_SIZE, pool.MAX_THREAD_SIZE, threads)
@@ -193,7 +223,7 @@ def build_target(c: conf.HammerConfig, target: str) -> bool:
         arrput(objects, ofile)
         # --
         pos = pos + 1
-    build_objects(buildables)
+    build_objects(c, buildables)
     cleanup_buildables(buildables)
     # Build binaries
     length = len(c.binaries)

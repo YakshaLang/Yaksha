@@ -13,6 +13,7 @@ class Binary:
     out_dir: str
     args_link: Array[str]
     cpp: bool
+    sources: Array[str]
 
 class HammerConfig:
     # [compilation]
@@ -27,6 +28,7 @@ class HammerConfig:
     # Additional information
     zig: str
     errors: Array[str]
+    disable_parallel: bool
 
 def find_zig_compiler(c: HammerConfig) -> None:
     # Find zig(.exe) binary file
@@ -46,6 +48,7 @@ def load_binary(t: toml.Table, c: HammerConfig, binary_name: str) -> Binary:
     b.name = toml.get_string_default(t, "name", binary_name)
     b.out_dir = toml.get_string_default(t, "out_dir", ".")
     b.main_file = toml.get_string_default(t, "main_file", "")
+    b.sources = toml.get_string_array(t, "sources")
     if len(b.main_file) == 0:
         arrput(c.errors, "Empty main file for: " + binary_name)
     b.cpp = strings.endswith(b.main_file, ".cpp")
@@ -74,6 +77,7 @@ def load() -> HammerConfig:
     c.include_paths = toml.get_string_array(table, "include_paths")
     c.sources = toml.get_string_array(table, "sources")
     c.temp_out_dir = toml.get_string_default(table, "temp_out_dir", ".")
+    c.disable_parallel = toml.get_bool_default(table, "disable_parallel", False)
     binaries: Array[str] = toml.get_string_array(table, "binaries")
     length: int = len(binaries)
     pos: int = 0
@@ -87,6 +91,7 @@ def load() -> HammerConfig:
 
 def del_binary(b: Binary) -> None:
     sarr.del_str_array(b.args_link)
+    sarr.del_str_array(b.sources)
     del b.main_file
     del b.name
     del b.out_dir
