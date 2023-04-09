@@ -293,6 +293,10 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     if c.compilation.web and len(c.compilation.web_shell) > 0:
         arrput(args, "--shell-file")
         arrput(args, c.compilation.web_shell)
+    # Add web assets dir
+    if c.compilation.web and len(c.compilation.web_assets) > 0:
+        arrput(args, "--preload-file")
+        arrput(args, c.compilation.web_assets)
     # -shared
     if c.compilation.raylib_hot_reloading_dll:
         arrput(args, "-shared")

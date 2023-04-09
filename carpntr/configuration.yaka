@@ -43,6 +43,7 @@ class Compilation:
     raylib_hot_reloading_dll: bool
     web: bool
     web_shell: str
+    web_assets: str
     wasm4: bool
     disable_parallel_build: bool
 
@@ -219,6 +220,7 @@ def load_compilation(conf: toml.Table, c: Config) -> Compilation:
     co.web = toml.get_bool_default(co_data, "web", False)
     co.wasm4 = toml.get_bool_default(co_data, "wasm4", False)
     co.web_shell = toml.get_string(co_data, "web_shell")
+    co.web_assets = toml.get_string(co_data, "web_assets")
     return co
 
 def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
@@ -382,7 +384,7 @@ def load_config() -> Config:
         return c
     return c
 
-def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str, crdll: bool, no_parallel: bool) -> Config:
+def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str, web_assets: str, crdll: bool, no_parallel: bool) -> Config:
     # Create an adhoc configuration for single file execution mode
     c: Config = Config()
     c.compilation = Compilation()
@@ -391,6 +393,7 @@ def create_adhoc_config(name: str, file_path: str, use_raylib: bool, use_web: bo
     c.compilation.raylib_hot_reloading_dll = crdll
     c.compilation.web = use_web
     c.compilation.web_shell = web_shell
+    c.compilation.web_assets = web_assets
     c.compilation.wasm4 = wasm4
     c.compilation.disable_parallel_build = no_parallel
     # Try and find yakshac.exe
@@ -448,6 +451,7 @@ def del_config(c: Config) -> None:
         del c.compilation.libc
         del c.compilation.compiler
         del c.compilation.web_shell
+        del c.compilation.web_assets
 
     if c.project != None:
         del c.project.main

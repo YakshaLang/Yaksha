@@ -108,10 +108,10 @@ def perform_build() -> int:
     ret: int = build_from_config(config, False)
     return ret
 
-def perform_mini_build(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str, silent: bool, actually_run: bool, crdll: bool, no_parallel: bool) -> int:
+def perform_mini_build(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str, asset_path: str, silent: bool, actually_run: bool, crdll: bool, no_parallel: bool) -> int:
     # Perform single file project build and execute binary
     name: str = path.remove_extension(path.basename(filename))
-    config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib, use_web, wasm4, web_shell, crdll, no_parallel)
+    config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib, use_web, wasm4, web_shell, asset_path, crdll, no_parallel)
     defer carp.del_config(config)
     if len(config.errors) > 0:
         print_errors(config.errors)
@@ -169,7 +169,9 @@ def handle_args(args: os.Arguments) -> int:
     silent_mode: int = 0
     no_parallel: int = 0
     file_path: c.CStr = strings.null_cstr()
+    assets_path: c.CStr = strings.null_cstr()
     web_shell: str = ""
+    assets_path_s: str = ""
     arrput(options, argparse.opt_boolean("h", "help", getref(help), "show help and exit"))
     arrput(options, argparse.opt_boolean("R", "run", getref(run), "run a single file"))
     arrput(options, argparse.opt_boolean("C", "compile", getref(just_compile), "compile a single file"))
@@ -177,6 +179,7 @@ def handle_args(args: os.Arguments) -> int:
     arrput(options, argparse.opt_boolean("w", "web", getref(web), "build for web (works only with raylib)"))
     arrput(options, argparse.opt_boolean("d", "dll", getref(crdll), "enable .dll client build for hot reloading with ykreload/cr.h (works only with raylib)"))
     arrput(options, argparse.opt_string("s", "shell", getref(file_path), "specify shell file for web builds"))
+    arrput(options, argparse.opt_string("a", "assets", getref(assets_path), "specify assets directory for web builds"))
     arrput(options, argparse.opt_boolean("4", "wasm4", getref(wasm4), "wasm4 build"))
     arrput(options, argparse.opt_boolean("S", "silent", getref(silent_mode), "do not print anything except errors"))
     arrput(options, argparse.opt_boolean("N", "nothread", getref(no_parallel), "no parallel builds (for debugging)"))
@@ -210,6 +213,9 @@ def handle_args(args: os.Arguments) -> int:
     if web != 1 and strings.valid_cstr(file_path):
         println("Shell is only supported with web")
         return 1
+    if web != 1 and strings.valid_cstr(file_path):
+        println("Shell is only supported with web")
+        return 1
     if run == 1 and crdll == 1:
         println("Use -C instead of -R to compile a dll.")
         return 1
@@ -218,7 +224,11 @@ def handle_args(args: os.Arguments) -> int:
             web_shell = strings.from_cstr(file_path)
             print("Using web-shell:")
             println(web_shell)
-        return perform_mini_build(single_file, raylib == 1, web == 1, wasm4 == 1, web_shell, silent_mode == 1, run == 1, crdll == 1, no_parallel == 1)
+        if strings.valid_cstr(assets_path):
+            assets_path_s = strings.from_cstr(assets_path)
+            print("Using asset-path:")
+            println(assets_path_s)
+        return perform_mini_build(single_file, raylib == 1, web == 1, wasm4 == 1, web_shell, assets_path_s, silent_mode == 1, run == 1, crdll == 1, no_parallel == 1)
     console.red("Invalid usage. Please use '-R' option if you want to run a program. Try 'carpntr --help' for more information.\n")
     return 0
 
