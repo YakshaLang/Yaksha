@@ -455,7 +455,11 @@ void compiler::visit_variable_expr(variable_expr *obj) {
     return;
   }
   auto object = scope_.get(name);
-  push(name, object);
+  if (object.desugar_rewrite_needed_) {
+    push(object.desugar_rewrite_, object);
+  } else {
+    push(name, object);
+  }
 }
 void compiler::visit_block_stmt(block_stmt *obj) {
   // block will be compiled to '{' + statements + '}'
@@ -1230,5 +1234,9 @@ void compiler::visit_compins_stmt(compins_stmt *obj) {
   // Add given item to scope
   auto name = prefix(obj->name_->token_, prefix_val_);
   auto object = ykobject(obj->data_type_);
+  if (obj->meta1_ != nullptr) {
+    object.desugar_rewrite_ = obj->meta1_->token_;
+    object.desugar_rewrite_needed_ = true;
+  }
   scope_.define(name, object);
 }

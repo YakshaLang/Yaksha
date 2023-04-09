@@ -225,14 +225,11 @@ void desugaring_compiler::visit_foreach_stmt(foreach_stmt *obj) {
                                paren_token_, arr_holder_arg)));
   // While body
   std::vector<stmt *> new_while_body{};
-  // While body    ->     #define yy__item h__array[h__counter]
-  const std::string ccode1 = "#define " + prefixed_name + " (" + array_holder +
-                             "[" + counter + "]) // desugar by reference begin";
-  new_while_body.emplace_back(
-      ast_pool_->c_ccode_stmt(ccode_token_, create_str_literal(ccode1)));
-  // While body    ->     expose obj->name + obj->data_type
+  // While body    ->     #yaksha-define yy__item h__array[h__counter]
+  // While body    ->     expose yy__item ==> obj->name + obj->data_type
+  const std::string desugar_rewrite = "(" + array_holder + "[" + counter + "])";
   new_while_body.emplace_back(ast_pool_->c_compins_stmt(
-      obj->name_, obj->data_type_, nullptr, nullptr, nullptr));
+      obj->name_, obj->data_type_, create_str_literal(desugar_rewrite), nullptr, nullptr));
   // Create counter += 1 statement
   auto counter_incr = ast_pool_->c_expression_stmt(ast_pool_->c_assign_expr(
       counter_tok, plus_eq_token_,
@@ -247,11 +244,6 @@ void desugaring_compiler::visit_foreach_stmt(foreach_stmt *obj) {
   }
   // While body    ->     counter += 1
   new_while_body.emplace_back(counter_incr);
-  // While body    ->     #undef yy__item
-  const std::string ccode2 =
-      "#undef " + prefixed_name + " // desugar by reference end";
-  new_while_body.emplace_back(
-      ast_pool_->c_ccode_stmt(ccode_token_, create_str_literal(ccode2)));
   // New statement -> while counter < length: + While body
   auto counter_less_length = ast_pool_->c_binary_expr(
       ast_pool_->c_variable_expr(counter_tok), less_token_,

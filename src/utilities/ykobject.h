@@ -33,6 +33,8 @@ namespace yaksha {
     std::string string_val_{};
     std::string module_file_{};
     std::string module_name_{};
+    bool desugar_rewrite_needed_{false};
+    std::string desugar_rewrite_{};
     double double_val_{};
     bool bool_val_{};
     object_type object_type_{object_type::PRIMITIVE_OR_OBJ};

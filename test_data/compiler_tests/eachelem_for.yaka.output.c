@@ -28,7 +28,6 @@ int32_t yy__main()
         {
             break;
         }
-        #define yy__i (yy__0t[yy__1t]) // desugar by reference begin;
         int32_t* yy__3t = yy__e2;
         int32_t yy__4t = INT32_C(0);
         int32_t yy__5t = yk__arrlen(yy__3t);
@@ -38,17 +37,14 @@ int32_t yy__main()
             {
                 break;
             }
-            #define yy__j (yy__3t[yy__4t]) // desugar by reference begin;
-            yk__printint(((intmax_t)yy__i));
+            yk__printint(((intmax_t)(yy__0t[yy__1t])));
             yk__sds t__8 = yk__sdsnewlen(" - ", 3);
             yk__printstr((t__8));
-            yk__printlnint(((intmax_t)yy__j));
+            yk__printlnint(((intmax_t)(yy__3t[yy__4t])));
             yy__4t += INT32_C(1);
-            #undef yy__j // desugar by reference end;
             yk__sdsfree(t__8);
         }
         yy__1t += INT32_C(1);
-        #undef yy__i // desugar by reference end;
     }
     yk__arrfree(yy__e1);
     yk__arrfree(yy__e2);
