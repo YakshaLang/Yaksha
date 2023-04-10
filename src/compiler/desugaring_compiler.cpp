@@ -256,7 +256,6 @@ void desugaring_compiler::visit_foreach_stmt(foreach_stmt *obj) {
 }
 void desugaring_compiler::visit_forendless_stmt(forendless_stmt *obj) {
   // convert to a while True:
-  std::cout << "H";
   pre_continue_stack_.emplace_back(nullptr);
   auto while_stmt = ast_pool_->c_while_stmt(
       obj->for_keyword_, ast_pool_->c_literal_expr(true_token_),
