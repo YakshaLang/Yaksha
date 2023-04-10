@@ -59,3 +59,4 @@ test_data/sample6.yaka
 test_data/sample_hello_threads.yaka
 test_data/sample_negative_numbers.yaka
 test_data/test_compiler.yaka
+test_data/simple_programs/defer_test.yaka

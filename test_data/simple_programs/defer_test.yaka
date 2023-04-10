@@ -1,0 +1,16 @@
+# This code demonstrates the different between Yaksha and Go defer
+# This will print 1, 2, 3, 4
+# If you remove defer it will print 0, 1, 2, 3
+# --
+# Similar loop will print 3, 2, 1, 0 in Go
+#	i := 0
+#	for i < 4 {
+#		defer fmt.Print(i)
+#		i++
+#	}
+def main() -> int:
+    i: int = 0
+    while i < 4:
+        defer println(i)
+        i += 1
+    return 0

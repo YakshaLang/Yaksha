@@ -59,5 +59,6 @@
   "test_data/sample6.yaka": "Invalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\n\nInvalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\n\nCritical !! main() function must be present\n\nreturn := 4294967295",
   "test_data/sample_hello_threads.yaka": "File not found or unable to read:cpu.yaka\n\nFailed to compile:sample_hello_threads.yaka\n\nreturn := 4294967295",
   "test_data/sample_negative_numbers.yaka": "Invalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\n\nCritical !! main() function must be present\n\nreturn := 4294967295",
+  "test_data/simple_programs/defer_test.yaka": "1\n2\n3\n4\n\nreturn := 0",
   "test_data/test_compiler.yaka": "3628800\n362880\n40320\n5040\n720\n120\n24\n6\n2\n1\naaaaaaaaaab\n2 From defer --> Program Completed\n1 From defer --> Program Completed\n\nreturn := 0"
 }
