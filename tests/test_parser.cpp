@@ -117,3 +117,26 @@ TEST_CASE("type checker: continue used outside loop") {
                     "    return 0",
                     "Invalid assignment target!");
 }
+TEST_CASE("parser: def in def") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    def x() -> None:\n"
+                    "        pass\n"
+                    "    c: bool = False\n"
+                    "    return 0",
+                    "Blocks with nested import/def/class is not supported");
+}
+TEST_CASE("parser: class in def") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    class X:\n"
+                    "        a: int\n"
+                    "    c: bool = False\n"
+                    "    return 0",
+                    "Blocks with nested import/def/class is not supported");
+}
+TEST_CASE("parser: import in def") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    import banana\n"
+                    "    c: bool = False\n"
+                    "    return 0",
+                    "Blocks with nested import/def/class is not supported");
+}

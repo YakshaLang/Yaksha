@@ -317,6 +317,17 @@ stmt *parser::if_statement() {
   return pool_.c_if_stmt(if_keyword, exp, if_branch, sugar_else_,
                          pool_.c_block_stmt(sugar_else_block));
 }
+void parser::verify_statements(token *token, std::vector<stmt *> &statements) {
+  for (stmt *st : statements) {
+    if (st->get_type() == ast_type::STMT_IMPORT ||
+        st->get_type() == ast_type::STMT_DEF ||
+        st->get_type() == ast_type::STMT_CLASS) {
+      throw error(token,
+                  "Blocks with nested import/def/class is not supported");
+      break;
+    }
+  }
+}
 stmt *parser::block_statement() {
   // block_stmt -> COLON NEW_LINE BA_INDENT statement+ BA_DEDENT
   consume(token_type::COLON, "Expected ':' at start of block");
@@ -348,6 +359,7 @@ stmt *parser::block_statement() {
                        " statement for an empty block.");
   }
   consume(token_type::BA_DEDENT, "Expected dedent");
+  verify_statements(colon, statements);
   return pool_.c_block_stmt(statements);
 }
 stmt *parser::defer_statement() {

@@ -86,6 +86,7 @@ private:
     parsing_error error(token *tok, const std::string &message);
     void handle_error(const parsing_error &err);
     void synchronize_parser();
+    void verify_statements(token* t, std::vector<stmt*>& statements);
     // state
     std::size_t current_;
     ast_pool pool_;
