@@ -140,3 +140,7 @@ TEST_CASE("parser: import in def") {
                     "    return 0",
                     "Blocks with nested import/def/class is not supported");
 }
+TEST_CASE("parser: mini blocks") {
+  TEST_FILE("../test_data/compiler_tests/smallest.yaka", "smallest.yaka",
+            "../test_data/compiler_tests/smallest.ast.tokens");
+}

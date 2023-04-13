@@ -321,46 +321,74 @@ void parser::verify_statements(token *token, std::vector<stmt *> &statements) {
   for (stmt *st : statements) {
     if (st->get_type() == ast_type::STMT_IMPORT ||
         st->get_type() == ast_type::STMT_DEF ||
-        st->get_type() == ast_type::STMT_CLASS) {
+        st->get_type() == ast_type::STMT_CLASS ||
+        st->get_type() == ast_type::STMT_RUNTIMEFEATURE) {
       throw error(token,
                   "Blocks with nested import/def/class is not supported");
-      break;
+    }
+  }
+}
+void parser::verify_only_single_line_statements(
+    token *token, std::vector<stmt *> &statements) {
+  for (stmt *st : statements) {
+    if (!(st->get_type() == ast_type::STMT_DEFER
+          || st->get_type() == ast_type::STMT_DEL
+          || st->get_type() == ast_type::STMT_PASS
+          || st->get_type() == ast_type::STMT_RETURN
+          || st->get_type() == ast_type::STMT_EXPRESSION
+          || st->get_type() == ast_type::STMT_CCODE
+            )) {
+      throw error(token,
+                  "Blocks with nested import/def/class is not supported");
     }
   }
 }
 stmt *parser::block_statement() {
   // block_stmt -> COLON NEW_LINE BA_INDENT statement+ BA_DEDENT
+  // block_stmt -> COLON SIMPLE_STMT
   consume(token_type::COLON, "Expected ':' at start of block");
   auto colon = previous();
-  consume(token_type::NEW_LINE, "Expected new line");
-  consume(token_type::BA_INDENT, "Expected indented block");
   std::vector<stmt *> statements{};
-  statements.reserve(3);
-  while (!is_at_end()) {
+  if (peek()->type_ != token_type::NEW_LINE) {
+    statements.reserve(1);
     auto decl = declaration_statement();
-    if (decl == nullptr) { break; }
-    statements.emplace_back(decl);
-    if (peek()->type_ == token_type::BA_DEDENT) { break; }
-  }
-  if (statements.empty()) {
-    throw error(colon, "Block cannot be empty. Use 'pass'"
-                       " statement for an empty block.");
-  }
-  // Discard python style documentation comments
-  if (statements.front()->get_type() == ast_type::EXPR_LITERAL) {
-    auto first_item = dynamic_cast<literal_expr *>(statements.front());
-    if (first_item->literal_token_->type_ == token_type::STRING ||
-        first_item->literal_token_->type_ == token_type::THREE_QUOTE_STRING) {
-      statements.erase(statements.begin());
+    if (decl == nullptr) {
+      throw error(colon, "Block cannot be empty. Use 'pass'"
+                         " statement for an empty block.");
     }
+    statements.emplace_back(decl);
+    verify_only_single_line_statements(colon, statements);
+    return pool_.c_block_stmt(statements);
+  } else {
+    consume(token_type::NEW_LINE, "Expected new line");
+    consume(token_type::BA_INDENT, "Expected indented block");
+    statements.reserve(3);
+    while (!is_at_end()) {
+      auto decl = declaration_statement();
+      if (decl == nullptr) { break; }
+      statements.emplace_back(decl);
+      if (peek()->type_ == token_type::BA_DEDENT) { break; }
+    }
+    if (statements.empty()) {
+      throw error(colon, "Block cannot be empty. Use 'pass'"
+                         " statement for an empty block.");
+    }
+    // Discard python style documentation comments
+    if (statements.front()->get_type() == ast_type::EXPR_LITERAL) {
+      auto first_item = dynamic_cast<literal_expr *>(statements.front());
+      if (first_item->literal_token_->type_ == token_type::STRING ||
+          first_item->literal_token_->type_ == token_type::THREE_QUOTE_STRING) {
+        statements.erase(statements.begin());
+      }
+    }
+    if (statements.empty()) {
+      throw error(colon, "Block cannot be empty. Use 'pass'"
+                         " statement for an empty block.");
+    }
+    consume(token_type::BA_DEDENT, "Expected dedent");
+    verify_statements(colon, statements);
+    return pool_.c_block_stmt(statements);
   }
-  if (statements.empty()) {
-    throw error(colon, "Block cannot be empty. Use 'pass'"
-                       " statement for an empty block.");
-  }
-  consume(token_type::BA_DEDENT, "Expected dedent");
-  verify_statements(colon, statements);
-  return pool_.c_block_stmt(statements);
 }
 stmt *parser::defer_statement() {
   auto defer_keyword = previous();
