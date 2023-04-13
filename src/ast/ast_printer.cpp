@@ -114,13 +114,13 @@ void ast_printer::visit_fncall_expr(fncall_expr *obj) {
 void ast_printer::visit_def_stmt(def_stmt *obj) {
   if (obj->annotations_.native_) {
     // @native
-    text_ << "(native_def";
+    text_ << "(native_def ";
   } else if (obj->annotations_.native_macro_) {
     // @nativemacro
-    text_ << "(native_macro_def";
+    text_ << "(native_macro_def ";
   } else {
     // normal functions
-    text_ << "(def";
+    text_ << "(def ";
   }
   text_ << obj->name_->token_;
   text_ << " (";
