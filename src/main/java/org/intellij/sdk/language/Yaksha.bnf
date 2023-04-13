@@ -16,7 +16,8 @@
   psiImplUtilClass="org.intellij.sdk.language.psi.impl.YakshaPsiImplUtil"
 }
 
-yakshaFile ::= item_*
+yakshaFile ::= item_*  {pin=1 recoverWhile="top_level_recover" name="import, def, class"}
+private top_level_recover ::= !('@' | 'class'  | 'def' | 'import' | 'runtimefeature')
 
 private item_ ::= (outer_statement | COMMENT | empty_line)
 
@@ -55,7 +56,9 @@ def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERA
 }
 def_params ::= def_param (S? OPERATOR_COMMA S? def_param)*
 def_param ::= IDENTIFIER S? OPERATOR_COLON S? data_type
-def_bits ::= pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement | let_statement | empty_line | continue_statement | break_statement | COMMENT
+def_bits ::= pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement
+ | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
+  | let_statement | empty_line | continue_statement | break_statement | COMMENT
 
 // Compound statements
 if_statement ::= I KW_IF S? exp S? OPERATOR_COLON S? NL def_bits+
@@ -74,7 +77,8 @@ del_statement ::= I KW_DEL  S? exp NL
 return_statement ::= I KW_RETURN (S? exp)? NL
 defer_statement ::= I KW_DEFER S? KW_DEL? S? exp NL
 expr_statement ::= I exp S? NL
-assignment_statement ::= I exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ | OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
+assignment_statement ::= I exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
+ OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
 let_statement ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? (OPERATOR_EQ S? exp S?)? NL
 
 // Expression Recursion

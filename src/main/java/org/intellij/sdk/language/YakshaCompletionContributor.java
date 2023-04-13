@@ -118,6 +118,8 @@ public class YakshaCompletionContributor extends CompletionContributor {
                         resultSet.addElement(LookupElementBuilder.create("if").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("else").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("while").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("for").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("in").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("break").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("continue").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("del").withIcon(YakshaIcons.KEYWORD));
@@ -138,6 +140,7 @@ public class YakshaCompletionContributor extends CompletionContributor {
                         resultSet.addElement(LookupElementBuilder.create("@dotaccess").withIcon(YakshaIcons.KEYWORD));
 
                         resultSet.addElement(LookupElementBuilder.create("Array").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("Tuple").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("SMEntry").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("MEntry").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("Function").withIcon(YakshaIcons.DATA_TYPE));
