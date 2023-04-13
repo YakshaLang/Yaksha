@@ -1,0 +1,111 @@
+{
+  parserClass="org.intellij.sdk.language.parser.YakshaParser"
+  parserUtilClass="org.intellij.sdk.language.parser.YakshaParserUtil"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Yaksha"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.intellij.sdk.language.psi"
+  psiImplPackage="org.intellij.sdk.language.psi.impl"
+
+  elementTypeHolderClass="org.intellij.sdk.language.psi.YakshaTypes"
+  elementTypeClass="org.intellij.sdk.language.psi.YakshaElementType"
+  tokenTypeClass="org.intellij.sdk.language.psi.YakshaTokenType"
+
+  psiImplUtilClass="org.intellij.sdk.language.psi.impl.YakshaPsiImplUtil"
+}
+
+yakshaFile ::= item_*  {pin=1 recoverWhile="top_level_recover" name="import, def, class"}
+private top_level_recover ::= !('@' | 'class'  | 'def' | 'import' | 'runtimefeature')
+
+private item_ ::= (outer_statement | COMMENT | empty_line)
+
+empty_line ::= S? NL
+
+outer_statement ::= runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement
+
+runtimefeature_statement ::= KW_RUNTIMEFEATURE S STRING S? NL
+
+import_statement ::= KW_IMPORT S IDENTIFIER (OPERATOR_DOT IDENTIFIER)* (S KW_AS S IDENTIFIER)? S? NL {
+    mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
+    implements="org.intellij.sdk.language.psi.YakshaNamedElement"
+    methods=[getImportPath getName setName getNameIdentifier getPresentation]
+}
+const_statement ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? (KW_CCODE S? STRING| literal) S? NL {
+    mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
+    implements="org.intellij.sdk.language.psi.YakshaNamedElement"
+    methods=[getName setName getNameIdentifier getPresentation]
+}
+literal ::= NUMBER | KW_TRUE | KW_FALSE
+
+class_statement ::= KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? NL class_bits+ {
+    mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
+    implements="org.intellij.sdk.language.psi.YakshaNamedElement"
+    methods=[getName setName getNameIdentifier getPresentation]
+}
+class_bits ::= pass_statement | COMMENT | empty_line | class_field
+class_field ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL {
+    methods=[getName getNameIdentifier getPresentation]
+}
+
+def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON S? NL def_bits+ {
+    mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
+    implements="org.intellij.sdk.language.psi.YakshaNamedElement"
+    methods=[getName setName getNameIdentifier getPresentation]
+}
+def_params ::= def_param (S? OPERATOR_COMMA S? def_param)*
+def_param ::= IDENTIFIER S? OPERATOR_COLON S? data_type
+def_bits ::= pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement
+ | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
+  | let_statement | empty_line | continue_statement | break_statement | COMMENT
+
+// Compound statements
+if_statement ::= I KW_IF S? exp S? OPERATOR_COLON S? NL def_bits+
+elif_statement ::= I KW_ELIF S? exp S? OPERATOR_COLON S? NL def_bits+
+else_statement ::= I KW_ELSE S? OPERATOR_COLON S? NL def_bits+
+while_statement ::= I KW_WHILE S? exp S? OPERATOR_COLON S? NL def_bits+
+foreach_statement ::= I KW_FOR S? IDENTIFIER S? OPERATOR_COLON S? data_type S? KW_IN S? exp S? OPERATOR_COLON S? NL def_bits+
+forendless_statement ::= I KW_FOR S? OPERATOR_COLON S? NL def_bits+
+
+// Simple statements
+pass_statement ::= I KW_PASS S? NL
+continue_statement ::= I KW_CONTINUE S? NL
+break_statement ::= I KW_BREAK S? NL
+ccode_statement ::= I KW_CCODE S? STRING S? NL
+del_statement ::= I KW_DEL  S? exp NL
+return_statement ::= I KW_RETURN (S? exp)? NL
+defer_statement ::= I KW_DEFER S? KW_DEL? S? exp NL
+expr_statement ::= I exp S? NL
+assignment_statement ::= I exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
+ OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
+let_statement ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? (OPERATOR_EQ S? exp S?)? NL
+
+// Expression Recursion
+exp ::= S? logic_or S?
+logic_or ::= logic_and (S? OPERATOR_OR S? logic_and)* | logic_and
+logic_and ::= comparison (S? OPERATOR_AND S? comparison)* | comparison
+comparison ::= bitwise (S? OPERATOR_COMPARISON S? bitwise)* | bitwise
+bitwise ::= term (S? (OPERATOR_B_OR | OPERATOR_B_AND | OPERATOR_B_XOR | OPERATOR_SHL | OPERATOR_SHR ) S? term)* | term
+term ::= factor (S? (OPERATOR_MINUS | OPERATOR_PLUS) S? factor)* | factor
+factor ::= unary (S? (OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER) S? unary)* | unary
+unary ::= (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp | fncall | primary
+fncall ::= IDENTIFIER (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER )* {
+    methods=[getDefOrClassName getFullName getReference]
+}
+primary ::= KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | IDENTIFIER | paren_exp
+paren_exp ::= OPERATOR_OPEN_P S? exp S? OPERATOR_CLOSE_P
+arguments ::= exp (S? OPERATOR_COMMA S? exp)*
+
+annotation ::= OPERATOR_AT IDENTIFIER annotation_arg? S? NL
+annotation_arg ::= S? OPERATOR_OPEN_P S? STRING S? OPERATOR_CLOSE_P
+
+
+// Data Type Recursion
+data_type ::= data_type_bit data_type_args | data_type_bit
+data_type_args ::= S? OPERATOR_OPEN_SQB S? data_type_arg_bits S? OPERATOR_CLOSE_SQB S?
+data_type_arg_bits ::= data_type (S? OPERATOR_COMMA S? data_type)*
+data_type_bit ::=  data_type_identifier | PRIMITIVE_DATA_TYPE | KW_NONE  {
+    methods=[getReference]
+}
+data_type_identifier ::= IDENTIFIER (OPERATOR_DOT IDENTIFIER)?
