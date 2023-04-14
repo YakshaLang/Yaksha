@@ -63,7 +63,7 @@ def clean_line_c_compiler_paths(s: str) -> str:
     if WINDOWS:
         s = re.sub(r"[A-Z]:\\", r"\\", s)
         s = re.sub(r"\\", "/", s)
-    match = re.match(r"^([\\a-zA-Z0-9/:_.]+) (.+)$", s)
+    match = re.match(r"^([\\a-zA-Z0-9/:_.\\-]+) (.+)$", s)
     if match:
         f = match.group(1)
         e = match.group(2)
@@ -72,7 +72,7 @@ def clean_line_c_compiler_paths(s: str) -> str:
         f = ":".join(path_items)
         text = f + " " + e
         s = text.rstrip()
-    s = re.sub(r"/([a-zA-Z0-9_]+/)+", "", s)
+    s = re.sub(r"/([a-zA-Z0-9_\\-]+/)+", "", s)
     return s.rstrip()
 
 
