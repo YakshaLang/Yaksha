@@ -12,11 +12,15 @@ public interface YakshaTypes {
   IElementType ANNOTATION_ARG = new YakshaElementType("ANNOTATION_ARG");
   IElementType ARGUMENTS = new YakshaElementType("ARGUMENTS");
   IElementType ASSIGNMENT_STATEMENT = new YakshaElementType("ASSIGNMENT_STATEMENT");
+  IElementType ASSIGNMENT_STATEMENT_WO_INDENT = new YakshaElementType("ASSIGNMENT_STATEMENT_WO_INDENT");
   IElementType BITWISE = new YakshaElementType("BITWISE");
   IElementType BREAK_STATEMENT = new YakshaElementType("BREAK_STATEMENT");
   IElementType CCODE_STATEMENT = new YakshaElementType("CCODE_STATEMENT");
+  IElementType CCODE_STATEMENT_WO_INDENT = new YakshaElementType("CCODE_STATEMENT_WO_INDENT");
   IElementType CLASS_BITS = new YakshaElementType("CLASS_BITS");
+  IElementType CLASS_BLOCK = new YakshaElementType("CLASS_BLOCK");
   IElementType CLASS_FIELD = new YakshaElementType("CLASS_FIELD");
+  IElementType CLASS_FIELD_WO_INDENT = new YakshaElementType("CLASS_FIELD_WO_INDENT");
   IElementType CLASS_STATEMENT = new YakshaElementType("CLASS_STATEMENT");
   IElementType COMPARISON = new YakshaElementType("COMPARISON");
   IElementType CONST_STATEMENT = new YakshaElementType("CONST_STATEMENT");
@@ -27,16 +31,20 @@ public interface YakshaTypes {
   IElementType DATA_TYPE_BIT = new YakshaElementType("DATA_TYPE_BIT");
   IElementType DATA_TYPE_IDENTIFIER = new YakshaElementType("DATA_TYPE_IDENTIFIER");
   IElementType DEFER_STATEMENT = new YakshaElementType("DEFER_STATEMENT");
+  IElementType DEFER_STATEMENT_WO_INDENT = new YakshaElementType("DEFER_STATEMENT_WO_INDENT");
   IElementType DEF_BITS = new YakshaElementType("DEF_BITS");
+  IElementType DEF_BLOCK = new YakshaElementType("DEF_BLOCK");
   IElementType DEF_PARAM = new YakshaElementType("DEF_PARAM");
   IElementType DEF_PARAMS = new YakshaElementType("DEF_PARAMS");
   IElementType DEF_STATEMENT = new YakshaElementType("DEF_STATEMENT");
   IElementType DEL_STATEMENT = new YakshaElementType("DEL_STATEMENT");
+  IElementType DEL_STATEMENT_WO_INDENT = new YakshaElementType("DEL_STATEMENT_WO_INDENT");
   IElementType ELIF_STATEMENT = new YakshaElementType("ELIF_STATEMENT");
   IElementType ELSE_STATEMENT = new YakshaElementType("ELSE_STATEMENT");
   IElementType EMPTY_LINE = new YakshaElementType("EMPTY_LINE");
   IElementType EXP = new YakshaElementType("EXP");
   IElementType EXPR_STATEMENT = new YakshaElementType("EXPR_STATEMENT");
+  IElementType EXPR_STATEMENT_WO_INDENT = new YakshaElementType("EXPR_STATEMENT_WO_INDENT");
   IElementType FACTOR = new YakshaElementType("FACTOR");
   IElementType FNCALL = new YakshaElementType("FNCALL");
   IElementType FOREACH_STATEMENT = new YakshaElementType("FOREACH_STATEMENT");
@@ -50,9 +58,13 @@ public interface YakshaTypes {
   IElementType OUTER_STATEMENT = new YakshaElementType("OUTER_STATEMENT");
   IElementType PAREN_EXP = new YakshaElementType("PAREN_EXP");
   IElementType PASS_STATEMENT = new YakshaElementType("PASS_STATEMENT");
+  IElementType PASS_STATEMENT_WO_INDENT = new YakshaElementType("PASS_STATEMENT_WO_INDENT");
   IElementType PRIMARY = new YakshaElementType("PRIMARY");
   IElementType RETURN_STATEMENT = new YakshaElementType("RETURN_STATEMENT");
+  IElementType RETURN_STATEMENT_WO_INDENT = new YakshaElementType("RETURN_STATEMENT_WO_INDENT");
   IElementType RUNTIMEFEATURE_STATEMENT = new YakshaElementType("RUNTIMEFEATURE_STATEMENT");
+  IElementType SINGLE_LINE_CLASS_BITS = new YakshaElementType("SINGLE_LINE_CLASS_BITS");
+  IElementType SINGLE_LINE_DEF_BITS = new YakshaElementType("SINGLE_LINE_DEF_BITS");
   IElementType TERM = new YakshaElementType("TERM");
   IElementType UNARY = new YakshaElementType("UNARY");
   IElementType WHILE_STATEMENT = new YakshaElementType("WHILE_STATEMENT");
@@ -137,6 +149,9 @@ public interface YakshaTypes {
       else if (type == ASSIGNMENT_STATEMENT) {
         return new YakshaAssignmentStatementImpl(node);
       }
+      else if (type == ASSIGNMENT_STATEMENT_WO_INDENT) {
+        return new YakshaAssignmentStatementWoIndentImpl(node);
+      }
       else if (type == BITWISE) {
         return new YakshaBitwiseImpl(node);
       }
@@ -146,11 +161,20 @@ public interface YakshaTypes {
       else if (type == CCODE_STATEMENT) {
         return new YakshaCcodeStatementImpl(node);
       }
+      else if (type == CCODE_STATEMENT_WO_INDENT) {
+        return new YakshaCcodeStatementWoIndentImpl(node);
+      }
       else if (type == CLASS_BITS) {
         return new YakshaClassBitsImpl(node);
       }
+      else if (type == CLASS_BLOCK) {
+        return new YakshaClassBlockImpl(node);
+      }
       else if (type == CLASS_FIELD) {
         return new YakshaClassFieldImpl(node);
+      }
+      else if (type == CLASS_FIELD_WO_INDENT) {
+        return new YakshaClassFieldWoIndentImpl(node);
       }
       else if (type == CLASS_STATEMENT) {
         return new YakshaClassStatementImpl(node);
@@ -182,8 +206,14 @@ public interface YakshaTypes {
       else if (type == DEFER_STATEMENT) {
         return new YakshaDeferStatementImpl(node);
       }
+      else if (type == DEFER_STATEMENT_WO_INDENT) {
+        return new YakshaDeferStatementWoIndentImpl(node);
+      }
       else if (type == DEF_BITS) {
         return new YakshaDefBitsImpl(node);
+      }
+      else if (type == DEF_BLOCK) {
+        return new YakshaDefBlockImpl(node);
       }
       else if (type == DEF_PARAM) {
         return new YakshaDefParamImpl(node);
@@ -196,6 +226,9 @@ public interface YakshaTypes {
       }
       else if (type == DEL_STATEMENT) {
         return new YakshaDelStatementImpl(node);
+      }
+      else if (type == DEL_STATEMENT_WO_INDENT) {
+        return new YakshaDelStatementWoIndentImpl(node);
       }
       else if (type == ELIF_STATEMENT) {
         return new YakshaElifStatementImpl(node);
@@ -211,6 +244,9 @@ public interface YakshaTypes {
       }
       else if (type == EXPR_STATEMENT) {
         return new YakshaExprStatementImpl(node);
+      }
+      else if (type == EXPR_STATEMENT_WO_INDENT) {
+        return new YakshaExprStatementWoIndentImpl(node);
       }
       else if (type == FACTOR) {
         return new YakshaFactorImpl(node);
@@ -251,14 +287,26 @@ public interface YakshaTypes {
       else if (type == PASS_STATEMENT) {
         return new YakshaPassStatementImpl(node);
       }
+      else if (type == PASS_STATEMENT_WO_INDENT) {
+        return new YakshaPassStatementWoIndentImpl(node);
+      }
       else if (type == PRIMARY) {
         return new YakshaPrimaryImpl(node);
       }
       else if (type == RETURN_STATEMENT) {
         return new YakshaReturnStatementImpl(node);
       }
+      else if (type == RETURN_STATEMENT_WO_INDENT) {
+        return new YakshaReturnStatementWoIndentImpl(node);
+      }
       else if (type == RUNTIMEFEATURE_STATEMENT) {
         return new YakshaRuntimefeatureStatementImpl(node);
+      }
+      else if (type == SINGLE_LINE_CLASS_BITS) {
+        return new YakshaSingleLineClassBitsImpl(node);
+      }
+      else if (type == SINGLE_LINE_DEF_BITS) {
+        return new YakshaSingleLineDefBitsImpl(node);
       }
       else if (type == TERM) {
         return new YakshaTermImpl(node);

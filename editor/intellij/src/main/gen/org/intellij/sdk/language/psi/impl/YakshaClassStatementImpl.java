@@ -29,8 +29,8 @@ public class YakshaClassStatementImpl extends YakshaNamedElementImpl implements 
 
   @Override
   @NotNull
-  public List<YakshaClassBits> getClassBitsList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaClassBits.class);
+  public YakshaClassBlock getClassBlock() {
+    return findNotNullChildByClass(YakshaClassBlock.class);
   }
 
   @Override

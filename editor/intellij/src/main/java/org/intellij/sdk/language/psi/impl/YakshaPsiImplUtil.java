@@ -7,17 +7,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import org.intellij.sdk.language.YakshaIcons;
 import org.intellij.sdk.language.YakshaReference;
-import org.intellij.sdk.language.psi.YakshaClassField;
-import org.intellij.sdk.language.psi.YakshaClassStatement;
-import org.intellij.sdk.language.psi.YakshaConstStatement;
-import org.intellij.sdk.language.psi.YakshaDataTypeBit;
-import org.intellij.sdk.language.psi.YakshaDataTypeIdentifier;
-import org.intellij.sdk.language.psi.YakshaDefParam;
-import org.intellij.sdk.language.psi.YakshaDefParams;
-import org.intellij.sdk.language.psi.YakshaDefStatement;
-import org.intellij.sdk.language.psi.YakshaFncall;
-import org.intellij.sdk.language.psi.YakshaImportStatement;
-import org.intellij.sdk.language.psi.YakshaTypes;
+import org.intellij.sdk.language.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -151,6 +141,19 @@ public class YakshaPsiImplUtil {
     /* ============================================================== */
 
     public static String getName(final YakshaClassField statement) {
+       return getName(statement.getClassFieldWoIndent());
+    }
+
+
+    public static ItemPresentation getPresentation(final YakshaClassField element) {
+        return getPresentation(element.getClassFieldWoIndent());
+    }
+
+    public static PsiElement getNameIdentifier(final YakshaClassField statement) {
+        return getNameIdentifier(statement.getClassFieldWoIndent());
+    }
+
+    public static String getName(final YakshaClassFieldWoIndent statement) {
         ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
         if (nameNode != null) {
             return nameNode.getText();
@@ -158,8 +161,7 @@ public class YakshaPsiImplUtil {
         return null;
     }
 
-
-    public static ItemPresentation getPresentation(final YakshaClassField element) {
+    public static ItemPresentation getPresentation(final YakshaClassFieldWoIndent element) {
         return new ItemPresentation() {
             @Nullable
             @Override
@@ -189,7 +191,7 @@ public class YakshaPsiImplUtil {
         };
     }
 
-    public static PsiElement getNameIdentifier(final YakshaClassField statement) {
+    public static PsiElement getNameIdentifier(final YakshaClassFieldWoIndent statement) {
         ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
         if (nameNode != null) {
             return nameNode.getPsi();

@@ -29,8 +29,8 @@ public class YakshaDeferStatementImpl extends ASTWrapperPsiElement implements Ya
 
   @Override
   @NotNull
-  public YakshaExp getExp() {
-    return findNotNullChildByClass(YakshaExp.class);
+  public YakshaDeferStatementWoIndent getDeferStatementWoIndent() {
+    return findNotNullChildByClass(YakshaDeferStatementWoIndent.class);
   }
 
 }

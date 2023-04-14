@@ -7,4 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface YakshaCcodeStatement extends PsiElement {
 
+  @NotNull
+  YakshaCcodeStatementWoIndent getCcodeStatementWoIndent();
+
 }

@@ -12,7 +12,7 @@ public interface YakshaDefStatement extends YakshaNamedElement {
   YakshaDataType getDataType();
 
   @NotNull
-  List<YakshaDefBits> getDefBitsList();
+  YakshaDefBlock getDefBlock();
 
   @Nullable
   YakshaDefParams getDefParams();

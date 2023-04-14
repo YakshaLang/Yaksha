@@ -7,4 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface YakshaPassStatement extends PsiElement {
 
+  @NotNull
+  YakshaPassStatementWoIndent getPassStatementWoIndent();
+
 }

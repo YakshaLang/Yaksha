@@ -23,6 +23,10 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitAssignmentStatementWoIndent(@NotNull YakshaAssignmentStatementWoIndent o) {
+    visitPsiElement(o);
+  }
+
   public void visitBitwise(@NotNull YakshaBitwise o) {
     visitPsiElement(o);
   }
@@ -35,11 +39,23 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitCcodeStatementWoIndent(@NotNull YakshaCcodeStatementWoIndent o) {
+    visitPsiElement(o);
+  }
+
   public void visitClassBits(@NotNull YakshaClassBits o) {
     visitPsiElement(o);
   }
 
+  public void visitClassBlock(@NotNull YakshaClassBlock o) {
+    visitPsiElement(o);
+  }
+
   public void visitClassField(@NotNull YakshaClassField o) {
+    visitPsiElement(o);
+  }
+
+  public void visitClassFieldWoIndent(@NotNull YakshaClassFieldWoIndent o) {
     visitPsiElement(o);
   }
 
@@ -83,6 +99,10 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitDefBlock(@NotNull YakshaDefBlock o) {
+    visitPsiElement(o);
+  }
+
   public void visitDefParam(@NotNull YakshaDefParam o) {
     visitPsiElement(o);
   }
@@ -99,7 +119,15 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitDeferStatementWoIndent(@NotNull YakshaDeferStatementWoIndent o) {
+    visitPsiElement(o);
+  }
+
   public void visitDelStatement(@NotNull YakshaDelStatement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDelStatementWoIndent(@NotNull YakshaDelStatementWoIndent o) {
     visitPsiElement(o);
   }
 
@@ -120,6 +148,10 @@ public class YakshaVisitor extends PsiElementVisitor {
   }
 
   public void visitExprStatement(@NotNull YakshaExprStatement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitExprStatementWoIndent(@NotNull YakshaExprStatementWoIndent o) {
     visitPsiElement(o);
   }
 
@@ -175,6 +207,10 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitPassStatementWoIndent(@NotNull YakshaPassStatementWoIndent o) {
+    visitPsiElement(o);
+  }
+
   public void visitPrimary(@NotNull YakshaPrimary o) {
     visitPsiElement(o);
   }
@@ -183,7 +219,19 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitReturnStatementWoIndent(@NotNull YakshaReturnStatementWoIndent o) {
+    visitPsiElement(o);
+  }
+
   public void visitRuntimefeatureStatement(@NotNull YakshaRuntimefeatureStatement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitSingleLineClassBits(@NotNull YakshaSingleLineClassBits o) {
+    visitPsiElement(o);
+  }
+
+  public void visitSingleLineDefBits(@NotNull YakshaSingleLineDefBits o) {
     visitPsiElement(o);
   }
 

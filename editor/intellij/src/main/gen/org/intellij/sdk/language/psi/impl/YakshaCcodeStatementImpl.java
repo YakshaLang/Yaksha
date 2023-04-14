@@ -27,4 +27,10 @@ public class YakshaCcodeStatementImpl extends ASTWrapperPsiElement implements Ya
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public YakshaCcodeStatementWoIndent getCcodeStatementWoIndent() {
+    return findNotNullChildByClass(YakshaCcodeStatementWoIndent.class);
+  }
+
 }

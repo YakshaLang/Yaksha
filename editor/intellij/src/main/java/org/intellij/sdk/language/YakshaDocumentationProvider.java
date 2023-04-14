@@ -5,18 +5,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.presentation.java.SymbolPresentationUtil;
-import org.intellij.sdk.language.psi.YakshaClassBits;
-import org.intellij.sdk.language.psi.YakshaClassField;
-import org.intellij.sdk.language.psi.YakshaClassStatement;
-import org.intellij.sdk.language.psi.YakshaDataType;
-import org.intellij.sdk.language.psi.YakshaDataTypeBit;
-import org.intellij.sdk.language.psi.YakshaDataTypeIdentifier;
-import org.intellij.sdk.language.psi.YakshaDefParam;
-import org.intellij.sdk.language.psi.YakshaDefParams;
-import org.intellij.sdk.language.psi.YakshaDefStatement;
-import org.intellij.sdk.language.psi.YakshaFncall;
-import org.intellij.sdk.language.psi.YakshaImportStatement;
-import org.intellij.sdk.language.psi.YakshaTypes;
+import org.intellij.sdk.language.psi.*;
+import org.intellij.sdk.language.psi.impl.YakshaClassFieldWoIndentImpl;
 import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,7 +55,7 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
             YakshaClassStatement c = (YakshaClassStatement) element;
             b.title(c.getName());
             b.keyValue("<b>Kind</b>", "Class");
-            final List<YakshaClassBits> bitsList = c.getClassBitsList();
+            final List<YakshaClassBits> bitsList = c.getClassBlock().getClassBitsList();
             if (bitsList != null) {
                 for (YakshaClassBits bit : bitsList) {
                     YakshaClassField field = bit.getClassField();
@@ -73,13 +63,21 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
                         final ASTNode node = field.getNode().findChildByType(YakshaTypes.IDENTIFIER);
                         if (node != null) {
                             String dt = "?";
-                            if (field.getDataType() != null) {
-                                dt = field.getDataType().getText();
+                            if (field.getClassFieldWoIndent().getDataType() != null) {
+                                dt = field.getClassFieldWoIndent().getDataType().getText();
                             }
                             b.typeKeyValue("Member", node.getText(), dt);
                         }
                     }
                 }
+            }
+            @Nullable YakshaSingleLineClassBits possibleSingl = c.getClassBlock().getSingleLineClassBits();
+            if (possibleSingl != null && possibleSingl.getClassFieldWoIndent() != null) {
+                String dt = "?";
+                if (possibleSingl.getClassFieldWoIndent().getDataType() != null) {
+                    dt = possibleSingl.getClassFieldWoIndent().getDataType().getText();
+                }
+                b.typeKeyValue("Member", possibleSingl.getClassFieldWoIndent().getText(), dt);
             }
             b.description(extractComments(element));
             return b.build();
