@@ -19,10 +19,10 @@ jobs:
         path: main
         submodules: 'true'
     - name: Build zips & 7zs
-      run: python main/scripts/release.py
+      run: python main/compiler/scripts/release.py
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          main/comp_output_test/yaksha_v*.zip
-          main/comp_output_test/yaksha_v*.7z
+          main/compiler/comp_output_test/yaksha_v*.zip
+          main/compiler/comp_output_test/yaksha_v*.7z

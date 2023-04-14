@@ -1,13 +1,13 @@
 [submodule "3rd/Catch2"]
-	path = 3rd/Catch2
+	path = compiler/3rd/Catch2
 	url = https://github.com/catchorg/Catch2.git
 	branch = v2.x
 [submodule "3rd/utfcpp"]
-	path = 3rd/utfcpp
+	path = compiler/3rd/utfcpp
 	url = https://github.com/nemtrif/utfcpp.git
 [submodule "runtime/raylib"]
-	path = runtime/raylib
+	path = compiler/runtime/raylib
 	url = https://github.com/raysan5/raylib.git
 [submodule "runtime/raygui"]
-	path = runtime/raygui
+	path = compiler/runtime/raygui
 	url = https://github.com/raysan5/raygui.git

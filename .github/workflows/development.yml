@@ -27,16 +27,16 @@ jobs:
         git submodule update
         sudo apt update
         sudo apt install -y cmake ninja-build g++
-        mkdir -p cmake-build-release
+        mkdir -p compiler/cmake-build-release
     - name: Configuring CMake
-      working-directory: main/cmake-build-release
+      working-directory: main/compiler/cmake-build-release
       run: |
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ../
     - name: Build
-      working-directory: main/cmake-build-release
+      working-directory: main/compiler/cmake-build-release
       run: |
         ninja all
     - name: Test
-      working-directory: main/cmake-build-release
+      working-directory: main/compiler/cmake-build-release
       run: |
         ninja test
