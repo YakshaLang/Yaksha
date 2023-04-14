@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface YakshaIfStatement extends PsiElement {
 
   @NotNull
-  List<YakshaDefBits> getDefBitsList();
+  YakshaDefBlock getDefBlock();
 
   @NotNull
   YakshaExp getExp();

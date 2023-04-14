@@ -6,19 +6,10 @@ import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.NavigatablePsiElement;
-import org.intellij.sdk.language.psi.YakshaClassBits;
-import org.intellij.sdk.language.psi.YakshaClassField;
-import org.intellij.sdk.language.psi.YakshaClassStatement;
-import org.intellij.sdk.language.psi.YakshaConstStatement;
-import org.intellij.sdk.language.psi.YakshaDefStatement;
-import org.intellij.sdk.language.psi.YakshaFile;
-import org.intellij.sdk.language.psi.YakshaImportStatement;
-import org.intellij.sdk.language.psi.impl.YakshaClassFieldImpl;
-import org.intellij.sdk.language.psi.impl.YakshaClassStatementImpl;
-import org.intellij.sdk.language.psi.impl.YakshaConstStatementImpl;
-import org.intellij.sdk.language.psi.impl.YakshaDefStatementImpl;
-import org.intellij.sdk.language.psi.impl.YakshaImportStatementImpl;
+import org.intellij.sdk.language.psi.*;
+import org.intellij.sdk.language.psi.impl.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,15 +86,18 @@ public class YakshaStructureViewElement implements StructureViewTreeElement, Sor
         if (myElement instanceof YakshaClassStatement) {
             List<TreeElement> treeElements = new ArrayList<>();
             YakshaClassStatement st = (YakshaClassStatement) myElement;
-            List<YakshaClassBits> bitList = st.getClassBitsList();
-            if (bitList == null || bitList.isEmpty()) {
-                return EMPTY_ARRAY;
-            }
-            for (YakshaClassBits bit : bitList) {
-                final YakshaClassField field = bit.getClassField();
-                if (field != null) {
-                    treeElements.add(new YakshaStructureViewElement((YakshaClassFieldImpl) field));
+            List<YakshaClassBits> bitList = st.getClassBlock().getClassBitsList();
+            if (!(bitList == null || bitList.isEmpty())) {
+                for (YakshaClassBits bit : bitList) {
+                    final YakshaClassField field = bit.getClassField();
+                    if (field != null) {
+                        treeElements.add(new YakshaStructureViewElement((YakshaClassFieldImpl) field));
+                    }
                 }
+            }
+            @Nullable YakshaSingleLineClassBits possibleSingl = st.getClassBlock().getSingleLineClassBits();
+            if (possibleSingl != null && possibleSingl.getClassFieldWoIndent() != null) {
+                treeElements.add(new YakshaStructureViewElement((YakshaClassFieldWoIndentImpl) possibleSingl.getClassFieldWoIndent()));
             }
             return treeElements.toArray(new TreeElement[0]);
         }

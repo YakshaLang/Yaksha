@@ -29,8 +29,8 @@ public class YakshaDelStatementImpl extends ASTWrapperPsiElement implements Yaks
 
   @Override
   @NotNull
-  public YakshaExp getExp() {
-    return findNotNullChildByClass(YakshaExp.class);
+  public YakshaDelStatementWoIndent getDelStatementWoIndent() {
+    return findNotNullChildByClass(YakshaDelStatementWoIndent.class);
   }
 
 }

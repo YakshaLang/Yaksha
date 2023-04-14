@@ -4,16 +4,17 @@ package org.intellij.sdk.language.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.intellij.navigation.ItemPresentation;
 
-public interface YakshaForeachStatement extends PsiElement {
+public interface YakshaClassFieldWoIndent extends PsiElement {
 
   @NotNull
   YakshaDataType getDataType();
 
-  @NotNull
-  YakshaDefBlock getDefBlock();
+  String getName();
 
-  @NotNull
-  YakshaExp getExp();
+  PsiElement getNameIdentifier();
+
+  ItemPresentation getPresentation();
 
 }

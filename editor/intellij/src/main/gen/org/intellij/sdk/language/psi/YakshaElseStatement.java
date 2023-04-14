@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface YakshaElseStatement extends PsiElement {
 
   @NotNull
-  List<YakshaDefBits> getDefBitsList();
+  YakshaDefBlock getDefBlock();
 
 }

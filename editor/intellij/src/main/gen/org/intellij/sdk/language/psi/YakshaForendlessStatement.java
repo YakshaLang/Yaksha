@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface YakshaForendlessStatement extends PsiElement {
 
   @NotNull
-  List<YakshaDefBits> getDefBitsList();
+  YakshaDefBlock getDefBlock();
 
 }

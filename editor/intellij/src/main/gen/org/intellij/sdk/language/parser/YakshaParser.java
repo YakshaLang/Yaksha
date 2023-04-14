@@ -153,36 +153,47 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
-  //  OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
+  // I assignment_statement_wo_indent
   public static boolean assignment_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignment_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, I);
-    r = r && exp(b, l + 1);
-    r = r && assignment_statement_2(b, l + 1);
-    r = r && assignment_statement_3(b, l + 1);
-    r = r && assignment_statement_4(b, l + 1);
-    r = r && exp(b, l + 1);
-    r = r && assignment_statement_6(b, l + 1);
-    r = r && consumeToken(b, NL);
+    r = r && assignment_statement_wo_indent(b, l + 1);
     exit_section_(b, m, ASSIGNMENT_STATEMENT, r);
     return r;
   }
 
+  /* ********************************************************** */
+  // exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
+  //  OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
+  public static boolean assignment_statement_wo_indent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment_statement_wo_indent")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, ASSIGNMENT_STATEMENT_WO_INDENT, "<assignment statement wo indent>");
+    r = exp(b, l + 1);
+    r = r && assignment_statement_wo_indent_1(b, l + 1);
+    r = r && assignment_statement_wo_indent_2(b, l + 1);
+    r = r && assignment_statement_wo_indent_3(b, l + 1);
+    r = r && exp(b, l + 1);
+    r = r && assignment_statement_wo_indent_5(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
   // S?
-  private static boolean assignment_statement_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment_statement_2")) return false;
+  private static boolean assignment_statement_wo_indent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment_statement_wo_indent_1")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
   //  OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ
-  private static boolean assignment_statement_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment_statement_3")) return false;
+  private static boolean assignment_statement_wo_indent_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment_statement_wo_indent_2")) return false;
     boolean r;
     r = consumeToken(b, OPERATOR_EQ);
     if (!r) r = consumeToken(b, OPERATOR_PLUS_EQ);
@@ -199,15 +210,15 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   // S?
-  private static boolean assignment_statement_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment_statement_4")) return false;
+  private static boolean assignment_statement_wo_indent_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment_statement_wo_indent_3")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean assignment_statement_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment_statement_6")) return false;
+  private static boolean assignment_statement_wo_indent_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment_statement_wo_indent_5")) return false;
     consumeToken(b, S);
     return true;
   }
@@ -307,31 +318,44 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I KW_CCODE S? STRING S? NL
+  // I ccode_statement_wo_indent
   public static boolean ccode_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ccode_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, I, KW_CCODE);
-    r = r && ccode_statement_2(b, l + 1);
-    r = r && consumeToken(b, STRING);
-    r = r && ccode_statement_4(b, l + 1);
-    r = r && consumeToken(b, NL);
+    r = consumeToken(b, I);
+    r = r && ccode_statement_wo_indent(b, l + 1);
     exit_section_(b, m, CCODE_STATEMENT, r);
     return r;
   }
 
+  /* ********************************************************** */
+  // KW_CCODE S? STRING S? NL
+  public static boolean ccode_statement_wo_indent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ccode_statement_wo_indent")) return false;
+    if (!nextTokenIs(b, KW_CCODE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_CCODE);
+    r = r && ccode_statement_wo_indent_1(b, l + 1);
+    r = r && consumeToken(b, STRING);
+    r = r && ccode_statement_wo_indent_3(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, m, CCODE_STATEMENT_WO_INDENT, r);
+    return r;
+  }
+
   // S?
-  private static boolean ccode_statement_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ccode_statement_2")) return false;
+  private static boolean ccode_statement_wo_indent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ccode_statement_wo_indent_1")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean ccode_statement_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ccode_statement_4")) return false;
+  private static boolean ccode_statement_wo_indent_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ccode_statement_wo_indent_3")) return false;
     consumeToken(b, S);
     return true;
   }
@@ -351,46 +375,97 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL
+  // single_line_class_bits | NL class_bits+
+  public static boolean class_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_block")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, CLASS_BLOCK, "<class block>");
+    r = single_line_class_bits(b, l + 1);
+    if (!r) r = class_block_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // NL class_bits+
+  private static boolean class_block_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_block_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, NL);
+    r = r && class_block_1_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // class_bits+
+  private static boolean class_block_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_block_1_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = class_bits(b, l + 1);
+    while (r) {
+      int c = current_position_(b);
+      if (!class_bits(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "class_block_1_1", c)) break;
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // I class_field_wo_indent
   public static boolean class_field(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_field")) return false;
     if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, I, IDENTIFIER);
-    r = r && class_field_2(b, l + 1);
-    r = r && consumeToken(b, OPERATOR_COLON);
-    r = r && class_field_4(b, l + 1);
-    r = r && data_type(b, l + 1);
-    r = r && class_field_6(b, l + 1);
-    r = r && consumeToken(b, NL);
+    r = consumeToken(b, I);
+    r = r && class_field_wo_indent(b, l + 1);
     exit_section_(b, m, CLASS_FIELD, r);
     return r;
   }
 
+  /* ********************************************************** */
+  // IDENTIFIER S? OPERATOR_COLON S? data_type S? NL
+  public static boolean class_field_wo_indent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_field_wo_indent")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, IDENTIFIER);
+    r = r && class_field_wo_indent_1(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_COLON);
+    r = r && class_field_wo_indent_3(b, l + 1);
+    r = r && data_type(b, l + 1);
+    r = r && class_field_wo_indent_5(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, m, CLASS_FIELD_WO_INDENT, r);
+    return r;
+  }
+
   // S?
-  private static boolean class_field_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_field_2")) return false;
+  private static boolean class_field_wo_indent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_field_wo_indent_1")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean class_field_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_field_4")) return false;
+  private static boolean class_field_wo_indent_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_field_wo_indent_3")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean class_field_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_field_6")) return false;
+  private static boolean class_field_wo_indent_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_field_wo_indent_5")) return false;
     consumeToken(b, S);
     return true;
   }
 
   /* ********************************************************** */
-  // KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? NL class_bits+
+  // KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? class_block
   public static boolean class_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_statement")) return false;
     if (!nextTokenIs(b, KW_CLASS)) return false;
@@ -400,8 +475,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && class_statement_3(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
     r = r && class_statement_5(b, l + 1);
-    r = r && consumeToken(b, NL);
-    r = r && class_statement_7(b, l + 1);
+    r = r && class_block(b, l + 1);
     exit_section_(b, m, CLASS_STATEMENT, r);
     return r;
   }
@@ -418,21 +492,6 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "class_statement_5")) return false;
     consumeToken(b, S);
     return true;
-  }
-
-  // class_bits+
-  private static boolean class_statement_7(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_statement_7")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = class_bits(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!class_bits(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "class_statement_7", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -768,7 +827,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement
-  //  | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
+  //   | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
   //   | let_statement | empty_line | continue_statement | break_statement | COMMENT
   public static boolean def_bits(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "def_bits")) return false;
@@ -793,6 +852,44 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = break_statement(b, l + 1);
     if (!r) r = consumeToken(b, COMMENT);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // single_line_def_bits | NL def_bits+
+  public static boolean def_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "def_block")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, DEF_BLOCK, "<def block>");
+    r = single_line_def_bits(b, l + 1);
+    if (!r) r = def_block_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // NL def_bits+
+  private static boolean def_block_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "def_block_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, NL);
+    r = r && def_block_1_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // def_bits+
+  private static boolean def_block_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "def_block_1_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = def_bits(b, l + 1);
+    while (r) {
+      int c = current_position_(b);
+      if (!def_bits(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "def_block_1_1", c)) break;
+    }
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -878,7 +975,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON S? NL def_bits+
+  // KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON S? def_block
   public static boolean def_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "def_statement")) return false;
     if (!nextTokenIs(b, KW_DEF)) return false;
@@ -898,8 +995,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && def_statement_13(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
     r = r && def_statement_15(b, l + 1);
-    r = r && consumeToken(b, NL);
-    r = r && def_statement_17(b, l + 1);
+    r = r && def_block(b, l + 1);
     exit_section_(b, m, DEF_STATEMENT, r);
     return r;
   }
@@ -960,83 +1056,94 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // def_bits+
-  private static boolean def_statement_17(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "def_statement_17")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = def_bits(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!def_bits(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "def_statement_17", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
   /* ********************************************************** */
-  // I KW_DEFER S? KW_DEL? S? exp NL
+  // I defer_statement_wo_indent
   public static boolean defer_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "defer_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, I, KW_DEFER);
-    r = r && defer_statement_2(b, l + 1);
-    r = r && defer_statement_3(b, l + 1);
-    r = r && defer_statement_4(b, l + 1);
-    r = r && exp(b, l + 1);
-    r = r && consumeToken(b, NL);
+    r = consumeToken(b, I);
+    r = r && defer_statement_wo_indent(b, l + 1);
     exit_section_(b, m, DEFER_STATEMENT, r);
     return r;
   }
 
+  /* ********************************************************** */
+  // KW_DEFER S? KW_DEL? S? exp NL
+  public static boolean defer_statement_wo_indent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "defer_statement_wo_indent")) return false;
+    if (!nextTokenIs(b, KW_DEFER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_DEFER);
+    r = r && defer_statement_wo_indent_1(b, l + 1);
+    r = r && defer_statement_wo_indent_2(b, l + 1);
+    r = r && defer_statement_wo_indent_3(b, l + 1);
+    r = r && exp(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, m, DEFER_STATEMENT_WO_INDENT, r);
+    return r;
+  }
+
   // S?
-  private static boolean defer_statement_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "defer_statement_2")) return false;
+  private static boolean defer_statement_wo_indent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "defer_statement_wo_indent_1")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // KW_DEL?
-  private static boolean defer_statement_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "defer_statement_3")) return false;
+  private static boolean defer_statement_wo_indent_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "defer_statement_wo_indent_2")) return false;
     consumeToken(b, KW_DEL);
     return true;
   }
 
   // S?
-  private static boolean defer_statement_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "defer_statement_4")) return false;
+  private static boolean defer_statement_wo_indent_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "defer_statement_wo_indent_3")) return false;
     consumeToken(b, S);
     return true;
   }
 
   /* ********************************************************** */
-  // I KW_DEL  S? exp NL
+  // I del_statement_wo_indent
   public static boolean del_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "del_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, I, KW_DEL);
-    r = r && del_statement_2(b, l + 1);
-    r = r && exp(b, l + 1);
-    r = r && consumeToken(b, NL);
+    r = consumeToken(b, I);
+    r = r && del_statement_wo_indent(b, l + 1);
     exit_section_(b, m, DEL_STATEMENT, r);
     return r;
   }
 
+  /* ********************************************************** */
+  // KW_DEL S? exp NL
+  public static boolean del_statement_wo_indent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "del_statement_wo_indent")) return false;
+    if (!nextTokenIs(b, KW_DEL)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_DEL);
+    r = r && del_statement_wo_indent_1(b, l + 1);
+    r = r && exp(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, m, DEL_STATEMENT_WO_INDENT, r);
+    return r;
+  }
+
   // S?
-  private static boolean del_statement_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "del_statement_2")) return false;
+  private static boolean del_statement_wo_indent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "del_statement_wo_indent_1")) return false;
     consumeToken(b, S);
     return true;
   }
 
   /* ********************************************************** */
-  // I KW_ELIF S? exp S? OPERATOR_COLON S? NL def_bits+
+  // I KW_ELIF S? exp S? OPERATOR_COLON S? def_block
   public static boolean elif_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "elif_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -1048,8 +1155,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && elif_statement_4(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
     r = r && elif_statement_6(b, l + 1);
-    r = r && consumeToken(b, NL);
-    r = r && elif_statement_8(b, l + 1);
+    r = r && def_block(b, l + 1);
     exit_section_(b, m, ELIF_STATEMENT, r);
     return r;
   }
@@ -1075,23 +1181,8 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // def_bits+
-  private static boolean elif_statement_8(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "elif_statement_8")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = def_bits(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!def_bits(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "elif_statement_8", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
   /* ********************************************************** */
-  // I KW_ELSE S? OPERATOR_COLON S? NL def_bits+
+  // I KW_ELSE S? OPERATOR_COLON S? def_block
   public static boolean else_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "else_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -1101,8 +1192,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && else_statement_2(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
     r = r && else_statement_4(b, l + 1);
-    r = r && consumeToken(b, NL);
-    r = r && else_statement_6(b, l + 1);
+    r = r && def_block(b, l + 1);
     exit_section_(b, m, ELSE_STATEMENT, r);
     return r;
   }
@@ -1119,21 +1209,6 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "else_statement_4")) return false;
     consumeToken(b, S);
     return true;
-  }
-
-  // def_bits+
-  private static boolean else_statement_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "else_statement_6")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = def_bits(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!def_bits(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "else_statement_6", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -1184,23 +1259,34 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I exp S? NL
+  // I expr_statement_wo_indent
   public static boolean expr_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expr_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, I);
-    r = r && exp(b, l + 1);
-    r = r && expr_statement_2(b, l + 1);
-    r = r && consumeToken(b, NL);
+    r = r && expr_statement_wo_indent(b, l + 1);
     exit_section_(b, m, EXPR_STATEMENT, r);
     return r;
   }
 
+  /* ********************************************************** */
+  // exp S? NL
+  public static boolean expr_statement_wo_indent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr_statement_wo_indent")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, EXPR_STATEMENT_WO_INDENT, "<expr statement wo indent>");
+    r = exp(b, l + 1);
+    r = r && expr_statement_wo_indent_1(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
   // S?
-  private static boolean expr_statement_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr_statement_2")) return false;
+  private static boolean expr_statement_wo_indent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expr_statement_wo_indent_1")) return false;
     consumeToken(b, S);
     return true;
   }
@@ -1392,7 +1478,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I KW_FOR S? IDENTIFIER S? OPERATOR_COLON S? data_type S? KW_IN S? exp S? OPERATOR_COLON S? NL def_bits+
+  // I KW_FOR S? IDENTIFIER S? OPERATOR_COLON S? data_type S? KW_IN S? exp S? OPERATOR_COLON S? def_block
   public static boolean foreach_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "foreach_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -1412,8 +1498,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && foreach_statement_12(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
     r = r && foreach_statement_14(b, l + 1);
-    r = r && consumeToken(b, NL);
-    r = r && foreach_statement_16(b, l + 1);
+    r = r && def_block(b, l + 1);
     exit_section_(b, m, FOREACH_STATEMENT, r);
     return r;
   }
@@ -1467,23 +1552,8 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // def_bits+
-  private static boolean foreach_statement_16(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "foreach_statement_16")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = def_bits(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!def_bits(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "foreach_statement_16", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
   /* ********************************************************** */
-  // I KW_FOR S? OPERATOR_COLON S? NL def_bits+
+  // I KW_FOR S? OPERATOR_COLON S? def_block
   public static boolean forendless_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "forendless_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -1493,8 +1563,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && forendless_statement_2(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
     r = r && forendless_statement_4(b, l + 1);
-    r = r && consumeToken(b, NL);
-    r = r && forendless_statement_6(b, l + 1);
+    r = r && def_block(b, l + 1);
     exit_section_(b, m, FORENDLESS_STATEMENT, r);
     return r;
   }
@@ -1513,23 +1582,8 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // def_bits+
-  private static boolean forendless_statement_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "forendless_statement_6")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = def_bits(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!def_bits(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "forendless_statement_6", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
   /* ********************************************************** */
-  // I KW_IF S? exp S? OPERATOR_COLON S? NL def_bits+
+  // I KW_IF S? exp S? OPERATOR_COLON S? def_block
   public static boolean if_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "if_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -1541,8 +1595,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && if_statement_4(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
     r = r && if_statement_6(b, l + 1);
-    r = r && consumeToken(b, NL);
-    r = r && if_statement_8(b, l + 1);
+    r = r && def_block(b, l + 1);
     exit_section_(b, m, IF_STATEMENT, r);
     return r;
   }
@@ -1566,21 +1619,6 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "if_statement_6")) return false;
     consumeToken(b, S);
     return true;
-  }
-
-  // def_bits+
-  private static boolean if_statement_8(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "if_statement_8")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = def_bits(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!def_bits(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "if_statement_8", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -1954,22 +1992,35 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I KW_PASS S? NL
+  // I pass_statement_wo_indent
   public static boolean pass_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "pass_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, I, KW_PASS);
-    r = r && pass_statement_2(b, l + 1);
-    r = r && consumeToken(b, NL);
+    r = consumeToken(b, I);
+    r = r && pass_statement_wo_indent(b, l + 1);
     exit_section_(b, m, PASS_STATEMENT, r);
     return r;
   }
 
+  /* ********************************************************** */
+  // KW_PASS S? NL
+  public static boolean pass_statement_wo_indent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "pass_statement_wo_indent")) return false;
+    if (!nextTokenIs(b, KW_PASS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_PASS);
+    r = r && pass_statement_wo_indent_1(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, m, PASS_STATEMENT_WO_INDENT, r);
+    return r;
+  }
+
   // S?
-  private static boolean pass_statement_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pass_statement_2")) return false;
+  private static boolean pass_statement_wo_indent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "pass_statement_wo_indent_1")) return false;
     consumeToken(b, S);
     return true;
   }
@@ -1992,40 +2043,53 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I KW_RETURN (S? exp)? NL
+  // I return_statement_wo_indent
   public static boolean return_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, I, KW_RETURN);
-    r = r && return_statement_2(b, l + 1);
-    r = r && consumeToken(b, NL);
+    r = consumeToken(b, I);
+    r = r && return_statement_wo_indent(b, l + 1);
     exit_section_(b, m, RETURN_STATEMENT, r);
     return r;
   }
 
+  /* ********************************************************** */
+  // KW_RETURN (S? exp)? NL
+  public static boolean return_statement_wo_indent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_statement_wo_indent")) return false;
+    if (!nextTokenIs(b, KW_RETURN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_RETURN);
+    r = r && return_statement_wo_indent_1(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, m, RETURN_STATEMENT_WO_INDENT, r);
+    return r;
+  }
+
   // (S? exp)?
-  private static boolean return_statement_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "return_statement_2")) return false;
-    return_statement_2_0(b, l + 1);
+  private static boolean return_statement_wo_indent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_statement_wo_indent_1")) return false;
+    return_statement_wo_indent_1_0(b, l + 1);
     return true;
   }
 
   // S? exp
-  private static boolean return_statement_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "return_statement_2_0")) return false;
+  private static boolean return_statement_wo_indent_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_statement_wo_indent_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = return_statement_2_0_0(b, l + 1);
+    r = return_statement_wo_indent_1_0_0(b, l + 1);
     r = r && exp(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // S?
-  private static boolean return_statement_2_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "return_statement_2_0_0")) return false;
+  private static boolean return_statement_wo_indent_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_statement_wo_indent_1_0_0")) return false;
     consumeToken(b, S);
     return true;
   }
@@ -2049,6 +2113,37 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "runtimefeature_statement_3")) return false;
     consumeToken(b, S);
     return true;
+  }
+
+  /* ********************************************************** */
+  // pass_statement_wo_indent | class_field_wo_indent
+  public static boolean single_line_class_bits(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "single_line_class_bits")) return false;
+    if (!nextTokenIs(b, "<single line class bits>", IDENTIFIER, KW_PASS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, SINGLE_LINE_CLASS_BITS, "<single line class bits>");
+    r = pass_statement_wo_indent(b, l + 1);
+    if (!r) r = class_field_wo_indent(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // pass_statement_wo_indent | ccode_statement_wo_indent | del_statement_wo_indent
+  //   | defer_statement_wo_indent | return_statement_wo_indent | expr_statement_wo_indent | assignment_statement_wo_indent
+  public static boolean single_line_def_bits(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "single_line_def_bits")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, SINGLE_LINE_DEF_BITS, "<single line def bits>");
+    r = pass_statement_wo_indent(b, l + 1);
+    if (!r) r = ccode_statement_wo_indent(b, l + 1);
+    if (!r) r = del_statement_wo_indent(b, l + 1);
+    if (!r) r = defer_statement_wo_indent(b, l + 1);
+    if (!r) r = return_statement_wo_indent(b, l + 1);
+    if (!r) r = expr_statement_wo_indent(b, l + 1);
+    if (!r) r = assignment_statement_wo_indent(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */
@@ -2187,7 +2282,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I KW_WHILE S? exp S? OPERATOR_COLON S? NL def_bits+
+  // I KW_WHILE S? exp S? OPERATOR_COLON S? def_block
   public static boolean while_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "while_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -2199,8 +2294,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && while_statement_4(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
     r = r && while_statement_6(b, l + 1);
-    r = r && consumeToken(b, NL);
-    r = r && while_statement_8(b, l + 1);
+    r = r && def_block(b, l + 1);
     exit_section_(b, m, WHILE_STATEMENT, r);
     return r;
   }
@@ -2224,21 +2318,6 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "while_statement_6")) return false;
     consumeToken(b, S);
     return true;
-  }
-
-  // def_bits+
-  private static boolean while_statement_8(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "while_statement_8")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = def_bits(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!def_bits(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "while_statement_8", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */

@@ -39,17 +39,22 @@ const_statement ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? 
 }
 literal ::= NUMBER | KW_TRUE | KW_FALSE
 
-class_statement ::= KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? NL class_bits+ {
+class_statement ::= KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? class_block {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
     methods=[getName setName getNameIdentifier getPresentation]
 }
 class_bits ::= pass_statement | COMMENT | empty_line | class_field
-class_field ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? NL {
+class_field ::= I class_field_wo_indent {
     methods=[getName getNameIdentifier getPresentation]
 }
+class_field_wo_indent ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? NL {
+    methods=[getName getNameIdentifier getPresentation]
+}
+single_line_class_bits ::= pass_statement_wo_indent | class_field_wo_indent
+class_block ::= single_line_class_bits | NL class_bits+
 
-def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON S? NL def_bits+ {
+def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON S? def_block {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
     methods=[getName setName getNameIdentifier getPresentation]
@@ -57,27 +62,37 @@ def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERA
 def_params ::= def_param (S? OPERATOR_COMMA S? def_param)*
 def_param ::= IDENTIFIER S? OPERATOR_COLON S? data_type
 def_bits ::= pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement
- | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
+  | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
   | let_statement | empty_line | continue_statement | break_statement | COMMENT
+single_line_def_bits ::= pass_statement_wo_indent | ccode_statement_wo_indent | del_statement_wo_indent
+  | defer_statement_wo_indent | return_statement_wo_indent | expr_statement_wo_indent | assignment_statement_wo_indent
+def_block ::= single_line_def_bits | NL def_bits+
 
 // Compound statements
-if_statement ::= I KW_IF S? exp S? OPERATOR_COLON S? NL def_bits+
-elif_statement ::= I KW_ELIF S? exp S? OPERATOR_COLON S? NL def_bits+
-else_statement ::= I KW_ELSE S? OPERATOR_COLON S? NL def_bits+
-while_statement ::= I KW_WHILE S? exp S? OPERATOR_COLON S? NL def_bits+
-foreach_statement ::= I KW_FOR S? IDENTIFIER S? OPERATOR_COLON S? data_type S? KW_IN S? exp S? OPERATOR_COLON S? NL def_bits+
-forendless_statement ::= I KW_FOR S? OPERATOR_COLON S? NL def_bits+
+if_statement ::= I KW_IF S? exp S? OPERATOR_COLON S? def_block
+elif_statement ::= I KW_ELIF S? exp S? OPERATOR_COLON S? def_block
+else_statement ::= I KW_ELSE S? OPERATOR_COLON S? def_block
+while_statement ::= I KW_WHILE S? exp S? OPERATOR_COLON S? def_block
+foreach_statement ::= I KW_FOR S? IDENTIFIER S? OPERATOR_COLON S? data_type S? KW_IN S? exp S? OPERATOR_COLON S? def_block
+forendless_statement ::= I KW_FOR S? OPERATOR_COLON S? def_block
 
 // Simple statements
-pass_statement ::= I KW_PASS S? NL
+pass_statement ::= I pass_statement_wo_indent
+pass_statement_wo_indent ::= KW_PASS S? NL
 continue_statement ::= I KW_CONTINUE S? NL
 break_statement ::= I KW_BREAK S? NL
-ccode_statement ::= I KW_CCODE S? STRING S? NL
-del_statement ::= I KW_DEL  S? exp NL
-return_statement ::= I KW_RETURN (S? exp)? NL
-defer_statement ::= I KW_DEFER S? KW_DEL? S? exp NL
-expr_statement ::= I exp S? NL
-assignment_statement ::= I exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
+ccode_statement ::= I ccode_statement_wo_indent
+ccode_statement_wo_indent ::= KW_CCODE S? STRING S? NL
+del_statement ::= I del_statement_wo_indent
+del_statement_wo_indent ::= KW_DEL S? exp NL
+return_statement ::= I return_statement_wo_indent
+return_statement_wo_indent ::= KW_RETURN (S? exp)? NL
+defer_statement ::= I defer_statement_wo_indent
+defer_statement_wo_indent ::= KW_DEFER S? KW_DEL? S? exp NL
+expr_statement ::= I expr_statement_wo_indent
+expr_statement_wo_indent ::= exp S? NL
+assignment_statement ::= I assignment_statement_wo_indent
+assignment_statement_wo_indent ::= exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
  OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
 let_statement ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? (OPERATOR_EQ S? exp S?)? NL
 

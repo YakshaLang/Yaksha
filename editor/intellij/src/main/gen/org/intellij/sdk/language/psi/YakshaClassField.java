@@ -9,7 +9,7 @@ import com.intellij.navigation.ItemPresentation;
 public interface YakshaClassField extends PsiElement {
 
   @NotNull
-  YakshaDataType getDataType();
+  YakshaClassFieldWoIndent getClassFieldWoIndent();
 
   String getName();
 

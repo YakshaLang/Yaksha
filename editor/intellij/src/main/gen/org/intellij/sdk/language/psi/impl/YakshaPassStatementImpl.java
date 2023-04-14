@@ -27,4 +27,10 @@ public class YakshaPassStatementImpl extends ASTWrapperPsiElement implements Yak
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public YakshaPassStatementWoIndent getPassStatementWoIndent() {
+    return findNotNullChildByClass(YakshaPassStatementWoIndent.class);
+  }
+
 }

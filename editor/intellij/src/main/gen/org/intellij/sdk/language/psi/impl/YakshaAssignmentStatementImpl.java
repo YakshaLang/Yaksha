@@ -29,8 +29,8 @@ public class YakshaAssignmentStatementImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<YakshaExp> getExpList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaExp.class);
+  public YakshaAssignmentStatementWoIndent getAssignmentStatementWoIndent() {
+    return findNotNullChildByClass(YakshaAssignmentStatementWoIndent.class);
   }
 
 }

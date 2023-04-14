@@ -5,15 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YakshaForeachStatement extends PsiElement {
+public interface YakshaSingleLineClassBits extends PsiElement {
 
-  @NotNull
-  YakshaDataType getDataType();
+  @Nullable
+  YakshaClassFieldWoIndent getClassFieldWoIndent();
 
-  @NotNull
-  YakshaDefBlock getDefBlock();
-
-  @NotNull
-  YakshaExp getExp();
+  @Nullable
+  YakshaPassStatementWoIndent getPassStatementWoIndent();
 
 }

@@ -30,8 +30,8 @@ public class YakshaClassFieldImpl extends ASTWrapperPsiElement implements Yaksha
 
   @Override
   @NotNull
-  public YakshaDataType getDataType() {
-    return findNotNullChildByClass(YakshaDataType.class);
+  public YakshaClassFieldWoIndent getClassFieldWoIndent() {
+    return findNotNullChildByClass(YakshaClassFieldWoIndent.class);
   }
 
   @Override

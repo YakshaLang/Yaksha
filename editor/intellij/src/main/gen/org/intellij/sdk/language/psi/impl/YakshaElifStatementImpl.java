@@ -29,8 +29,8 @@ public class YakshaElifStatementImpl extends ASTWrapperPsiElement implements Yak
 
   @Override
   @NotNull
-  public List<YakshaDefBits> getDefBitsList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaDefBits.class);
+  public YakshaDefBlock getDefBlock() {
+    return findNotNullChildByClass(YakshaDefBlock.class);
   }
 
   @Override

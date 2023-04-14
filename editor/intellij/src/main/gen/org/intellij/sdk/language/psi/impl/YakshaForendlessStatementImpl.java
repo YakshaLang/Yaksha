@@ -29,8 +29,8 @@ public class YakshaForendlessStatementImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<YakshaDefBits> getDefBitsList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaDefBits.class);
+  public YakshaDefBlock getDefBlock() {
+    return findNotNullChildByClass(YakshaDefBlock.class);
   }
 
 }

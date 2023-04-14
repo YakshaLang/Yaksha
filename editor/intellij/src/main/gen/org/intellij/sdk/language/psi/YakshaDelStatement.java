@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface YakshaDelStatement extends PsiElement {
 
   @NotNull
-  YakshaExp getExp();
+  YakshaDelStatementWoIndent getDelStatementWoIndent();
 
 }

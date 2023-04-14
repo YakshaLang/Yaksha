@@ -10,15 +10,16 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
+import com.intellij.navigation.ItemPresentation;
 
-public class YakshaForeachStatementImpl extends ASTWrapperPsiElement implements YakshaForeachStatement {
+public class YakshaClassFieldWoIndentImpl extends ASTWrapperPsiElement implements YakshaClassFieldWoIndent {
 
-  public YakshaForeachStatementImpl(@NotNull ASTNode node) {
+  public YakshaClassFieldWoIndentImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YakshaVisitor visitor) {
-    visitor.visitForeachStatement(this);
+    visitor.visitClassFieldWoIndent(this);
   }
 
   @Override
@@ -34,15 +35,18 @@ public class YakshaForeachStatementImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
-  @NotNull
-  public YakshaDefBlock getDefBlock() {
-    return findNotNullChildByClass(YakshaDefBlock.class);
+  public String getName() {
+    return YakshaPsiImplUtil.getName(this);
   }
 
   @Override
-  @NotNull
-  public YakshaExp getExp() {
-    return findNotNullChildByClass(YakshaExp.class);
+  public PsiElement getNameIdentifier() {
+    return YakshaPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
+  public ItemPresentation getPresentation() {
+    return YakshaPsiImplUtil.getPresentation(this);
   }
 
 }

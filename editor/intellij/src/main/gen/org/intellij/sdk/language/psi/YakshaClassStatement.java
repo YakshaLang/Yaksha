@@ -9,7 +9,7 @@ import com.intellij.navigation.ItemPresentation;
 public interface YakshaClassStatement extends YakshaNamedElement {
 
   @NotNull
-  List<YakshaClassBits> getClassBitsList();
+  YakshaClassBlock getClassBlock();
 
   String getName();
 
