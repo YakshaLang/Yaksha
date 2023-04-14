@@ -137,7 +137,7 @@ public class YakshaCompletionContributor extends CompletionContributor {
                         resultSet.addElement(LookupElementBuilder.create("@nativedefine").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("@nativemacro").withIcon(YakshaIcons.KEYWORD));
                         resultSet.addElement(LookupElementBuilder.create("@varargs").withIcon(YakshaIcons.KEYWORD));
-                        resultSet.addElement(LookupElementBuilder.create("@dotaccess").withIcon(YakshaIcons.KEYWORD));
+                        resultSet.addElement(LookupElementBuilder.create("@onstack").withIcon(YakshaIcons.KEYWORD));
 
                         resultSet.addElement(LookupElementBuilder.create("Array").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("Tuple").withIcon(YakshaIcons.DATA_TYPE));
