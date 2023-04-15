@@ -33,7 +33,7 @@
 		},
 		{
 			"name": "keyword.language.yaksha",
-			"match": "\\b(while|import|as|if|else|return|break|continue|pass)\\b"
+			"match": "\\b(while|def|import|continue|break|if|elif|else|class|return|pass|as|for|in)\\b"
 		},
 		{
 			"name": "invalid.spaces.yaksha",
@@ -45,19 +45,19 @@
 		},
 		{
 			"name": "keyword.native.related.yaksha",
-			"match": "\\b(ccode)\\b"
+			"match": "\\b(ccode|runtimefeature)\\b"
 		},		
 		{
 			"name": "entity.name.type.yaksha",
-			"match": "\\b(str|mstr|strliteral|int|bool|i8|i16|i32|i64|float|double|u8|u16|u32|u64|Array)\\b"
+			"match": "\\b(int|float|i8|i16|i32|i64|u8|u16|u32|u64|float|f32|f64|Array|Function|In|Const|AnyPtr|Out|SMEntry|MEntry|str|bool|Ptr|Tuple|AnyPtrToConst)\\b"
 		},
 		{
 			"name": "support.function.yaksha",
-			"match": "\\b(arrput|len|print|println)\\b"
+			"match": "\\b(print|println|len|arrput|arrpop|arrnew|array|getref|unref|charat|shnew|shput|shget|shgeti|hmnew|hmput|hmget|hmgeti|cast|qsort|iif|foreach|countif|filter|map|binarydata|arrsetlen|arrsetcap)\\b"
 		},
 		{
 			"name": "keyword.decorator.yaksha",
-			"match": "@\\s*(varargs|nativedefine|nativemacro|native)"
+			"match": "@\\s*(nativedefine|varargs|onstack|nativemacro|native)"
 		},
 		{
 			"name": "keyword.operator.yaksha",
