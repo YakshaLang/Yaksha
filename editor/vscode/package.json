@@ -2,7 +2,11 @@
     "name": "yaksha-language-support",
     "displayName": "Yaksha Language Support",
     "description": "Yaksha Language Support Plugin",
-    "version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/YakshaLang/Yaksha.git"
+    },
+    "version": "0.0.2",
     "engines": {
         "vscode": "^1.64.0"
     },
