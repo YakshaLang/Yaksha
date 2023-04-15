@@ -8,7 +8,10 @@ compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
     : defs_classes_(defs_classes), scope_(pool), dt_pool_(pool),
       builtins_(pool), ast_pool_(new ast_pool()), esc_(esc),
       desugar_(new desugaring_compiler{ast_pool_, dt_pool_}) {}
-compiler::~compiler() { delete ast_pool_; }
+compiler::~compiler() {
+  delete ast_pool_;
+  delete desugar_;
+}
 void compiler::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
   auto name = prefix(obj->name_->token_, prefix_val_);
