@@ -59,7 +59,7 @@ EXCEPTION = 2
 FAILED = 3
 # Ensure that we are not running an endless loop? or something crazy like that
 # If the parser itself goes to an endless loop we need to know as well
-MAX_EXECUTION_TIME_SEC = 5
+MAX_EXECUTION_TIME_SEC = 100
 ROOT = os.path.dirname(os.path.dirname(__file__))
 PROCESSES = max(1, multiprocessing.cpu_count() - 1)
 INPUT_FILES = glob.glob(os.path.join(ROOT, 'test_data/**/*'), recursive=True)

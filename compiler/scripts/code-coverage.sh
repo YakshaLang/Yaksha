@@ -8,7 +8,7 @@ set -e
 cd build || exit 1
 # Build project
 cmake -S .. -B . -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -fPIC -O0 -fsanitize=address -static-libasan -g"
-cmake --build .
+cmake --build . -- -j 24
 # Fix test data by converting them all to unix format
 cd ../test_data || exit 1
 dos2unix *
