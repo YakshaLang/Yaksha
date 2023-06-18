@@ -5,27 +5,24 @@
 using namespace yaksha;
 enum class ic_tokenizer_state { NORMAL, PATH_SPEC_EXPECTED };
 ic_tokenizer::ic_tokenizer(std::string file, std::string data)
-    : file_(std::move(file)), data_(std::move(data)), line_(0), pos_(0) {}
+    : file_(std::move(file)), data_(std::move(data)), prev_line_(0),
+      prev_pos_(0), iter_tt_(data_), iter_ls_(iter_tt_),
+      character_iterator_(iter_ls_) {}
 ic_tokenizer::~ic_tokenizer() = default;
 #define skip_1()                                                               \
   do {                                                                         \
-    utf8::next(iterator, end);                                                 \
-    pos_++;                                                                    \
-    characters = ::string_utils::peek3(iterator, end);                         \
-    current = std::get<0>(characters);                                         \
-    next = std::get<1>(characters);                                            \
-    after_next = std::get<2>(characters);                                      \
+    character_iterator_.next();                                                \
+    current = character_iterator_.get_current();                               \
+    next = character_iterator_.get_next();                                     \
+    after_next = character_iterator_.get_fourth();                             \
   } while (0)
 #define skip_2()                                                               \
   do {                                                                         \
-    utf8::next(iterator, end);                                                 \
-    pos_++;                                                                    \
-    utf8::next(iterator, end);                                                 \
-    pos_++;                                                                    \
-    characters = ::string_utils::peek3(iterator, end);                         \
-    current = std::get<0>(characters);                                         \
-    next = std::get<1>(characters);                                            \
-    after_next = std::get<2>(characters);                                      \
+    character_iterator_.next();                                                \
+    character_iterator_.next();                                                \
+    current = character_iterator_.get_current();                               \
+    next = character_iterator_.get_next();                                     \
+    after_next = character_iterator_.get_fourth();                             \
   } while (0)
 #define emit_tok(str, ttype)                                                   \
   do {                                                                         \
@@ -34,17 +31,14 @@ ic_tokenizer::~ic_tokenizer() = default;
   } while (0)
 #define eat(message)                                                           \
   do {                                                                         \
-    utf8::next(iterator, end);                                                 \
-    pos_++;                                                                    \
-    if (iterator == end) {                                                     \
-      std::cout << prev_line_ << ":" << prev_pos_ << "-->" << token_buf << "\n";         \
-      errors_.emplace_back(message, file_, line_, pos_);                       \
-      throw ic_parsing_error{message, file_, line_, pos_};                     \
+    character_iterator_.next();                                                \
+    if (character_iterator_.reached_end()) {                                   \
+      errors_.emplace_back(message, file_, prev_line_, prev_pos_);             \
+      throw ic_parsing_error{message, file_, prev_line_, prev_pos_};           \
     }                                                                          \
-    characters = ::string_utils::peek3(iterator, end);                         \
-    current = std::get<0>(characters);                                         \
-    next = std::get<1>(characters);                                            \
-    after_next = std::get<2>(characters);                                      \
+    current = character_iterator_.get_current();                               \
+    next = character_iterator_.get_next();                                     \
+    after_next = character_iterator_.get_fourth();                             \
   } while (0)
 #define clear_buf()                                                            \
   do {                                                                         \
@@ -72,23 +66,21 @@ void ic_tokenizer::tokenize() {
     errors_.emplace_back("Invalid String:" + ex.message_, nullptr);
   } catch (ic_parsing_error &ignored) {}
 }
+// TODO handle digraph # character, ## character as well
+// TODO add a test case for digraphs each
+// TODO add a test case for trigraphs each
 void ic_tokenizer::tokenize_internal() {
-  line_ = 0;
-  pos_ = 1;
-  auto iterator = data_.begin();
-  auto end = data_.end();
   utf8::uint32_t current;
   utf8::uint32_t next;
   utf8::uint32_t after_next;
   std::string token_buf{};
   ic_tokenizer_state state = ic_tokenizer_state::NORMAL;
-  while (iterator != end) {
-    prev_line_ = line_;
-    prev_pos_ = pos_;
-    auto characters = ::string_utils::peek3(iterator, end);
-    current = std::get<0>(characters);
-    next = std::get<1>(characters);
-    after_next = std::get<2>(characters);
+  while (!character_iterator_.reached_end()) {
+    prev_line_ = character_iterator_.get_line();
+    prev_pos_ = character_iterator_.get_column();
+    current = character_iterator_.get_current();
+    next = character_iterator_.get_next();
+    after_next = character_iterator_.get_after_next();
     if (current == '!' && next == '=') {
       emit_tok("!=", ic_token_type::NE_OP);
       skip_1();
@@ -146,11 +138,13 @@ void ic_tokenizer::tokenize_internal() {
     } else if (current == '-') {
       emit_tok("-", ic_token_type::SUB);
     } else if (current == '.' && next == '.' && after_next == '.') {
+      // TODO add a test case for this
       emit_tok("...", ic_token_type::ELLIPSIS);
       skip_2();
     } else if (current == '.') {
       emit_tok(".", ic_token_type::DOT);
     } else if (current == '/' && next == '=') {
+      // TODO add a test case for this
       emit_tok("/=", ic_token_type::DIV_ASSIGN);
       skip_1();
     } else if (current == '/' && next == '*') {
@@ -158,11 +152,7 @@ void ic_tokenizer::tokenize_internal() {
         eat("Reached end of file while capturing multi line comment");
         if (current == '\r' && next == '\n') {
           eat("cannot error here");
-          line_++;
-          pos_ = 0;
         } else if (current == '\r' || current == '\n') {
-          line_++;
-          pos_ = 0;
         }
       }
       skip_1();
@@ -171,11 +161,9 @@ void ic_tokenizer::tokenize_internal() {
         eat("Reached end of file while capturing single line comment");
       }
       if (current == '\r' && next == '\n') { skip_1(); }
-      prev_line_ = line_;
-      prev_pos_ = pos_;
+      prev_line_ = character_iterator_.get_line();
+      prev_pos_ = character_iterator_.get_column();
       emit_nl();
-      line_++;
-      pos_ = 0;
     } else if (current == '/') {
       emit_tok("/", ic_token_type::DIV);
     } else if (current == ':' && next == '>') {// NOTE :> -> ]
@@ -185,7 +173,7 @@ void ic_tokenizer::tokenize_internal() {
       emit_tok(":", ic_token_type::COLON);
     } else if (current == ';') {
       emit_tok(";", ic_token_type::SEMICOLON);
-    } else if (current == '<' and
+    } else if (current == '<' &&
                state == ic_tokenizer_state::PATH_SPEC_EXPECTED) {
       // -------------------- Handle #include <...> ----------------------
       skip_1();
@@ -263,13 +251,9 @@ void ic_tokenizer::tokenize_internal() {
     } else if (current == '\\') {
       emit_tok("\\", ic_token_type::BACKSLASH);
     } else if (current == '\r' && next == '\n') {
-      line_++;
-      pos_ = 0;
       skip_1();
       emit_nl();
     } else if (current == '\r' || current == '\n') {
-      line_++;
-      pos_ = 0;
       emit_nl();
     } else if (current == '\t' || current == ' ') {
       // ignored
@@ -280,14 +264,15 @@ void ic_tokenizer::tokenize_internal() {
       utf8::uint32_t prev = 0;
       if (current == '\'') {
         errors_.emplace_back("Empty character literal is invalid.", file_,
-                             line_, pos_);
+                             prev_line_, prev_pos_);
       } else {
         while (current != '\'') {
           if (current == '\\') {
             collect();
             eat("Expected a character after escape in char literal");
             collect();
-            eat("Expected a second character after escape sequence in char literal");
+            eat("Expected a second character after escape sequence in char "
+                "literal");
           } else {
             collect();
             eat("Reached end of file while capturing char literal");
@@ -327,6 +312,7 @@ void ic_tokenizer::tokenize_internal() {
       }
     } else if (current >= '0' && current <= '9') {
       // TODO do proper number capturing.. this is just basic?
+      // TODO ensure that both floats and integers can be captured
       clear_buf();
       while ((current >= '0' && current <= '9') &&
              (next >= '0' && next <= '9')) {
@@ -350,13 +336,12 @@ void ic_tokenizer::tokenize_internal() {
       }
       emit_tok(token_buf, ic_token_type::IDENTIFIER);
     } else {
-      errors_.emplace_back("Invalid character", file_, line_, pos_);
+      errors_.emplace_back("Invalid character", file_, prev_line_, prev_pos_);
     }
-    utf8::next(iterator, end);
-    pos_++;
+    character_iterator_.next();
   }
-  prev_line_ = line_;
-  prev_pos_ = pos_;
+  prev_line_ = character_iterator_.get_line();
+  prev_pos_ = character_iterator_.get_column();
   // Have a new line at the end to indicate end of last line!
   if (!tokens_.empty() && tokens_.back().type_ != ic_token_type::NEWLINE) {
     emit_tok("\n", ic_token_type::NEWLINE);

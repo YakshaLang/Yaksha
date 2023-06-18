@@ -565,10 +565,10 @@ namespace yaksha {
   /**
  * Content of an error message
  */
-  struct ic_parsing_error {
+  struct ic_parsing_error : std::exception {
     std::string message_;// content of the line this error occurred
     ic_token tok_;
-    bool token_set_{};
+    [[maybe_unused]] bool token_set_{};
     ic_parsing_error(std::string message, ic_token *at);
     ic_parsing_error(std::string message, std::string file, int line, int pos);
   };

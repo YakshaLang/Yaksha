@@ -303,8 +303,8 @@ private:
     std::vector<ic_stmt *> cleanup_stmt_;
   };
   /**
-* Parameter for a user defined function declaration
-*/
+  * Parameter for a user defined function declaration
+  */
   struct ic_parameter {
     ic_token *name_;
     std::vector<ic_token *> data_type_;
