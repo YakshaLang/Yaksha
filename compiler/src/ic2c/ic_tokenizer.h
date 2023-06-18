@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include "ic_token.h"
+#include "ic_trigraph_translater.h"
+#include "ic_peek_ahead_iter.h"
+#include "ic_line_splicer.h"
 namespace yaksha {
   struct ic_token;
   struct ic_parsing_error;
@@ -18,10 +21,11 @@ private:
     void tokenize_internal();
     std::string file_;
     std::string data_;
-    int line_;
-    int pos_;
     int prev_line_;
     int prev_pos_;
+    ic_trigraph_translater iter_tt_;
+    ic_line_splicer iter_ls_;
+    ic_peek_ahead_iter character_iterator_;
   };
 }// namespace yaksha
 #endif

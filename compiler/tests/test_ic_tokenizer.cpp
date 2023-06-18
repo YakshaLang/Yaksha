@@ -85,6 +85,40 @@ TEST_CASE("ic_tokenizer: Simple file") {
   TOKENS_END();
   REQUIRE(t.errors_.empty());
 }
+// Below example is obtained from here --> https://en.wikipedia.org/wiki/Digraphs_and_trigraphs
+// Notice that ? mark is escaped below ! so trigraph is preserved in the string
+// So I can see if it works as expected
+// We can also disable the trigraph support if needed.
+TEST_CASE("ic_tokenizer: Trigraphs + Line splicer return 1 test") {
+  yaksha::ic_tokenizer t("test.c", "int trigraphsavailable() // returns 0 or "
+                                   "1; language standard C99 or later\n"
+                                   "{\n"
+                                   "\t// are trigraphs available\?\?/\n"
+                                   "\treturn 0;\n"
+                                   "\treturn 1;\n"
+                                   "}");
+  t.tokenize();
+  TOKENS_PRINT();
+  REQUIRE(t.tokens_.size() == 13 + 2);
+  TOKENS_BEGIN();
+  T_V("int", ic_token_type::IDENTIFIER);
+  T_V("trigraphsavailable", ic_token_type::IDENTIFIER);
+  T_V("(", ic_token_type::OPEN_PAREN);
+  T_V(")", ic_token_type::CLOSE_PAREN);
+  T_V("\n", ic_token_type::NEWLINE);
+  T_V("{", ic_token_type::OPEN_CURLY);
+  T_V("\n", ic_token_type::NEWLINE);
+  T_V("\n", ic_token_type::NEWLINE);
+  T_V("return", ic_token_type::IDENTIFIER);
+  T_V("1", ic_token_type::INTEGER_CONSTANT);
+  T_V(";", ic_token_type::SEMICOLON);
+  T_V("\n", ic_token_type::NEWLINE);
+  T_V("}", ic_token_type::CLOSE_CURLY);
+  T_V("\n", ic_token_type::NEWLINE);
+  T_EMPTY(ic_token_type::TC_EOF);
+  TOKENS_END();
+  REQUIRE(t.errors_.empty());
+}
 TEST_CASE("ic_tokenizer: Simple string escape - single slash") {
   yaksha::ic_tokenizer t("test.c", R"("\\")");
   t.tokenize();
@@ -224,22 +258,19 @@ TEST_CASE("ic_tokenizer: Tokenize simple native function output from Yaksha") {
             "../test_data/ic2c_tests/0_native_functions.c.tokens");
 }
 TEST_CASE("ic_tokenizer: Tokenize real world C code - utf8proc.c") {
-  TEST_FILE("../runtime/utf8proc.c",
-            "utf8proc.c",
+  TEST_FILE("../runtime/utf8proc.c", "utf8proc.c",
             "../test_data/ic2c_tests/0_utf8proc.c.tokens");
 }
 TEST_CASE("ic_tokenizer: Tokenize real world C code - whereami.c") {
-  TEST_FILE("../runtime/whereami.c",
-            "whereami.c",
+  TEST_FILE("../runtime/whereami.c", "whereami.c",
             "../test_data/ic2c_tests/0_whereami.c.tokens");
 }
-TEST_CASE("ic_tokenizer: Tokenize real world C code - carpntr -> program_code.c") {
-  TEST_FILE("../carpntr/build/program_code.c",
-            "carpntr_program_code.c",
+TEST_CASE(
+    "ic_tokenizer: Tokenize real world C code - carpntr -> program_code.c") {
+  TEST_FILE("../carpntr/build/program_code.c", "carpntr_program_code.c",
             "../test_data/ic2c_tests/0_carpntr_program_code.c.tokens");
 }
 TEST_CASE("ic_tokenizer: Tokenize real world C code - yk__graphic_utils.c") {
-  TEST_FILE("../runtime/yk__graphic_utils.c",
-            "yk__graphic_utils.c",
+  TEST_FILE("../runtime/yk__graphic_utils.c", "yk__graphic_utils.c",
             "../test_data/ic2c_tests/0_yk__graphic_utils.c.tokens");
 }
