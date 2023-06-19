@@ -482,3 +482,11 @@ TEST_CASE(
   TEST_SNIPPET("a: Ptr[Const[u8]] = binarydata(1, 2, 3)",
                "binarydata() builtin expects 1 argument");
 }
+TEST_CASE("type checker: Redefining variables in a function different data types") {
+  TEST_FILE("../test_data/bug_fixes/redefining_vars.yaka",
+            "Redefining a variable is not allowed");
+}
+TEST_CASE("type checker: Redefining variables in a function - params") {
+  TEST_FILE("../test_data/bug_fixes/redefining_vars_params.yaka",
+            "Redefining a variable is not allowed");
+}

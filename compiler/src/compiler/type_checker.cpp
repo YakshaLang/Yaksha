@@ -457,6 +457,9 @@ void type_checker::visit_if_stmt(if_stmt *obj) {
 }
 void type_checker::visit_let_stmt(let_stmt *obj) {
   auto name = obj->name_->token_;
+  if (scope_.is_defined(name)) {
+    error(obj->name_, "Redefining a variable is not allowed");
+  }
   auto placeholder = ykobject(obj->data_type_);
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);

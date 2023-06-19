@@ -1,0 +1,7 @@
+def a() -> int:
+    b: int = 1
+    b: u8 = 1u8
+    return 0
+
+def main() -> int:
+    return 0
