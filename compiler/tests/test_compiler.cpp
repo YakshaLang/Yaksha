@@ -2,6 +2,7 @@
 #include "compiler/multifile_compiler.h"
 #include "file_formats/tokens_file.h"
 #include "tokenizer/tokenizer.h"
+#include <filesystem>
 #include <string>
 using namespace yaksha;
 #define TEST_FILE(A, B, C)                                                     \
@@ -13,8 +14,12 @@ using namespace yaksha;
     c_code.tokenize();                                                         \
     auto token_snapshot = yaksha::load_token_dump(C);                          \
     yaksha::save_token_dump(C, c_code.tokens_);                                \
-    std::string c_code_file{A};                                                \
-    c_code_file += ".output.c";                                                \
+    auto yaksha_file_path = std::filesystem::path{A};                          \
+    auto tokens_file_path = std::filesystem::path{C};                          \
+    std::string c_code_file =                                                  \
+        (tokens_file_path.parent_path() / yaksha_file_path.filename())         \
+            .string() +                                                        \
+        ".output.c";                                                           \
     std::ofstream save_file(c_code_file);                                      \
     REQUIRE(save_file.is_open() == true);                                      \
     save_file << result.code_;                                                 \
@@ -31,39 +36,39 @@ using namespace yaksha;
   } while (0)
 TEST_CASE("compiler: Hello World") {
   TEST_FILE("../test_data/compiler_tests/test1.yaka", "test1.yaka",
-            "../test_data/compiler_tests/test1.tokens");
+            "../test_data/compiler_tests/output/test1.tokens");
 }
 TEST_CASE("compiler: Defer") {
   TEST_FILE("../test_data/compiler_tests/test2.yaka", "test2.yaka",
-            "../test_data/compiler_tests/test2.tokens");
+            "../test_data/compiler_tests/output/test2.tokens");
 }
 TEST_CASE("compiler: Class support") {
   TEST_FILE("../test_data/compiler_tests/test3.yaka", "test3.yaka",
-            "../test_data/compiler_tests/test3.tokens");
+            "../test_data/compiler_tests/output/test3.tokens");
 }
 TEST_CASE("compiler: Create object from class") {
   TEST_FILE("../test_data/compiler_tests/test4.yaka", "test4.yaka",
-            "../test_data/compiler_tests/test4.tokens");
+            "../test_data/compiler_tests/output/test4.tokens");
 }
 TEST_CASE("compiler: Object members") {
   TEST_FILE("../test_data/compiler_tests/test5.yaka", "test5.yaka",
-            "../test_data/compiler_tests/test5.tokens");
+            "../test_data/compiler_tests/output/test5.tokens");
 }
 TEST_CASE("compiler: Array access") {
   TEST_FILE("../test_data/compiler_tests/test6.yaka", "test6.yaka",
-            "../test_data/compiler_tests/test6.tokens");
+            "../test_data/compiler_tests/output/test6.tokens");
 }
 TEST_CASE("compiler: Nested array access") {
   TEST_FILE("../test_data/compiler_tests/test7.yaka", "test7.yaka",
-            "../test_data/compiler_tests/test7.tokens");
+            "../test_data/compiler_tests/output/test7.tokens");
 }
 TEST_CASE("compiler: Void function") {
   TEST_FILE("../test_data/compiler_tests/voidfunc.yaka", "voidfunc.yaka",
-            "../test_data/compiler_tests/voidfunc.tokens");
+            "../test_data/compiler_tests/output/voidfunc.tokens");
 }
 TEST_CASE("compiler: Native functions") {
   TEST_FILE("../test_data/compiler_tests/nativefunc.yaka", "nativefunc.yaka",
-            "../test_data/compiler_tests/nativefunc.tokens");
+            "../test_data/compiler_tests/output/nativefunc.tokens");
 }
 TEST_CASE("compiler: Imports") {
   TEST_FILE("../test_data/import_tests/main.yaka", "main.yaka",
@@ -75,7 +80,7 @@ TEST_CASE("compiler: Native functions in imports") {
 }
 TEST_CASE("compiler: Array methods") {
   TEST_FILE("../test_data/compiler_tests/arrstack.yaka", "arrstack.yaka",
-            "../test_data/compiler_tests/arrstack.tokens");
+            "../test_data/compiler_tests/output/arrstack.tokens");
 }
 TEST_CASE("compiler: Native defines") {
   TEST_FILE("../test_data/byol/lisp.yaka", "lisp.yaka",
@@ -84,149 +89,158 @@ TEST_CASE("compiler: Native defines") {
 TEST_CASE("compiler: Do not copy str for getref") {
   TEST_FILE("../test_data/compiler_tests/do_not_copy_str_getref.yaka",
             "do_not_copy_str_getref.yaka",
-            "../test_data/compiler_tests/do_not_copy_str_getref.tokens");
+            "../test_data/compiler_tests/output/do_not_copy_str_getref.tokens");
 }
 TEST_CASE("compiler: Str unref and getref hacks!") {
   TEST_FILE("../test_data/compiler_tests/str_getref_unref.yaka",
             "str_getref_unref.yaka",
-            "../test_data/compiler_tests/str_getref_unref.tokens");
+            "../test_data/compiler_tests/output/str_getref_unref.tokens");
 }
 TEST_CASE("compiler: Test automatic generation for string hashes!") {
   TEST_FILE("../test_data/compiler_tests/string_hash.yaka", "string_hash.yaka",
-            "../test_data/compiler_tests/string_hash.tokens");
+            "../test_data/compiler_tests/output/string_hash.tokens");
 }
 TEST_CASE("compiler: Test return calls a function with defer deleted stuff !") {
   TEST_FILE("../test_data/compiler_tests/defer_return.yaka",
             "defer_return.yaka",
-            "../test_data/compiler_tests/defer_return.tokens");
+            "../test_data/compiler_tests/output/defer_return.tokens");
 }
 TEST_CASE("compiler: All @native stuff !") {
-  TEST_FILE("../test_data/compiler_tests/native_function_type_tests.yaka",
-            "native_function_type_tests.yaka",
-            "../test_data/compiler_tests/native_function_type_tests.tokens");
+  TEST_FILE(
+      "../test_data/compiler_tests/native_function_type_tests.yaka",
+      "native_function_type_tests.yaka",
+      "../test_data/compiler_tests/output/native_function_type_tests.tokens");
 }
 TEST_CASE("compiler: Test elif") {
   TEST_FILE("../test_data/compiler_tests/elif_testing.yaka",
             "elif_testing.yaka",
-            "../test_data/compiler_tests/elif_testing.tokens");
+            "../test_data/compiler_tests/output/elif_testing.tokens");
 }
 TEST_CASE("compiler: Casting") {
   TEST_FILE("../test_data/compiler_tests/casting_test.yaka",
             "casting_test.yaka",
-            "../test_data/compiler_tests/casting_test.tokens");
+            "../test_data/compiler_tests/output/casting_test.tokens");
 }
 TEST_CASE("compiler: Basic function pointer") {
   TEST_FILE("../test_data/compiler_tests/function_datatype_test.yaka",
             "function_datatype_test.yaka",
-            "../test_data/compiler_tests/function_datatype_test.tokens");
+            "../test_data/compiler_tests/output/function_datatype_test.tokens");
 }
 TEST_CASE("compiler: Function pointer passing & calling") {
   TEST_FILE(
       "../test_data/compiler_tests/function_datatype_passing_calling_test.yaka",
       "function_datatype_passing_calling_test.yaka",
-      "../test_data/compiler_tests/"
+      "../test_data/compiler_tests/output/"
       "function_datatype_passing_calling_test.tokens");
 }
 TEST_CASE("compiler: Test automatic generation for normal hashes!") {
   TEST_FILE("../test_data/compiler_tests/normal_hash_map.yaka",
             "normal_hash_map.yaka",
-            "../test_data/compiler_tests/normal_hash_map.tokens");
+            "../test_data/compiler_tests/output/normal_hash_map.tokens");
 }
 TEST_CASE("compiler: Test sorting functionality using qsort() !") {
   TEST_FILE("../test_data/compiler_tests/sort_test.yaka", "sort_test.yaka",
-            "../test_data/compiler_tests/sort_test.tokens");
+            "../test_data/compiler_tests/output/sort_test.tokens");
 }
 TEST_CASE("compiler: Test arrnew() !") {
   TEST_FILE("../test_data/compiler_tests/arrnew_test.yaka", "arrnew_test.yaka",
-            "../test_data/compiler_tests/arrnew_test.tokens");
+            "../test_data/compiler_tests/output/arrnew_test.tokens");
 }
 TEST_CASE("compiler: Test array() !") {
   TEST_FILE("../test_data/compiler_tests/array_test.yaka", "array_test.yaka",
-            "../test_data/compiler_tests/array_test.tokens");
+            "../test_data/compiler_tests/output/array_test.tokens");
 }
 TEST_CASE("compiler: Test sorting with @native functions") {
   TEST_FILE("../test_data/compiler_tests/native_func_sort.yaka",
             "native_func_sort.yaka",
-            "../test_data/compiler_tests/native_func_sort.tokens");
+            "../test_data/compiler_tests/output/native_func_sort.tokens");
 }
 TEST_CASE("compiler: Test iif() builtin") {
   TEST_FILE("../test_data/compiler_tests/iif_test.yaka", "iif_test.yaka",
-            "../test_data/compiler_tests/iif_test.tokens");
+            "../test_data/compiler_tests/output/iif_test.tokens");
 }
 TEST_CASE("compiler: Test foreach() builtin") {
-  TEST_FILE("../test_data/compiler_tests/functional_test_foreach.yaka",
-            "functional_test_foreach.yaka",
-            "../test_data/compiler_tests/functional_test_foreach.tokens");
+  TEST_FILE(
+      "../test_data/compiler_tests/functional_test_foreach.yaka",
+      "functional_test_foreach.yaka",
+      "../test_data/compiler_tests/output/functional_test_foreach.tokens");
 }
 TEST_CASE("compiler: Test countif() builtin") {
-  TEST_FILE("../test_data/compiler_tests/functional_test_countif.yaka",
-            "functional_test_countif.yaka",
-            "../test_data/compiler_tests/functional_test_countif.tokens");
+  TEST_FILE(
+      "../test_data/compiler_tests/functional_test_countif.yaka",
+      "functional_test_countif.yaka",
+      "../test_data/compiler_tests/output/functional_test_countif.tokens");
 }
 TEST_CASE("compiler: Test map() builtin") {
   TEST_FILE("../test_data/compiler_tests/functional_test_map.yaka",
             "functional_test_map.yaka",
-            "../test_data/compiler_tests/functional_test_maph.tokens");
+            "../test_data/compiler_tests/output/functional_test_maph.tokens");
 }
 TEST_CASE("compiler: Test filter() builtin") {
   TEST_FILE("../test_data/compiler_tests/functional_test_filter.yaka",
             "functional_test_filter.yaka",
-            "../test_data/compiler_tests/functional_test_filter.tokens");
+            "../test_data/compiler_tests/output/functional_test_filter.tokens");
 }
 TEST_CASE("compiler: Tuple data type") {
   TEST_FILE("../test_data/compiler_tests/tuple_test.yaka", "tuple_test.yaka",
-            "../test_data/compiler_tests/tuple_test.tokens");
+            "../test_data/compiler_tests/output/tuple_test.tokens");
 }
 TEST_CASE("compiler: Number literals") {
   TEST_FILE("../test_data/compiler_tests/all_integers.yaka",
             "all_integers.yaka",
-            "../test_data/compiler_tests/all_integers.tokens");
+            "../test_data/compiler_tests/output/all_integers.tokens");
 }
 TEST_CASE("compiler: Operator test augment assign and bitwise") {
   TEST_FILE("../test_data/compiler_tests/operator_test.yaka",
             "operator_test.yaka",
-            "../test_data/compiler_tests/operator_test.tokens");
+            "../test_data/compiler_tests/output/operator_test.tokens");
 }
 TEST_CASE("compiler: Global constants") {
   TEST_FILE("../test_data/compiler_tests/global_constants.yaka",
             "global_constants.yaka",
-            "../test_data/compiler_tests/global_constants.tokens");
+            "../test_data/compiler_tests/output/global_constants.tokens");
 }
 TEST_CASE("compiler: None comparison") {
   TEST_FILE("../test_data/compiler_tests/none_comparison.yaka",
             "none_comparison.yaka",
-            "../test_data/compiler_tests/none_comparison.tokens");
+            "../test_data/compiler_tests/output/none_comparison.tokens");
 }
 TEST_CASE("compiler: Loops and logical operators") {
   TEST_FILE("../test_data/compiler_tests/loops_and_logic.yaka",
             "loops_and_logic.yaka",
-            "../test_data/compiler_tests/loops_and_logic.tokens");
+            "../test_data/compiler_tests/output/loops_and_logic.tokens");
 }
 TEST_CASE("compiler: Class stuff") {
   TEST_FILE("../test_data/compiler_tests/class_stuff.yaka", "class_stuff.yaka",
-            "../test_data/compiler_tests/class_stuff.tokens");
+            "../test_data/compiler_tests/output/class_stuff.tokens");
 }
 TEST_CASE("compiler: Test binarydata() builtin") {
-  TEST_FILE("../test_data/compiler_tests/binarydata_builtin_test.yaka", "binarydata_builtin_test.yaka",
-            "../test_data/compiler_tests/binarydata_builtin_test.tokens");
+  TEST_FILE(
+      "../test_data/compiler_tests/binarydata_builtin_test.yaka",
+      "binarydata_builtin_test.yaka",
+      "../test_data/compiler_tests/output/binarydata_builtin_test.tokens");
 }
 TEST_CASE("compiler: Test native constants") {
-  TEST_FILE("../test_data/compiler_tests/native_constants.yaka", "native_constants.yaka",
-            "../test_data/compiler_tests/native_constants.tokens");
+  TEST_FILE("../test_data/compiler_tests/native_constants.yaka",
+            "native_constants.yaka",
+            "../test_data/compiler_tests/output/native_constants.tokens");
 }
 TEST_CASE("compiler: Test @onstack class") {
-  TEST_FILE("../test_data/compiler_tests/on_stack_test.yaka", "on_stack_test.yaka",
-            "../test_data/compiler_tests/on_stack_test.tokens");
+  TEST_FILE("../test_data/compiler_tests/on_stack_test.yaka",
+            "on_stack_test.yaka",
+            "../test_data/compiler_tests/output/on_stack_test.tokens");
 }
 TEST_CASE("compiler: Test endless for") {
   TEST_FILE("../test_data/compiler_tests/endless_for.yaka", "endless_for.yaka",
-            "../test_data/compiler_tests/endless_for.tokens");
+            "../test_data/compiler_tests/output/endless_for.tokens");
 }
 TEST_CASE("compiler: Test println each element in for") {
-  TEST_FILE("../test_data/compiler_tests/eachelem_for.yaka", "eachelem_for.yaka",
-            "../test_data/compiler_tests/eachelem_for.tokens");
+  TEST_FILE("../test_data/compiler_tests/eachelem_for.yaka",
+            "eachelem_for.yaka",
+            "../test_data/compiler_tests/output/eachelem_for.tokens");
 }
 TEST_CASE("compiler: bug-fix comment break indent") {
-  TEST_FILE("../test_data/bug_fixes/comment_break_indent.yaka", "comment_break_indent.yaka",
+  TEST_FILE("../test_data/bug_fixes/comment_break_indent.yaka",
+            "comment_break_indent.yaka",
             "../test_data/bug_fixes/comment_break_indent.tokens");
 }
