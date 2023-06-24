@@ -189,6 +189,7 @@ std::string get_my_exe_path() {
   if (path == nullptr) { return nullptr; }
   wai_getModulePath(path, length, nullptr);
   path[length] = '\0';
-  return std::string{path, static_cast<std::basic_string<char>::size_type>(length)};
+  return std::string{path,
+                     static_cast<std::basic_string<char>::size_type>(length)};
 }
 #endif

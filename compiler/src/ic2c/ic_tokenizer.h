@@ -1,12 +1,12 @@
 // ic_tokenizer.h
 #ifndef IC_TOKENIZER_H
 #define IC_TOKENIZER_H
-#include <string>
-#include <vector>
+#include "ic_line_splicer.h"
+#include "ic_peek_ahead_iter.h"
 #include "ic_token.h"
 #include "ic_trigraph_translater.h"
-#include "ic_peek_ahead_iter.h"
-#include "ic_line_splicer.h"
+#include <string>
+#include <vector>
 namespace yaksha {
   struct ic_token;
   struct ic_parsing_error;

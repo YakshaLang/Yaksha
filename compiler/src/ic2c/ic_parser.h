@@ -12,17 +12,17 @@ namespace yaksha {
 
 private:
     // ---------------------- Parsing ----------------------
-    ic_stmt* preprocessor_statement();
-    ic_stmt* define_st(ic_token* hash_t);
-    ic_stmt* include_st(ic_token* hash_t);
-    ic_stmt* line_st(ic_token* hash_t);
-    ic_stmt* undef_st(ic_token* hash_t);
-    ic_stmt* error_st(ic_token* hash_t);
-    ic_stmt* warning_st(ic_token* hash_t);
-    ic_stmt* pragma_st(ic_token* hash_t);
-    ic_stmt* code_line();
-    ic_stmt* block(ic_token* hash_t);
-    ic_stmt* if_st(ic_token* hash_t);
+    ic_stmt *preprocessor_statement();
+    ic_stmt *define_st(ic_token *hash_t);
+    ic_stmt *include_st(ic_token *hash_t);
+    ic_stmt *line_st(ic_token *hash_t);
+    ic_stmt *undef_st(ic_token *hash_t);
+    ic_stmt *error_st(ic_token *hash_t);
+    ic_stmt *warning_st(ic_token *hash_t);
+    ic_stmt *pragma_st(ic_token *hash_t);
+    ic_stmt *code_line();
+    ic_stmt *block(ic_token *hash_t);
+    ic_stmt *if_st(ic_token *hash_t);
     // ---------------------- State -------------------------
     ic_ast_pool *ast_pool_;
     std::vector<ic_token> &tokens_;

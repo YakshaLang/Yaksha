@@ -331,13 +331,12 @@ void parser::verify_statements(token *token, std::vector<stmt *> &statements) {
 void parser::verify_only_single_line_statements(
     token *token, std::vector<stmt *> &statements) {
   for (stmt *st : statements) {
-    if (!(st->get_type() == ast_type::STMT_DEFER
-          || st->get_type() == ast_type::STMT_DEL
-          || st->get_type() == ast_type::STMT_PASS
-          || st->get_type() == ast_type::STMT_RETURN
-          || st->get_type() == ast_type::STMT_EXPRESSION
-          || st->get_type() == ast_type::STMT_CCODE
-            )) {
+    if (!(st->get_type() == ast_type::STMT_DEFER ||
+          st->get_type() == ast_type::STMT_DEL ||
+          st->get_type() == ast_type::STMT_PASS ||
+          st->get_type() == ast_type::STMT_RETURN ||
+          st->get_type() == ast_type::STMT_EXPRESSION ||
+          st->get_type() == ast_type::STMT_CCODE)) {
       throw error(token,
                   "Blocks with nested import/def/class is not supported");
     }
@@ -424,7 +423,9 @@ stmt *parser::declaration_statement() {
       return runtimefeature_statement();
     }
     if (match({token_type::KEYWORD_DEF})) { return def_statement({}); }
-    if (match({token_type::KEYWORD_CLASS})) { return class_statement({}); }
+    if (match({token_type::KEYWORD_CLASS, token_type::KEYWORD_STRUCT})) {
+      return class_statement({});
+    }
     if (match({token_type::AT})) { return attempt_parse_def_or_class(); }
     if (!match({token_type::NAME})) { return statement(); }
     var_name = previous();
@@ -666,6 +667,13 @@ ykdatatype *parser::parse_datatype() {
   return dt;
 }
 stmt *parser::class_statement(annotations ants) {
+  auto class_token = previous();
+  if (class_token->type_ == token_type::KEYWORD_STRUCT) {
+    if (ants.on_stack_) {
+      throw error(class_token, "struct is already @onstack");
+    }
+    ants.on_stack_ = true;
+  }
   auto name = consume(token_type::NAME, "Class name must be present");
   consume(token_type::COLON, "Colon must be present after class name");
   consume(token_type::NEW_LINE, "Class block must start with a new line");
@@ -719,7 +727,7 @@ stmt *parser::attempt_parse_def_or_class() {
       if (!ants.error_.empty()) { throw error(at_sign, ants.error_); }
     } else if (match({token_type::KEYWORD_DEF})) {
       return def_statement(ants);
-    } else if (match({token_type::KEYWORD_CLASS})) {
+    } else if (match({token_type::KEYWORD_CLASS, token_type::KEYWORD_STRUCT})) {
       return class_statement(ants);
     } else {
       break;

@@ -739,14 +739,11 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
   }
   if ((lhs.is_primitive_or_obj() && rhs.is_primitive_or_obj())) {
     auto rhs_dt = rhs.datatype_;
-    if (rhs_dt->is_const()) {
-      rhs_dt = rhs.datatype_->args_[0];
-    }
+    if (rhs_dt->is_const()) { rhs_dt = rhs.datatype_->args_[0]; }
     if (*lhs.datatype_ != *rhs_dt) {
       error(oper, "Cannot assign between 2 different data types.");
     }
   }
-
   token_type operator_type = oper->type_;
   switch (operator_type) {
     case token_type::AND_EQ:
