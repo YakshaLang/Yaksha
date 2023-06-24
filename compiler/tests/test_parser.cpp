@@ -60,39 +60,39 @@ using namespace yaksha;
   } while (0)
 TEST_CASE("parser: Hello World") {
   TEST_FILE("../test_data/compiler_tests/test1.yaka", "test1.yaka",
-            "../test_data/compiler_tests/test1.ast.tokens");
+            "../test_data/compiler_tests/output/test1.ast.tokens");
 }
 TEST_CASE("parser: Defer") {
   TEST_FILE("../test_data/compiler_tests/test2.yaka", "test2.yaka",
-            "../test_data/compiler_tests/test2.ast.tokens");
+            "../test_data/compiler_tests/output/test2.ast.tokens");
 }
 TEST_CASE("parser: Class support") {
   TEST_FILE("../test_data/compiler_tests/test3.yaka", "test3.yaka",
-            "../test_data/compiler_tests/test3.ast.tokens");
+            "../test_data/compiler_tests/output/test3.ast.tokens");
 }
 TEST_CASE("parser: Create object from class") {
   TEST_FILE("../test_data/compiler_tests/test4.yaka", "test4.yaka",
-            "../test_data/compiler_tests/test4.ast.tokens");
+            "../test_data/compiler_tests/output/test4.ast.tokens");
 }
 TEST_CASE("parser: Object members") {
   TEST_FILE("../test_data/compiler_tests/test5.yaka", "test5.yaka",
-            "../test_data/compiler_tests/test5.ast.tokens");
+            "../test_data/compiler_tests/output/test5.ast.tokens");
 }
 TEST_CASE("parser: Array access") {
   TEST_FILE("../test_data/compiler_tests/test6.yaka", "test6.yaka",
-            "../test_data/compiler_tests/test6.ast.tokens");
+            "../test_data/compiler_tests/output/test6.ast.tokens");
 }
 TEST_CASE("parser: Nested array access") {
   TEST_FILE("../test_data/compiler_tests/test7.yaka", "test7.yaka",
-            "../test_data/compiler_tests/test7.ast.tokens");
+            "../test_data/compiler_tests/output/test7.ast.tokens");
 }
 TEST_CASE("parser: Void function") {
   TEST_FILE("../test_data/compiler_tests/voidfunc.yaka", "voidfunc.yaka",
-            "../test_data/compiler_tests/voidfunc.ast.tokens");
+            "../test_data/compiler_tests/output/voidfunc.ast.tokens");
 }
 TEST_CASE("parser: Native functions") {
   TEST_FILE("../test_data/compiler_tests/nativefunc.yaka", "nativefunc.yaka",
-            "../test_data/compiler_tests/nativefunc.ast.tokens");
+            "../test_data/compiler_tests/output/nativefunc.ast.tokens");
 }
 TEST_CASE("parser: Unicode test") {
   TEST_FILE("../test_data/unicode_test.py", "unicode_test.py",
@@ -142,5 +142,5 @@ TEST_CASE("parser: import in def") {
 }
 TEST_CASE("parser: mini blocks") {
   TEST_FILE("../test_data/compiler_tests/smallest.yaka", "smallest.yaka",
-            "../test_data/compiler_tests/smallest.ast.tokens");
+            "../test_data/compiler_tests/output/smallest.ast.tokens");
 }
