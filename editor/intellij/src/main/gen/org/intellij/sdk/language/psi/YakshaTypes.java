@@ -91,6 +91,7 @@ public interface YakshaTypes {
   IElementType KW_PASS = new YakshaTokenType("KW_PASS");
   IElementType KW_RETURN = new YakshaTokenType("KW_RETURN");
   IElementType KW_RUNTIMEFEATURE = new YakshaTokenType("KW_RUNTIMEFEATURE");
+  IElementType KW_STRUCT = new YakshaTokenType("KW_STRUCT");
   IElementType KW_TRUE = new YakshaTokenType("KW_TRUE");
   IElementType KW_WHILE = new YakshaTokenType("KW_WHILE");
   IElementType NL = new YakshaTokenType("NL");

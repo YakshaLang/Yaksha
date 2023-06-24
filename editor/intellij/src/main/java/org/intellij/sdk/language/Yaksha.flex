@@ -83,6 +83,7 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   "as"                           { return YakshaTypes.KW_AS; }
   "break"                        { return YakshaTypes.KW_BREAK; }
   "class"                        { return YakshaTypes.KW_CLASS; }
+  "struct"                       { return YakshaTypes.KW_STRUCT; }
   "ccode"                        { return YakshaTypes.KW_CCODE; }
   "continue"                     { return YakshaTypes.KW_CONTINUE; }
   "def"                          { return YakshaTypes.KW_DEF; }

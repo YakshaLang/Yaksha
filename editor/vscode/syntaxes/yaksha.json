@@ -33,7 +33,7 @@
 		},
 		{
 			"name": "keyword.language.yaksha",
-			"match": "\\b(while|def|import|continue|break|if|elif|else|class|return|pass|as|for|in)\\b"
+			"match": "\\b(while|def|import|continue|break|if|elif|else|class|struct|return|pass|as|for|in)\\b"
 		},
 		{
 			"name": "invalid.spaces.yaksha",
@@ -64,7 +64,7 @@
 			"match": "\\.|\\+|\\-|\\*|\\\/|\\:|\\[|\\]|\\(|\\)|,|>|<|<\\=|>\\=|\\=\\=|\\=|\\bnot\\b|\\bor\\b|\\band\\b|!\\=|\\->"
 		},
 		{
-			"match": "^(class)\\s+([a-zA-Z_][a-zA-Z0-9_]+)\\s*",
+			"match": "^(class|struct)\\s+([a-zA-Z_][a-zA-Z0-9_]+)\\s*",
 			"captures": {
 				"1": {
 					"name": "keyword.language.yaksha"
