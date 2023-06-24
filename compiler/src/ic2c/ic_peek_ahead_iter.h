@@ -34,5 +34,5 @@ private:
     int fourth_l_;
     bool fourth_e_;
   };
-}
+}// namespace yaksha
 #endif

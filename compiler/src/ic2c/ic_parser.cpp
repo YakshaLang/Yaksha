@@ -105,8 +105,7 @@ ic_stmt *ic_parser::define_st(ic_token *hash_t) {
     std::vector<ic_token *> tok_string = token_string();
     consume(ic_token_type::NEWLINE, "new line is expected after #define");
     return ast_pool_->ic_c_pp_define_function_stmt(
-        hash_t, define_tok, identifier_tok,
-        paren_open, args, paren_close,
+        hash_t, define_tok, identifier_tok, paren_open, args, paren_close,
         tok_string);
   }
   // parse simple #define

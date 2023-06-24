@@ -229,7 +229,8 @@ void desugaring_compiler::visit_foreach_stmt(foreach_stmt *obj) {
   // While body    ->     expose yy__item ==> obj->name + obj->data_type
   const std::string desugar_rewrite = "(" + array_holder + "[" + counter + "])";
   new_while_body.emplace_back(ast_pool_->c_compins_stmt(
-      obj->name_, obj->data_type_, create_str_literal(desugar_rewrite), nullptr, nullptr));
+      obj->name_, obj->data_type_, create_str_literal(desugar_rewrite), nullptr,
+      nullptr));
   // Create counter += 1 statement
   auto counter_incr = ast_pool_->c_expression_stmt(ast_pool_->c_assign_expr(
       counter_tok, plus_eq_token_,

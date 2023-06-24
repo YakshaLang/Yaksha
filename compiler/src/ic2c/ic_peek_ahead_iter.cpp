@@ -1,7 +1,7 @@
 // ic_peek_ahead_iter.cpp
 #include "ic_peek_ahead_iter.h"
 using namespace yaksha;
- ic_peek_ahead_iter::ic_peek_ahead_iter(ic_simple_character_iter &tt)
+ic_peek_ahead_iter::ic_peek_ahead_iter(ic_simple_character_iter &tt)
     : tt_(tt), current_(0), next_(0), after_next_(0), fourth_(0) {
   current_ = tt_.get_current();
   current_l_ = tt_.get_line();

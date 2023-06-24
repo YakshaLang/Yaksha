@@ -7,14 +7,14 @@
 #include <vector>
 using namespace yaksha;
 bool yaksha::ic_save_token_dump(const std::string &file,
-                             const std::vector<ic_token> &tokens) {
+                                const std::vector<ic_token> &tokens) {
   std::ofstream save_file(file);
   if (!save_file.is_open()) { return false; }
   ic_write_token_dump(save_file, tokens);
   return true;
 }
 void yaksha::ic_write_token_dump(std::ostream &output,
-                              const std::vector<ic_token> &tokens) {
+                                 const std::vector<ic_token> &tokens) {
   bool comma = false;
   output << "[";
   for (auto &tok : tokens) {

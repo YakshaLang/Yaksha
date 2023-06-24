@@ -34,7 +34,8 @@ void ic_trigraph_translater::read() {
   utf8::uint32_t next = std::get<1>(characters);
   utf8::uint32_t after_next = std::get<2>(characters);
   bool read_skip_ = false;
-  if ((current == '\r' && next == '\n') || current == '\r' || (current == '\n' && prev != '\r')) {
+  if ((current == '\r' && next == '\n') || current == '\r' ||
+      (current == '\n' && prev != '\r')) {
     increment_line_ = true;
   }
   if (current == '?' && next == '?') {

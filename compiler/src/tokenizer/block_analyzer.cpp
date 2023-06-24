@@ -122,12 +122,11 @@ void block_analyzer::analyze() {
       if (tok.type_ == token_type::NEW_LINE) {
         // Don't start with new lines, Don't add a newline after a new line
         if (prev_comment) {
-            if (cleaned.empty() || cleaned.back().line_ != tok.line_) {
-                continue;
-            }
+          if (cleaned.empty() || cleaned.back().line_ != tok.line_) {
+            continue;
+          }
         }
-        if (cleaned.empty() ||
-                   cleaned.back().type_ == token_type::NEW_LINE) {
+        if (cleaned.empty() || cleaned.back().type_ == token_type::NEW_LINE) {
           continue;
         } else if (cleaned.back().type_ == token_type::INDENT) {
           // get rid of empty indents that just follows by a new line

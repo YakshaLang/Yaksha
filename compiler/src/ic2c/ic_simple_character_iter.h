@@ -11,5 +11,5 @@ namespace yaksha {
     virtual int get_line() = 0;
     virtual ~ic_simple_character_iter() = default;
   };
-}
+}// namespace yaksha
 #endif
