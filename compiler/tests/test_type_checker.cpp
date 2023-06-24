@@ -5,14 +5,24 @@
 using namespace yaksha;
 #define TEST_FILE(A, E)                                                        \
   do {                                                                         \
+    yaksha::errors::error_capture.clear();                                     \
     multifile_compiler mc{};                                                   \
     auto result = mc.compile(A);                                               \
     REQUIRE(result.failed_ == true);                                           \
     REQUIRE(!yaksha::errors::error_capture.empty());                           \
     REQUIRE(yaksha::errors::has_error(E));                                     \
   } while (0)
+#define TEST_FILE_OK(A)                                                        \
+  do {                                                                         \
+    yaksha::errors::error_capture.clear();                                     \
+    multifile_compiler mc{};                                                   \
+    auto result = mc.compile(A);                                               \
+    REQUIRE(result.failed_ == false);                                          \
+    REQUIRE(yaksha::errors::error_capture.empty());                            \
+  } while (0)
 #define TEST_SNIPPET(S, E)                                                     \
   do {                                                                         \
+    yaksha::errors::error_capture.clear();                                     \
     multifile_compiler mc{};                                                   \
     std::string xa = "def main() -> int:\n";                                   \
     xa += "    ";                                                              \
@@ -26,6 +36,7 @@ using namespace yaksha;
   } while (0)
 #define TEST_SNIPPET_FULL(S, E)                                                \
   do {                                                                         \
+    yaksha::errors::error_capture.clear();                                     \
     multifile_compiler mc{};                                                   \
     std::string xa = (S);                                                      \
     auto result = mc.compile(xa, true, "dummy.yaka", "../libs");               \
@@ -467,26 +478,29 @@ TEST_CASE("type checker: non existent element access") {
                     "Cannot find data type of LHS");
 }
 TEST_CASE("type checker: ccode statement used outside non native function") {
-  TEST_SNIPPET_FULL("def main() -> int:\n"
-                    "    ccode \"\"\"int a = 1;\"\"\"\n"
-                    "    return 0",
-                    "Invalid use of ccode statement outside non native function");
+  TEST_SNIPPET_FULL(
+      "def main() -> int:\n"
+      "    ccode \"\"\"int a = 1;\"\"\"\n"
+      "    return 0",
+      "Invalid use of ccode statement outside non native function");
 }
-TEST_CASE(
-    "type checker: argument must be a string literal for binarydata()") {
+TEST_CASE("type checker: argument must be a string literal for binarydata()") {
   TEST_SNIPPET("a: Ptr[Const[u8]] = binarydata(1)",
                "Argument to binarydata() must be a str literal");
 }
-TEST_CASE(
-    "type checker: only 1 argument is allowed for binarydata()") {
+TEST_CASE("type checker: only 1 argument is allowed for binarydata()") {
   TEST_SNIPPET("a: Ptr[Const[u8]] = binarydata(1, 2, 3)",
                "binarydata() builtin expects 1 argument");
 }
-TEST_CASE("type checker: Redefining variables in a function different data types") {
+TEST_CASE(
+    "type checker: Redefining variables in a function different data types") {
   TEST_FILE("../test_data/bug_fixes/redefining_vars.yaka",
             "Redefining a variable is not allowed");
 }
 TEST_CASE("type checker: Redefining variables in a function - params") {
   TEST_FILE("../test_data/bug_fixes/redefining_vars_params.yaka",
             "Redefining a variable is not allowed");
+}
+TEST_CASE("type checker: Const assignment should work as expected") {
+  TEST_FILE_OK("../test_data/bug_fixes/assign_const.yaka");
 }

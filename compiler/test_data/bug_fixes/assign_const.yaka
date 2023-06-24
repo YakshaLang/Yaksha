@@ -1,0 +1,6 @@
+def main() -> int:
+    A: Const[int] = 1
+    a: int = 2
+    a = A
+    b: int = A
+    return a + b

@@ -733,16 +733,20 @@ void type_checker::visit_assign_arr_expr(assign_arr_expr *obj) {
 }
 void type_checker::handle_assigns(token *oper, const ykobject &lhs,
                                   const ykobject &rhs) {
-  // TODO you can assign a const to a value?
-  // Both are primitive but not equal? then it is a problem
-  if ((lhs.is_primitive_or_obj() && rhs.is_primitive_or_obj()) &&
-      *lhs.datatype_ != *rhs.datatype_) {
-    error(oper, "Cannot assign between 2 different data types.");
-  }
   if (lhs.datatype_->is_const()) { error(oper, "Cannot assign to a constant"); }
   if (rhs.is_a_function() && !slot_match(rhs, lhs.datatype_)) {
     error(oper, "You can only assign a function to a Function[In[?],Out[?]]");
   }
+  if ((lhs.is_primitive_or_obj() && rhs.is_primitive_or_obj())) {
+    auto rhs_dt = rhs.datatype_;
+    if (rhs_dt->is_const()) {
+      rhs_dt = rhs.datatype_->args_[0];
+    }
+    if (*lhs.datatype_ != *rhs_dt) {
+      error(oper, "Cannot assign between 2 different data types.");
+    }
+  }
+
   token_type operator_type = oper->type_;
   switch (operator_type) {
     case token_type::AND_EQ:
