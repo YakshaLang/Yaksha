@@ -86,6 +86,7 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
             .add(YakshaTypes.KW_AS)
             .add(YakshaTypes.KW_BREAK)
             .add(YakshaTypes.KW_CLASS)
+            .add(YakshaTypes.KW_STRUCT)
             .add(YakshaTypes.KW_CCODE)
             .add(YakshaTypes.KW_CONTINUE)
             .add(YakshaTypes.KW_DEF)

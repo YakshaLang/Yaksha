@@ -465,18 +465,28 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? class_block
+  // (KW_CLASS | KW_STRUCT) S IDENTIFIER S? OPERATOR_COLON S? class_block
   public static boolean class_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_statement")) return false;
-    if (!nextTokenIs(b, KW_CLASS)) return false;
+    if (!nextTokenIs(b, "<class statement>", KW_CLASS, KW_STRUCT)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, KW_CLASS, S, IDENTIFIER);
+    Marker m = enter_section_(b, l, _NONE_, CLASS_STATEMENT, "<class statement>");
+    r = class_statement_0(b, l + 1);
+    r = r && consumeTokens(b, 0, S, IDENTIFIER);
     r = r && class_statement_3(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
     r = r && class_statement_5(b, l + 1);
     r = r && class_block(b, l + 1);
-    exit_section_(b, m, CLASS_STATEMENT, r);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // KW_CLASS | KW_STRUCT
+  private static boolean class_statement_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_statement_0")) return false;
+    boolean r;
+    r = consumeToken(b, KW_CLASS);
+    if (!r) r = consumeToken(b, KW_STRUCT);
     return r;
   }
 
@@ -2217,7 +2227,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !('@' | 'class'  | 'def' | 'import' | 'runtimefeature')
+  // !('@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature')
   static boolean top_level_recover(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "top_level_recover")) return false;
     boolean r;
@@ -2227,12 +2237,13 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '@' | 'class'  | 'def' | 'import' | 'runtimefeature'
+  // '@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature'
   private static boolean top_level_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "top_level_recover_0")) return false;
     boolean r;
     r = consumeToken(b, "@");
     if (!r) r = consumeToken(b, "class");
+    if (!r) r = consumeToken(b, "struct");
     if (!r) r = consumeToken(b, "def");
     if (!r) r = consumeToken(b, "import");
     if (!r) r = consumeToken(b, "runtimefeature");

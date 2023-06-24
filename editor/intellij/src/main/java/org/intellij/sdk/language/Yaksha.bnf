@@ -17,7 +17,7 @@
 }
 
 yakshaFile ::= item_*  {pin=1 recoverWhile="top_level_recover" name="import, def, class"}
-private top_level_recover ::= !('@' | 'class'  | 'def' | 'import' | 'runtimefeature')
+private top_level_recover ::= !('@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature')
 
 private item_ ::= (outer_statement | COMMENT | empty_line)
 
@@ -39,7 +39,7 @@ const_statement ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? 
 }
 literal ::= NUMBER | KW_TRUE | KW_FALSE
 
-class_statement ::= KW_CLASS S IDENTIFIER S? OPERATOR_COLON S? class_block {
+class_statement ::= (KW_CLASS | KW_STRUCT) S IDENTIFIER S? OPERATOR_COLON S? class_block {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
     methods=[getName setName getNameIdentifier getPresentation]
