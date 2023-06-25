@@ -123,6 +123,8 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   ")"                            { return YakshaTypes.OPERATOR_CLOSE_P; }
   "["                            { return YakshaTypes.OPERATOR_OPEN_SQB; }
   "]"                            { return YakshaTypes.OPERATOR_CLOSE_SQB; }
+  "{"                            { return YakshaTypes.OPERATOR_CURLY_OPEN; }
+  "}"                            { return YakshaTypes.OPERATOR_CURLY_CLOSE; }
   "->"                            { return YakshaTypes.OPERATOR_ARROW; }
   "+"                            { return YakshaTypes.OPERATOR_PLUS; }
   "-"                            { return YakshaTypes.OPERATOR_MINUS; }

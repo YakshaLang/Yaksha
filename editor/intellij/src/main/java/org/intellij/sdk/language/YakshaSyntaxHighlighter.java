@@ -35,6 +35,9 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey BAD_CHARACTER =
             createTextAttributesKey("YAKSHA_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
 
+    public static final TextAttributesKey PARAM =
+            createTextAttributesKey("YAKSHA_PARAM", DefaultLanguageHighlighterColors.PARAMETER);
+
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] SIGN_KEYS = new TextAttributesKey[]{SIGN};
     private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
@@ -42,6 +45,7 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] DATA_KEYS = new TextAttributesKey[]{DATA_TYPE};
+    private static final TextAttributesKey[] PARAM_KEYS = new TextAttributesKey[]{PARAM};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
     private static final Set<IElementType> YK_OPERATORS = ImmutableSet.<IElementType>builder()
@@ -80,6 +84,8 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
             .add(YakshaTypes.OPERATOR_B_OR_EQ)
             .add(YakshaTypes.OPERATOR_B_XOR_EQ)
             .add(YakshaTypes.OPERATOR_B_NOT)
+            .add(YakshaTypes.OPERATOR_CURLY_OPEN)
+            .add(YakshaTypes.OPERATOR_CURLY_CLOSE)
             .build();
 
     private static final Set<IElementType> YK_KW = ImmutableSet.<IElementType>builder()

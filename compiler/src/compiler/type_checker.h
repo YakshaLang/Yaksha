@@ -52,6 +52,7 @@ namespace yaksha {
     void visit_foreach_stmt(foreach_stmt *obj) override;
     void visit_forendless_stmt(forendless_stmt *obj) override;
     void visit_compins_stmt(compins_stmt *obj) override;
+    void visit_struct_literal_expr(struct_literal_expr *obj) override;
     /**
      * Errors vector, type checker will try and identify as much errors as possible
      * but after first error, everything else is best guess
@@ -68,6 +69,7 @@ namespace yaksha {
 
 private:
     ykobject pop();
+    class_stmt* find_class(token* tok, ykdatatype* data_type);
     void push(const ykobject &data_type);
     void error(token *tok, const std::string &message);
     void error(const std::string &message);
@@ -92,6 +94,7 @@ private:
     builtins builtins_;
     // Copy of internal stmt_alias to handle dt parsing in builtins
     std::unordered_map<std::string, import_stmt *> import_stmts_alias_{};
+    void validate_member(name_val member, class_stmt *class_st);
   };
 }// namespace yaksha
 #endif

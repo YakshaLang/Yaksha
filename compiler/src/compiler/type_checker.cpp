@@ -15,12 +15,17 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
   auto rhs = pop();
   auto name = obj->name_->token_;
-  if (!scope_.is_defined(name)) {
-    error(obj->name_, "Assignment without definition");
-    return;
+  ykobject object;
+  if (scope_.is_defined(name)) {
+    object = scope_.get(name);
+  } else {
+    object = ykobject(rhs.datatype_);
+    obj->promoted_ = true;
   }
-  auto object = scope_.get(name);
   handle_assigns(obj->opr_, object, rhs);
+  if (obj->promoted_) {
+    scope_.define(name, object);
+  }
 }
 template<typename Verifier>
 bool dt_match_ignore_const(ykdatatype *lhs, ykdatatype *rhs, Verifier v) {
@@ -645,7 +650,6 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     return;
   }
   auto item = member_item->token_;
-  auto user_defined_type = lhs.datatype_->type_;
   if (!lhs.datatype_->module_.empty()) {
     auto mod_file_info = cf_->get(lhs.datatype_->module_);
     if (mod_file_info != nullptr &&
@@ -783,7 +787,9 @@ void type_checker::visit_ccode_stmt(ccode_stmt *obj) {
           "Invalid use of ccode statement outside non native function");
   }
 }
-void type_checker::visit_import_stmt(import_stmt *obj) {}
+void type_checker::visit_import_stmt(import_stmt *obj) {
+  // Not required to be type checked
+}
 void type_checker::visit_const_stmt(const_stmt *obj) {
   if (!obj->data_type_->args_[0]->is_bool() &&
       !obj->data_type_->args_[0]->is_a_number()) {
@@ -848,8 +854,12 @@ ykdatatype *type_checker::function_to_datatype(const ykobject &arg) {
   // Compare now
   return fnc;
 }
-void type_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
-void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {}
+void type_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
+  // Not required to be type checked
+}
+void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {
+  if (!scope_.is_global_level()) { scope_.define(obj->name_->token_, ykobject(obj->data_type_)); }
+}
 void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
@@ -882,4 +892,66 @@ void type_checker::visit_forendless_stmt(forendless_stmt *obj) {
   scope_.pop();
   pop_scope_type();
 }
-void type_checker::visit_compins_stmt(compins_stmt *obj) {}
+void type_checker::visit_compins_stmt(compins_stmt *obj) {
+  // Does not occur in AST
+  // Does not need to be type checked at the moment
+}
+void type_checker::visit_struct_literal_expr(struct_literal_expr *obj) {
+  // Validate that there are no duplicate names
+  std::unordered_set<std::string> names{};
+  for (auto nv : obj->values_) {
+    if (names.find(nv.name_->token_) != names.end()) {
+      error(nv.name_, "duplicate field in struct literal.");
+    }
+  }
+  // Match data type of each element with member data type
+  auto class_stmt = find_class(obj->colon_, obj->data_type_);
+  if (class_stmt == nullptr) {
+    // Note error is created in find_class, so no need to do it again here
+    push(ykobject(dt_pool_));
+    return;
+  }
+  for (auto member: obj->values_) {
+    validate_member(member, class_stmt);
+  }
+  push(ykobject(obj->data_type_));
+}
+class_stmt *type_checker::find_class(token *tok, ykdatatype *data_type) {
+  // If this is a primitive / builtin it is not a user defined class
+  if (data_type->is_builtin_or_primitive()) {
+    error(tok, "primitives/builtins cannot be created as a struct literal");
+    return nullptr;
+  }
+  auto mod = cf_->get(data_type->module_);
+  if (mod == nullptr) {
+    error(tok, "module not found");
+    return nullptr;
+  }
+  if (mod->data_->dsv_->has_class(data_type->type_)) {
+    return mod->data_->dsv_->get_class(data_type->type_);
+  }
+  error(tok, "class/struct not found");
+  return nullptr;
+}
+void type_checker::validate_member(name_val member, class_stmt *class_st) {
+  bool found = false;
+  ykdatatype* class_member_dt;
+  for (auto const& para: class_st->members_) {
+    if (para.name_->token_ == member.name_->token_) {
+      found = true;
+      class_member_dt = para.data_type_;
+    }
+  }
+  if (!found) {
+    error(member.name_, "member not found in class/struct");
+  }
+  member.value_->accept(this);
+  auto set_value = pop();
+  ykdatatype* member_dt = set_value.datatype_;
+  if (member_dt->is_const()) {
+    member_dt = member_dt->args_[0];
+  }
+  if (*class_member_dt != *member_dt) {
+    error(member.name_, "data types mismatch");
+  }
+}

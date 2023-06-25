@@ -12,7 +12,8 @@ import os
 # expression type name is followed by content of the class
 EXPRS = sorted([
     # Assign to a variable
-    ("assign", (("token*", "name"), ("token*", "opr"), ("expr*", "right"))),
+    # We can promote an assignment to a let statement, if so promoted is set to true
+    ("assign", (("token*", "name"), ("token*", "opr"), ("expr*", "right"), ("bool", "promoted"))),
     # Assign to a member
     ("assign_member", (("expr*", "set_oper"), ("token*", "opr"), ("expr*", "right"))),
     # Assign to array object
@@ -34,6 +35,10 @@ EXPRS = sorted([
     # Can be abc(), abc(1), abc(1, 2, 3), etc
     #        name->`abc` args->`1, 2, 3` paren_token->`)`
     ("fncall", (("expr*", "name"), ("token*", "paren_token"), ("std::vector<expr*>", "args"))),
+    # Struct literal
+    ("struct_literal", (("token*", "colon"),
+                        ("ykdatatype*", "data_type"), ("token*", "curly_open"), ("std::vector<name_val>", "values"),
+                        ("token*", "curly_close"))),
     # Can be a[1], a[b[1]], etc
     ("square_bracket_access", (("expr*", "name"), ("token*", "sqb_token"), ("expr*", "index_expr"))),
     ("square_bracket_set", (("expr*", "name"), ("token*", "sqb_token"), ("expr*", "index_expr"))),
@@ -190,6 +195,7 @@ namespace yaksha {
 struct expr;
 struct stmt;
 struct parameter;
+struct name_val;
 $FORWARD_DECLS$
 // Types of expressions and statements
 $AST_TYPES$
@@ -221,6 +227,13 @@ $AST_POOL$
 struct parameter {
     token* name_;
     ykdatatype* data_type_;
+};
+/**
+* Name + value item
+*/
+struct name_val {
+    token* name_;
+    expr* value_;
 };
 } // namespace yaksha
 #endif

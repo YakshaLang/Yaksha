@@ -234,7 +234,7 @@ void desugaring_compiler::visit_foreach_stmt(foreach_stmt *obj) {
   // Create counter += 1 statement
   auto counter_incr = ast_pool_->c_expression_stmt(ast_pool_->c_assign_expr(
       counter_tok, plus_eq_token_,
-      ast_pool_->c_literal_expr(create_int_literal("1"))));
+      ast_pool_->c_literal_expr(create_int_literal("1")), false));
   //                      desugar body (add counter += 1 before continue)
   pre_continue_stack_.emplace_back(counter_incr);
   auto desugared = desugar(obj->for_body_);

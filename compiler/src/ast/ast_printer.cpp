@@ -219,4 +219,15 @@ void ast_printer::visit_forendless_stmt(forendless_stmt *obj) {
   obj->for_body_->accept(this);
   text_ << ")";
 }
-void ast_printer::visit_compins_stmt(compins_stmt *obj) {}
+void ast_printer::visit_compins_stmt(compins_stmt *obj) {
+  // Does not occur in AST
+}
+void ast_printer::visit_struct_literal_expr(struct_literal_expr *obj) {
+  text_ << "(struct " << obj->data_type_->as_string() << " (";
+  for (auto st : obj->values_) {
+    text_ << " ";
+    text_ << st.name_->token_ << ":";
+    st.value_->accept(this);
+  }
+  text_ << " ))";
+}

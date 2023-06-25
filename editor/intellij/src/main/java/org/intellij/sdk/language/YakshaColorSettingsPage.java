@@ -20,7 +20,8 @@ public class YakshaColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Number", YakshaSyntaxHighlighter.NUMBER),
             new AttributesDescriptor("Data type", YakshaSyntaxHighlighter.DATA_TYPE),
             new AttributesDescriptor("Bad value", YakshaSyntaxHighlighter.BAD_CHARACTER),
-            new AttributesDescriptor("Comment", YakshaSyntaxHighlighter.COMMENT)
+            new AttributesDescriptor("Comment", YakshaSyntaxHighlighter.COMMENT),
+            new AttributesDescriptor("Param", YakshaSyntaxHighlighter.PARAM)
     };
 
     @Nullable

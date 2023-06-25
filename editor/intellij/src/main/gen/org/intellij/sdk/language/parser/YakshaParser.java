@@ -2036,7 +2036,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | IDENTIFIER | paren_exp
+  // KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | IDENTIFIER | struct_literal | paren_exp
   public static boolean primary(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "primary")) return false;
     boolean r;
@@ -2047,6 +2047,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, NUMBER);
     if (!r) r = consumeToken(b, STRING);
     if (!r) r = consumeToken(b, IDENTIFIER);
+    if (!r) r = struct_literal(b, l + 1);
     if (!r) r = paren_exp(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -2154,6 +2155,127 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = assignment_statement_wo_indent(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
+  }
+
+  /* ********************************************************** */
+  // IDENTIFIER S? OPERATOR_COLON S? exp
+  public static boolean struct_arg(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_arg")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, IDENTIFIER);
+    r = r && struct_arg_1(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_COLON);
+    r = r && struct_arg_3(b, l + 1);
+    r = r && exp(b, l + 1);
+    exit_section_(b, m, STRUCT_ARG, r);
+    return r;
+  }
+
+  // S?
+  private static boolean struct_arg_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_arg_1")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean struct_arg_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_arg_3")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // struct_arg (S? OPERATOR_COMMA S? struct_arg)*
+  public static boolean struct_arguments(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_arguments")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = struct_arg(b, l + 1);
+    r = r && struct_arguments_1(b, l + 1);
+    exit_section_(b, m, STRUCT_ARGUMENTS, r);
+    return r;
+  }
+
+  // (S? OPERATOR_COMMA S? struct_arg)*
+  private static boolean struct_arguments_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_arguments_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!struct_arguments_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "struct_arguments_1", c)) break;
+    }
+    return true;
+  }
+
+  // S? OPERATOR_COMMA S? struct_arg
+  private static boolean struct_arguments_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_arguments_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = struct_arguments_1_0_0(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_COMMA);
+    r = r && struct_arguments_1_0_2(b, l + 1);
+    r = r && struct_arg(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean struct_arguments_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_arguments_1_0_0")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean struct_arguments_1_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_arguments_1_0_2")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // OPERATOR_COLON S? data_type S? OPERATOR_CURLY_OPEN S? struct_arguments OPERATOR_CURLY_CLOSE
+  public static boolean struct_literal(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_literal")) return false;
+    if (!nextTokenIs(b, OPERATOR_COLON)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPERATOR_COLON);
+    r = r && struct_literal_1(b, l + 1);
+    r = r && data_type(b, l + 1);
+    r = r && struct_literal_3(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_OPEN);
+    r = r && struct_literal_5(b, l + 1);
+    r = r && struct_arguments(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_CLOSE);
+    exit_section_(b, m, STRUCT_LITERAL, r);
+    return r;
+  }
+
+  // S?
+  private static boolean struct_literal_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_literal_1")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean struct_literal_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_literal_3")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean struct_literal_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_literal_5")) return false;
+    consumeToken(b, S);
+    return true;
   }
 
   /* ********************************************************** */

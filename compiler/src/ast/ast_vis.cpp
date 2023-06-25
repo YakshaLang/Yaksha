@@ -281,7 +281,21 @@ void ast_vis::visit_ccode_stmt(ccode_stmt *obj) {
         << "<br />";
   end_block();
 }
-void ast_vis::visit_import_stmt(import_stmt *obj) {}
+void ast_vis::visit_import_stmt(import_stmt *obj) {
+  begin_block("import");
+  std::stringstream name;
+  bool first = true;
+  for (auto tok: obj->import_names_) {
+    if (first) {
+      first = false;
+    } else {
+      name << ".";
+    }
+    name << tok->token_;
+  }
+  field("path", name.str());
+  end_block();
+}
 void ast_vis::visit_const_stmt(const_stmt *obj) {
   begin_block("const");
   field("name", obj->name_->token_);
@@ -325,4 +339,15 @@ void ast_vis::visit_forendless_stmt(forendless_stmt *obj) {
   field("body", obj->for_body_);
   end_block();
 }
-void ast_vis::visit_compins_stmt(compins_stmt *obj) {}
+void ast_vis::visit_compins_stmt(compins_stmt *obj) {
+  // Does not occur in AST
+}
+void ast_vis::visit_struct_literal_expr(struct_literal_expr *obj) {
+  begin_block("struct");
+  field("datatype", obj->data_type_->as_string());
+  for (auto st : obj->values_) {
+    field("." + st.name_->token_, st.value_);
+  }
+  text_ << "\n<br />";
+  end_block();
+}

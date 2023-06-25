@@ -1,3 +1,5 @@
+import class_stuff as c
+
 @onstack
 class Enemy:
     x: int
@@ -8,12 +10,12 @@ struct Friend:
     x: int
 
 def main() -> int:
-    enemies: Array[Enemy] = arrnew("Enemy", 2)
+    enemies = arrnew("Enemy", 2)
     enemies[0].x = 1
     enemies[1].x = 2
-    good_person: Friend
-    good_person.x = 0
+    good_person: Friend = :Friend {x: 0}
+    my_obj = :c.C {c: 0}
     big_enemy: Enemy
     big_enemy.x = 4
-    println(enemies[0].x + enemies[1].x + big_enemy.x + good_person.x)
+    println(enemies[0].x + enemies[1].x + big_enemy.x + good_person.x + my_obj.c)
     return 0

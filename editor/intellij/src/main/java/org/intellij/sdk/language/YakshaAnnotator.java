@@ -9,6 +9,8 @@ import org.intellij.sdk.language.psi.*;
 import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class YakshaAnnotator implements Annotator {
 
     @Override
@@ -50,6 +52,20 @@ public class YakshaAnnotator implements Annotator {
                     .range(element.getTextRange())
                     .textAttributes(YakshaSyntaxHighlighter.COMMENT)
                     .create();
+        } else if (element instanceof YakshaStructLiteral) {
+            YakshaStructLiteral literal = (YakshaStructLiteral) element;
+            holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                    .range(literal.getFirstChild().getTextRange())
+                    .textAttributes(YakshaSyntaxHighlighter.DATA_TYPE)
+                    .create();
+            YakshaStructArguments args = literal.getStructArguments();
+            List<YakshaStructArg> argList = args.getStructArgList();
+            for (YakshaStructArg arg : argList) {
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                        .range(arg.getFirstChild().getTextRange())
+                        .textAttributes(YakshaSyntaxHighlighter.PARAM)
+                        .create();
+            }
         }
     }
 

@@ -108,7 +108,10 @@ unary ::= (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp | fncall | pri
 fncall ::= IDENTIFIER (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER )* {
     methods=[getDefOrClassName getFullName getReference]
 }
-primary ::= KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | IDENTIFIER | paren_exp
+primary ::= KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | IDENTIFIER | struct_literal | paren_exp
+struct_literal ::= OPERATOR_COLON S? data_type S? OPERATOR_CURLY_OPEN S? struct_arguments OPERATOR_CURLY_CLOSE
+struct_arguments ::= struct_arg (S? OPERATOR_COMMA S? struct_arg)*
+struct_arg ::= IDENTIFIER S? OPERATOR_COLON S? exp
 paren_exp ::= OPERATOR_OPEN_P S? exp S? OPERATOR_CLOSE_P
 arguments ::= exp (S? OPERATOR_COMMA S? exp)*
 
