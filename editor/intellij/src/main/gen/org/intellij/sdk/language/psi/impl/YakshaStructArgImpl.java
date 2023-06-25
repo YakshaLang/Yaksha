@@ -11,14 +11,14 @@ import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
 
-public class YakshaPrimaryImpl extends ASTWrapperPsiElement implements YakshaPrimary {
+public class YakshaStructArgImpl extends ASTWrapperPsiElement implements YakshaStructArg {
 
-  public YakshaPrimaryImpl(@NotNull ASTNode node) {
+  public YakshaStructArgImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YakshaVisitor visitor) {
-    visitor.visitPrimary(this);
+    visitor.visitStructArg(this);
   }
 
   @Override
@@ -28,15 +28,9 @@ public class YakshaPrimaryImpl extends ASTWrapperPsiElement implements YakshaPri
   }
 
   @Override
-  @Nullable
-  public YakshaParenExp getParenExp() {
-    return findChildByClass(YakshaParenExp.class);
-  }
-
-  @Override
-  @Nullable
-  public YakshaStructLiteral getStructLiteral() {
-    return findChildByClass(YakshaStructLiteral.class);
+  @NotNull
+  public YakshaExp getExp() {
+    return findNotNullChildByClass(YakshaExp.class);
   }
 
 }

@@ -34,6 +34,19 @@ using namespace yaksha;
     REQUIRE(!yaksha::errors::error_capture.empty());                           \
     REQUIRE(yaksha::errors::has_error(E));                                     \
   } while (0)
+#define TEST_SNIPPET_OK(S)                                                     \
+  do {                                                                         \
+    yaksha::errors::error_capture.clear();                                     \
+    multifile_compiler mc{};                                                   \
+    std::string xa = "def main() -> int:\n";                                   \
+    xa += "    ";                                                              \
+    xa += (S);                                                                 \
+    xa += "\n"                                                                 \
+          "    return 0";                                                      \
+    auto result = mc.compile(xa, true, "dummy.yaka", "../libs");               \
+    REQUIRE(result.failed_ == false);                                          \
+    REQUIRE(yaksha::errors::error_capture.empty());                            \
+  } while (0)
 #define TEST_SNIPPET_FULL(S, E)                                                \
   do {                                                                         \
     yaksha::errors::error_capture.clear();                                     \
@@ -133,8 +146,8 @@ TEST_CASE("type checker: Object creation with argument not allowed") {
                     "    return 0",
                     "Arguments for object creation is not supported");
 }
-TEST_CASE("type checker: assignment without definition") {
-  TEST_SNIPPET("a = 1", "Assignment without definition");
+TEST_CASE("type checker: assignment without definition is allowed") {
+  TEST_SNIPPET_OK("a = 1");
 }
 TEST_CASE(
     "type checker: Binary operation between two different data types (meta)") {

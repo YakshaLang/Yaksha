@@ -65,6 +65,9 @@ public interface YakshaTypes {
   IElementType RUNTIMEFEATURE_STATEMENT = new YakshaElementType("RUNTIMEFEATURE_STATEMENT");
   IElementType SINGLE_LINE_CLASS_BITS = new YakshaElementType("SINGLE_LINE_CLASS_BITS");
   IElementType SINGLE_LINE_DEF_BITS = new YakshaElementType("SINGLE_LINE_DEF_BITS");
+  IElementType STRUCT_ARG = new YakshaElementType("STRUCT_ARG");
+  IElementType STRUCT_ARGUMENTS = new YakshaElementType("STRUCT_ARGUMENTS");
+  IElementType STRUCT_LITERAL = new YakshaElementType("STRUCT_LITERAL");
   IElementType TERM = new YakshaElementType("TERM");
   IElementType UNARY = new YakshaElementType("UNARY");
   IElementType WHILE_STATEMENT = new YakshaElementType("WHILE_STATEMENT");
@@ -111,6 +114,8 @@ public interface YakshaTypes {
   IElementType OPERATOR_COLON = new YakshaTokenType("OPERATOR_COLON");
   IElementType OPERATOR_COMMA = new YakshaTokenType("OPERATOR_COMMA");
   IElementType OPERATOR_COMPARISON = new YakshaTokenType("OPERATOR_COMPARISON");
+  IElementType OPERATOR_CURLY_CLOSE = new YakshaTokenType("OPERATOR_CURLY_CLOSE");
+  IElementType OPERATOR_CURLY_OPEN = new YakshaTokenType("OPERATOR_CURLY_OPEN");
   IElementType OPERATOR_DIV = new YakshaTokenType("OPERATOR_DIV");
   IElementType OPERATOR_DIV_EQ = new YakshaTokenType("OPERATOR_DIV_EQ");
   IElementType OPERATOR_DOT = new YakshaTokenType("OPERATOR_DOT");
@@ -308,6 +313,15 @@ public interface YakshaTypes {
       }
       else if (type == SINGLE_LINE_DEF_BITS) {
         return new YakshaSingleLineDefBitsImpl(node);
+      }
+      else if (type == STRUCT_ARG) {
+        return new YakshaStructArgImpl(node);
+      }
+      else if (type == STRUCT_ARGUMENTS) {
+        return new YakshaStructArgumentsImpl(node);
+      }
+      else if (type == STRUCT_LITERAL) {
+        return new YakshaStructLiteralImpl(node);
       }
       else if (type == TERM) {
         return new YakshaTermImpl(node);

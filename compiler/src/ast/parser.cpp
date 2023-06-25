@@ -197,6 +197,27 @@ expr *parser::primary() {
     return pool_.c_literal_expr(previous());
   }
   if (match({token_type::NAME})) { return pool_.c_variable_expr(previous()); }
+  if (match({token_type::COLON})) {
+    std::vector<name_val> values{};
+    auto colon_token = previous();
+    auto dt = parse_datatype();
+    auto curly_open = consume(token_type::CURLY_BRACKET_OPEN,
+                              "Expect '}' after :DataType for struct literals");
+    if (!check(token_type::CURLY_BRACKET_CLOSE)) {
+      do {
+        auto member_name =
+            consume(token_type::NAME, "Member name must be present");
+        consume(token_type::COLON,
+                "Colon must be present between member name and expression");
+        auto exp = expression();
+        values.emplace_back(name_val{member_name, exp});
+      } while (match({token_type::COMMA}));
+    }
+    auto curly_close = consume(token_type::CURLY_BRACKET_CLOSE,
+                               "struct literal must end with '}'");
+    return pool_.c_struct_literal_expr(colon_token, dt, curly_open, values,
+                                       curly_close);
+  }
   if (match({token_type::PAREN_OPEN})) {
     expr *ex = expression();
     consume(token_type::PAREN_CLOSE, "Expect ')' after expression");
@@ -229,6 +250,7 @@ void parser::synchronize_parser() {
     if (previous()->type_ == token_type::NEW_LINE) { return; }
     switch (peek()->type_) {
       case token_type::KEYWORD_CLASS:
+      case token_type::KEYWORD_STRUCT:
       case token_type::KEYWORD_FOR:
       case token_type::KEYWORD_DEF:
       case token_type::KEYWORD_IF:
@@ -477,7 +499,7 @@ expr *parser::assignment() {
     auto val = assignment();
     if (exp->get_type() == ast_type::EXPR_VARIABLE) {
       auto name = (dynamic_cast<variable_expr *>(exp))->name_;
-      return pool_.c_assign_expr(name, assignment_operator, val);
+      return pool_.c_assign_expr(name, assignment_operator, val, false);
     } else if (exp->get_type() == ast_type::EXPR_GET) {
       auto get = (dynamic_cast<get_expr *>(exp));
       auto set_expr = pool_.c_set_expr(get->lhs_, get->dot_, get->item_);
@@ -624,7 +646,7 @@ ykdatatype *parser::parse_datatype() {
     if (dt->is_primitive() || dt->is_any_ptr()) {
       throw error(
           dt->token_,
-          "Primitive data types / SortArg cannot have internal data types.");
+          "Primitive data types / AnyPtr cannot have internal data types.");
     }
     do {
       auto arg = parse_datatype();

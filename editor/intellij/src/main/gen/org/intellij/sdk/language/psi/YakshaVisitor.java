@@ -235,6 +235,18 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitStructArg(@NotNull YakshaStructArg o) {
+    visitPsiElement(o);
+  }
+
+  public void visitStructArguments(@NotNull YakshaStructArguments o) {
+    visitPsiElement(o);
+  }
+
+  public void visitStructLiteral(@NotNull YakshaStructLiteral o) {
+    visitPsiElement(o);
+  }
+
   public void visitTerm(@NotNull YakshaTerm o) {
     visitPsiElement(o);
   }

@@ -91,8 +91,9 @@ namespace yaksha {
     void dedent() override;
     void visit_foreach_stmt(foreach_stmt *obj) override;
     void visit_forendless_stmt(forendless_stmt *obj) override;
-    std::string prefix_token(token *pToken);
+    std::string prefix_token(token *p_token);
     void visit_compins_stmt(compins_stmt *obj) override;
+    void visit_struct_literal_expr(struct_literal_expr *obj) override;
 
 private:
     void push_scope_type(ast_type scope_type);
@@ -109,6 +110,7 @@ private:
     std::string prefix_val_{};
     codefiles *cf_{nullptr};
     std::pair<std::string, ykobject> pop();
+    std::pair<std::string, ykobject> compile_expression(expr* ex);
     // Indentation to generate
     int indent_{0};
     // Counter for temp variables.

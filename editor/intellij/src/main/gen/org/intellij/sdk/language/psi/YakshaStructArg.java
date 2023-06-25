@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YakshaPrimary extends PsiElement {
+public interface YakshaStructArg extends PsiElement {
 
-  @Nullable
-  YakshaParenExp getParenExp();
-
-  @Nullable
-  YakshaStructLiteral getStructLiteral();
+  @NotNull
+  YakshaExp getExp();
 
 }

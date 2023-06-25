@@ -4,6 +4,9 @@ class A:
 class B:
     b: int
 
+struct C:
+    c: int
+
 def main() -> int:
     a: A = A()
     defer del a

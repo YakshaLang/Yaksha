@@ -13,9 +13,14 @@ compiler::~compiler() {
   delete desugar_;
 }
 void compiler::visit_assign_expr(assign_expr *obj) {
+  if (obj->promoted_) {
+    auto let_st = ast_pool_->c_let_stmt(obj->name_, nullptr, obj->right_);
+    let_st->accept(this);
+    return;
+  }
   obj->right_->accept(this);
-  auto name = prefix(obj->name_->token_, prefix_val_);
   auto rhs = pop();
+  auto name = prefix(obj->name_->token_, prefix_val_);
   token_type operator_type = obj->opr_->type_;
   std::string &token = obj->opr_->token_;
   perform_assign(name, rhs, operator_type, token);
@@ -665,11 +670,17 @@ void compiler::visit_if_stmt(if_stmt *obj) {
 void compiler::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_, prefix_val_);
   auto object = ykobject(dt_pool_);
+  std::pair<std::string, ykobject> resulting_pair;
+  bool visited_expr = false;
+  if (obj->data_type_ == nullptr) {
+    visited_expr = true;
+    resulting_pair = compile_expression(obj->expression_);
+    obj->data_type_ = resulting_pair.second.datatype_; /* set our data type here */
+  }
   if (obj->data_type_->is_str()) {
     object = ykobject(std::string("str"), dt_pool_);
     if (obj->expression_ != nullptr) {
-      obj->expression_->accept(this);
-      auto exp = pop();
+      auto exp = (visited_expr) ? resulting_pair : compile_expression(obj->expression_);
       write_indent(body_);
       body_ << "yk__sds " << name << " = "
             << "yk__sdsdup(" << exp.first << ")";
@@ -685,8 +696,7 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   } else if (obj->data_type_->is_an_array()) {
     object = ykobject(obj->data_type_);
     if (obj->expression_ != nullptr) {
-      obj->expression_->accept(this);
-      auto exp = pop();
+      auto exp = (visited_expr) ? resulting_pair : compile_expression(obj->expression_);
       write_indent(body_);
       body_ << convert_dt(obj->data_type_) << " " << name;
       body_ << " = " << exp.first;
@@ -698,8 +708,7 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   } else {
     object = ykobject(obj->data_type_);
     if (obj->expression_ != nullptr) {
-      obj->expression_->accept(this);
-      auto exp = pop();
+      auto exp = (visited_expr) ? resulting_pair : compile_expression(obj->expression_);
       write_indent(body_);
       body_ << convert_dt(obj->data_type_) << " " << name;
       if (exp.second.is_a_function()) {
@@ -1230,8 +1239,8 @@ void compiler::visit_foreach_stmt(foreach_stmt *obj) {
 void compiler::visit_forendless_stmt(forendless_stmt *obj) {
   // Not supported directly by compiler
 }
-std::string compiler::prefix_token(token *pToken) {
-  return ::prefix(pToken->token_, prefix_val_);
+std::string compiler::prefix_token(token *p_token) {
+  return ::prefix(p_token->token_, prefix_val_);
 }
 void compiler::visit_compins_stmt(compins_stmt *obj) {
   // Add given item to scope
@@ -1242,4 +1251,49 @@ void compiler::visit_compins_stmt(compins_stmt *obj) {
     object.desugar_rewrite_needed_ = true;
   }
   scope_.define(name, object);
+}
+void compiler::visit_struct_literal_expr(struct_literal_expr *obj) {
+  auto dt = obj->data_type_->token_->token_;
+  std::stringstream ss{};
+  if (!obj->data_type_->module_.empty() && cf_ != nullptr) {
+    auto module = cf_->get(obj->data_type_->module_);
+    auto imported_module_prefix = module->prefix_;
+    auto class_info = module->data_->dsv_->get_class(dt);
+    if (class_info != nullptr) {
+      if (class_info->annotations_.native_define_) {
+        error(obj->colon_, "Cannot create a native structure");
+        push("<><>", ykobject(dt_pool_));
+        return;
+      }
+      if (class_info->annotations_.on_stack_) {
+        ss << "((" << convert_dt(obj->data_type_) << ")"
+           << "{";
+        bool first = true;
+        for (auto const &para : obj->values_) {
+          para.value_->accept(this);
+          auto val = pop();
+          if (first) {
+            first = false;
+          } else {
+            ss << ", ";
+          }
+          ss << "." << imported_module_prefix << para.name_->token_ << " = ("
+             << val.first << ")";
+        }
+        ss << "})";
+        push(ss.str(), ykobject(obj->data_type_));
+        return;
+      }
+      // TODO allow creating heap objects as literals too
+    }
+  }
+  error(obj->colon_, "Failed to compile struct literal");
+  push("<><>", ykobject(dt_pool_));
+}
+std::pair<std::string, ykobject> compiler::compile_expression(expr *ex) {
+  ex->accept(this);
+  auto p = std::make_pair(expr_stack_.back(), type_stack_.back());
+  expr_stack_.pop_back();
+  type_stack_.pop_back();
+  return p;
 }
