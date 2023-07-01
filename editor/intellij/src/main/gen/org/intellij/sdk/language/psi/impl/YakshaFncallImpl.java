@@ -41,6 +41,12 @@ public class YakshaFncallImpl extends ASTWrapperPsiElement implements YakshaFnca
   }
 
   @Override
+  @NotNull
+  public List<YakshaStructArguments> getStructArgumentsList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaStructArguments.class);
+  }
+
+  @Override
   public String getDefOrClassName() {
     return YakshaPsiImplUtil.getDefOrClassName(this);
   }

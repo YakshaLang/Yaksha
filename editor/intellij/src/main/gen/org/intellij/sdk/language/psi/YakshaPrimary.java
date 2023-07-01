@@ -10,7 +10,4 @@ public interface YakshaPrimary extends PsiElement {
   @Nullable
   YakshaParenExp getParenExp();
 
-  @Nullable
-  YakshaStructLiteral getStructLiteral();
-
 }

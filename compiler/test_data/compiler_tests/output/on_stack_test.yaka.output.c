@@ -6,6 +6,7 @@ struct yy__class_stuff_B;
 struct yy__class_stuff_C;
 struct yy__Enemy;
 struct yy__Friend;
+struct yy__AnotherFriend;
 int32_t yy__class_stuff_main();
 int32_t yy__main();
 // --structs-- 
@@ -24,6 +25,9 @@ struct yy__Enemy {
     int32_t yy__hp;
 };
 struct yy__Friend {
+    int32_t yy__x;
+};
+struct yy__AnotherFriend {
     int32_t yy__x;
 };
 // --functions-- 
@@ -48,9 +52,13 @@ int32_t yy__main()
     yy__enemies[INT32_C(1)].yy__x = INT32_C(2);
     struct yy__Friend yy__good_person = ((struct yy__Friend){.yy__x = (INT32_C(0))});
     struct yy__class_stuff_C yy__my_obj = ((struct yy__class_stuff_C){.yy__class_stuff_c = (INT32_C(0))});
+    struct yy__AnotherFriend* t__1 = calloc(1, sizeof(struct yy__AnotherFriend));
+    t__1->yy__x = (INT32_C(0));
+    struct yy__AnotherFriend* yy__another_friend = t__1;
     struct yy__Enemy yy__big_enemy;
     yy__big_enemy.yy__x = INT32_C(4);
-    yk__printlnint(((intmax_t)((((yy__enemies[INT32_C(0)].yy__x + yy__enemies[INT32_C(1)].yy__x) + yy__big_enemy.yy__x) + yy__good_person.yy__x) + yy__my_obj.yy__class_stuff_c)));
+    yk__printlnint(((intmax_t)(((((yy__enemies[INT32_C(0)].yy__x + yy__enemies[INT32_C(1)].yy__x) + yy__big_enemy.yy__x) + yy__good_person.yy__x) + yy__my_obj.yy__class_stuff_c) + yy__another_friend->yy__x)));
+    free(yy__another_friend);
     return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)

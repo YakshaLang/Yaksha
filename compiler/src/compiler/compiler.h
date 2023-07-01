@@ -68,6 +68,11 @@ namespace yaksha {
     void visit_const_stmt(const_stmt *obj) override;
     void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
     void visit_nativeconst_stmt(nativeconst_stmt *obj) override;
+    void visit_foreach_stmt(foreach_stmt *obj) override;
+    void visit_forendless_stmt(forendless_stmt *obj) override;
+    std::string prefix_token(token *p_token);
+    void visit_compins_stmt(compins_stmt *obj) override;
+    void visit_curly_call_expr(curly_call_expr *obj) override;
     /**
      * Convert Yaksha data type to appropriate C data type.
      * @param basic_dt data type as a token.
@@ -89,11 +94,7 @@ namespace yaksha {
     void write_statement_no_end(std::string code_line) override;
     void indent() override;
     void dedent() override;
-    void visit_foreach_stmt(foreach_stmt *obj) override;
-    void visit_forendless_stmt(forendless_stmt *obj) override;
-    std::string prefix_token(token *p_token);
-    void visit_compins_stmt(compins_stmt *obj) override;
-    void visit_struct_literal_expr(struct_literal_expr *obj) override;
+
 
 private:
     void push_scope_type(ast_type scope_type);
@@ -165,6 +166,8 @@ private:
                         const std::pair<std::string, ykobject> &rhs,
                         const token_type &operator_type,
                         const std::string &token);
+    static void obj_calloc(const std::string &name,
+                                  std::stringstream &code) ;
   };
 }// namespace yaksha
 #endif

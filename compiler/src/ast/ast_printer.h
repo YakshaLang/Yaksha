@@ -55,8 +55,7 @@ namespace yaksha {
     void visit_foreach_stmt(foreach_stmt *obj) override;
     void visit_forendless_stmt(forendless_stmt *obj) override;
     void visit_compins_stmt(compins_stmt *obj) override;
-    void visit_struct_literal_expr(struct_literal_expr *obj) override;
-
+    void visit_curly_call_expr(curly_call_expr *obj) override;
 private:
     std::stringstream text_{};
   };

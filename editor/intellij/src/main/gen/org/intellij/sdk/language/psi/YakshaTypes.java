@@ -67,7 +67,6 @@ public interface YakshaTypes {
   IElementType SINGLE_LINE_DEF_BITS = new YakshaElementType("SINGLE_LINE_DEF_BITS");
   IElementType STRUCT_ARG = new YakshaElementType("STRUCT_ARG");
   IElementType STRUCT_ARGUMENTS = new YakshaElementType("STRUCT_ARGUMENTS");
-  IElementType STRUCT_LITERAL = new YakshaElementType("STRUCT_LITERAL");
   IElementType TERM = new YakshaElementType("TERM");
   IElementType UNARY = new YakshaElementType("UNARY");
   IElementType WHILE_STATEMENT = new YakshaElementType("WHILE_STATEMENT");
@@ -319,9 +318,6 @@ public interface YakshaTypes {
       }
       else if (type == STRUCT_ARGUMENTS) {
         return new YakshaStructArgumentsImpl(node);
-      }
-      else if (type == STRUCT_LITERAL) {
-        return new YakshaStructLiteralImpl(node);
       }
       else if (type == TERM) {
         return new YakshaTermImpl(node);

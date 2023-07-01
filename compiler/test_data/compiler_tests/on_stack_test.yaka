@@ -9,13 +9,18 @@ class Enemy:
 struct Friend:
     x: int
 
+class AnotherFriend:
+    x: int
+
 def main() -> int:
     enemies = arrnew("Enemy", 2)
     enemies[0].x = 1
     enemies[1].x = 2
-    good_person: Friend = :Friend {x: 0}
-    my_obj = :c.C {c: 0}
+    good_person: Friend = Friend{x: 0}
+    my_obj = c.C{c: 0}
+    another_friend = AnotherFriend{x: 0}
+    defer del another_friend
     big_enemy: Enemy
     big_enemy.x = 4
-    println(enemies[0].x + enemies[1].x + big_enemy.x + good_person.x + my_obj.c)
+    println(enemies[0].x + enemies[1].x + big_enemy.x + good_person.x + my_obj.c + another_friend.x)
     return 0

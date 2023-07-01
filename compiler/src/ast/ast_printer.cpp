@@ -222,8 +222,10 @@ void ast_printer::visit_forendless_stmt(forendless_stmt *obj) {
 void ast_printer::visit_compins_stmt(compins_stmt *obj) {
   // Does not occur in AST
 }
-void ast_printer::visit_struct_literal_expr(struct_literal_expr *obj) {
-  text_ << "(struct " << obj->data_type_->as_string() << " (";
+void ast_printer::visit_curly_call_expr(curly_call_expr *obj) {
+  text_ << "(struct ";
+  obj->dt_expr_->accept(this);
+  text_ << " (";
   for (auto st : obj->values_) {
     text_ << " ";
     text_ << st.name_->token_ << ":";
