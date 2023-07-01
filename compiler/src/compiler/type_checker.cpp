@@ -19,6 +19,9 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
   if (scope_.is_defined(name)) {
     object = scope_.get(name);
   } else {
+    if (rhs.is_a_function()) {
+      rhs.datatype_ = function_to_datatype(rhs);
+    }
     object = ykobject(rhs.datatype_);
     obj->promoted_ = true;
   }
