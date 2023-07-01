@@ -29,7 +29,7 @@
     ],
     "onEnterRules": [
         {
-          "beforeText": "^\\s*(?:def|class|for|if|elif|else|while).*?:\\s*$",
+          "beforeText": "^\\s*(?:def|class|struct|for|if|elif|else|while).*?:\\s*$",
           "action": { "indent": "indent" }
         }
     ]    

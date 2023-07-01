@@ -28,9 +28,9 @@ public class YakshaForeachStatementImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
-  @NotNull
+  @Nullable
   public YakshaDataType getDataType() {
-    return findNotNullChildByClass(YakshaDataType.class);
+    return findChildByClass(YakshaDataType.class);
   }
 
   @Override

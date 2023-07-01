@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface YakshaForeachStatement extends PsiElement {
 
-  @NotNull
+  @Nullable
   YakshaDataType getDataType();
 
   @NotNull

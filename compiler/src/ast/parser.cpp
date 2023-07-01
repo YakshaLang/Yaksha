@@ -552,8 +552,11 @@ stmt *parser::for_statement() {
           token_type::
               NAME)) {// foreach_stmt -> FOR name: datatype in array: block_stmt
     auto name = consume(token_type::NAME, "Name must be present");
-    consume(token_type::COLON, "Colon must be present");
-    auto dt = parse_datatype();
+    ykdatatype* dt = nullptr;
+    if (check(token_type::COLON)) {
+      consume(token_type::COLON, "Colon must be present");
+      dt = parse_datatype();
+    }
     auto in_k =
         consume(token_type::KEYWORD_IN,
                 "in must follow the data type declaration in for each loop.");

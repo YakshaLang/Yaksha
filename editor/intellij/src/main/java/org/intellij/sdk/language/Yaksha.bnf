@@ -73,7 +73,7 @@ if_statement ::= I KW_IF S? exp S? OPERATOR_COLON S? def_block
 elif_statement ::= I KW_ELIF S? exp S? OPERATOR_COLON S? def_block
 else_statement ::= I KW_ELSE S? OPERATOR_COLON S? def_block
 while_statement ::= I KW_WHILE S? exp S? OPERATOR_COLON S? def_block
-foreach_statement ::= I KW_FOR S? IDENTIFIER S? OPERATOR_COLON S? data_type S? KW_IN S? exp S? OPERATOR_COLON S? def_block
+foreach_statement ::= I KW_FOR S? IDENTIFIER (S? OPERATOR_COLON S? data_type)? S? KW_IN S? exp S? OPERATOR_COLON S? def_block
 forendless_statement ::= I KW_FOR S? OPERATOR_COLON S? def_block
 
 // Simple statements

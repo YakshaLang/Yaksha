@@ -1517,7 +1517,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // I KW_FOR S? IDENTIFIER S? OPERATOR_COLON S? data_type S? KW_IN S? exp S? OPERATOR_COLON S? def_block
+  // I KW_FOR S? IDENTIFIER (S? OPERATOR_COLON S? data_type)? S? KW_IN S? exp S? OPERATOR_COLON S? def_block
   public static boolean foreach_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "foreach_statement")) return false;
     if (!nextTokenIs(b, I)) return false;
@@ -1527,16 +1527,13 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && foreach_statement_2(b, l + 1);
     r = r && consumeToken(b, IDENTIFIER);
     r = r && foreach_statement_4(b, l + 1);
-    r = r && consumeToken(b, OPERATOR_COLON);
-    r = r && foreach_statement_6(b, l + 1);
-    r = r && data_type(b, l + 1);
-    r = r && foreach_statement_8(b, l + 1);
+    r = r && foreach_statement_5(b, l + 1);
     r = r && consumeToken(b, KW_IN);
-    r = r && foreach_statement_10(b, l + 1);
+    r = r && foreach_statement_7(b, l + 1);
     r = r && exp(b, l + 1);
-    r = r && foreach_statement_12(b, l + 1);
+    r = r && foreach_statement_9(b, l + 1);
     r = r && consumeToken(b, OPERATOR_COLON);
-    r = r && foreach_statement_14(b, l + 1);
+    r = r && foreach_statement_11(b, l + 1);
     r = r && def_block(b, l + 1);
     exit_section_(b, m, FOREACH_STATEMENT, r);
     return r;
@@ -1549,44 +1546,64 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // S?
+  // (S? OPERATOR_COLON S? data_type)?
   private static boolean foreach_statement_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "foreach_statement_4")) return false;
+    foreach_statement_4_0(b, l + 1);
+    return true;
+  }
+
+  // S? OPERATOR_COLON S? data_type
+  private static boolean foreach_statement_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "foreach_statement_4_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = foreach_statement_4_0_0(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_COLON);
+    r = r && foreach_statement_4_0_2(b, l + 1);
+    r = r && data_type(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean foreach_statement_4_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "foreach_statement_4_0_0")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean foreach_statement_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "foreach_statement_6")) return false;
+  private static boolean foreach_statement_4_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "foreach_statement_4_0_2")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean foreach_statement_8(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "foreach_statement_8")) return false;
+  private static boolean foreach_statement_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "foreach_statement_5")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean foreach_statement_10(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "foreach_statement_10")) return false;
+  private static boolean foreach_statement_7(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "foreach_statement_7")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean foreach_statement_12(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "foreach_statement_12")) return false;
+  private static boolean foreach_statement_9(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "foreach_statement_9")) return false;
     consumeToken(b, S);
     return true;
   }
 
   // S?
-  private static boolean foreach_statement_14(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "foreach_statement_14")) return false;
+  private static boolean foreach_statement_11(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "foreach_statement_11")) return false;
     consumeToken(b, S);
     return true;
   }

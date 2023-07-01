@@ -67,6 +67,9 @@ STMTS = sorted([
     # For loop
     # for x: int in expr:
     #     println(x)
+    # ## or
+    # for x in expr:
+    #     println(x)
     ("foreach", (("token*", "for_keyword"), ("token*", "name"), ("ykdatatype*", "data_type"),
                  ("token*", "in_keyword"), ("expr*", "expression"), ("stmt*", "for_body"),)),
     # For loop - endless loop
