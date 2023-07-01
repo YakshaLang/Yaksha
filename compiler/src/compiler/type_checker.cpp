@@ -872,6 +872,10 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
     error(obj->for_keyword_,
           "Cannot use foreach iteration for SMEntry and MEntry.");
   }
+  // Infer data type of foreach
+  if (obj->data_type_ == nullptr) {
+    obj->data_type_ = exp.datatype_->args_[0];
+  }
   auto lhs = exp.datatype_->args_[0];
   auto rhs = obj->data_type_;
   if ((*lhs != *rhs)) {
