@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.lang.annotation.HighlightSeverity;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.intellij.sdk.language.psi.*;
 import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
@@ -46,26 +47,18 @@ public class YakshaAnnotator implements Annotator {
                             .create();
                 }
 
+            } else if (fncall.getStructArgumentsList() != null && !fncall.getStructArgumentsList().isEmpty()) {
+                TextRange tr = fncall.getTextRange();
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                        .range(new TextRange(tr.getStartOffset(), tr.getStartOffset() + fncall.getFullName().length()))
+                        .textAttributes(YakshaSyntaxHighlighter.DATA_TYPE)
+                        .create();
             }
         } else if (element instanceof YakshaRuntimefeatureStatement) {
             holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                     .range(element.getTextRange())
                     .textAttributes(YakshaSyntaxHighlighter.COMMENT)
                     .create();
-        } else if (element instanceof YakshaStructLiteral) {
-            YakshaStructLiteral literal = (YakshaStructLiteral) element;
-            holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-                    .range(literal.getFirstChild().getTextRange())
-                    .textAttributes(YakshaSyntaxHighlighter.DATA_TYPE)
-                    .create();
-            YakshaStructArguments args = literal.getStructArguments();
-            List<YakshaStructArg> argList = args.getStructArgList();
-            for (YakshaStructArg arg : argList) {
-                holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-                        .range(arg.getFirstChild().getTextRange())
-                        .textAttributes(YakshaSyntaxHighlighter.PARAM)
-                        .create();
-            }
         }
     }
 

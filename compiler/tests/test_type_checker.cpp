@@ -517,3 +517,38 @@ TEST_CASE("type checker: Redefining variables in a function - params") {
 TEST_CASE("type checker: Const assignment should work as expected") {
   TEST_FILE_OK("../test_data/bug_fixes/assign_const.yaka");
 }
+TEST_CASE("type checker: Test multiple assignment failure") {
+  TEST_FILE("../test_data/compiler_tests/multi_assign.yaka",
+            "Cannot assign between 2 different data types.");
+}
+TEST_CASE("type checker: Create a primitive using {} init") {
+  TEST_SNIPPET("a = int{x: 0}", "invalid data type for {} initialization");
+}
+TEST_CASE("type checker: Invalid fields in struct") {
+  TEST_SNIPPET_FULL(
+      "struct P:\n"
+      "    x: int\n\n"
+      "def main() -> int:\n"
+      "    a = P{k: 0}\n"
+      "    return 0\n"
+      , "member not found in class/struct");
+}
+TEST_CASE("type checker: Duplicate fields in {} init (struct)") {
+  TEST_SNIPPET_FULL(
+      "struct P:\n"
+      "    x: int\n\n"
+      "def main() -> int:\n"
+      "    a = P{x: 0, x: 1}\n"
+      "    return 0\n"
+      , "duplicate field in struct literal.");
+}
+TEST_CASE("type checker: Duplicate fields in {} init (class)") {
+  TEST_SNIPPET_FULL(
+      "class P:\n"
+      "    x: int\n\n"
+      "def main() -> int:\n"
+      "    a = P{x: 0, x: 1}\n"
+      "    defer del a\n"
+      "    return 0\n"
+      , "duplicate field in struct literal.");
+}

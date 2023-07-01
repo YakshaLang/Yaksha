@@ -55,6 +55,19 @@ expr *ast_pool::c_binary_expr(expr* left, token* opr, expr* right) {
   cleanup_expr_.push_back(o);
   return o;
 }
+curly_call_expr::curly_call_expr(expr* dt_expr, token* curly_open, std::vector<name_val> values, token* curly_close)
+    : dt_expr_(dt_expr), curly_open_(curly_open), values_(std::move(values)), curly_close_(curly_close) {}
+void curly_call_expr::accept(expr_visitor *v) {
+  v->visit_curly_call_expr(this);
+}
+ast_type curly_call_expr::get_type() {
+  return ast_type::EXPR_CURLY_CALL;
+}
+expr *ast_pool::c_curly_call_expr(expr* dt_expr, token* curly_open, std::vector<name_val> values, token* curly_close) {
+  auto o = new curly_call_expr(dt_expr, curly_open, std::move(values), curly_close);
+  cleanup_expr_.push_back(o);
+  return o;
+}
 fncall_expr::fncall_expr(expr* name, token* paren_token, std::vector<expr*> args)
     : name_(name), paren_token_(paren_token), args_(std::move(args)) {}
 void fncall_expr::accept(expr_visitor *v) {
@@ -71,7 +84,7 @@ expr *ast_pool::c_fncall_expr(expr* name, token* paren_token, std::vector<expr*>
 get_expr::get_expr(expr* lhs, token* dot, token* item)
     : lhs_(lhs), dot_(dot), item_(item) {}
 void get_expr::accept(expr_visitor *v) {
-  v->visit_get_expr(this);
+   v->visit_get_expr(this);
 }
 ast_type get_expr::get_type() {
   return ast_type::EXPR_GET;
@@ -156,19 +169,6 @@ ast_type square_bracket_set_expr::get_type() {
 }
 expr *ast_pool::c_square_bracket_set_expr(expr* name, token* sqb_token, expr* index_expr) {
   auto o = new square_bracket_set_expr(name, sqb_token, index_expr);
-  cleanup_expr_.push_back(o);
-  return o;
-}
-struct_literal_expr::struct_literal_expr(token* colon, ykdatatype* data_type, token* curly_open, std::vector<name_val> values, token* curly_close)
-    : colon_(colon), data_type_(data_type), curly_open_(curly_open), values_(std::move(values)), curly_close_(curly_close) {}
-void struct_literal_expr::accept(expr_visitor *v) {
-  v->visit_struct_literal_expr(this);
-}
-ast_type struct_literal_expr::get_type() {
-  return ast_type::EXPR_STRUCT_LITERAL;
-}
-expr *ast_pool::c_struct_literal_expr(token* colon, ykdatatype* data_type, token* curly_open, std::vector<name_val> values, token* curly_close) {
-  auto o = new struct_literal_expr(colon, data_type, curly_open, std::move(values), curly_close);
   cleanup_expr_.push_back(o);
   return o;
 }

@@ -14,6 +14,9 @@ public interface YakshaFncall extends PsiElement {
   @NotNull
   List<YakshaExp> getExpList();
 
+  @NotNull
+  List<YakshaStructArguments> getStructArgumentsList();
+
   String getDefOrClassName();
 
   String getFullName();

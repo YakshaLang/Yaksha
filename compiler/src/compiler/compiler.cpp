@@ -210,9 +210,13 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
 void compiler::compile_obj_creation(const std::string &name,
                                     std::stringstream &code,
                                     ykdatatype *return_type) {
-  code << "calloc(1, sizeof(struct " << name << "))";
+  obj_calloc(name, code);
   auto data = ykobject(return_type);
   push(code.str(), data);
+}
+void compiler::obj_calloc(const std::string &name,
+                                        std::stringstream &code) {
+  code << "calloc(1, sizeof(struct " << name << "))";
 }
 void compiler::compile_function_call(fncall_expr *obj, const std::string &name,
                                      std::stringstream &code,
@@ -675,12 +679,14 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   if (obj->data_type_ == nullptr) {
     visited_expr = true;
     resulting_pair = compile_expression(obj->expression_);
-    obj->data_type_ = resulting_pair.second.datatype_; /* set our data type here */
+    obj->data_type_ =
+        resulting_pair.second.datatype_; /* set our data type here */
   }
   if (obj->data_type_->is_str()) {
     object = ykobject(std::string("str"), dt_pool_);
     if (obj->expression_ != nullptr) {
-      auto exp = (visited_expr) ? resulting_pair : compile_expression(obj->expression_);
+      auto exp = (visited_expr) ? resulting_pair
+                                : compile_expression(obj->expression_);
       write_indent(body_);
       body_ << "yk__sds " << name << " = "
             << "yk__sdsdup(" << exp.first << ")";
@@ -696,7 +702,8 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   } else if (obj->data_type_->is_an_array()) {
     object = ykobject(obj->data_type_);
     if (obj->expression_ != nullptr) {
-      auto exp = (visited_expr) ? resulting_pair : compile_expression(obj->expression_);
+      auto exp = (visited_expr) ? resulting_pair
+                                : compile_expression(obj->expression_);
       write_indent(body_);
       body_ << convert_dt(obj->data_type_) << " " << name;
       body_ << " = " << exp.first;
@@ -708,7 +715,8 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   } else {
     object = ykobject(obj->data_type_);
     if (obj->expression_ != nullptr) {
-      auto exp = (visited_expr) ? resulting_pair : compile_expression(obj->expression_);
+      auto exp = (visited_expr) ? resulting_pair
+                                : compile_expression(obj->expression_);
       write_indent(body_);
       body_ << convert_dt(obj->data_type_) << " " << name;
       if (exp.second.is_a_function()) {
@@ -1252,48 +1260,85 @@ void compiler::visit_compins_stmt(compins_stmt *obj) {
   }
   scope_.define(name, object);
 }
-void compiler::visit_struct_literal_expr(struct_literal_expr *obj) {
-  auto dt = obj->data_type_->token_->token_;
-  std::stringstream ss{};
-  if (!obj->data_type_->module_.empty() && cf_ != nullptr) {
-    auto module = cf_->get(obj->data_type_->module_);
-    auto imported_module_prefix = module->prefix_;
-    auto class_info = module->data_->dsv_->get_class(dt);
-    if (class_info != nullptr) {
-      if (class_info->annotations_.native_define_) {
-        error(obj->colon_, "Cannot create a native structure");
-        push("<><>", ykobject(dt_pool_));
-        return;
-      }
-      if (class_info->annotations_.on_stack_) {
-        ss << "((" << convert_dt(obj->data_type_) << ")"
-           << "{";
-        bool first = true;
-        for (auto const &para : obj->values_) {
-          para.value_->accept(this);
-          auto val = pop();
-          if (first) {
-            first = false;
-          } else {
-            ss << ", ";
-          }
-          ss << "." << imported_module_prefix << para.name_->token_ << " = ("
-             << val.first << ")";
-        }
-        ss << "})";
-        push(ss.str(), ykobject(obj->data_type_));
-        return;
-      }
-      // TODO allow creating heap objects as literals too
-    }
-  }
-  error(obj->colon_, "Failed to compile struct literal");
-  push("<><>", ykobject(dt_pool_));
-}
 std::pair<std::string, ykobject> compiler::compile_expression(expr *ex) {
   ex->accept(this);
   auto p = std::make_pair(expr_stack_.back(), type_stack_.back());
   expr_stack_.pop_back();
   type_stack_.pop_back();
   return p;
+}
+void compiler::visit_curly_call_expr(curly_call_expr *obj) {
+  obj->dt_expr_->accept(this);
+  auto name_pair = pop();
+  auto name = name_pair.first;
+  std::stringstream code{};
+  class_stmt *class_info;
+  ykdatatype *dt;
+  std::string c_mod_prefix;
+  std::string prefixed_class_name;
+  if (name_pair.second.object_type_ == object_type::MODULE_CLASS) {
+    auto module_file = name_pair.second.module_file_;
+    auto module_class = name_pair.second.string_val_;
+    auto module_prefix = cf_->get(module_file)->prefix_;
+    c_mod_prefix = module_prefix;
+    class_info = cf_->get(module_file)->data_->dsv_->get_class(module_class);
+    dt = dt_pool_->create(module_class, module_file);
+    prefixed_class_name = prefix(module_class, c_mod_prefix);
+  } else if (defs_classes_.has_class(name)) {
+    class_info = defs_classes_.get_class(name);
+    dt = dt_pool_->create(name, filepath_);
+    c_mod_prefix = prefix_val_;
+    prefixed_class_name = prefix(name, c_mod_prefix);
+  } else {
+    error(obj->curly_open_, "Invalid {} initialization");
+    push("<><>", ykobject(dt_pool_));
+    return;
+  }
+
+  if (class_info != nullptr) {
+    if (class_info->annotations_.native_define_) {
+      error(obj->curly_open_, "Cannot create a native structure");
+      push("<><>", ykobject(dt_pool_));
+      return;
+    }
+    if (class_info->annotations_.on_stack_) {
+      // ---------- On stack --------
+      code << "((" << convert_dt(dt) << ")"
+         << "{";
+      bool first = true;
+      for (auto const &para : obj->values_) {
+        para.value_->accept(this);
+        auto val = pop();
+        if (first) {
+          first = false;
+        } else {
+          code << ", ";
+        }
+        code << "." << c_mod_prefix << para.name_->token_ << " = ("
+           << val.first << ")";
+      }
+      code << "})";
+      push(code.str(), ykobject(dt));
+      return;
+    } else {
+      // ---------- On heap --------
+      auto temp_name = temp();
+      write_indent(body_);
+      body_ << convert_dt(dt) << " " << temp_name << " = ";
+      obj_calloc(prefixed_class_name, body_);
+      write_end_statement(body_);
+
+      for (auto const &para : obj->values_) {
+        para.value_->accept(this);
+        auto val = pop();
+        write_indent(body_);
+        body_ << temp_name << "->" << c_mod_prefix << para.name_->token_ << " = (" << val.first << ")";
+        write_end_statement(body_);
+      }
+      push(temp_name, ykobject(dt));
+      return;
+    }
+  }
+  error(obj->curly_open_, "Failed to compile struct literal");
+  push("<><>", ykobject(dt_pool_));
 }

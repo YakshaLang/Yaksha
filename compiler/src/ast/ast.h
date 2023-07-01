@@ -16,6 +16,7 @@ struct assign_expr;
 struct assign_arr_expr;
 struct assign_member_expr;
 struct binary_expr;
+struct curly_call_expr;
 struct fncall_expr;
 struct get_expr;
 struct grouping_expr;
@@ -24,7 +25,6 @@ struct logical_expr;
 struct set_expr;
 struct square_bracket_access_expr;
 struct square_bracket_set_expr;
-struct struct_literal_expr;
 struct unary_expr;
 struct variable_expr;
 struct block_stmt;
@@ -55,6 +55,7 @@ enum class ast_type {
   EXPR_ASSIGN_ARR,
   EXPR_ASSIGN_MEMBER,
   EXPR_BINARY,
+  EXPR_CURLY_CALL,
   EXPR_FNCALL,
   EXPR_GET,
   EXPR_GROUPING,
@@ -63,7 +64,6 @@ enum class ast_type {
   EXPR_SET,
   EXPR_SQUARE_BRACKET_ACCESS,
   EXPR_SQUARE_BRACKET_SET,
-  EXPR_STRUCT_LITERAL,
   EXPR_UNARY,
   EXPR_VARIABLE,
   STMT_BLOCK,
@@ -95,6 +95,7 @@ struct expr_visitor {
   virtual void visit_assign_arr_expr(assign_arr_expr *obj) = 0;
   virtual void visit_assign_member_expr(assign_member_expr *obj) = 0;
   virtual void visit_binary_expr(binary_expr *obj) = 0;
+  virtual void visit_curly_call_expr(curly_call_expr *obj) = 0;
   virtual void visit_fncall_expr(fncall_expr *obj) = 0;
   virtual void visit_get_expr(get_expr *obj) = 0;
   virtual void visit_grouping_expr(grouping_expr *obj) = 0;
@@ -103,7 +104,6 @@ struct expr_visitor {
   virtual void visit_set_expr(set_expr *obj) = 0;
   virtual void visit_square_bracket_access_expr(square_bracket_access_expr *obj) = 0;
   virtual void visit_square_bracket_set_expr(square_bracket_set_expr *obj) = 0;
-  virtual void visit_struct_literal_expr(struct_literal_expr *obj) = 0;
   virtual void visit_unary_expr(unary_expr *obj) = 0;
   virtual void visit_variable_expr(variable_expr *obj) = 0;
   virtual ~expr_visitor() = default;
@@ -179,6 +179,15 @@ struct binary_expr : expr {
   token* opr_;
   expr* right_;
 };
+struct curly_call_expr : expr {
+  curly_call_expr(expr* dt_expr, token* curly_open, std::vector<name_val> values, token* curly_close);
+  void accept(expr_visitor *v) override;
+  ast_type get_type() override;
+  expr* dt_expr_;
+  token* curly_open_;
+  std::vector<name_val> values_;
+  token* curly_close_;
+};
 struct fncall_expr : expr {
   fncall_expr(expr* name, token* paren_token, std::vector<expr*> args);
   void accept(expr_visitor *v) override;
@@ -238,16 +247,6 @@ struct square_bracket_set_expr : expr {
   expr* name_;
   token* sqb_token_;
   expr* index_expr_;
-};
-struct struct_literal_expr : expr {
-  struct_literal_expr(token* colon, ykdatatype* data_type, token* curly_open, std::vector<name_val> values, token* curly_close);
-  void accept(expr_visitor *v) override;
-  ast_type get_type() override;
-  token* colon_;
-  ykdatatype* data_type_;
-  token* curly_open_;
-  std::vector<name_val> values_;
-  token* curly_close_;
 };
 struct unary_expr : expr {
   unary_expr(token* opr, expr* right);
@@ -443,6 +442,7 @@ struct ast_pool {
   expr *c_assign_arr_expr(expr* assign_oper, token* opr, expr* right);
   expr *c_assign_member_expr(expr* set_oper, token* opr, expr* right);
   expr *c_binary_expr(expr* left, token* opr, expr* right);
+  expr *c_curly_call_expr(expr* dt_expr, token* curly_open, std::vector<name_val> values, token* curly_close);
   expr *c_fncall_expr(expr* name, token* paren_token, std::vector<expr*> args);
   expr *c_get_expr(expr* lhs, token* dot, token* item);
   expr *c_grouping_expr(expr* expression);
@@ -451,7 +451,6 @@ struct ast_pool {
   expr *c_set_expr(expr* lhs, token* dot, token* item);
   expr *c_square_bracket_access_expr(expr* name, token* sqb_token, expr* index_expr);
   expr *c_square_bracket_set_expr(expr* name, token* sqb_token, expr* index_expr);
-  expr *c_struct_literal_expr(token* colon, ykdatatype* data_type, token* curly_open, std::vector<name_val> values, token* curly_close);
   expr *c_unary_expr(token* opr, expr* right);
   expr *c_variable_expr(token* name);
   stmt *c_block_stmt(std::vector<stmt*> statements);
