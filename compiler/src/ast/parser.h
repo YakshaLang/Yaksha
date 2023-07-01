@@ -46,6 +46,7 @@ private:
     expr *fncall();
     expr *match_rest_of_fncall(expr *name);
     expr *match_array_access(expr *name);
+    expr *match_rest_of_curly_call(expr *name);
     expr *primary();
     expr *or_op();
     expr *and_op();

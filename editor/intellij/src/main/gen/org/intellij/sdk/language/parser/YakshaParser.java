@@ -1373,7 +1373,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IDENTIFIER (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER )*
+  // IDENTIFIER (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | S? OPERATOR_CURLY_OPEN S? struct_arguments OPERATOR_CURLY_CLOSE | OPERATOR_DOT IDENTIFIER )*
   public static boolean fncall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fncall")) return false;
     if (!nextTokenIs(b, IDENTIFIER)) return false;
@@ -1385,7 +1385,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER )*
+  // (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | S? OPERATOR_CURLY_OPEN S? struct_arguments OPERATOR_CURLY_CLOSE | OPERATOR_DOT IDENTIFIER )*
   private static boolean fncall_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fncall_1")) return false;
     while (true) {
@@ -1396,13 +1396,14 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | OPERATOR_DOT IDENTIFIER
+  // S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | S? OPERATOR_CURLY_OPEN S? struct_arguments OPERATOR_CURLY_CLOSE | OPERATOR_DOT IDENTIFIER
   private static boolean fncall_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fncall_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = fncall_1_0_0(b, l + 1);
     if (!r) r = fncall_1_0_1(b, l + 1);
+    if (!r) r = fncall_1_0_2(b, l + 1);
     if (!r) r = parseTokens(b, 0, OPERATOR_DOT, IDENTIFIER);
     exit_section_(b, m, null, r);
     return r;
@@ -1483,6 +1484,34 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   // S?
   private static boolean fncall_1_0_1_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fncall_1_0_1_4")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S? OPERATOR_CURLY_OPEN S? struct_arguments OPERATOR_CURLY_CLOSE
+  private static boolean fncall_1_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = fncall_1_0_2_0(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_OPEN);
+    r = r && fncall_1_0_2_2(b, l + 1);
+    r = r && struct_arguments(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_CLOSE);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean fncall_1_0_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_2_0")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean fncall_1_0_2_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fncall_1_0_2_2")) return false;
     consumeToken(b, S);
     return true;
   }
@@ -2036,7 +2065,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | IDENTIFIER | struct_literal | paren_exp
+  // KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | IDENTIFIER | paren_exp
   public static boolean primary(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "primary")) return false;
     boolean r;
@@ -2047,7 +2076,6 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, NUMBER);
     if (!r) r = consumeToken(b, STRING);
     if (!r) r = consumeToken(b, IDENTIFIER);
-    if (!r) r = struct_literal(b, l + 1);
     if (!r) r = paren_exp(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -2234,46 +2262,6 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   // S?
   private static boolean struct_arguments_1_0_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "struct_arguments_1_0_2")) return false;
-    consumeToken(b, S);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // OPERATOR_COLON S? data_type S? OPERATOR_CURLY_OPEN S? struct_arguments OPERATOR_CURLY_CLOSE
-  public static boolean struct_literal(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_literal")) return false;
-    if (!nextTokenIs(b, OPERATOR_COLON)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, OPERATOR_COLON);
-    r = r && struct_literal_1(b, l + 1);
-    r = r && data_type(b, l + 1);
-    r = r && struct_literal_3(b, l + 1);
-    r = r && consumeToken(b, OPERATOR_CURLY_OPEN);
-    r = r && struct_literal_5(b, l + 1);
-    r = r && struct_arguments(b, l + 1);
-    r = r && consumeToken(b, OPERATOR_CURLY_CLOSE);
-    exit_section_(b, m, STRUCT_LITERAL, r);
-    return r;
-  }
-
-  // S?
-  private static boolean struct_literal_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_literal_1")) return false;
-    consumeToken(b, S);
-    return true;
-  }
-
-  // S?
-  private static boolean struct_literal_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_literal_3")) return false;
-    consumeToken(b, S);
-    return true;
-  }
-
-  // S?
-  private static boolean struct_literal_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_literal_5")) return false;
     consumeToken(b, S);
     return true;
   }

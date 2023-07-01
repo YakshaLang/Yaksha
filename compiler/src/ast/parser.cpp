@@ -150,6 +150,8 @@ expr *parser::fncall() {
       expr = pool_.c_get_expr(expr, dot_oper, rhs);
     } else if (match({token_type::SQUARE_BRACKET_OPEN})) {
       expr = match_array_access(expr);
+    } else if (match({token_type::CURLY_BRACKET_OPEN})) {
+      expr = match_rest_of_curly_call(expr);
     } else {
       break;
     }
@@ -166,10 +168,28 @@ expr *parser::match_rest_of_fncall(expr *name) {
   return pool_.c_fncall_expr(name, paren_close, args);
 }
 expr *parser::match_array_access(expr *name) {
-  auto arr_member = expression();
+  auto index_expr = expression();
   auto paren_close =
       consume(token_type::SQUARE_BRACKET_CLOSE, "Must end with a ']'");
-  return pool_.c_square_bracket_access_expr(name, paren_close, arr_member);
+  return pool_.c_square_bracket_access_expr(name, paren_close, index_expr);
+}
+expr *parser::match_rest_of_curly_call(expr *data_type_expr) {
+  auto curly_open = previous();
+  std::vector<name_val> values{};
+  if (!check(token_type::CURLY_BRACKET_CLOSE)) {
+    do {
+      auto member_name =
+          consume(token_type::NAME, "Member name must be present");
+      consume(token_type::COLON,
+              "Colon must be present between member name and expression");
+      auto exp = expression();
+      values.emplace_back(name_val{member_name, exp});
+    } while (match({token_type::COMMA}));
+  }
+  auto curly_close = consume(token_type::CURLY_BRACKET_CLOSE,
+                             "struct literal must end with '}'");
+  return pool_.c_curly_call_expr(data_type_expr, curly_open, values,
+                                 curly_close);
 }
 expr *parser::primary() {
   if (match({
@@ -197,27 +217,6 @@ expr *parser::primary() {
     return pool_.c_literal_expr(previous());
   }
   if (match({token_type::NAME})) { return pool_.c_variable_expr(previous()); }
-  if (match({token_type::COLON})) {
-    std::vector<name_val> values{};
-    auto colon_token = previous();
-    auto dt = parse_datatype();
-    auto curly_open = consume(token_type::CURLY_BRACKET_OPEN,
-                              "Expect '}' after :DataType for struct literals");
-    if (!check(token_type::CURLY_BRACKET_CLOSE)) {
-      do {
-        auto member_name =
-            consume(token_type::NAME, "Member name must be present");
-        consume(token_type::COLON,
-                "Colon must be present between member name and expression");
-        auto exp = expression();
-        values.emplace_back(name_val{member_name, exp});
-      } while (match({token_type::COMMA}));
-    }
-    auto curly_close = consume(token_type::CURLY_BRACKET_CLOSE,
-                               "struct literal must end with '}'");
-    return pool_.c_struct_literal_expr(colon_token, dt, curly_open, values,
-                                       curly_close);
-  }
   if (match({token_type::PAREN_OPEN})) {
     expr *ex = expression();
     consume(token_type::PAREN_CLOSE, "Expect ')' after expression");

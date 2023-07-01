@@ -342,9 +342,9 @@ void ast_vis::visit_forendless_stmt(forendless_stmt *obj) {
 void ast_vis::visit_compins_stmt(compins_stmt *obj) {
   // Does not occur in AST
 }
-void ast_vis::visit_struct_literal_expr(struct_literal_expr *obj) {
+void ast_vis::visit_curly_call_expr(curly_call_expr *obj) {
   begin_block("struct");
-  field("datatype", obj->data_type_->as_string());
+  field("datatype", obj->dt_expr_);
   for (auto st : obj->values_) {
     field("." + st.name_->token_, st.value_);
   }

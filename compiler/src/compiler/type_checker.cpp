@@ -23,9 +23,7 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
     obj->promoted_ = true;
   }
   handle_assigns(obj->opr_, object, rhs);
-  if (obj->promoted_) {
-    scope_.define(name, object);
-  }
+  if (obj->promoted_) { scope_.define(name, object); }
 }
 template<typename Verifier>
 bool dt_match_ignore_const(ykdatatype *lhs, ykdatatype *rhs, Verifier v) {
@@ -858,7 +856,9 @@ void type_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
   // Not required to be type checked
 }
 void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {
-  if (!scope_.is_global_level()) { scope_.define(obj->name_->token_, ykobject(obj->data_type_)); }
+  if (!scope_.is_global_level()) {
+    scope_.define(obj->name_->token_, ykobject(obj->data_type_));
+  }
 }
 void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   obj->expression_->accept(this);
@@ -896,26 +896,6 @@ void type_checker::visit_compins_stmt(compins_stmt *obj) {
   // Does not occur in AST
   // Does not need to be type checked at the moment
 }
-void type_checker::visit_struct_literal_expr(struct_literal_expr *obj) {
-  // Validate that there are no duplicate names
-  std::unordered_set<std::string> names{};
-  for (auto nv : obj->values_) {
-    if (names.find(nv.name_->token_) != names.end()) {
-      error(nv.name_, "duplicate field in struct literal.");
-    }
-  }
-  // Match data type of each element with member data type
-  auto class_stmt = find_class(obj->colon_, obj->data_type_);
-  if (class_stmt == nullptr) {
-    // Note error is created in find_class, so no need to do it again here
-    push(ykobject(dt_pool_));
-    return;
-  }
-  for (auto member: obj->values_) {
-    validate_member(member, class_stmt);
-  }
-  push(ykobject(obj->data_type_));
-}
 class_stmt *type_checker::find_class(token *tok, ykdatatype *data_type) {
   // If this is a primitive / builtin it is not a user defined class
   if (data_type->is_builtin_or_primitive()) {
@@ -935,23 +915,56 @@ class_stmt *type_checker::find_class(token *tok, ykdatatype *data_type) {
 }
 void type_checker::validate_member(name_val member, class_stmt *class_st) {
   bool found = false;
-  ykdatatype* class_member_dt;
-  for (auto const& para: class_st->members_) {
+  ykdatatype *class_member_dt;
+  for (auto const &para : class_st->members_) {
     if (para.name_->token_ == member.name_->token_) {
       found = true;
       class_member_dt = para.data_type_;
     }
   }
-  if (!found) {
-    error(member.name_, "member not found in class/struct");
-  }
+  if (!found) { error(member.name_, "member not found in class/struct"); }
   member.value_->accept(this);
   auto set_value = pop();
-  ykdatatype* member_dt = set_value.datatype_;
-  if (member_dt->is_const()) {
-    member_dt = member_dt->args_[0];
-  }
+  ykdatatype *member_dt = set_value.datatype_;
+  if (member_dt->is_const()) { member_dt = member_dt->args_[0]; }
   if (*class_member_dt != *member_dt) {
     error(member.name_, "data types mismatch");
+  }
+}
+void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
+  obj->dt_expr_->accept(this);
+  auto dt_class = pop();
+  if (dt_class.object_type_ == object_type::CLASS_ITSELF ||
+      dt_class.object_type_ == object_type::MODULE_CLASS) {
+    auto class_name = dt_class.string_val_;
+    ykobject data;
+    if (dt_class.object_type_ == object_type::CLASS_ITSELF) {
+      data = ykobject(dt_pool_->create(class_name, filepath_));
+    } else {
+      data = ykobject(
+          dt_pool_->create(dt_class.string_val_, dt_class.module_file_));
+    }
+    /* ----------------------------------------- */
+    // Member validation
+    std::unordered_set<std::string> names{};
+    for (auto nv : obj->values_) {
+      if (names.find(nv.name_->token_) != names.end()) {
+        error(nv.name_, "duplicate field in struct literal.");
+        break;
+      }
+      names.insert(nv.name_->token_);
+    }
+    // Match data type of each element with member data type
+    auto class_stmt = find_class(obj->curly_open_, data.datatype_);
+    if (class_stmt == nullptr) {
+      // Note error is created in find_class, so no need to do it again here
+      push(ykobject(dt_pool_));
+      return;
+    }
+    for (auto member : obj->values_) { validate_member(member, class_stmt); }
+    /* ----------------------------------------- */
+    push(data);
+  } else {
+    error(obj->curly_open_, "invalid data type for {} initialization");
   }
 }
