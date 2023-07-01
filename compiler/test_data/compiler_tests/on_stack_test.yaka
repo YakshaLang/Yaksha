@@ -12,7 +12,13 @@ struct Friend:
 class AnotherFriend:
     x: int
 
+def a() -> int:
+    return 0
+
 def main() -> int:
+    b = a
+    d = a
+    e = "Hello world"
     enemies = arrnew("Enemy", 2)
     enemies[0].x = 1
     enemies[1].x = 2

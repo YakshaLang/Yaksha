@@ -679,8 +679,15 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   if (obj->data_type_ == nullptr) {
     visited_expr = true;
     resulting_pair = compile_expression(obj->expression_);
-    obj->data_type_ =
-        resulting_pair.second.datatype_; /* set our data type here */
+    if (resulting_pair.second.is_a_function()) {
+      obj->data_type_ = function_to_datatype(resulting_pair.second);
+    } else {
+      obj->data_type_ =
+          resulting_pair.second.datatype_; /* set our data type here */
+    }
+  }
+  if (obj->data_type_->is_none()) {
+    error(obj->name_, "Failed to compile let statement. (Use of non compilable data type)");
   }
   if (obj->data_type_->is_str()) {
     object = ykobject(std::string("str"), dt_pool_);
