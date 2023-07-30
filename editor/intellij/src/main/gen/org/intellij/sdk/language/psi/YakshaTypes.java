@@ -8,8 +8,10 @@ import org.intellij.sdk.language.psi.impl.*;
 
 public interface YakshaTypes {
 
+  IElementType ALL_ALLOWED_SYMBOLS = new YakshaElementType("ALL_ALLOWED_SYMBOLS");
   IElementType ANNOTATION = new YakshaElementType("ANNOTATION");
   IElementType ANNOTATION_ARG = new YakshaElementType("ANNOTATION_ARG");
+  IElementType ANY_WS = new YakshaElementType("ANY_WS");
   IElementType ARGUMENTS = new YakshaElementType("ARGUMENTS");
   IElementType ASSIGNMENT_STATEMENT = new YakshaElementType("ASSIGNMENT_STATEMENT");
   IElementType ASSIGNMENT_STATEMENT_WO_INDENT = new YakshaElementType("ASSIGNMENT_STATEMENT_WO_INDENT");
@@ -52,9 +54,15 @@ public interface YakshaTypes {
   IElementType IF_STATEMENT = new YakshaElementType("IF_STATEMENT");
   IElementType IMPORT_STATEMENT = new YakshaElementType("IMPORT_STATEMENT");
   IElementType LET_STATEMENT = new YakshaElementType("LET_STATEMENT");
+  IElementType LISP_BODY = new YakshaElementType("LISP_BODY");
   IElementType LITERAL = new YakshaElementType("LITERAL");
   IElementType LOGIC_AND = new YakshaElementType("LOGIC_AND");
   IElementType LOGIC_OR = new YakshaElementType("LOGIC_OR");
+  IElementType LSP_EXPR = new YakshaElementType("LSP_EXPR");
+  IElementType LSP_Q_EXPR = new YakshaElementType("LSP_Q_EXPR");
+  IElementType LSP_S_EXPR = new YakshaElementType("LSP_S_EXPR");
+  IElementType MACRO_CALL = new YakshaElementType("MACRO_CALL");
+  IElementType MACRO_DECLARATION_STATEMENT = new YakshaElementType("MACRO_DECLARATION_STATEMENT");
   IElementType OUTER_STATEMENT = new YakshaElementType("OUTER_STATEMENT");
   IElementType PAREN_EXP = new YakshaElementType("PAREN_EXP");
   IElementType PASS_STATEMENT = new YakshaElementType("PASS_STATEMENT");
@@ -89,6 +97,7 @@ public interface YakshaTypes {
   IElementType KW_IF = new YakshaTokenType("KW_IF");
   IElementType KW_IMPORT = new YakshaTokenType("KW_IMPORT");
   IElementType KW_IN = new YakshaTokenType("KW_IN");
+  IElementType KW_MACROS = new YakshaTokenType("KW_MACROS");
   IElementType KW_NONE = new YakshaTokenType("KW_NONE");
   IElementType KW_PASS = new YakshaTokenType("KW_PASS");
   IElementType KW_RETURN = new YakshaTokenType("KW_RETURN");
@@ -124,6 +133,7 @@ public interface YakshaTypes {
   IElementType OPERATOR_MUL = new YakshaTokenType("OPERATOR_MUL");
   IElementType OPERATOR_MUL_EQ = new YakshaTokenType("OPERATOR_MUL_EQ");
   IElementType OPERATOR_NOT = new YakshaTokenType("OPERATOR_NOT");
+  IElementType OPERATOR_NOT_SYMBOL = new YakshaTokenType("OPERATOR_NOT_SYMBOL");
   IElementType OPERATOR_OPEN_P = new YakshaTokenType("OPERATOR_OPEN_P");
   IElementType OPERATOR_OPEN_SQB = new YakshaTokenType("OPERATOR_OPEN_SQB");
   IElementType OPERATOR_OR = new YakshaTokenType("OPERATOR_OR");
@@ -142,11 +152,17 @@ public interface YakshaTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-      if (type == ANNOTATION) {
+      if (type == ALL_ALLOWED_SYMBOLS) {
+        return new YakshaAllAllowedSymbolsImpl(node);
+      }
+      else if (type == ANNOTATION) {
         return new YakshaAnnotationImpl(node);
       }
       else if (type == ANNOTATION_ARG) {
         return new YakshaAnnotationArgImpl(node);
+      }
+      else if (type == ANY_WS) {
+        return new YakshaAnyWsImpl(node);
       }
       else if (type == ARGUMENTS) {
         return new YakshaArgumentsImpl(node);
@@ -274,6 +290,9 @@ public interface YakshaTypes {
       else if (type == LET_STATEMENT) {
         return new YakshaLetStatementImpl(node);
       }
+      else if (type == LISP_BODY) {
+        return new YakshaLispBodyImpl(node);
+      }
       else if (type == LITERAL) {
         return new YakshaLiteralImpl(node);
       }
@@ -282,6 +301,21 @@ public interface YakshaTypes {
       }
       else if (type == LOGIC_OR) {
         return new YakshaLogicOrImpl(node);
+      }
+      else if (type == LSP_EXPR) {
+        return new YakshaLspExprImpl(node);
+      }
+      else if (type == LSP_Q_EXPR) {
+        return new YakshaLspQExprImpl(node);
+      }
+      else if (type == LSP_S_EXPR) {
+        return new YakshaLspSExprImpl(node);
+      }
+      else if (type == MACRO_CALL) {
+        return new YakshaMacroCallImpl(node);
+      }
+      else if (type == MACRO_DECLARATION_STATEMENT) {
+        return new YakshaMacroDeclarationStatementImpl(node);
       }
       else if (type == OUTER_STATEMENT) {
         return new YakshaOuterStatementImpl(node);

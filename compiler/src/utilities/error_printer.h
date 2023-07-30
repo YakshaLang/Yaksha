@@ -3,11 +3,13 @@
 #define ERROR_PRINTER_H
 #include "tokenizer/string_utils.h"
 #include "tokenizer/token.h"
+#include "utilities/cpp_util.h"
 #include <iostream>
 #include <ostream>
+#include <utilities/colours.h>
 #include <vector>
 namespace yaksha::errors {
-#ifdef TESTING
+#ifdef YAKSHA_TESTING
   // Note: this is defined in error_printer.cpp
   // This is used for type checker testing
   extern std::vector<std::string> error_capture;
@@ -18,11 +20,13 @@ namespace yaksha::errors {
    * @param tok token object
    */
   static inline void print_token(std::ostream &output, const token &tok) {
-    output << tok.file_ << ":" << tok.line_ + 1 << ":" << tok.pos_;//<< ":";
+    output << tok.file_ << colours::green(":") << tok.line_ + 1
+           << colours::green(":") << tok.pos_;
     if (tok.type_ == token_type::END_OF_FILE) {
       output << " at EOF";
     } else if (tok.type_ != token_type::TK_UNKNOWN_TOKEN_DETECTED) {
-      output << " at " << string_utils::repr_string(tok.original_);
+      output << " at "
+             << colours::cyan(string_utils::repr_string(tok.original_));
     } else {
       output << " ";
     }
@@ -34,18 +38,18 @@ namespace yaksha::errors {
    */
   static inline void print_error(std::ostream &output,
                                  const parsing_error &err) {
-#ifdef TESTING
+#ifdef YAKSHA_TESTING
     error_capture.push_back(err.message_);
 #endif
     if (!err.token_set_) {
-      output << err.message_;
+      output << colours::red(err.message_);
       return;
     }
     auto tok = err.tok_;
     print_token(output, tok);
-    output << " --> " << err.message_;
+    output << " --> " << colours::red(err.message_);
   }
-#ifdef TESTING
+#ifdef YAKSHA_TESTING
   static bool has_error(const std::string &error_message) {
     for (auto &e : error_capture) {
       if (e == error_message) { return true; }

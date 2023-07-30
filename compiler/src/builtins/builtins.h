@@ -9,6 +9,7 @@
 #include "compiler/function_datatype_extractor.h"
 #include "compiler/slot_matcher.h"
 #include "compiler/statement_writer.h"
+#include "utilities/gc_pool.h"
 #include "utilities/ykobject.h"
 #include <string>
 #include <vector>
@@ -17,7 +18,7 @@ namespace yaksha {
    * Handle verifying and checking built in types
    */
   struct builtins : datatype_parser {
-    explicit builtins(ykdt_pool *dt_pool);
+    explicit builtins(ykdt_pool *dt_pool, gc_pool<token> *token_pool);
     ~builtins() override;
     /**
      * Is this name a valid builtin
@@ -84,6 +85,7 @@ namespace yaksha {
 private:
     ykdt_pool *dt_pool_;
     std::unordered_map<std::string, builtin *> builtins_;
+    gc_pool<token> *token_pool_;
   };
 }// namespace yaksha
 #endif

@@ -1,0 +1,9 @@
+macros! {
+    (= counter 0)
+    (defun ymacro_count ()
+        # increment counter state
+        (= counter (+ counter 2))
+        # return counter as a decimal token
+        (list (ykt_integer_decimal counter)))
+    (yk_register {dsl counter ymacro_count})
+}

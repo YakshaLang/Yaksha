@@ -82,9 +82,6 @@ def get_base_args(c: conf.HammerConfig, target: str, cpp: bool) -> Array[str]:
     if not (target == "native"):
         arrput(args, "-target")
         arrput(args, target)
-    # FLTO (Link time optimization)
-    if not (is_target_macos(target) or is_target_windows(target)):
-        arrput(args, "-flto=full")
     args = sarr.extend(args, c.args_c_or_cpp)
     if cpp:
         args = sarr.extend(args, c.args_cpp)
@@ -254,4 +251,3 @@ def main() -> int:
     if all_success:
         return 0
     return 1
-

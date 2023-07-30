@@ -31,7 +31,7 @@ namespace yaksha {
                     statement_writer,
                     function_datatype_extractor {
     compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
-             entry_struct_func_compiler *esc);
+             entry_struct_func_compiler *esc, gc_pool<token> *token_pool);
     ~compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
     ykdatatype *function_to_datatype(const ykobject &arg) override;
@@ -94,7 +94,7 @@ namespace yaksha {
     void write_statement_no_end(std::string code_line) override;
     void indent() override;
     void dedent() override;
-
+    void visit_macro_call_expr(macro_call_expr *obj) override;
 
 private:
     void push_scope_type(ast_type scope_type);
@@ -111,7 +111,7 @@ private:
     std::string prefix_val_{};
     codefiles *cf_{nullptr};
     std::pair<std::string, ykobject> pop();
-    std::pair<std::string, ykobject> compile_expression(expr* ex);
+    std::pair<std::string, ykobject> compile_expression(expr *ex);
     // Indentation to generate
     int indent_{0};
     // Counter for temp variables.
@@ -166,8 +166,7 @@ private:
                         const std::pair<std::string, ykobject> &rhs,
                         const token_type &operator_type,
                         const std::string &token);
-    static void obj_calloc(const std::string &name,
-                                  std::stringstream &code) ;
+    static void obj_calloc(const std::string &name, std::stringstream &code);
   };
 }// namespace yaksha
 #endif

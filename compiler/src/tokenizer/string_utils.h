@@ -14,7 +14,8 @@
  * String utilities
  */
 namespace yaksha::string_utils {
-  struct string_error {
+  struct string_error : std::exception {
+    explicit string_error(std::string s);
     std::string message_;
   };
   bool is_alpha(utf8::uint32_t c);

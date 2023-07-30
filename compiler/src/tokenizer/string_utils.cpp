@@ -2,6 +2,7 @@
 #include "tokenizer/string_utils.h"
 #include <iomanip>
 #include <sstream>
+#include <utility>
 const auto STR_ESCAPE_CHAR = '\\';
 std::string yaksha::string_utils::unescape(const std::string &escaped_string) {
   std::string buf_{};
@@ -101,7 +102,7 @@ std::string yaksha::string_utils::unescape(const std::string &escaped_string) {
               throw string_error{"\\xhh must be a valid byte (0-255)"};
             }
             // forcefully convert given byte, this is not a unicode code point
-            *(buf++) = static_cast<uint8_t>(hex_num);
+            *(buf++) = static_cast<char>(static_cast<uint8_t>(hex_num));
           } else {
             if (next == 'u' && hex_num >= 0x10000ULL) {
               throw string_error{"\\uhhhh must be less than 0x10000)"};
@@ -287,25 +288,31 @@ bool yaksha::string_utils::allowed_in_indent(utf8::uint32_t p,
 }
 std::string yaksha::string_utils::html_escape(const std::string &raw_string) {
   std::string buf_{};
-  auto buf = std::back_inserter(buf_);
-  auto iterator = raw_string.begin();
-  auto end = raw_string.end();
-  while (iterator != end) {
-    auto current = utf8::peek_next(iterator, end);
-    if (current == '&') {
-      buf_.append("&amp;");
-    } else if (current == '\"') {
-      buf_.append("&quot;");
-    } else if (current == '\'') {
-      buf_.append("&apos;");
-    } else if (current == '<') {
-      buf_.append("&lt;");
-    } else if (current == '>') {
-      buf_.append("&gt;");
-    } else {
-      utf8::append(static_cast<char32_t>(current), buf);
+  try {
+    auto buf = std::back_inserter(buf_);
+    auto iterator = raw_string.begin();
+    auto end = raw_string.end();
+    while (iterator != end) {
+      auto current = utf8::peek_next(iterator, end);
+      if (current == '&') {
+        buf_.append("&amp;");
+      } else if (current == '\"') {
+        buf_.append("&quot;");
+      } else if (current == '\'') {
+        buf_.append("&apos;");
+      } else if (current == '<') {
+        buf_.append("&lt;");
+      } else if (current == '>') {
+        buf_.append("&gt;");
+      } else {
+        utf8::append(static_cast<char32_t>(current), buf);
+      }
+      utf8::next(iterator, end);
     }
-    utf8::next(iterator, end);
+  } catch (utf8::invalid_utf8 &ignored) {
+    // ignore
   }
   return buf_;
 }
+yaksha::string_utils::string_error::string_error(std::string s)
+    : message_(std::move(s)) {}

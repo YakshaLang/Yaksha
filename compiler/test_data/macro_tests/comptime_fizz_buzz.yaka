@@ -1,0 +1,20 @@
+# ╔═╗┌─┐┌┬┐┌─┐┬┬  ┌─┐  ╔╦╗┬┌┬┐┌─┐
+# ║  │ ││││├─┘││  ├┤    ║ ││││├┤
+# ╚═╝└─┘┴ ┴┴  ┴┴─┘└─┘   ╩ ┴┴ ┴└─┘
+# ╔═╗┬┌─┐┌─┐  ╔╗ ┬ ┬┌─┐┌─┐
+# ╠╣ │┌─┘┌─┘  ╠╩╗│ │┌─┘┌─┘
+# ╚  ┴└─┘└─┘  ╚═╝└─┘└─┘└─┘
+macros!{
+    (defun to_fb (n) (+ (if (== n 1) "" " ") (cond
+        ((== 0 (modulo n 15)) "FizzBuzz")
+        ((== 0 (modulo n 3)) "Fizz")
+        ((== 0 (modulo n 5)) "Buzz")
+        (true (to_string n))
+        )))
+    (defun fizzbuzz () (list (yk_create_token YK_TOKEN_STRING (reduce + (map to_fb (range 1 101))))))
+    (yk_register {dsl fizzbuzz fizzbuzz})
+}
+
+def main() -> int:
+    println(fizzbuzz!{})
+    return 0

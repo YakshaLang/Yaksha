@@ -2,6 +2,7 @@
 #ifndef INDENT_ANALYZER_H
 #define INDENT_ANALYZER_H
 #include "tokenizer/token.h"
+#include "utilities/gc_pool.h"
 #include <vector>
 namespace yaksha {
   /**
@@ -31,16 +32,20 @@ namespace yaksha {
    * // TODO Extract cleaning to a different class (Single Responsibility/SOLID)
    */
   struct block_analyzer {
-    explicit block_analyzer(const std::vector<token> &tokens);
+    explicit block_analyzer(const std::vector<token *> &tokens,
+                            gc_pool<token> *token_pool);
     void analyze();
     std::vector<parsing_error> errors_;
-    std::vector<token> tokens_;
+    std::vector<token *> tokens_;
+    token *c_token(std::string file, int line, int pos, std::string token_buf,
+                   token_type token_type_val);
 
 private:
     void handle_error(const parsing_error &err);
-    void create_dedents(std::vector<std::size_t> &indents, const token &tok,
+    void create_dedents(std::vector<std::size_t> &indents, token *tok,
                         size_t prev_level, size_t current_level);
-    const std::vector<token> &original_tokens_;
+    const std::vector<token *> &original_tokens_;
+    gc_pool<token> *token_pool_{nullptr};
   };
 }// namespace yaksha
 #endif

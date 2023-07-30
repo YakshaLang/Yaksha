@@ -8,7 +8,7 @@ def factorial(x: int) -> int:
 
 
 def main() -> int:
-    a: int = 0
+    a = 0
     while a < 10:
         console.cyan("factorial")
         console.red("(")

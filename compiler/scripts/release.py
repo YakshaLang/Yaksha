@@ -13,7 +13,10 @@ ROOT = os.path.realpath(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 MAX_EXECUTION_TIME_SEC = 60 * 4
 PATHS = []
 
-
+WINDOWS_OS = sys.platform.startswith('win')
+CURRENT_PLATFORM_KEY = "windows_x86_64" if WINDOWS_OS else "linux_x86_64"
+BUNDLED_ZIG_VERSION = "0.9.1"
+COMPILER_BINARIES = ["yaksha.exe", "yakshac.exe"] if WINDOWS_OS else ["yaksha", "yakshac"]
 @contextmanager
 def updated_path():
     # ref: https://stackoverflow.com/a/69274881
@@ -117,8 +120,10 @@ def download(url: str, sha256_hash: str) -> (bool, str):
     if os.path.isfile(target):
         with open(target, "rb+") as h:
             file_hash = hash_sha256(h.read())
-            if file_hash == sha256_hash:
+            if sha256_hash == "-" or file_hash == sha256_hash:
                 print(filename, "✔️ already downloaded. It will be used for packaging.")
+                if sha256_hash == "-":
+                    print(filename, "hashed: ", file_hash)
                 return True, target
     with urllib.request.urlopen(url) as f:
         with open(target, "wb+") as t:
@@ -259,19 +264,23 @@ def compile_yaksha():
         execute("cmake -S .. -B .".split(" "))
         execute("cmake --build . --config Release -j 2".split(" "))
     PATHS.append(os.path.join(ROOT, "bin", "Release"))
+    PATHS.append(os.path.join(ROOT, "bin"))
     # Hack to copy binaries in Release directory
-    for binary in ["yaksha.exe", "yakshac.exe"]:
-        shutil.copyfile(os.path.join(ROOT, "bin", "Release", binary), os.path.join(ROOT, "bin", binary))
+    for binary in COMPILER_BINARIES:
+        try:
+            shutil.copyfile(os.path.join(ROOT, "bin", "Release", binary), os.path.join(ROOT, "bin", binary))
+        except FileNotFoundError:
+            pass
 
 
 def extract_zig_for_compilation():
     global PATHS
-    name = "windows_x86_64"
+    name = CURRENT_PLATFORM_KEY
     sec = CONFIG.section(name)
     success, zig = download(sec.zig, sec.zig_sha256)
     temp = make_directory(name + "_temp")
     extract(zig, temp)
-    PATHS.append(os.path.join(temp, "zig-windows-x86_64-0.9.1"))
+    PATHS.append(os.path.join(temp, CURRENT_PLATFORM_KEY + "-" + BUNDLED_ZIG_VERSION))
 
 
 def compile_carpntr():

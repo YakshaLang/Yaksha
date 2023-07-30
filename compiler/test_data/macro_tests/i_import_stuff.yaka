@@ -1,0 +1,17 @@
+import import_me as other
+
+macros! {
+    (defun ymacro_count ()
+        # get the increment value from another macro?
+        (= x (map_get (head (other::ymacro_count)) "value"))
+        (= x (- x 1))
+        (list (ykt_integer_decimal x)))
+    (yk_register {dsl xcounter ymacro_count})
+}
+
+
+def main() -> int:
+    println(xcounter!{})
+    println(xcounter!{})
+    println(xcounter!{})
+    return 0

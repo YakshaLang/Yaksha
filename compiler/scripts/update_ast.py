@@ -35,19 +35,41 @@ EXPRS = sorted([
     # Can be abc(), abc(1), abc(1, 2, 3), etc
     #        name->`abc` args->`1, 2, 3` paren_token->`)`
     ("fncall", (("expr*", "name"), ("token*", "paren_token"), ("std::vector<expr*>", "args"))),
+    ("curly_call", (("expr*", "dt_expr"),
+                    ("token*", "curly_open"),
+                    ("std::vector<name_val>", "values"),
+                    ("token*", "curly_close"))),
+    # Simple macro call (function or procedure macro)
+    # examples
+    #   eval!("(+ 1 2 3)") --> 6
+    ("macro_call", (("token*", "path"), ("token*", "name"), ("token*", "not_symbol_tok"), ("token*", "paren_token"),
+                    ("std::vector<expr*>", "args"), ("token*", "close_paren_token"))),
     # Can be a[1], a[b[1]], etc
     ("square_bracket_access", (("expr*", "name"), ("token*", "sqb_token"), ("expr*", "index_expr"))),
-    ("curly_call", (("expr*", "dt_expr"), ("token*", "curly_open"), ("std::vector<name_val>", "values"),
-                    ("token*", "curly_close"))),
     ("square_bracket_set", (("expr*", "name"), ("token*", "sqb_token"), ("expr*", "index_expr"))),
     # Dot operator is used as both set and get operations
     ("set", (("expr*", "lhs"), ("token*", "dot"), ("token*", "item"))),
     ("get", (("expr*", "lhs"), ("token*", "dot"), ("token*", "item"))),
 ], key=lambda x: x[0])
 # Do not add visitor methods for this stmt type
-IGNORE_VISITS_STMT = {"elif"}
+IGNORE_VISITS_STMT = {"elif", "macros", "token_soup", "dsl_macro"}
 # Different kinds of statements
 STMTS = sorted([
+    # Define macros in current file.
+    # Parser should check that for a single invoke of parse(), there must be only one, macros section.
+    # -- macros code will be validated and parsed same way.
+    # macros! {
+    #     (println "Hello from macro processor")
+    # }
+    ("macros", (("token*", "macros_token"), ("token*", "not_symbol_tok"), ("token*", "curly_open"),
+                ("std::vector<token*>", "lisp_code"), ("token*", "curly_close"))),
+    # Execute a DSL macro
+    # format: name[. name2]!{ internal_soup }
+    ("dsl_macro", (("token*", "name"), ("token*", "name2"), ("token*", "not_symbol_tok"), ("token*", "curly_open"),
+                   ("std::vector<token*>", "internal_soup"), ("token*", "curly_close"))),
+    # Why?
+    # this allows us to store arbitrary tokens in order in statement list
+    ("token_soup", (("std::vector<token*>", "soup"),)),
     ("return", (("token*", "return_keyword"), ("expr*", "expression"))),
     # defer statement works just like how we use string, deletions.
     ("defer", (("token*", "defer_keyword"), ("expr*", "expression"), ("stmt*", "del_statement"))),

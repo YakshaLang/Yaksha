@@ -5,10 +5,12 @@
 #include <utility>
 using namespace yaksha;
 type_checker::type_checker(std::string filepath, codefiles *cf,
-                           def_class_visitor *dcv, ykdt_pool *pool)
-    : cf_(cf), dt_pool_(pool), scope_(pool), builtins_(pool),
+                           def_class_visitor *dcv, ykdt_pool *pool,
+                           gc_pool<token> *token_pool)
+    : cf_(cf), dt_pool_(pool), scope_(pool), builtins_(pool, token_pool),
       defs_classes_(dcv), filepath_(std::move(filepath)) {
-  import_stmts_alias_ = cf->get(filepath_)->data_->parser_->import_stmts_alias_;
+  import_stmts_alias_ =
+      cf->get_or_null(filepath_)->data_->parser_->import_stmts_alias_;
 }
 type_checker::~type_checker() = default;
 void type_checker::visit_assign_expr(assign_expr *obj) {
@@ -19,9 +21,7 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
   if (scope_.is_defined(name)) {
     object = scope_.get(name);
   } else {
-    if (rhs.is_a_function()) {
-      rhs.datatype_ = function_to_datatype(rhs);
-    }
+    if (rhs.is_a_function()) { rhs.datatype_ = function_to_datatype(rhs); }
     object = ykobject(rhs.datatype_);
     obj->promoted_ = true;
   }
@@ -167,7 +167,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     if (name.object_type_ == object_type::FUNCTION) {
       funct = defs_classes_->get_function(name.string_val_);
     } else {
-      auto imp = cf_->get(name.module_file_);
+      auto imp = cf_->get_or_null(name.module_file_);
       funct = imp->data_->dsv_->get_function(name.string_val_);
     }
     // check if it's same size
@@ -178,29 +178,30 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       push(ykobject(dt_pool_));// Push None here
       return;
     }
-    auto last_param_index = funct->params_.size() - 1;
-    for (auto i = 0; i < funct->params_.size(); i++) {
-      auto param = funct->params_[i];
-      if (i == last_param_index && funct->annotations_.varargs_) {
-        for (auto j = i; j < arguments.size(); j++) {
-          auto arg = arguments[j];
+    if (!funct->params_.empty()) {
+      auto last_param_index = funct->params_.size() - 1;
+      for (auto i = 0; i < funct->params_.size(); i++) {
+        auto param = funct->params_[i];
+        if (i == last_param_index && funct->annotations_.varargs_) {
+          for (auto j = i; j < arguments.size(); j++) {
+            auto arg = arguments[j];
+            if (!slot_match(arg, param.data_type_)) {
+              std::stringstream message{};
+              message << "Variable argument: " << (j + 1) << " mismatches";
+              error(obj->paren_token_, message.str());
+            }
+          }
+        } else {
+          auto arg = arguments[i];
           if (!slot_match(arg, param.data_type_)) {
             std::stringstream message{};
-            message << "Variable argument: " << (j + 1) << " mismatches";
+            message << "Parameter & argument " << (i + 1) << " mismatches";
             error(obj->paren_token_, message.str());
           }
         }
-      } else {
-        auto arg = arguments[i];
-        if (!slot_match(arg, param.data_type_)) {
-          std::stringstream message{};
-          message << "Parameter & argument " << (i + 1) << " mismatches";
-          error(obj->paren_token_, message.str());
-        }
       }
     }
-    auto data = ykobject(funct->return_type_);
-    push(data);
+    push(ykobject(funct->return_type_));
     return;
   }
   if (name.object_type_ == object_type::BUILTIN_FUNCTION) {
@@ -616,7 +617,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
   lhs_expr->accept(this);
   auto lhs = pop();
   if (lhs.object_type_ == object_type::MODULE) {
-    auto imported = cf_->get(lhs.string_val_);
+    auto imported = cf_->get_or_null(lhs.string_val_);
     bool has_func = imported->data_->dsv_->has_function(member_item->token_);
     bool has_class = imported->data_->dsv_->has_class(member_item->token_);
     bool has_const = imported->data_->dsv_->has_const(member_item->token_);
@@ -652,7 +653,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
   }
   auto item = member_item->token_;
   if (!lhs.datatype_->module_.empty()) {
-    auto mod_file_info = cf_->get(lhs.datatype_->module_);
+    auto mod_file_info = cf_->get_or_null(lhs.datatype_->module_);
     if (mod_file_info != nullptr &&
         mod_file_info->data_->dsv_->has_class(lhs.datatype_->type_)) {
       auto class_ = mod_file_info->data_->dsv_->get_class(lhs.datatype_->type_);
@@ -826,7 +827,7 @@ ykdatatype *type_checker::function_to_datatype(const ykobject &arg) {
   if (arg.object_type_ == object_type::FUNCTION) {
     funct = defs_classes_->get_function(arg.string_val_);
   } else {
-    auto imp = cf_->get(arg.module_file_);
+    auto imp = cf_->get_or_null(arg.module_file_);
     funct = imp->data_->dsv_->get_function(arg.string_val_);
   }
   if (funct->annotations_.varargs_) {
@@ -875,10 +876,12 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
     error(obj->for_keyword_,
           "Cannot use foreach iteration for SMEntry and MEntry.");
   }
-  // Infer data type of foreach
-  if (obj->data_type_ == nullptr) {
-    obj->data_type_ = exp.datatype_->args_[0];
+  if (exp.datatype_->args_.empty()) {
+    // We do not have any information to continue
+    return;
   }
+  // Infer data type of foreach
+  if (obj->data_type_ == nullptr) { obj->data_type_ = exp.datatype_->args_[0]; }
   auto lhs = exp.datatype_->args_[0];
   auto rhs = obj->data_type_;
   if ((*lhs != *rhs)) {
@@ -909,7 +912,7 @@ class_stmt *type_checker::find_class(token *tok, ykdatatype *data_type) {
     error(tok, "primitives/builtins cannot be created as a struct literal");
     return nullptr;
   }
-  auto mod = cf_->get(data_type->module_);
+  auto mod = cf_->get_or_null(data_type->module_);
   if (mod == nullptr) {
     error(tok, "module not found");
     return nullptr;
@@ -920,16 +923,17 @@ class_stmt *type_checker::find_class(token *tok, ykdatatype *data_type) {
   error(tok, "class/struct not found");
   return nullptr;
 }
-void type_checker::validate_member(name_val member, class_stmt *class_st) {
-  bool found = false;
-  ykdatatype *class_member_dt;
+void type_checker::validate_member(name_val &member, class_stmt *class_st) {
+  ykdatatype *class_member_dt = nullptr;
   for (auto const &para : class_st->members_) {
     if (para.name_->token_ == member.name_->token_) {
-      found = true;
       class_member_dt = para.data_type_;
     }
   }
-  if (!found) { error(member.name_, "member not found in class/struct"); }
+  if (class_member_dt == nullptr) {
+    error(member.name_, "member not found in class/struct");
+    return;
+  }
   member.value_->accept(this);
   auto set_value = pop();
   ykdatatype *member_dt = set_value.datatype_;
@@ -968,10 +972,11 @@ void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
       push(ykobject(dt_pool_));
       return;
     }
-    for (auto member : obj->values_) { validate_member(member, class_stmt); }
+    for (auto &member : obj->values_) { validate_member(member, class_stmt); }
     /* ----------------------------------------- */
     push(data);
   } else {
     error(obj->curly_open_, "invalid data type for {} initialization");
   }
 }
+void type_checker::visit_macro_call_expr(macro_call_expr *obj) {}

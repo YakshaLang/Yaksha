@@ -1,0 +1,16 @@
+macros!{
+    (defun a1 (a) (list (ykt_integer_decimal (+ (to_int (map_get a "value")) 1))))
+    (defun a2 (a b) (list (ykt_integer_decimal
+        (+
+            (to_int (map_get a "value"))
+            (to_int (map_get b "value"))
+            1
+        ))))
+    (yk_register {dsl a1 a1})
+    (yk_register {dsl a2 a2})
+}
+
+def main() -> int:
+    println(a1!{2})
+    println(a2!{2 2})
+    return 0

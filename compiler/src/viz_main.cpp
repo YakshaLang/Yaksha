@@ -23,13 +23,14 @@ int main(int argc, char *argv[]) {
   }
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
-  tokenizer t{file_name, data};
+  gc_pool<token> token_pool{};
+  tokenizer t{file_name, data, &token_pool};
   t.tokenize();
   if (!t.errors_.empty()) {
     errors::print_errors(t.errors_);
     return EXIT_FAILURE;
   }
-  block_analyzer b{t.tokens_};
+  block_analyzer b{t.tokens_, &token_pool};
   b.analyze();
   ykdt_pool dt_pool{};
   try {

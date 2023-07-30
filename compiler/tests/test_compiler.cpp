@@ -5,35 +5,35 @@
 #include <filesystem>
 #include <string>
 using namespace yaksha;
-#define TEST_FILE(A, B, C)                                                     \
-  do {                                                                         \
-    multifile_compiler mc{};                                                   \
-    auto result = mc.compile(A);                                               \
-    REQUIRE(result.failed_ == false);                                          \
-    tokenizer c_code{"output.c", result.code_};                                \
-    c_code.tokenize();                                                         \
-    auto token_snapshot = yaksha::load_token_dump(C);                          \
-    yaksha::save_token_dump(C, c_code.tokens_);                                \
-    auto yaksha_file_path = std::filesystem::path{A};                          \
-    auto tokens_file_path = std::filesystem::path{C};                          \
-    std::string c_code_file =                                                  \
-        (tokens_file_path.parent_path() / yaksha_file_path.filename())         \
-            .string() +                                                        \
-        ".output.c";                                                           \
-    std::ofstream save_file(c_code_file);                                      \
-    REQUIRE(save_file.is_open() == true);                                      \
-    save_file << result.code_;                                                 \
-    REQUIRE(c_code.tokens_.size() == token_snapshot.size());                   \
-    for (int i = 0; i < token_snapshot.size(); i++) {                          \
-      auto parsed = c_code.tokens_[i];                                         \
-      auto snapshot = token_snapshot[i];                                       \
-      REQUIRE(parsed.file_ == snapshot.file_);                                 \
-      REQUIRE(parsed.line_ == snapshot.line_);                                 \
-      REQUIRE(parsed.pos_ == snapshot.pos_);                                   \
-      REQUIRE(parsed.token_ == snapshot.token_);                               \
-      REQUIRE(parsed.type_ == snapshot.type_);                                 \
-    }                                                                          \
-  } while (0)
+static void TEST_FILE(const std::string &A, const std::string &B,
+                      const std::string &C) {
+  multifile_compiler mc{};
+  auto result = mc.compile(A);
+  REQUIRE(result.failed_ == false);
+  gc_pool<token> token_pool{};
+  tokenizer c_code{"output.c", result.code_, &token_pool};
+  c_code.tokenize();
+  auto token_snapshot = yaksha::load_token_dump(C, &token_pool);
+  yaksha::save_token_dump(C, c_code.tokens_);
+  auto yaksha_file_path = std::filesystem::path{A};
+  auto tokens_file_path = std::filesystem::path{C};
+  std::string c_code_file =
+      (tokens_file_path.parent_path() / yaksha_file_path.filename()).string() +
+      ".output.c";
+  std::ofstream save_file(c_code_file);
+  REQUIRE(save_file.is_open() == true);
+  save_file << result.code_;
+  REQUIRE(c_code.tokens_.size() == token_snapshot.size());
+  for (int i = 0; i < token_snapshot.size(); i++) {
+    auto parsed = c_code.tokens_[i];
+    auto snapshot = token_snapshot[i];
+    REQUIRE(parsed->file_ == snapshot->file_);
+    REQUIRE(parsed->line_ == snapshot->line_);
+    REQUIRE(parsed->pos_ == snapshot->pos_);
+    REQUIRE(parsed->token_ == snapshot->token_);
+    REQUIRE(parsed->type_ == snapshot->type_);
+  }
+}
 TEST_CASE("compiler: Hello World") {
   TEST_FILE("../test_data/compiler_tests/test1.yaka", "test1.yaka",
             "../test_data/compiler_tests/output/test1.tokens");
@@ -127,11 +127,11 @@ TEST_CASE("compiler: Basic function pointer") {
             "../test_data/compiler_tests/output/function_datatype_test.tokens");
 }
 TEST_CASE("compiler: Function pointer passing & calling") {
-  TEST_FILE(
-      "../test_data/compiler_tests/function_datatype_passing_calling_test.yaka",
-      "function_datatype_passing_calling_test.yaka",
-      "../test_data/compiler_tests/output/"
-      "function_datatype_passing_calling_test.tokens");
+  TEST_FILE("../test_data/compiler_tests/"
+            "function_datatype_passing_calling_test.yaka",
+            "function_datatype_passing_calling_test.yaka",
+            "../test_data/compiler_tests/output/"
+            "function_datatype_passing_calling_test.tokens");
 }
 TEST_CASE("compiler: Test automatic generation for normal hashes!") {
   TEST_FILE("../test_data/compiler_tests/normal_hash_map.yaka",
@@ -243,4 +243,37 @@ TEST_CASE("compiler: bug-fix comment break indent") {
   TEST_FILE("../test_data/bug_fixes/comment_break_indent.yaka",
             "comment_break_indent.yaka",
             "../test_data/bug_fixes/comment_break_indent.tokens");
+}
+TEST_CASE("compiler: macros - compile with macros!{} and dsl!{} macro usage") {
+  TEST_FILE(
+      "../test_data/macro_tests/eachelem_for_with_macros.yaka",
+      "eachelem_for_with_macros.yaka",
+      "../test_data/compiler_tests/output/eachelem_for_with_macros.tokens");
+}
+TEST_CASE("compiler: macros - compile time fizzbuzz!{}") {
+  TEST_FILE("../test_data/macro_tests/comptime_fizz_buzz.yaka",
+            "comptime_fizz_buzz.yaka",
+            "../test_data/compiler_tests/output/comptime_fizz_buzz.tokens");
+}
+TEST_CASE("compiler: macros - load a file as a string") {
+  TEST_FILE("../test_data/macro_tests/grab_file.yaka", "grab_file.yaka",
+            "../test_data/compiler_tests/output/grab_file.tokens");
+}
+TEST_CASE("compiler: macros - different kind of arguments") {
+  TEST_FILE("../test_data/macro_tests/m_args.yaka", "m_args.yaka",
+            "../test_data/compiler_tests/output/m_args.tokens");
+}
+TEST_CASE("compiler: macros - use macros in other files in my macros") {
+  TEST_FILE("../test_data/macro_tests/i_import_stuff.yaka",
+            "i_import_stuff.yaka",
+            "../test_data/compiler_tests/output/i_import_stuff.tokens");
+}
+TEST_CASE("compiler: macros - use macro from another file as module.dsl!{}") {
+  TEST_FILE("../test_data/macro_tests/imported_dsl_macro_use.yaka",
+            "imported_dsl_macro_use.yaka",
+            "../test_data/compiler_tests/output/imported_dsl_macro_use.tokens");
+}
+TEST_CASE("compiler: macros - gensym usage") {
+  TEST_FILE("../test_data/macro_tests/g1.yaka", "g1.yaka",
+            "../test_data/compiler_tests/output/g1.tokens");
 }

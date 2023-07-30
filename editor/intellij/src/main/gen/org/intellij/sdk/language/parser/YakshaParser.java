@@ -36,6 +36,74 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // IDENTIFIER | STRING | NUMBER | OPERATOR_COMPARISON | OPERATOR_AT | OPERATOR_COLON | OPERATOR_DOT | OPERATOR_COMMA | OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ | OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ | OPERATOR_NOT | OPERATOR_B_NOT | OPERATOR_OR | OPERATOR_AND | OPERATOR_ARROW | OPERATOR_PLUS | OPERATOR_MINUS | OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER | OPERATOR_SHL | OPERATOR_SHR | OPERATOR_B_AND | OPERATOR_B_OR | OPERATOR_B_XOR | PRIMITIVE_DATA_TYPE | KW_AS | KW_BREAK | KW_CLASS | KW_STRUCT | KW_CCODE | KW_CONTINUE | KW_DEF | KW_DEL | KW_DEFER | KW_ELSE | KW_IF | KW_ELIF | KW_IMPORT | KW_PASS | KW_RETURN | KW_WHILE | KW_TRUE | KW_FALSE | KW_NONE | KW_RUNTIMEFEATURE | KW_FOR | KW_IN | KW_MACROS
+  public static boolean all_allowed_symbols(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "all_allowed_symbols")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, ALL_ALLOWED_SYMBOLS, "<all allowed symbols>");
+    r = consumeToken(b, IDENTIFIER);
+    if (!r) r = consumeToken(b, STRING);
+    if (!r) r = consumeToken(b, NUMBER);
+    if (!r) r = consumeToken(b, OPERATOR_COMPARISON);
+    if (!r) r = consumeToken(b, OPERATOR_AT);
+    if (!r) r = consumeToken(b, OPERATOR_COLON);
+    if (!r) r = consumeToken(b, OPERATOR_DOT);
+    if (!r) r = consumeToken(b, OPERATOR_COMMA);
+    if (!r) r = consumeToken(b, OPERATOR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_PLUS_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_MINUS_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_MUL_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_DIV_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_REMAINDER_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_SHL_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_SHR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_B_AND_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_B_OR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_B_XOR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_NOT);
+    if (!r) r = consumeToken(b, OPERATOR_B_NOT);
+    if (!r) r = consumeToken(b, OPERATOR_OR);
+    if (!r) r = consumeToken(b, OPERATOR_AND);
+    if (!r) r = consumeToken(b, OPERATOR_ARROW);
+    if (!r) r = consumeToken(b, OPERATOR_PLUS);
+    if (!r) r = consumeToken(b, OPERATOR_MINUS);
+    if (!r) r = consumeToken(b, OPERATOR_MUL);
+    if (!r) r = consumeToken(b, OPERATOR_DIV);
+    if (!r) r = consumeToken(b, OPERATOR_REMAINDER);
+    if (!r) r = consumeToken(b, OPERATOR_SHL);
+    if (!r) r = consumeToken(b, OPERATOR_SHR);
+    if (!r) r = consumeToken(b, OPERATOR_B_AND);
+    if (!r) r = consumeToken(b, OPERATOR_B_OR);
+    if (!r) r = consumeToken(b, OPERATOR_B_XOR);
+    if (!r) r = consumeToken(b, PRIMITIVE_DATA_TYPE);
+    if (!r) r = consumeToken(b, KW_AS);
+    if (!r) r = consumeToken(b, KW_BREAK);
+    if (!r) r = consumeToken(b, KW_CLASS);
+    if (!r) r = consumeToken(b, KW_STRUCT);
+    if (!r) r = consumeToken(b, KW_CCODE);
+    if (!r) r = consumeToken(b, KW_CONTINUE);
+    if (!r) r = consumeToken(b, KW_DEF);
+    if (!r) r = consumeToken(b, KW_DEL);
+    if (!r) r = consumeToken(b, KW_DEFER);
+    if (!r) r = consumeToken(b, KW_ELSE);
+    if (!r) r = consumeToken(b, KW_IF);
+    if (!r) r = consumeToken(b, KW_ELIF);
+    if (!r) r = consumeToken(b, KW_IMPORT);
+    if (!r) r = consumeToken(b, KW_PASS);
+    if (!r) r = consumeToken(b, KW_RETURN);
+    if (!r) r = consumeToken(b, KW_WHILE);
+    if (!r) r = consumeToken(b, KW_TRUE);
+    if (!r) r = consumeToken(b, KW_FALSE);
+    if (!r) r = consumeToken(b, KW_NONE);
+    if (!r) r = consumeToken(b, KW_RUNTIMEFEATURE);
+    if (!r) r = consumeToken(b, KW_FOR);
+    if (!r) r = consumeToken(b, KW_IN);
+    if (!r) r = consumeToken(b, KW_MACROS);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // OPERATOR_AT IDENTIFIER annotation_arg? S? NL
   public static boolean annotation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "annotation")) return false;
@@ -100,6 +168,32 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "annotation_arg_4")) return false;
     consumeToken(b, S);
     return true;
+  }
+
+  /* ********************************************************** */
+  // (I | S | NL)+
+  public static boolean any_ws(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "any_ws")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, ANY_WS, "<any ws>");
+    r = any_ws_0(b, l + 1);
+    while (r) {
+      int c = current_position_(b);
+      if (!any_ws_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "any_ws", c)) break;
+    }
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // I | S | NL
+  private static boolean any_ws_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "any_ws_0")) return false;
+    boolean r;
+    r = consumeToken(b, I);
+    if (!r) r = consumeToken(b, S);
+    if (!r) r = consumeToken(b, NL);
+    return r;
   }
 
   /* ********************************************************** */
@@ -1824,6 +1918,31 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // (lsp_expr | any_ws)+
+  public static boolean lisp_body(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lisp_body")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, LISP_BODY, "<lisp body>");
+    r = lisp_body_0(b, l + 1);
+    while (r) {
+      int c = current_position_(b);
+      if (!lisp_body_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "lisp_body", c)) break;
+    }
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // lsp_expr | any_ws
+  private static boolean lisp_body_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lisp_body_0")) return false;
+    boolean r;
+    r = lsp_expr(b, l + 1);
+    if (!r) r = any_ws(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
   // NUMBER | KW_TRUE | KW_FALSE
   public static boolean literal(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literal")) return false;
@@ -1959,7 +2078,360 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement
+  // all_allowed_symbols | lsp_s_expr | lsp_q_expr
+  public static boolean lsp_expr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_expr")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, LSP_EXPR, "<lsp expr>");
+    r = all_allowed_symbols(b, l + 1);
+    if (!r) r = lsp_s_expr(b, l + 1);
+    if (!r) r = lsp_q_expr(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // OPERATOR_CURLY_OPEN any_ws? OPERATOR_CURLY_CLOSE | OPERATOR_CURLY_OPEN any_ws? lsp_expr (any_ws? lsp_expr)* any_ws? OPERATOR_CURLY_CLOSE
+  public static boolean lsp_q_expr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_q_expr")) return false;
+    if (!nextTokenIs(b, OPERATOR_CURLY_OPEN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = lsp_q_expr_0(b, l + 1);
+    if (!r) r = lsp_q_expr_1(b, l + 1);
+    exit_section_(b, m, LSP_Q_EXPR, r);
+    return r;
+  }
+
+  // OPERATOR_CURLY_OPEN any_ws? OPERATOR_CURLY_CLOSE
+  private static boolean lsp_q_expr_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_q_expr_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPERATOR_CURLY_OPEN);
+    r = r && lsp_q_expr_0_1(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_CLOSE);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // any_ws?
+  private static boolean lsp_q_expr_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_q_expr_0_1")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  // OPERATOR_CURLY_OPEN any_ws? lsp_expr (any_ws? lsp_expr)* any_ws? OPERATOR_CURLY_CLOSE
+  private static boolean lsp_q_expr_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_q_expr_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPERATOR_CURLY_OPEN);
+    r = r && lsp_q_expr_1_1(b, l + 1);
+    r = r && lsp_expr(b, l + 1);
+    r = r && lsp_q_expr_1_3(b, l + 1);
+    r = r && lsp_q_expr_1_4(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_CLOSE);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // any_ws?
+  private static boolean lsp_q_expr_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_q_expr_1_1")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  // (any_ws? lsp_expr)*
+  private static boolean lsp_q_expr_1_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_q_expr_1_3")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!lsp_q_expr_1_3_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "lsp_q_expr_1_3", c)) break;
+    }
+    return true;
+  }
+
+  // any_ws? lsp_expr
+  private static boolean lsp_q_expr_1_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_q_expr_1_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = lsp_q_expr_1_3_0_0(b, l + 1);
+    r = r && lsp_expr(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // any_ws?
+  private static boolean lsp_q_expr_1_3_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_q_expr_1_3_0_0")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  // any_ws?
+  private static boolean lsp_q_expr_1_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_q_expr_1_4")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // OPERATOR_OPEN_P any_ws? OPERATOR_CLOSE_P |  OPERATOR_OPEN_P any_ws? lsp_expr (any_ws? lsp_expr)* any_ws? OPERATOR_CLOSE_P
+  public static boolean lsp_s_expr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_s_expr")) return false;
+    if (!nextTokenIs(b, OPERATOR_OPEN_P)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = lsp_s_expr_0(b, l + 1);
+    if (!r) r = lsp_s_expr_1(b, l + 1);
+    exit_section_(b, m, LSP_S_EXPR, r);
+    return r;
+  }
+
+  // OPERATOR_OPEN_P any_ws? OPERATOR_CLOSE_P
+  private static boolean lsp_s_expr_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_s_expr_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPERATOR_OPEN_P);
+    r = r && lsp_s_expr_0_1(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CLOSE_P);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // any_ws?
+  private static boolean lsp_s_expr_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_s_expr_0_1")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  // OPERATOR_OPEN_P any_ws? lsp_expr (any_ws? lsp_expr)* any_ws? OPERATOR_CLOSE_P
+  private static boolean lsp_s_expr_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_s_expr_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPERATOR_OPEN_P);
+    r = r && lsp_s_expr_1_1(b, l + 1);
+    r = r && lsp_expr(b, l + 1);
+    r = r && lsp_s_expr_1_3(b, l + 1);
+    r = r && lsp_s_expr_1_4(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CLOSE_P);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // any_ws?
+  private static boolean lsp_s_expr_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_s_expr_1_1")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  // (any_ws? lsp_expr)*
+  private static boolean lsp_s_expr_1_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_s_expr_1_3")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!lsp_s_expr_1_3_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "lsp_s_expr_1_3", c)) break;
+    }
+    return true;
+  }
+
+  // any_ws? lsp_expr
+  private static boolean lsp_s_expr_1_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_s_expr_1_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = lsp_s_expr_1_3_0_0(b, l + 1);
+    r = r && lsp_expr(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // any_ws?
+  private static boolean lsp_s_expr_1_3_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_s_expr_1_3_0_0")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  // any_ws?
+  private static boolean lsp_s_expr_1_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lsp_s_expr_1_4")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // IDENTIFIER (OPERATOR_DOT IDENTIFIER)? OPERATOR_NOT_SYMBOL S? (OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | OPERATOR_CURLY_OPEN S? lisp_body? S? OPERATOR_CURLY_CLOSE)
+  public static boolean macro_call(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, IDENTIFIER);
+    r = r && macro_call_1(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_NOT_SYMBOL);
+    r = r && macro_call_3(b, l + 1);
+    r = r && macro_call_4(b, l + 1);
+    exit_section_(b, m, MACRO_CALL, r);
+    return r;
+  }
+
+  // (OPERATOR_DOT IDENTIFIER)?
+  private static boolean macro_call_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_1")) return false;
+    macro_call_1_0(b, l + 1);
+    return true;
+  }
+
+  // OPERATOR_DOT IDENTIFIER
+  private static boolean macro_call_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, OPERATOR_DOT, IDENTIFIER);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean macro_call_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_3")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | OPERATOR_CURLY_OPEN S? lisp_body? S? OPERATOR_CURLY_CLOSE
+  private static boolean macro_call_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_4")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = macro_call_4_0(b, l + 1);
+    if (!r) r = macro_call_4_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P
+  private static boolean macro_call_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_4_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPERATOR_OPEN_P);
+    r = r && macro_call_4_0_1(b, l + 1);
+    r = r && macro_call_4_0_2(b, l + 1);
+    r = r && macro_call_4_0_3(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CLOSE_P);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean macro_call_4_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_4_0_1")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // arguments?
+  private static boolean macro_call_4_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_4_0_2")) return false;
+    arguments(b, l + 1);
+    return true;
+  }
+
+  // S?
+  private static boolean macro_call_4_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_4_0_3")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // OPERATOR_CURLY_OPEN S? lisp_body? S? OPERATOR_CURLY_CLOSE
+  private static boolean macro_call_4_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_4_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPERATOR_CURLY_OPEN);
+    r = r && macro_call_4_1_1(b, l + 1);
+    r = r && macro_call_4_1_2(b, l + 1);
+    r = r && macro_call_4_1_3(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_CLOSE);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean macro_call_4_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_4_1_1")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // lisp_body?
+  private static boolean macro_call_4_1_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_4_1_2")) return false;
+    lisp_body(b, l + 1);
+    return true;
+  }
+
+  // S?
+  private static boolean macro_call_4_1_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call_4_1_3")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // KW_MACROS OPERATOR_NOT_SYMBOL any_ws? OPERATOR_CURLY_OPEN any_ws? lisp_body any_ws? OPERATOR_CURLY_CLOSE NL
+  public static boolean macro_declaration_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_declaration_statement")) return false;
+    if (!nextTokenIs(b, KW_MACROS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, KW_MACROS, OPERATOR_NOT_SYMBOL);
+    r = r && macro_declaration_statement_2(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_OPEN);
+    r = r && macro_declaration_statement_4(b, l + 1);
+    r = r && lisp_body(b, l + 1);
+    r = r && macro_declaration_statement_6(b, l + 1);
+    r = r && consumeTokens(b, 0, OPERATOR_CURLY_CLOSE, NL);
+    exit_section_(b, m, MACRO_DECLARATION_STATEMENT, r);
+    return r;
+  }
+
+  // any_ws?
+  private static boolean macro_declaration_statement_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_declaration_statement_2")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  // any_ws?
+  private static boolean macro_declaration_statement_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_declaration_statement_4")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  // any_ws?
+  private static boolean macro_declaration_statement_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_declaration_statement_6")) return false;
+    any_ws(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | macro_declaration_statement
   public static boolean outer_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "outer_statement")) return false;
     boolean r;
@@ -1969,6 +2441,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = const_statement(b, l + 1);
     if (!r) r = outer_statement_3(b, l + 1);
     if (!r) r = outer_statement_4(b, l + 1);
+    if (!r) r = macro_declaration_statement(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -2354,7 +2827,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !('@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature')
+  // !('@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature' | 'macros')
   static boolean top_level_recover(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "top_level_recover")) return false;
     boolean r;
@@ -2364,7 +2837,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature'
+  // '@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature' | 'macros'
   private static boolean top_level_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "top_level_recover_0")) return false;
     boolean r;
@@ -2374,16 +2847,18 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, "def");
     if (!r) r = consumeToken(b, "import");
     if (!r) r = consumeToken(b, "runtimefeature");
+    if (!r) r = consumeToken(b, "macros");
     return r;
   }
 
   /* ********************************************************** */
-  // (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp | fncall | primary
+  // (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp | macro_call | fncall | primary
   public static boolean unary(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unary")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, UNARY, "<unary>");
     r = unary_0(b, l + 1);
+    if (!r) r = macro_call(b, l + 1);
     if (!r) r = fncall(b, l + 1);
     if (!r) r = primary(b, l + 1);
     exit_section_(b, l, m, r, false, null);

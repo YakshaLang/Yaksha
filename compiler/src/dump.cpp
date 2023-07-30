@@ -53,24 +53,24 @@ std::string extract_comments(int definition_line, tokenizer &token_extractor) {
   // Skip to first token, after `def, class, const` line
   for (; position < token_extractor.tokens_.size(); position++) {
     auto token = token_extractor.tokens_[position];
-    if (token.line_ > definition_line) { break; }
+    if (token->line_ > definition_line) { break; }
   }
   std::stringstream comments{};
   bool first = true;
   // Extract comments
   for (; position < token_extractor.tokens_.size(); position++) {
     auto token = token_extractor.tokens_[position];
-    if (token.type_ == yaksha::token_type::NEW_LINE ||
-        token.type_ == yaksha::token_type::INDENT) {
+    if (token->type_ == yaksha::token_type::NEW_LINE ||
+        token->type_ == yaksha::token_type::INDENT) {
       continue;
     }
-    if (token.type_ == yaksha::token_type::COMMENT) {
+    if (token->type_ == yaksha::token_type::COMMENT) {
       if (first) {
         first = false;
       } else {
         comments << "\n";
       }
-      comments << trim_copy(token.token_);
+      comments << trim_copy(token->token_);
     } else {
       break;
     }
@@ -278,7 +278,6 @@ void display(def_class_visitor &df, parser &parser_object,
   }
   std::cout << "\n]}" << std::endl;
 }
-// Simple main function to run a script and print the ast.
 int main(int argc, char *argv[]) {
   if (argc != 2) {
     std::cerr << "Usage: " << PROGRAM_NAME << " script.yaka\n";
@@ -290,22 +289,23 @@ int main(int argc, char *argv[]) {
     std::cerr << "Failed to read file:" << file_name << "\n";
     return EXIT_FAILURE;
   }
+  gc_pool<token> token_pool{};
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
-  tokenizer token_extractor{file_name, data};
+  tokenizer token_extractor{file_name, data, &token_pool};
   token_extractor.tokenize();
   if (!token_extractor.errors_.empty()) {
     errors::print_errors(token_extractor.errors_);
     return EXIT_FAILURE;
   }
-  block_analyzer block_scanner{token_extractor.tokens_};
+  block_analyzer block_scanner{token_extractor.tokens_, &token_pool};
   block_scanner.analyze();
   ykdt_pool dt_pool{};
   try {
     parser parser_obj{file_name, block_scanner.tokens_, &dt_pool};
     auto tree = parser_obj.parse();
     if (!tree.empty() && parser_obj.errors_.empty()) {
-      auto builtins_obj = new builtins{&dt_pool};
+      auto builtins_obj = new builtins{&dt_pool, &token_pool};
       def_class_visitor def_visitor{builtins_obj};
       def_visitor.extract(tree);
       delete builtins_obj;

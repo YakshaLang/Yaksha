@@ -1,14 +1,23 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 // parser.cpp
 #include "ast/parser.h"
+#include "tokenizer/block_analyzer.h"
+#include "utilities/cpp_util.h"
+#include "yaksha_lisp/macro_processor.h"
 #include <algorithm>
 #include <cassert>
 #include <utility>
 using namespace yaksha;
-parser::parser(std::string filepath, std::vector<token> &tokens,
+#ifdef YAKSHA_DEBUG
+#define PRINT_PREPROCESSOR_OUTPUT
+#endif
+parser::parser(std::string filepath, std::vector<token *> &tokens,
                ykdt_pool *pool)
-    : pool_{}, tokens_{tokens}, current_{0}, control_flow_{0},
+    : pool_{}, original_tokens_{tokens}, current_{0}, control_flow_{0},
       magic_return_token_(new token{}), sugar_else_(new token{}),
-      dt_pool_(pool), import_stmts_(), filepath_(std::move(filepath)) {
+      dt_pool_(pool), import_stmts_(), filepath_(std::move(filepath)),
+      pre_parse_import_stmts_() {
   // Create a fake return token to be injected at end of void functions.
   // WHY?: This ensures that defer + string freeing work
   // --
@@ -25,6 +34,9 @@ parser::parser(std::string filepath, std::vector<token> &tokens,
   sugar_else_->line_ = 0;
   sugar_else_->pos_ = 0;
   sugar_else_->type_ = token_type::KEYWORD_ELSE;
+  // Tokens are stored in a vector of pointers to tokens.
+  // This allows us to mutate this later when required.
+  for (auto &t : original_tokens_) { tokens_.push_back(t); }
 }
 parser::~parser() {
   delete (magic_return_token_);
@@ -40,10 +52,14 @@ token *parser::recede() {
   return peek();
 }
 bool parser::is_at_end() { return peek()->type_ == token_type::END_OF_FILE; }
-token *parser::peek() { return &tokens_[current_]; }
+bool parser::is_at_end_of_stream() {
+  return current_ + 1 >= tokens_.size() ||
+         peek()->type_ == token_type::END_OF_FILE;
+}
+token *parser::peek() { return tokens_[current_]; }
 token *parser::previous() {
   assert(current_ > 0);
-  return &tokens_[current_ - 1];
+  return tokens_[current_ - 1];
 }
 bool parser::match(std::initializer_list<token_type> types) {
   return std::any_of(types.begin(), types.end(), [this](token_type t) {
@@ -547,12 +563,10 @@ stmt *parser::for_statement() {
     stmt *for_body = block_statement();
     control_flow_--;
     return pool_.c_forendless_stmt(for_keyword, for_body);
-  } else if (
-      check(
-          token_type::
-              NAME)) {// foreach_stmt -> FOR name: datatype in array: block_stmt
+  } else if (check(token_type::NAME)) {
+    // foreach_stmt -> FOR name: datatype in array: block_stmt
     auto name = consume(token_type::NAME, "Name must be present");
-    ykdatatype* dt = nullptr;
+    ykdatatype *dt = nullptr;
     if (check(token_type::COLON)) {
       consume(token_type::COLON, "Colon must be present");
       dt = parse_datatype();
@@ -568,7 +582,6 @@ stmt *parser::for_statement() {
   }
   control_flow_--;
   throw error(for_keyword, "invalid for loop");
-  return nullptr;
 }
 stmt *parser::continue_statement() {
   auto tok = previous();
@@ -598,7 +611,8 @@ stmt *parser::return_statement() {
   return pool_.c_return_stmt(tok, exp);
 }
 stmt *parser::def_statement(annotations ants) {
-  // def_statement -> KEYWORD_DEF NAME PAREN_OPEN [[NAME COLON DATA_TYPE]*] PAREN_CLOSE ARROW DATA_TYPE BLOCK
+  // def_statement -> KEYWORD_DEF NAME PAREN_OPEN
+  //    [[NAME COLON DATA_TYPE]*] PAREN_CLOSE ARROW DATA_TYPE BLOCK
   auto name = consume(token_type::NAME, "Function name must be present");
   consume(token_type::PAREN_OPEN, "Opening '(' must be present");
   std::vector<parameter> params{};
@@ -814,14 +828,24 @@ stmt *parser::import_statement() {
     name_token = imp_names.back();
   }
   consume(token_type::NEW_LINE, "Import must end with new line.");
-  auto st = pool_.c_import_stmt(import_token, imp_names, name_token, nullptr);
   if (import_stmts_alias_.find(name_token->token_) !=
       import_stmts_alias_.end()) {
     throw error(name_token, "Duplicate import alias");
   }
-  auto import = dynamic_cast<import_stmt *>(st);
-  import_stmts_.emplace_back(import);
-  import_stmts_alias_.insert({name_token->token_, import});
+  // We can see if we encountered this in pre_parsing
+  // If we did, then we can use the pre-parsed data
+  // during preparsing, this section will do nothing as there are no pre_parse stuff
+  if (pre_parse_import_stmts_alias_.find(name_token->token_) !=
+      pre_parse_import_stmts_alias_.end()) {
+    auto pre_parse_import = pre_parse_import_stmts_alias_[name_token->token_];
+    import_stmts_.emplace_back(pre_parse_import);
+    import_stmts_alias_.insert({name_token->token_, pre_parse_import});
+    return pre_parse_import;
+  }
+  auto st = pool_.c_import_stmt(import_token, imp_names, name_token, nullptr);
+  auto import_ = dynamic_cast<import_stmt *>(st);
+  import_stmts_.emplace_back(import_);
+  import_stmts_alias_.insert({name_token->token_, import_});
   return st;
 }
 void parser::rescan_datatypes() {
@@ -845,3 +869,275 @@ stmt *parser::runtimefeature_statement() {
                  "Expect new line after value for runtimefeature statement.");
   return pool_.c_runtimefeature_stmt(runtime_feature_kw, cc);
 }
+void parser::preprocess(macro_processor *mp, gc_pool<token> *token_pool) {
+  step_1_parse_token_soup();
+  /* step_2_initialize_env */ mp->init_env(filepath_, import_stmts_alias_);
+  step_3_excute_macros(mp);
+  step_4_expand_macros(mp, token_pool);
+}
+void parser::step_4_expand_macros(macro_processor *mp,
+                                  gc_pool<token> *token_pool) {
+  try {
+    std::vector<token *> tokens_buffer{};
+    for (auto stmt : soup_statements_) {
+      if (stmt->get_type() == ast_type::STMT_MACROS) { continue; }
+      if (stmt->get_type() == ast_type::STMT_DSL_MACRO) {
+        auto dsl_stmt = dynamic_cast<dsl_macro_stmt *>(stmt);
+        auto result = macro_expand(mp, dsl_stmt, token_pool);
+        tokens_buffer.insert(tokens_buffer.end(), result.begin(), result.end());
+      } else if (stmt->get_type() == ast_type::STMT_TOKEN_SOUP) {
+        auto tokens = dynamic_cast<token_soup_stmt *>(stmt);
+        tokens_buffer.insert(tokens_buffer.end(), tokens->soup_.begin(),
+                             tokens->soup_.end());
+      } else {
+        // Cannot happen
+        throw std::runtime_error("Unknown statement type");
+      }
+    }
+    block_analyzer analyzer{tokens_buffer, token_pool};
+    analyzer.analyze();
+    if (!analyzer.errors_.empty()) {
+      throw error(&analyzer.errors_.front().tok_,
+                  analyzer.errors_.front().message_);
+    }
+    // Update tokens_ for the parse() & inject EOF
+    tokens_ = analyzer.tokens_;
+    if (tokens_.empty() || tokens_.back()->type_ != token_type::END_OF_FILE) {
+      tokens_.emplace_back(
+          analyzer.c_token(filepath_, 0, 0, "", token_type::END_OF_FILE));
+    }
+#ifdef PRINT_PREPROCESSOR_OUTPUT
+    std::cout << "----------- Preprocessor output for " << filepath_
+              << "-------------------" << std::endl;
+    token *prev = nullptr;
+    for (auto tk : tokens_) {
+      if (prev != nullptr && prev->type_ != token_type::NAME) {
+        std::cout << " ";
+      }
+      if (tk->type_ == token_type::NEW_LINE) {
+        std::cout << "[NL]" << std::endl;
+      } else if (tk->type_ == token_type::BA_INDENT) {
+        std::cout << "`{";
+      } else if (tk->type_ == token_type::BA_DEDENT) {
+        std::cout << "}`";
+      } else if (tk->type_ == token_type::END_OF_FILE) {
+        std::cout << "[EOF]" << std::endl;
+      } else if (tk->type_ == token_type::STRING) {
+        std::cout << "\"" << tk->token_ << "\"";
+      } else {
+        std::cout << tk->token_;
+      }
+      prev = tk;
+    }
+    std::cout << "---------------- end ------------------ " << std::endl;
+#endif
+    current_ = 0;
+    // Clear imports so parser can parse them again, and verify validity
+    pre_parse_import_stmts_ = import_stmts_;
+    pre_parse_import_stmts_alias_ = import_stmts_alias_;
+    import_stmts_alias_.clear();
+    import_stmts_.clear();
+    // Validate tokens
+    for (auto tk : tokens_) {
+      if (!is_valid(tk->token_, tk->type_)) {
+        throw error(tk, "Invalid token");
+      }
+    }
+    // macro expanded
+  } catch (parsing_error &err) {
+    errors_.emplace_back(err.message_, err.tok_.file_, err.tok_.line_,
+                         err.tok_.pos_);
+  }
+}
+void parser::step_3_excute_macros(macro_processor *mp) {
+  try {
+    std::vector<macros_stmt *> macros_stmts{};
+    for (auto macro_stmt : soup_statements_) {
+      if (macro_stmt->get_type() == ast_type::STMT_MACROS) {
+        macros_stmts.emplace_back(dynamic_cast<macros_stmt *>(macro_stmt));
+      }
+    }
+    for (auto macros_statement : macros_stmts) {
+      mp->execute(filepath_, macros_statement->lisp_code_, import_stmts_alias_);
+    }
+  } catch (parsing_error &err) {
+    errors_.emplace_back(err.message_, err.tok_.file_, err.tok_.line_,
+                         err.tok_.pos_);
+  }
+}
+void parser::step_1_parse_token_soup() {
+  try {
+    std::vector<token *> tokens_buffer{};
+    parse_token_soup(soup_statements_, tokens_buffer);
+  } catch (parsing_error &err) {
+    errors_.emplace_back(err.message_, err.tok_.file_, err.tok_.line_,
+                         err.tok_.pos_);
+  }
+}
+std::vector<token *> parser::macro_expand(macro_processor *mp,
+                                          dsl_macro_stmt *dsl_macro,
+                                          gc_pool<token> *token_pool) {
+  std::vector<token *> tokens_buffer{};
+  std::vector<stmt *> stmts{};
+  std::vector<token *> result{};
+  current_ = 0;
+  tokens_ = dsl_macro->internal_soup_;
+  if (tokens_.empty() || tokens_.back()->type_ != token_type::END_OF_FILE) {
+    auto token = token_pool->allocate();
+    token->type_ = token_type::END_OF_FILE;
+    token->token_ = "";
+    token->line_ = 0;
+    token->pos_ = 0;
+    token->file_ = filepath_;
+    token->original_ = token->token_;
+    tokens_.emplace_back(token);
+  }
+  while (!is_at_end_of_stream()) { parse_dsl_soup(stmts, tokens_buffer); }
+  if (!tokens_buffer.empty()) {
+    stmts.emplace_back(pool_.c_token_soup_stmt(tokens_buffer));
+    tokens_buffer.clear();
+  }
+  for (auto st : stmts) {
+    if (st->get_type() == ast_type::STMT_TOKEN_SOUP) {
+      auto tokens = dynamic_cast<token_soup_stmt *>(st);
+      result.insert(result.end(), tokens->soup_.begin(), tokens->soup_.end());
+    } else if (st->get_type() == ast_type::STMT_DSL_MACRO) {
+      auto dsl_stmt = dynamic_cast<dsl_macro_stmt *>(st);
+      auto inner_result = macro_expand(mp, dsl_stmt, token_pool);
+      result.insert(result.end(), inner_result.begin(), inner_result.end());
+    } else {
+      throw std::runtime_error("Unknown statement type");
+    }
+  }
+  if (dsl_macro->name2_ == nullptr) {
+    return mp->expand_dsl(filepath_, import_stmts_alias_,
+                          dsl_macro->name_->token_, result, "");
+  } else {
+    return mp->expand_dsl(filepath_, import_stmts_alias_,
+                          dsl_macro->name2_->token_, result,
+                          dsl_macro->name_->token_);
+  }
+}
+void parser::parse_token_soup(std::vector<stmt *> &stmts,
+                              std::vector<token *> &tokens_buffer) {
+  // Token soup parsing
+  // ==================
+  // 4 different criteria here are
+  // 1) macros!{} - execute once before macro expansion, as this is the definition of macros, returned tokens are ignored.
+  // 2) name!{}   - DSL macros, execute during macro expansion (this is an expression, wrap it up)
+  // 2.1) path.name!{} - imported DSL macro
+  // 3) arbitrary tokens  - preserve as is
+  // 4) import statements - extracted, and executed as needed during macros defining and macro expansion
+  while (!is_at_end_of_stream()) {
+    if (match({token_type::KEYWORD_MACROS})) {
+      if (!tokens_buffer.empty()) {
+        stmts.emplace_back(pool_.c_token_soup_stmt(tokens_buffer));
+        tokens_buffer.clear();
+      }
+      auto macros_kw = previous();
+      auto not_symbol =
+          consume(token_type::NOT_SYMBOL, "Expect '!' after macros keyword.");
+      auto curly_open = consume(token_type::CURLY_BRACKET_OPEN,
+                                "Expect '{' after 'macros!'.");
+      size_t level = 1;
+      while (level > 0) {
+        if (is_at_end_of_stream()) {
+          throw error(peek(), "Expect '}' to close macros!{} block.");
+        }
+        auto tk = advance();
+        if (tk->type_ == token_type::CURLY_BRACKET_OPEN) {
+          level++;
+        } else if (tk->type_ == token_type::CURLY_BRACKET_CLOSE) {
+          level--;
+        }
+        if (level > 0) { tokens_buffer.emplace_back(tk); }
+      }
+      auto curly_close = previous();
+      stmts.emplace_back(pool_.c_macros_stmt(macros_kw, not_symbol, curly_open,
+                                             tokens_buffer, curly_close));
+      tokens_buffer.clear();
+    } else if (match({token_type::KEYWORD_IMPORT})) {
+      size_t pos = current_;
+      tokens_buffer.emplace_back(previous());
+      this->import_statement();
+      // Preserve import statements as is, so it can be parsed again!
+      for (size_t i = pos; i < current_; i++) {
+        tokens_buffer.emplace_back(tokens_[i]);
+      }
+    } else {
+      parse_dsl_soup(stmts, tokens_buffer);
+    }
+  }
+  if (!tokens_buffer.empty()) {
+    stmts.emplace_back(pool_.c_token_soup_stmt(tokens_buffer));
+    tokens_buffer.clear();
+  }
+}
+void parser::parse_dsl_soup(std::vector<stmt *> &stmts,
+                            std::vector<token *> &tokens_buffer) {
+  if (match({token_type::NAME})) {
+    // DSL macro has 2 forms
+    // 1) name!{...}
+    // 2) path.name!{...}
+    auto name = previous();
+    token *name2 = nullptr;
+    token *dot = nullptr;
+    token *not_symbol = nullptr;
+    if (check(token_type::DOT) || check(token_type::NOT_SYMBOL)) {
+      if (check(token_type::NOT_SYMBOL)) {
+        not_symbol = advance();
+      } else {
+        dot = advance();
+        if (check(token_type::NAME)) {
+          name2 = advance();
+          if (check(token_type::NOT_SYMBOL)) {
+            not_symbol = advance();
+          } else {
+            tokens_buffer.emplace_back(name);
+            tokens_buffer.emplace_back(dot);
+            tokens_buffer.emplace_back(name2);
+            return;
+          }
+        } else {
+          tokens_buffer.emplace_back(name);
+          if (dot) tokens_buffer.emplace_back(dot);
+          return;
+        }
+      }
+      if (check(token_type::CURLY_BRACKET_OPEN)) {
+        if (!tokens_buffer.empty()) {
+          stmts.emplace_back(pool_.c_token_soup_stmt(tokens_buffer));
+          tokens_buffer.clear();
+        }
+        auto curly_open = advance();
+        size_t level = 1;
+        while (level > 0) {
+          if (is_at_end_of_stream()) {
+            throw error(peek(), "Expect '}' to close dsl!{} block.");
+          }
+          auto tk = advance();
+          if (tk->type_ == token_type::CURLY_BRACKET_OPEN) {
+            level++;
+          } else if (tk->type_ == token_type::CURLY_BRACKET_CLOSE) {
+            level--;
+          }
+          if (level > 0) { tokens_buffer.emplace_back(tk); }
+        }
+        auto curly_close = previous();
+        stmts.emplace_back(pool_.c_dsl_macro_stmt(
+            name, name2, not_symbol, curly_open, tokens_buffer, curly_close));
+        tokens_buffer.clear();
+      } else {
+        tokens_buffer.emplace_back(name);
+        if (dot) tokens_buffer.emplace_back(dot);
+        if (name2) tokens_buffer.emplace_back(name2);
+        if (not_symbol) tokens_buffer.emplace_back(not_symbol);
+      }
+    } else {
+      tokens_buffer.emplace_back(name);
+    }
+  } else {
+    tokens_buffer.emplace_back(advance());
+  }
+}
+#pragma clang diagnostic pop

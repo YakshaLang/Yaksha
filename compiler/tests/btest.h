@@ -4,7 +4,8 @@
 // But we can still use DBGPRINT. Which is useful for some debugging.
 #ifndef BTEST_H
 #define BTEST_H
-#ifdef TESTING
+#include "utilities/cpp_util.h"
+#ifdef YAKSHA_TESTING
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -48,7 +49,7 @@ extern int global_failures_btest;
 #define ASSERTN(NAME, BOOL)                                                    \
   {}
 #endif
-#ifdef TESTING_IMPLEMENTATION
+#ifdef YAKSHA_TESTING_IMPLEMENTATION
 #if defined(WIN32) || defined(_WIN32) ||                                       \
     defined(__WIN32) && !defined(__CYGWIN__)
 // Reference https://stackoverflow.com/a/45588456
@@ -104,7 +105,7 @@ int main(int argc, char *args[]) {
 //      // test code
 // })
 //
-#ifdef TESTING
+#ifdef YAKSHA_TESTING
 #define TEST(NAME, LAMBDA_BODY)                                                \
   static_block {                                                               \
     int failure = 0;                                                           \

@@ -9,14 +9,15 @@
 #include "utilities/error_printer.h"
 using namespace yaksha;
 void test_ast(const std::string &data, const std::string &file_name) {
-  tokenizer t{file_name, data};
+  gc_pool<token> token_pool{};
+  tokenizer t{file_name, data, &token_pool};
   ykdt_pool dt_pool{};
   t.tokenize();
   if (!t.errors_.empty()) {
     errors::print_errors(t.errors_);
     return;
   }
-  block_analyzer b{t.tokens_};
+  block_analyzer b{t.tokens_, &token_pool};
   b.analyze();
   try {
     parser p{file_name, b.tokens_, &dt_pool};

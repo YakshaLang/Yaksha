@@ -17,19 +17,19 @@ class State:
 
 def branch(x: float, y: float, length: float, angle: float, s: State) -> None:
     if length < 4.0f:
-        leaf_width: float = random.random_betweenf(1.0f, 3.0f)
-        leaf_height: float = random.random_betweenf(3.0f, 6.0f)
-        lerped_green: rl.Color = utils.lerp_color(s.green, s.blue, utils.remap(x, 0.0f, s.width, 0.0f, 1.0f) * 2.0f)
-        color: rl.Color = utils.lerp_color(lerped_green, s.color3, utils.remap(y, 0.0f, s.height, 0.0f, 1.0f) * 1.5f)
+        leaf_width = random.random_betweenf(1.0f, 3.0f)
+        leaf_height = random.random_betweenf(3.0f, 6.0f)
+        lerped_green = utils.lerp_color(s.green, s.blue, utils.remap(x, 0.0f, s.width, 0.0f, 1.0f) * 2.0f)
+        color = utils.lerp_color(lerped_green, s.color3, utils.remap(y, 0.0f, s.height, 0.0f, 1.0f) * 1.5f)
         rl.draw_ellipse(num.f2i(x), num.f2i(y), leaf_height, leaf_width, color)
         return
-    wind: float = utils.sin_deg(perlin.noise1df(num.uu2f(s.frame_count) / 50.0f)) * 100.0f * utils.sin_deg(num.uu2f(s.frame_count) / 2.0f)
-    next_y: float = y - length * utils.cos_deg(angle)
-    next_x: float = x + length * utils.sin_deg(angle)
-    thick: float = utils.remap(length, 0.0f, s.height / 4.0f, 2.0f, 6.0f)
+    wind = utils.sin_deg(perlin.noise1df(num.uu2f(s.frame_count) / 50.0f)) * 100.0f * utils.sin_deg(num.uu2f(s.frame_count) / 2.0f)
+    next_y = y - length * utils.cos_deg(angle)
+    next_x = x + length * utils.sin_deg(angle)
+    thick = utils.remap(length, 0.0f, s.height / 4.0f, 2.0f, 6.0f)
     rl.draw_line_ex(rl.vector2(x, y), rl.vector2(next_x, next_y), thick, rl.color(152, 50, 1, 255))
-    r1: float = random.random_betweenf(0.3f, 0.9f)
-    r2: float = random.random_betweenf(0.5f, 0.8f)
+    r1 = random.random_betweenf(0.3f, 0.9f)
+    r2 = random.random_betweenf(0.5f, 0.8f)
     branch(next_x, next_y, (length * r2), angle + s.angle + wind * 10.0f, s)
     branch(next_x, next_y, (length * r1), angle - s.angle + wind * 10.0f, s)
 
@@ -56,7 +56,7 @@ def main() -> int:
         update_draw_frame(s)
         rl.draw_fps(0, 0)
         rl.end_drawing()
-        s.frame_count = s.frame_count + num.i2uu(1)
+        s.frame_count += 1u64
         random.set_seed(seed)
     rl.close_window()
     del s

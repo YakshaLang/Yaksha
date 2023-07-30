@@ -1415,7 +1415,8 @@ struct builtin_binarydata : builtin {
   }
 };
 //=======================================
-builtins::builtins(ykdt_pool *dt_pool) : dt_pool_{dt_pool}, builtins_{} {
+builtins::builtins(ykdt_pool *dt_pool, gc_pool<token> *token_pool)
+    : dt_pool_{dt_pool}, builtins_{}, token_pool_(token_pool) {
   builtins_.insert({"arrput", new builtin_arrput{}});
   builtins_.insert({"arrpop", new builtin_arrpop{}});
   builtins_.insert({"arrnew", new builtin_arrnew{}});
@@ -1486,7 +1487,7 @@ ykdatatype *builtins::parse(
     std::string data_type_str,
     const std::unordered_map<std::string, import_stmt *> &import_aliases,
     const std::string &filepath) {
-  auto t = tokenizer{filepath, std::move(data_type_str)};
+  auto t = tokenizer{filepath, std::move(data_type_str), token_pool_};
   t.tokenize();
   if (!t.errors_.empty()) { return nullptr; }
   auto p = parser{filepath, t.tokens_, dt_pool_};

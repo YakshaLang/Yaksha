@@ -113,6 +113,7 @@
     ["output.c",17,9,"if","KEYWORD_IF"],
     ["output.c",17,12,"(","PAREN_OPEN"],
     ["output.c",17,13,"(","PAREN_OPEN"],
+    ["output.c",17,14,"!","NOT_SYMBOL"],
     ["output.c",17,16,"(","PAREN_OPEN"],
     ["output.c",17,17,"(","PAREN_OPEN"],
     ["output.c",17,18,"(","PAREN_OPEN"],

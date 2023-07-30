@@ -4,9 +4,9 @@
 #include <cinttypes>
 using namespace yaksha;
 compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
-                   entry_struct_func_compiler *esc)
+                   entry_struct_func_compiler *esc, gc_pool<token> *token_pool)
     : defs_classes_(defs_classes), scope_(pool), dt_pool_(pool),
-      builtins_(pool), ast_pool_(new ast_pool()), esc_(esc),
+      builtins_(pool, token_pool), ast_pool_(new ast_pool()), esc_(esc),
       desugar_(new desugaring_compiler{ast_pool_, dt_pool_}) {}
 compiler::~compiler() {
   delete ast_pool_;
@@ -166,8 +166,9 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   } else if (name_pair.second.object_type_ == object_type::MODULE_CLASS) {
     auto module_file = name_pair.second.module_file_;
     auto module_class = name_pair.second.string_val_;
-    auto module_prefix = cf_->get(module_file)->prefix_;
-    auto class_ = cf_->get(module_file)->data_->dsv_->get_class(module_class);
+    auto module_prefix = cf_->get_or_null(module_file)->prefix_;
+    auto class_ =
+        cf_->get_or_null(module_file)->data_->dsv_->get_class(module_class);
     if (class_->annotations_.on_stack_) {
       error(obj->paren_token_, "Cannot construct an @onstack object");
     }
@@ -177,7 +178,7 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
   } else if (name_pair.second.object_type_ == object_type::MODULE_FUNCTION) {
     auto module_file = name_pair.second.module_file_;
     auto module_fn = name_pair.second.string_val_;
-    auto module_info = cf_->get(module_file);
+    auto module_info = cf_->get_or_null(module_file);
     auto module_prefix = module_info->prefix_;
     auto prefixed_fn_name = prefix(module_fn, module_prefix);
     auto fn_return =
@@ -214,8 +215,7 @@ void compiler::compile_obj_creation(const std::string &name,
   auto data = ykobject(return_type);
   push(code.str(), data);
 }
-void compiler::obj_calloc(const std::string &name,
-                                        std::stringstream &code) {
+void compiler::obj_calloc(const std::string &name, std::stringstream &code) {
   code << "calloc(1, sizeof(struct " << name << "))";
 }
 void compiler::compile_function_call(fncall_expr *obj, const std::string &name,
@@ -259,7 +259,7 @@ compiler::prefix_function_arg(const std::pair<std::string, ykobject> &arg_val) {
   if (arg_val.second.object_type_ == object_type::MODULE_FUNCTION) {
     auto module_file = arg_val.second.module_file_;
     auto module_fn = arg_val.second.string_val_;
-    auto module_info = cf_->get(module_file);
+    auto module_info = cf_->get_or_null(module_file);
     auto module_prefix = module_info->prefix_;
     return prefix(module_fn, module_prefix);
   } else {
@@ -687,7 +687,8 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     }
   }
   if (obj->data_type_->is_none()) {
-    error(obj->name_, "Failed to compile let statement. (Use of non compilable data type)");
+    error(obj->name_,
+          "Failed to compile let statement. (Use of non compilable data type)");
   }
   if (obj->data_type_->is_str()) {
     object = ykobject(std::string("str"), dt_pool_);
@@ -865,7 +866,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   }
   auto dt = basic_dt->token_->token_;
   if (!basic_dt->module_.empty() && cf_ != nullptr) {
-    auto module = cf_->get(basic_dt->module_);
+    auto module = cf_->get_or_null(basic_dt->module_);
     auto imported_module_prefix = module->prefix_;
     auto class_info = module->data_->dsv_->get_class(dt);
     if (class_info != nullptr) {
@@ -1013,7 +1014,7 @@ void compiler::visit_get_expr(get_expr *obj) {
   auto lhs = pop();
   if (lhs.second.object_type_ == object_type::MODULE) {
     auto member_item = obj->item_;
-    auto imported = cf_->get(lhs.second.string_val_);
+    auto imported = cf_->get_or_null(lhs.second.string_val_);
     bool has_func = imported->data_->dsv_->has_function(member_item->token_);
     bool has_class = imported->data_->dsv_->has_class(member_item->token_);
     bool has_const = imported->data_->dsv_->has_const(member_item->token_);
@@ -1038,7 +1039,7 @@ void compiler::visit_get_expr(get_expr *obj) {
       mod_obj.string_val_ = member_item->token_;
       mod_obj.module_file_ = lhs.second.string_val_;
       mod_obj.module_name_ = lhs.second.module_name_;
-      auto module_info = cf_->get(mod_obj.module_file_);
+      auto module_info = cf_->get_or_null(mod_obj.module_file_);
       auto prefixed_name = prefix(mod_obj.string_val_, module_info->prefix_);
       push(prefixed_name, mod_obj);
       return;
@@ -1049,7 +1050,7 @@ void compiler::visit_get_expr(get_expr *obj) {
       mod_obj.string_val_ = member_item->token_;
       mod_obj.module_file_ = lhs.second.string_val_;
       mod_obj.module_name_ = lhs.second.module_name_;
-      auto module_info = cf_->get(mod_obj.module_file_);
+      auto module_info = cf_->get_or_null(mod_obj.module_file_);
       auto prefixed_name = prefix(mod_obj.string_val_, module_info->prefix_);
       push(prefixed_name, mod_obj);
       return;
@@ -1065,7 +1066,7 @@ void compiler::visit_get_expr(get_expr *obj) {
   class_stmt *class_;
   std::string item_prefix = prefix_val_;
   std::string access_ = "->";
-  file_info *module_info = cf_->get(module_file);
+  file_info *module_info = cf_->get_or_null(module_file);
   class_ = module_info->data_->dsv_->get_class(user_defined_type);
   item_prefix = module_info->prefix_;
   if (class_->annotations_.native_define_) { item_prefix = ""; }
@@ -1089,7 +1090,7 @@ void compiler::visit_set_expr(set_expr *obj) {
   class_stmt *class_;
   std::string item_prefix = prefix_val_;
   std::string access_ = "->";
-  file_info *module_info = cf_->get(module_file);
+  file_info *module_info = cf_->get_or_null(module_file);
   class_ = module_info->data_->dsv_->get_class(user_defined_type);
   item_prefix = module_info->prefix_;
   if (class_->annotations_.native_define_) { item_prefix = ""; }
@@ -1201,7 +1202,7 @@ ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
   if (arg.object_type_ == object_type::FUNCTION) {
     funct = defs_classes_.get_function(arg.string_val_);
   } else {
-    auto imp = cf_->get(arg.module_file_);
+    auto imp = cf_->get_or_null(arg.module_file_);
     funct = imp->data_->dsv_->get_function(arg.string_val_);
   }
   if (funct->annotations_.varargs_ || funct->annotations_.native_macro_ ||
@@ -1286,9 +1287,10 @@ void compiler::visit_curly_call_expr(curly_call_expr *obj) {
   if (name_pair.second.object_type_ == object_type::MODULE_CLASS) {
     auto module_file = name_pair.second.module_file_;
     auto module_class = name_pair.second.string_val_;
-    auto module_prefix = cf_->get(module_file)->prefix_;
+    auto module_prefix = cf_->get_or_null(module_file)->prefix_;
     c_mod_prefix = module_prefix;
-    class_info = cf_->get(module_file)->data_->dsv_->get_class(module_class);
+    class_info =
+        cf_->get_or_null(module_file)->data_->dsv_->get_class(module_class);
     dt = dt_pool_->create(module_class, module_file);
     prefixed_class_name = prefix(module_class, c_mod_prefix);
   } else if (defs_classes_.has_class(name)) {
@@ -1301,7 +1303,6 @@ void compiler::visit_curly_call_expr(curly_call_expr *obj) {
     push("<><>", ykobject(dt_pool_));
     return;
   }
-
   if (class_info != nullptr) {
     if (class_info->annotations_.native_define_) {
       error(obj->curly_open_, "Cannot create a native structure");
@@ -1311,7 +1312,7 @@ void compiler::visit_curly_call_expr(curly_call_expr *obj) {
     if (class_info->annotations_.on_stack_) {
       // ---------- On stack --------
       code << "((" << convert_dt(dt) << ")"
-         << "{";
+           << "{";
       bool first = true;
       for (auto const &para : obj->values_) {
         para.value_->accept(this);
@@ -1321,8 +1322,8 @@ void compiler::visit_curly_call_expr(curly_call_expr *obj) {
         } else {
           code << ", ";
         }
-        code << "." << c_mod_prefix << para.name_->token_ << " = ("
-           << val.first << ")";
+        code << "." << c_mod_prefix << para.name_->token_ << " = (" << val.first
+             << ")";
       }
       code << "})";
       push(code.str(), ykobject(dt));
@@ -1334,12 +1335,12 @@ void compiler::visit_curly_call_expr(curly_call_expr *obj) {
       body_ << convert_dt(dt) << " " << temp_name << " = ";
       obj_calloc(prefixed_class_name, body_);
       write_end_statement(body_);
-
       for (auto const &para : obj->values_) {
         para.value_->accept(this);
         auto val = pop();
         write_indent(body_);
-        body_ << temp_name << "->" << c_mod_prefix << para.name_->token_ << " = (" << val.first << ")";
+        body_ << temp_name << "->" << c_mod_prefix << para.name_->token_
+              << " = (" << val.first << ")";
         write_end_statement(body_);
       }
       push(temp_name, ykobject(dt));
@@ -1348,4 +1349,7 @@ void compiler::visit_curly_call_expr(curly_call_expr *obj) {
   }
   error(obj->curly_open_, "Failed to compile struct literal");
   push("<><>", ykobject(dt_pool_));
+}
+void compiler::visit_macro_call_expr(macro_call_expr *obj) {
+  // Not supported directly by compiler
 }

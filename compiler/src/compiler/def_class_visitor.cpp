@@ -233,3 +233,4 @@ void def_class_visitor::visit_foreach_stmt(foreach_stmt *obj) {}
 void def_class_visitor::visit_forendless_stmt(forendless_stmt *obj) {}
 void def_class_visitor::visit_compins_stmt(compins_stmt *obj) {}
 void def_class_visitor::visit_curly_call_expr(curly_call_expr *obj) {}
+void def_class_visitor::visit_macro_call_expr(macro_call_expr *obj) {}

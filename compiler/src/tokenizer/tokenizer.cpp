@@ -162,8 +162,10 @@ yaksha::consume_number(std::string &buf, octet_iterator &begin,
           (dot_found || exponent_found) ? token_type::DOUBLE_NUMBER
                                         : token_type::UNKNOWN_DECIMAL};
 }
-tokenizer::tokenizer(std::string file, std::string data)
-    : tokens_(), file_(std::move(file)), data_(std::move(data)), errors_() {}
+tokenizer::tokenizer(std::string file, std::string data,
+                     gc_pool<token> *token_pool)
+    : tokens_(), file_(std::move(file)), data_(std::move(data)), errors_(),
+      token_pool_{token_pool} {}
 void tokenizer::tokenize() {
   try {
     tokenize_actual();
@@ -225,241 +227,253 @@ void tokenizer::tokenize_actual() {
       switch (current) {
         case '\n':
           tokens_.emplace_back(
-              token{file_, line, pos, "\n", token_type::NEW_LINE});
+              c_token(file_, line, pos, "\n", token_type::NEW_LINE));
           line++;
           pos = 0;
           break;
         case '@':
-          tokens_.emplace_back(token{file_, line, pos, "@", token_type::AT});
+          tokens_.emplace_back(c_token(file_, line, pos, "@", token_type::AT));
           break;
         case '(':
           tokens_.emplace_back(
-              token{file_, line, pos, "(", token_type::PAREN_OPEN});
+              c_token(file_, line, pos, "(", token_type::PAREN_OPEN));
           break;
         case ')':
           tokens_.emplace_back(
-              token{file_, line, pos, ")", token_type::PAREN_CLOSE});
+              c_token(file_, line, pos, ")", token_type::PAREN_CLOSE));
           break;
         case '[':
           tokens_.emplace_back(
-              token{file_, line, pos, "[", token_type::SQUARE_BRACKET_OPEN});
+              c_token(file_, line, pos, "[", token_type::SQUARE_BRACKET_OPEN));
           break;
         case ']':
           tokens_.emplace_back(
-              token{file_, line, pos, "]", token_type::SQUARE_BRACKET_CLOSE});
+              c_token(file_, line, pos, "]", token_type::SQUARE_BRACKET_CLOSE));
           break;
         case '{':
           tokens_.emplace_back(
-              token{file_, line, pos, "{", token_type::CURLY_BRACKET_OPEN});
+              c_token(file_, line, pos, "{", token_type::CURLY_BRACKET_OPEN));
           break;
         case '}':
           tokens_.emplace_back(
-              token{file_, line, pos, "}", token_type::CURLY_BRACKET_CLOSE});
+              c_token(file_, line, pos, "}", token_type::CURLY_BRACKET_CLOSE));
           break;
         case '.':
           if (next == '.' && after_next == '.') {
             tokens_.emplace_back(
-                token{file_, line, pos, "...", token_type::ELLIPSIS});
+                c_token(file_, line, pos, "...", token_type::ELLIPSIS));
             utf8::next(iterator, end);
             utf8::next(iterator, end);
             pos += 2;
           } else {
-            tokens_.emplace_back(token{file_, line, pos, ".", token_type::DOT});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, ".", token_type::DOT));
           }
           break;
         case '<':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "<=", token_type::LESS_EQ});
+                c_token(file_, line, pos, "<=", token_type::LESS_EQ));
             utf8::next(iterator, end);
             pos++;
           } else if (next == '<') {
             if (after_next == '=') {
               tokens_.emplace_back(
-                  token{file_, line, pos, "<<=", token_type::SHL_EQ});
+                  c_token(file_, line, pos, "<<=", token_type::SHL_EQ));
               utf8::next(iterator, end);
               pos++;
             } else {
               tokens_.emplace_back(
-                  token{file_, line, pos, "<<", token_type::SHL});
+                  c_token(file_, line, pos, "<<", token_type::SHL));
             }
             utf8::next(iterator, end);
             pos++;
           } else {
             tokens_.emplace_back(
-                token{file_, line, pos, "<", token_type::LESS});
+                c_token(file_, line, pos, "<", token_type::LESS));
           }
           break;
         case '=':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "==", token_type::EQ_EQ});
+                c_token(file_, line, pos, "==", token_type::EQ_EQ));
             utf8::next(iterator, end);
             pos++;
           } else {
-            tokens_.emplace_back(token{file_, line, pos, "=", token_type::EQ});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, "=", token_type::EQ));
           }
           break;
         case '>':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, ">=", token_type::GREAT_EQ});
+                c_token(file_, line, pos, ">=", token_type::GREAT_EQ));
             utf8::next(iterator, end);
             pos++;
           } else if (next == '>') {
             if (after_next == '=') {
               tokens_.emplace_back(
-                  token{file_, line, pos, ">>=", token_type::SHR_EQ});
+                  c_token(file_, line, pos, ">>=", token_type::SHR_EQ));
               utf8::next(iterator, end);
               pos++;
             } else {
               tokens_.emplace_back(
-                  token{file_, line, pos, ">>", token_type::SHR});
+                  c_token(file_, line, pos, ">>", token_type::SHR));
             }
             utf8::next(iterator, end);
             pos++;
           } else {
             tokens_.emplace_back(
-                token{file_, line, pos, ">", token_type::GREAT});
+                c_token(file_, line, pos, ">", token_type::GREAT));
           }
           break;
         case '!':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "!=", token_type::NOT_EQ});
+                c_token(file_, line, pos, "!=", token_type::NOT_EQ));
             utf8::next(iterator, end);
             pos++;
           } else {
-            handle_error(parsing_error{
-                "Tokenizer Error : did you mean to write `!=` here?", file_,
-                line, pos});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, "!", token_type::NOT_SYMBOL));
           }
           break;
         case '+':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "+=", token_type::PLUS_EQ});
+                c_token(file_, line, pos, "+=", token_type::PLUS_EQ));
             utf8::next(iterator, end);
             pos++;
           } else {
             tokens_.emplace_back(
-                token{file_, line, pos, "+", token_type::PLUS});
+                c_token(file_, line, pos, "+", token_type::PLUS));
           }
           break;
         case '-':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "-=", token_type::SUB_EQ});
+                c_token(file_, line, pos, "-=", token_type::SUB_EQ));
             utf8::next(iterator, end);
             pos++;
           } else if (next == '>') {
             tokens_.emplace_back(
-                token{file_, line, pos, "->", token_type::ARROW});
+                c_token(file_, line, pos, "->", token_type::ARROW));
             utf8::next(iterator, end);
             pos++;
           } else {
-            tokens_.emplace_back(token{file_, line, pos, "-", token_type::SUB});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, "-", token_type::SUB));
           }
           break;
         case '*': {
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "*=", token_type::MUL_EQ});
+                c_token(file_, line, pos, "*=", token_type::MUL_EQ));
             utf8::next(iterator, end);
             pos++;
           } else if (next == '*') {
             if (after_next == '=') {
               tokens_.emplace_back(
-                  token{file_, line, pos, "**=", token_type::POWER_EQ});
+                  c_token(file_, line, pos, "**=", token_type::POWER_EQ));
               utf8::next(iterator, end);
               pos++;
             } else {
               tokens_.emplace_back(
-                  token{file_, line, pos, "**", token_type::POWER});
+                  c_token(file_, line, pos, "**", token_type::POWER));
             }
             utf8::next(iterator, end);
             pos++;
           } else {
-            tokens_.emplace_back(token{file_, line, pos, "*", token_type::MUL});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, "*", token_type::MUL));
           }
         } break;
         case '/': {
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "/=", token_type::DIV_EQ});
+                c_token(file_, line, pos, "/=", token_type::DIV_EQ));
             utf8::next(iterator, end);
             pos++;
           } else if (next == '/') {
             if (after_next == '=') {
               tokens_.emplace_back(
-                  token{file_, line, pos, "//=", token_type::INT_DIV_EQ});
+                  c_token(file_, line, pos, "//=", token_type::INT_DIV_EQ));
               utf8::next(iterator, end);
               pos++;
             } else {
               tokens_.emplace_back(
-                  token{file_, line, pos, "//", token_type::INT_DIV});
+                  c_token(file_, line, pos, "//", token_type::INT_DIV));
             }
             utf8::next(iterator, end);
             pos++;
           } else {
-            tokens_.emplace_back(token{file_, line, pos, "/", token_type::DIV});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, "/", token_type::DIV));
           }
         } break;
         case '&':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "&=", token_type::AND_EQ});
+                c_token(file_, line, pos, "&=", token_type::AND_EQ));
             utf8::next(iterator, end);
             pos++;
           } else {
-            tokens_.emplace_back(token{file_, line, pos, "&", token_type::AND});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, "&", token_type::AND));
           }
           break;
         case '|':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "|=", token_type::OR_EQ});
+                c_token(file_, line, pos, "|=", token_type::OR_EQ));
             utf8::next(iterator, end);
             pos++;
           } else {
-            tokens_.emplace_back(token{file_, line, pos, "|", token_type::OR});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, "|", token_type::OR));
           }
           break;
         case '^':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "^=", token_type::XOR_EQ});
+                c_token(file_, line, pos, "^=", token_type::XOR_EQ));
             utf8::next(iterator, end);
             pos++;
           } else {
-            tokens_.emplace_back(token{file_, line, pos, "^", token_type::XOR});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, "^", token_type::XOR));
           }
           break;
         case '%':
           if (next == '=') {
             tokens_.emplace_back(
-                token{file_, line, pos, "%=", token_type::MOD_EQ});
+                c_token(file_, line, pos, "%=", token_type::MOD_EQ));
             utf8::next(iterator, end);
             pos++;
           } else {
-            tokens_.emplace_back(token{file_, line, pos, "%", token_type::MOD});
+            tokens_.emplace_back(
+                c_token(file_, line, pos, "%", token_type::MOD));
           }
           break;
         case ':':
-          tokens_.emplace_back(token{file_, line, pos, ":", token_type::COLON});
+          tokens_.emplace_back(
+              c_token(file_, line, pos, ":", token_type::COLON));
           break;
         case ',':
-          tokens_.emplace_back(token{file_, line, pos, ",", token_type::COMMA});
+          tokens_.emplace_back(
+              c_token(file_, line, pos, ",", token_type::COMMA));
           break;
         case '~':
-          tokens_.emplace_back(token{file_, line, pos, "~", token_type::TILDE});
+          tokens_.emplace_back(
+              c_token(file_, line, pos, "~", token_type::TILDE));
           break;
         // Unicode Spaces will not be supported, only space or tab
         case ' ':
         case '\t':
           // Either first line may start with an indent (not allowed, but allowed
           // in tokenizer) or need to be just after new line
-          if (tokens_.empty() || tokens_.back().type_ == token_type::NEW_LINE) {
+          if (tokens_.empty() ||
+              tokens_.back()->type_ == token_type::NEW_LINE) {
             // Indent
             mode = INDENT_MATCH;
             continue;
@@ -495,8 +509,8 @@ void tokenizer::tokenize_actual() {
         CONTINUE_TO_NEXT_CHAR;
         continue;
       }
-      tokens_.emplace_back(token{file_, line, pos - 1, token_buf,
-                                 token_type::THREE_QUOTE_STRING});
+      tokens_.emplace_back(c_token(file_, line, pos - 1, token_buf,
+                                   token_type::THREE_QUOTE_STRING));
       auto lines_in_str = std::get<2>(result);
       pos += std::get<0>(result);
       if (lines_in_str == 0) {
@@ -508,7 +522,7 @@ void tokenizer::tokenize_actual() {
         string_utils::unescape(token_buf);
       } catch (string_utils::string_error &str_error) {
         std::string error_message = "Invalid string: " + str_error.message_;
-        handle_error(parsing_error{error_message, &tokens_.back()});
+        handle_error(parsing_error{error_message, tokens_.back()});
       }
     } else if (mode == STRING_MATCH) {
       token_buf = {};
@@ -528,7 +542,7 @@ void tokenizer::tokenize_actual() {
         continue;
       }
       tokens_.emplace_back(
-          token{file_, line, pos, token_buf, token_type::STRING});
+          c_token(file_, line, pos, token_buf, token_type::STRING));
       pos += result.first;
       pos++;
       utf8::next(iterator, end);// skip last " in string
@@ -537,7 +551,7 @@ void tokenizer::tokenize_actual() {
         string_utils::unescape(token_buf);
       } catch (string_utils::string_error &str_error) {
         std::string error_message = "Invalid string: " + str_error.message_;
-        handle_error(parsing_error{error_message, &tokens_.back()});
+        handle_error(parsing_error{error_message, tokens_.back()});
       }
     } else if (mode == NAME_MATCH) {
       token_buf = {};
@@ -546,9 +560,9 @@ void tokenizer::tokenize_actual() {
       token_type kw = str_to_keyword(token_buf);
       if (kw == token_type::TK_UNKNOWN_TOKEN_DETECTED) {
         tokens_.emplace_back(
-            token{file_, line, pos, token_buf, token_type::NAME});
+            c_token(file_, line, pos, token_buf, token_type::NAME));
       } else {
-        tokens_.emplace_back(token{file_, line, pos, token_buf, kw});
+        tokens_.emplace_back(c_token(file_, line, pos, token_buf, kw));
       }
       pos += result.first;
       mode = NORMAL_MATCH;
@@ -558,7 +572,7 @@ void tokenizer::tokenize_actual() {
                                             token_buf, iterator, end, true);
       if (result.first > 0) {
         tokens_.emplace_back(
-            token{file_, line, pos, token_buf, token_type::INDENT});
+            c_token(file_, line, pos, token_buf, token_type::INDENT));
         pos += result.first;
       }
       mode = NORMAL_MATCH;
@@ -567,7 +581,7 @@ void tokenizer::tokenize_actual() {
       auto result = ::string_utils::consume(::string_utils::allowed_in_comment,
                                             token_buf, iterator, end, true);
       tokens_.emplace_back(
-          token{file_, line, pos - 1, token_buf, token_type::COMMENT});
+          c_token(file_, line, pos - 1, token_buf, token_type::COMMENT));
       if (result.first > 0) { pos += result.first; }
       mode = NORMAL_MATCH;
     } else if (mode == HEX_MATCH || mode == OCT_MATCH || mode == BIN_MATCH) {
@@ -604,7 +618,7 @@ void tokenizer::tokenize_actual() {
         iterator = iterator_copy;
       }
       tokens_.emplace_back(
-          token{file_, line, pos, token_buf, token_type_number});
+          c_token(file_, line, pos, token_buf, token_type_number));
       pos += result.first + 1;
       mode = NORMAL_MATCH;
     } else {// MATCH_INTEGER_OR_FLOAT
@@ -612,7 +626,7 @@ void tokenizer::tokenize_actual() {
       auto result = ::consume_number(token_buf, iterator, end);
       int size = std::get<0>(result);
       token_type number_type = std::get<2>(result);
-      tokens_.emplace_back(token{file_, line, pos, token_buf, number_type});
+      tokens_.emplace_back(c_token(file_, line, pos, token_buf, number_type));
       pos += size;
       mode = NORMAL_MATCH;
     }
@@ -621,24 +635,28 @@ void tokenizer::tokenize_actual() {
     handle_error(parsing_error{"Tokenizer Error : Invalid end of file", file_,
                                line, pos});
   }
-  consider_integer_suffix(
-      0, 0, 0);// edge case where code ends with a non suffixed integer
+  // edge case where code ends with a non suffixed integer
+  // WHY? because we need to specialize the last integer token,
+  // if it is there, example -> return 0 <---- now this 0 needs to be recognised as i32
+  consider_integer_suffix(0, 0, 0);
+  // WHY?
+  // End of file token's location actually depend on if the file ended with a new line or not.
   bool last_new_ln =
-      !tokens_.empty() && tokens_.back().type_ == token_type::NEW_LINE;
-  tokens_.emplace_back(token{file_, line, pos + (last_new_ln ? 0 : 1), "",
-                             token_type::END_OF_FILE});
-  for (auto &t : tokens_) { t.original_ = t.token_; }
+      !tokens_.empty() && tokens_.back()->type_ == token_type::NEW_LINE;
+  tokens_.emplace_back(c_token(file_, line, pos + (last_new_ln ? 0 : 1), "",
+                               token_type::END_OF_FILE));
+  for (auto &t : tokens_) { t->original_ = t->token_; }
 }
 std::pair<int, bool> tokenizer::consider_integer_suffix(uint32_t current,
                                                         uint32_t next,
                                                         uint32_t after_next) {
   int skip = 0;
   bool should_continue = false;
-  if (!tokens_.empty() && is_unknown_integer_token(tokens_.back().type_) &&
+  if (!tokens_.empty() && is_unknown_integer_token(tokens_.back()->type_) &&
       (current == 'i' || current == 'u')) {
     // Integer prefixes
     token_type replacement;
-    token_type prev = tokens_.back().type_;
+    token_type prev = tokens_.back()->type_;
     int integer_size = 0;
     if (current == 'i' && next == '8') {
       skip = 2;
@@ -668,22 +686,22 @@ std::pair<int, bool> tokenizer::consider_integer_suffix(uint32_t current,
     // If skip == 0 this means it is not a valid prefix, we continue as normal
     if (skip != 0) {
       replacement = specalize_integer_token(prev, integer_size);
-      token to_update = tokens_.back();
+      token *to_update = tokens_.back();
       tokens_.pop_back();
-      to_update.type_ = replacement;
+      to_update->type_ = replacement;
       tokens_.emplace_back(to_update);
       should_continue = true;
     }
   } else if (!tokens_.empty() &&
-             is_unknown_integer_token(tokens_.back().type_)) {
+             is_unknown_integer_token(tokens_.back()->type_)) {
     // i32 is default
     token_type replacement;
-    token_type prev = tokens_.back().type_;
+    token_type prev = tokens_.back()->type_;
     int integer_size = -32;
     replacement = specalize_integer_token(prev, integer_size);
-    token to_update = tokens_.back();
+    token *to_update = tokens_.back();
     tokens_.pop_back();
-    to_update.type_ = replacement;
+    to_update->type_ = replacement;
     tokens_.emplace_back(to_update);
     should_continue = true;
   }
@@ -832,6 +850,16 @@ bool tokenizer::is_unknown_integer_token(token_type token_type_val) {
          token_type_val == token_type::UNKNOWN_OCT ||
          token_type_val == token_type::UNKNOWN_BIN;
 }
+token *tokenizer::c_token(std::string file, int line, int pos,
+                          std::string token_buf, token_type token_type_val) {
+  auto tok = token_pool_->allocate();
+  tok->file_ = std::move(file);
+  tok->line_ = line;
+  tok->pos_ = pos;
+  tok->token_ = std::move(token_buf);
+  tok->type_ = token_type_val;
+  return tok;
+}
 parsing_error::parsing_error(std::string message, token *token_)
     : message_(std::move(message)) {
   if (token_ == nullptr) {
@@ -852,3 +880,11 @@ parsing_error::parsing_error(std::string message, std::string file, int line,
                                          token_type::TK_UNKNOWN_TOKEN_DETECTED,
                                          ""},
       token_set_(true) {}
+void token::clean_state() {
+  this->type_ = token_type::TK_UNKNOWN_TOKEN_DETECTED;
+  this->token_ = "";
+  this->pos_ = 0;
+  this->line_ = 0;
+  this->file_ = "";
+  this->original_ = "";
+}

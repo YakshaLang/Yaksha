@@ -11,7 +11,8 @@ import org.jetbrains.annotations.Nullable;
 public class YakshaBraceMatcher implements PairedBraceMatcher {
     private static final BracePair[] PAIRS = {
             new BracePair(YakshaTypes.OPERATOR_OPEN_P, YakshaTypes.OPERATOR_CLOSE_P, true),
-            new BracePair(YakshaTypes.OPERATOR_OPEN_SQB, YakshaTypes.OPERATOR_CLOSE_SQB, true)
+            new BracePair(YakshaTypes.OPERATOR_OPEN_SQB, YakshaTypes.OPERATOR_CLOSE_SQB, true),
+            new BracePair(YakshaTypes.OPERATOR_CURLY_OPEN, YakshaTypes.OPERATOR_CURLY_CLOSE, true)
     };
 
     @Override

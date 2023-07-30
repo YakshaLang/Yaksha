@@ -285,7 +285,7 @@ void ast_vis::visit_import_stmt(import_stmt *obj) {
   begin_block("import");
   std::stringstream name;
   bool first = true;
-  for (auto tok: obj->import_names_) {
+  for (auto tok : obj->import_names_) {
     if (first) {
       first = false;
     } else {
@@ -345,9 +345,17 @@ void ast_vis::visit_compins_stmt(compins_stmt *obj) {
 void ast_vis::visit_curly_call_expr(curly_call_expr *obj) {
   begin_block("struct");
   field("datatype", obj->dt_expr_);
-  for (auto st : obj->values_) {
-    field("." + st.name_->token_, st.value_);
+  for (auto st : obj->values_) { field("." + st.name_->token_, st.value_); }
+  text_ << "\n<br />";
+  end_block();
+}
+void ast_vis::visit_macro_call_expr(macro_call_expr *obj) {
+  begin_block("macro");
+  field("name", obj->name_->token_);
+  if (obj->paren_token_->type_ == token_type::CURLY_BRACKET_OPEN) {
+    field("type", "dsl");
   }
+  for (auto st : obj->args_) { field("arg", st); }
   text_ << "\n<br />";
   end_block();
 }

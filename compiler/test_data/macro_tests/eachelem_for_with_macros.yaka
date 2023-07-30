@@ -1,0 +1,21 @@
+macros! {
+    (= counter 0)
+    (defun ymacro_count ()
+        # increment counter state
+        (= counter (+ counter 1))
+        # return counter as a decimal token
+        (list (ykt_integer_decimal counter)))
+    (yk_register {dsl counter ymacro_count})
+}
+
+def main() -> int:
+    e1: Array[int] = array("int", counter!{}, counter!{}, counter!{})
+    e2 = array("int", counter!{}, counter!{}, counter!{}, counter!{})
+    for i: int in e1:
+        for j in e2:
+            print(i)
+            print(" - ")
+            println(j)
+    del e1
+    del e2
+    return 0

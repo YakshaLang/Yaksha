@@ -23,6 +23,9 @@ public interface YakshaOuterStatement extends PsiElement {
   YakshaImportStatement getImportStatement();
 
   @Nullable
+  YakshaMacroDeclarationStatement getMacroDeclarationStatement();
+
+  @Nullable
   YakshaRuntimefeatureStatement getRuntimefeatureStatement();
 
 }

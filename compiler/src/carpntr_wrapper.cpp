@@ -134,7 +134,6 @@ std::string get_my_exe_path() {
   return {rawPathName};
 }
 #else
-#include "../runtime/subprocess.h"
 int execute_process(std::filesystem::path carpntr_path, int argc,
                     char **arguments) {
   char **arguments_copy =

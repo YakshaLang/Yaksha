@@ -1,0 +1,60 @@
+macros! {
+# _ START _ #
+    (def YK_PRELUDE_INCLUDED 1)
+    # =========== #
+    (defun noop (&x) (ghost nil))
+    # Disable print and println
+    # You can enable it by calling (enable_print)
+    (= n____original_print print)
+    (= n____original_println println)
+    (defun disable_print () (= print noop) (= println noop))
+    (defun enable_print () (= print n____original_print) (= println n____original_println))
+    (disable_print)
+    # =========== #
+    # Base functionality
+    # =========== #
+    # Is this a token?
+    (def YK_OBJECT_TYPE "yk_type")
+    # What kind of token is this?
+    (def YK_KEY_WHAT "yk_what")
+    (def YK_TYPE_TOKEN "yk_token")
+    (defun yk_get_type (x) (map_get x YK_KEY_TYPE))
+    (defun yk_what (x) (map_get x YK_KEY_NODE_TYPE))
+    (defun yk_is_token (x) (== (yk_get_type x) YK_TYPE_TOKEN))
+    (defun yk_is_expr (x) (== (yk_get_type x) YK_TYPE_EXPR))
+    (defun yk_is_stmt (x) (== (yk_get_type x) YK_TYPE_STMT))
+    (defun yk_register (type_name_func)
+        (if (!= (len type_name_func) 3) (raise_error "yk_register: expected 3 item list"))
+        (def macro_type (repr (index type_name_func 0)))
+        (def macro_name (repr (index type_name_func 1)))
+        (def macro_func (eval (index type_name_func 2)))
+        (def target (+ "yaksha#macro#" macro_type "#" macro_name))
+        (map_set (parent) target macro_func)
+    )
+    # =========== #
+    #  Constants
+    # =========== #
+    # $TOKEN_CONSTS$
+    # =========== #
+    #  Generating tokens
+    # =========== #
+    (defun yk_create_token (token_type value)
+        (def m @{})
+        (map_set m YK_OBJECT_TYPE YK_TYPE_TOKEN)
+        (map_set m YK_KEY_WHAT token_type)
+        (map_set m "value" value)
+        (map_set m "line" -1)
+        (map_set m "pos" -1)
+        m)
+    (defun ykt_integer_decimal (value) (yk_create_token YK_TOKEN_INTEGER_DECIMAL value))
+    (defun ykt_float (value) (yk_create_token YK_TOKEN_FLOAT_NUMBER value))
+    (defun ykt_double (value) (yk_create_token YK_TOKEN_DOUBLE_NUMBER value))
+    (defun ykt_string (value) (yk_create_token YK_TOKEN_STRING value))
+    (defun ykt_indent () (yk_create_token YK_TOKEN_BA_INDENT " "))
+    (defun ykt_dedent () (yk_create_token YK_TOKEN_BA_DEDENT " "))
+    (defun ykt_newline () (yk_create_token YK_TOKEN_NEW_LINE "\n"))
+    # $TOKEN_GENERATION$ #
+    (system_enable_gc)
+    (system_lock_current_scope)
+# _ END _ #
+}
