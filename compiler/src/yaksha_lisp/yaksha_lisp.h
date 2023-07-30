@@ -193,6 +193,8 @@ private:
     virtual void gc_mark() = 0;
     virtual void enable_gc() = 0;
     virtual void disable_gc() = 0;
+    virtual void root_lock() = 0;
+    virtual void root_unlock() = 0;
   };
   // ┬┌┬┐┌─┐┌─┐┬─┐┌┬┐  ┬─┐┌─┐┌─┐┌─┐┬ ┬  ┬┌─┐┬─┐
   // ││││├─┘│ │├┬┘ │   ├┬┘├┤ └─┐│ ││ └┐┌┘├┤ ├┬┘
@@ -269,6 +271,8 @@ private:
     std::string identifier_{};
     bool builtins_created_{false};
     bool prelude_evaluate_success_{false};
+    void lockdown_root();
+    void unlock_root();
 
 private:
     std::vector<yaksha_envmap *> closures_{};
@@ -354,6 +358,8 @@ private:
     void gc_mark() override;
     void enable_gc() override;
     void disable_gc() override;
+    void root_lock() override;
+    void root_unlock() override;
 
 private:
     bool enable_gc_{false};

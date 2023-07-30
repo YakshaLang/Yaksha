@@ -201,10 +201,10 @@ TEST_CASE("yaksha_lisp: tail of a list") {
     (if (== 2 (head (tail l))) (= success 1))
     )");
 }
-TEST_CASE("yaksha_lisp: use set to change a value") {
+TEST_CASE("yaksha_lisp: use setq to change a value") {
   test_snippet_execute(R"(
     (def a 1)
-    (set a 2)
+    (setq a 2)
     (if (== 2 a) (= success 1))
     )");
 }
@@ -543,7 +543,7 @@ TEST_CASE("yaksha_lisp: test bitwise_right_shift") {
 TEST_CASE("yaksha_lisp: test set") {
   test_snippet_execute(R"(
     (def a 2)
-    (set a 1)
+    (setq a 1)
     (if (== a 1) (= success 1))
     )");
 }
@@ -592,7 +592,7 @@ TEST_CASE("yaksha_lisp: random string test") {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 5);
     std::vector<std::string> keywords = {
-        "if", "def", "define", "defun", "set", "print", "=", "!=", "==",
+        "if", "def", "define", "defun", "setq", "print", "=", "!=", "==",
         "<",  "<=",  ">=",     "+",     "-",   "*",     "/", "%"};
     std::uniform_int_distribution<> dis_keywords(
         0, static_cast<int>(keywords.size() - 1));
@@ -620,7 +620,7 @@ TEST_CASE("yaksha_lisp: random s-expression test with keywords") {
   for (int rounds = 0; rounds < 300; rounds++) {
     std::string random_code = "(";
     std::vector<std::string> keywords = {
-        "if", "def", "define", "defun", "set", "print", "=", "!=", "==",
+        "if", "def", "define", "defun", "setq", "print", "=", "!=", "==",
         "<",  "<=",  ">=",     "+",     "-",   "*",     "/", "%"};
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -716,7 +716,7 @@ TEST_CASE("yaksha_macro_support: macros!{}") {
   // ----------
   yaksha_macro_preprocess_happy_path(R"**(
 macros! { # Comment here
-    (enable_print)
+    (system_enable_print)
     (println "// Oi, macros can print stuff")
     (= board_game_addict 1)
     (= success (== board_game_addict 1)) # Ha!
@@ -762,9 +762,9 @@ TEST_CASE("yaksha_macro_support: list builtins") {
   yaksha_macro_preprocess_happy_path(R"**(# In order to print a list of builtins in YakshaLisp
 #   just run this!
 macros! {
-    (enable_print)
+    (system_enable_print)
     (println "Builtins:")
-    (println (repr (map_keys (this))))
+    (println (repr (map_keys (parent))))
     (= success 1)
 }
 

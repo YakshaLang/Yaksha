@@ -6,6 +6,7 @@
 #include <unordered_set>
 using namespace yaksha;
 // TODO make the code here nicer, too much copy pasta
+static bool yaksha_macro_print_allowed = false;
 static yaksha_lisp_value *
 eq_operator(yaksha_envmap *env,
             const std::vector<yaksha_lisp_value *> &e_args) {
@@ -346,9 +347,9 @@ yaksha_lisp_builtins::print_(const std::vector<yaksha_lisp_value *> &args,
   auto e_args = eval_args(args, env);
   auto r = yaksha_lisp_builtins::copy_val(env, e_args[0]);
   if (r->type_ == yaksha_lisp_value_type::NUMBER) {
-    std::cout << r->num_;
+    if (yaksha_macro_print_allowed) { std::cout << r->num_; }
   } else if (r->type_ == yaksha_lisp_value_type::STRING) {
-    std::cout << r->str_;
+    if (yaksha_macro_print_allowed) { std::cout << r->str_; }
   } else {
     throw parsing_error{"print/println takes only numbers or strings", "", 0,
                         0};
@@ -359,7 +360,7 @@ yaksha_lisp_value *
 yaksha_lisp_builtins::println_(const std::vector<yaksha_lisp_value *> &args,
                                yaksha_envmap *env) {
   auto v = yaksha_lisp_builtins::print_(args, env);
-  std::cout << std::endl;
+  if (yaksha_macro_print_allowed) { std::cout << std::endl; }
   return v;
 }
 yaksha_lisp_value *
@@ -467,15 +468,15 @@ yaksha_lisp_builtins::raise_error_(const std::vector<yaksha_lisp_value *> &args,
   throw parsing_error{r->str_, "", 0, 0};
 }
 yaksha_lisp_value *
-yaksha_lisp_builtins::set_(const std::vector<yaksha_lisp_value *> &args,
+yaksha_lisp_builtins::setq_(const std::vector<yaksha_lisp_value *> &args,
                            yaksha_envmap *env) {
   if (args.size() != 2) {
-    throw parsing_error{"set takes 2 arguments", "", 0, 0};
+    throw parsing_error{"setq takes 2 arguments", "", 0, 0};
   }
   auto name = args[0];
   if (!(name->type_ == yaksha_lisp_value_type::EXPR &&
         name->expr_->token_->type_ == yaksha_lisp_token_type::SYMBOL)) {
-    throw parsing_error{"set takes a symbol as first argument", "", 0, 0};
+    throw parsing_error{"setq takes a symbol as first argument", "", 0, 0};
   }
   auto val = env->eval(args[1]);
   env->set(name->expr_->token_->token_, val, false);
@@ -1564,20 +1565,20 @@ yaksha_lisp_builtins::magic_dot_(const std::vector<yaksha_lisp_value *> &args,
   throw parsing_error{"magic_dot takes a module or map as first argument", "",
                       0, 0};
 }
-yaksha_lisp_value *yaksha_lisp_builtins::system_lock_current_scope_(
+yaksha_lisp_value *yaksha_lisp_builtins::system_lock_root_scope_(
     const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env) {
   if (!args.empty()) {
-    throw parsing_error{"system_lock_current_scope takes no arguments", "", 0, 0};
+    throw parsing_error{"system_lock_root_scope takes no arguments", "", 0, 0};
   }
-  env->lockdown();
+  env->lockdown_root();
   return env->create_nil();
 }
-yaksha_lisp_value *yaksha_lisp_builtins::system_unlock_current_scope_(
+yaksha_lisp_value *yaksha_lisp_builtins::system_unlock_root_scope_(
     const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env) {
   if (!args.empty()) {
-    throw parsing_error{"system_unlock_current_scope takes no arguments", "", 0, 0};
+    throw parsing_error{"system_unlock_root_scope takes no arguments", "", 0, 0};
   }
-  env->unlock();
+  env->unlock_root();
   return env->create_nil();
 }
 yaksha_lisp_value *yaksha_lisp_builtins::system_enable_gc_(
@@ -1594,5 +1595,21 @@ yaksha_lisp_value *yaksha_lisp_builtins::system_disable_gc_(
     throw parsing_error{"system_disable_gc takes no arguments", "", 0, 0};
   }
   env->gc_disable();
+  return env->create_nil();
+}
+yaksha_lisp_value *yaksha_lisp_builtins::system_enable_print_(
+    const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env) {
+  if (!args.empty()) {
+    throw parsing_error{"system_enable_print takes no arguments", "", 0, 0};
+  }
+  yaksha_macro_print_allowed = true;
+  return env->create_nil();
+}
+yaksha_lisp_value *yaksha_lisp_builtins::system_disable_print_(
+    const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env) {
+  if (!args.empty()) {
+    throw parsing_error{"system_disable_print takes no arguments", "", 0, 0};
+  }
+  yaksha_macro_print_allowed = false;
   return env->create_nil();
 }

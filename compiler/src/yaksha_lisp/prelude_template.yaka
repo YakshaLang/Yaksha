@@ -3,13 +3,6 @@ macros! {
     (def YK_PRELUDE_INCLUDED 1)
     # =========== #
     (defun noop (&x) (ghost nil))
-    # Disable print and println
-    # You can enable it by calling (enable_print)
-    (= n____original_print print)
-    (= n____original_println println)
-    (defun disable_print () (= print noop) (= println noop))
-    (defun enable_print () (= print n____original_print) (= println n____original_println))
-    (disable_print)
     # =========== #
     # Base functionality
     # =========== #
@@ -55,6 +48,6 @@ macros! {
     (defun ykt_newline () (yk_create_token YK_TOKEN_NEW_LINE "\n"))
     # $TOKEN_GENERATION$ #
     (system_enable_gc)
-    (system_lock_current_scope)
+    (system_lock_root_scope)
 # _ END _ #
 }

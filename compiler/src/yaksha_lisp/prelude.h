@@ -6,13 +6,6 @@ const std::string YAKSHA_LISP_PRELUDE = R"<><><><>(
     (def YK_PRELUDE_INCLUDED 1)
     # =========== #
     (defun noop (&x) (ghost nil))
-    # Disable print and println
-    # You can enable it by calling (enable_print)
-    (= n____original_print print)
-    (= n____original_println println)
-    (defun disable_print () (= print noop) (= println noop))
-    (defun enable_print () (= print n____original_print) (= println n____original_println))
-    (disable_print)
     # =========== #
     # Base functionality
     # =========== #
@@ -244,7 +237,7 @@ const std::string YAKSHA_LISP_PRELUDE = R"<><><><>(
     (defun ykt_keyword_try () (yk_create_token YK_TOKEN_KEYWORD_TRY "try"))
     (defun ykt_keyword_while () (yk_create_token YK_TOKEN_KEYWORD_WHILE "while"))
     (system_enable_gc)
-    (system_lock_current_scope)
+    (system_lock_root_scope)
 
 )<><><><>";
 #endif
