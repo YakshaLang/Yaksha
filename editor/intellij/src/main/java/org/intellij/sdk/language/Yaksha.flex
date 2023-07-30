@@ -102,6 +102,7 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   "runtimefeature"               { return YakshaTypes.KW_RUNTIMEFEATURE; }
   "for"                          { return YakshaTypes.KW_FOR; }
   "in"                           { return YakshaTypes.KW_IN; }
+  "macros"                       { return YakshaTypes.KW_MACROS; }
 
 "int" |
 "i8" |
@@ -162,6 +163,7 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   "^="                            { return YakshaTypes.OPERATOR_B_XOR_EQ; }
 
   "not"                              { return YakshaTypes.OPERATOR_NOT; }
+  "!"                              { return YakshaTypes.OPERATOR_NOT_SYMBOL; }
   "~"                              { return YakshaTypes.OPERATOR_B_NOT; }
   "or"                              { return YakshaTypes.OPERATOR_OR; }
   "and"                              { return YakshaTypes.OPERATOR_AND; }

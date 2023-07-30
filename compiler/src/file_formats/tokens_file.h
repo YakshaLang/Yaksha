@@ -9,14 +9,16 @@ namespace yaksha {
  * @param file file with token data
  * @return list of tokens
  */
-  std::vector<token> load_token_dump(const std::string &file);
+  std::vector<token *> load_token_dump(const std::string &file,
+                                       gc_pool<token> *token_pool);
   /**
  * Save vector of tokens to given file
  * @param file file with token data
  * @param tokens list of tokens
  */
   [[maybe_unused]] bool save_token_dump(const std::string &file,
-                                        const std::vector<token> &tokens);
-  void write_token_dump(std::ostream &output, const std::vector<token> &tokens);
+                                        const std::vector<token *> &tokens);
+  void write_token_dump(std::ostream &output,
+                        const std::vector<token *> &tokens);
 }// namespace yaksha
 #endif

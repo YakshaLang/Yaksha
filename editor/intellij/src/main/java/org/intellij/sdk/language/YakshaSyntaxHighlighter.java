@@ -38,6 +38,9 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey PARAM =
             createTextAttributesKey("YAKSHA_PARAM", DefaultLanguageHighlighterColors.PARAMETER);
 
+    public static final TextAttributesKey META_PROGRAMMING =
+            createTextAttributesKey("YAKSHA_META_PROGRAMMING", DefaultLanguageHighlighterColors.MARKUP_ENTITY);
+
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] SIGN_KEYS = new TextAttributesKey[]{SIGN};
     private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
@@ -46,6 +49,7 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] DATA_KEYS = new TextAttributesKey[]{DATA_TYPE};
     private static final TextAttributesKey[] PARAM_KEYS = new TextAttributesKey[]{PARAM};
+    private static final TextAttributesKey[] META_PROGRAMMING_KEYS = new TextAttributesKey[]{META_PROGRAMMING};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
     private static final Set<IElementType> YK_OPERATORS = ImmutableSet.<IElementType>builder()
@@ -110,6 +114,7 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
             .add(YakshaTypes.KW_TRUE)
             .add(YakshaTypes.KW_FALSE)
             .add(YakshaTypes.KW_NONE)
+            .add(YakshaTypes.KW_MACROS)
             .build();
 
     @NotNull

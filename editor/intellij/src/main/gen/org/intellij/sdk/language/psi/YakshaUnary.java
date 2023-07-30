@@ -14,6 +14,9 @@ public interface YakshaUnary extends PsiElement {
   YakshaFncall getFncall();
 
   @Nullable
+  YakshaMacroCall getMacroCall();
+
+  @Nullable
   YakshaPrimary getPrimary();
 
 }

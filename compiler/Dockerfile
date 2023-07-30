@@ -33,6 +33,7 @@ ADD scripts /app/scripts
 ADD libs /app/libs
 ADD runtime /app/runtime
 ADD carpntr /app/carpntr
+ADD bin/test.txt /app/test.txt
 RUN mkdir "/app/bin"
 
 ENTRYPOINT ["/app/scripts/code-coverage.sh"]

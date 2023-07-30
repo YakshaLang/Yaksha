@@ -3,6 +3,7 @@
 #define TOKENIZER_H
 #include "tokenizer/string_utils.h"
 #include "tokenizer/token.h"
+#include "utilities/gc_pool.h"
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -42,8 +43,9 @@ namespace yaksha {
  * Tokenize a string to vector of tokens
  */
   struct tokenizer {
-    explicit tokenizer(std::string file, std::string data);
-    std::vector<token> tokens_;
+    explicit tokenizer(std::string file, std::string data,
+                       gc_pool<token> *token_pool);
+    std::vector<token *> tokens_;
     std::vector<parsing_error> errors_;
     /**
    * Parse given string to a list of tokens accessible in tokens_
@@ -51,6 +53,8 @@ namespace yaksha {
    */
     void tokenize();
     static bool is_integer_token(token_type token_type_value);
+    token *c_token(std::string file, int line, int pos, std::string token_buf,
+                   token_type token_type_val);
 
 private:
     std::string file_;
@@ -63,6 +67,7 @@ private:
     std::pair<int, bool> consider_integer_suffix(uint32_t current,
                                                  uint32_t next,
                                                  uint32_t after_next);
+    gc_pool<token> *token_pool_{nullptr};
   };
 }// namespace yaksha
 #endif

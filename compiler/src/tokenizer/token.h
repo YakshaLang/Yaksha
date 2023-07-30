@@ -60,6 +60,7 @@ namespace yaksha {
     NAME,
     NEW_LINE,
     NOT_EQ,
+    NOT_SYMBOL,
     OR,
     OR_EQ,
     PAREN_CLOSE,
@@ -121,6 +122,7 @@ namespace yaksha {
     KEYWORD_IF,
     KEYWORD_IMPORT,
     KEYWORD_IN,
+    KEYWORD_MACROS,
     KEYWORD_NOT,
     KEYWORD_OR,
     KEYWORD_PASS,
@@ -131,6 +133,44 @@ namespace yaksha {
     KEYWORD_WHILE,
     TK_UNKNOWN_TOKEN_DETECTED
   };
+  static inline bool is_keyword(const token_type &t) {
+    bool is_kw = false;
+    switch (t) {
+      case token_type::KEYWORD_FALSE:
+      case token_type::KEYWORD_NONE:
+      case token_type::KEYWORD_TRUE:
+      case token_type::KEYWORD_AND:
+      case token_type::KEYWORD_AS:
+      case token_type::KEYWORD_ASSERT:
+      case token_type::KEYWORD_BREAK:
+      case token_type::KEYWORD_CCODE:
+      case token_type::KEYWORD_CLASS:
+      case token_type::KEYWORD_CONTINUE:
+      case token_type::KEYWORD_DEF:
+      case token_type::KEYWORD_DEFER:
+      case token_type::KEYWORD_DEL:
+      case token_type::KEYWORD_ELIF:
+      case token_type::KEYWORD_ELSE:
+      case token_type::KEYWORD_FOR:
+      case token_type::KEYWORD_FROM:
+      case token_type::KEYWORD_IF:
+      case token_type::KEYWORD_IMPORT:
+      case token_type::KEYWORD_IN:
+      case token_type::KEYWORD_MACROS:
+      case token_type::KEYWORD_NOT:
+      case token_type::KEYWORD_OR:
+      case token_type::KEYWORD_PASS:
+      case token_type::KEYWORD_RETURN:
+      case token_type::KEYWORD_RUNTIMEFEATURE:
+      case token_type::KEYWORD_STRUCT:
+      case token_type::KEYWORD_TRY:
+      case token_type::KEYWORD_WHILE:
+        is_kw = true;
+      default:
+        break;
+    }
+    return is_kw;
+  }
   /**
  * Convert a token to a string
  * @param t token type
@@ -187,6 +227,7 @@ namespace yaksha {
     if (t == token_type::NAME) return "NAME";
     if (t == token_type::NEW_LINE) return "NEW_LINE";
     if (t == token_type::NOT_EQ) return "NOT_EQ";
+    if (t == token_type::NOT_SYMBOL) return "NOT_SYMBOL";
     if (t == token_type::OR) return "OR";
     if (t == token_type::OR_EQ) return "OR_EQ";
     if (t == token_type::PAREN_CLOSE) return "PAREN_CLOSE";
@@ -248,6 +289,7 @@ namespace yaksha {
     if (t == token_type::KEYWORD_IF) return "KEYWORD_IF";
     if (t == token_type::KEYWORD_IMPORT) return "KEYWORD_IMPORT";
     if (t == token_type::KEYWORD_IN) return "KEYWORD_IN";
+    if (t == token_type::KEYWORD_MACROS) return "KEYWORD_MACROS";
     if (t == token_type::KEYWORD_NOT) return "KEYWORD_NOT";
     if (t == token_type::KEYWORD_OR) return "KEYWORD_OR";
     if (t == token_type::KEYWORD_PASS) return "KEYWORD_PASS";
@@ -310,6 +352,7 @@ namespace yaksha {
     if (t == "NAME") return token_type::NAME;
     if (t == "NEW_LINE") return token_type::NEW_LINE;
     if (t == "NOT_EQ") return token_type::NOT_EQ;
+    if (t == "NOT_SYMBOL") return token_type::NOT_SYMBOL;
     if (t == "OR") return token_type::OR;
     if (t == "OR_EQ") return token_type::OR_EQ;
     if (t == "PAREN_CLOSE") return token_type::PAREN_CLOSE;
@@ -371,6 +414,7 @@ namespace yaksha {
     if (t == "KEYWORD_IF") return token_type::KEYWORD_IF;
     if (t == "KEYWORD_IMPORT") return token_type::KEYWORD_IMPORT;
     if (t == "KEYWORD_IN") return token_type::KEYWORD_IN;
+    if (t == "KEYWORD_MACROS") return token_type::KEYWORD_MACROS;
     if (t == "KEYWORD_NOT") return token_type::KEYWORD_NOT;
     if (t == "KEYWORD_OR") return token_type::KEYWORD_OR;
     if (t == "KEYWORD_PASS") return token_type::KEYWORD_PASS;
@@ -403,6 +447,7 @@ namespace yaksha {
     if (t == "if") return token_type::KEYWORD_IF;
     if (t == "import") return token_type::KEYWORD_IMPORT;
     if (t == "in") return token_type::KEYWORD_IN;
+    if (t == "macros") return token_type::KEYWORD_MACROS;
     if (t == "not") return token_type::KEYWORD_NOT;
     if (t == "or") return token_type::KEYWORD_OR;
     if (t == "pass") return token_type::KEYWORD_PASS;
@@ -412,6 +457,439 @@ namespace yaksha {
     if (t == "try") return token_type::KEYWORD_TRY;
     if (t == "while") return token_type::KEYWORD_WHILE;
     return token_type::TK_UNKNOWN_TOKEN_DETECTED;
+  }
+  static inline token_type numeric_id_to_token(const int64_t n) {
+    if (n == 28864) return token_type::AND;
+    if (n == 28865) return token_type::AND_EQ;
+    if (n == 28866) return token_type::ARROW;
+    if (n == 28867) return token_type::AT;
+    if (n == 28868) return token_type::BA_DEDENT;
+    if (n == 28869) return token_type::BA_INDENT;
+    if (n == 28870) return token_type::COLON;
+    if (n == 28871) return token_type::COMMA;
+    if (n == 28873) return token_type::CURLY_BRACKET_CLOSE;
+    if (n == 28874) return token_type::CURLY_BRACKET_OPEN;
+    if (n == 28875) return token_type::DIV;
+    if (n == 28876) return token_type::DIV_EQ;
+    if (n == 28877) return token_type::DOT;
+    if (n == 28878) return token_type::DOUBLE_NUMBER;
+    if (n == 28879) return token_type::ELLIPSIS;
+    if (n == 28881) return token_type::EQ;
+    if (n == 28882) return token_type::EQ_EQ;
+    if (n == 28883) return token_type::FLOAT_NUMBER;
+    if (n == 28884) return token_type::GREAT;
+    if (n == 28885) return token_type::GREAT_EQ;
+    if (n == 28887) return token_type::INTEGER_BIN;
+    if (n == 28888) return token_type::INTEGER_BIN_16;
+    if (n == 28889) return token_type::INTEGER_BIN_64;
+    if (n == 28890) return token_type::INTEGER_BIN_8;
+    if (n == 28891) return token_type::INTEGER_DECIMAL;
+    if (n == 28892) return token_type::INTEGER_DECIMAL_16;
+    if (n == 28893) return token_type::INTEGER_DECIMAL_64;
+    if (n == 28894) return token_type::INTEGER_DECIMAL_8;
+    if (n == 28895) return token_type::INTEGER_HEX;
+    if (n == 28896) return token_type::INTEGER_HEX_16;
+    if (n == 28897) return token_type::INTEGER_HEX_64;
+    if (n == 28898) return token_type::INTEGER_HEX_8;
+    if (n == 28899) return token_type::INTEGER_OCT;
+    if (n == 28900) return token_type::INTEGER_OCT_16;
+    if (n == 28901) return token_type::INTEGER_OCT_64;
+    if (n == 28902) return token_type::INTEGER_OCT_8;
+    if (n == 28903) return token_type::INT_DIV;
+    if (n == 28904) return token_type::INT_DIV_EQ;
+    if (n == 28905) return token_type::LESS;
+    if (n == 28906) return token_type::LESS_EQ;
+    if (n == 28907) return token_type::MOD;
+    if (n == 28908) return token_type::MOD_EQ;
+    if (n == 28909) return token_type::MUL;
+    if (n == 28910) return token_type::MUL_EQ;
+    if (n == 28911) return token_type::NAME;
+    if (n == 28912) return token_type::NEW_LINE;
+    if (n == 28913) return token_type::NOT_EQ;
+    if (n == 28914) return token_type::NOT_SYMBOL;
+    if (n == 28915) return token_type::OR;
+    if (n == 28916) return token_type::OR_EQ;
+    if (n == 28917) return token_type::PAREN_CLOSE;
+    if (n == 28918) return token_type::PAREN_OPEN;
+    if (n == 28919) return token_type::PLUS;
+    if (n == 28920) return token_type::PLUS_EQ;
+    if (n == 28921) return token_type::POWER;
+    if (n == 28922) return token_type::POWER_EQ;
+    if (n == 28923) return token_type::SHL;
+    if (n == 28924) return token_type::SHL_EQ;
+    if (n == 28925) return token_type::SHR;
+    if (n == 28926) return token_type::SHR_EQ;
+    if (n == 28927) return token_type::SQUARE_BRACKET_CLOSE;
+    if (n == 28928) return token_type::SQUARE_BRACKET_OPEN;
+    if (n == 28929) return token_type::STRING;
+    if (n == 28930) return token_type::SUB;
+    if (n == 28931) return token_type::SUB_EQ;
+    if (n == 28932) return token_type::THREE_QUOTE_STRING;
+    if (n == 28933) return token_type::TILDE;
+    if (n == 28934) return token_type::UINTEGER_BIN;
+    if (n == 28935) return token_type::UINTEGER_BIN_16;
+    if (n == 28936) return token_type::UINTEGER_BIN_64;
+    if (n == 28937) return token_type::UINTEGER_BIN_8;
+    if (n == 28938) return token_type::UINTEGER_DECIMAL;
+    if (n == 28939) return token_type::UINTEGER_DECIMAL_16;
+    if (n == 28940) return token_type::UINTEGER_DECIMAL_64;
+    if (n == 28941) return token_type::UINTEGER_DECIMAL_8;
+    if (n == 28942) return token_type::UINTEGER_HEX;
+    if (n == 28943) return token_type::UINTEGER_HEX_16;
+    if (n == 28944) return token_type::UINTEGER_HEX_64;
+    if (n == 28945) return token_type::UINTEGER_HEX_8;
+    if (n == 28946) return token_type::UINTEGER_OCT;
+    if (n == 28947) return token_type::UINTEGER_OCT_16;
+    if (n == 28948) return token_type::UINTEGER_OCT_64;
+    if (n == 28949) return token_type::UINTEGER_OCT_8;
+    if (n == 28954) return token_type::XOR;
+    if (n == 28955) return token_type::XOR_EQ;
+    if (n == 28956) return token_type::KEYWORD_FALSE;
+    if (n == 28957) return token_type::KEYWORD_NONE;
+    if (n == 28958) return token_type::KEYWORD_TRUE;
+    if (n == 28959) return token_type::KEYWORD_AND;
+    if (n == 28960) return token_type::KEYWORD_AS;
+    if (n == 28961) return token_type::KEYWORD_ASSERT;
+    if (n == 28962) return token_type::KEYWORD_BREAK;
+    if (n == 28963) return token_type::KEYWORD_CCODE;
+    if (n == 28964) return token_type::KEYWORD_CLASS;
+    if (n == 28965) return token_type::KEYWORD_CONTINUE;
+    if (n == 28966) return token_type::KEYWORD_DEF;
+    if (n == 28967) return token_type::KEYWORD_DEFER;
+    if (n == 28968) return token_type::KEYWORD_DEL;
+    if (n == 28969) return token_type::KEYWORD_ELIF;
+    if (n == 28970) return token_type::KEYWORD_ELSE;
+    if (n == 28971) return token_type::KEYWORD_FOR;
+    if (n == 28972) return token_type::KEYWORD_FROM;
+    if (n == 28973) return token_type::KEYWORD_IF;
+    if (n == 28974) return token_type::KEYWORD_IMPORT;
+    if (n == 28975) return token_type::KEYWORD_IN;
+    if (n == 28976) return token_type::KEYWORD_MACROS;
+    if (n == 28977) return token_type::KEYWORD_NOT;
+    if (n == 28978) return token_type::KEYWORD_OR;
+    if (n == 28979) return token_type::KEYWORD_PASS;
+    if (n == 28980) return token_type::KEYWORD_RETURN;
+    if (n == 28981) return token_type::KEYWORD_RUNTIMEFEATURE;
+    if (n == 28982) return token_type::KEYWORD_STRUCT;
+    if (n == 28983) return token_type::KEYWORD_TRY;
+    if (n == 28984) return token_type::KEYWORD_WHILE;
+    return token_type::TK_UNKNOWN_TOKEN_DETECTED;
+  }
+  static inline int64_t token_to_numeric_id(const token_type &t) {
+    if (t == token_type::AND) return 28864;
+    if (t == token_type::AND_EQ) return 28865;
+    if (t == token_type::ARROW) return 28866;
+    if (t == token_type::AT) return 28867;
+    if (t == token_type::BA_DEDENT) return 28868;
+    if (t == token_type::BA_INDENT) return 28869;
+    if (t == token_type::COLON) return 28870;
+    if (t == token_type::COMMA) return 28871;
+    if (t == token_type::CURLY_BRACKET_CLOSE) return 28873;
+    if (t == token_type::CURLY_BRACKET_OPEN) return 28874;
+    if (t == token_type::DIV) return 28875;
+    if (t == token_type::DIV_EQ) return 28876;
+    if (t == token_type::DOT) return 28877;
+    if (t == token_type::DOUBLE_NUMBER) return 28878;
+    if (t == token_type::ELLIPSIS) return 28879;
+    if (t == token_type::EQ) return 28881;
+    if (t == token_type::EQ_EQ) return 28882;
+    if (t == token_type::FLOAT_NUMBER) return 28883;
+    if (t == token_type::GREAT) return 28884;
+    if (t == token_type::GREAT_EQ) return 28885;
+    if (t == token_type::INTEGER_BIN) return 28887;
+    if (t == token_type::INTEGER_BIN_16) return 28888;
+    if (t == token_type::INTEGER_BIN_64) return 28889;
+    if (t == token_type::INTEGER_BIN_8) return 28890;
+    if (t == token_type::INTEGER_DECIMAL) return 28891;
+    if (t == token_type::INTEGER_DECIMAL_16) return 28892;
+    if (t == token_type::INTEGER_DECIMAL_64) return 28893;
+    if (t == token_type::INTEGER_DECIMAL_8) return 28894;
+    if (t == token_type::INTEGER_HEX) return 28895;
+    if (t == token_type::INTEGER_HEX_16) return 28896;
+    if (t == token_type::INTEGER_HEX_64) return 28897;
+    if (t == token_type::INTEGER_HEX_8) return 28898;
+    if (t == token_type::INTEGER_OCT) return 28899;
+    if (t == token_type::INTEGER_OCT_16) return 28900;
+    if (t == token_type::INTEGER_OCT_64) return 28901;
+    if (t == token_type::INTEGER_OCT_8) return 28902;
+    if (t == token_type::INT_DIV) return 28903;
+    if (t == token_type::INT_DIV_EQ) return 28904;
+    if (t == token_type::LESS) return 28905;
+    if (t == token_type::LESS_EQ) return 28906;
+    if (t == token_type::MOD) return 28907;
+    if (t == token_type::MOD_EQ) return 28908;
+    if (t == token_type::MUL) return 28909;
+    if (t == token_type::MUL_EQ) return 28910;
+    if (t == token_type::NAME) return 28911;
+    if (t == token_type::NEW_LINE) return 28912;
+    if (t == token_type::NOT_EQ) return 28913;
+    if (t == token_type::NOT_SYMBOL) return 28914;
+    if (t == token_type::OR) return 28915;
+    if (t == token_type::OR_EQ) return 28916;
+    if (t == token_type::PAREN_CLOSE) return 28917;
+    if (t == token_type::PAREN_OPEN) return 28918;
+    if (t == token_type::PLUS) return 28919;
+    if (t == token_type::PLUS_EQ) return 28920;
+    if (t == token_type::POWER) return 28921;
+    if (t == token_type::POWER_EQ) return 28922;
+    if (t == token_type::SHL) return 28923;
+    if (t == token_type::SHL_EQ) return 28924;
+    if (t == token_type::SHR) return 28925;
+    if (t == token_type::SHR_EQ) return 28926;
+    if (t == token_type::SQUARE_BRACKET_CLOSE) return 28927;
+    if (t == token_type::SQUARE_BRACKET_OPEN) return 28928;
+    if (t == token_type::STRING) return 28929;
+    if (t == token_type::SUB) return 28930;
+    if (t == token_type::SUB_EQ) return 28931;
+    if (t == token_type::THREE_QUOTE_STRING) return 28932;
+    if (t == token_type::TILDE) return 28933;
+    if (t == token_type::UINTEGER_BIN) return 28934;
+    if (t == token_type::UINTEGER_BIN_16) return 28935;
+    if (t == token_type::UINTEGER_BIN_64) return 28936;
+    if (t == token_type::UINTEGER_BIN_8) return 28937;
+    if (t == token_type::UINTEGER_DECIMAL) return 28938;
+    if (t == token_type::UINTEGER_DECIMAL_16) return 28939;
+    if (t == token_type::UINTEGER_DECIMAL_64) return 28940;
+    if (t == token_type::UINTEGER_DECIMAL_8) return 28941;
+    if (t == token_type::UINTEGER_HEX) return 28942;
+    if (t == token_type::UINTEGER_HEX_16) return 28943;
+    if (t == token_type::UINTEGER_HEX_64) return 28944;
+    if (t == token_type::UINTEGER_HEX_8) return 28945;
+    if (t == token_type::UINTEGER_OCT) return 28946;
+    if (t == token_type::UINTEGER_OCT_16) return 28947;
+    if (t == token_type::UINTEGER_OCT_64) return 28948;
+    if (t == token_type::UINTEGER_OCT_8) return 28949;
+    if (t == token_type::XOR) return 28954;
+    if (t == token_type::XOR_EQ) return 28955;
+    if (t == token_type::KEYWORD_FALSE) return 28956;
+    if (t == token_type::KEYWORD_NONE) return 28957;
+    if (t == token_type::KEYWORD_TRUE) return 28958;
+    if (t == token_type::KEYWORD_AND) return 28959;
+    if (t == token_type::KEYWORD_AS) return 28960;
+    if (t == token_type::KEYWORD_ASSERT) return 28961;
+    if (t == token_type::KEYWORD_BREAK) return 28962;
+    if (t == token_type::KEYWORD_CCODE) return 28963;
+    if (t == token_type::KEYWORD_CLASS) return 28964;
+    if (t == token_type::KEYWORD_CONTINUE) return 28965;
+    if (t == token_type::KEYWORD_DEF) return 28966;
+    if (t == token_type::KEYWORD_DEFER) return 28967;
+    if (t == token_type::KEYWORD_DEL) return 28968;
+    if (t == token_type::KEYWORD_ELIF) return 28969;
+    if (t == token_type::KEYWORD_ELSE) return 28970;
+    if (t == token_type::KEYWORD_FOR) return 28971;
+    if (t == token_type::KEYWORD_FROM) return 28972;
+    if (t == token_type::KEYWORD_IF) return 28973;
+    if (t == token_type::KEYWORD_IMPORT) return 28974;
+    if (t == token_type::KEYWORD_IN) return 28975;
+    if (t == token_type::KEYWORD_MACROS) return 28976;
+    if (t == token_type::KEYWORD_NOT) return 28977;
+    if (t == token_type::KEYWORD_OR) return 28978;
+    if (t == token_type::KEYWORD_PASS) return 28979;
+    if (t == token_type::KEYWORD_RETURN) return 28980;
+    if (t == token_type::KEYWORD_RUNTIMEFEATURE) return 28981;
+    if (t == token_type::KEYWORD_STRUCT) return 28982;
+    if (t == token_type::KEYWORD_TRY) return 28983;
+    if (t == token_type::KEYWORD_WHILE) return 28984;
+    return 0;
+  }
+  static inline bool is_number_token(const token_type &t) {
+    return (
+        t == token_type::DOUBLE_NUMBER || t == token_type::FLOAT_NUMBER ||
+        t == token_type::INTEGER_BIN || t == token_type::INTEGER_BIN_16 ||
+        t == token_type::INTEGER_BIN_64 || t == token_type::INTEGER_BIN_8 ||
+        t == token_type::INTEGER_DECIMAL ||
+        t == token_type::INTEGER_DECIMAL_16 ||
+        t == token_type::INTEGER_DECIMAL_64 ||
+        t == token_type::INTEGER_DECIMAL_8 || t == token_type::INTEGER_HEX ||
+        t == token_type::INTEGER_HEX_16 || t == token_type::INTEGER_HEX_64 ||
+        t == token_type::INTEGER_HEX_8 || t == token_type::INTEGER_OCT ||
+        t == token_type::INTEGER_OCT_16 || t == token_type::INTEGER_OCT_64 ||
+        t == token_type::INTEGER_OCT_8 || t == token_type::UINTEGER_BIN ||
+        t == token_type::UINTEGER_BIN_16 || t == token_type::UINTEGER_BIN_64 ||
+        t == token_type::UINTEGER_BIN_8 || t == token_type::UINTEGER_DECIMAL ||
+        t == token_type::UINTEGER_DECIMAL_16 ||
+        t == token_type::UINTEGER_DECIMAL_64 ||
+        t == token_type::UINTEGER_DECIMAL_8 || t == token_type::UINTEGER_HEX ||
+        t == token_type::UINTEGER_HEX_16 || t == token_type::UINTEGER_HEX_64 ||
+        t == token_type::UINTEGER_HEX_8 || t == token_type::UINTEGER_OCT ||
+        t == token_type::UINTEGER_OCT_16 || t == token_type::UINTEGER_OCT_64 ||
+        t == token_type::UINTEGER_OCT_8);
+  }
+  static inline bool is_valid_complex(const std::string &value,
+                                      const token_type &t) {
+    if (t == token_type::STRING || t == token_type::THREE_QUOTE_STRING ||
+        t == token_type::COMMENT || t == token_type::NEW_LINE ||
+        t == token_type::END_OF_FILE || t == token_type::BA_INDENT ||
+        t == token_type::BA_DEDENT || t == token_type::INDENT) {
+      return true;
+    }
+    if (t == token_type::DOUBLE_NUMBER) {
+      try {
+        std::stod(value);
+        return true;
+      } catch (...) { return false; }
+    }
+    if (t == token_type::FLOAT_NUMBER) {
+      if (value.size() > 2 &&
+          (value[value.size() - 1] == 'f' || value[value.size() - 1] == 'F')) {
+        for (size_t i = 0; i < value.size() - 1; i++) {
+          if (value[i] < '0' || value[i] > '9') {
+            std::string new_value = value.substr(0, value.size() - 1);
+            return is_valid_complex(new_value, token_type::DOUBLE_NUMBER);
+          }
+        }
+        return true;// This is a short float - 1f, 2f, etc
+      }
+      return false;
+    }
+    if (t == token_type::INTEGER_BIN || t == token_type::INTEGER_BIN_8 ||
+        t == token_type::INTEGER_BIN_16 || t == token_type::INTEGER_BIN_64 ||
+        t == token_type::UINTEGER_BIN || t == token_type::UINTEGER_BIN_8 ||
+        t == token_type::UINTEGER_BIN_16 || t == token_type::UINTEGER_BIN_64) {
+      if (value.size() < 3) return false;
+      if (value[0] != '0' || (value[1] != 'b' && value[1] != 'B')) return false;
+      for (size_t i = 2; i < value.size(); i++) {
+        if (value[i] != '0' && value[i] != '1') return false;
+      }
+      return true;
+    }
+    if (t == token_type::INTEGER_DECIMAL ||
+        t == token_type::INTEGER_DECIMAL_8 ||
+        t == token_type::INTEGER_DECIMAL_16 ||
+        t == token_type::INTEGER_DECIMAL_64 ||
+        t == token_type::UINTEGER_DECIMAL ||
+        t == token_type::UINTEGER_DECIMAL_8 ||
+        t == token_type::UINTEGER_DECIMAL_16 ||
+        t == token_type::UINTEGER_DECIMAL_64) {
+      if (value.empty()) return false;
+      if (value == "0") return true;
+      if (value[0] < '1' || value[0] > '9') return false;
+      for (size_t i = 1; i < value.size(); i++) {
+        if (value[i] < '0' || value[i] > '9') return false;
+      }
+      return true;
+    }
+    if (t == token_type::INTEGER_HEX || t == token_type::INTEGER_HEX_8 ||
+        t == token_type::INTEGER_HEX_16 || t == token_type::INTEGER_HEX_64 ||
+        t == token_type::UINTEGER_HEX || t == token_type::UINTEGER_HEX_8 ||
+        t == token_type::UINTEGER_HEX_16 || t == token_type::UINTEGER_HEX_64) {
+      if (value.size() < 3) return false;
+      if (value[0] != '0' || (value[1] != 'x' && value[1] != 'X')) return false;
+      for (size_t i = 2; i < value.size(); i++) {
+        if ((value[i] < '0' || value[i] > '9') &&
+            (value[i] < 'a' || value[i] > 'f') &&
+            (value[i] < 'A' || value[i] > 'F'))
+          return false;
+      }
+      return true;
+    }
+    if (t == token_type::INTEGER_OCT || t == token_type::INTEGER_OCT_8 ||
+        t == token_type::INTEGER_OCT_16 || t == token_type::INTEGER_OCT_64 ||
+        t == token_type::UINTEGER_OCT || t == token_type::UINTEGER_OCT_8 ||
+        t == token_type::UINTEGER_OCT_16 || t == token_type::UINTEGER_OCT_64) {
+      if (value.size() < 3) return false;
+      if (value[0] != '0' || (value[1] != 'o' && value[1] != 'O')) return false;
+      for (size_t i = 2; i < value.size(); i++) {
+        if (value[i] < '0' || value[i] > '7') return false;
+      }
+      return true;
+    }
+    if (t == token_type::NAME) {
+      if (value.empty()) return false;
+      std::string new_value = value;
+      // Can start with a $ for gensym
+      if (value[0] == '$') new_value = value.substr(1);
+      if (new_value.empty()) return false;
+      if (new_value[0] != '_' && (new_value[0] < 'a' || new_value[0] > 'z') &&
+          (new_value[0] < 'A' || new_value[0] > 'Z'))
+        return false;
+      for (size_t i = 1; i < new_value.size(); i++) {
+        if (new_value[i] != '_' && (new_value[i] < 'a' || new_value[i] > 'z') &&
+            (new_value[i] < 'A' || new_value[i] > 'Z') &&
+            (new_value[i] < '0' || new_value[i] > '9'))
+          return false;
+      }
+      return true;
+    }
+    return false;
+  }
+  static inline bool is_valid(const std::string &value, const token_type &t) {
+    if (t == token_type::AT) return (value == "@");
+    if (t == token_type::COLON) return (value == ":");
+    if (t == token_type::PAREN_OPEN) return (value == "(");
+    if (t == token_type::PAREN_CLOSE) return (value == ")");
+    if (t == token_type::SQUARE_BRACKET_OPEN) return (value == "[");
+    if (t == token_type::SQUARE_BRACKET_CLOSE) return (value == "]");
+    if (t == token_type::CURLY_BRACKET_OPEN) return (value == "{");
+    if (t == token_type::CURLY_BRACKET_CLOSE) return (value == "}");
+    if (t == token_type::LESS) return (value == "<");
+    if (t == token_type::EQ) return (value == "=");
+    if (t == token_type::GREAT) return (value == ">");
+    if (t == token_type::OR) return (value == "|");
+    if (t == token_type::PLUS) return (value == "+");
+    if (t == token_type::SUB) return (value == "-");
+    if (t == token_type::MUL) return (value == "*");
+    if (t == token_type::DIV) return (value == "/");
+    if (t == token_type::AND) return (value == "&");
+    if (t == token_type::XOR) return (value == "^");
+    if (t == token_type::MOD) return (value == "%");
+    if (t == token_type::INT_DIV) return (value == "//");
+    if (t == token_type::POWER) return (value == "**");
+    if (t == token_type::LESS_EQ) return (value == "<=");
+    if (t == token_type::EQ_EQ) return (value == "==");
+    if (t == token_type::GREAT_EQ) return (value == ">=");
+    if (t == token_type::OR_EQ) return (value == "|=");
+    if (t == token_type::PLUS_EQ) return (value == "+=");
+    if (t == token_type::SUB_EQ) return (value == "-=");
+    if (t == token_type::MUL_EQ) return (value == "*=");
+    if (t == token_type::DIV_EQ) return (value == "/=");
+    if (t == token_type::AND_EQ) return (value == "&=");
+    if (t == token_type::XOR_EQ) return (value == "^=");
+    if (t == token_type::MOD_EQ) return (value == "%=");
+    if (t == token_type::INT_DIV_EQ) return (value == "//=");
+    if (t == token_type::POWER_EQ) return (value == "**=");
+    if (t == token_type::ARROW) return (value == "->");
+    if (t == token_type::ELLIPSIS) return (value == "...");
+    if (t == token_type::DOT) return (value == ".");
+    if (t == token_type::COMMA) return (value == ",");
+    if (t == token_type::SHL) return (value == "<<");
+    if (t == token_type::SHR) return (value == ">>");
+    if (t == token_type::SHL_EQ) return (value == "<<=");
+    if (t == token_type::SHR_EQ) return (value == ">>=");
+    if (t == token_type::NOT_EQ) return (value == "!=");
+    if (t == token_type::TILDE) return (value == "~");
+    if (t == token_type::NOT_SYMBOL) return (value == "!");
+    if (t == token_type::KEYWORD_FALSE) return (value == "False");
+    if (t == token_type::KEYWORD_NONE) return (value == "None");
+    if (t == token_type::KEYWORD_TRUE) return (value == "True");
+    if (t == token_type::KEYWORD_AND) return (value == "and");
+    if (t == token_type::KEYWORD_AS) return (value == "as");
+    if (t == token_type::KEYWORD_ASSERT) return (value == "assert");
+    if (t == token_type::KEYWORD_BREAK) return (value == "break");
+    if (t == token_type::KEYWORD_CCODE) return (value == "ccode");
+    if (t == token_type::KEYWORD_CLASS) return (value == "class");
+    if (t == token_type::KEYWORD_CONTINUE) return (value == "continue");
+    if (t == token_type::KEYWORD_DEF) return (value == "def");
+    if (t == token_type::KEYWORD_DEFER) return (value == "defer");
+    if (t == token_type::KEYWORD_DEL) return (value == "del");
+    if (t == token_type::KEYWORD_ELIF) return (value == "elif");
+    if (t == token_type::KEYWORD_ELSE) return (value == "else");
+    if (t == token_type::KEYWORD_FOR) return (value == "for");
+    if (t == token_type::KEYWORD_FROM) return (value == "from");
+    if (t == token_type::KEYWORD_IF) return (value == "if");
+    if (t == token_type::KEYWORD_IMPORT) return (value == "import");
+    if (t == token_type::KEYWORD_IN) return (value == "in");
+    if (t == token_type::KEYWORD_MACROS) return (value == "macros");
+    if (t == token_type::KEYWORD_NOT) return (value == "not");
+    if (t == token_type::KEYWORD_OR) return (value == "or");
+    if (t == token_type::KEYWORD_PASS) return (value == "pass");
+    if (t == token_type::KEYWORD_RETURN) return (value == "return");
+    if (t == token_type::KEYWORD_RUNTIMEFEATURE)
+      return (value == "runtimefeature");
+    if (t == token_type::KEYWORD_STRUCT) return (value == "struct");
+    if (t == token_type::KEYWORD_TRY) return (value == "try");
+    if (t == token_type::KEYWORD_WHILE) return (value == "while");
+    return is_valid_complex(value, t);
   }
   /**
  * Single token
@@ -423,11 +901,16 @@ namespace yaksha {
     std::string token_;
     token_type type_;// type of the token
     std::string original_;
+    // For gc_pool
+    token *next_{nullptr};
+    token *prev_{nullptr};
+    std::uint8_t mark_{0};
+    void clean_state();
   };
   /**
  * Content of an error message
  */
-  struct parsing_error {
+  struct parsing_error : public std::exception {
     std::string message_;// content of the line this error occurred
     token tok_;
     bool token_set_{};
@@ -446,10 +929,29 @@ namespace yaksha {
     type_checker *type_checker_{nullptr};
     def_class_visitor *dsv_{nullptr};
   };
+  enum class scanning_step {
+    /** Step 0) At the begining when we scan main, or find import */
+    NOTHING_DONE = 0,
+    /** Step 1) Scan macro soup */
+    SOUP_SCAN_DONE = 1,
+    /** Step 2) Create an environment for the file's macro's to be excuted */
+    ENV_CREATED = 2,
+    /** Step 3) Execute macros!{} */
+    MACROS_SETUP_DONE = 3,
+    /** Step 4) Expand dsl!{} + parse again */
+    MACROS_EXPANDED = 4,
+    /** Step 5) Parse the file */
+    PARSE_DONE = 5,
+    /** Step 7) If all above are done, and no imports are left */
+    ALL_PARSING_SUCCESSFUL = 7,
+    /** If any of above fails */
+    FAILURE = -999,
+  };
   struct file_info {
     std::filesystem::path filepath_;
     std::string prefix_;
     file_data *data_{nullptr};
+    scanning_step step_{scanning_step::NOTHING_DONE};
   };
 }// namespace yaksha
 #endif

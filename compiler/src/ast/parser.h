@@ -4,24 +4,35 @@
 #include "ast/ast.h"
 #include "tokenizer/string_utils.h"
 #include "tokenizer/token.h"
+#include "utilities/gc_pool.h"
 #include "utilities/ykdt_pool.h"
+#include "yaksha_lisp/macro_processor.h"
 #include <sstream>
 #include <unordered_map>
 #include <vector>
 namespace yaksha {
   struct parser {
-    explicit parser(std::string filepath_, std::vector<token> &tokens,
+    explicit parser(std::string filepath_, std::vector<token *> &tokens,
                     ykdt_pool *pool);
     ~parser();
+    // stepwise preprocess dsl macros
+    void step_1_parse_token_soup();
+    void step_3_excute_macros(macro_processor *mp);
+    void step_4_expand_macros(macro_processor *mp, gc_pool<token> *token_pool);
+    // facade for preprocess dsl macros (all above steps are done here, for tests)
+    void preprocess(macro_processor *mp, gc_pool<token> *token_pool);
     /**
-   * parse and return a vector of statements
-   * @return empty if cannot parse, if so check errors
-   */
+    * parse and return a vector of statements
+    * @return empty if cannot parse, if so check errors
+    */
     std::vector<stmt *> parse();
     /**
      * Errors vector
      */
     std::vector<parsing_error> errors_;
+    std::vector<import_stmt *> pre_parse_import_stmts_;
+    std::unordered_map<std::string, import_stmt *>
+        pre_parse_import_stmts_alias_{};
     std::vector<import_stmt *> import_stmts_;
     std::unordered_map<std::string, import_stmt *> import_stmts_alias_{};
     std::vector<stmt *> stmts_{};
@@ -31,6 +42,13 @@ namespace yaksha {
     void rescan_datatypes();
 
 private:
+    std::vector<token *> macro_expand(macro_processor *mp,
+                                      dsl_macro_stmt *dsl_macro,
+                                      gc_pool<token> *token_pool);
+    void parse_token_soup(std::vector<stmt *> &stmts,
+                          std::vector<token *> &tokens_buffer);
+    void parse_dsl_soup(std::vector<stmt *> &stmts,
+                        std::vector<token *> &tokens_buffer);
     // expressions
     expr *assignment();
     expr *expression();
@@ -78,6 +96,7 @@ private:
     bool match(std::initializer_list<token_type> types);
     bool check(token_type t);
     bool is_at_end();
+    bool is_at_end_of_stream();
     token *advance();
     token *recede();
     token *peek();
@@ -94,8 +113,10 @@ private:
     std::size_t current_;
     ast_pool pool_;
     ykdt_pool *dt_pool_;
-    std::vector<token> &tokens_;
+    std::vector<token *> &original_tokens_;
+    std::vector<token *> tokens_{};
     std::vector<ykdatatype *> datatypes_from_modules_{};
+    std::vector<stmt *> soup_statements_{};
     // Increase when we allow control, flow.
     // Decrease after parsing.
     // If this is <= zero do not allow `continue` or `break`

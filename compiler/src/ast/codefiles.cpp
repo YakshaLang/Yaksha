@@ -4,6 +4,7 @@
 #include "compiler/type_checker.h"
 #include "tokenizer/block_analyzer.h"
 #include "utilities/error_printer.h"
+#include <optional>
 using namespace yaksha;
 codefiles::codefiles(std::filesystem::path &libs_path)
     : current_path_(std::filesystem::current_path()), prefixes_(),
@@ -24,29 +25,30 @@ codefiles::~codefiles() {
   }
   delete esc_;
 }
-file_info *codefiles::scan_main(const std::string &code,
-                                const std::string &filename) {
+file_info *codefiles::initialize_parsing_or_null(const std::string &code,
+                                                 const std::string &filename) {
   std::error_code err{};
   std::filesystem::path f{filename};
   auto path = std::filesystem::absolute(f, err);
   std::string str_path = path.string();
-  auto p = parse(code, filename);
+  auto p = parse_or_null(code, filename);
   if (p == nullptr) {
     print_unable_to_process_error(str_path);
     return nullptr;
   }
   auto fi = new file_info{path, "yy__", p};
+  fi->step_ = scanning_step::SOUP_SCAN_DONE;
   path_to_fi_[str_path] = fi;
   prefixes_.insert({"yy__"});
   files_.emplace_back(fi);
   for (auto imp : fi->data_->parser_->import_stmts_) {
-    auto import_data = scan(imp);
+    auto import_data = scan_or_null(imp);
     if (import_data == nullptr) { return nullptr; }
     imp->data_ = import_data;
   }
   return fi;
 }
-file_info *codefiles::scan_main(const std::string &filename) {
+file_info *codefiles::initialize_parsing_or_null(const std::string &filename) {
   std::error_code err{};
   std::filesystem::path f{filename};
   auto path = std::filesystem::absolute(f, err);
@@ -67,59 +69,40 @@ file_info *codefiles::scan_main(const std::string &filename) {
   if (path_to_fi_.find(str_path) != path_to_fi_.end()) {// not found
     return path_to_fi_[str_path];
   }
-  auto p = parse(path);
+  auto p = parse_or_null(path);
   if (p == nullptr) {
     print_unable_to_process_error(str_path);
     return nullptr;
   }
   auto fi = new file_info{path, "yy__", p};
+  fi->step_ = scanning_step::SOUP_SCAN_DONE;
   path_to_fi_[str_path] = fi;
   prefixes_.insert({"yy__"});
   files_.emplace_back(fi);
   for (auto imp : fi->data_->parser_->import_stmts_) {
-    auto import_data = scan(imp);
+    auto import_data = scan_or_null(imp);
     if (import_data == nullptr) { return nullptr; }
     imp->data_ = import_data;
   }
   return fi;
 }
-file_info *codefiles::scan(import_stmt *st) {
-  auto p = std::filesystem::path{current_path_};
-  std::vector<token *> names = st->import_names_;
-  // If we have a custom path for libs
-  if (names.front()->token_ == "libs" || names.front()->token_ == "raylib" ||
-      names.front()->token_ == "w4") {
-    p = std::filesystem::path{libs_path_};
-  }
-  for (auto name_tok : names) {
-    auto name = name_tok->token_;
-    p /= name; /* equal to path join with '/' */
-  }
-  p += ".yaka"; /* add .yaka file extension */
-  std::error_code err{};
-  auto path = std::filesystem::absolute(p, err);
-  if (err) {
-    print_file_not_found_error(path.string());
-    return nullptr;
-  }
-  if (!std::filesystem::exists(path, err)) {
-    print_file_not_found_error(path.string());
-    return nullptr;
-  }
-  if (err) {
-    print_file_not_found_error(path.string());
-    return nullptr;
-  }
+file_info *codefiles::scan_or_null(import_stmt *st) {
+  auto optional_path = import_to_optional_file_path(st);
+  if (!optional_path.has_value()) { return nullptr; }
+#ifdef YAKSHA_DEBUG
+  std::cout << "@@@@@@@@@@ found file:" << optional_path.value() << std::endl;
+#endif
+  auto path = optional_path.value();
   // if we have it in our map we return that
   if (path_to_fi_.find(path.string()) != path_to_fi_.end()) {
     return path_to_fi_[path.string()];
   }
-  auto parsed_data = parse(path);
+  auto parsed_data = parse_or_null(path);
   if (parsed_data == nullptr) {
     print_unable_to_process_error(path.string());
     return nullptr;
   }
-  auto nm = names.back();
+  auto nm = st->import_names_.back();
   std::string prefix = "yy__" + nm->token_;
   std::string cur_prefix = prefix + "_";
   unsigned int count = 1;
@@ -128,20 +111,57 @@ file_info *codefiles::scan(import_stmt *st) {
     count++;
   }
   auto fi = new file_info{path, cur_prefix, parsed_data};
+  fi->step_ = scanning_step::SOUP_SCAN_DONE;
   prefixes_.insert(std::string{cur_prefix});
   path_to_fi_.insert({path.string(), fi});
   files_.emplace_back(fi);
   for (auto imp : fi->data_->parser_->import_stmts_) {
-    auto import_data = scan(imp);
+    auto import_data = scan_or_null(imp);
     if (import_data == nullptr) { return nullptr; }
     imp->data_ = import_data;
   }
   return path_to_fi_[path.string()];
 }
+std::optional<std::filesystem::path>
+codefiles::import_to_optional_file_path(import_stmt *st) {
+  auto key = reinterpret_cast<std::intptr_t>(st);
+  if (import_to_path_cache_.find(key) != import_to_path_cache_.end()) {
+    auto path = import_to_path_cache_[key];
+    return {path};
+  }
+  auto original_path = std::filesystem::path{current_path_};
+  std::vector<token *> names = st->import_names_;
+  if (names.front()->token_ == "libs" || names.front()->token_ == "raylib" ||
+      names.front()->token_ == "w4") {
+    original_path = std::filesystem::path{libs_path_};
+  }
+  std::error_code err{};
+  auto p = original_path;
+  for (auto name_tok : names) {
+    auto name = name_tok->token_;
+    p /= name; /* equal to path join with '/' */
+  }
+  p += ".yaka"; /* add .yaka file extension */
+  p = std::filesystem::absolute(p, err);
+  if (err) {
+    print_file_not_found_error(p.string());
+    return {};
+  }
+  if (!std::filesystem::exists(p, err)) {
+    print_file_not_found_error(p.string());
+    return {};
+  }
+  if (err) {
+    print_file_not_found_error(p.string());
+    return {};
+  }
+  import_to_path_cache_[key] = p;
+  return {p};
+}
 bool codefiles::has_prefix(std::string &root) {
   return prefixes_.find(root) != prefixes_.end();
 }
-file_data *codefiles::parse(std::filesystem::path &file_name) {
+file_data *codefiles::parse_or_null(std::filesystem::path &file_name) {
   std::ifstream script_file(file_name);
   if (!script_file.good()) {
     std::cerr << "Failed to read file:" << file_name << "\n";
@@ -150,18 +170,18 @@ file_data *codefiles::parse(std::filesystem::path &file_name) {
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
   std::string fname = file_name.string();
-  return parse(data, fname);
+  return parse_or_null(data, fname);
 }
-file_data *codefiles::parse(const std::string &data,
-                            const std::string &file_name) {
-  auto *t = new tokenizer{file_name, data};
+file_data *codefiles::parse_or_null(const std::string &data,
+                                    const std::string &file_name) {
+  auto *t = new tokenizer{file_name, data, yaksha_macros_.get_yk_token_pool()};
   t->tokenize();
   if (!t->errors_.empty()) {
     errors::print_errors(t->errors_);
     delete (t);
     return nullptr;
   }
-  auto *b = new block_analyzer{t->tokens_};
+  auto *b = new block_analyzer{t->tokens_, yaksha_macros_.get_yk_token_pool()};
   b->analyze();
   if (!b->errors_.empty()) {
     errors::print_errors(b->errors_);
@@ -170,9 +190,9 @@ file_data *codefiles::parse(const std::string &data,
     return nullptr;
   }
   auto *p = new parser(file_name, b->tokens_, &pool_);
-  p->parse();
-  if (!p->errors_.empty()) {
-    errors::print_errors(p->errors_);
+  p->step_1_parse_token_soup();
+  if (!b->errors_.empty()) {
+    errors::print_errors(b->errors_);
     delete (t);
     delete (b);
     delete (p);
@@ -180,7 +200,7 @@ file_data *codefiles::parse(const std::string &data,
   }
   return new file_data{p, t, b};
 }
-file_info *codefiles::get(const std::string &f) {
+file_info *codefiles::get_or_null(const std::string &f) {
   if (path_to_fi_.find(f) == path_to_fi_.end()) return nullptr;
   return path_to_fi_[f];
 }

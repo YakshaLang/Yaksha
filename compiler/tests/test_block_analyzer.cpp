@@ -23,21 +23,22 @@ std::ostream &operator<<(std::ostream &o, const token &t) {
       std::string code((std::istreambuf_iterator<char>(code_file)),            \
                        std::istreambuf_iterator<char>());                      \
       try {                                                                    \
-        yaksha::tokenizer tt(B, code);                                         \
+        gc_pool<token> token_pool{};                                           \
+        yaksha::tokenizer tt(B, code, &token_pool);                            \
         tt.tokenize();                                                         \
-        yaksha::block_analyzer t(tt.tokens_);                                  \
+        yaksha::block_analyzer t(tt.tokens_, &token_pool);                     \
         t.analyze();                                                           \
-        auto token_snapshot = yaksha::load_token_dump(C);                      \
+        auto token_snapshot = yaksha::load_token_dump(C, &token_pool);         \
         yaksha::save_token_dump(C, t.tokens_);                                 \
         REQUIRE(t.tokens_.size() == token_snapshot.size());                    \
         for (int i = 0; i < token_snapshot.size(); i++) {                      \
           auto parsed = t.tokens_[i];                                          \
           auto snapshot = token_snapshot[i];                                   \
-          REQUIRE(parsed.file_ == snapshot.file_);                             \
-          REQUIRE(parsed.line_ == snapshot.line_);                             \
-          REQUIRE(parsed.pos_ == snapshot.pos_);                               \
-          REQUIRE(parsed.token_ == snapshot.token_);                           \
-          REQUIRE(parsed.type_ == snapshot.type_);                             \
+          REQUIRE(parsed->file_ == snapshot->file_);                           \
+          REQUIRE(parsed->line_ == snapshot->line_);                           \
+          REQUIRE(parsed->pos_ == snapshot->pos_);                             \
+          REQUIRE(parsed->token_ == snapshot->token_);                         \
+          REQUIRE(parsed->type_ == snapshot->type_);                           \
         }                                                                      \
       } catch (parsing_error & e) {                                            \
         DBGPRINT(e.message_);                                                  \

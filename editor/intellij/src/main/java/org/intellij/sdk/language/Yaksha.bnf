@@ -17,15 +17,24 @@
 }
 
 yakshaFile ::= item_*  {pin=1 recoverWhile="top_level_recover" name="import, def, class"}
-private top_level_recover ::= !('@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature')
+private top_level_recover ::= !('@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature' | 'macros')
 
 private item_ ::= (outer_statement | COMMENT | empty_line)
 
 empty_line ::= S? NL
 
-outer_statement ::= runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement
+outer_statement ::= runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | macro_declaration_statement
 
 runtimefeature_statement ::= KW_RUNTIMEFEATURE S STRING S? NL
+
+macro_declaration_statement ::= KW_MACROS OPERATOR_NOT_SYMBOL any_ws? OPERATOR_CURLY_OPEN any_ws? lisp_body any_ws? OPERATOR_CURLY_CLOSE NL
+lisp_body ::= (lsp_expr | any_ws)+
+lsp_expr ::= all_allowed_symbols | lsp_s_expr | lsp_q_expr
+lsp_s_expr ::= OPERATOR_OPEN_P any_ws? OPERATOR_CLOSE_P |  OPERATOR_OPEN_P any_ws? lsp_expr (any_ws? lsp_expr)* any_ws? OPERATOR_CLOSE_P
+lsp_q_expr ::= OPERATOR_CURLY_OPEN any_ws? OPERATOR_CURLY_CLOSE | OPERATOR_CURLY_OPEN any_ws? lsp_expr (any_ws? lsp_expr)* any_ws? OPERATOR_CURLY_CLOSE
+all_allowed_symbols ::= IDENTIFIER | STRING | NUMBER | OPERATOR_COMPARISON | OPERATOR_AT | OPERATOR_COLON | OPERATOR_DOT | OPERATOR_COMMA | OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ | OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ | OPERATOR_NOT | OPERATOR_B_NOT | OPERATOR_OR | OPERATOR_AND | OPERATOR_ARROW | OPERATOR_PLUS | OPERATOR_MINUS | OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER | OPERATOR_SHL | OPERATOR_SHR | OPERATOR_B_AND | OPERATOR_B_OR | OPERATOR_B_XOR | PRIMITIVE_DATA_TYPE | KW_AS | KW_BREAK | KW_CLASS | KW_STRUCT | KW_CCODE | KW_CONTINUE | KW_DEF | KW_DEL | KW_DEFER | KW_ELSE | KW_IF | KW_ELIF | KW_IMPORT | KW_PASS | KW_RETURN | KW_WHILE | KW_TRUE | KW_FALSE | KW_NONE | KW_RUNTIMEFEATURE | KW_FOR | KW_IN | KW_MACROS
+
+any_ws ::= (I | S | NL)+
 
 import_statement ::= KW_IMPORT S IDENTIFIER (OPERATOR_DOT IDENTIFIER)* (S KW_AS S IDENTIFIER)? S? NL {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
@@ -104,10 +113,11 @@ comparison ::= bitwise (S? OPERATOR_COMPARISON S? bitwise)* | bitwise
 bitwise ::= term (S? (OPERATOR_B_OR | OPERATOR_B_AND | OPERATOR_B_XOR | OPERATOR_SHL | OPERATOR_SHR ) S? term)* | term
 term ::= factor (S? (OPERATOR_MINUS | OPERATOR_PLUS) S? factor)* | factor
 factor ::= unary (S? (OPERATOR_MUL | OPERATOR_DIV | OPERATOR_REMAINDER) S? unary)* | unary
-unary ::= (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp | fncall | primary
+unary ::= (OPERATOR_B_NOT | OPERATOR_MINUS | OPERATOR_NOT) S? exp | macro_call | fncall | primary
 fncall ::= IDENTIFIER (S? OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | S? OPERATOR_OPEN_SQB S? exp S? OPERATOR_CLOSE_SQB | S? OPERATOR_CURLY_OPEN S? struct_arguments OPERATOR_CURLY_CLOSE | OPERATOR_DOT IDENTIFIER )* {
     methods=[getDefOrClassName getFullName getReference]
 }
+macro_call ::= IDENTIFIER (OPERATOR_DOT IDENTIFIER)? OPERATOR_NOT_SYMBOL S? (OPERATOR_OPEN_P S? arguments? S? OPERATOR_CLOSE_P | OPERATOR_CURLY_OPEN S? lisp_body? S? OPERATOR_CURLY_CLOSE)
 primary ::= KW_TRUE | KW_FALSE | KW_NONE | NUMBER | STRING | IDENTIFIER | paren_exp
 struct_arguments ::= struct_arg (S? OPERATOR_COMMA S? struct_arg)*
 struct_arg ::= IDENTIFIER S? OPERATOR_COLON S? exp

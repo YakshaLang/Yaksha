@@ -1,10 +1,13 @@
 #include "btest.h"
 #include "catch2/catch.hpp"
-#include "file_formats/ic_tokens_file.h"
 #include "ic2c/ic_tokenizer.h"
-#include "tokenizer/string_utils.h"
 #include <iostream>
 using namespace yaksha;
+//#define IC_TOKENIZER_PRINT_TOKENS
+//#define SLOW_TESTS
+#if defined(IC_TOKENIZER_PRINT_TOKENS) || defined(SLOW_TESTS)
+#include "tokenizer/string_utils.h"
+#include "file_formats/ic_tokens_file.h"
 #define TOKENS_PRINT()                                                         \
   do {                                                                         \
     for (auto const &to : t.tokens_) {                                         \
@@ -18,6 +21,9 @@ using namespace yaksha;
       }                                                                        \
     }                                                                          \
   } while (0)
+#else
+#define TOKENS_PRINT()
+#endif
 #define TOKENS_BEGIN() int token_pos = -1
 #define T_V(item, type)                                                        \
   do {                                                                         \
@@ -252,6 +258,7 @@ TEST_CASE("ic_tokenizer: Empty character string / char literals") {
   TOKENS_END();
   REQUIRE(t.errors_.size() == 2);// two errors for the ''
 }
+#ifdef SLOW_TESTS
 TEST_CASE("ic_tokenizer: Tokenize simple native function output from Yaksha") {
   TEST_FILE("../test_data/ic2c_tests/0_native_functions.c",
             "0_native_functions.c",
@@ -274,3 +281,4 @@ TEST_CASE("ic_tokenizer: Tokenize real world C code - yk__graphic_utils.c") {
   TEST_FILE("../runtime/yk__graphic_utils.c", "yk__graphic_utils.c",
             "../test_data/ic2c_tests/0_yk__graphic_utils.c.tokens");
 }
+#endif

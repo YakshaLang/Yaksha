@@ -1,0 +1,27 @@
+import g2
+
+macros!{
+    (defun g1 ()
+        (list
+            # $a = 5 <<<< $a will use a unique symbol name
+            (yk_create_token YK_TOKEN_NAME "$a")
+            (ykt_eq)
+            (ykt_integer_decimal 2)
+            (ykt_newline)
+            # println($a) <<<< we will use the correct symbol name here
+            (yk_create_token YK_TOKEN_NAME "println")
+            (ykt_paren_open)
+            (yk_create_token YK_TOKEN_NAME "$a")
+            (ykt_paren_close)
+            (ykt_newline)
+            ))
+    (yk_register {dsl g1 g1})
+}
+
+
+def main() -> int:
+    a: int = 1
+    println(a)
+    g1!{}
+    g2.g2()
+    return 0

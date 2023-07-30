@@ -266,6 +266,7 @@
     ["output.c",30,9,"if","KEYWORD_IF"],
     ["output.c",30,12,"(","PAREN_OPEN"],
     ["output.c",30,13,"(","PAREN_OPEN"],
+    ["output.c",30,14,"!","NOT_SYMBOL"],
     ["output.c",30,16,"(","PAREN_OPEN"],
     ["output.c",30,17,"(","PAREN_OPEN"],
     ["output.c",30,18,"(","PAREN_OPEN"],

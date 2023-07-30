@@ -10,8 +10,6 @@ import org.intellij.sdk.language.psi.*;
 import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public class YakshaAnnotator implements Annotator {
 
     @Override
@@ -59,6 +57,31 @@ public class YakshaAnnotator implements Annotator {
                     .range(element.getTextRange())
                     .textAttributes(YakshaSyntaxHighlighter.COMMENT)
                     .create();
+        } else if (element instanceof YakshaAllAllowedSymbols) {
+            YakshaAllAllowedSymbols symbol = (YakshaAllAllowedSymbols) element;
+            final String method = symbol.getText();
+            if (YakshaDocs.LISP_BUILTIN_NAMES.contains(method)) {
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                        .range(symbol.getTextRange())
+                        .textAttributes(YakshaSyntaxHighlighter.KEYWORD)
+                        .create();
+            }
+        } else if (element instanceof YakshaMacroCall | element instanceof YakshaMacroDeclarationStatement) {
+            PsiElement method = element.getFirstChild();
+            if (method != null) {
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                        .range(method.getTextRange())
+                        .textAttributes(YakshaSyntaxHighlighter.META_PROGRAMMING)
+                        .create();
+                final PsiElement notSign = method.getNextSibling();
+                if (notSign != null) {
+                    holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                            .range(notSign.getTextRange())
+                            .textAttributes(YakshaSyntaxHighlighter.META_PROGRAMMING)
+                            .create();
+                }
+            }
+
         }
     }
 

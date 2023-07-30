@@ -207,7 +207,10 @@ void ast_printer::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
 }
 void ast_printer::visit_foreach_stmt(foreach_stmt *obj) {
   text_ << "(for " << obj->name_->token_;
-  text_ << ":" << obj->data_type_->as_string() << " ";
+  if (obj->data_type_ != nullptr) {
+    text_ << ":" << obj->data_type_->as_string();
+  }
+  text_ << " ";
   parenthesize("expr", {obj->expression_});
   text_ << " do ";
   obj->for_body_->accept(this);
@@ -232,4 +235,18 @@ void ast_printer::visit_curly_call_expr(curly_call_expr *obj) {
     st.value_->accept(this);
   }
   text_ << " ))";
+}
+void ast_printer::visit_macro_call_expr(macro_call_expr *obj) {
+  text_ << "(macro_call";
+  if (obj->paren_token_->type_ == token_type::CURLY_BRACKET_OPEN) {
+    text_ << " DSL ";
+  } else {
+    text_ << " ";
+  }
+  text_ << obj->name_->token_;
+  for (auto st : obj->args_) {
+    text_ << " ";
+    st->accept(this);
+  }
+  text_ << ")";
 }

@@ -49,6 +49,40 @@ public class YakshaDocs {
             .put("binarydata", BuiltinDoc.b("binarydata(\"data\") -> Const[Ptr[Const[u8]]]", "Create constant binary data (must pass in a string literal).\nReturns Const[Ptr[Const[u8]]] that does not need to be deleted."))
             .build();
     public static final Set<String> BUILTIN_FUNCTION_NAMES = BUILTIN_FUNCTIONS.keySet();
+    public static final Set<String> LISP_BUILTIN_NAMES = Set.of("YK_TOKEN_KEYWORD_RUNTIMEFEATURE", "YK_TOKEN_KEYWORD_RETURN",
+            "YK_TOKEN_KEYWORD_OR", "YK_TOKEN_KEYWORD_NOT", "YK_TOKEN_KEYWORD_MACROS", "YK_TOKEN_KEYWORD_IMPORT", "YK_TOKEN_KEYWORD_IF",
+            "YK_TOKEN_KEYWORD_ELSE", "YK_TOKEN_KEYWORD_ELIF", "YK_TOKEN_KEYWORD_DEL", "YK_TOKEN_KEYWORD_DEFER", "YK_TOKEN_KEYWORD_CLASS",
+            "YK_TOKEN_KEYWORD_CCODE", "YK_TOKEN_KEYWORD_BREAK", "YK_TOKEN_KEYWORD_AS", "YK_TOKEN_KEYWORD_AND", "YK_TOKEN_XOR_EQ", "YK_TOKEN_UINTEGER_OCT_16",
+            "YK_TOKEN_UINTEGER_HEX_8", "YK_TOKEN_UINTEGER_HEX_64", "YK_TOKEN_UINTEGER_DECIMAL_64", "YK_TOKEN_UINTEGER_DECIMAL_16",
+            "YK_TOKEN_UINTEGER_DECIMAL", "YK_TOKEN_UINTEGER_BIN_8", "YK_TOKEN_UINTEGER_BIN_64", "YK_TOKEN_TILDE",
+            "YK_TOKEN_THREE_QUOTE_STRING", "YK_TOKEN_SQUARE_BRACKET_CLOSE", "YK_TOKEN_SHR", "YK_TOKEN_SHL_EQ", "YK_TOKEN_POWER",
+            "YK_TOKEN_PAREN_CLOSE", "YK_TOKEN_OR_EQ", "YK_TOKEN_NOT_SYMBOL", "YK_TOKEN_SHR_EQ", "YK_TOKEN_NAME", "YK_TOKEN_LESS_EQ",
+            "YK_TOKEN_LESS", "YK_TOKEN_INT_DIV_EQ", "YK_TOKEN_INTEGER_OCT_8", "YK_TOKEN_INTEGER_OCT", "yk_create_token", "YK_TOKEN_SUB_EQ",
+            "YK_TOKEN_INTEGER_HEX_8", "YK_TOKEN_INTEGER_HEX_64", "time", "random", "to_int", "YK_KEY_WHAT", "is_callable", "YK_TOKEN_UINTEGER_OCT",
+            "YK_TOKEN_UINTEGER_BIN_16", "is_list", "input", "io_read_file", "print", "YK_TOKEN_KEYWORD_STRUCT", "/", "YK_TOKEN_SHL", "newline",
+            "YK_TOKEN_UINTEGER_DECIMAL_8", "to_string", "io_write_file", "defun", "pop", "bitwise_or", "is_truthy", "not", "=", "YK_TOKEN_MUL_EQ",
+            "set", "len", "YK_TOKEN_UINTEGER_BIN", "YK_TOKEN_SUB", "YK_TOKEN_EQ_EQ", "is_nil", "cons", "or", "filter", "for", "noop", "YK_TOKEN_INTEGER_DECIMAL",
+            "YK_TOKEN_KEYWORD_WHILE", "head", "while", "try", "modulo", "YK_TOKEN_PLUS_EQ", "tail", "YK_TOKEN_BA_INDENT", "YK_TOKEN_KEYWORD_FOR",
+            "-", "list", "YK_TOKEN_MOD", "<", "==", ">=", "is_string", "reduce", "n____original_println", "+", "push", "yk_register",
+            "true", "range", "YK_TOKEN_INTEGER_DECIMAL_16", "yk_is_token", "YK_TOKEN_KEYWORD_TRY", "YK_TOKEN_OR", "YK_TOKEN_INTEGER_HEX_16",
+            "yk_get_type", "YK_TOKEN_XOR", ">", "YK_TOKEN_KEYWORD_TRUE", "YK_TYPE_EXPR", "YK_TOKEN_STRING",
+            "YK_TOKEN_INTEGER_OCT_64", "YK_TYPE_STMT", "<=", "YK_TOKEN_NOT_EQ", "and", "YK_TOKEN_UINTEGER_HEX_16",
+            "YK_TOKEN_EQ", "YK_TOKEN_FLOAT_NUMBER", "YK_TOKEN_PAREN_OPEN", "println", "YK_TOKEN_MOD_EQ", "define",
+            "if", "map", "do", "is_int", "YK_TOKEN_KEYWORD_CONTINUE", "YK_TOKEN_KEYWORD_NONE", "quote",
+            "eval", "YK_TOKEN_DIV_EQ", "ykt_integer_decimal", "YK_TOKEN_KEYWORD_IN", "insert", "*", "remove", "map_keys",
+            "def", "map_get", "YK_TOKEN_KEYWORD_FROM", "map_remove", "bitwise_xor", "bitwise_and", "bitwise_not", "YK_TOKEN_COMMA",
+            "YK_TOKEN_INTEGER_HEX", "bitwise_left_shift", "YK_TOKEN_COLON", "index", "YK_TOKEN_KEYWORD_DEF", "map_set",
+            "YK_TOKEN_UINTEGER_OCT_64", "map_values", "YK_TOKEN_INT_DIV", "YK_TOKEN_INTEGER_OCT_16", "this",
+            "YK_TOKEN_UINTEGER_HEX", "parent", "YK_TOKEN_INTEGER_BIN_16", "YK_TOKEN_SQUARE_BRACKET_OPEN", "repr",
+            "YK_TOKEN_POWER_EQ", "cond", "ghost", "raise_error", "n____original_print", "YK_PRELUDE_INCLUDED",
+            "disable_print", "false", "enable_print", "YK_TOKEN_KEYWORD_FALSE", "YK_OBJECT_TYPE", "YK_TOKEN_PLUS",
+            "nil", "YK_TYPE_TOKEN", "YK_TOKEN_KEYWORD_PASS", "yk_what", "yk_is_expr", "parse", "yk_is_stmt",
+            "YK_TOKEN_MUL", "YK_TOKEN_CURLY_BRACKET_OPEN", "YK_TOKEN_AND", "YK_TOKEN_AND_EQ", "lambda", "YK_TOKEN_INTEGER_DECIMAL_64",
+            "bitwise_right_shift", "YK_TOKEN_ARROW", "YK_TOKEN_KEYWORD_ASSERT", "YK_TOKEN_AT", "YK_TOKEN_INTEGER_DECIMAL_8", "YK_TOKEN_BA_DEDENT",
+            "YK_TOKEN_INTEGER_BIN_64", "YK_TOKEN_CURLY_BRACKET_CLOSE", "try_catch", "YK_TOKEN_DIV", "scope", "YK_TOKEN_DOT",
+            "YK_TOKEN_DOUBLE_NUMBER", "YK_TOKEN_ELLIPSIS", "YK_TOKEN_GREAT", "YK_TOKEN_UINTEGER_OCT_8", "!=",
+            "YK_TOKEN_GREAT_EQ", "YK_TOKEN_INTEGER_BIN", "map_has", "YK_TOKEN_INTEGER_BIN_8");
+
     public static final YakshaDocs INSTANCE = new YakshaDocs();
     private final Map<String, Doc> doc;
 

@@ -27,7 +27,8 @@ int main(int argc, char *argv[]) {
   auto plugin_str = abs_path.string();
   std::cout << "[YKRELOAD] Loading plugin:" << plugin_str << "\n";
   cr_plugin ctx{};
-  yk__user_data my_userdata{(void *) 0, true, 0, 0, false, false};
+  yk__user_data my_userdata{(void *) 0, true, 0, 0,
+                            false,      false};// NOLINT(modernize-use-nullptr)
   ctx.userdata = &my_userdata;
   bool success = cr_plugin_open(ctx, plugin_str.c_str());
   std::cout << "[YKRELOAD] Initial load completed \n";

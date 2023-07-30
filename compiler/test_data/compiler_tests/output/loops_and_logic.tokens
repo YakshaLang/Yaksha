@@ -78,6 +78,7 @@
     ["output.c",13,9,"if","KEYWORD_IF"],
     ["output.c",13,12,"(","PAREN_OPEN"],
     ["output.c",13,13,"(","PAREN_OPEN"],
+    ["output.c",13,14,"!","NOT_SYMBOL"],
     ["output.c",13,16,"(","PAREN_OPEN"],
     ["output.c",13,17,"(","PAREN_OPEN"],
     ["output.c",13,18,"(","PAREN_OPEN"],

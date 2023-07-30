@@ -41,6 +41,12 @@ public class YakshaUnaryImpl extends ASTWrapperPsiElement implements YakshaUnary
 
   @Override
   @Nullable
+  public YakshaMacroCall getMacroCall() {
+    return findChildByClass(YakshaMacroCall.class);
+  }
+
+  @Override
+  @Nullable
   public YakshaPrimary getPrimary() {
     return findChildByClass(YakshaPrimary.class);
   }

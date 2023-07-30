@@ -1,0 +1,8 @@
+macros! {
+    (defun load_string (file) (list (yk_create_token YK_TOKEN_STRING (io_read_file (map_get file "value")))))
+    (yk_register {dsl load_string load_string})
+}
+
+def main() -> int:
+    println(load_string!{"test.txt"})
+    return 0

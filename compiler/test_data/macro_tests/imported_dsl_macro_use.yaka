@@ -1,0 +1,7 @@
+import import_me as magic
+
+def main() -> int:
+    println(magic.counter!{})
+    println(magic.counter!{})
+    println(magic.counter!{})
+    return 0

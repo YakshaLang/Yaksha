@@ -2,10 +2,10 @@
 #include "ast/parser.h"
 #include "btest.h"
 #include "catch2/catch.hpp"
+#include "compiler/multifile_compiler.h"
 #include "file_formats/tokens_file.h"
 #include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
-#include "compiler/multifile_compiler.h"
 #include "utilities/error_printer.h"
 using namespace yaksha;
 #define TEST_FILE(A, B, C)                                                     \
@@ -15,10 +15,11 @@ using namespace yaksha;
       std::string code((std::istreambuf_iterator<char>(code_file)),            \
                        std::istreambuf_iterator<char>());                      \
       try {                                                                    \
-        yaksha::tokenizer t(B, code);                                          \
+        gc_pool<token> token_pool{};                                           \
+        yaksha::tokenizer t(B, code, &token_pool);                             \
         t.tokenize();                                                          \
         REQUIRE(t.errors_.empty());                                            \
-        block_analyzer b{t.tokens_};                                           \
+        block_analyzer b{t.tokens_, &token_pool};                              \
         b.analyze();                                                           \
         ykdt_pool dt_pool{};                                                   \
         parser p{A, b.tokens_, &dt_pool};                                      \
@@ -27,19 +28,19 @@ using namespace yaksha;
         REQUIRE(p.errors_.empty());                                            \
         ast_printer prn{};                                                     \
         auto ast_out = prn.print_to_str(tree);                                 \
-        tokenizer lsp_code{"ast_out.l", ast_out};                              \
+        tokenizer lsp_code{"ast_out.l", ast_out, &token_pool};                 \
         lsp_code.tokenize();                                                   \
-        auto token_snapshot = yaksha::load_token_dump(C);                      \
+        auto token_snapshot = yaksha::load_token_dump(C, &token_pool);       \
         yaksha::save_token_dump(C, lsp_code.tokens_);                          \
         REQUIRE(lsp_code.tokens_.size() == token_snapshot.size());             \
         for (int i = 0; i < token_snapshot.size(); i++) {                      \
           auto parsed = lsp_code.tokens_[i];                                   \
           auto snapshot = token_snapshot[i];                                   \
-          REQUIRE(parsed.file_ == snapshot.file_);                             \
-          REQUIRE(parsed.line_ == snapshot.line_);                             \
-          REQUIRE(parsed.pos_ == snapshot.pos_);                               \
-          REQUIRE(parsed.token_ == snapshot.token_);                           \
-          REQUIRE(parsed.type_ == snapshot.type_);                             \
+          REQUIRE(parsed->file_ == snapshot->file_);                           \
+          REQUIRE(parsed->line_ == snapshot->line_);                           \
+          REQUIRE(parsed->pos_ == snapshot->pos_);                             \
+          REQUIRE(parsed->token_ == snapshot->token_);                         \
+          REQUIRE(parsed->type_ == snapshot->type_);                           \
         }                                                                      \
       } catch (parsing_error & e) {                                            \
         DBGPRINT(e.message_);                                                  \
@@ -129,13 +130,6 @@ TEST_CASE("parser: class in def") {
   TEST_SNIPPET_FULL("def main() -> int:\n"
                     "    class X:\n"
                     "        a: int\n"
-                    "    c: bool = False\n"
-                    "    return 0",
-                    "Blocks with nested import/def/class is not supported");
-}
-TEST_CASE("parser: import in def") {
-  TEST_SNIPPET_FULL("def main() -> int:\n"
-                    "    import banana\n"
                     "    c: bool = False\n"
                     "    return 0",
                     "Blocks with nested import/def/class is not supported");

@@ -7,11 +7,19 @@ import com.intellij.psi.PsiElement;
 
 public class YakshaVisitor extends PsiElementVisitor {
 
+  public void visitAllAllowedSymbols(@NotNull YakshaAllAllowedSymbols o) {
+    visitPsiElement(o);
+  }
+
   public void visitAnnotation(@NotNull YakshaAnnotation o) {
     visitPsiElement(o);
   }
 
   public void visitAnnotationArg(@NotNull YakshaAnnotationArg o) {
+    visitPsiElement(o);
+  }
+
+  public void visitAnyWs(@NotNull YakshaAnyWs o) {
     visitPsiElement(o);
   }
 
@@ -183,6 +191,10 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitLispBody(@NotNull YakshaLispBody o) {
+    visitPsiElement(o);
+  }
+
   public void visitLiteral(@NotNull YakshaLiteral o) {
     visitPsiElement(o);
   }
@@ -192,6 +204,26 @@ public class YakshaVisitor extends PsiElementVisitor {
   }
 
   public void visitLogicOr(@NotNull YakshaLogicOr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitLspExpr(@NotNull YakshaLspExpr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitLspQExpr(@NotNull YakshaLspQExpr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitLspSExpr(@NotNull YakshaLspSExpr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitMacroCall(@NotNull YakshaMacroCall o) {
+    visitPsiElement(o);
+  }
+
+  public void visitMacroDeclarationStatement(@NotNull YakshaMacroDeclarationStatement o) {
     visitPsiElement(o);
   }
 

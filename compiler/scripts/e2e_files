@@ -60,3 +60,11 @@ test_data/sample_hello_threads.yaka
 test_data/sample_negative_numbers.yaka
 test_data/test_compiler.yaka
 test_data/simple_programs/defer_test.yaka
+test_data/bug_fixes/comment_break_indent.yaka
+test_data/macro_tests/eachelem_for_with_macros.yaka
+test_data/macro_tests/comptime_fizz_buzz.yaka
+test_data/macro_tests/grab_file.yaka
+test_data/macro_tests/m_args.yaka
+test_data/macro_tests/i_import_stuff.yaka
+test_data/macro_tests/imported_dsl_macro_use.yaka
+test_data/macro_tests/g1.yaka

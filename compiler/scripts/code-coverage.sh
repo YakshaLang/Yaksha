@@ -4,6 +4,7 @@ cd /app || exit 1
 mkdir build
 mkdir bin
 mkdir bin/fuzz
+cp /app/test.txt bin/test.txt
 set -e
 cd build || exit 1
 # Build project

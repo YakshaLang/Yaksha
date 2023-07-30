@@ -21,7 +21,8 @@ public class YakshaColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Data type", YakshaSyntaxHighlighter.DATA_TYPE),
             new AttributesDescriptor("Bad value", YakshaSyntaxHighlighter.BAD_CHARACTER),
             new AttributesDescriptor("Comment", YakshaSyntaxHighlighter.COMMENT),
-            new AttributesDescriptor("Param", YakshaSyntaxHighlighter.PARAM)
+            new AttributesDescriptor("Param", YakshaSyntaxHighlighter.PARAM),
+            new AttributesDescriptor("MacroCall", YakshaSyntaxHighlighter.META_PROGRAMMING),
     };
 
     @Nullable
@@ -39,7 +40,17 @@ public class YakshaColorSettingsPage implements ColorSettingsPage {
     @NotNull
     @Override
     public String getDemoText() {
-        return "import raylib as rl\n" +
+        return "macros!{\n" +
+                "    (defun to_fb (n) (+ (if (== n 1) \"\" \" \") (cond\n" +
+                "        ((== 0 (modulo n 15)) \"FizzBuzz\")\n" +
+                "        ((== 0 (modulo n 3)) \"Fizz\")\n" +
+                "        ((== 0 (modulo n 5)) \"Buzz\")\n" +
+                "        (true (to_string n))\n" +
+                "        )))\n" +
+                "    (defun fizzbuzz () (list (yk_create_token YK_TOKEN_STRING (reduce + (map to_fb (range 1 101))))))\n" +
+                "    (yk_register {dsl fizzbuzz fizzbuzz})\n" +
+                "}\n\n" +
+                "import raylib as rl\n" +
                 "import raylib.utils\n" +
                 "import libs.numbers as num\n" +
                 "import libs.perlin\n" +
@@ -55,8 +66,10 @@ public class YakshaColorSettingsPage implements ColorSettingsPage {
                 "    blue: rl.Color\n" +
                 "    green: rl.Color\n" +
                 "    color3: rl.Color\n" +
-                "\n" +
-                "\n" +
+                "\n\n" +
+                "struct Hello:\n" +
+                "    world: int\n" +
+                "\n\n" +
                 "def branch(x: float, y: float, length: float, angle: float, s: State) -> None:\n" +
                 "    if length < 4.0f:\n" +
                 "        leaf_width: float = random.random_betweenf(1.0f, 3.0f)\n" +

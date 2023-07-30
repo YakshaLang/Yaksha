@@ -59,6 +59,12 @@ public class YakshaOuterStatementImpl extends ASTWrapperPsiElement implements Ya
 
   @Override
   @Nullable
+  public YakshaMacroDeclarationStatement getMacroDeclarationStatement() {
+    return findChildByClass(YakshaMacroDeclarationStatement.class);
+  }
+
+  @Override
+  @Nullable
   public YakshaRuntimefeatureStatement getRuntimefeatureStatement() {
     return findChildByClass(YakshaRuntimefeatureStatement.class);
   }
