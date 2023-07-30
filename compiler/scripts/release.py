@@ -10,11 +10,11 @@ from hashlib import sha256
 from typing import List
 
 ROOT = os.path.realpath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-MAX_EXECUTION_TIME_SEC = 60 * 4
+MAX_EXECUTION_TIME_SEC = 60 * 60
 PATHS = []
 
 WINDOWS_OS = sys.platform.startswith('win')
-CURRENT_PLATFORM_KEY = "windows_x86_64" if WINDOWS_OS else "linux_x86_64"
+CURRENT_PLATFORM_KEY = "windows-x86_64" if WINDOWS_OS else "linux-x86_64"
 BUNDLED_ZIG_VERSION = "0.9.1"
 COMPILER_BINARIES = ["yaksha.exe", "yakshac.exe"] if WINDOWS_OS else ["yaksha", "yakshac"]
 @contextmanager
@@ -23,6 +23,7 @@ def updated_path():
     old_env = os.environ.copy()
     sep: str = os.pathsep
     path_var = old_env["PATH"] + sep + sep.join(PATHS)
+    print("$PATH = ", path_var)
     os.environ.update({"PATH": path_var})
     yield
     os.environ.clear()
@@ -280,7 +281,13 @@ def extract_zig_for_compilation():
     success, zig = download(sec.zig, sec.zig_sha256)
     temp = make_directory(name + "_temp")
     extract(zig, temp)
-    PATHS.append(os.path.join(temp, CURRENT_PLATFORM_KEY + "-" + BUNDLED_ZIG_VERSION))
+    zig_path = os.path.join(temp, "zig-" + CURRENT_PLATFORM_KEY + "-" + BUNDLED_ZIG_VERSION)
+    if not WINDOWS_OS:
+        command = "chmod +x " + os.path.join(zig_path, "zig")
+        print("executing: ", command)
+        execute(command.split(" "))
+    PATHS.append(zig_path)
+    print(PATHS)
 
 
 def compile_carpntr():

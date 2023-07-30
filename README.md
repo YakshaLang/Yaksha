@@ -4,6 +4,9 @@
 
 ![https://yakshalang.github.io/](https://yakshalang.github.io/images/yk-banner.png)
 
+[![.github/workflows/development.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/development.yml/badge.svg)](https://github.com/YakshaLang/Yaksha/actions/workflows/development.yml)
+[![.github/workflows/release.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/release.yml/badge.svg)](https://github.com/YakshaLang/Yaksha/actions/workflows/release.yml)
+
 # Documentation
 
 * [Standard Library](https://yakshalang.github.io/library-docs.html)
