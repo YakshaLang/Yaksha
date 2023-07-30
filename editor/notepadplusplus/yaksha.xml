@@ -13,7 +13,7 @@
             <Keywords name="Numbers, suffix1">f</Keywords>
             <Keywords name="Numbers, suffix2">i8 u8 i16 u16 i32 u32 i64 u64</Keywords>
             <Keywords name="Numbers, range"></Keywords>
-            <Keywords name="Operators1">+= -= *= /= %= &amp;= |= ^= &lt;&lt;= &gt;&gt;= -&gt; + - * / % &amp; | ^ &lt;&lt; &gt;&gt; = : , ( ) [ ] . { }</Keywords>
+            <Keywords name="Operators1">+= -= *= /= %= &amp;= |= ^= &lt;&lt;= &gt;&gt;= -&gt; + - * / % &amp; | ^ &lt;&lt; &gt;&gt; = : , ( ) [ ] . { } !</Keywords>
             <Keywords name="Operators2">and or</Keywords>
             <Keywords name="Folders in code1, open"></Keywords>
             <Keywords name="Folders in code1, middle"></Keywords>
@@ -24,7 +24,7 @@
             <Keywords name="Folders in comment, open"></Keywords>
             <Keywords name="Folders in comment, middle"></Keywords>
             <Keywords name="Folders in comment, close"></Keywords>
-            <Keywords name="Keywords1">while def import continue break if elif else class struct return ccode pass defer del as for in</Keywords>
+            <Keywords name="Keywords1">while def import continue break if elif else class struct return ccode pass defer del as for in macros</Keywords>
             <Keywords name="Keywords2">@nativedefine @varargs @onstack @nativemacro @native</Keywords>
             <Keywords name="Keywords3">int float i8 i16 i32 i64 u8 u16 u32 u64 float f32 f64 Array Function In Const AnyPtr Out SMEntry MEntry str bool Ptr Tuple AnyPtrToConst</Keywords>
             <Keywords name="Keywords4">print println len arrput arrpop arrnew array getref unref charat shnew shput shget shgeti hmnew hmput hmget hmgeti cast qsort iif foreach countif filter map binarydata arrsetlen arrsetcap</Keywords>
