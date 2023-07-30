@@ -886,7 +886,7 @@ void yaksha_envmap::setup_builtins() {
                      yaksha_lisp_builtins::bitwise_right_shift_));
   // set builtin will update the value of a symbol in the current scope or parent scope(s)
   // as long as the symbol is defined
-  set("set", create_builtin(this, "set", yaksha_lisp_builtins::set_));
+  set("setq", create_builtin(this, "setq", yaksha_lisp_builtins::setq_));
   set("index", create_builtin(this, "index", yaksha_lisp_builtins::index_));
   set("map_get",
       create_builtin(this, "map_get", yaksha_lisp_builtins::map_get_));
@@ -918,13 +918,23 @@ void yaksha_envmap::setup_builtins() {
       create_builtin(this, "magic_dot", yaksha_lisp_builtins::magic_dot_));
   // ---
   set("system_enable_gc",
-      create_builtin(this, "system_enable_gc", yaksha_lisp_builtins::system_enable_gc_));
+      create_builtin(this, "system_enable_gc",
+                     yaksha_lisp_builtins::system_enable_gc_));
   set("system_disable_gc",
-      create_builtin(this, "system_disable_gc", yaksha_lisp_builtins::system_disable_gc_));
-  set("system_lock_current_scope",
-      create_builtin(this, "system_lock_current_scope", yaksha_lisp_builtins::system_lock_current_scope_));
-  set("system_unlock_current_scope",
-      create_builtin(this, "system_unlock_current_scope", yaksha_lisp_builtins::system_unlock_current_scope_));
+      create_builtin(this, "system_disable_gc",
+                     yaksha_lisp_builtins::system_disable_gc_));
+  set("system_lock_root_scope",
+      create_builtin(this, "system_lock_root_scope",
+                     yaksha_lisp_builtins::system_lock_root_scope_));
+  set("system_unlock_root_scope",
+      create_builtin(this, "system_unlock_root_scope",
+                     yaksha_lisp_builtins::system_unlock_root_scope_));
+  set("system_enable_print",
+      create_builtin(this, "system_enable_print",
+                     yaksha_lisp_builtins::system_enable_print_));
+  set("system_disable_print",
+      create_builtin(this, "system_disable_print",
+                     yaksha_lisp_builtins::system_disable_print_));
   builtins_created_ = true;
 }
 void yaksha_envmap::push_closure(yaksha_envmap *env) {
@@ -1045,6 +1055,8 @@ void yaksha_envmap::setup_prelude() {
 }
 void yaksha_envmap::lockdown() { this->locked_down_env_ = true; }
 void yaksha_envmap::unlock() { this->locked_down_env_ = false; }
+void yaksha_envmap::lockdown_root() { mm_->root_lock(); }
+void yaksha_envmap::unlock_root() { mm_->root_unlock(); }
 void yaksha_envmap::gc_enable() {
   if (this->mm_ != nullptr) { this->mm_->enable_gc(); }
 }
@@ -1536,6 +1548,12 @@ void yaksha_macros::gc_mark() {
 }
 void yaksha_macros::enable_gc() { this->enable_gc_ = true; }
 void yaksha_macros::disable_gc() { this->enable_gc_ = false; }
+void yaksha_macros::root_lock() {
+  if (builtins_root_ != nullptr) { builtins_root_->lockdown(); }
+}
+void yaksha_macros::root_unlock() {
+  if (builtins_root_ != nullptr) { builtins_root_->unlock(); }
+}
 void yaksha_lisp_value::gc_mark(yk_memory_manager *memory_manager) {
   if (get_bit(&mark_, GC_POOL_MARK_BIT)) { return; }
   memory_manager->mark(this);// this is used

@@ -54,7 +54,7 @@
 //#define YAKSHA_DEBUG_COMPILE
 //#endif
 //// ---- yaksha high level debug enabled if we are in possible debug mode
-//#define YAKSHA_DEBUG
+// #define YAKSHA_DEBUG
 #if !defined(YAKSHA_DEBUG) &&                                                  \
     (defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)) &&                 \
     !defined(YAKSHA_FAST_TESTS)
