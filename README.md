@@ -10,9 +10,9 @@
 # Documentation
 
 * [Standard Library](https://yakshalang.github.io/library-docs.html)
-* [Tutorials](https://yakshalang.github.io/Tutorials/)
+* [Tutorials](https://yakshalang.github.io/tutorials.html)
 * [Documentation](https://yakshalang.github.io/documentation)
-* [Proposals](https://github.com/YakshaLang/YAMA/tree/main/proposals)
+* [Proposals](https://yakshalang.github.io/yama.html)
 
 # Communities
 
