@@ -1,0 +1,23 @@
+macros!{
+    (defun patch (target &patches) (do
+        (= counter -1)
+        (= variable (yk_create_token YK_TOKEN_NAME "$kmem"))
+        (defun patch_code (single_patch) (do
+            # $kmem[counter] = single_patch NEWLINE
+            (= counter (+ counter 1))
+            (list variable (ykt_square_bracket_open) (ykt_integer_decimal counter) (ykt_square_bracket_close) (ykt_eq) single_patch (ykt_newline))
+        ))
+        (+
+            # $kmem = inlinec("Array[u8]", "(uint8_t*)&gKernelBase[target]") NEWLINE
+            (list variable (ykt_eq)
+             (yk_create_token YK_TOKEN_NAME "inlinec") (ykt_paren_open)
+              (ykt_string "Array[u8]") (ykt_comma) (ykt_string (+ "(uint8_t*)&gKernelBase[" target::value "]")) (ykt_paren_close) (ykt_newline))
+              (reduce + (map patch_code patches)))
+    ))
+    (yk_register {dsl patch patch})
+}
+
+def main() -> int:
+    # patch(location_to_access, x[0]=?, x[1]=?, ...)
+    patch!{0x6A8EB0 0x31u8 0xC0u8 0xC3u8 0x90u8}
+    return 0

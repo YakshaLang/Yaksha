@@ -31,7 +31,7 @@ struct builtin_arrput : builtin {
     } else {
       return o;
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -80,7 +80,7 @@ struct builtin_arrpop : builtin {
     } else {
       return ykobject(args[0].datatype_->args_[0]);
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -135,7 +135,7 @@ struct builtin_arrsetlencap : builtin {
     } else {
       return ykobject(dt_pool);// None return
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -188,7 +188,7 @@ struct builtin_print : builtin {
     } else {
       return o;
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -249,7 +249,7 @@ struct builtin_len : builtin {
     } else {
       return ykobject(dt_pool->create("int"));
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -306,7 +306,7 @@ struct builtin_charat : builtin {
     } else {
       return ykobject(dt_pool->create("int"));
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -350,7 +350,7 @@ struct builtin_getref : builtin {
       dt->args_.emplace_back(args[0].datatype_);
       return ykobject(dt);
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -394,7 +394,7 @@ struct builtin_unref : builtin {
     } else {
       return ykobject(args[0].datatype_->args_[0]);
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -437,7 +437,7 @@ struct builtin_shnew : builtin {
     } else {
       return o;
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -482,7 +482,7 @@ struct builtin_shget : builtin {
     } else {
       return ykobject(args[0].datatype_->args_[0]->args_[0]);
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -528,7 +528,7 @@ struct builtin_shgeti : builtin {
     } else {
       return ykobject(dt_pool->create("int"));
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -577,7 +577,7 @@ struct builtin_shput : builtin {
     } else {
       return o;
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -635,7 +635,7 @@ struct builtin_cast : builtin {
         }
       }
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -689,7 +689,7 @@ struct builtin_hmnew : builtin {
     } else {
       return o;
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -734,7 +734,7 @@ struct builtin_hmget : builtin {
     } else {
       return ykobject(args[0].datatype_->args_[0]->args_[1]);
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -782,7 +782,7 @@ struct builtin_hmgeti : builtin {
     } else {
       return ykobject(dt_pool->create("int"));
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -834,7 +834,7 @@ struct builtin_hmput : builtin {
     } else {
       return o;
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -901,7 +901,7 @@ struct builtin_qsort : builtin {
             "Function[In[Const[AnyPtrToConst],Const[AnyPtrToConst]],Out[int]]";
       }
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -964,7 +964,7 @@ struct builtin_arrnew : builtin {
         }
       }
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -1035,7 +1035,7 @@ struct builtin_array : builtin {
             if (!dt_slot_matcher->slot_match(args[i], parsed_dt)) {
               o.string_val_ = "All arguments must match with data type passed "
                               "to first argument for array() builtin";
-              o.object_type_ = object_type::RUNTIME_ERROR;
+              o.object_type_ = object_type::ERROR_DETECTED;
               return o;
             }
           }
@@ -1045,7 +1045,7 @@ struct builtin_array : builtin {
         }
       }
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -1126,7 +1126,7 @@ struct builtin_iif : builtin {
       o = ykobject(args[1].datatype_);
       return o;
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -1186,7 +1186,7 @@ struct builtin_functional : builtin {
       return verify_function(args[0], args[1], dt_slot_matcher, dt_pool,
                              args[2].datatype_);
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -1361,7 +1361,7 @@ struct builtin_functional : builtin {
       }
       return o;
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   fnc fnc_type_;
@@ -1390,7 +1390,7 @@ struct builtin_binarydata : builtin {
           dt_parser->parse("Const[Ptr[Const[u8]]]", import_aliases, filepath));
       return o;
     }
-    o.object_type_ = object_type::RUNTIME_ERROR;
+    o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   bool should_compile_argument(int arg_index, expr *arg_expression) override {
@@ -1412,6 +1412,154 @@ struct builtin_binarydata : builtin {
     o = ykobject(
         dt_parser->parse("Const[Ptr[Const[u8]]]", import_aliases, filepath));
     return {esc->compile_binary_data(raw_string), o};
+  }
+};
+//
+// ┌┬┐┌─┐┬┌─┌─┐
+// │││├─┤├┴┐├┤
+// ┴ ┴┴ ┴┴ ┴└─┘
+//
+// Allocate a single object of given data type on heap
+//    Most common use case would be to use with a struct or a primitive
+//    make("int") -> Ptr[int]
+//    make("SomeStructOrClass") ->  Ptr[SomeStructOrClass]
+//    Note that since classes are heap allocated already, doing this will result in 'struct MyClass **'
+//    this can also make any @native structure
+//
+// Inspired by ac2pic's make builtin
+// https://github.com/ac2pic/Yaksha/blob/main/compiler/src/builtins/builtins.cpp#L1417
+struct builtin_make : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 1) {
+      o.string_val_ = "One argument must be provided for make() builtin";
+    } else if (!args[0].datatype_->is_str() ||
+               arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+      o.string_val_ = "Argument to make() must be a str literal";
+    } else {
+      auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
+      auto data_type = lit->literal_token_->token_;
+      ykdatatype *parsed_dt_original =
+          dt_parser->parse(data_type, import_aliases, filepath);
+      if (parsed_dt_original != nullptr) {
+        ykdatatype *parsed_dt = parsed_dt_original;
+        if (parsed_dt_original->is_const()) {
+          parsed_dt = parsed_dt_original->args_[0];// Extract const
+        }
+        if (parsed_dt->is_function_input() || parsed_dt->is_function_output() ||
+            parsed_dt->is_m_entry() || parsed_dt->is_sm_entry() ||
+            parsed_dt->is_none() || parsed_dt->is_const()) {
+          o.string_val_ =
+              "First argument to make() is an invalid data type " + data_type;
+        } else {
+          // We support things like -> i32, etc. to be created on heap as well
+          ykdatatype *dt = dt_pool->create("Ptr");
+          dt->args_.emplace_back(parsed_dt_original);
+          return ykobject(dt);
+        }
+      }
+    }
+    o.object_type_ = object_type::ERROR_DETECTED;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return false;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
+    auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
+    auto data_type = lit->literal_token_->token_;
+    ykdatatype *parsed_dt =
+        dt_parser->parse(data_type, import_aliases, filepath);
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    code << "calloc(1, sizeof(" << dt_compiler->convert_dt(parsed_dt) << "))";
+    ykdatatype *dt = dt_pool->create("Ptr");
+    dt->args_.emplace_back(parsed_dt);
+    o.datatype_ = dt;
+    return {code.str(), o};
+  }
+};
+//
+// ┬┌┐┌┬  ┬┌┐┌┌─┐┌─┐
+// │││││  ││││├┤ │
+// ┴┘└┘┴─┘┴┘└┘└─┘└─┘
+// Arbitary inline C code.
+//
+// inlinec("c.CStr", "\"oi\"")
+// inlinec("None", "puts(\"hello world\\n\"))
+//
+struct builtin_inlinec : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = ykobject(dt_pool);
+    if (args.size() != 2) {
+      o.string_val_ = "Two arguments must be provided for inlinec() builtin";
+    } else if (!args[0].datatype_->is_str() ||
+               arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+      o.string_val_ = "First argument to inlinec() must be a str literal";
+    } else if (!args[1].datatype_->is_str() ||
+               arg_expressions[1]->get_type() != ast_type::EXPR_LITERAL) {
+      o.string_val_ = "Second argument to inlinec() must be a str literal";
+    } else {
+      auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
+      auto data_type = lit->literal_token_->token_;
+      ykdatatype *parsed_dt_original =
+          dt_parser->parse(data_type, import_aliases, filepath);
+      if (parsed_dt_original != nullptr) {
+        ykdatatype *parsed_dt = parsed_dt_original;
+        if (parsed_dt_original->is_const()) {
+          parsed_dt = parsed_dt_original->args_[0];// Extract const
+        }
+        if (parsed_dt->is_function_input() || parsed_dt->is_function_output() ||
+            parsed_dt->is_m_entry() || parsed_dt->is_sm_entry() ||
+            parsed_dt->is_none() || parsed_dt->is_const()) {
+          o.string_val_ =
+              "First argument to inlinec() is an invalid data type " + data_type;
+        } else {
+          return ykobject(parsed_dt_original);
+        }
+      }
+    }
+    o.object_type_ = object_type::ERROR_DETECTED;
+    return o;
+  }
+  bool should_compile_argument(int arg_index, expr *arg_expression) override {
+    return false;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
+    auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
+    auto *code = dynamic_cast<literal_expr *>(arg_expressions[1]);
+    auto data_type = lit->literal_token_->token_;
+    ykdatatype *parsed_dt =
+        dt_parser->parse(data_type, import_aliases, filepath);
+    auto o = ykobject(dt_pool);
+    o.datatype_ = parsed_dt;
+    return {code->literal_token_->token_, o};
   }
 };
 //=======================================
@@ -1451,6 +1599,8 @@ builtins::builtins(ykdt_pool *dt_pool, gc_pool<token> *token_pool)
   builtins_.insert(
       {"map", new builtin_functional{builtin_functional::fnc::MAP, "map"}});
   builtins_.insert({"binarydata", new builtin_binarydata{}});
+  builtins_.insert({"make", new builtin_make{}});
+  builtins_.insert({"inlinec", new builtin_inlinec{}});
 }
 builtins::~builtins() {
   for (auto &i : builtins_) { delete i.second; }

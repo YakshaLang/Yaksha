@@ -165,6 +165,10 @@ public class YakshaCompletionContributor extends CompletionContributor {
                             resultSet.addElement(LookupElementBuilder.create(e.getKey())
                                     .withIcon(YakshaIcons.BUILT_IN).withTypeText(e.getValue().typeText()));
                         }
+
+                        for (String e: YakshaDocs.LISP_BUILTIN_NAMES) {
+                            resultSet.addElement(LookupElementBuilder.create(e).withBoldness(true).withIcon(YakshaIcons.DATA_TYPE));
+                        }
                     }
                 });
     }
