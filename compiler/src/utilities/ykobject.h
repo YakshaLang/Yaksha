@@ -10,7 +10,7 @@ namespace yaksha {
   enum class object_type {
     PRIMITIVE_OR_OBJ,
     FUNCTION,
-    RUNTIME_ERROR,
+    ERROR_DETECTED,
     UNKNOWN_OBJECT,
     CLASS_ITSELF,
     BUILTIN_FUNCTION,

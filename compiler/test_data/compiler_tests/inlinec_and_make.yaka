@@ -1,0 +1,8 @@
+@nativedefine("struct foreign")
+struct Foreign:
+    pass
+
+def main() -> int:
+    a: Ptr[Foreign] = make("Foreign")
+    b: Ptr[Foreign] = inlinec("Ptr[Foreign]", "make_foreign_ptr()")
+    return 0

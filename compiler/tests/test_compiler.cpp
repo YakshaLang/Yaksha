@@ -277,3 +277,11 @@ TEST_CASE("compiler: macros - gensym usage") {
   TEST_FILE("../test_data/macro_tests/g1.yaka", "g1.yaka",
             "../test_data/compiler_tests/output/g1.tokens");
 }
+TEST_CASE("compiler: inlinec and make") {
+  TEST_FILE("../test_data/compiler_tests/inlinec_and_make.yaka", "inlinec_and_make.yaka",
+            "../test_data/compiler_tests/output/inlinec_and_make.tokens");
+}
+TEST_CASE("compiler: inlinec & macros") {
+  TEST_FILE("../test_data/macro_tests/memory_writer.yaka", "memory_writer.yaka",
+            "../test_data/compiler_tests/output/memory_writer.tokens");
+}
