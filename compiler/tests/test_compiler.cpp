@@ -30,7 +30,10 @@ static void TEST_FILE(const std::string &A, const std::string &B,
     REQUIRE(parsed->file_ == snapshot->file_);
     REQUIRE(parsed->line_ == snapshot->line_);
     REQUIRE(parsed->pos_ == snapshot->pos_);
-    REQUIRE(parsed->token_ == snapshot->token_);
+    // Ignore gensym
+    if (!(parsed->token_.rfind("g_", 0) == 0 && snapshot->token_.rfind("g_", 0) == 0)) {
+      REQUIRE(parsed->token_ == snapshot->token_);
+    }
     REQUIRE(parsed->type_ == snapshot->type_);
   }
 }
