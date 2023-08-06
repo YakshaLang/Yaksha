@@ -155,6 +155,7 @@ const std::string YAKSHA_LISP_PRELUDE = R"<><><><>(
         (map_set m "line" -1)
         (map_set m "pos" -1)
         m)
+    (defun yk_assert_token (tok tok_type) (if (!= (map_get tok YK_KEY_WHAT) tok_type) (raise_error "invalid token type")))
     (defun ykt_integer_decimal (value) (yk_create_token YK_TOKEN_INTEGER_DECIMAL value))
     (defun ykt_float (value) (yk_create_token YK_TOKEN_FLOAT_NUMBER value))
     (defun ykt_double (value) (yk_create_token YK_TOKEN_DOUBLE_NUMBER value))
