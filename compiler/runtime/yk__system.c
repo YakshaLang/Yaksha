@@ -109,17 +109,25 @@ void yk__freewchar_array(wchar_t **arr) {
 }
 void yk__printstr(const char *str) {
   wchar_t *text = yk__utf8_to_utf16_null_terminated(str);
-  wprintf(L"%ls", text);
+  /* wprintf(L"%ls", text); */
+  fputws(text, stdout);
   free(text);
 }
 void yk__printlnstr(const char *str) {
   wchar_t *text = yk__utf8_to_utf16_null_terminated(str);
-  wprintf(L"%ls\n", text);
+  /* wprintf(L"%ls\n", text); */
+  _putws(text);
   free(text);
 }
 #else
-void yk__printstr(const char *str) { printf("%s", str); }
-void yk__printlnstr(const char *str) { printf("%s\n", str); }
+void yk__printstr(const char *str) {
+  /* printf("%s", str); */
+  fputs(str, stdout);
+}
+void yk__printlnstr(const char *str) {
+  /* printf("%s\n", str); */
+  puts(str);
+}
 #endif
 #if defined(_WIN32) || defined(_WIN64)
 #include <direct.h>
@@ -418,3 +426,7 @@ bool yk__io_writefile(yk__sds fpath, yk__sds data) {
   fclose(file);
   return fully_written;
 }
+#include "_include_io.c"
+#if defined(_WIN32) || defined(_WIN64)
+#include "_include_mman_win.c"
+#endif

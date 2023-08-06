@@ -1,3 +1,148 @@
+import libs.c
+
+PROT_NONE: Const[int] = ccode "PROT_NONE"
+PROT_READ: Const[int] = ccode "PROT_READ"
+PROT_WRITE: Const[int] = ccode "PROT_WRITE"
+PROT_EXEC: Const[int] = ccode "PROT_EXEC"
+
+MAP_FILE: Const[int] = ccode "MAP_FILE"
+MAP_SHARED: Const[int] = ccode "MAP_SHARED"
+MAP_PRIVATE: Const[int] = ccode "MAP_PRIVATE"
+MAP_TYPE: Const[int] = ccode "MAP_TYPE"
+MAP_FIXED: Const[int] = ccode "MAP_FIXED"
+MAP_ANONYMOUS: Const[int] = ccode "MAP_ANONYMOUS"
+MAP_ANON: Const[int] = ccode "MAP_ANON"
+MAP_FAILED: Const[int] = ccode "MAP_FAILED"
+
+MS_ASYNC: Const[int] = ccode "MS_ASYNC"
+MS_SYNC: Const[int] = ccode "MS_SYNC"
+MS_INVALIDATE: Const[int] = ccode "MS_INVALIDATE"
+
+O_RDONLY: Const[int] = ccode "YK__IO_O_RDONLY"
+O_WRONLY: Const[int] = ccode "YK__IO_O_WRONLY"
+O_RDWR: Const[int] = ccode "YK__IO_O_RDWR"
+O_CREAT: Const[int] = ccode "YK__IO_O_CREAT"
+O_EXCL: Const[int] = ccode "YK__IO_O_EXCL"
+O_APPEND: Const[int] = ccode "YK__IO_O_APPEND"
+O_ASYNC: Const[int] = ccode "YK__IO_O_ASYNC"
+O_CLOEXEC: Const[int] = ccode "YK__IO_O_CLOEXEC"
+O_NONBLOCK: Const[int] = ccode "YK__IO_O_NONBLOCK"
+O_TMPFILE: Const[int] = ccode "YK__IO_O_TMPFILE"
+
+
+@nativedefine("FILE")
+class File:
+    pass
+
+@nativedefine("fpos_t")
+class FilePos:
+    pass
+
+@nativemacro("stdin")
+def stdin() -> Ptr[File]:
+    pass
+
+@nativemacro("stdout")
+def stdout() -> Ptr[File]:
+    pass
+
+@nativemacro("stderr")
+def stderr() -> Ptr[File]:
+    pass
+
+@nativemacro("(nn__stream != NULL)")
+def valid(stream: Ptr[File]) -> bool:
+    # Did we succesfully opened a file?
+    pass
+
+@nativedefine("yk__io_fopen")
+def fopen(fname: str, mode: str) -> Ptr[File]:
+    # Open a file
+    pass
+
+@nativedefine("yk__io_fclose")
+def fclose(stream: Ptr[File]) -> bool:
+    # Close a file using given FILE*
+    pass
+
+@nativedefine("yk__io_fflush")
+def fflush(stream: Ptr[File]) -> bool:
+    pass
+
+def fflush_all() -> bool:
+    return fflush(cast("Ptr[File]", None))
+
+@nativedefine("yk__io_fread")
+def fread(buffer: AnyPtr, size: c.Size, count: c.Size, stream: Ptr[File]) -> c.Size:
+    pass
+
+@nativedefine("yk__io_fwrite")
+def fwrite(buffer: AnyPtr, size: c.Size, count: c.Size, stream: Ptr[File]) -> c.Size:
+    pass
+
+@nativedefine("yk__io_ftell")
+def ftell(stream: Ptr[File]) -> i64:
+    pass
+
+@nativemacro("(yk__io_fseek(nn__stream, nn__offset, SEEK_SET))")
+def fseek_begin(stream: Ptr[File], offset: i64) -> bool:
+    # Seek from begining
+    pass
+
+@nativemacro("(yk__io_fseek(nn__stream, nn__offset, SEEK_CUR))")
+def fseek_relative(stream: Ptr[File], offset: i64) -> bool:
+    # Seem from current location
+    pass
+
+@nativemacro("(yk__io_fseek(nn__stream, nn__offset, SEEK_END))")
+def fseek_end(stream: Ptr[File], offset: i64) -> bool:
+    # Seek from end
+    pass
+
+@nativedefine("yk__io_feof")
+def is_eof(stream: Ptr[File]) -> bool:
+    # Is end of file?
+    pass
+
+@nativedefine("yk__io_ferror")
+def has_error(stream: Ptr[File]) -> bool:
+    # Has error?
+    pass
+
+@nativedefine("yk__io_clearerr")
+def clear_error(stream: Ptr[File]) -> None:
+    # Clear eof and error
+    pass
+
+@nativedefine("yk__io_rewind")
+def rewind(stream: Ptr[File]) -> None:
+    # Set the position as begining of file
+    pass
+
+@nativedefine("mmap")
+def mmap(address: AnyPtr, length: c.Size, protection: int, flags: int, file_descriptor: c.CInt, offset: i64) -> AnyPtr:
+    pass
+
+@nativedefine("munmap")
+def munmap(address: AnyPtr, length: c.Size) -> int:
+    pass
+
+@nativedefine("mprotect")
+def mprotect(address: AnyPtr, length: c.Size, protection: int) -> int:
+    pass
+
+@nativedefine("msync")
+def msync(address: AnyPtr, length: c.Size, flags: int) -> int:
+    pass
+
+@nativedefine("mlock")
+def mlock(address: AnyPtr, length: c.Size) -> int:
+    pass
+
+@nativedefine("munlock")
+def munlock(address: AnyPtr, length: c.Size) -> int:
+    pass
+
 @native("yk__io_readfile")
 def readfile(fname: str) -> str:
     # Read a file to as string, on error returns empty
@@ -6,4 +151,12 @@ def readfile(fname: str) -> str:
 @native("yk__io_writefile")
 def writefile(fname: str, data: str) -> bool:
     # Write a file
+    pass
+
+@nativedefine("yk__io_open")
+def open(path: str, mode: int) -> c.CInt:
+    pass
+
+@nativedefine("yk__io_close")
+def close(file: c.CInt) -> bool:
     pass

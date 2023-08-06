@@ -35,7 +35,7 @@ set(YAKSHA_TEST_FILES
 
 include_directories("runtime")
 set(YAKSHA_RUNTIME_FILES
-        runtime/argparse.h runtime/cr.h runtime/cr_userdata.h runtime/ini.h runtime/stmmr.h runtime/subprocess.h runtime/tinycthread.h runtime/toml.h runtime/utf8proc.h runtime/wasm4.h runtime/whereami.h runtime/yk__argparse.h runtime/yk__arrayutils.h runtime/yk__console.h runtime/yk__cpu.h runtime/yk__graphic_utils.h runtime/yk__lib.h runtime/yk__process.h runtime/yk__system.h runtime/yk__utf8iter.h runtime/yk__wasm4_libc.h runtime/argparse.c runtime/tinycthread.c runtime/toml.c runtime/utf8proc.c runtime/whereami.c runtime/yk__argparse.c runtime/yk__arrayutils.c runtime/yk__console.c runtime/yk__cpu.c runtime/yk__graphic_utils.c runtime/yk__main.c runtime/yk__process.c runtime/yk__system.c) # update_makefile.py YK_RUNTIME
+        runtime/_include_io.h runtime/_include_mman_win.h runtime/argparse.h runtime/cr.h runtime/cr_userdata.h runtime/ini.h runtime/stmmr.h runtime/subprocess.h runtime/tinycthread.h runtime/toml.h runtime/utf8proc.h runtime/wasm4.h runtime/whereami.h runtime/yk__argparse.h runtime/yk__arrayutils.h runtime/yk__console.h runtime/yk__cpu.h runtime/yk__graphic_utils.h runtime/yk__lib.h runtime/yk__process.h runtime/yk__system.h runtime/yk__utf8iter.h runtime/yk__wasm4_libc.h runtime/argparse.c runtime/tinycthread.c runtime/toml.c runtime/utf8proc.c runtime/whereami.c runtime/yk__argparse.c runtime/yk__arrayutils.c runtime/yk__console.c runtime/yk__cpu.c runtime/yk__graphic_utils.c runtime/yk__main.c runtime/yk__process.c runtime/yk__system.c) # update_makefile.py YK_RUNTIME
 
 add_library(library_yaksha ${YAKSHA_SOURCE_FILES})
 

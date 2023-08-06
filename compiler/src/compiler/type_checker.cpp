@@ -683,10 +683,10 @@ void type_checker::visit_assign_member_expr(assign_member_expr *obj) {
 }
 void type_checker::visit_square_bracket_access_expr(
     square_bracket_access_expr *obj) {
-  handle_square_access(obj->index_expr_, obj->sqb_token_, obj->name_);
+  handle_square_access(obj->index_expr_, obj->sqb_token_, obj->name_, false);
 }
 void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
-                                        expr *name_expr) {
+                                        expr *name_expr, bool mutate) {
   index_expr->accept(this);
   auto index_exp = pop();
   if (!index_exp.datatype_->is_an_integer()) {
@@ -695,13 +695,21 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
   }
   name_expr->accept(this);
   auto arr_var = pop();
-  if (arr_var.datatype_->is_an_array()) {
+  ykdatatype* arr_data_type = arr_var.datatype_;
+  if (arr_data_type->is_const()) {
+    arr_data_type = arr_data_type->args_[0];
+  }
+  if (arr_data_type->is_an_array() || arr_data_type->is_a_pointer()) {
     auto placeholder = ykobject(dt_pool_);
-    placeholder.datatype_ = arr_var.datatype_->args_[0];
+    placeholder.datatype_ = arr_data_type->args_[0];
+    // --- OK ---
     push(placeholder);
+    if (placeholder.datatype_->is_const() && mutate) {
+      error(sqb_token, "Mutating an imutable element");
+    }
     return;
   }
-  if (arr_var.datatype_->is_tuple()) {
+  if (arr_data_type->is_tuple()) {
     if (index_expr->get_type() != ast_type::EXPR_LITERAL) {
       push(ykobject(dt_pool_));
       error(sqb_token, "Must use a literal for accessing tuple elements");
@@ -717,14 +725,18 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
     }
     auto item = lexp->literal_token_->token_;
     auto index = std::stoi(item);
-    if (index < 0 || index >= arr_var.datatype_->args_.size()) {
+    if (index < 0 || index >= arr_data_type->args_.size()) {
       push(ykobject(dt_pool_));
       error(sqb_token, "Tuple index out of bounds");
       return;
     }
     auto placeholder = ykobject(dt_pool_);
-    placeholder.datatype_ = arr_var.datatype_->args_[index];
+    placeholder.datatype_ = arr_data_type->args_[index];
+    // --- OK ---
     push(placeholder);
+    if (placeholder.datatype_->is_const() && mutate) {
+      error(sqb_token, "Mutating an imutable element");
+    }
     return;
   }
   push(ykobject(dt_pool_));
@@ -779,7 +791,7 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
   }
 }
 void type_checker::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
-  handle_square_access(obj->index_expr_, obj->sqb_token_, obj->name_);
+  handle_square_access(obj->index_expr_, obj->sqb_token_, obj->name_, true);
 }
 void type_checker::visit_ccode_stmt(ccode_stmt *obj) {
   auto fname = peek_function();

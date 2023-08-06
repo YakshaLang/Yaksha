@@ -60,3 +60,5 @@ test_data/document_samples/gui_window
 /test_data/compiler_tests/normal_hash_map.c
 .clang
 /bin/Release/
+/test_libs/tests
+/test_libs/tests.c

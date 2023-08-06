@@ -83,7 +83,7 @@ private:
     void pop_function();
     void handle_dot_operator(expr *lhs_expr, token *dot, token *member_item);
     void handle_square_access(expr *index_expr, token *sqb_token,
-                              expr *name_expr);
+                              expr *name_expr, bool mutate);
     void handle_assigns(token *oper, const ykobject &lhs, const ykobject &rhs);
     // Data type pool
     ykdt_pool *dt_pool_;

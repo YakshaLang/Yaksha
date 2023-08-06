@@ -1,0 +1,99 @@
+macros! {
+    (= counter -1)
+    (= tests @{})
+    (= test_order {})
+    (defun get_name () (do
+       (= counter (+ counter 1))
+       (+ "$test" (to_string counter))
+       ))
+    (defun create_print (message) (list (yk_create_token YK_TOKEN_NAME "print") (ykt_paren_open) message (ykt_paren_close) (ykt_newline)))
+    (defun create_println (message) (list (yk_create_token YK_TOKEN_NAME "println") (ykt_paren_open) message (ykt_paren_close) (ykt_newline)))
+    (defun create_colour_print (message colour) (list (yk_create_token YK_TOKEN_NAME "$co")
+        (ykt_dot) (yk_create_token YK_TOKEN_NAME colour) (ykt_paren_open) message (ykt_paren_close) (ykt_newline)))
+    # Font -- http://patorjk.com/software/taag/#p=display&f=Calvin%20S
+    (defun banner () (+
+        (create_colour_print (ykt_string "──────────────────") "cyan")    (create_println (ykt_string ""))
+        (create_colour_print (ykt_string "╦ ╦╔═╗╦╔═┌─┐┬ ┬╔═╗") "red")     (create_println (ykt_string ""))
+        (create_colour_print (ykt_string "╚╦╝╠═╣╠╩╗└─┐├─┤╠═╣") "green")   (create_println (ykt_string ""))
+        (create_colour_print (ykt_string " ╩ ╩ ╩╩ ╩└─┘┴ ┴╩ ╩") "yellow")  (create_println (ykt_string ""))
+        (create_colour_print (ykt_string "  ╔╦╗╔═╗╔═╗╔╦╗╔═╗ ") "red")     (create_println (ykt_string ""))
+        (create_colour_print (ykt_string "   ║ ║╣ ╚═╗ ║ ╚═╗ ") "green")   (create_println (ykt_string ""))
+        (create_colour_print (ykt_string "   ╩ ╚═╝╚═╝ ╩ ╚═╝ ") "yellow")  (create_println (ykt_string ""))
+        (create_colour_print (ykt_string "──────────────────") "cyan")    (create_println (ykt_string ""))
+        (create_colour_print (ykt_string "                  ") "cyan")    (create_println (ykt_string ""))
+    ))
+    (defun create_success_output (message) (+
+        (create_print (ykt_string "  "))
+        (create_colour_print (ykt_string "success") "green")
+        (create_colour_print (ykt_string " <- ") "cyan")
+        (create_print message)
+        (create_println (ykt_string ""))
+        (list (ykt_dedent))
+    ))
+    (defun create_failure_output (message) (+
+        (create_print (ykt_string "  "))
+        (create_colour_print (ykt_string "failure") "red")
+        (create_colour_print (ykt_string " <- ") "cyan")
+        (create_print message)
+        (create_println (ykt_string ""))
+        (list (ykt_keyword_return)
+        (ykt_integer_decimal 1) (ykt_newline) (ykt_dedent))
+    ))
+    (defun assert_true (message &condition) (do
+        (+
+            (list (ykt_keyword_if)) condition (list (ykt_colon) (ykt_newline) (ykt_indent))
+            (create_success_output message)
+            (list (ykt_keyword_else) (ykt_colon) (ykt_newline) (ykt_indent))
+            (create_failure_output message)
+        )
+    ))
+    (defun assert_false (message &condition) (do
+        (+
+            (list (ykt_keyword_if)) (list (ykt_keyword_not) (ykt_paren_open)) condition (list (ykt_paren_close))
+                (list (ykt_colon) (ykt_newline) (ykt_indent))
+                (create_success_output message)
+            (list (ykt_keyword_else) (ykt_colon) (ykt_newline) (ykt_indent))
+                (create_failure_output message)
+        )
+    ))
+    (defun test_case (name) (do
+        (= fun_name (get_name))
+        (push fun_name test_order)
+        (map_set tests fun_name name)
+        (list (ykt_keyword_def) (yk_create_token YK_TOKEN_NAME fun_name)
+            (ykt_paren_open) (ykt_paren_close) (ykt_arrow) (yk_create_token YK_TOKEN_NAME "int"))
+    ))
+    (defun end_test_case () (list (ykt_keyword_return)
+                                            (ykt_integer_decimal 0) (ykt_newline)))
+    (defun run_single_test (fun_name)
+        (+
+        (create_colour_print (ykt_string "TEST - ") "cyan")
+        (create_colour_print (map_get tests fun_name) "cyan")
+        (create_println (ykt_string ""))
+        # $x = $x + test_x()
+        (list (yk_create_token YK_TOKEN_NAME "$x") (ykt_eq) (yk_create_token YK_TOKEN_NAME "$x")
+            (ykt_plus) (yk_create_token YK_TOKEN_NAME fun_name) (ykt_paren_open) (ykt_paren_close) (ykt_newline))
+            ))
+    (defun run_all () (+
+        # import libs.console as $co
+        (list
+            (ykt_keyword_import) (yk_create_token YK_TOKEN_NAME "libs")
+            (ykt_dot) (yk_create_token YK_TOKEN_NAME "console") (ykt_keyword_as) (yk_create_token YK_TOKEN_NAME "$co") (ykt_newline))
+        # def main() -> int:
+        (list
+            (ykt_keyword_def) (yk_create_token YK_TOKEN_NAME "main")
+            (ykt_paren_open) (ykt_paren_close) (ykt_arrow) (yk_create_token YK_TOKEN_NAME "int") (ykt_colon) (ykt_newline) (ykt_indent))
+        (banner)
+        # $x = 0
+        (list (yk_create_token YK_TOKEN_NAME "$x") (ykt_eq) (ykt_integer_decimal 0) (ykt_newline))
+        # $x = $x + test_x()
+        (reduce + (map run_single_test test_order))
+        # return $x
+        (list (ykt_keyword_return) (yk_create_token YK_TOKEN_NAME "$x") (ykt_newline) (ykt_dedent))
+    ))
+    (yk_register {dsl assert_true assert_true})
+    (yk_register {dsl assert_false assert_false})
+    (yk_register {dsl test_case test_case})
+    (yk_register {dsl end_test_case end_test_case})
+    (yk_register {dsl run_all run_all})
+}
