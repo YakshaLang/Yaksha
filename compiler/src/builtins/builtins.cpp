@@ -1529,7 +1529,7 @@ struct builtin_inlinec : builtin {
         }
         if (parsed_dt->is_function_input() || parsed_dt->is_function_output() ||
             parsed_dt->is_m_entry() || parsed_dt->is_sm_entry() ||
-            parsed_dt->is_none() || parsed_dt->is_const()) {
+            parsed_dt->is_const()) {
           o.string_val_ =
               "First argument to inlinec() is an invalid data type " + data_type;
         } else {
@@ -1559,7 +1559,7 @@ struct builtin_inlinec : builtin {
         dt_parser->parse(data_type, import_aliases, filepath);
     auto o = ykobject(dt_pool);
     o.datatype_ = parsed_dt;
-    return {code->literal_token_->token_, o};
+    return {string_utils::unescape(code->literal_token_->token_), o};
   }
 };
 //=======================================
