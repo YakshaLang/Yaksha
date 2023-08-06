@@ -1328,7 +1328,7 @@ std::vector<token *> yaksha_macros::expand_dsl(
     std::string &filepath,
     std::unordered_map<std::string, import_stmt *> &imports,
     std::string &dsl_macro_name, std::vector<token *> &dsl_macro_input,
-    std::string imported_macro) {
+    std::string imported_macro, token *macro_name) {
   yaksha_envmap *env;
   if (imported_macro.empty()) {
     env = validate_and_get_environment_root(filepath);
@@ -1349,6 +1349,11 @@ std::vector<token *> yaksha_macros::expand_dsl(
         0,
     };
   }
+  if (env->has_map(KEY_IMPORT_REFERENCE)) {
+    env->set(KEY_IMPORT_REFERENCE, env->create_string(KEY_IMPORT_REFERENCE), false);
+  } else {
+    env->set(KEY_IMPORT_REFERENCE, env->create_string(KEY_IMPORT_REFERENCE), true);
+  }
   yaksha_lisp_value *result = nullptr;
   if (dsl_macro_input.empty()) {
     result = env->eval_call(callable_value, {});
@@ -1357,7 +1362,7 @@ std::vector<token *> yaksha_macros::expand_dsl(
         callable_value,
         create_token_maps_from_yaksha_tokens(dsl_macro_input, env));
   }
-  return create_yaksha_tokens_from_result(dsl_macro_name, result);
+  return create_yaksha_tokens_from_result(dsl_macro_name, result, macro_name);
 }
 yaksha_envmap *
 yaksha_macros::validate_and_get_environment_root(const std::string &filepath) {
@@ -1389,7 +1394,8 @@ yaksha_macros::create_token_maps_from_yaksha_tokens(
   return dsl_macro_input_list;
 }
 std::vector<token *> yaksha_macros::create_yaksha_tokens_from_result(
-    const std::string &dsl_macro_name, yaksha_lisp_value *result) {
+    const std::string &dsl_macro_name, yaksha_lisp_value *result,
+    token *macro_name) {
   if (result->type_ != yaksha_lisp_value_type::LIST) {
     throw parsing_error{
         "DSL macro " + dsl_macro_name + " did not return a list",
@@ -1399,7 +1405,7 @@ std::vector<token *> yaksha_macros::create_yaksha_tokens_from_result(
     };
   }
   auto result_list = std::vector<token *>{};
-  for (auto &r : result->list_) {
+  for (auto r : result->list_) {
     if (r->type_ != yaksha_lisp_value_type::MAP) {
       throw parsing_error{
           "DSL macro " + dsl_macro_name + " did not return a list of maps",
@@ -1483,8 +1489,13 @@ std::vector<token *> yaksha_macros::create_yaksha_tokens_from_result(
     }
     token->line_ = (int) token_line->num_;
     token->pos_ = (int) token_pos->num_;
+    if (token->line_ == -1 && token->pos_ == -1) {
+      token->line_ = macro_name->line_;
+      token->pos_ = macro_name->pos_;
+    }
     token->type_ = numeric_id_to_token((int) token_type->num_);
     token->original_ = token->token_;
+    token->file_ = macro_name->file_;
     result_list.emplace_back(token);
   }
   return result_list;
@@ -1538,6 +1549,7 @@ void yaksha_macros::init_env(
     auto name = i.second->name_->token_;
     env->set_map(name, mod);
   }
+  env->set_map("__FILE__", env->create_string(filepath));
   roots_[filepath] = env;
 }
 void yaksha_macros::gc_mark() {

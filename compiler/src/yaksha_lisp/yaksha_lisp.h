@@ -28,6 +28,7 @@
  * Example special forms are - if, do, scope, defun, def and lambda.
  *
  */
+static const char *const KEY_IMPORT_REFERENCE = "yk_import_ref";
 namespace yaksha {
   struct yk_memory_manager;
   enum class yaksha_lisp_token_type {
@@ -348,7 +349,7 @@ private:
                std::unordered_map<std::string, import_stmt *> &imports,
                std::string &dsl_macro_name,
                std::vector<token *> &dsl_macro_input,
-               std::string imported_macro) override;
+               std::string imported_macro, token *macro_name) override;
     gc_pool<token> *get_yk_token_pool() override;
     void
     init_env(std::string filepath,
@@ -374,7 +375,8 @@ private:
     std::unordered_map<std::string, yaksha_envmap *> roots_{};
     std::vector<token *>
     create_yaksha_tokens_from_result(const std::string &dsl_macro_name,
-                                     yaksha_lisp_value *result);
+                                     yaksha_lisp_value *result,
+                                     token *macro_name);
     std::vector<yaksha_lisp_value *>
     create_token_maps_from_yaksha_tokens(std::vector<token *> &dsl_macro_input,
                                          yaksha_envmap *env);

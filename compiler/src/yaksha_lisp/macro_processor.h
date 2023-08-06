@@ -35,7 +35,7 @@ namespace yaksha {
                std::unordered_map<std::string, import_stmt *> &imports,
                std::string &dsl_macro_name,
                std::vector<token *> &dsl_macro_input,
-               std::string imported_macro) = 0;
+               std::string imported_macro, token *macro_name) = 0;
 
 private:
   };

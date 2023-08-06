@@ -1009,13 +1009,20 @@ std::vector<token *> parser::macro_expand(macro_processor *mp,
       throw std::runtime_error("Unknown statement type");
     }
   }
-  if (dsl_macro->name2_ == nullptr) {
-    return mp->expand_dsl(filepath_, import_stmts_alias_,
-                          dsl_macro->name_->token_, result, "");
-  } else {
-    return mp->expand_dsl(filepath_, import_stmts_alias_,
-                          dsl_macro->name2_->token_, result,
-                          dsl_macro->name_->token_);
+  try {
+    if (dsl_macro->name2_ == nullptr) {
+      return mp->expand_dsl(filepath_, import_stmts_alias_,
+                            dsl_macro->name_->token_, result, "", dsl_macro->name_);
+    } else {
+      return mp->expand_dsl(filepath_, import_stmts_alias_,
+                            dsl_macro->name2_->token_, result,
+                            dsl_macro->name_->token_, dsl_macro->name2_);
+    }
+  } catch (parsing_error &err) {
+    if (err.tok_.line_ != 0 || err.tok_.pos_ != 0) { throw; }
+    throw parsing_error{err.message_,
+                        ((dsl_macro->name2_ == nullptr) ? dsl_macro->name_
+                                                        : dsl_macro->name2_)};
   }
 }
 void parser::parse_token_soup(std::vector<stmt *> &stmts,
