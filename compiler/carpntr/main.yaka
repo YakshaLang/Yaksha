@@ -64,7 +64,7 @@ def print_config(config: carp.Config) -> None:
     printkv("w4", config.w4_path)
     printkv("standard library version", libs.version())
 
-def build_from_config(config: carp.Config, simple: bool) -> int:
+def build_from_config(config: carp.Config, simple: bool, silent: bool) -> int:
     # Build given config, if simple building.build_simple() is called
     return_val: int = 0
     yk_args: Array[str] = array("str", config.compiler_path, "compile", config.project.main, config.libs_path)
@@ -85,7 +85,7 @@ def build_from_config(config: carp.Config, simple: bool) -> int:
     else:
         if strings.startswith(result.output, "// YK"):
             if simple:
-                return_val = building.build_simple(config, result.output)
+                return_val = building.build_simple(config, result.output, silent)
             else:
                 return_val = building.build(config, result.output)
         else:
@@ -105,7 +105,7 @@ def perform_build() -> int:
         print_errors(config.errors)
         return -1
     print_config(config)
-    ret: int = build_from_config(config, False)
+    ret: int = build_from_config(config, False, False)
     return ret
 
 def perform_mini_build(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str, asset_path: str, silent: bool, actually_run: bool, crdll: bool, no_parallel: bool) -> int:
@@ -118,14 +118,15 @@ def perform_mini_build(filename: str, use_raylib: bool, use_web: bool, wasm4: bo
         return -1
     if not silent:
         print_config(config)
-    ret: int = build_from_config(config, True)
+    ret: int = build_from_config(config, True, silent)
     if ret != 0:
         return ret
     if not actually_run:
         return 0
     # Try to run binary now
-    console.cyan("-----------------------------")
-    print("\n")
+    if not silent:
+        console.cyan("-----------------------------")
+        print("\n")
     binary: str = name
     if use_web:
         binary = binary + ".html"

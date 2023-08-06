@@ -329,7 +329,14 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     # ----
     return args
 
-def build_target(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> int:
+def print_target_eq(target: str, native: bool) -> None:
+    if native:
+        console.yellow("native")
+    else:
+        console.yellow(target)
+    console.cyan(" := ")
+
+def build_target(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str], silent: bool) -> int:
     # Build a single target (platform)
     # if target is empty it is considered to be native (current platform)
     # zero is returned if successful
@@ -338,15 +345,13 @@ def build_target(c: carp.Config, code_path: str, build_path: str, target: str, r
     defer sarr.del_str_array(a)
     result: os.ProcessResult = os.run(a)
     defer os.del_process_result(result)
-    if native:
-        console.yellow("native")
-    else:
-        console.yellow(target)
-    console.cyan(" := ")
     if result.ok:
-        console.green("done.\n")
+        if not silent:
+            print_target_eq(target, native)
+            console.green("done.\n")
         return 0
     else:
+        print_target_eq(target, native)
         console.red("failed.\n")
         console.cyan("-------\n")
         console.red("command := ")
@@ -364,7 +369,7 @@ def print_error(error: str, ignored: int) -> bool:
 def build(c: carp.Config, code: str) -> int:
     # Cross build all compilation targets
     # zero is returned if all are successful
-    carp.load_runtime_features(c, code)
+    carp.load_runtime_features(c, code, False)
     if c.compilation.wasm4 and (c.compilation.web or c.compilation.raylib):
         arrput(c.errors, "WASM4 builds are not compatible with raylib/web builds")
 
@@ -410,13 +415,13 @@ def build(c: carp.Config, code: str) -> int:
     failed_count: int = 0
 
     # Build current system native binary
-    failed_count = failed_count + build_target(c, code_path, build_path, target, raylib_args)
+    failed_count = failed_count + build_target(c, code_path, build_path, target, raylib_args, False)
 
     # Building other targets
     cnt: int = 0
     while cnt < len(c.compilation.targets):
         target = c.compilation.targets[cnt]
-        failed_count = failed_count + build_target(c, code_path, build_path, target, raylib_args)
+        failed_count = failed_count + build_target(c, code_path, build_path, target, raylib_args, False)
         cnt = cnt + 1
 
     print("\n")
@@ -424,9 +429,9 @@ def build(c: carp.Config, code: str) -> int:
         return -1
     return 0
 
-def build_simple(c: carp.Config, code: str) -> int:
+def build_simple(c: carp.Config, code: str, silent: bool) -> int:
     # Native build only
-    carp.load_runtime_features(c, code)
+    carp.load_runtime_features(c, code, silent)
     if c.compilation.wasm4 and (c.compilation.web or c.compilation.raylib):
         arrput(c.errors, "WASM4 builds are not compatible with raylib/web builds")
     if len(c.errors) > 0:
@@ -448,7 +453,7 @@ def build_simple(c: carp.Config, code: str) -> int:
         println(code_path)
         return -1
 
-    failed_count: int = build_target(c, code_path, os.cwd(), target, raylib_args)
+    failed_count: int = build_target(c, code_path, os.cwd(), target, raylib_args, silent)
 
     if failed_count > 0:
         return -1

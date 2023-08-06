@@ -238,14 +238,15 @@ def inject_c_code_defaults(cc: CCode, c: Config) -> CCode:
 
     return cc
 
-def load_runtime_features(c: Config, code: str) -> Config:
+def load_runtime_features(c: Config, code: str, silent: bool) -> Config:
     header: str = "// YK:"
     has_requirements: bool = strings.startswith(code, header)
     if not has_requirements:
-        console.cyan("runtime_features")
-        console.red(" := ")
-        console.green("none!")
-        print("\n")
+        if not silent:
+            console.cyan("runtime_features")
+            console.red(" := ")
+            console.green("none!")
+            print("\n")
         return c
     # Find #
     until: int = strings.find_char(code, strings.ord("#"))
@@ -254,10 +255,11 @@ def load_runtime_features(c: Config, code: str) -> Config:
         arrput(c.errors, "Failed to extract runtime features. Cannot find # in compiled code first line.")
         return c
     temp_features: str = strings.mid(code, len(header), until - len(header))
-    console.cyan("runtime_features")
-    console.red(" := ")
-    console.green(temp_features)
-    print("\n")
+    if not silent:
+        console.cyan("runtime_features")
+        console.red(" := ")
+        console.green(temp_features)
+        print("\n")
     features: Array[str] = strings.split(temp_features, ",")
     defer sarr.del_str_array(features)
     x: int = 0
