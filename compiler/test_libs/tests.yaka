@@ -1,0 +1,47 @@
+import libs.unittest as u
+import libs.strings as s
+import libs.console as console
+
+# ---------------------------------------------------------------------------------------------
+# ┌─┐┌─┐┌─┐┬ ┬┌┬┐┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
+# ├─┤└─┐└─┐│ ││││├─┘ │ ││ ││││└─┐
+# ┴ ┴└─┘└─┘└─┘┴ ┴┴   ┴ ┴└─┘┘└┘└─┘
+# ---------------------------------------------------------------------------------------------
+u.test_case!{"assumptions"}:
+    u.assert_true!{"char is 1 byte" (1 == inlinec("int", "sizeof(char)"))}
+    x = 1
+    u.assert_true!{"int is 4 byte" (4 == inlinec("int", "sizeof(yy__x)"))}
+    u.end_test_case!{}
+
+# ---------------------------------------------------------------------------------------------
+# ┬  ┬┌┐ ┌─┐ ┌─┐┌┬┐┬─┐┬┌┐┌┌─┐┌─┐
+# │  │├┴┐└─┐ └─┐ │ ├┬┘│││││ ┬└─┐
+# ┴─┘┴└─┘└─┘o└─┘ ┴ ┴└─┴┘└┘└─┘└─┘
+# ---------------------------------------------------------------------------------------------
+u.test_case!{"libs.strings.contains"}:
+    u.assert_true!{"""strings.contains("", "")""" (s.contains("", ""))}
+    u.assert_true!{"""strings.contains("a", "a")""" (s.contains("a", "a"))}
+    u.assert_true!{"""strings.contains("ab", "a")""" (s.contains("ab", "a"))}
+    u.assert_false!{"""strings.contains("a", "ab")""" (s.contains("a", "ab"))}
+    u.end_test_case!{}
+
+u.test_case!{"libs.strings.startswith"}:
+    u.assert_true!{"""strings.startswith("", "")""" (s.startswith("", ""))}
+    u.assert_true!{"""strings.startswith("a", "a")""" (s.startswith("a", "a"))}
+    u.assert_true!{"""strings.startswith("ab", "a")""" (s.startswith("ab", "a"))}
+    u.end_test_case!{}
+
+
+# ---------------------------------------------------------------------------------------------
+# ┬  ┬┌┐ ┌─┐ ┌─┐┌─┐┌┐┌┌─┐┌─┐┬  ┌─┐
+# │  │├┴┐└─┐ │  │ ││││└─┐│ ││  ├┤
+# ┴─┘┴└─┘└─┘o└─┘└─┘┘└┘└─┘└─┘┴─┘└─┘
+# ---------------------------------------------------------------------------------------------
+u.test_case!{"libs.console.print_literal!{}"}:
+    console.print_literal!{"  Hello"}
+    console.println_literal!{" World"}
+    u.end_test_case!{}
+
+# ---------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
+u.run_all!{}

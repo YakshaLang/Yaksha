@@ -3,6 +3,8 @@
 #include "yk__lib.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
 ////////////////////////// Base System Module //////////////////////////
 struct yk__arguments {
   yk__sds *argv;
@@ -30,6 +32,14 @@ bool yk__io_writefile(yk__sds name, yk__sds data);
 #if defined(_WIN32) || defined(_WIN64)
 wchar_t *yk__utf8_to_utf16_null_terminated(const char *str);
 char *yk__utf16_to_utf8_null_terminated(const wchar_t *str);
+#endif
+#include "_include_io.h"
+#include <fcntl.h>
+#if defined(_WIN32) || defined(_WIN64)
+#include "_include_mman_win.h"
+#else
+#include <unistd.h>
+#include <sys/mman.h>
 #endif
 //////////////////////// Forward declaration to yaksha code main() /////////////
 int32_t yy__main();

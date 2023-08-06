@@ -1,3 +1,20 @@
+macros! {
+    (defun const_str (elem)
+        (list (yk_create_token YK_TOKEN_NAME "inlinec")
+            (ykt_paren_open)
+            (ykt_string (+ "Const[Ptr[Const[" yk_import_ref ".Char]]]")) (ykt_comma)
+            (ykt_string (repr (repr elem::value))) (ykt_paren_close)))
+    (defun character (elem)
+        (list (yk_create_token YK_TOKEN_NAME "inlinec")
+            (ykt_paren_open)
+            (ykt_string (+ "Const[" yk_import_ref ".Char]")) (ykt_comma)
+            (ykt_string (+ "'" elem::value "'") (ykt_paren_close))))
+    (yk_register {dsl str const_str})
+    # c.str!{"Hi"} --> create a const char * const --> inlinec("Const[Ptr[Const[Char]]]", "\"Hi\"")
+    (yk_register {dsl char character})
+    # c.char!{"a"} --> create a char --> inlinec("Const[Char]", "'a'")
+}
+
 @nativedefine("void*")
 class VoidPtr:
     # Any pointer type
@@ -30,6 +47,10 @@ class CInt:
 class CLong:
     pass
 
+@nativedefine("long long")
+class CLongLong:
+    pass
+
 @nativedefine("short")
 class CShort:
     pass
@@ -38,12 +59,20 @@ class CShort:
 class CChar:
     pass
 
+@nativedefine("signed char")
+class CSChar:
+    pass
+
 @nativedefine("unsigned int")
 class CUInt:
     pass
 
 @nativedefine("unsigned long")
 class CULong:
+    pass
+
+@nativedefine("unsigned long long")
+class CULongLong:
     pass
 
 @nativedefine("unsigned short")

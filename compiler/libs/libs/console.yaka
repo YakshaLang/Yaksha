@@ -1,5 +1,24 @@
 runtimefeature "console"
 
+macros! {
+    (defun print_literal (elem)
+        (do (yk_assert_token elem YK_TOKEN_STRING)
+        (list (yk_create_token YK_TOKEN_NAME "inlinec")
+            (ykt_paren_open)
+            (ykt_string "None") (ykt_comma)
+            (ykt_string (+ "yk__printstr(" (repr elem::value) ")")) (ykt_paren_close))))
+    (defun println_literal (elem)
+        (do (yk_assert_token elem YK_TOKEN_STRING)
+        (list (yk_create_token YK_TOKEN_NAME "inlinec")
+            (ykt_paren_open)
+            (ykt_string "None") (ykt_comma)
+            (ykt_string (+ "yk__printlnstr(" (repr elem::value) ")")) (ykt_paren_close))))
+    (yk_register {dsl print_literal print_literal})
+    # print_literal!{"x"} --> print a string literal without creating a str object
+    (yk_register {dsl println_literal println_literal})
+    # println_literal!{"x"} --> print a string (with newline) without creating a str object
+}
+
 REWIND: Const[int] = 0
 # Use rewind with set_color to stop applying any color
 RED: Const[int] = 1
