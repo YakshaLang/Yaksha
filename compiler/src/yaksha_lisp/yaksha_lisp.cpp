@@ -870,6 +870,9 @@ void yaksha_envmap::setup_builtins() {
   set("insert", create_builtin(this, "insert", yaksha_lisp_builtins::insert_));
   set("remove", create_builtin(this, "remove", yaksha_lisp_builtins::remove_));
   set("parse", create_builtin(this, "parse", yaksha_lisp_builtins::parse_));
+  set("sorted", create_builtin(this, "sorted", yaksha_lisp_builtins::sorted_));
+  set("reversed",
+      create_builtin(this, "reversed", yaksha_lisp_builtins::reversed_));
   set("bitwise_and",
       create_builtin(this, "bitwise_and", yaksha_lisp_builtins::bitwise_and_));
   set("bitwise_or",
@@ -1350,9 +1353,11 @@ std::vector<token *> yaksha_macros::expand_dsl(
     };
   }
   if (env->has_map(KEY_IMPORT_REFERENCE)) {
-    env->set(KEY_IMPORT_REFERENCE, env->create_string(KEY_IMPORT_REFERENCE), false);
+    env->set(KEY_IMPORT_REFERENCE, env->create_string(KEY_IMPORT_REFERENCE),
+             false);
   } else {
-    env->set(KEY_IMPORT_REFERENCE, env->create_string(KEY_IMPORT_REFERENCE), true);
+    env->set(KEY_IMPORT_REFERENCE, env->create_string(KEY_IMPORT_REFERENCE),
+             true);
   }
   yaksha_lisp_value *result = nullptr;
   if (dsl_macro_input.empty()) {

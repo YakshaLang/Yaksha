@@ -22,7 +22,15 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
     object = scope_.get(name);
   } else {
     if (rhs.is_a_function()) { rhs.datatype_ = function_to_datatype(rhs); }
-    object = ykobject(rhs.datatype_);
+    if (rhs.datatype_->is_none()) {
+      error(obj->opr_, "Cannot infer type when RHS is None");
+    }
+    if (rhs.datatype_->is_string_literal()) {
+      // When `a = string_lit`, then `a` should be promoted to `sr`
+      object = ykobject(dt_pool_->create("sr"));
+    } else {
+      object = ykobject(rhs.datatype_);
+    }
     obj->promoted_ = true;
   }
   handle_assigns(obj->opr_, object, rhs);
@@ -30,10 +38,8 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
 }
 template<typename Verifier>
 bool dt_match_ignore_const(ykdatatype *lhs, ykdatatype *rhs, Verifier v) {
-  ykdatatype *my_lhs = lhs;
-  ykdatatype *my_rhs = rhs;
-  if (lhs->is_const()) { my_lhs = lhs->args_[0]; }
-  if (rhs->is_const()) { my_rhs = rhs->args_[0]; }
+  ykdatatype *my_lhs = lhs->const_unwrap();
+  ykdatatype *my_rhs = rhs->const_unwrap();
   return (*my_lhs == *my_rhs) && v(my_lhs) && v(my_rhs);
 }
 #define DT_MATCH(lhs, rhs, fnc)                                                \
@@ -79,12 +85,23 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
               "% - * / operators work only for numbers of same type");
       }
       break;
-    case token_type::PLUS:
-      if (!(DT_MATCH(lhs, rhs, (a->is_a_number() || a->is_str())))) {
+    case token_type::PLUS: {
+      // Does this result in a str?
+      auto castable = lhs.datatype_->auto_cast(rhs.datatype_, false, dt_pool_);
+      if (castable != nullptr) {
+        push(ykobject(castable));
+        return;
+      }
+      if (!(DT_MATCH(lhs, rhs, (a->is_a_number() || a->is_a_string())))) {
         error(obj->opr_,
               "+ operator works only for numbers of same type or strings");
       }
+      if (lhs.datatype_->const_unwrap()->is_sr()) {// sr + sr -> str
+        push(ykobject(dt_pool_->create("str")));
+        return;
+      }
       break;
+    }
     case token_type::LESS:
     case token_type::LESS_EQ:
     case token_type::GREAT:
@@ -104,6 +121,12 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
               "MEntry/SMEntry/Tuple cannot be compared with == or != operator");
         break;
       }
+      // Any 2 string data types can be compared due to auto type casting
+      if (lhs.datatype_->const_unwrap()->is_a_string() &&
+          rhs.datatype_->const_unwrap()->is_a_string()) {
+        push(ykobject(dt_pool_->create("bool")));
+        return;
+      }
       if (lhs.datatype_->is_none() || rhs.datatype_->is_none()) {
         // can compare with array/anyptr/pointer/none/not primitive
         ykdatatype *to_comp;
@@ -114,7 +137,7 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
         }
         if (to_comp->is_const()) { to_comp = to_comp->args_[0]; }
         if (!(to_comp->is_any_ptr() || to_comp->is_an_array() ||
-              to_comp->is_str() || to_comp->is_a_pointer() ||
+              to_comp->is_a_string() || to_comp->is_a_pointer() ||
               to_comp->is_any_ptr_to_const() || to_comp->is_none() ||
               !to_comp->is_builtin_or_primitive())) {
           error(obj->opr_, "Datatype cannot be compared with None");
@@ -268,7 +291,7 @@ void type_checker::visit_literal_expr(literal_expr *obj) {
   auto literal_type = obj->literal_token_->type_;
   if (literal_type == token_type::STRING ||
       literal_type == token_type::THREE_QUOTE_STRING) {
-    data = ykobject(std::string{"str"}, dt_pool_);
+    data = ykobject(obj->literal_token_->token_, dt_pool_);
   } else if (literal_type == token_type::KEYWORD_TRUE ||
              literal_type == token_type::KEYWORD_FALSE) {
     data = ykobject(true, dt_pool_);
@@ -467,6 +490,9 @@ void type_checker::visit_let_stmt(let_stmt *obj) {
   if (scope_.is_defined(name)) {
     error(obj->name_, "Redefining a variable is not allowed");
   }
+  if (obj->data_type_->is_none()) {
+    error(obj->name_, "Cannot use None as a data type here");
+  }
   auto placeholder = ykobject(obj->data_type_);
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
@@ -494,6 +520,7 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
     if (!slot_match(return_data_type, func->return_type_)) {
       error(obj->return_keyword_, "Invalid return data type");
     }
+    obj->result_type_ = func->return_type_;
   }
 }
 void type_checker::visit_while_stmt(while_stmt *obj) {
@@ -598,9 +625,9 @@ void type_checker::visit_del_stmt(del_stmt *obj) {
   auto deletable_expression = pop();
   ykdatatype *dt = deletable_expression.datatype_;
   if (dt->is_const()) { dt = dt->args_[0]; }
-  // Cannot delete int, bool
+  // Cannot delete int, bool. But we can delete sr and str
   if (deletable_expression.is_primitive_or_obj() && dt->is_primitive() &&
-      !dt->is_str()) {
+      !dt->is_str() && !dt->is_sr()) {
     error(obj->del_keyword_, "Invalid delete statement used on primitives");
   }
   if (dt->is_m_entry() || dt->is_sm_entry() || dt->is_tuple() ||
@@ -695,10 +722,7 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
   }
   name_expr->accept(this);
   auto arr_var = pop();
-  ykdatatype* arr_data_type = arr_var.datatype_;
-  if (arr_data_type->is_const()) {
-    arr_data_type = arr_data_type->args_[0];
-  }
+  ykdatatype *arr_data_type = arr_var.datatype_->const_unwrap();
   if (arr_data_type->is_an_array() || arr_data_type->is_a_pointer()) {
     auto placeholder = ykobject(dt_pool_);
     placeholder.datatype_ = arr_data_type->args_[0];
@@ -756,10 +780,12 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
     error(oper, "You can only assign a function to a Function[In[?],Out[?]]");
   }
   if ((lhs.is_primitive_or_obj() && rhs.is_primitive_or_obj())) {
-    auto rhs_dt = rhs.datatype_;
-    if (rhs_dt->is_const()) { rhs_dt = rhs.datatype_->args_[0]; }
+    auto rhs_dt = rhs.datatype_->const_unwrap();
     if (*lhs.datatype_ != *rhs_dt) {
-      error(oper, "Cannot assign between 2 different data types.");
+      auto castable = lhs.datatype_->auto_cast(rhs.datatype_, true, dt_pool_);
+      if (castable == nullptr) {
+        error(oper, "Cannot assign between 2 different data types.");
+      }
     }
   }
   token_type operator_type = oper->type_;
@@ -782,6 +808,7 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
       }
       break;
     case token_type::PLUS_EQ:
+      // += will not be supported for string references or literals as that makes no sense
       if (!lhs.datatype_->is_a_number() && !lhs.datatype_->is_str()) {
         error(oper, "Cannot use += for data type");
       }
@@ -806,8 +833,9 @@ void type_checker::visit_import_stmt(import_stmt *obj) {
 }
 void type_checker::visit_const_stmt(const_stmt *obj) {
   if (!obj->data_type_->args_[0]->is_bool() &&
-      !obj->data_type_->args_[0]->is_a_number()) {
-    error(obj->name_, "Only number and bool constants are supported");
+      !obj->data_type_->args_[0]->is_a_number() &&
+      !obj->data_type_->args_[0]->is_sr()) {
+    error(obj->name_, "Only number/bool/sr constants are supported");
   }
   if (obj->expression_ == nullptr) {
     error(obj->name_, "Need a value for the constant");
@@ -817,8 +845,12 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto expression_data = pop();
-    ykdatatype *expression_dt = expression_data.datatype_;
-    if (expression_dt->is_const()) { expression_dt = expression_dt->args_[0]; }
+    ykdatatype *expression_dt = expression_data.datatype_->const_unwrap();
+    if (obj->data_type_->args_[0]->is_sr() &&
+        expression_dt->is_string_literal()) {
+      // sr and literal is allowed
+      return;
+    }
     if (*(obj->data_type_->args_[0]) != *expression_dt) {
       error(obj->name_, "Data type mismatch in expression and declaration.");
     }
@@ -831,7 +863,16 @@ bool type_checker::slot_match(const ykobject &arg, ykdatatype *datatype) {
     ykdatatype *arg_datatype = function_to_datatype(arg);
     return arg_datatype != nullptr && *arg_datatype == *datatype;
   }
-  if (arg.is_primitive_or_obj() && *arg.datatype_ == *datatype) { return true; }
+  if (arg.is_primitive_or_obj() &&
+      *(arg.datatype_->const_unwrap()) == *(datatype->const_unwrap())) {
+    return true;
+  }
+  // Due to auto casting any string can be passed to any string (at user level we only got sr and str)
+  if (arg.is_primitive_or_obj() &&
+      arg.datatype_->const_unwrap()->is_a_string() &&
+      datatype->const_unwrap()->is_a_string()) {
+    return true;
+  }
   return false;
 }
 ykdatatype *type_checker::function_to_datatype(const ykobject &arg) {

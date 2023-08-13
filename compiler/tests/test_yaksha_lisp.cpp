@@ -1,6 +1,6 @@
 #include "ast/parser.h"
-#include "utilities/cpp_util.h"
 #include "catch2/catch.hpp"
+#include "utilities/cpp_util.h"
 #define private public
 #include "yaksha_lisp/yaksha_lisp.h"
 #undef private
@@ -28,7 +28,8 @@ void test_snippet_execute(std::string code) {
   auto yaksha_lisp_m = yaksha_macros{};
   auto dt = yaksha_lisp_m.create_tokenizer();
   auto parser = yaksha_lisp_m.create_parser(dt);
-  dt->tokenize("test.macro", std::move(code), yaksha_lisp_m.get_yk_token_pool());
+  dt->tokenize("test.macro", std::move(code),
+               yaksha_lisp_m.get_yk_token_pool());
   REQUIRE(dt->errors_.empty());
   parser->parse();
   REQUIRE(parser->errors_.empty());
@@ -37,7 +38,7 @@ void test_snippet_execute(std::string code) {
   if (env->builtins_created_) { env->setup_prelude(); }
   yaksha_lisp_m.builtins_root_ = env;
   yaksha_lisp_m.enable_gc();
-  env->unlock(); // unlock as we do not create 2nd env
+  env->unlock();// unlock as we do not create 2nd env
   try {
     env->eval(parser->exprs_);
   } catch (const parsing_error &e) { FAIL(e.message_); }
@@ -105,7 +106,8 @@ void no_crash_test(std::string text) {
   try {
     auto yaksha_lisp_m = yaksha_macros{};
     auto dt = yaksha_lisp_tokenizer{&yaksha_lisp_m};
-    dt.tokenize("test.macro", std::move(text), yaksha_lisp_m.get_yk_token_pool());
+    dt.tokenize("test.macro", std::move(text),
+                yaksha_lisp_m.get_yk_token_pool());
     if (!dt.errors_.empty()) return;
     auto parser = yaksha_lisp_parser{&dt, &yaksha_lisp_m};
     parser.parse();
@@ -593,7 +595,7 @@ TEST_CASE("yaksha_lisp: random string test") {
     std::uniform_int_distribution<> dis(0, 5);
     std::vector<std::string> keywords = {
         "if", "def", "define", "defun", "setq", "print", "=", "!=", "==",
-        "<",  "<=",  ">=",     "+",     "-",   "*",     "/", "%"};
+        "<",  "<=",  ">=",     "+",     "-",    "*",     "/", "%"};
     std::uniform_int_distribution<> dis_keywords(
         0, static_cast<int>(keywords.size() - 1));
     for (int i = 0; i < 100; ++i) {
@@ -621,7 +623,7 @@ TEST_CASE("yaksha_lisp: random s-expression test with keywords") {
     std::string random_code = "(";
     std::vector<std::string> keywords = {
         "if", "def", "define", "defun", "setq", "print", "=", "!=", "==",
-        "<",  "<=",  ">=",     "+",     "-",   "*",     "/", "%"};
+        "<",  "<=",  ">=",     "+",     "-",    "*",     "/", "%"};
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 5);
@@ -679,10 +681,12 @@ TEST_CASE("yaksha_lisp: single line stuff") {
   test_snippet_execute(R"((println "Hello World") (= success 1))");
 }
 TEST_CASE("yaksha_lisp: execute non existing element") {
-  test_snippet_execute_unhappy(R"((echo "Hello World"))", "unknown symbol: echo");
+  test_snippet_execute_unhappy(R"((echo "Hello World"))",
+                               "unknown symbol: echo");
 }
 TEST_CASE("yaksha_lisp: execute non callable") {
-  test_snippet_execute_unhappy(R"((3 "Hello World"))", "calling a non callable (nor metamacro): 3");
+  test_snippet_execute_unhappy(R"((3 "Hello World"))",
+                               "calling a non callable (nor metamacro): 3");
 }
 TEST_CASE("yaksha_lisp: metamacro support") {
   test_snippet_execute(R"(
@@ -759,12 +763,17 @@ def main() -> int:
 }
 TEST_CASE("yaksha_macro_support: list builtins") {
   // ----------
-  yaksha_macro_preprocess_happy_path(R"**(# In order to print a list of builtins in YakshaLisp
+  yaksha_macro_preprocess_happy_path(
+      R"**(# In order to print a list of builtins in YakshaLisp
 #   just run this!
 macros! {
     (system_enable_print)
+    (= all_builtins (map_keys (parent)))
+    (= all_builtins (reversed (sorted (map repr all_builtins))))
+    (defun comma (x y) (+ x ", " y))
+    (= all_builtins (reduce comma all_builtins))
     (println "Builtins:")
-    (println (repr (map_keys (parent))))
+    (println all_builtins)
     (= success 1)
 }
 

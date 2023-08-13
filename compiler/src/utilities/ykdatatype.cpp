@@ -1,6 +1,8 @@
 // ykdatatype.cpp
 #include "ykdatatype.h"
 #include "compiler/compiler_utils.h"
+#include "utilities/cpp_util.h"
+#include "ykdt_pool.h"
 #include <utility>
 using namespace yaksha;
 ykdatatype::ykdatatype(token *primitive_dt) {
@@ -36,6 +38,10 @@ void ykdatatype::find_builtin_or_primitive() {
     primitive_type_ = ykprimitive::F64;
   } else if (token_->token_ == "str") {
     primitive_type_ = ykprimitive::STR;
+  } else if (token_->token_ == "sr") {
+    primitive_type_ = ykprimitive::SR;
+  } else if (token_->token_ == ":s:") {
+    primitive_type_ = ykprimitive::HIDDEN_STRING_LIT;
   } else if (token_->token_ == "bool") {
     primitive_type_ = ykprimitive::BOOL;
   } else if (token_->token_ == "None") {
@@ -75,6 +81,7 @@ bool ykdatatype::is_u16() const { return primitive_type_ == ykprimitive::U16; }
 bool ykdatatype::is_u32() const { return primitive_type_ == ykprimitive::U32; }
 bool ykdatatype::is_u64() const { return primitive_type_ == ykprimitive::U64; }
 bool ykdatatype::is_str() const { return primitive_type_ == ykprimitive::STR; }
+bool ykdatatype::is_sr() const { return primitive_type_ == ykprimitive::SR; }
 bool ykdatatype::is_float() const {
   return primitive_type_ == ykprimitive::F32;
 }
@@ -112,12 +119,9 @@ std::string ykdatatype::as_string() const {
   return s.str();
 }
 bool ykdatatype::is_primitive() const {
-  return is_str() || is_int() || is_float() || is_bool() || is_f32() ||
-         is_f64() || is_i8() || is_i16() || is_i32() || is_i64() || is_u8() ||
-         is_u16() || is_u32() || is_u64() || is_none();
-}
-bool ykdatatype::matches(const yaksha::ykdatatype &template_) const {
-  return *this == template_;
+  return is_str() || is_sr() || is_string_literal() || is_int() || is_float() ||
+         is_bool() || is_f32() || is_f64() || is_i8() || is_i16() || is_i32() ||
+         is_i64() || is_u8() || is_u16() || is_u32() || is_u64() || is_none();
 }
 ykdatatype::ykdatatype(std::string primitive) : type_(std::move(primitive)) {
   token_ = new token();
@@ -141,9 +145,6 @@ ykdatatype::ykdatatype(std::string primitive_dt, std::string module)
     module_ = "";// Do not store module if it's a primitive
   }
 }
-bool ykdatatype::support_plus() const {
-  return is_str() || is_a_float() || is_an_integer();
-}
 bool ykdatatype::is_a_number() const { return is_an_integer() || is_a_float(); }
 bool ykdatatype::is_a_number_or_const_number() const {
   return (is_a_number() || (is_const() && args_[0]->is_a_number()));
@@ -166,12 +167,6 @@ bool ykdatatype::is_a_signed_integer() const {
 }
 bool ykdatatype::is_an_unsigned_integer() const {
   return is_u8() || is_u16() || is_u32() || is_u64();
-}
-bool ykdatatype::is_a_const_signed_integer() const {
-  return is_const() && args_[0]->is_a_signed_integer();
-}
-bool ykdatatype::is_a_const_unsigned_integer() const {
-  return is_const() && args_[0]->is_an_unsigned_integer();
 }
 bool ykdatatype::is_a_float() const {
   return is_float() || is_f32() || is_f64();
@@ -209,4 +204,37 @@ bool ykdatatype::is_tuple() const {
 }
 bool ykdatatype::is_bool_or_const_bool() const {
   return is_bool() || is_const_bool();
+}
+ykdatatype *ykdatatype::const_unwrap() {
+  if (is_const()) { return args_[0]; }
+  return this;
+}
+bool ykdatatype::is_string_literal() const {
+  return primitive_type_ == ykprimitive::HIDDEN_STRING_LIT;
+}
+bool ykdatatype::is_a_string() const { return +primitive_type_ >= 1000; }
+ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, bool lhs_mutates,
+                                  ykdt_pool *pool) {
+  ykdatatype *castable = nullptr;
+  //  bool require_widening = false;
+  if (lhs_mutates && is_const()) {
+    return nullptr;// cannot auto cast [INDENT] a: Const[int] = 5 [NL] a = 4 [NL] [DEDENT]
+  }
+  ykdatatype *lhsu = const_unwrap();
+  ykdatatype *rhsu = rhs->const_unwrap();
+  if (*lhsu == *rhsu) { return nullptr; }
+  if (lhsu->is_a_string() && rhsu->is_a_string()) {
+    castable = pool->create("str");
+  }
+  // TODO add numeric casting support
+  // bool -> i8 -> i16 -> i32 -> i64 -> f32 -> f64
+  //              /      /      /
+  //            /      /      /
+  //           /     /      /
+  // bool -> u8 -> u16 -> u32 -> u64 -> f32 -> f64
+  //  if (lhs_mutates && require_widening && castable != nullptr && *castable != *lhsu) {
+  //    // we can only assign to a bigger type
+  //    return nullptr;
+  //  }
+  return castable;
 }

@@ -1,0 +1,19 @@
+A: Const[sr] = " Hello"
+
+def do_something(s: sr) -> int:
+    print("Printing sr: ")
+    println(s)
+    return 0
+
+def takes_str(s: str) -> int:
+    print("Printing str: ")
+    println(s)
+    return 0
+
+def main() -> int:
+    a: sr = "Hi"
+    b: sr = " there"
+    do_something(a + b + a)
+    takes_str(a + b)
+    takes_str(a + b + A)
+    return 0

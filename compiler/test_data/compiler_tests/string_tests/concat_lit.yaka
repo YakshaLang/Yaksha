@@ -1,0 +1,14 @@
+def do_something(s: sr) -> int:
+    print("Printing sr: ")
+    println(s)
+    return 0
+
+def takes_str(s: str) -> int:
+    print("Printing str: ")
+    println(s)
+    return 0
+
+def main() -> int:
+    do_something("Oi" + " Hello there" + " Another")
+    takes_str("Oi" + " Hello there" + " Another")
+    return 0

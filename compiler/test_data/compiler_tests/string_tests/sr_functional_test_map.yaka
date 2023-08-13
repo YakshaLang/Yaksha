@@ -1,0 +1,24 @@
+def to_lengths(a: sr, ignored: int) -> int:
+    return len(a)
+
+def to_pow2(a: int, ignored: int) -> int:
+    return a * a
+
+def print_int(a: int, ignored: int) -> bool:
+    println(a)
+    return True
+
+
+def main() -> int:
+    println(">> map sr test <<")
+    ar: Array[sr] = array("sr", "Hello", "World", "How", "Are", "You")
+    println("map to_lengths ==> ")
+    foreach(map(ar, to_lengths, 0), print_int, 0)
+    println(">> countif int test <<")
+    ai: Array[int] = array("int", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    println("map to_pow2 ==> ")
+    foreach(map(ai, to_pow2, 0), print_int, 0)
+    println("completed.")
+    if True:
+        println("true")
+    return 0

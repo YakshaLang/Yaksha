@@ -25,7 +25,7 @@ int32_t yy__f1()
 }
 int32_t yy__main() 
 {
-    yk__printlnint(((intmax_t)yy__f1()));
+    yk__printlnint((intmax_t)yy__f1());
     return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)

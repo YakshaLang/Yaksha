@@ -1,0 +1,24 @@
+def keep_len_n(a: sr, n: int) -> bool:
+    if len(a) == n:
+        return True
+    return False
+
+def keep_upto_n(a: int, n: int) -> bool:
+    if a > n:
+        return False
+    return True
+
+def main() -> int:
+    println(">> countif sr test <<")
+    f = keep_len_n
+    ar = array("sr", "Hello", "World", "How", "Are", "You")
+    print("count len 3 ==> ")
+    println(countif(ar, keep_len_n, 3))
+    print("count len 5 ==> ")
+    println(countif(ar, f, 5))
+    println(">> countif int test <<")
+    ai = array("int", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    print("count up to 5 ==> ")
+    println(countif(ai, keep_upto_n, 5))
+    println("completed.")
+    return 0

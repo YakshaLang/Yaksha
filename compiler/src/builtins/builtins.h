@@ -40,18 +40,6 @@ namespace yaksha {
            const std::unordered_map<std::string, import_stmt *> &import_aliases,
            const std::string &filepath, slot_matcher *dt_slot_matcher);
     /**
-     * Should we compile given argument + arg index
-     * This is used to handle <code>cast("c.AnyPtr", state)</code>
-     * @param name Built in name
-     * @param arg_index argument to compile
-     * @param arg_expression Raw argument expression
-     * @return Should we compile this argument?
-     * (if false this needs to be consumed
-     *      as a literal by the builtin compile function)
-     */
-    bool should_compile_argument(const std::string &name, int arg_index,
-                                 expr *arg_expression);
-    /**
      * Compile a builtin function call.
      * This assumes verify and has builtin is called.
      * @param name name of the function

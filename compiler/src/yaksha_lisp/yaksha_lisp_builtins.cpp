@@ -469,7 +469,7 @@ yaksha_lisp_builtins::raise_error_(const std::vector<yaksha_lisp_value *> &args,
 }
 yaksha_lisp_value *
 yaksha_lisp_builtins::setq_(const std::vector<yaksha_lisp_value *> &args,
-                           yaksha_envmap *env) {
+                            yaksha_envmap *env) {
   if (args.size() != 2) {
     throw parsing_error{"setq takes 2 arguments", "", 0, 0};
   }
@@ -877,6 +877,7 @@ yaksha_lisp_builtins::reduce_(const std::vector<yaksha_lisp_value *> &args,
   if (list_->type_ != yaksha_lisp_value_type::LIST) {
     throw parsing_error{"reduce takes a list as second argument", "", 0, 0};
   }
+  if (list_->list_.empty()) { return env->create_nil(); }
   auto item = list_->list_[0];
   yaksha_lisp_value *first = copy_val(env, item);
   for (size_t i = 1; i < list_->list_.size(); i++) {
@@ -1576,7 +1577,8 @@ yaksha_lisp_value *yaksha_lisp_builtins::system_lock_root_scope_(
 yaksha_lisp_value *yaksha_lisp_builtins::system_unlock_root_scope_(
     const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env) {
   if (!args.empty()) {
-    throw parsing_error{"system_unlock_root_scope takes no arguments", "", 0, 0};
+    throw parsing_error{"system_unlock_root_scope takes no arguments", "", 0,
+                        0};
   }
   env->unlock_root();
   return env->create_nil();
@@ -1612,4 +1614,59 @@ yaksha_lisp_value *yaksha_lisp_builtins::system_disable_print_(
   }
   yaksha_macro_print_allowed = false;
   return env->create_nil();
+}
+yaksha_lisp_value *
+yaksha_lisp_builtins::sorted_(const std::vector<yaksha_lisp_value *> &args,
+                              yaksha_envmap *env) {
+  if (args.size() != 1) {
+    throw parsing_error{"sorted takes 1 argument", "", 0, 0};
+  }
+  auto e_args = eval_args(args, env);
+  auto list_ = e_args[0];
+  if (list_->type_ != yaksha_lisp_value_type::LIST) {
+    throw parsing_error{"sorted takes a list as first argument", "", 0, 0};
+  }
+  if (list_->list_.empty()) { return env->create_nil(); }
+  if (list_->list_[0]->type_ != yaksha_lisp_value_type::STRING &&
+      list_->list_[1]->type_ != yaksha_lisp_value_type::NUMBER) {
+    throw parsing_error{
+        "sorted - only string lists or number lists are supported", "", 0, 0};
+  }
+  auto data_type = list_->list_[0]->type_;
+  for (auto item : list_->list_) {
+    if (item->type_ != data_type) {
+      throw parsing_error{"sorted - only string lists or number lists are "
+                          "supported, mixed types are not supported",
+                          "", 0, 0};
+    }
+  }
+  auto v = copy_val(env, list_);
+  if (data_type == yaksha_lisp_value_type::STRING) {
+    std::sort(v->list_.begin(), v->list_.end(),
+              [](yaksha_lisp_value *const &a, yaksha_lisp_value *const &b) {
+                return a->str_ < b->str_;
+              });
+  } else {
+    std::sort(v->list_.begin(), v->list_.end(),
+              [](yaksha_lisp_value *const &a, yaksha_lisp_value *const &b) {
+                return a->num_ < b->num_;
+              });
+  }
+  return v;
+}
+yaksha_lisp_value *
+yaksha_lisp_builtins::reversed_(const std::vector<yaksha_lisp_value *> &args,
+                                yaksha_envmap *env) {
+  if (args.size() != 1) {
+    throw parsing_error{"sorted takes 1 argument", "", 0, 0};
+  }
+  auto e_args = eval_args(args, env);
+  auto list_ = e_args[0];
+  if (list_->type_ != yaksha_lisp_value_type::LIST) {
+    throw parsing_error{"sorted takes a list as first argument", "", 0, 0};
+  }
+  if (list_->list_.empty()) { return env->create_nil(); }
+  auto v = copy_val(env, list_);
+  std::reverse(v->list_.begin(), v->list_.end());
+  return v;
 }

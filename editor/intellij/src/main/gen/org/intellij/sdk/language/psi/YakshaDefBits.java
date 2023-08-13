@@ -26,6 +26,9 @@ public interface YakshaDefBits extends PsiElement {
   YakshaDelStatement getDelStatement();
 
   @Nullable
+  YakshaDslInnerBlock getDslInnerBlock();
+
+  @Nullable
   YakshaElifStatement getElifStatement();
 
   @Nullable

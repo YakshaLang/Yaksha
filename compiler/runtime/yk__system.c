@@ -426,7 +426,9 @@ bool yk__io_writefile(yk__sds fpath, yk__sds data) {
   fclose(file);
   return fully_written;
 }
+#if !defined(YAKSHA__WASM_BUILD)
 #include "_include_io.c"
 #if defined(_WIN32) || defined(_WIN64)
 #include "_include_mman_win.c"
+#endif
 #endif

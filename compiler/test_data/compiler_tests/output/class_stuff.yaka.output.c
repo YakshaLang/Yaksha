@@ -22,7 +22,7 @@ int32_t yy__main()
     yy__a->yy__a = INT32_C(1);
     struct yy__B* yy__b = calloc(1, sizeof(struct yy__B));
     yy__b->yy__b = INT32_C(10);
-    yk__printlnint(((intmax_t)yy__a->yy__a));
+    yk__printlnint((intmax_t)yy__a->yy__a);
     int32_t t__0 = yy__b->yy__b;
     free(yy__b);
     free(yy__a);

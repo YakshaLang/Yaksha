@@ -169,7 +169,6 @@ TEST_CASE("gc_pool: random test") {
     REQUIRE(count == pool.num_allocated_);
   }
 }
-
 TEST_CASE("gc_pool: allocate/free") {
   gc_pool<test_object> pool{2};
   test_object *p1 = pool.allocate();
@@ -183,7 +182,6 @@ TEST_CASE("gc_pool: allocate/free") {
   REQUIRE(pool.m_free_doubly_linked_list_ != nullptr);
   REQUIRE(pool.m_used_doubly_linked_list_ == nullptr);
 }
-
 TEST_CASE("gc_pool: clear") {
   gc_pool<test_object> pool{1};
   test_object *p1 = pool.allocate();
@@ -196,7 +194,6 @@ TEST_CASE("gc_pool: clear") {
   REQUIRE(pool.m_used_doubly_linked_list_ == nullptr);
   REQUIRE(pool.num_allocated_ == 0);
 }
-
 TEST_CASE("gc_pool: allocate more than initial size, check linked list") {
   gc_pool<test_object> pool{2};
   test_object *p1 = pool.allocate();

@@ -1,0 +1,16 @@
+def a() -> sr:
+    return "Hello"
+
+def b() -> str:
+    x = "Hello"
+    return x
+
+def c() -> sr:
+    y = "Oi"
+    return y
+
+def main() -> int:
+    println(a())
+    println(b())
+    println(c())
+    return 0

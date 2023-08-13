@@ -5,6 +5,16 @@
 #ifndef CPP_UTIL_H
 #define CPP_UTIL_H
 #include <iostream>
+// ╔╦╗┌─┐┌┬┐┌─┐┬  ┌─┐┌┬┐┌─┐  ╔╦╗┌─┐┌─┐┬┌─┐
+//  ║ ├┤ │││├─┘│  ├─┤ │ ├┤   ║║║├─┤│ ┬││
+//  ╩ └─┘┴ ┴┴  ┴─┘┴ ┴ ┴ └─┘  ╩ ╩┴ ┴└─┘┴└─┘
+// reference: https://stackoverflow.com/a/42198760
+// enum to int with +ENUM
+template<typename T>
+constexpr auto operator+(T e) noexcept
+    -> std::enable_if_t<std::is_enum<T>::value, std::underlying_type_t<T>> {
+  return static_cast<std::underlying_type_t<T>>(e);
+}
 //
 // ╦ ╦╔═╗╦╔═╔═╗╦ ╦╔═╗    ╔═╗╔═╗
 // ╚╦╝╠═╣╠╩╗╚═╗╠═╣╠═╣    ║ ║╚═╗
@@ -53,6 +63,8 @@
 //#ifndef YAKSHA_DEBUG_COMPILE
 //#define YAKSHA_DEBUG_COMPILE
 //#endif
+//#define IC_TOKENIZER_PRINT_TOKENS
+//#define SLOW_TESTS
 //// ---- yaksha high level debug enabled if we are in possible debug mode
 // #define YAKSHA_DEBUG
 #if !defined(YAKSHA_DEBUG) &&                                                  \
@@ -67,4 +79,8 @@
 #else
 #define LOG_COMP(msg)
 #endif
+// useful stuff
+namespace yaksha {
+  std::string get_my_exe_path();
+}
 #endif

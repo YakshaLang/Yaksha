@@ -608,7 +608,7 @@ stmt *parser::return_statement() {
   }
   consume_or_eof(token_type::NEW_LINE,
                  "Expect new line after 'return' statement.");
-  return pool_.c_return_stmt(tok, exp);
+  return pool_.c_return_stmt(tok, exp, nullptr);
 }
 stmt *parser::def_statement(annotations ants) {
   // def_statement -> KEYWORD_DEF NAME PAREN_OPEN
@@ -635,7 +635,7 @@ stmt *parser::def_statement(annotations ants) {
       return_dt->is_builtin_or_primitive() && return_dt->is_none()) {
     if (body->statements_.back()->get_type() != ast_type::STMT_RETURN) {
       body->statements_.emplace_back(
-          pool_.c_return_stmt(magic_return_token_, nullptr));
+          pool_.c_return_stmt(magic_return_token_, nullptr, nullptr));
     }
   }
   return pool_.c_def_stmt(name, params, body, return_dt, std::move(ants));
@@ -1012,7 +1012,8 @@ std::vector<token *> parser::macro_expand(macro_processor *mp,
   try {
     if (dsl_macro->name2_ == nullptr) {
       return mp->expand_dsl(filepath_, import_stmts_alias_,
-                            dsl_macro->name_->token_, result, "", dsl_macro->name_);
+                            dsl_macro->name_->token_, result, "",
+                            dsl_macro->name_);
     } else {
       return mp->expand_dsl(filepath_, import_stmts_alias_,
                             dsl_macro->name2_->token_, result,

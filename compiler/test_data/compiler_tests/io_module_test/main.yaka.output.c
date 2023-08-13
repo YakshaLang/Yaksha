@@ -23,24 +23,18 @@ yk__sds yy__io_readfile(yk__sds nn__fname)
 }
 int32_t yy__main() 
 {
-    yk__sds t__0 = yk__sdsnewlen("// ----->>> this is my code <<<<------\n", 39);
-    yk__printstr((t__0));
-    yk__sds t__1 = yk__sdsnewlen("test.c", 6);
-    yk__sds t__2 = yy__io_readfile(yk__sdsdup(t__1));
-    yk__sds yy__a = yk__sdsdup((t__2));
+    yk__printstr("// ----->>> this is my code <<<<------\n");
+    yk__sds t__0 = yy__io_readfile(yk__sdsnewlen("test.c", 6));
+    yk__sds yy__a = yk__sdsdup(t__0);
     if (yy__strings_is_empty_str(yk__sdsdup(yy__a)))
     {
-        yk__sds t__3 = yk__sdsnewlen("test.c is empty or not found", 28);
-        yk__printstr((t__3));
-        yk__sdsfree(t__3);
+        yk__printstr("test.c is empty or not found");
     }
     else
     {
-        yk__printstr((yy__a));
+        yk__printstr(yy__a);
     }
     yk__sdsfree(yy__a);
-    yk__sdsfree(t__2);
-    yk__sdsfree(t__1);
     yk__sdsfree(t__0);
     return INT32_C(0);
 }

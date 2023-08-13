@@ -1,0 +1,10 @@
+def main() -> int:
+    a: str = "a"
+    b: sr = "oi"
+    println(b == b)
+    println(a == a)
+    println((a == b) or (a != b))
+    println("a" == a)
+    println(b != a)
+    println(b != "x")
+    return 0

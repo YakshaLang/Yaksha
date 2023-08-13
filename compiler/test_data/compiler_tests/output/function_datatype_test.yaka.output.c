@@ -12,30 +12,22 @@ int32_t yy__main();
 // --functions-- 
 void yy__a(ykfncptr0 yy__formatter) 
 {
-    yk__sds t__0 = yk__sdsnewlen("hello", 5);
-    yk__printstr((t__0));
-    yk__sdsfree(t__0);
+    yk__printstr("hello");
     return;
 }
 void yy__b(ykfncptr0 yy__formatter) 
 {
-    yk__sds t__1 = yk__sdsnewlen("hello", 5);
-    yk__printstr((t__1));
-    yk__sdsfree(t__1);
+    yk__printstr("hello");
     return;
 }
 void yy__c(ykfncptr1 yy__formatter) 
 {
-    yk__sds t__2 = yk__sdsnewlen("hello", 5);
-    yk__printstr((t__2));
-    yk__sdsfree(t__2);
+    yk__printstr("hello");
     return;
 }
 int32_t yy__main() 
 {
-    yk__sds t__3 = yk__sdsnewlen("Hello World", 11);
-    yk__printlnstr((t__3));
-    yk__sdsfree(t__3);
+    yk__printlnstr("Hello World");
     return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)

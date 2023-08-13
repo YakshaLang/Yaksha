@@ -95,6 +95,11 @@ namespace yaksha {
     void indent() override;
     void dedent() override;
     void visit_macro_call_expr(macro_call_expr *obj) override;
+    void compile_string_assign(token *t, std::stringstream &code,
+                               const std::pair<std::string, ykobject> &rhs,
+                               const ykdatatype *rhs_datatype,
+                               const ykdatatype *lhs_datatype) override;
+    std::string wrap_in_paren(const std::string &code) const override;
 
 private:
     void push_scope_type(ast_type scope_type);
@@ -156,17 +161,18 @@ private:
     std::string filepath_{};
     std::vector<parsing_error> errors_;
     void compile_function_call(fncall_expr *obj, const std::string &name,
-                               std::stringstream &code,
-                               ykdatatype *return_type);
+                               std::stringstream &code, ykdatatype *return_type,
+                               const std::vector<ykdatatype *> &parameters,
+                               bool varargs_fnc);
     void compile_obj_creation(const std::string &name, std::stringstream &code,
                               ykdatatype *return_type);
     std::string
     prefix_function_arg(const std::pair<std::string, ykobject> &arg_val);
-    void perform_assign(const std::string &name,
+    void perform_assign(const std::pair<std::string, ykobject> &lhs,
                         const std::pair<std::string, ykobject> &rhs,
-                        const token_type &operator_type,
-                        const std::string &token);
+                        token *operator_token, bool assign_variable);
     static void obj_calloc(const std::string &name, std::stringstream &code);
+    static bool should_wrap_in_paren(const std::string &code);
   };
 }// namespace yaksha
 #endif

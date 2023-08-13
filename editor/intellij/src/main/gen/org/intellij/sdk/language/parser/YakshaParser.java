@@ -932,7 +932,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement
   //   | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
-  //   | let_statement | empty_line | continue_statement | break_statement | COMMENT
+  //   | let_statement | empty_line | continue_statement | break_statement | dsl_inner_block | COMMENT
   public static boolean def_bits(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "def_bits")) return false;
     boolean r;
@@ -954,6 +954,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = empty_line(b, l + 1);
     if (!r) r = continue_statement(b, l + 1);
     if (!r) r = break_statement(b, l + 1);
+    if (!r) r = dsl_inner_block(b, l + 1);
     if (!r) r = consumeToken(b, COMMENT);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -1242,6 +1243,186 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   // S?
   private static boolean del_statement_wo_indent_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "del_statement_wo_indent_1")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // I IDENTIFIER (OPERATOR_DOT IDENTIFIER)? OPERATOR_NOT_SYMBOL S? OPERATOR_CURLY_OPEN S? lisp_body? S? OPERATOR_CURLY_CLOSE S? OPERATOR_COLON? S? def_block
+  public static boolean dsl_inner_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block")) return false;
+    if (!nextTokenIs(b, I)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, I, IDENTIFIER);
+    r = r && dsl_inner_block_2(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_NOT_SYMBOL);
+    r = r && dsl_inner_block_4(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_OPEN);
+    r = r && dsl_inner_block_6(b, l + 1);
+    r = r && dsl_inner_block_7(b, l + 1);
+    r = r && dsl_inner_block_8(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_CLOSE);
+    r = r && dsl_inner_block_10(b, l + 1);
+    r = r && dsl_inner_block_11(b, l + 1);
+    r = r && dsl_inner_block_12(b, l + 1);
+    r = r && def_block(b, l + 1);
+    exit_section_(b, m, DSL_INNER_BLOCK, r);
+    return r;
+  }
+
+  // (OPERATOR_DOT IDENTIFIER)?
+  private static boolean dsl_inner_block_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block_2")) return false;
+    dsl_inner_block_2_0(b, l + 1);
+    return true;
+  }
+
+  // OPERATOR_DOT IDENTIFIER
+  private static boolean dsl_inner_block_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, OPERATOR_DOT, IDENTIFIER);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean dsl_inner_block_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block_4")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean dsl_inner_block_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block_6")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // lisp_body?
+  private static boolean dsl_inner_block_7(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block_7")) return false;
+    lisp_body(b, l + 1);
+    return true;
+  }
+
+  // S?
+  private static boolean dsl_inner_block_8(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block_8")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean dsl_inner_block_10(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block_10")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // OPERATOR_COLON?
+  private static boolean dsl_inner_block_11(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block_11")) return false;
+    consumeToken(b, OPERATOR_COLON);
+    return true;
+  }
+
+  // S?
+  private static boolean dsl_inner_block_12(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_inner_block_12")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // IDENTIFIER (OPERATOR_DOT IDENTIFIER)? OPERATOR_NOT_SYMBOL S? OPERATOR_CURLY_OPEN S? lisp_body? S? OPERATOR_CURLY_CLOSE S? OPERATOR_COLON? S? def_block
+  public static boolean dsl_outer_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, IDENTIFIER);
+    r = r && dsl_outer_block_1(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_NOT_SYMBOL);
+    r = r && dsl_outer_block_3(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_OPEN);
+    r = r && dsl_outer_block_5(b, l + 1);
+    r = r && dsl_outer_block_6(b, l + 1);
+    r = r && dsl_outer_block_7(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CURLY_CLOSE);
+    r = r && dsl_outer_block_9(b, l + 1);
+    r = r && dsl_outer_block_10(b, l + 1);
+    r = r && dsl_outer_block_11(b, l + 1);
+    r = r && def_block(b, l + 1);
+    exit_section_(b, m, DSL_OUTER_BLOCK, r);
+    return r;
+  }
+
+  // (OPERATOR_DOT IDENTIFIER)?
+  private static boolean dsl_outer_block_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block_1")) return false;
+    dsl_outer_block_1_0(b, l + 1);
+    return true;
+  }
+
+  // OPERATOR_DOT IDENTIFIER
+  private static boolean dsl_outer_block_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, OPERATOR_DOT, IDENTIFIER);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // S?
+  private static boolean dsl_outer_block_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block_3")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean dsl_outer_block_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block_5")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // lisp_body?
+  private static boolean dsl_outer_block_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block_6")) return false;
+    lisp_body(b, l + 1);
+    return true;
+  }
+
+  // S?
+  private static boolean dsl_outer_block_7(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block_7")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean dsl_outer_block_9(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block_9")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // OPERATOR_COLON?
+  private static boolean dsl_outer_block_10(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block_10")) return false;
+    consumeToken(b, OPERATOR_COLON);
+    return true;
+  }
+
+  // S?
+  private static boolean dsl_outer_block_11(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "dsl_outer_block_11")) return false;
     consumeToken(b, S);
     return true;
   }
@@ -2431,7 +2612,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | macro_declaration_statement
+  // runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | macro_declaration_statement | dsl_outer_block
   public static boolean outer_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "outer_statement")) return false;
     boolean r;
@@ -2442,6 +2623,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = outer_statement_3(b, l + 1);
     if (!r) r = outer_statement_4(b, l + 1);
     if (!r) r = macro_declaration_statement(b, l + 1);
+    if (!r) r = dsl_outer_block(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

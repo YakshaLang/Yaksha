@@ -19,9 +19,7 @@ int32_t yy__main()
     uint8_t const * yy__a = ykbindata0;
     uint8_t const * yy__b = ykbindata0;
     uint8_t const * yy__c = ykbindata1;
-    yk__sds t__0 = yk__sdsnewlen("ok", 2);
-    yk__printlnstr((t__0));
-    yk__sdsfree(t__0);
+    yk__printlnstr("ok");
     return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)

@@ -3,42 +3,43 @@
 #include "btest.h"
 #include "catch2/catch.hpp"
 #include "file_formats/tokens_file.h"
+#include <utility>
 using namespace yaksha;
 #define TOK_REQUIRE(POS, TEXT, TYPE)                                           \
   do {                                                                         \
     REQUIRE(t.tokens_[POS]->token_ == (TEXT));                                 \
     REQUIRE(t.tokens_[POS]->type_ == (TYPE));                                  \
   } while (0)
-#define TEST_FILE(A, B, C)                                                     \
-  do {                                                                         \
-    std::ifstream code_file(A);                                                \
-    if (code_file.good()) {                                                    \
-      std::string code((std::istreambuf_iterator<char>(code_file)),            \
-                       std::istreambuf_iterator<char>());                      \
-      try {                                                                    \
-        gc_pool<token> token_pool{};                                           \
-        yaksha::tokenizer t(B, code, &token_pool);                             \
-        t.tokenize();                                                          \
-        auto token_snapshot = yaksha::load_token_dump(C, &token_pool);         \
-        yaksha::save_token_dump(C, t.tokens_);                                 \
-        REQUIRE(t.tokens_.size() == token_snapshot.size());                    \
-        for (int i = 0; i < token_snapshot.size(); i++) {                      \
-          auto parsed = t.tokens_[i];                                          \
-          auto snapshot = token_snapshot[i];                                   \
-          REQUIRE(parsed->file_ == snapshot->file_);                           \
-          REQUIRE(parsed->line_ == snapshot->line_);                           \
-          REQUIRE(parsed->pos_ == snapshot->pos_);                             \
-          REQUIRE(parsed->token_ == snapshot->token_);                         \
-          REQUIRE(parsed->type_ == snapshot->type_);                           \
-        }                                                                      \
-      } catch (parsing_error & e) {                                            \
-        DBGPRINT(e.message_);                                                  \
-        REQUIRE(false);                                                        \
-      }                                                                        \
-    } else {                                                                   \
-      REQUIRE(false);                                                          \
-    }                                                                          \
-  } while (0)
+static void test_tokenizer_yaka_file(const std::string &A, std::string B,
+                                     const std::string &C) {
+  std::ifstream code_file(A);
+  if (code_file.good()) {
+    std::string code((std::istreambuf_iterator<char>(code_file)),
+                     std::istreambuf_iterator<char>());
+    try {
+      gc_pool<token> token_pool{};
+      yaksha::tokenizer t(std::move(B), code, &token_pool);
+      t.tokenize();
+      auto token_snapshot = yaksha::load_token_dump(C, &token_pool);
+      yaksha::save_token_dump(C, t.tokens_);
+      REQUIRE(t.tokens_.size() == token_snapshot.size());
+      for (int i = 0; i < token_snapshot.size(); i++) {
+        auto parsed = t.tokens_[i];
+        auto snapshot = token_snapshot[i];
+        REQUIRE(parsed->file_ == snapshot->file_);
+        REQUIRE(parsed->line_ == snapshot->line_);
+        REQUIRE(parsed->pos_ == snapshot->pos_);
+        REQUIRE(parsed->token_ == snapshot->token_);
+        REQUIRE(parsed->type_ == snapshot->type_);
+      }
+    } catch (parsing_error &e) {
+      DBGPRINT(e.message_);
+      REQUIRE(false);
+    }
+  } else {
+    REQUIRE(false);
+  }
+}
 TEST_CASE("tokenizer: Names: Basic") {
   gc_pool<token> token_pool{};
   yaksha::tokenizer t("test.py", "a banana b aaaaa ", &token_pool);
@@ -107,7 +108,8 @@ TEST_CASE("tokenizer: Indentation: Mixed") {
 }
 TEST_CASE("tokenizer: Symbols: Basic") {
   gc_pool<token> token_pool{};
-  yaksha::tokenizer t("test.py", "@ : ( ) < = > | + - * / & ^ % , [ ] { }", &token_pool);
+  yaksha::tokenizer t("test.py", "@ : ( ) < = > | + - * / & ^ % , [ ] { }",
+                      &token_pool);
   t.tokenize();
   REQUIRE(t.tokens_.size() == 20 + 1);
   TOK_REQUIRE(0, "@", token_type::AT);
@@ -135,7 +137,8 @@ TEST_CASE("tokenizer: Symbols: Basic") {
 TEST_CASE("tokenizer: Symbols: Multi character symbols") {
   gc_pool<token> token_pool{};
   yaksha::tokenizer t("test.py",
-                      "<= == >= |= += -= *= /= &= ^= %= ** **= // //= ... ->", &token_pool);
+                      "<= == >= |= += -= *= /= &= ^= %= ** **= // //= ... ->",
+                      &token_pool);
   t.tokenize();
   REQUIRE(t.tokens_.size() == 17 + 1);
   TOK_REQUIRE(0, "<=", token_type::LESS_EQ);
@@ -238,7 +241,8 @@ TEST_CASE("tokenizer: Numbers: Bunch of numbers") {
   gc_pool<token> token_pool{};
   yaksha::tokenizer t("test.py",
                       "0xABCDEF0 0b1111001 "
-                      "0o123456 1.2e3 123 1.2e+3 1.2e-3 1f 1.2f 1.2e1f", &token_pool);
+                      "0o123456 1.2e3 123 1.2e+3 1.2e-3 1f 1.2f 1.2e1f",
+                      &token_pool);
   t.tokenize();
   REQUIRE(t.tokens_.size() == 10 + 1);
   REQUIRE(t.tokens_[0]->token_ == "0xABCDEF0");
@@ -286,14 +290,15 @@ TEST_CASE("tokenizer: Comment: Two lines") {
   REQUIRE(t.errors_.empty());
 }
 TEST_CASE("tokenizer: Parse test_vector_add.py") {
-  TEST_FILE("../test_data/test_vector_add.py", "test_vector_add.py",
-            "../test_data/test_vector_add.py.tokens");
+  test_tokenizer_yaka_file("../test_data/test_vector_add.py",
+                           "test_vector_add.py",
+                           "../test_data/test_vector_add.py.tokens");
 }
 TEST_CASE("tokenizer: Parse unicode_test.py") {
-  TEST_FILE("../test_data/unicode_test.py", "unicode_test.py",
-            "../test_data/unicode_test.py.tokens");
+  test_tokenizer_yaka_file("../test_data/unicode_test.py", "unicode_test.py",
+                           "../test_data/unicode_test.py.tokens");
 }
 TEST_CASE("tokenizer: Parse bad_test.py") {
-  TEST_FILE("../test_data/bad_test.py", "bad_test.py",
-            "../test_data/bad_test.py.tokens");
+  test_tokenizer_yaka_file("../test_data/bad_test.py", "bad_test.py",
+                           "../test_data/bad_test.py.tokens");
 }

@@ -13,7 +13,7 @@ ykobject::ykobject(int i, ykdt_pool *pool)
 }
 ykobject::ykobject(std::string str, ykdt_pool *pool)
     : string_val_{std::move(str)}, object_type_(object_type::PRIMITIVE_OR_OBJ) {
-  datatype_ = pool->create("str");
+  datatype_ = pool->create(":s:");
 }
 ykobject::ykobject(double dbl, ykdt_pool *pool)
     : double_val_{dbl}, object_type_{object_type::PRIMITIVE_OR_OBJ} {

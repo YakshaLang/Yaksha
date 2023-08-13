@@ -21,50 +21,67 @@ void compiler::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
   auto rhs = pop();
   auto name = prefix(obj->name_->token_, prefix_val_);
-  token_type operator_type = obj->opr_->type_;
-  std::string &token = obj->opr_->token_;
-  perform_assign(name, rhs, operator_type, token);
+  auto object = scope_.get(name);
+  perform_assign(std::make_pair(name, object), rhs, obj->opr_, true);
 }
-void compiler::perform_assign(const std::string &name,
+void compiler::perform_assign(const std::pair<std::string, ykobject> &lhs,
                               const std::pair<std::string, ykobject> &rhs,
-                              const token_type &operator_type,
-                              const std::string &token) {
+                              token *operator_token, bool assign_variable) {
   write_indent(body_);
-  if (rhs.second.is_primitive_or_obj() && rhs.second.datatype_->is_str() &&
-      operator_type == token_type::EQ) {
-    // -- str =
-    // free current value.
-    body_ << "yk__sdsfree(" << name << ")";
-    write_end_statement(body_);
+  if (rhs.second.is_primitive_or_obj() &&
+      rhs.second.datatype_->const_unwrap()->is_a_string() &&
+      operator_token->type_ == token_type::EQ) {
+    // if lhs is str, we need to free the current value here --
+    if (assign_variable && lhs.second.datatype_->const_unwrap()->is_str()) {
+      body_ << "yk__sdsfree(" << lhs.first << ")";
+      write_end_statement(body_);
+      write_indent(body_);
+    }
     // duplicate the input.
     // do assignment of the duplicate
-    write_indent(body_);
-    body_ << name << " = yk__sdsdup(" << rhs.first << ")";
+    body_ << lhs.first << " = ";
+    compile_string_assign(operator_token, body_, rhs,
+                          rhs.second.datatype_->const_unwrap(),
+                          lhs.second.datatype_->const_unwrap());
   } else if (rhs.second.is_primitive_or_obj() &&
-             rhs.second.datatype_->is_str() &&
-             operator_type == token_type::PLUS_EQ) {
+             rhs.second.datatype_->is_a_string() &&
+             operator_token->type_ == token_type::PLUS_EQ) {
     // -- str +=
-    body_ << name << " = yk__sdscatsds(" << name << ", " << rhs.first << ")";
+    if (rhs.second.datatype_->const_unwrap()->is_str()) {
+      body_ << lhs.first << " = yk__append_sds_sds(" << lhs.first << ", "
+            << rhs.first << ")";
+    } else if (rhs.second.datatype_->const_unwrap()->is_sr()) {
+      body_ << lhs.first << " = yk__append_sds_bstr(" << lhs.first << ", "
+            << rhs.first << ")";
+    } else if (rhs.second.datatype_->const_unwrap()->is_string_literal()) {
+      auto u = string_utils::unescape(rhs.second.string_val_);
+      body_ << lhs.first << " = "
+            << "yk__append_sds_lit(" << lhs.first << ", \""
+            << string_utils::escape(u) << "\" , " << u.size() << ")";
+    } else {
+      error("Cannot compile += for str");
+    }
   } else if (rhs.second.is_a_function()) {
-    body_ << name << " = " << prefix_function_arg(rhs);
+    body_ << lhs.first << " = " << prefix_function_arg(rhs);
   } else if (rhs.second.is_primitive_or_obj() &&
-             operator_type == token_type::MOD_EQ &&
+             operator_token->type_ == token_type::MOD_EQ &&
              rhs.second.datatype_->is_f32()) {
     // f32 %=
-    body_ << name << " = "
-          << "remainderf(" << name + ", " + rhs.first + ")";
+    body_ << lhs.first << " = "
+          << "remainderf(" << lhs.first + ", " + rhs.first + ")";
   } else if (rhs.second.is_primitive_or_obj() &&
-             operator_type == token_type::MOD_EQ &&
+             operator_token->type_ == token_type::MOD_EQ &&
              rhs.second.datatype_->is_f64()) {
     // f64 %=
-    body_ << name << " = "
-          << "remainder(" << name + ", " + rhs.first + ")";
+    body_ << lhs.first << " = "
+          << "remainder(" << lhs.first + ", " + rhs.first + ")";
   } else {// usual case
-    body_ << name << " " << token << " " << rhs.first;
+    body_ << lhs.first << " " << operator_token->token_ << " " << rhs.first;
   }
   write_end_statement(body_);
 }
 void compiler::visit_binary_expr(binary_expr *obj) {
+  token_type operator_type = obj->opr_->type_;
   // Vist left side of the binary expression and right side.
   // This should give us the data types from the 2 stacks we maintain.
   obj->left_->accept(this);
@@ -73,25 +90,101 @@ void compiler::visit_binary_expr(binary_expr *obj) {
   auto rhs = pop();
   // Note: we are assuming data type to be same as first,
   // Since this will be type checked using type_checker.
-  token_type operator_type = obj->opr_->type_;
   auto data_type = lhs.second;
+  bool both_sr = lhs.second.datatype_->const_unwrap()->is_sr() &&
+                 rhs.second.datatype_->const_unwrap()->is_sr();
+  bool different_types = (*(lhs.second.datatype_->const_unwrap()) !=
+                          *(rhs.second.datatype_->const_unwrap()));
   if (lhs.second.datatype_->is_none() || rhs.second.datatype_->is_none()) {
     // both null
     if (lhs.second.datatype_->is_none() && rhs.second.datatype_->is_none()) {
-      if (operator_type == token_type::EQ_EQ) {
-        push("true", ykobject(dt_pool_->create("bool")));// None == None -> True
-      } else {
-        push("false",
-             ykobject(dt_pool_->create("bool")));// None != None -> False
-      }
+      // None == None -> True
+      // None !- None -> False
+      push(operator_type == token_type::EQ_EQ ? "true" : "false",
+           ykobject(dt_pool_->create("bool")));
     } else if (lhs.second.datatype_->is_none()) {
-      push("(NULL " + obj->opr_->token_ + " " + rhs.first + ")",
-           ykobject(dt_pool_->create("bool")));
+      // rhs is not None
+      if (rhs.second.datatype_->const_unwrap()->is_sr()) {
+        push("(NULL " + obj->opr_->token_ + " yk__bstr_get_reference(" +
+                 rhs.first + "))",
+             ykobject(dt_pool_->create("bool")));
+      } else if (rhs.second.datatype_->const_unwrap()->is_string_literal()) {
+        push(operator_type != token_type::EQ_EQ ? "true" : "false",
+             ykobject(dt_pool_->create("bool")));
+      } else {
+        push("(NULL " + obj->opr_->token_ + " " + rhs.first + ")",
+             ykobject(dt_pool_->create("bool")));
+      }
     } else {
-      push("(" + lhs.first + " " + obj->opr_->token_ + " NULL)",
-           ykobject(dt_pool_->create("bool")));
+      // lhs is not None
+      if (lhs.second.datatype_->const_unwrap()->is_sr()) {
+        push("(yk__bstr_get_reference(" + lhs.first + ") " + obj->opr_->token_ +
+                 " NULL)",
+             ykobject(dt_pool_->create("bool")));
+      } else if (lhs.second.datatype_->const_unwrap()->is_string_literal()) {
+        push(operator_type != token_type::EQ_EQ ? "true" : "false",
+             ykobject(dt_pool_->create("bool")));
+      } else {
+        push("(" + lhs.first + " " + obj->opr_->token_ + " NULL)",
+             ykobject(dt_pool_->create("bool")));
+      }
     }
-  } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_str()) {
+  } else if (data_type.is_primitive_or_obj() &&
+             rhs.second.is_primitive_or_obj() && (both_sr || different_types)) {
+    // we are in an auto cast scenario
+    if (lhs.second.datatype_->const_unwrap()->is_a_string() &&
+        rhs.second.datatype_->const_unwrap()->is_a_string()) {
+      auto lhsd = lhs.second.datatype_->const_unwrap();
+      auto lhsdn = lhsd->is_sr() ? "bstr" : (lhsd->is_str() ? "sds" : "lit");
+      std::string lhs_code = lhs.first;
+      if (lhsd->is_string_literal()) {
+        auto s = string_utils::unescape(lhs.second.string_val_);
+        lhs_code =
+            "\"" + string_utils::escape(s) + "\", " + std::to_string(s.size());
+      }
+      auto rhsd = rhs.second.datatype_->const_unwrap();
+      auto rhsdn = rhsd->is_sr() ? "bstr" : (rhsd->is_str() ? "sds" : "lit");
+      std::string rhs_code = rhs.first;
+      if (rhsd->is_string_literal()) {
+        auto s = string_utils::unescape(rhs.second.string_val_);
+        rhs_code =
+            "\"" + string_utils::escape(s) + "\", " + std::to_string(s.size());
+      }
+      if (operator_type == token_type::EQ_EQ ||
+          operator_type == token_type::NOT_EQ) {
+        std::string code = std::string{"(yk__cmp_"} + lhsdn + "_" + rhsdn +
+                           "(" + lhs_code + ", " + rhs_code + ")";
+        if (operator_type == token_type::EQ_EQ) {
+          code += " == 0)";
+        } else {
+          code += " != 0)";
+        }
+        push(code, ykobject(dt_pool_->create("bool")));
+      } else if (operator_type ==
+                 token_type::PLUS) {// :s:|str|lit + :s:|str|lit --> str
+        auto temporary_string = temp();
+        // put the temp to the deletions stack
+        deletions_.push(temporary_string,
+                        "yk__sdsfree(" + temporary_string + ")");
+        // duplicate lhs
+        // call sdscatsds
+        // assign to the temp
+        write_indent(body_);
+        body_ << "yk__sds " << temporary_string << " = "
+              << "yk__concat_" << lhsdn << "_" << rhsdn << "(" << lhs_code
+              << ", " << rhs_code << ")";
+        write_end_statement(body_);
+        push(temporary_string, ykobject(dt_pool_->create("str")));
+      } else {
+        error(obj->opr_, "Failed to compile string binary operation");
+        push("<><>", rhs.second);
+      }
+    } else {
+      error(obj->opr_, "Failed to compile binary operation");
+      push("<><>", rhs.second);
+    }
+  } else if (data_type.is_primitive_or_obj() &&
+             data_type.datatype_->is_str()) {// str +|==|!= str
     if (obj->opr_->type_ == token_type::EQ_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") == 0)",
            ykobject(dt_pool_->create("bool")));
@@ -113,6 +206,26 @@ void compiler::visit_binary_expr(binary_expr *obj) {
       write_end_statement(body_);
       // push the temp
       push(temporary_string, data_type);
+    }
+  } else if (data_type.is_primitive_or_obj() &&
+             data_type.datatype_->is_string_literal()) {// :s: +|==|!= :s:
+    // compile time +,==,!=
+    auto lhsu = string_utils::unescape(lhs.second.string_val_);
+    auto rhsu = string_utils::unescape(rhs.second.string_val_);
+    if (operator_type == token_type::PLUS) {
+      std::string result = string_utils::escape(lhsu + rhsu);
+      // just keep rhs and update its string value by combining 2 strings together
+      rhs.second.string_val_ = result;
+      push(rhs.first, rhs.second);
+    } else if (operator_type == token_type::EQ_EQ) {
+      bool eq = lhsu == rhsu;
+      push(eq ? "true" : "false", ykobject(dt_pool_->create("bool")));
+    } else if (operator_type == token_type::NOT_EQ) {
+      bool neq = lhsu != rhsu;
+      push(neq ? "true" : "false", ykobject(dt_pool_->create("bool")));
+    } else {
+      error("Failed to compile literal string binary operation");
+      push("<><>", rhs.second);
     }
   } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_f32() &&
              obj->opr_->type_ == token_type::MOD) {// Float %
@@ -144,18 +257,12 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     std::vector<std::pair<std::string, ykobject>> args{};
     int i = 0;
     for (auto arg : obj->args_) {
-      if (builtins_.should_compile_argument(name, i, arg)) {
-        arg->accept(this);
-        auto val = pop();
-        if (val.second.is_a_function()) {
-          args.emplace_back(std::pair<std::string, ykobject>{
-              prefix_function_arg(val), val.second});
-        } else {
-          args.emplace_back(val);
-        }
+      arg->accept(this);
+      auto val = pop();
+      if (val.second.is_a_function()) {
+        args.emplace_back(prefix_function_arg(val), val.second);
       } else {
-        args.emplace_back(
-            std::pair<std::string, ykobject>{"", ykobject(dt_pool_)});
+        args.emplace_back(val);
       }
       i++;
     }
@@ -181,13 +288,21 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     auto module_info = cf_->get_or_null(module_file);
     auto module_prefix = module_info->prefix_;
     auto prefixed_fn_name = prefix(module_fn, module_prefix);
-    auto fn_return =
-        module_info->data_->dsv_->get_function(module_fn)->return_type_;
-    compile_function_call(obj, prefixed_fn_name, code, fn_return);
+    auto fndef = module_info->data_->dsv_->get_function(module_fn);
+    auto fn_return = fndef->return_type_;
+    std::vector<ykdatatype *> params{};
+    params.reserve(fndef->params_.size());
+    for (auto &p : fndef->params_) { params.emplace_back(p.data_type_); }
+    compile_function_call(obj, prefixed_fn_name, code, fn_return, params,
+                          fndef->annotations_.varargs_);
   } else if (defs_classes_.has_function(name)) {
     auto fn_def = defs_classes_.get_function(name);
     auto return_type = fn_def->return_type_;
-    compile_function_call(obj, prefix(name, prefix_val_), code, return_type);
+    std::vector<ykdatatype *> params{};
+    params.reserve(fn_def->params_.size());
+    for (auto &p : fn_def->params_) { params.emplace_back(p.data_type_); }
+    compile_function_call(obj, prefix(name, prefix_val_), code, return_type,
+                          params, fn_def->annotations_.varargs_);
   } else if (defs_classes_.has_class(name)) {
     auto class_ = defs_classes_.get_class(name);
     if (class_->annotations_.on_stack_) {
@@ -203,7 +318,8 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     } else {
       return_type = ret_type->args_[0];
     }
-    compile_function_call(obj, prefix(name, prefix_val_), code, return_type);
+    compile_function_call(obj, prefix(name, prefix_val_), code, return_type,
+                          name_pair.second.datatype_->args_[0]->args_, false);
   } else {
     error(obj->paren_token_, "Invalid function call compilation");
   }
@@ -218,13 +334,23 @@ void compiler::compile_obj_creation(const std::string &name,
 void compiler::obj_calloc(const std::string &name, std::stringstream &code) {
   code << "calloc(1, sizeof(struct " << name << "))";
 }
-void compiler::compile_function_call(fncall_expr *obj, const std::string &name,
-                                     std::stringstream &code,
-                                     ykdatatype *return_type) {
+void compiler::compile_function_call(
+    fncall_expr *obj, const std::string &name, std::stringstream &code,
+    ykdatatype *return_type, const std::vector<ykdatatype *> &parameters,
+    bool varargs_fnc) {
   // Note: no need to check here as type_checker & def_class_visitor ensure this is present.
   code << name << "(";
   bool first = true;
-  for (auto arg : obj->args_) {
+  size_t arg_size = obj->args_.size();
+  size_t param_size = parameters.size();
+  for (size_t i = 0; i < arg_size; i++) {
+    auto arg = obj->args_[i];
+    ykdatatype *param;
+    if (i >= param_size) {
+      param = parameters[param_size - 1];
+    } else {
+      param = parameters[i];
+    }
     arg->accept(this);
     auto arg_val = pop();
     if (!first) {
@@ -233,11 +359,12 @@ void compiler::compile_function_call(fncall_expr *obj, const std::string &name,
       first = false;
     }
     if (arg_val.second.is_primitive_or_obj() &&
-        arg_val.second.datatype_->is_str()) {
-      code << "yk__sdsdup(" << arg_val.first << ")";
+        arg_val.second.datatype_->const_unwrap()->is_a_string()) {
+      auto ad = arg_val.second.datatype_->const_unwrap();
+      auto pd = param->const_unwrap();
+      compile_string_assign(obj->paren_token_, code, arg_val, ad, pd);
     } else if (arg_val.second.is_a_function()) {
       code << prefix_function_arg(arg_val);
-      ;
     } else {
       code << arg_val.first;
     }
@@ -249,9 +376,48 @@ void compiler::compile_function_call(fncall_expr *obj, const std::string &name,
     body_ << "yk__sds " << temp_name << " = " << code.str();
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
-    push("(" + temp_name + ")", ykobject(return_type));
+    push(wrap_in_paren(temp_name), ykobject(return_type));
   } else {
     push(code.str(), ykobject(return_type));
+  }
+}
+void compiler::compile_string_assign(
+    token *t, std::stringstream &code,
+    const std::pair<std::string, ykobject> &rhs, const ykdatatype *rhs_datatype,
+    const ykdatatype *lhs_datatype) {// param - sr, arg - sr
+  if (lhs_datatype->is_sr() && rhs_datatype->is_sr()) {
+    code << rhs.first;
+  }
+  // param - sr, arg - lit
+  else if (lhs_datatype->is_sr() && rhs_datatype->is_string_literal()) {
+    auto u = string_utils::unescape(rhs.second.string_val_);
+    code << "yk__bstr_s(\"" << string_utils::escape(u) << "\", " << u.size()
+         << ")";
+  }
+  // param - sr, arg - str
+  else if (lhs_datatype->is_sr() && rhs_datatype->is_str()) {
+    code << "yk__bstr_h(" << rhs.first << ")";
+  }
+  // param - str, arg - sr
+  else if (lhs_datatype->is_str() && rhs_datatype->is_sr()) {
+    code << "yk__bstr_copy_to_sds(" << rhs.first << ")";
+  }
+  // param - str, arg - lit
+  else if (lhs_datatype->is_str() && rhs_datatype->is_string_literal()) {
+    auto u = string_utils::unescape(rhs.second.string_val_);
+    code << "yk__sdsnewlen(\"" << string_utils::escape(u) << "\", " << u.size()
+         << ")";
+  }
+  // param - str, arg - str
+  else if (lhs_datatype->is_str() && rhs_datatype->is_str()) {
+    code << "yk__sdsdup(" << rhs.first << ")";
+  } else {
+    if (t != nullptr) {
+      error(t, "Invalid string passing/assignment operation");
+    } else {
+      error("Invalid string passing/assignment operation");
+    }
+    code << "yk__sdsdup(" << rhs.first << ")";// pretend it is fine?
   }
 }
 std::string
@@ -269,11 +435,49 @@ compiler::prefix_function_arg(const std::pair<std::string, ykobject> &arg_val) {
 void compiler::visit_grouping_expr(grouping_expr *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
-  if (exp.second.is_a_function()) {
-    push("(" + prefix_function_arg(exp) + ")", exp.second);
-  } else {
-    push("(" + exp.first + ")", exp.second);
+  if (exp.second.datatype_->is_string_literal()) {
+    push(exp.first, exp.second);
+    return;
   }
+  std::string code{};
+  if (exp.second.is_a_function()) {
+    code = prefix_function_arg(exp);
+  } else {
+    code = exp.first;
+  }
+  push(wrap_in_paren(code), exp.second);
+}
+std::string compiler::wrap_in_paren(const std::string &code) const {
+  if (!should_wrap_in_paren(code)) { return code; }
+  return "(" + code + ")";
+}
+bool compiler::should_wrap_in_paren(const std::string &code) {
+  bool should_group = false;
+  // seems scary
+  for (std::string::size_type i = 1; i < code.size() - 1; ++i) {
+    auto c = code[i];
+    if (c == ' ' || c == '*' || c == '=' || c == '+' || c == '-' || c == '%' ||
+        c == '&' || c == '^' || c == '~' || c == '(' || c == ')' || c == '{' ||
+        c == '}' || c == '|' || c == '/' || c == ':' || c == ';' || c == '<' ||
+        c == '>') {
+      should_group = true;
+      break;
+    }
+  }
+  // already in paren ()
+  if (should_group && code.size() >= 3 && code[0] == '(' &&
+      code[code.size() - 1] == ')') {
+    int paren = 0;
+    for (std::string::size_type i = 1; i < code.size() - 1; ++i) {
+      if (code[i] == '(') {
+        paren++;
+      } else if (code[i] == ')' && paren > 1) {
+        paren--;
+      }
+    }
+    if (paren == 0) { should_group = false; }
+  }
+  return should_group;
 }
 std::string compiler::conv_integer_literal(token_type token_type_val,
                                            token *literal_token) {
@@ -336,22 +540,8 @@ void compiler::visit_literal_expr(literal_expr *obj) {
   auto data_type_tok = obj->literal_token_->type_;
   if (data_type_tok == token_type::STRING ||
       data_type_tok == token_type::THREE_QUOTE_STRING) {
-    // Do nothing for now.
-    auto temp_name = temp();
-    write_indent(body_);
-    body_ << "yk__sds " << temp_name;
-    if (obj->literal_token_->token_.empty()) {
-      body_ << " = yk__sdsempty()";
-    } else {
-      const std::string unescaped =
-          string_utils::unescape(obj->literal_token_->token_);
-      body_ << " = yk__sdsnewlen(\"" << string_utils::escape(unescaped)
-            << "\", " << unescaped.size() << ")";
-    }
-    write_end_statement(body_);
-    deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
-    push(temp_name, ykobject(std::string{"str"},
-                             dt_pool_));// Note: dummy value for ykobject
+    ykobject str_lit_object = ykobject(obj->literal_token_->token_, dt_pool_);
+    push("<><>", str_lit_object);
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_TRUE) {
     push("true", ykobject(dt_pool_->create("bool")));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_FALSE) {
@@ -399,21 +589,21 @@ void compiler::visit_literal_expr(literal_expr *obj) {
              data_type_tok == token_type::UINTEGER_HEX_8) {
     push("UINT8_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool_->create("i8")));
+         ykobject(dt_pool_->create("u8")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_16 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_16 ||
              data_type_tok == token_type::UINTEGER_OCT_16 ||
              data_type_tok == token_type::UINTEGER_HEX_16) {
     push("UINT16_C(" +
              conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
-         ykobject(dt_pool_->create("i16")));
+         ykobject(dt_pool_->create("u16")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_64 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_64 ||
              data_type_tok == token_type::UINTEGER_OCT_64 ||
              data_type_tok == token_type::UINTEGER_HEX_64) {
     push("UINT64_C(" +
              conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
-         ykobject(dt_pool_->create("i64")));
+         ykobject(dt_pool_->create("u64")));
   } else if (data_type_tok == token_type::FLOAT_NUMBER) {
     push(obj->literal_token_->token_, ykobject(dt_pool_->create("float")));
   } else if (data_type_tok == token_type::DOUBLE_NUMBER) {
@@ -444,7 +634,7 @@ void compiler::visit_unary_expr(unary_expr *obj) {
   auto rhs = pop();
   std::string operator_token = obj->opr_->token_;
   if (obj->opr_->type_ == token_type::KEYWORD_NOT) { operator_token = "!"; }
-  push("(" + operator_token + " (" + rhs.first + "))", rhs.second);
+  push(wrap_in_paren(operator_token + wrap_in_paren(rhs.first)), rhs.second);
 }
 void compiler::visit_variable_expr(variable_expr *obj) {
   // Compiler is visiting a variable, can get data type from scope_
@@ -643,7 +833,13 @@ void compiler::visit_if_stmt(if_stmt *obj) {
   obj->expression_->accept(this);
   auto if_expr = pop();
   write_indent(body_);
-  body_ << "if (" << if_expr.first << ")";
+  auto boolean_expr = if_expr.first;
+  if (boolean_expr.size() > 2 && boolean_expr[0] == '(' &&
+      boolean_expr[boolean_expr.size() - 1] == ')') {
+    body_ << "if " << boolean_expr << "";
+  } else {
+    body_ << "if (" << boolean_expr << ")";
+  }
   scope_.push();
   deletions_.push_delete_stack(ast_type::STMT_IF);
   defers_.push_defer_stack(ast_type::STMT_IF);
@@ -676,6 +872,7 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   auto object = ykobject(dt_pool_);
   std::pair<std::string, ykobject> resulting_pair;
   bool visited_expr = false;
+  // infer data type based on RHS if we do not have a data type here
   if (obj->data_type_ == nullptr) {
     visited_expr = true;
     resulting_pair = compile_expression(obj->expression_);
@@ -691,15 +888,26 @@ void compiler::visit_let_stmt(let_stmt *obj) {
           "Failed to compile let statement. (Use of non compilable data type)");
   }
   if (obj->data_type_->is_str()) {
-    object = ykobject(std::string("str"), dt_pool_);
+    object = ykobject(dt_pool_->create("str"));
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
       write_indent(body_);
-      body_ << "yk__sds " << name << " = "
-            << "yk__sdsdup(" << exp.first << ")";
+      if (exp.second.datatype_->const_unwrap()->is_str()) {
+        body_ << "yk__sds " << name << " = "
+              << "yk__sdsdup(" << exp.first << ")";
+      } else if (exp.second.datatype_->const_unwrap()->is_sr()) {
+        body_ << "yk__sds " << name << " = "
+              << "yk__bstr_copy_to_sds(" << exp.first << ")";
+      } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
+        auto u = string_utils::unescape(exp.second.string_val_);
+        body_ << "yk__sds " << name << " = "
+              << "yk__sdsnewlen(\"" << string_utils::escape(u) << "\" , "
+              << u.size() << ")";
+      } else {
+        error("Failed to compile assign to string.");
+      }
     } else {
-      write_indent(body_);
       body_ << "yk__sds " << name << " = "
             << "yk__sdsempty()";
     }
@@ -707,6 +915,30 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     // If there is not an expression, assign yk__sdsempty()
     // Add to deletions
     deletions_.push(name, "yk__sdsfree(" + name + ")");
+  } else if (obj->data_type_->is_sr() || obj->data_type_->is_string_literal()) {
+    object = ykobject(dt_pool_->create("sr"));
+    if (obj->expression_ != nullptr) {
+      auto exp = (visited_expr) ? resulting_pair
+                                : compile_expression(obj->expression_);
+      write_indent(body_);
+      if (exp.second.datatype_->const_unwrap()->is_str()) {
+        body_ << "struct yk__bstr " << name << " = yk__bstr_h(" << exp.first
+              << ")";
+      } else if (exp.second.datatype_->const_unwrap()->is_sr()) {
+        body_ << "struct yk__bstr " << name << " = " << exp.first;
+      } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
+        auto u = string_utils::unescape(exp.second.string_val_);
+        body_ << "struct yk__bstr " << name << " = "
+              << "yk__bstr_s(\"" << string_utils::escape(u) << "\" , "
+              << u.size() << ")";
+      } else {
+        error("Failed to compile assign to sr.");
+      }
+    } else {
+      body_ << "struct yk__bstr " << name
+            << " = ((struct yk__bstr){.s = YK__EMPTY_STRING_BSTR,"
+               " .l = 0, .t = yk__bstr_static})";
+    }
   } else if (obj->data_type_->is_an_array()) {
     object = ykobject(obj->data_type_);
     if (obj->expression_ != nullptr) {
@@ -750,8 +982,21 @@ void compiler::visit_return_stmt(return_stmt *obj) {
     obj->expression_->accept(this);
     auto rhs = pop();
     std::string return_val = rhs.first;
-    // Literals are safe to return as it is
-    if (obj->expression_->get_type() != ast_type::EXPR_LITERAL) {
+    ykdatatype *result_type = nullptr;
+    if (obj->result_type_ != nullptr) {
+      result_type = obj->result_type_->const_unwrap();
+    }
+    if (result_type != nullptr &&
+        *result_type != *rhs.second.datatype_->const_unwrap()) {
+      // different data types are here
+      if (result_type->is_a_string()) {
+        std::stringstream code_ss{};
+        compile_string_assign(obj->return_keyword_, code_ss, rhs,
+                              rhs.second.datatype_->const_unwrap(),
+                              result_type);
+        return_val = code_ss.str();
+      }
+    } else if (obj->expression_->get_type() != ast_type::EXPR_LITERAL) {
       // First we assign return value to a temp variable
       std::string temp_name = temp();
       write_indent(body_);
@@ -760,7 +1005,8 @@ void compiler::visit_return_stmt(return_stmt *obj) {
       write_end_statement(body_);
       return_val = temp_name;
     }
-    // Do the deletions, defers
+    // Literals are safe to return as it is
+    // Generate deletions, defers
     defers_.write(this);
     deletions_.write(body_, indent_, rhs.first);
     // Now we return the temp value
@@ -828,6 +1074,10 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return convert_dt(basic_dt->args_[0]) + " const ";
   } else if (basic_dt->is_str()) {
     return "yk__sds";
+  } else if (basic_dt->is_sr()) {
+    return "struct yk__bstr";
+  } else if (basic_dt->is_string_literal()) {
+    return "const char*";
   } else if (basic_dt->is_i8()) {
     return "int8_t";
   } else if (basic_dt->is_i16()) {
@@ -1109,7 +1359,7 @@ void compiler::visit_assign_member_expr(assign_member_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
-  perform_assign(lhs.first, rhs, obj->opr_->type_, obj->opr_->token_);
+  perform_assign(lhs, rhs, obj->opr_, false);
 }
 void compiler::visit_square_bracket_access_expr(
     square_bracket_access_expr *obj) {
@@ -1163,7 +1413,7 @@ void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
     body_ << lhs.first << " = yk__sdsdup(" << rhs.first << ")";
     write_end_statement(body_);
   } else {
-    perform_assign(lhs.first, rhs, obj->opr_->type_, obj->opr_->token_);
+    perform_assign(lhs, rhs, obj->opr_, false);
   }
 }
 void compiler::visit_ccode_stmt(ccode_stmt *obj) {
@@ -1176,6 +1426,21 @@ void compiler::visit_const_stmt(const_stmt *obj) {
   if (scope_.is_global_level()) {// constant is global
     auto name = prefix(obj->name_->token_, prefix_val_);
     auto *literal_expression = dynamic_cast<literal_expr *>(obj->expression_);
+    if (obj->data_type_->const_unwrap()->is_sr()) {
+      if (obj->expression_ != nullptr) {
+        auto exp = compile_expression(obj->expression_);
+        if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
+          auto u = string_utils::unescape(exp.second.string_val_);
+          global_constants_ << "struct yk__bstr const " << name << " = "
+                            << "((struct yk__bstr){.data.s = "
+                            << "\"" << string_utils::escape(u) << "\""
+                            << ", .l = " << u.size()
+                            << ", .t = yk__bstr_static})";
+          write_end_statement(global_constants_);
+          return;
+        }
+      }
+    }
     literal_expression->accept(this);
     auto exp = pop();
     global_constants_ << this->convert_dt(obj->data_type_) << " " << name
