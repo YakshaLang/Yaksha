@@ -16,4 +16,5 @@ def main() -> int:
     do_something(a + b + a)
     takes_str(a + b)
     takes_str(a + b + A)
+    del A
     return 0

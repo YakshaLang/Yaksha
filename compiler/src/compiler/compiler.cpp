@@ -1239,7 +1239,8 @@ void compiler::visit_del_stmt(del_stmt *obj) {
   auto name = pop();
   if (name.second.is_primitive_or_obj() &&
       name.second.datatype_->is_primitive() &&
-      !name.second.datatype_->is_str()) {
+      !name.second.datatype_->is_str() &&
+      !name.second.datatype_->const_unwrap()->is_sr()) {
     return;
   }
   write_indent(body_);
@@ -1254,6 +1255,9 @@ void compiler::visit_del_stmt(del_stmt *obj) {
   } else if (name.second.is_primitive_or_obj() &&
              name.second.datatype_->is_str()) {
     body_ << "yk__sdsfree(" << name.first << ")";
+  } else if (name.second.is_primitive_or_obj() &&
+             name.second.datatype_->const_unwrap()->is_sr()) {
+    body_ << "yk__bstr_free_underlying(" << name.first << ")";
   } else {
     body_ << "free(" << name.first << ")";
   }
