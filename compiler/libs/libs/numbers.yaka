@@ -88,3 +88,63 @@ def uu2f(a: u64) -> float:
 @nativemacro
 def i2s(a: int) -> str:
     ccode """(yk__sdsfromlonglong(nn__a))"""
+
+@nativemacro
+def to_le16(a: u16) -> u16:
+    ccode """(end_htole16(nn__a))"""
+
+@nativemacro
+def to_le32(a: u32) -> u32:
+    ccode """(end_htole32(nn__a))"""
+
+@nativemacro
+def to_le64(a: u64) -> u64:
+    ccode """(end_htole64(nn__a))"""
+
+@nativemacro
+def from_le16(a: u16) -> u16:
+    ccode """(end_le16toh(nn__a))"""
+
+@nativemacro
+def from_le32(a: u32) -> u32:
+    ccode """(end_le32toh(nn__a))"""
+
+@nativemacro
+def from_le64(a: u64) -> u64:
+    ccode """(end_le64toh(nn__a))"""
+
+@nativemacro
+def to_be16(a: u16) -> u16:
+    ccode """(end_htobe16(nn__a))"""
+
+@nativemacro
+def to_be32(a: u32) -> u32:
+    ccode """(end_htobe32(nn__a))"""
+
+@nativemacro
+def to_be64(a: u64) -> u64:
+    ccode """(end_htobe64(nn__a))"""
+
+@nativemacro
+def from_be16(a: u16) -> u16:
+    ccode """(end_be16toh(nn__a))"""
+
+@nativemacro
+def from_be32(a: u32) -> u32:
+    ccode """(end_be32toh(nn__a))"""
+
+@nativemacro
+def from_be64(a: u64) -> u64:
+    ccode """(end_be64toh(nn__a))"""
+
+@nativemacro
+def swap_16(a: u16) -> u16:
+    ccode """(end_bswap16(nn__a))"""
+
+@nativemacro
+def swap_32(a: u32) -> u32:
+    ccode """(end_bswap32(nn__a))"""
+
+@nativemacro
+def swap_64(a: u64) -> u64:
+    ccode """(end_bswap64(nn__a))"""
