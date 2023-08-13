@@ -24,7 +24,7 @@ int32_t yy__main()
     int32_t yy__2t = yk__arrlen(yy__0t);
     while (true)
     {
-        if ((! (((yy__1t < yy__2t)))))
+        if (!(yy__1t < yy__2t))
         {
             break;
         }
@@ -33,16 +33,14 @@ int32_t yy__main()
         int32_t yy__5t = yk__arrlen(yy__3t);
         while (true)
         {
-            if ((! (((yy__4t < yy__5t)))))
+            if (!(yy__4t < yy__5t))
             {
                 break;
             }
-            yk__printint(((intmax_t)(yy__0t[yy__1t])));
-            yk__sds t__8 = yk__sdsnewlen(" - ", 3);
-            yk__printstr((t__8));
-            yk__printlnint(((intmax_t)(yy__3t[yy__4t])));
+            yk__printint((intmax_t)(yy__0t[yy__1t]));
+            yk__printstr(" - ");
+            yk__printlnint((intmax_t)(yy__3t[yy__4t]));
             yy__4t += INT32_C(1);
-            yk__sdsfree(t__8);
         }
         yy__1t += INT32_C(1);
     }

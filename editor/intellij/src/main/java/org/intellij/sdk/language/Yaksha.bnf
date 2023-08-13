@@ -23,7 +23,7 @@ private item_ ::= (outer_statement | COMMENT | empty_line)
 
 empty_line ::= S? NL
 
-outer_statement ::= runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | macro_declaration_statement
+outer_statement ::= runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | macro_declaration_statement | dsl_outer_block
 
 runtimefeature_statement ::= KW_RUNTIMEFEATURE S STRING S? NL
 
@@ -72,10 +72,12 @@ def_params ::= def_param (S? OPERATOR_COMMA S? def_param)*
 def_param ::= IDENTIFIER S? OPERATOR_COLON S? data_type
 def_bits ::= pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement
   | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
-  | let_statement | empty_line | continue_statement | break_statement | COMMENT
+  | let_statement | empty_line | continue_statement | break_statement | dsl_inner_block | COMMENT
 single_line_def_bits ::= pass_statement_wo_indent | ccode_statement_wo_indent | del_statement_wo_indent
   | defer_statement_wo_indent | return_statement_wo_indent | expr_statement_wo_indent | assignment_statement_wo_indent
 def_block ::= single_line_def_bits | NL def_bits+
+
+dsl_outer_block ::= IDENTIFIER (OPERATOR_DOT IDENTIFIER)? OPERATOR_NOT_SYMBOL S? OPERATOR_CURLY_OPEN S? lisp_body? S? OPERATOR_CURLY_CLOSE S? OPERATOR_COLON? S? def_block
 
 // Compound statements
 if_statement ::= I KW_IF S? exp S? OPERATOR_COLON S? def_block
@@ -84,6 +86,7 @@ else_statement ::= I KW_ELSE S? OPERATOR_COLON S? def_block
 while_statement ::= I KW_WHILE S? exp S? OPERATOR_COLON S? def_block
 foreach_statement ::= I KW_FOR S? IDENTIFIER (S? OPERATOR_COLON S? data_type)? S? KW_IN S? exp S? OPERATOR_COLON S? def_block
 forendless_statement ::= I KW_FOR S? OPERATOR_COLON S? def_block
+dsl_inner_block ::= I IDENTIFIER (OPERATOR_DOT IDENTIFIER)? OPERATOR_NOT_SYMBOL S? OPERATOR_CURLY_OPEN S? lisp_body? S? OPERATOR_CURLY_CLOSE S? OPERATOR_COLON? S? def_block
 
 // Simple statements
 pass_statement ::= I pass_statement_wo_indent

@@ -65,6 +65,12 @@ public class YakshaDefBitsImpl extends ASTWrapperPsiElement implements YakshaDef
 
   @Override
   @Nullable
+  public YakshaDslInnerBlock getDslInnerBlock() {
+    return findChildByClass(YakshaDslInnerBlock.class);
+  }
+
+  @Override
+  @Nullable
   public YakshaElifStatement getElifStatement() {
     return findChildByClass(YakshaElifStatement.class);
   }

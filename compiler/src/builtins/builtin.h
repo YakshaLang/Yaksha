@@ -20,8 +20,6 @@ namespace yaksha {
            datatype_parser *dt_parser, ykdt_pool *dt_pool,
            const std::unordered_map<std::string, import_stmt *> &import_aliases,
            const std::string &filepath, slot_matcher *dt_slot_matcher) = 0;
-    virtual bool should_compile_argument(int arg_index,
-                                         expr *arg_expression) = 0;
     virtual std::pair<std::string, ykobject> compile(
         const std::vector<std::pair<std::string, ykobject>> &args,
         const std::vector<expr *> &arg_expressions,

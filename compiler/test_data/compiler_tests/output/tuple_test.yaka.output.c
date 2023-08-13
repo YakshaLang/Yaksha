@@ -16,15 +16,13 @@ int32_t yy__main()
     yy__a.e2 = INT32_C(2);
     yy__a.e3 = INT32_C(3);
     yy__a.e1 = INT32_C(100);
-    yk__printlnint(((intmax_t)yy__a.e2));
-    yk__printlnint(((intmax_t)yy__a.e3));
-    yk__printlnint(((intmax_t)yy__a.e1));
+    yk__printlnint((intmax_t)yy__a.e2);
+    yk__printlnint((intmax_t)yy__a.e3);
+    yk__printlnint((intmax_t)yy__a.e1);
     struct yktuple1 yy__c;
-    yk__sds t__0 = yk__sdsnewlen("Hello", 5);
-    yy__c.e1 = yk__sdsdup(t__0);
-    yk__printlnstr((yy__c.e1));
+    yy__c.e1 = yk__sdsnewlen("Hello", 5);
+    yk__printlnstr(yy__c.e1);
     yk__sdsfree(yy__c.e1);
-    yk__sdsfree(t__0);
     return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)

@@ -3575,3 +3575,11 @@ int yk__quicksort(void *arr, size_t item_size, size_t elements,
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+// TODO move below
+#ifndef YK__IO_BSTR
+#define YK__IO_BSTR
+#include "_include_bstr.h"
+#ifdef YK__IO_BSTR_IMPLEMENTATION
+#include "_include_bstr.c"
+#endif
+#endif

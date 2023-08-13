@@ -12,11 +12,11 @@ int32_t yy__main()
     yk__arrput(yy__a, INT32_C(3));
     while (true)
     {
-        if ((! (((yk__arrlen(yy__a) > INT32_C(0))))))
+        if (!(((yk__arrlen(yy__a) > INT32_C(0)))))
         {
             break;
         }
-        yk__printlnint(((intmax_t)yk__arrpop(yy__a)));
+        yk__printlnint((intmax_t)yk__arrpop(yy__a));
     }
     yk__arrfree(yy__a);
     return INT32_C(0);

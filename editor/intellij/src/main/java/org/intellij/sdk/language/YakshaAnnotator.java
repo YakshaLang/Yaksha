@@ -66,19 +66,29 @@ public class YakshaAnnotator implements Annotator {
                         .textAttributes(YakshaSyntaxHighlighter.KEYWORD)
                         .create();
             }
-        } else if (element instanceof YakshaMacroCall | element instanceof YakshaMacroDeclarationStatement) {
+        } else if (element instanceof YakshaMacroCall | element instanceof YakshaMacroDeclarationStatement |
+                element instanceof YakshaDslInnerBlock | element instanceof YakshaDslOuterBlock) {
             PsiElement method = element.getFirstChild();
             if (method != null) {
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                         .range(method.getTextRange())
                         .textAttributes(YakshaSyntaxHighlighter.META_PROGRAMMING)
                         .create();
-                final PsiElement notSign = method.getNextSibling();
-                if (notSign != null) {
-                    holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-                            .range(notSign.getTextRange())
-                            .textAttributes(YakshaSyntaxHighlighter.META_PROGRAMMING)
-                            .create();
+                boolean target_found = false;
+                while (!target_found) {
+                    final PsiElement notSign = method.getNextSibling();
+                    if (notSign != null) {
+                        holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                                .range(notSign.getTextRange())
+                                .textAttributes(YakshaSyntaxHighlighter.META_PROGRAMMING)
+                                .create();
+                        if (notSign.getText().strip().equals("!")) {
+                            target_found = true;
+                        }
+                    } else {
+                        target_found = true;
+                    }
+                    method = notSign;
                 }
             }
 

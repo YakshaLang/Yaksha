@@ -19,15 +19,13 @@ int32_t yy__main()
     int32_t yy__a = INT32_C(10);
     while (true)
     {
-        if ((! (((yy__a != INT32_C(0))))))
+        if (!(((yy__a != INT32_C(0)))))
         {
             break;
         }
-        yk__printint(((intmax_t)yy__a));
-        yk__sds t__0 = yk__sdsnewlen("\n", 1);
-        yk__printstr((t__0));
+        yk__printint((intmax_t)yy__a);
+        yk__printstr("\n");
         yy__a = (yy__a - INT32_C(1));
-        yk__sdsfree(t__0);
     }
     return INT32_C(0);
 }

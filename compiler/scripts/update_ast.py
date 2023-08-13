@@ -70,7 +70,7 @@ STMTS = sorted([
     # Why?
     # this allows us to store arbitrary tokens in order in statement list
     ("token_soup", (("std::vector<token*>", "soup"),)),
-    ("return", (("token*", "return_keyword"), ("expr*", "expression"))),
+    ("return", (("token*", "return_keyword"), ("expr*", "expression"), ("ykdatatype*", "result_type"))),
     # defer statement works just like how we use string, deletions.
     ("defer", (("token*", "defer_keyword"), ("expr*", "expression"), ("stmt*", "del_statement"))),
     # del statement

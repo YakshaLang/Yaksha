@@ -1,10 +1,10 @@
-#if defined(_WIN32) || defined(_WIN64)
+#include "utilities/cpp_util.h"
+#if defined(YAKSHA_OS_WINDOWS)
 #include <windows.h>
 #else
 // NOTE: These needs to be properly wrapped like we do for Yaksha runtime
 // Better to just use these for unix for now
 #include "../runtime/subprocess.h"
-#include "../runtime/whereami.h"
 #endif
 #include <cstdlib>
 #include <cstring>
@@ -13,14 +13,13 @@
 #include <string>
 static const int ERR_ALLOC = -4;
 static const int ERR_CREATE_SUB = -3;
-std::string get_my_exe_path();
-int execute_process(std::filesystem::path carpntr_path, int argc,
+int execute_process(const std::filesystem::path &carpntr_path, int argc,
                     char **arguments);
 int execute_carpntr(int argc, char **arguments) {
-  std::string path_str = get_my_exe_path();
+  std::string path_str = yaksha::get_my_exe_path();
   std::filesystem::path exe_path{path_str};
   exe_path = std::filesystem::absolute(exe_path);
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(YAKSHA_OS_WINDOWS)
   std::filesystem::path carpntr = exe_path.parent_path() / "carpntr.exe";
   if (!std::filesystem::exists(carpntr)) {
     carpntr = exe_path.parent_path() / "cmakecarpntr.exe";
@@ -34,7 +33,7 @@ int execute_carpntr(int argc, char **arguments) {
   int result = execute_process(carpntr, argc, arguments);
   return result;
 }
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(YAKSHA_OS_WINDOWS)
 // https://learn.microsoft.com/en-gb/archive/blogs/twistylittlepassagesallalike/everyone-quotes-command-line-arguments-the-wrong-way
 void ArgvQuote(const std::string &Argument, std::string &CommandLine,
                bool Force)
@@ -128,13 +127,8 @@ int execute_process(std::filesystem::path carpntr_path, int argc,
   }
   return (int) std::system(argument.c_str());
 }
-std::string get_my_exe_path() {
-  char rawPathName[MAX_PATH];
-  GetModuleFileNameA(NULL, rawPathName, MAX_PATH);
-  return {rawPathName};
-}
 #else
-int execute_process(std::filesystem::path carpntr_path, int argc,
+int execute_process(const std::filesystem::path &carpntr_path, int argc,
                     char **arguments) {
   char **arguments_copy =
       static_cast<char **>(malloc(sizeof(char *) * (argc + 1)));
@@ -181,14 +175,5 @@ int execute_process(std::filesystem::path carpntr_path, int argc,
   subprocess_destroy(&subprocess);
   // TODO clean
   return process_return;
-}
-std::string get_my_exe_path() {
-  int length = wai_getModulePath(nullptr, 0, nullptr);
-  char *path = (char *) malloc(length + 1);
-  if (path == nullptr) { return nullptr; }
-  wai_getModulePath(path, length, nullptr);
-  path[length] = '\0';
-  return std::string{path,
-                     static_cast<std::basic_string<char>::size_type>(length)};
 }
 #endif

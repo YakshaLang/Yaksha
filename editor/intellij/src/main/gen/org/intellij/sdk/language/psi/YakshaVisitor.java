@@ -139,6 +139,14 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitDslInnerBlock(@NotNull YakshaDslInnerBlock o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDslOuterBlock(@NotNull YakshaDslOuterBlock o) {
+    visitPsiElement(o);
+  }
+
   public void visitElifStatement(@NotNull YakshaElifStatement o) {
     visitPsiElement(o);
   }

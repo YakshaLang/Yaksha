@@ -382,12 +382,15 @@ stmt *ast_pool::c_pass_stmt(token *pass_token) {
   cleanup_stmt_.push_back(o);
   return o;
 }
-return_stmt::return_stmt(token *return_keyword, expr *expression)
-    : return_keyword_(return_keyword), expression_(expression) {}
+return_stmt::return_stmt(token *return_keyword, expr *expression,
+                         ykdatatype *result_type)
+    : return_keyword_(return_keyword), expression_(expression),
+      result_type_(result_type) {}
 void return_stmt::accept(stmt_visitor *v) { v->visit_return_stmt(this); }
 ast_type return_stmt::get_type() { return ast_type::STMT_RETURN; }
-stmt *ast_pool::c_return_stmt(token *return_keyword, expr *expression) {
-  auto o = new return_stmt(return_keyword, expression);
+stmt *ast_pool::c_return_stmt(token *return_keyword, expr *expression,
+                              ykdatatype *result_type) {
+  auto o = new return_stmt(return_keyword, expression, result_type);
   cleanup_stmt_.push_back(o);
   return o;
 }

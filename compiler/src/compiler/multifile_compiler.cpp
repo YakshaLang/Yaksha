@@ -10,7 +10,8 @@ using namespace yaksha;
 multifile_compiler_result
 multifile_compiler::compile(const std::string &main_file) {
   LOG_COMP("compile:" << main_file);
-  auto libs_path = std::filesystem::current_path().string();
+  auto libs_path = std::filesystem::path{get_my_exe_path()}.parent_path();
+  libs_path = libs_path.parent_path() / "libs";
   return compile(main_file, libs_path);
 }
 //

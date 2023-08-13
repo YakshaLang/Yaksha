@@ -33,6 +33,10 @@ bool yk__io_writefile(yk__sds name, yk__sds data);
 wchar_t *yk__utf8_to_utf16_null_terminated(const char *str);
 char *yk__utf16_to_utf8_null_terminated(const wchar_t *str);
 #endif
+#if defined(__EMSCRIPTEN__) || defined(__wasm__) || defined(__wasm32__) || defined(__wasm64__)
+#define YAKSHA__WASM_BUILD
+#endif
+#if !defined(YAKSHA__WASM_BUILD)
 #include "_include_io.h"
 #include <fcntl.h>
 #if defined(_WIN32) || defined(_WIN64)
@@ -40,6 +44,7 @@ char *yk__utf16_to_utf8_null_terminated(const wchar_t *str);
 #else
 #include <unistd.h>
 #include <sys/mman.h>
+#endif
 #endif
 //////////////////////// Forward declaration to yaksha code main() /////////////
 int32_t yy__main();

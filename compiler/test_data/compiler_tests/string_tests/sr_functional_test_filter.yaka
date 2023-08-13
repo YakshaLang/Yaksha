@@ -1,0 +1,44 @@
+def keep_len_n(a: sr, n: int) -> bool:
+    return len(a) == n
+
+def keep_all(a: sr, n: int) -> bool:
+    return True
+
+def keep_upto(a: int, n: int) -> bool:
+    if a > n:
+        return False
+    return True
+
+def keep_div(a: int, n: int) -> bool:
+    return a % n == 0
+
+def print_sr(a: sr, ignored: int) -> bool:
+    println(a)
+    return True
+
+def print_int(a: int, ignored: int) -> bool:
+    println(a)
+    return True
+
+def main() -> int:
+    println(">> filter sr test <<")
+    f: Function[In[sr, int], Out[bool]] = keep_len_n
+    ar: Array[sr] = array("sr", "Hello", "World", "How", "Are", "You")
+    println("Before =>> ")
+    foreach(ar, print_sr, 0)
+    ar2: Array[sr] = filter(ar, keep_len_n, 3)
+    println("Filtered =>> ")
+    foreach(ar2, print_sr, 0)
+    println("Keep All =>> ")
+    foreach(filter(ar, keep_all, 0), print_sr, 0)
+    println(">> filter int test <<")
+    fi: Function[In[int, int], Out[bool]] = keep_upto
+    ai: Array[int] = array("int", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    println("Keep Upto 5 =>> ")
+    foreach(filter(ai, keep_upto, 5), print_int, 0)
+    println("Keep Upto 7 =>> ")
+    foreach(filter(ai, keep_upto, 7), print_int, 0)
+    println("Keep div 2 (even) =>> ")
+    foreach(filter(ai, keep_div, 2), print_int, 0)
+    println(">> completed.")
+    return 0

@@ -96,8 +96,9 @@ void def_class_visitor::visit_const_stmt(const_stmt *obj) {
     return;
   }
   if (!obj->data_type_->args_[0]->is_a_number() &&
-      !obj->data_type_->args_[0]->is_bool()) {
-    error(obj->name_, "Only number and boolean constants are supported.");
+      !obj->data_type_->args_[0]->is_bool() &&
+      !obj->data_type_->args_[0]->is_sr()) {
+    error(obj->name_, "Only number/bool/sr constants are supported.");
     return;
   }
   // Note below is only at the moment --> // at the moment?
@@ -131,7 +132,6 @@ void def_class_visitor::visit_nativeconst_stmt(nativeconst_stmt *obj) {
           "Should be Const[x], only single data type can be specified");
     return;
   }
-  // TODO should we support more? // think!
   if (!obj->data_type_->args_[0]->is_a_number() &&
       !obj->data_type_->args_[0]->is_bool()) {
     error(obj->name_, "Only number and boolean constants are supported.");

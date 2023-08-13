@@ -1,13 +1,12 @@
 #include "btest.h"
 #include "catch2/catch.hpp"
 #include "ic2c/ic_tokenizer.h"
+#include "utilities/cpp_util.h"
 #include <iostream>
 using namespace yaksha;
-//#define IC_TOKENIZER_PRINT_TOKENS
-//#define SLOW_TESTS
 #if defined(IC_TOKENIZER_PRINT_TOKENS) || defined(SLOW_TESTS)
-#include "tokenizer/string_utils.h"
 #include "file_formats/ic_tokens_file.h"
+#include "tokenizer/string_utils.h"
 #define TOKENS_PRINT()                                                         \
   do {                                                                         \
     for (auto const &to : t.tokens_) {                                         \

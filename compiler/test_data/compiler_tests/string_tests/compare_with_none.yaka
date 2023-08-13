@@ -1,0 +1,12 @@
+def main() -> int:
+    a: sr = "a"
+    b: str = "b"
+    println(a == None)
+    println(b == None)
+    println("a" != None)
+    println("a" == None)
+    println(None != a)
+    println(None != b)
+    println(None == "a")
+    println(None != "a")
+    return 0

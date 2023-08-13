@@ -117,7 +117,8 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
 "float" |
 "bool" |
 "f32" |
-"f64" { return YakshaTypes.PRIMITIVE_DATA_TYPE; }
+"f64" |
+"sr" { return YakshaTypes.PRIMITIVE_DATA_TYPE; }
 
   /* operators */
   "("                            { return YakshaTypes.OPERATOR_OPEN_P; }

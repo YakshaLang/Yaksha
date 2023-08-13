@@ -41,6 +41,8 @@ public interface YakshaTypes {
   IElementType DEF_STATEMENT = new YakshaElementType("DEF_STATEMENT");
   IElementType DEL_STATEMENT = new YakshaElementType("DEL_STATEMENT");
   IElementType DEL_STATEMENT_WO_INDENT = new YakshaElementType("DEL_STATEMENT_WO_INDENT");
+  IElementType DSL_INNER_BLOCK = new YakshaElementType("DSL_INNER_BLOCK");
+  IElementType DSL_OUTER_BLOCK = new YakshaElementType("DSL_OUTER_BLOCK");
   IElementType ELIF_STATEMENT = new YakshaElementType("ELIF_STATEMENT");
   IElementType ELSE_STATEMENT = new YakshaElementType("ELSE_STATEMENT");
   IElementType EMPTY_LINE = new YakshaElementType("EMPTY_LINE");
@@ -250,6 +252,12 @@ public interface YakshaTypes {
       }
       else if (type == DEL_STATEMENT_WO_INDENT) {
         return new YakshaDelStatementWoIndentImpl(node);
+      }
+      else if (type == DSL_INNER_BLOCK) {
+        return new YakshaDslInnerBlockImpl(node);
+      }
+      else if (type == DSL_OUTER_BLOCK) {
+        return new YakshaDslOuterBlockImpl(node);
       }
       else if (type == ELIF_STATEMENT) {
         return new YakshaElifStatementImpl(node);

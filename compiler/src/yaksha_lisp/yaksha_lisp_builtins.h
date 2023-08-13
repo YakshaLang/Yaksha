@@ -47,8 +47,7 @@ namespace yaksha {
     // only if it is defined in the current scope or a parent scope(s)
     // changes the value
     static yaksha_lisp_value *
-    setq_(const std::vector<yaksha_lisp_value *> &args,
-                                   yaksha_envmap *env);
+    setq_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
     // sets the value in the current scope if it is defined there
     // otherwise defines it in the current scope
     static yaksha_lisp_value *
@@ -222,25 +221,29 @@ namespace yaksha {
     static yaksha_lisp_value *
     magic_dot_(const std::vector<yaksha_lisp_value *> &args,
                yaksha_envmap *env);
+    static yaksha_lisp_value *
+    sorted_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
+    static yaksha_lisp_value *
+    reversed_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
     // --
     static yaksha_lisp_value *
     system_lock_root_scope_(const std::vector<yaksha_lisp_value *> &args,
-               yaksha_envmap *env);
+                            yaksha_envmap *env);
     static yaksha_lisp_value *
     system_unlock_root_scope_(const std::vector<yaksha_lisp_value *> &args,
-               yaksha_envmap *env);
+                              yaksha_envmap *env);
     static yaksha_lisp_value *
     system_enable_gc_(const std::vector<yaksha_lisp_value *> &args,
-               yaksha_envmap *env);
-    static yaksha_lisp_value *
-    system_disable_gc_(const std::vector<yaksha_lisp_value *> &args,
-               yaksha_envmap *env);
-    static yaksha_lisp_value *
-    system_enable_print_(const std::vector<yaksha_lisp_value *> &args,
                       yaksha_envmap *env);
     static yaksha_lisp_value *
-    system_disable_print_(const std::vector<yaksha_lisp_value *> &args,
+    system_disable_gc_(const std::vector<yaksha_lisp_value *> &args,
                        yaksha_envmap *env);
+    static yaksha_lisp_value *
+    system_enable_print_(const std::vector<yaksha_lisp_value *> &args,
+                         yaksha_envmap *env);
+    static yaksha_lisp_value *
+    system_disable_print_(const std::vector<yaksha_lisp_value *> &args,
+                          yaksha_envmap *env);
     // ----------------------------------------------------------------- //
     static yaksha_lisp_value *copy_val(yaksha_envmap *env,
                                        yaksha_lisp_value *item);

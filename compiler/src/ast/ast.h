@@ -469,11 +469,13 @@ namespace yaksha {
     token *pass_token_;
   };
   struct return_stmt : stmt {
-    return_stmt(token *return_keyword, expr *expression);
+    return_stmt(token *return_keyword, expr *expression,
+                ykdatatype *result_type);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *return_keyword_;
     expr *expression_;
+    ykdatatype *result_type_;
   };
   struct runtimefeature_stmt : stmt {
     runtimefeature_stmt(token *runtimefeature_token, token *feature);
@@ -557,7 +559,8 @@ namespace yaksha {
     stmt *c_nativeconst_stmt(token *name, ykdatatype *data_type,
                              token *ccode_keyword, token *code_str);
     stmt *c_pass_stmt(token *pass_token);
-    stmt *c_return_stmt(token *return_keyword, expr *expression);
+    stmt *c_return_stmt(token *return_keyword, expr *expression,
+                        ykdatatype *result_type);
     stmt *c_runtimefeature_stmt(token *runtimefeature_token, token *feature);
     stmt *c_token_soup_stmt(std::vector<token *> soup);
     stmt *c_while_stmt(token *while_keyword, expr *expression,

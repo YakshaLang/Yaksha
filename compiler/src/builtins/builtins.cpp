@@ -23,7 +23,12 @@ struct builtin_arrput : builtin {
       o.string_val_ = "Two arguments must be provided for arrput() builtin";
     } else if (!args[0].datatype_->is_an_array()) {
       o.string_val_ = "First argument to arrput() must be an Array[?]";
-    } else if (*(args[0].datatype_->args_[0]) != *args[1].datatype_) {
+    } else if (*(args[0].datatype_->args_[0]) !=
+               *args[1].datatype_->const_unwrap()) {
+      if (args[0].datatype_->args_[0]->const_unwrap()->is_a_string() &&
+          args[1].datatype_->const_unwrap()->is_a_string()) {
+        return o;
+      }
       o.string_val_ = "Second argument to arrput() must match with Array[?]";
     } else if (args[0].datatype_->args_[0]->is_m_entry() ||
                args[0].datatype_->args_[0]->is_sm_entry()) {
@@ -33,9 +38,6 @@ struct builtin_arrput : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -48,9 +50,12 @@ struct builtin_arrput : builtin {
           entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
-    if (args[1].second.datatype_->is_str()) {
-      code << "yk__arrput(" << args[0].first << ", yk__sdsdup(" << args[1].first
-           << "))";
+    if (args[1].second.datatype_->const_unwrap()->is_a_string()) {
+      code << "yk__arrput(" << args[0].first << ", ";
+      dt_compiler->compile_string_assign(
+          nullptr, code, args[1], args[1].second.datatype_->const_unwrap(),
+          args[0].second.datatype_->args_[0]->const_unwrap());
+      code << ")";
     } else {
       code << "yk__arrput(" << args[0].first << ", " << args[1].first << ")";
     }
@@ -82,9 +87,6 @@ struct builtin_arrpop : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -138,9 +140,6 @@ struct builtin_arrsetlencap : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
-  }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
           const std::vector<expr *> &arg_expressions,
@@ -180,19 +179,13 @@ struct builtin_print : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for print() builtin";
-    } else if (!(args[0].datatype_->is_primitive() ||
-                 (args[0].datatype_->is_const() &&
-                  args[0].datatype_->args_[0]->is_primitive()))) {
-      // Primitive or Const[primitive]
+    } else if (!(args[0].datatype_->const_unwrap()->is_primitive())) {
       o.string_val_ = "Argument to print() must be a primitive";
     } else {
       return o;
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -206,21 +199,36 @@ struct builtin_print : builtin {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
     auto rhs = args[0];
-    ykdatatype *dt = rhs.second.datatype_;
-    if (dt->is_const()) { dt = dt->args_[0]; }
+    ykdatatype *dt = rhs.second.datatype_->const_unwrap();
     if (dt->is_a_signed_integer()) {
-      code << "yk__" << func_name_ << "int(((intmax_t)" << rhs.first << "))";
+      code << "yk__" << func_name_ << "int((intmax_t)" << rhs.first << ")";
     } else if (dt->is_an_unsigned_integer()) {
-      code << "yk__" << func_name_ << "uint(((uintmax_t)" << rhs.first << "))";
+      code << "yk__" << func_name_ << "uint((uintmax_t)" << rhs.first << ")";
     } else if (dt->is_str()) {
-      code << "yk__" << func_name_ << "str((" << rhs.first << "))";
+      code << "yk__" << func_name_ << "str(" << rhs.first << ")";
+    } else if (dt->is_string_literal()) {
+      code << "yk__" << func_name_ << "str(\""
+           << string_utils::escape(
+                  string_utils::unescape(rhs.second.string_val_))
+           << "\")";
+    } else if (dt->is_sr()) {
+      code << "yk__" << func_name_ << "str("
+           << "yk__bstr_get_reference(" << rhs.first << ")"
+           << ")";
     } else if (dt->is_a_float()) {
-      code << "yk__" << func_name_ << "dbl((" << rhs.first << "))";
+      code << "yk__" << func_name_ << "dbl(" << rhs.first << ")";
     } else if (dt->is_none()) {
       code << "yk__" << func_name_ << "str(\"None\")";
     } else if (dt->is_bool()) {
-      code << "yk__" << func_name_ << "str((" << rhs.first
-           << R"() ? "True" : "False"))";
+      if (rhs.first == "true") {
+        code << "yk__" << func_name_ << "str(\"True\")";
+      } else if (rhs.first == "false") {
+        code << "yk__" << func_name_ << "str(\"False\")";
+      } else {
+        code << "yk__" << func_name_ << "str("
+             << dt_compiler->wrap_in_paren(rhs.first)
+             << R"( ? "True" : "False"))";
+      }
     }
     return {code.str(), o};
   }
@@ -243,17 +251,14 @@ struct builtin_len : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for len() builtin";
-    } else if (!args[0].datatype_->is_an_array() &&
-               !args[0].datatype_->is_str()) {
-      o.string_val_ = "Argument to len() must be an Array or a str";
+    } else if (!args[0].datatype_->const_unwrap()->is_an_array() &&
+               !args[0].datatype_->const_unwrap()->is_a_string()) {
+      o.string_val_ = "Argument to len() must be an Array or a string";
     } else {
       return ykobject(dt_pool->create("int"));
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -266,14 +271,25 @@ struct builtin_len : builtin {
           entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
-    if (args[0].second.datatype_->is_str()) {
+    if (args[0].second.datatype_->const_unwrap()->is_str()) {
       code << "yk__sdslen(" << args[0].first << ")";
-    } else if (args[0].second.datatype_->is_an_array() &&
-               args[0].second.datatype_->args_[0]->is_sm_entry()) {
+    } else if (args[0].second.datatype_->const_unwrap()->is_string_literal()) {
+      auto u = string_utils::unescape(args[0].second.string_val_);
+      code << u.size();
+    } else if (args[0].second.datatype_->const_unwrap()->is_sr()) {
+      code << "yk__bstr_len(" << args[0].first << ")";
+    } else if (args[0].second.datatype_->const_unwrap()->is_an_array() &&
+               args[0]
+                   .second.datatype_->const_unwrap()
+                   ->args_[0]
+                   ->is_sm_entry()) {
       // Array[SMEntry[V]]
       code << "yk__shlen(" << args[0].first << ")";
-    } else if (args[0].second.datatype_->is_an_array() &&
-               args[0].second.datatype_->args_[0]->is_m_entry()) {
+    } else if (args[0].second.datatype_->const_unwrap()->is_an_array() &&
+               args[0]
+                   .second.datatype_->const_unwrap()
+                   ->args_[0]
+                   ->is_m_entry()) {
       // Array[MEntry[K,V]]
       code << "yk__hmlen(" << args[0].first << ")";
     } else {
@@ -298,19 +314,15 @@ struct builtin_charat : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for charat() builtin";
-    } else if (!args[0].datatype_->is_str()) {
-      o.string_val_ = "Fist argument to charat() must be a str";
-    } else if (!(args[1].datatype_->is_an_integer() ||
-                 args[1].datatype_->is_a_const_integer())) {
+    } else if (!args[0].datatype_->const_unwrap()->is_a_string()) {
+      o.string_val_ = "Fist argument to charat() must be a string";
+    } else if (!(args[1].datatype_->const_unwrap()->is_an_integer())) {
       o.string_val_ = "Second argument to charat() must be an integer";
     } else {
       return ykobject(dt_pool->create("int"));
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -323,7 +335,13 @@ struct builtin_charat : builtin {
           entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
-    code << "(" << args[0].first << "[" << args[1].first << "])";
+    if (args[0].second.datatype_->const_unwrap()->is_string_literal() ||
+        args[0].second.datatype_->const_unwrap()->is_str()) {
+      code << "(" << args[0].first << "[" << args[1].first << "])";
+    } else {// sr
+      code << "(yk__bstr_get_reference(" << args[0].first << ")["
+           << args[1].first << "])";
+    }
     o = ykobject(dt_pool->create("int"));
     return {code.str(), o};
   }
@@ -352,9 +370,6 @@ struct builtin_getref : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -397,9 +412,6 @@ struct builtin_unref : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
-  }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
           const std::vector<expr *> &arg_expressions,
@@ -440,9 +452,6 @@ struct builtin_shnew : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
-  }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
           const std::vector<expr *> &arg_expressions,
@@ -477,16 +486,13 @@ struct builtin_shget : builtin {
                !args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ =
           "First argument to shget() must match with Array[SMEntry[?]]";
-    } else if (!args[1].datatype_->is_str()) {
-      o.string_val_ = "Second argument to shget() must be a str";
+    } else if (!args[1].datatype_->const_unwrap()->is_a_string()) {
+      o.string_val_ = "Second argument to shget() must be a string";
     } else {
       return ykobject(args[0].datatype_->args_[0]->args_[0]);
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -499,7 +505,11 @@ struct builtin_shget : builtin {
           entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
-    code << "yk__shget(" << args[0].first << ", " << args[1].first << ")";
+    code << "yk__shget(" << args[0].first << ", ";
+    dt_compiler->compile_string_assign(nullptr, code, args[1],
+                                       args[1].second.datatype_->const_unwrap(),
+                                       dt_pool->create("str"));
+    code << ")";
     o = ykobject(args[0].second.datatype_->args_[0]->args_[0]);
     return {code.str(), o};
   }
@@ -523,16 +533,13 @@ struct builtin_shgeti : builtin {
                !args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ =
           "First argument to shgeti() must match with Array[SMEntry[?]]";
-    } else if (!args[1].datatype_->is_str()) {
-      o.string_val_ = "Second argument to shgeti() must be a str";
+    } else if (!args[1].datatype_->const_unwrap()->is_a_string()) {
+      o.string_val_ = "Second argument to shgeti() must be a string";
     } else {
       return ykobject(dt_pool->create("int"));
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -545,7 +552,11 @@ struct builtin_shgeti : builtin {
           entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
-    code << "yk__shgeti(" << args[0].first << ", " << args[1].first << ")";
+    code << "yk__shgeti(" << args[0].first << ", ";
+    dt_compiler->compile_string_assign(nullptr, code, args[1],
+                                       args[1].second.datatype_->const_unwrap(),
+                                       dt_pool->create("str"));
+    code << ")";
     o = ykobject(dt_pool->create("int"));
     return {code.str(), o};
   }
@@ -569,19 +580,16 @@ struct builtin_shput : builtin {
                !args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ =
           "First argument to shput() must match with Array[SMEntry[?]]";
-    } else if (!args[1].datatype_->is_str()) {
-      o.string_val_ = "Second argument to shput() must be a str";
-    } else if (!(*args[2].datatype_ ==
-                 *args[0].datatype_->args_[0]->args_[0])) {
+    } else if (!args[1].datatype_->const_unwrap()->is_a_string()) {
+      o.string_val_ = "Second argument to shput() must be a string";
+    } else if (!(*(args[2].datatype_->const_unwrap()) ==
+                 *(args[0].datatype_->args_[0]->args_[0]->const_unwrap()))) {
       o.string_val_ = "Third argument to shput() must match provided map";
     } else {
       return o;
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -594,8 +602,11 @@ struct builtin_shput : builtin {
           entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
-    code << "yk__shput(" << args[0].first << ", " << args[1].first << ", "
-         << args[2].first << ")";
+    code << "yk__shput(" << args[0].first << ", ";
+    dt_compiler->compile_string_assign(nullptr, code, args[1],
+                                       args[1].second.datatype_->const_unwrap(),
+                                       dt_pool->create("str"));
+    code << ", " << args[2].first << ")";
     return {code.str(), o};
   }
 };
@@ -614,8 +625,7 @@ struct builtin_cast : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for cast() builtin";
-    } else if (!args[0].datatype_->is_str() ||
-               arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+    } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
       o.string_val_ = "First argument to cast() must be a literal.";
     } else if (!args[1].is_primitive_or_obj()) {
       o.string_val_ = "Second argument to cast() must be an object/primitive";
@@ -638,10 +648,6 @@ struct builtin_cast : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    if (arg_index == 0) { return false; }
-    return true;
-  }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
           const std::vector<expr *> &arg_expressions,
@@ -657,7 +663,7 @@ struct builtin_cast : builtin {
     auto out_dt =
         dt_parser->parse(dt->literal_token_->token_, import_aliases, filepath);
     if (out_dt->is_any_ptr() || out_dt->is_any_ptr_to_const()) {
-      code << "(" << args[1].first << ")";
+      code << dt_compiler->wrap_in_paren(args[1].first);
     } else if (args[1].second.datatype_->is_none()) {
       code << "NULL";
     } else {
@@ -691,9 +697,6 @@ struct builtin_hmnew : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -736,9 +739,6 @@ struct builtin_hmget : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -784,9 +784,6 @@ struct builtin_hmgeti : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -836,9 +833,6 @@ struct builtin_hmput : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -904,9 +898,6 @@ struct builtin_qsort : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
-  }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
           const std::vector<expr *> &arg_expressions,
@@ -941,35 +932,26 @@ struct builtin_arrnew : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for arrnew() builtin";
-    } else if (arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+    } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
       o.string_val_ = "First argument to arrnew() must be a string literal";
     } else if (!(args[1].datatype_->is_an_integer() ||
                  args[1].datatype_->is_a_const_integer())) {
       o.string_val_ = "Second argument to arrnew() must be an int";
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
-      if (lit->literal_token_->type_ != token_type::STRING &&
-          lit->literal_token_->type_ != token_type::THREE_QUOTE_STRING) {
-        o.string_val_ = "First argument to arrnew() must be a string literal";
+      auto data_type = lit->literal_token_->token_;
+      ykdatatype *parsed_dt =
+          dt_parser->parse(data_type, import_aliases, filepath);
+      if (parsed_dt == nullptr) {
+        o.string_val_ = "Invalid data type provided to arrnew()";
       } else {
-        auto data_type = lit->literal_token_->token_;
-        ykdatatype *parsed_dt =
-            dt_parser->parse(data_type, import_aliases, filepath);
-        if (parsed_dt == nullptr) {
-          o.string_val_ = "Invalid data type provided to arrnew()";
-        } else {
-          ykdatatype *array_wrapper = dt_pool->create("Array");
-          array_wrapper->args_.emplace_back(parsed_dt);
-          return ykobject(array_wrapper);
-        }
+        ykdatatype *array_wrapper = dt_pool->create("Array");
+        array_wrapper->args_.emplace_back(parsed_dt);
+        return ykobject(array_wrapper);
       }
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    if (arg_index == 0) { return false; }
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -1016,41 +998,32 @@ struct builtin_array : builtin {
     auto o = ykobject(dt_pool);
     if (args.empty()) {
       o.string_val_ = "array() builtin expects >= 1 arguments";
-    } else if (arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+    } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
       o.string_val_ = "First argument to array() must be a string literal";
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
-      if (lit->literal_token_->type_ != token_type::STRING &&
-          lit->literal_token_->type_ != token_type::THREE_QUOTE_STRING) {
-        o.string_val_ = "First argument to array() must be a string literal";
+      auto data_type = lit->literal_token_->token_;
+      ykdatatype *parsed_dt =
+          dt_parser->parse(data_type, import_aliases, filepath);
+      if (parsed_dt == nullptr) {
+        o.string_val_ = "Invalid data type provided to array()";
       } else {
-        auto data_type = lit->literal_token_->token_;
-        ykdatatype *parsed_dt =
-            dt_parser->parse(data_type, import_aliases, filepath);
-        if (parsed_dt == nullptr) {
-          o.string_val_ = "Invalid data type provided to array()";
-        } else {
-          size_t length = args.size();
-          for (size_t i = 1; i < length; i++) {
-            if (!dt_slot_matcher->slot_match(args[i], parsed_dt)) {
-              o.string_val_ = "All arguments must match with data type passed "
-                              "to first argument for array() builtin";
-              o.object_type_ = object_type::ERROR_DETECTED;
-              return o;
-            }
+        size_t length = args.size();
+        for (size_t i = 1; i < length; i++) {
+          if (!dt_slot_matcher->slot_match(args[i], parsed_dt)) {
+            o.string_val_ = "All arguments must match with data type passed "
+                            "to first argument for array() builtin";
+            o.object_type_ = object_type::ERROR_DETECTED;
+            return o;
           }
-          ykdatatype *array_wrapper = dt_pool->create("Array");
-          array_wrapper->args_.emplace_back(parsed_dt);
-          return ykobject(array_wrapper);
         }
+        ykdatatype *array_wrapper = dt_pool->create("Array");
+        array_wrapper->args_.emplace_back(parsed_dt);
+        return ykobject(array_wrapper);
       }
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    if (arg_index == 0) { return false; }
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -1079,9 +1052,12 @@ struct builtin_array : builtin {
     code.clear();
     size_t length = args.size();
     for (size_t i = 1; i < length; i++) {
-      if (element_data_type->is_str()) {
-        code << "yk__arrput(" << array_var << ", yk__sdsdup(" << args[i].first
-             << "))";
+      if (element_data_type->is_a_string()) {
+        code << "yk__arrput(" << array_var << ", ";
+        dt_compiler->compile_string_assign(
+            dt->literal_token_, code, args[i],
+            args[i].second.datatype_->const_unwrap(), element_data_type);
+        code << ")";
       } else {
         code << "yk__arrput(" << array_var << ", " << args[i].first << ")";
       }
@@ -1111,12 +1087,14 @@ struct builtin_iif : builtin {
       o.string_val_ = "iif() builtin expects 3 arguments";
     } else if (!(args[0].datatype_->is_bool_or_const_bool())) {
       o.string_val_ = "First argument to iif() must be a bool";
-    } else if (*args[1].datatype_ != *args[2].datatype_) {
+    } else if (*args[1].datatype_->const_unwrap() !=
+               *args[2].datatype_->const_unwrap()) {
       o.string_val_ = "Second and third argument to iif() must be of same type";
     } else if (args[1].is_a_function()) {
       ykdatatype *arg1_dt = dt_slot_matcher->function_to_datatype(args[1]);
       ykdatatype *arg2_dt = dt_slot_matcher->function_to_datatype(args[2]);
-      if (arg1_dt != nullptr && arg2_dt != nullptr && *arg1_dt == *arg2_dt) {
+      if (arg1_dt != nullptr && arg2_dt != nullptr &&
+          *(arg1_dt->const_unwrap()) == *(arg2_dt->const_unwrap())) {
         o = ykobject(arg1_dt);
         return o;
       } else {
@@ -1124,13 +1102,13 @@ struct builtin_iif : builtin {
       }
     } else {
       o = ykobject(args[1].datatype_);
+      if (args[1].datatype_->const_unwrap()->is_string_literal()) {
+        o.datatype_ = dt_pool->create("sr");
+      }
       return o;
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -1143,9 +1121,19 @@ struct builtin_iif : builtin {
           entry_struct_func_compiler *esc) override {
     auto o = ykobject(dt_pool);
     std::stringstream code{};
-    code << "(" << args[0].first << " ? " << args[1].first << " : "
-         << args[2].first << ")";
-    o = ykobject(args[1].second.datatype_);
+    if (args[1].second.datatype_->const_unwrap()->is_string_literal()) {
+      o.datatype_ = dt_pool->create("sr");
+      auto u_lhs = string_utils::unescape(args[1].second.string_val_);
+      auto u_rhs = string_utils::unescape(args[2].second.string_val_);
+      code << "(" << args[0].first << " ? yk__bstr_s(\""
+           << string_utils::escape(u_lhs) << "\", " << u_lhs.size() << ") : "
+           << "yk__bstr_s(\"" << string_utils::escape(u_rhs) << "\", "
+           << u_rhs.size() << "))";
+    } else {
+      code << "(" << args[0].first << " ? " << args[1].first << " : "
+           << args[2].first << ")";
+      o.datatype_ = args[1].second.datatype_;
+    }
     return {code.str(), o};
   }
 };
@@ -1188,9 +1176,6 @@ struct builtin_functional : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return true;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -1382,8 +1367,7 @@ struct builtin_binarydata : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "binarydata() builtin expects 1 argument";
-    } else if (!args[0].datatype_->is_str() ||
-               arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+    } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
       o.string_val_ = "Argument to binarydata() must be a str literal";
     } else {
       o = ykobject(
@@ -1392,9 +1376,6 @@ struct builtin_binarydata : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return false;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -1438,8 +1419,7 @@ struct builtin_make : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for make() builtin";
-    } else if (!args[0].datatype_->is_str() ||
-               arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+    } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
       o.string_val_ = "Argument to make() must be a str literal";
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
@@ -1466,9 +1446,6 @@ struct builtin_make : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return false;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -1511,11 +1488,9 @@ struct builtin_inlinec : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for inlinec() builtin";
-    } else if (!args[0].datatype_->is_str() ||
-               arg_expressions[0]->get_type() != ast_type::EXPR_LITERAL) {
+    } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
       o.string_val_ = "First argument to inlinec() must be a str literal";
-    } else if (!args[1].datatype_->is_str() ||
-               arg_expressions[1]->get_type() != ast_type::EXPR_LITERAL) {
+    } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
       o.string_val_ = "Second argument to inlinec() must be a str literal";
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
@@ -1523,15 +1498,13 @@ struct builtin_inlinec : builtin {
       ykdatatype *parsed_dt_original =
           dt_parser->parse(data_type, import_aliases, filepath);
       if (parsed_dt_original != nullptr) {
-        ykdatatype *parsed_dt = parsed_dt_original;
-        if (parsed_dt_original->is_const()) {
-          parsed_dt = parsed_dt_original->args_[0];// Extract const
-        }
+        ykdatatype *parsed_dt = parsed_dt_original->const_unwrap();
         if (parsed_dt->is_function_input() || parsed_dt->is_function_output() ||
             parsed_dt->is_m_entry() || parsed_dt->is_sm_entry() ||
             parsed_dt->is_const()) {
           o.string_val_ =
-              "First argument to inlinec() is an invalid data type " + data_type;
+              "First argument to inlinec() is an invalid data type " +
+              data_type;
         } else {
           return ykobject(parsed_dt_original);
         }
@@ -1539,9 +1512,6 @@ struct builtin_inlinec : builtin {
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
-  }
-  bool should_compile_argument(int arg_index, expr *arg_expression) override {
-    return false;
   }
   std::pair<std::string, ykobject>
   compile(const std::vector<std::pair<std::string, ykobject>> &args,
@@ -1628,10 +1598,6 @@ std::pair<std::string, ykobject> builtins::compile(
   return builtins_[name]->compile(args, arg_expressions, dt_compiler, this,
                                   dt_pool_, import_aliases, filepath, st_writer,
                                   fnc_dt_extractor, esc);
-}
-bool builtins::should_compile_argument(const std::string &name, int arg_index,
-                                       expr *arg_expression) {
-  return builtins_[name]->should_compile_argument(arg_index, arg_expression);
 }
 ykdatatype *builtins::parse(
     std::string data_type_str,

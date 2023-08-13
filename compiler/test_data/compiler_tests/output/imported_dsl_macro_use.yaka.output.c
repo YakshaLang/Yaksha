@@ -6,9 +6,9 @@ int32_t yy__main();
 // --functions-- 
 int32_t yy__main() 
 {
-    yk__printlnint(((intmax_t)INT32_C(2)));
-    yk__printlnint(((intmax_t)INT32_C(4)));
-    yk__printlnint(((intmax_t)INT32_C(6)));
+    yk__printlnint((intmax_t)INT32_C(2));
+    yk__printlnint((intmax_t)INT32_C(4));
+    yk__printlnint((intmax_t)INT32_C(6));
     return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)

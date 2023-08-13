@@ -1,0 +1,6 @@
+def main() -> int:
+    println("a" == "a")
+    println("a" == "b")
+    println("a" != "a")
+    println("a" != "b")
+    return 0
