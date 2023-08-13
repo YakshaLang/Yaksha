@@ -427,3 +427,15 @@ TEST_CASE("compiler: autocasting") {
       "autocast.yaka",
       "../test_data/compiler_tests/output/autocast.tokens");
 }
+TEST_CASE("compiler: doc sample - wind_tree") {
+  test_compile_yaka_file(
+      "../test_data/document_samples/wind_tree.yaka",
+      "doc_wind_tree.yaka",
+      "../test_data/compiler_tests/output/doc_wind_tree.tokens");
+}
+TEST_CASE("compiler: doc sample - factorial") {
+  test_compile_yaka_file(
+      "../test_data/document_samples/factorial.yaka",
+      "doc_factorial.yaka",
+      "../test_data/compiler_tests/output/doc_factorial.tokens");
+}
