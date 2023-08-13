@@ -22,15 +22,37 @@ void compiler::visit_assign_expr(assign_expr *obj) {
   auto rhs = pop();
   auto name = prefix(obj->name_->token_, prefix_val_);
   auto object = scope_.get(name);
-  perform_assign(std::make_pair(name, object), rhs, obj->opr_, true);
+  auto o = std::make_pair(name, object);
+  perform_assign(o, rhs, obj->opr_, true, true);
 }
-void compiler::perform_assign(const std::pair<std::string, ykobject> &lhs,
-                              const std::pair<std::string, ykobject> &rhs,
-                              token *operator_token, bool assign_variable) {
+void compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
+                              std::pair<std::string, ykobject> &rhs,
+                              token *operator_token, bool assign_variable,
+                              bool lhs_mutates) {
+  auto castable = lhs.second.datatype_->auto_cast(rhs.second.datatype_,
+                                                  dt_pool_, lhs_mutates, true);
   write_indent(body_);
-  if (rhs.second.is_primitive_or_obj() &&
-      rhs.second.datatype_->const_unwrap()->is_a_string() &&
-      operator_token->type_ == token_type::EQ) {
+  if (castable != nullptr &&
+      (lhs.second.datatype_->const_unwrap()->is_a_number() ||
+       lhs.second.datatype_->const_unwrap()->is_bool())) {
+    // Number cast that we can do here
+    body_ << lhs.first << " = ";
+    cast_numbers(castable, lhs, rhs);
+    if (lhs.second.is_primitive_or_obj() &&
+        lhs.second.datatype_->const_unwrap()->is_f32() &&
+        operator_token->type_ == token_type::MOD_EQ) {// Float %=
+      body_ << "remainderf(" << lhs.first << ", " << rhs.first << ")";
+    } else if (lhs.second.is_primitive_or_obj() &&
+               lhs.second.datatype_->const_unwrap()->is_f64() &&
+               operator_token->type_ == token_type::MOD_EQ) {// Double %=
+      body_ << "remainder(" << lhs.first << ", " << rhs.first << ")";
+    } else {
+      body_ << rhs.first;
+    }
+    LOG_COMP("cast assign:" << lhs.first << " = " << rhs.first);
+  } else if (rhs.second.is_primitive_or_obj() &&
+             rhs.second.datatype_->const_unwrap()->is_a_string() &&
+             operator_token->type_ == token_type::EQ) {
     // if lhs is str, we need to free the current value here --
     if (assign_variable && lhs.second.datatype_->const_unwrap()->is_str()) {
       body_ << "yk__sdsfree(" << lhs.first << ")";
@@ -88,9 +110,11 @@ void compiler::visit_binary_expr(binary_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
+  LOG_COMP("binary: " << lhs.first << " " << obj->opr_->token_ << " "
+                      << rhs.first);
   // Note: we are assuming data type to be same as first,
   // Since this will be type checked using type_checker.
-  auto data_type = lhs.second;
+  //  auto data_type = lhs.second;
   bool both_sr = lhs.second.datatype_->const_unwrap()->is_sr() &&
                  rhs.second.datatype_->const_unwrap()->is_sr();
   bool different_types = (*(lhs.second.datatype_->const_unwrap()) !=
@@ -129,7 +153,7 @@ void compiler::visit_binary_expr(binary_expr *obj) {
              ykobject(dt_pool_->create("bool")));
       }
     }
-  } else if (data_type.is_primitive_or_obj() &&
+  } else if (lhs.second.is_primitive_or_obj() &&
              rhs.second.is_primitive_or_obj() && (both_sr || different_types)) {
     // we are in an auto cast scenario
     if (lhs.second.datatype_->const_unwrap()->is_a_string() &&
@@ -180,11 +204,29 @@ void compiler::visit_binary_expr(binary_expr *obj) {
         push("<><>", rhs.second);
       }
     } else {
-      error(obj->opr_, "Failed to compile binary operation");
-      push("<><>", rhs.second);
+      auto castable = lhs.second.datatype_->auto_cast(rhs.second.datatype_,
+                                                      dt_pool_, false, false);
+      LOG_COMP("binary castable: " << castable->as_string());
+      LOG_COMP("binary castable widen lhs: " << castable->widen_lhs);
+      LOG_COMP("binary castable widen rhs: " << castable->widen_rhs);
+      if (castable == nullptr) {
+        error(obj->opr_, "Failed to compile binary operation");
+        push("<><>", rhs.second);
+      } else {
+        LOG_COMP("binary before lhs: " << lhs.first);
+        LOG_COMP("binary before lhs: " << lhs.second.datatype_->as_string());
+        LOG_COMP("binary before rhs: " << rhs.first);
+        LOG_COMP("binary before rhs: " << rhs.second.datatype_->as_string());
+        cast_numbers(castable, lhs, rhs);
+        LOG_COMP("binary after lhs: " << lhs.first);
+        LOG_COMP("binary after lhs: " << lhs.second.datatype_->as_string());
+        LOG_COMP("binary after rhs: " << rhs.first);
+        LOG_COMP("binary after rhs: " << rhs.second.datatype_->as_string());
+        compile_simple_bin_op(obj, operator_type, lhs, rhs);
+      }
     }
-  } else if (data_type.is_primitive_or_obj() &&
-             data_type.datatype_->is_str()) {// str +|==|!= str
+  } else if (lhs.second.is_primitive_or_obj() &&
+             lhs.second.datatype_->is_str()) {// str +|==|!= str
     if (obj->opr_->type_ == token_type::EQ_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") == 0)",
            ykobject(dt_pool_->create("bool")));
@@ -205,10 +247,10 @@ void compiler::visit_binary_expr(binary_expr *obj) {
             << lhs.first << "), " << rhs.first << ")";
       write_end_statement(body_);
       // push the temp
-      push(temporary_string, data_type);
+      push(temporary_string, lhs.second);
     }
-  } else if (data_type.is_primitive_or_obj() &&
-             data_type.datatype_->is_string_literal()) {// :s: +|==|!= :s:
+  } else if (lhs.second.is_primitive_or_obj() &&
+             lhs.second.datatype_->is_string_literal()) {// :s: +|==|!= :s:
     // compile time +,==,!=
     auto lhsu = string_utils::unescape(lhs.second.string_val_);
     auto rhsu = string_utils::unescape(rhs.second.string_val_);
@@ -227,12 +269,45 @@ void compiler::visit_binary_expr(binary_expr *obj) {
       error("Failed to compile literal string binary operation");
       push("<><>", rhs.second);
     }
-  } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_f32() &&
-             obj->opr_->type_ == token_type::MOD) {// Float %
-    push("remainderf(" + lhs.first + ", " + rhs.first + ")", data_type);
-  } else if (data_type.is_primitive_or_obj() && data_type.datatype_->is_f64() &&
+  } else {
+    compile_simple_bin_op(obj, operator_type, lhs, rhs);
+  }
+  // Note: type checker prevents compiler coming here with non integer data types
+}
+void compiler::cast_numbers(
+    const ykdatatype *castable, std::pair<std::string, ykobject> &lhs,
+    std::pair<std::string, ykobject> &rhs) {// --- number casting ---
+  std::pair<std::string, ykobject> & wider_dt = (castable->widen_rhs) ? lhs : rhs;
+  std::pair<std::string, ykobject> & to_widen = (castable->widen_rhs) ? rhs : lhs;
+  auto code = to_widen.first;
+  LOG_COMP("cast to widen: " << to_widen.first);
+  LOG_COMP("cast to widen: " << to_widen.second.datatype_->as_string());
+  LOG_COMP("cast to keep: " << wider_dt.first);
+  LOG_COMP("cast to keep: " << wider_dt.second.datatype_->as_string());
+  if (to_widen.second.datatype_->const_unwrap()->is_bool()) {
+    // bool to integer -->
+    code = "((" + code + ") ? 1 : 0)";
+  }
+  to_widen.first = "((" +
+                   convert_dt(wider_dt.second.datatype_->const_unwrap()) +
+                   ")(" + code + "))";
+  to_widen.second.datatype_ = wider_dt.second.datatype_->const_unwrap();
+  LOG_COMP("cast_num: " << lhs.second.datatype_->as_string() << "--"
+                        << lhs.first << " <bin> "
+                        << rhs.second.datatype_->as_string() << "--"
+                        << rhs.first);
+}
+void compiler::compile_simple_bin_op(
+    const binary_expr *obj, const token_type &operator_type,
+    const std::pair<std::string, ykobject> &lhs,
+    const std::pair<std::string, ykobject> &rhs) {
+  if (lhs.second.is_primitive_or_obj() && lhs.second.datatype_->is_f32() &&
+      obj->opr_->type_ == token_type::MOD) {// Float %
+    push("remainderf(" + lhs.first + ", " + rhs.first + ")", lhs.second);
+  } else if (lhs.second.is_primitive_or_obj() &&
+             lhs.second.datatype_->is_f64() &&
              obj->opr_->type_ == token_type::MOD) {// Double %
-    push("remainder(" + lhs.first + ", " + rhs.first + ")", data_type);
+    push("remainder(" + lhs.first + ", " + rhs.first + ")", lhs.second);
   } else if (operator_type == token_type::LESS ||
              operator_type == token_type::LESS_EQ ||
              operator_type == token_type::GREAT ||
@@ -243,9 +318,8 @@ void compiler::visit_binary_expr(binary_expr *obj) {
          ykobject(dt_pool_->create("bool")));
   } else {// Other number stuff
     push("(" + lhs.first + " " + obj->opr_->token_ + " " + rhs.first + ")",
-         data_type);
+         lhs.second);
   }
-  // Note: type checker prevents compiler coming here with non integer data types
 }
 void compiler::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
@@ -872,6 +946,7 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   auto object = ykobject(dt_pool_);
   std::pair<std::string, ykobject> resulting_pair;
   bool visited_expr = false;
+  LOG_COMP("let lhs: " << name);
   // infer data type based on RHS if we do not have a data type here
   if (obj->data_type_ == nullptr) {
     visited_expr = true;
@@ -879,9 +954,11 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     if (resulting_pair.second.is_a_function()) {
       obj->data_type_ = function_to_datatype(resulting_pair.second);
     } else {
-      obj->data_type_ =
-          resulting_pair.second.datatype_; /* set our data type here */
+      obj->data_type_ = resulting_pair.second.datatype_
+                            ->const_unwrap(); /* set our data type here */
     }
+    LOG_COMP("type infer let: " << obj->data_type_->as_string());
+    LOG_COMP("let rhs: " << resulting_pair.first);
   }
   if (obj->data_type_->is_none()) {
     error(obj->name_,
@@ -957,12 +1034,16 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
+      auto castable = obj->data_type_->const_unwrap()->auto_cast(exp.second.datatype_, dt_pool_, false, true);
       write_indent(body_);
       body_ << convert_dt(obj->data_type_) << " " << name;
       if (exp.second.is_a_function()) {
         body_ << " = " << prefix_function_arg(exp);
-      } else {
+      } else if (castable == nullptr) {
         body_ << " = " << exp.first;
+      } else {
+        auto lhsu = obj->data_type_->const_unwrap();
+        write_casted_rhs(body_, exp, lhsu);
       }
     } else {
       write_indent(body_);
@@ -971,6 +1052,20 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   }
   write_end_statement(body_);
   scope_.define(name, object);
+}
+void compiler::write_casted_rhs(
+    std::stringstream& stream,
+    std::pair<std::string, ykobject> &rhs,
+    ykdatatype *lhsu) {// We need to cast RHS to appropriate DT
+  stream << " = ";
+  stream << "((";
+  stream << convert_dt(lhsu) << ")(";
+  if (rhs.second.datatype_->const_unwrap()->is_bool()) {
+    stream << "((" << rhs.first << ") ? 1 : 0)";
+  } else {
+    stream << rhs.first;
+  }
+  stream << "))";
 }
 void compiler::visit_pass_stmt(pass_stmt *obj) {
   write_indent(body_);
@@ -1363,7 +1458,7 @@ void compiler::visit_assign_member_expr(assign_member_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
-  perform_assign(lhs, rhs, obj->opr_, false);
+  perform_assign(lhs, rhs, obj->opr_, false, true);
 }
 void compiler::visit_square_bracket_access_expr(
     square_bracket_access_expr *obj) {
@@ -1417,7 +1512,7 @@ void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
     body_ << lhs.first << " = yk__sdsdup(" << rhs.first << ")";
     write_end_statement(body_);
   } else {
-    perform_assign(lhs, rhs, obj->opr_, false);
+    perform_assign(lhs, rhs, obj->opr_, false, true);
   }
 }
 void compiler::visit_ccode_stmt(ccode_stmt *obj) {
@@ -1447,8 +1542,13 @@ void compiler::visit_const_stmt(const_stmt *obj) {
     }
     literal_expression->accept(this);
     auto exp = pop();
-    global_constants_ << this->convert_dt(obj->data_type_) << " " << name
-                      << " = " << exp.first;
+    auto castable = obj->data_type_->const_unwrap()->auto_cast(exp.second.datatype_, dt_pool_, false, true);
+    global_constants_ << this->convert_dt(obj->data_type_) << " " << name;
+    if (castable == nullptr) {
+      global_constants_ << " = " << exp.first;
+    } else {
+      write_casted_rhs(global_constants_, exp, obj->data_type_->const_unwrap());
+    }
     write_end_statement(global_constants_);
   } else {// Compile as you would compile a let statement
     auto let_stmt_obj =

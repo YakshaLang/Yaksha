@@ -33,8 +33,13 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
     }
     obj->promoted_ = true;
   }
-  handle_assigns(obj->opr_, object, rhs);
-  if (obj->promoted_) { scope_.define(name, object); }
+  if (obj->promoted_) {
+    object.datatype_ = object.datatype_->const_unwrap();
+    handle_assigns(obj->opr_, object, rhs);
+    scope_.define(name, object);
+  } else {
+    handle_assigns(obj->opr_, object, rhs);
+  }
 }
 template<typename Verifier>
 bool dt_match_ignore_const(ykdatatype *lhs, ykdatatype *rhs, Verifier v) {
@@ -45,6 +50,17 @@ bool dt_match_ignore_const(ykdatatype *lhs, ykdatatype *rhs, Verifier v) {
 #define DT_MATCH(lhs, rhs, fnc)                                                \
   dt_match_ignore_const(lhs.datatype_, rhs.datatype_,                          \
                         [](ykdatatype *a) { return fnc; })
+template<typename Verifier>
+bool dt_verify_ignore_const(ykdatatype *castable, ykdatatype *lhs,
+                            ykdatatype *rhs, Verifier v) {
+  ykdatatype *my_lhs = lhs->const_unwrap();
+  ykdatatype *my_rhs = rhs->const_unwrap();
+  return ((castable == nullptr && *my_lhs == *my_rhs) || castable != nullptr) &&
+         v(my_lhs) && v(my_rhs);
+}
+#define DT_VERIFY(castable, lhs, rhs, fnc)                                     \
+  dt_verify_ignore_const(castable, lhs.datatype_, rhs.datatype_,               \
+                         [](ykdatatype *a) { return fnc; })
 template<typename Matcher>
 bool dt_either_match(ykdatatype *lhs, ykdatatype *rhs, Matcher m) {
   return m(lhs) || m(rhs);
@@ -65,30 +81,34 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
     push(rhs);// Try to figure out the rest
     return;
   }
+  auto castable =
+      lhs.datatype_->auto_cast(rhs.datatype_, dt_pool_, false, false);
   switch (oper) {
     case token_type::XOR:
     case token_type::AND:
     case token_type::OR:
     case token_type::SHL:
     case token_type::SHR:
-      if (!(DT_MATCH(lhs, rhs, a->is_an_integer()))) {
-        error(obj->opr_,
-              "^ & | << >> operators work only for integers of same type");
+      if (!(DT_VERIFY(castable, lhs, rhs, a->is_an_integer()))) {
+        error(obj->opr_, "^ & | << >> operators work only for integers");
+      } else if (castable != nullptr) {
+        rhs.datatype_ = castable;
       }
       break;
     case token_type::MOD:
     case token_type::DIV:
     case token_type::MUL:
     case token_type::SUB:
-      if (!(DT_MATCH(lhs, rhs, a->is_a_number()))) {
-        error(obj->opr_,
-              "% - * / operators work only for numbers of same type");
+      if (!(DT_VERIFY(castable, lhs, rhs, a->is_a_number()))) {
+        error(obj->opr_, "% - * / operators work only for numbers");
+      } else if (castable != nullptr) {
+        rhs.datatype_ = castable;
       }
       break;
     case token_type::PLUS: {
-      // Does this result in a str?
-      auto castable = lhs.datatype_->auto_cast(rhs.datatype_, false, dt_pool_);
-      if (castable != nullptr) {
+      if (castable != nullptr &&
+          (DT_VERIFY(castable, lhs, rhs, (a->is_a_number() || a->is_bool())) ||
+           DT_VERIFY(castable, lhs, rhs, (a->is_a_string())))) {
         push(ykobject(castable));
         return;
       }
@@ -106,9 +126,8 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
     case token_type::LESS_EQ:
     case token_type::GREAT:
     case token_type::GREAT_EQ:
-      if (!(DT_MATCH(lhs, rhs, a->is_a_number()))) {
-        error(obj->opr_,
-              "< > <= >= operators work only for numbers of same type");
+      if (!(DT_VERIFY(castable, lhs, rhs, a->is_a_number()))) {
+        error(obj->opr_, "< > <= >= operators work only for numbers");
       }
       push(ykobject(dt_pool_->create("bool")));
       return;
@@ -131,11 +150,10 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
         // can compare with array/anyptr/pointer/none/not primitive
         ykdatatype *to_comp;
         if (lhs.datatype_->is_none()) {
-          to_comp = rhs.datatype_;
+          to_comp = rhs.datatype_->const_unwrap();
         } else {
-          to_comp = lhs.datatype_;
+          to_comp = lhs.datatype_->const_unwrap();
         }
-        if (to_comp->is_const()) { to_comp = to_comp->args_[0]; }
         if (!(to_comp->is_any_ptr() || to_comp->is_an_array() ||
               to_comp->is_a_string() || to_comp->is_a_pointer() ||
               to_comp->is_any_ptr_to_const() || to_comp->is_none() ||
@@ -729,7 +747,7 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
     // --- OK ---
     push(placeholder);
     if (placeholder.datatype_->is_const() && mutate) {
-      error(sqb_token, "Mutating an imutable element");
+      error(sqb_token, "Mutating an immutable element");
     }
     return;
   }
@@ -777,12 +795,14 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
                                   const ykobject &rhs) {
   if (lhs.datatype_->is_const()) { error(oper, "Cannot assign to a constant"); }
   if (rhs.is_a_function() && !slot_match(rhs, lhs.datatype_)) {
-    error(oper, "You can only assign a function to a Function[In[?],Out[?]]");
+    error(oper, "You can only assign a (matching) function to a "
+                "Function[In[?],Out[?]]");
   }
   if ((lhs.is_primitive_or_obj() && rhs.is_primitive_or_obj())) {
     auto rhs_dt = rhs.datatype_->const_unwrap();
     if (*lhs.datatype_ != *rhs_dt) {
-      auto castable = lhs.datatype_->auto_cast(rhs.datatype_, true, dt_pool_);
+      auto castable =
+          lhs.datatype_->auto_cast(rhs.datatype_, dt_pool_, true, true);
       if (castable == nullptr) {
         error(oper, "Cannot assign between 2 different data types.");
       }
@@ -852,7 +872,11 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
       return;
     }
     if (*(obj->data_type_->args_[0]) != *expression_dt) {
-      error(obj->name_, "Data type mismatch in expression and declaration.");
+      auto castable = obj->data_type_->args_[0]->auto_cast(
+          expression_dt, dt_pool_, false, true);
+      if (castable == nullptr) {
+        error(obj->name_, "Data type mismatch in expression and declaration.");
+      }
     }
   }
   // If this is not a global constant define it
@@ -872,6 +896,13 @@ bool type_checker::slot_match(const ykobject &arg, ykdatatype *datatype) {
       arg.datatype_->const_unwrap()->is_a_string() &&
       datatype->const_unwrap()->is_a_string()) {
     return true;
+  }
+  // Number auto casting
+  if (arg.is_primitive_or_obj() &&
+      (arg.datatype_->const_unwrap()->is_a_number() ||
+       arg.datatype_->const_unwrap()->is_bool())) {
+    auto castable = datatype->auto_cast(arg.datatype_, dt_pool_, false, true);
+    if (castable != nullptr) { return true; }
   }
   return false;
 }
@@ -910,7 +941,7 @@ ykdatatype *type_checker::function_to_datatype(const ykobject &arg) {
   return fnc;
 }
 void type_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
-  // Not required to be type checked
+  // This is not required to be type checked
 }
 void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {
   if (!scope_.is_global_level()) {

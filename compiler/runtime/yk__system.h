@@ -45,6 +45,8 @@ char *yk__utf16_to_utf8_null_terminated(const wchar_t *str);
 #include <unistd.h>
 #include <sys/mman.h>
 #endif
+#define ENDIANNESS_PORTABLE_CONVERSION
+#include "endianness.h"
 #endif
 //////////////////////// Forward declaration to yaksha code main() /////////////
 int32_t yy__main();

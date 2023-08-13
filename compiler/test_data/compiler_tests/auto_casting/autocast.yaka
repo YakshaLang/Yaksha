@@ -1,0 +1,32 @@
+macros! {
+    (defun elem_debug (item) (list
+        # print ( item::value )
+        (yk_create_token YK_TOKEN_NAME "print") (ykt_paren_open) (ykt_string (repr item::value)) (ykt_paren_close) (ykt_newline)
+        # print (" = ")
+        (yk_create_token YK_TOKEN_NAME "print") (ykt_paren_open) (ykt_string " = ") (ykt_paren_close) (ykt_newline)
+        # println(item)
+        (yk_create_token YK_TOKEN_NAME "println") (ykt_paren_open) item (ykt_paren_close) (ykt_newline)))
+    (defun debug (&x) (reduce +(map elem_debug x)))
+    (yk_register {dsl debug debug})
+}
+
+A: Const[int] = 10i8
+B: Const[i8] = 10i8
+C: Const[i8] = False
+
+def main() -> int:
+    a: Const[int] = 1i8
+    b: Const[int] = 2i8
+    c = a + b
+    d: int = c + a + b
+    e = d + 1i32
+    f = a + 1i16
+    g: float = d
+    h: f64 = a + g
+    i = a * g
+    j = a / b * h + (1 == 1)
+    k = a / b * h + 5i64
+    l: int = (2 != 10)
+    m: Const[int] = 10i8
+    debug!{a b c d e f g h i j k l A B C}
+    return 0i8

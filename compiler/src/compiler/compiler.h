@@ -15,6 +15,7 @@
 #include "entry_struct_func_compiler.h"
 #include "tokenizer/token.h"
 #include "utilities/defer_stack_stack.h"
+#include "utilities/cpp_util.h"
 #include <sstream>
 namespace yaksha {
   struct compiler_output {
@@ -168,11 +169,20 @@ private:
                               ykdatatype *return_type);
     std::string
     prefix_function_arg(const std::pair<std::string, ykobject> &arg_val);
-    void perform_assign(const std::pair<std::string, ykobject> &lhs,
-                        const std::pair<std::string, ykobject> &rhs,
-                        token *operator_token, bool assign_variable);
+    void perform_assign(std::pair<std::string, ykobject> &lhs,
+                         std::pair<std::string, ykobject> &rhs,
+                        token *operator_token, bool assign_variable,
+                        bool lhs_mutates);
     static void obj_calloc(const std::string &name, std::stringstream &code);
     static bool should_wrap_in_paren(const std::string &code);
+    void compile_simple_bin_op(const binary_expr *obj,
+                               const token_type &operator_type,
+                               const std::pair<std::string, ykobject> &lhs,
+                               const std::pair<std::string, ykobject> &rhs);
+    void cast_numbers(const ykdatatype *castable,
+                      std::pair<std::string, ykobject> &lhs,
+                      std::pair<std::string, ykobject> &rhs);
+    void write_casted_rhs(std::stringstream& stream, std::pair<std::string, ykobject> &rhs, ykdatatype *lhsu);
   };
 }// namespace yaksha
 #endif

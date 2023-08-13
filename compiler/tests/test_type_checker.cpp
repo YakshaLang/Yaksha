@@ -198,21 +198,27 @@ TEST_CASE("type checker: different type of numbers used in operators bitwise") {
   test_typechecker_snippet(
       "a: int = 1\n"
       "    b: i8 = a & 1i8\n",
-      "^ & | << >> operators work only for integers of same type");
+      "Cannot assign between 2 different data types.");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators mul/div/rem") {
   test_typechecker_snippet(
       "a: int = 1\n"
       "    b: i8 = a * 1i8\n",
-      "% - * / operators work only for numbers of same type");
+      "Cannot assign between 2 different data types.");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators comparison") {
+  test_typechecker_snippet_ok(
+      "a: i8 = 1i8\n"
+      "    b: bool = a <= 77346\n");
+  test_typechecker_snippet_ok(
+      "a: int = 1\n"
+      "    b: bool = a <= 1i8\n");
   test_typechecker_snippet(
       "a: int = 1\n"
-      "    b: bool = a <= 1i8\n",
-      "< > <= >= operators work only for numbers of same type");
+      "    b: bool = a <= \"gah\"\n",
+      "< > <= >= operators work only for numbers");
 }
 TEST_CASE("type checker: + operator does not work for anything other than "
           "numbers and str") {
@@ -290,51 +296,88 @@ TEST_CASE("type checker: func call too much arguments") {
       "Too few or too much arguments for function call");
 }
 TEST_CASE("type checker: func call parameter and argument mismatches") {
-  test_typechecker_snippet_full("def fnc(a: int, b: int) -> None:\n"
+  test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
                                 "    pass\n"
                                 "def main() -> int:\n"
                                 "    fnc(1, False)\n"
+                                "    return 0");
+  test_typechecker_snippet_full("def fnc(a: i8, b: int) -> None:\n"
+                                   "    pass\n"
+                                   "def main() -> int:\n"
+                                   "    fnc(1i32, False)\n"
+                                   "    return 0",
+                                   "Parameter & argument 1 mismatches");
+  test_typechecker_snippet_full("def fnc(a: int, b: i8) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    fnc(1i32, 10)\n"
                                 "    return 0",
                                 "Parameter & argument 2 mismatches");
 }
 TEST_CASE("type checker: func call parameter and argument mismatches first "
           "argument") {
-  test_typechecker_snippet_full("def fnc(a: int, b: int) -> None:\n"
+  test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
                                 "    pass\n"
                                 "def main() -> int:\n"
                                 "    fnc(False, 3)\n"
+                                "    return 0");
+  test_typechecker_snippet_full("def fnc(a: i8, b: int) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    fnc(1340, 3)\n"
                                 "    return 0",
                                 "Parameter & argument 1 mismatches");
 }
 TEST_CASE(
     "type checker: func call parameter and argument mismatches for varargs") {
-  test_typechecker_snippet_full("@nativedefine(\"test\")\n"
+  test_typechecker_snippet_full_ok("@nativedefine(\"test\")\n"
                                 "@varargs\n"
                                 "def fnc(a: int, b: int) -> None:\n"
                                 "    pass\n"
                                 "def main() -> int:\n"
                                 "    fnc(1, 3, 2, 3, False)\n"
+                                "    return 0");
+  test_typechecker_snippet_full("@nativedefine(\"test\")\n"
+                                "@varargs\n"
+                                "def fnc(a: int, b: int) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    fnc(1, 3, 2, 3, 12i64)\n"
                                 "    return 0",
                                 "Variable argument: 5 mismatches");
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
-  test_typechecker_snippet_full(
+  test_typechecker_snippet_full_ok(
       "def fnc(a: int, b: int) -> None:\n"
       "    pass\n"
       "def main() -> int:\n"
       "    f1: Function[In[int,int],Out] = fnc\n"
       "    f1(1, False)\n"
+      "    return 0");
+  test_typechecker_snippet_full(
+      "def fnc(a: int, b: i8) -> None:\n"
+      "    pass\n"
+      "def main() -> int:\n"
+      "    f1: Function[In[int,int],Out] = fnc\n"
+      "    f1(1, 2)\n"
       "    return 0",
-      "Function[] call parameter & argument 2 mismatches");
+      "You can only assign a (matching) function to a Function[In[?],Out[?]]");
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches first "
           "argument") {
-  test_typechecker_snippet_full(
+  test_typechecker_snippet_full_ok(
       "def fnc(a: int, b: int) -> None:\n"
       "    pass\n"
       "def main() -> int:\n"
       "    f1: Function[In[int,int],Out] = fnc\n"
       "    f1(False, 1)\n"
+      "    return 0");
+  test_typechecker_snippet_full(
+      "def fnc(a: i8, b: int) -> None:\n"
+      "    pass\n"
+      "def main() -> int:\n"
+      "    f1: Function[In[i8,int],Out] = fnc\n"
+      "    f1(1000, 1)\n"
       "    return 0",
       "Function[] call parameter & argument 1 mismatches");
 }
