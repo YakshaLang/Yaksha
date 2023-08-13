@@ -54,8 +54,8 @@ namespace yaksha {
     ~ykdatatype();
     // Quick Checks for Primitive Data Types
     [[nodiscard]] ykdatatype *const_unwrap();
-    [[nodiscard]] ykdatatype *auto_cast(ykdatatype *rhs, bool lhs_mutates,
-                                        ykdt_pool *pool);
+    [[nodiscard]] ykdatatype *auto_cast(ykdatatype *rhs, ykdt_pool *pool,
+                                        bool lhs_mutates, bool assignment);
     [[nodiscard]] bool is_int() const;
     [[nodiscard]] bool is_str() const;
     [[nodiscard]] bool is_sr() const;
@@ -103,6 +103,8 @@ namespace yaksha {
     std::vector<ykdatatype *> args_;
     ykprimitive primitive_type_{ykprimitive::NOT_A_PRIMITIVE};
     ykbuiltin builtin_type_{ykbuiltin::NOT_A_BUILTIN};
+    bool widen_rhs{false};
+    bool widen_lhs{false};
 
 private:
     void write_to_str(std::stringstream &s) const;

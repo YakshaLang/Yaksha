@@ -213,28 +213,37 @@ bool ykdatatype::is_string_literal() const {
   return primitive_type_ == ykprimitive::HIDDEN_STRING_LIT;
 }
 bool ykdatatype::is_a_string() const { return +primitive_type_ >= 1000; }
-ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, bool lhs_mutates,
-                                  ykdt_pool *pool) {
+ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, ykdt_pool *pool,
+                                  bool lhs_mutates, bool assignment) {
   ykdatatype *castable = nullptr;
-  //  bool require_widening = false;
-  if (lhs_mutates && is_const()) {
-    return nullptr;// cannot auto cast [INDENT] a: Const[int] = 5 [NL] a = 4 [NL] [DEDENT]
-  }
+  if ((lhs_mutates || assignment) && is_const()) { return nullptr; }
   ykdatatype *lhsu = const_unwrap();
   ykdatatype *rhsu = rhs->const_unwrap();
   if (*lhsu == *rhsu) { return nullptr; }
+  auto li = +lhsu->primitive_type_;
+  auto ri = +rhsu->primitive_type_;
   if (lhsu->is_a_string() && rhsu->is_a_string()) {
     castable = pool->create("str");
+  } else if (li > 0 && li < 1000 &&
+             ri > 0 && ri < 1000) {
+    if (assignment && li < ri) {
+      return nullptr;
+    }
+    if (li > ri) {
+      if (li > 1 && li < 12 && (li - ri) <= 1) {
+        return nullptr;
+      }
+      castable = pool->create(lhsu->type_);
+      castable->widen_rhs = true;
+      castable->widen_lhs = false;
+    } else {
+      if (ri > 1 && ri < 12 && (ri - li) <= 1) {
+        return nullptr;
+      }
+      castable = pool->create(rhsu->type_);
+      castable->widen_rhs = false;
+      castable->widen_lhs = true;
+    }
   }
-  // TODO add numeric casting support
-  // bool -> i8 -> i16 -> i32 -> i64 -> f32 -> f64
-  //              /      /      /
-  //            /      /      /
-  //           /     /      /
-  // bool -> u8 -> u16 -> u32 -> u64 -> f32 -> f64
-  //  if (lhs_mutates && require_widening && castable != nullptr && *castable != *lhsu) {
-  //    // we can only assign to a bigger type
-  //    return nullptr;
-  //  }
   return castable;
 }

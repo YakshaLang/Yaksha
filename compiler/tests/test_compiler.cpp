@@ -421,3 +421,9 @@ TEST_CASE("compiler: carpntr code base") {
       "carpntr_main.yaka",
       "../test_data/compiler_tests/output/carpntr_main.tokens");
 }
+TEST_CASE("compiler: autocasting") {
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/auto_casting/autocast.yaka",
+      "autocast.yaka",
+      "../test_data/compiler_tests/output/autocast.tokens");
+}
