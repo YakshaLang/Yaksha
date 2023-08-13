@@ -32,6 +32,7 @@ int32_t yy__main()
     yk__sds t__3 = yk__concat_bstr_bstr(yy__a, yy__b);
     yk__sds t__4 = yk__concat_sds_bstr(t__3, yy__A);
     yy__takes_str(yk__sdsdup(t__4));
+    yk__bstr_free_underlying(yy__A);
     yk__sdsfree(t__4);
     yk__sdsfree(t__3);
     yk__sdsfree(t__2);
