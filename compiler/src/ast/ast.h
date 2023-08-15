@@ -149,12 +149,14 @@ namespace yaksha {
     virtual ~expr() = default;
     virtual void accept(expr_visitor *v) = 0;
     virtual ast_type get_type() = 0;
+    size_t hits_{0};
   };
   // ------- statement base class ------
   struct stmt {
     virtual ~stmt() = default;
     virtual void accept(stmt_visitor *v) = 0;
     virtual ast_type get_type() = 0;
+    size_t hits_{0};
   };
   // ------- expressions ------
   struct assign_expr : expr {

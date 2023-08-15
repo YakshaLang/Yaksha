@@ -1,11 +1,8 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
-#define yy__min_int(nn__a, nn__b) ((nn__a < nn__b) ? nn__a : nn__b)
-#define yy__max_int(nn__a, nn__b) ((nn__a > nn__b) ? nn__a : nn__b)
 yk__sds yy__readfile(yk__sds);
 bool yy__is_empty_str(yk__sds);
-void yy__leakme(yk__sds, yk__sds);
 int32_t yy__main();
 // --structs-- 
 // --functions-- 
@@ -24,7 +21,6 @@ bool yy__is_empty_str(yk__sds nn__s)
     yk__sdsfree(nn__s);
     return x;
 }
-void yy__leakme(yk__sds nn__a, yk__sds nn__b) { fopen(nn__a, nn__b); }
 int32_t yy__main() 
 {
     yk__printstr("// ----->>> this is my code <<<<------\n");

@@ -79,6 +79,9 @@ constexpr auto operator+(T e) noexcept
 #else
 #define LOG_COMP(msg)
 #endif
+#ifndef YAKSHA_DEADCODE_ELIMINATION
+#define YAKSHA_DEADCODE_ELIMINATION
+#endif
 // useful stuff
 namespace yaksha {
   std::string get_my_exe_path();

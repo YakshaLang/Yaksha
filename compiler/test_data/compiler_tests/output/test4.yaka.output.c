@@ -1,14 +1,9 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
-struct yy__Student;
 struct yy__Spaceship;
 int32_t yy__main();
 // --structs-- 
-struct yy__Student {
-    yk__sds yy__name;
-    int32_t yy__age;
-};
 struct yy__Spaceship {
     yk__sds yy__name;
     yk__sds yy__class_;

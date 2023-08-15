@@ -105,6 +105,7 @@ namespace yaksha {
     ykbuiltin builtin_type_{ykbuiltin::NOT_A_BUILTIN};
     bool widen_rhs{false};
     bool widen_lhs{false};
+    size_t hits_{0};
 
 private:
     void write_to_str(std::stringstream &s) const;

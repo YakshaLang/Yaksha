@@ -121,9 +121,11 @@ void desugaring_compiler::visit_continue_stmt(continue_stmt *obj) {
   statement_stack_.back()->emplace_back(obj);
 }
 void desugaring_compiler::visit_def_stmt(def_stmt *obj) {
-  statement_stack_.back()->emplace_back(ast_pool_->c_def_stmt(
-      obj->name_, obj->params_, desugar(obj->function_body_), obj->return_type_,
-      obj->annotations_));
+  auto def = ast_pool_->c_def_stmt(
+                          obj->name_, obj->params_, desugar(obj->function_body_), obj->return_type_,
+                          obj->annotations_);
+  def->hits_ = obj->hits_; // preserve hit count
+  statement_stack_.back()->emplace_back(def);
 }
 void desugaring_compiler::visit_defer_stmt(defer_stmt *obj) {
   statement_stack_.back()->emplace_back(obj);

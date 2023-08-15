@@ -5,6 +5,7 @@
 #include "compiler/compiler.h"
 #include "compiler/type_checker.h"
 #include "tokenizer/block_analyzer.h"
+#include "usage_analyser.h"
 #include "utilities/error_printer.h"
 using namespace yaksha;
 multifile_compiler_result
@@ -175,6 +176,15 @@ multifile_compiler::compile_all(codefiles &cf, file_info *main_file_info) {
   }
   if (has_errors) {
     LOG_COMP("found type checking errors");
+    return {true, ""};
+  }
+  // Statement usage analysis
+  // So we know which 'functions / classes / consts' are actually used
+  usage_analyser ua{main_file_info};
+  ua.analyse();
+  if (!ua.errors_.empty()) {
+    errors::print_errors(ua.errors_);
+    LOG_COMP("usage analyser found errors");
     return {true, ""};
   }
   // Compile all files.

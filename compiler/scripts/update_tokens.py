@@ -24,7 +24,8 @@ KEYWORDS = sorted(["False", "else", "import", "pass",
                    "assert", "del", "not",
                    "elif", "if", "or", "defer", "ccode", "runtimefeature", "in", "struct", "macros"])
 TOKENS = sorted([
-    "NAME", "AT", "DOUBLE_NUMBER", "FLOAT_NUMBER", "INDENT", "BA_INDENT", "BA_DEDENT", "NEW_LINE", "COLON", "COMMENT",
+    "NAME", "AT", "DOUBLE_NUMBER", "FLOAT_NUMBER", "INDENT", "BA_INDENT", "BA_DEDENT", "NEW_LINE", "COLON", "SEMICOLON",
+    "COMMENT",
     "THREE_QUOTE_STRING", "STRING", "PAREN_OPEN",
     "PAREN_CLOSE", "SQUARE_BRACKET_OPEN", "SQUARE_BRACKET_CLOSE", "CURLY_BRACKET_OPEN", "CURLY_BRACKET_CLOSE", "LESS",
     "EQ", "GREAT", "OR", "PLUS", "SUB", "MUL", "DIV", "AND", "XOR", "MOD", "INT_DIV", "POWER", "LESS_EQ", "EQ_EQ",
@@ -68,6 +69,7 @@ NOT_VALIDATED_SIMPLY = set(TEMP_TOKENS + ["NAME", "BA_INDENT", "BA_DEDENT", "STR
 SIMPLE_VALIDATIONS = {
     "AT": "@",
     "COLON": ":",
+    "SEMICOLON": ";",
     "PAREN_OPEN": "(",
     "PAREN_CLOSE": ")",
     "SQUARE_BRACKET_OPEN": "[",
@@ -113,7 +115,6 @@ SIMPLE_VALIDATIONS = {
     "NOT_SYMBOL": "!",
 }
 SIMPLE_VALIDATIONS.update({"KEYWORD_" + x.upper(): x for x in KEYWORDS})
-
 
 TEMPLATE = r"""
 // token.h
