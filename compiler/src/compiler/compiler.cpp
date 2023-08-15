@@ -277,8 +277,10 @@ void compiler::visit_binary_expr(binary_expr *obj) {
 void compiler::cast_numbers(
     const ykdatatype *castable, std::pair<std::string, ykobject> &lhs,
     std::pair<std::string, ykobject> &rhs) {// --- number casting ---
-  std::pair<std::string, ykobject> & wider_dt = (castable->widen_rhs) ? lhs : rhs;
-  std::pair<std::string, ykobject> & to_widen = (castable->widen_rhs) ? rhs : lhs;
+  std::pair<std::string, ykobject> &wider_dt =
+      (castable->widen_rhs) ? lhs : rhs;
+  std::pair<std::string, ykobject> &to_widen =
+      (castable->widen_rhs) ? rhs : lhs;
   auto code = to_widen.first;
   LOG_COMP("cast to widen: " << to_widen.first);
   LOG_COMP("cast to widen: " << to_widen.second.datatype_->as_string());
@@ -768,6 +770,9 @@ void compiler::visit_continue_stmt(continue_stmt *obj) {
   write_end_statement(body_);
 }
 void compiler::visit_def_stmt(def_stmt *obj) {
+#ifdef YAKSHA_DEADCODE_ELIMINATION
+  if (obj->hits_ == 0) { return; }
+#endif
   auto name = prefix(obj->name_->token_, prefix_val_);
   if (obj->annotations_.native_define_) {
     struct_forward_declarations_ << "#define " << name << " "
@@ -1034,7 +1039,8 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
-      auto castable = obj->data_type_->const_unwrap()->auto_cast(exp.second.datatype_, dt_pool_, false, true);
+      auto castable = obj->data_type_->const_unwrap()->auto_cast(
+          exp.second.datatype_, dt_pool_, false, true);
       write_indent(body_);
       body_ << convert_dt(obj->data_type_) << " " << name;
       if (exp.second.is_a_function()) {
@@ -1054,8 +1060,7 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   scope_.define(name, object);
 }
 void compiler::write_casted_rhs(
-    std::stringstream& stream,
-    std::pair<std::string, ykobject> &rhs,
+    std::stringstream &stream, std::pair<std::string, ykobject> &rhs,
     ykdatatype *lhsu) {// We need to cast RHS to appropriate DT
   stream << " = ";
   stream << "((";
@@ -1254,6 +1259,9 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
   // ----- Compile structure forward declarations ------
   for (const auto &name : this->defs_classes_.class_names_) {
     auto cls = defs_classes_.get_class(name);
+#ifdef YAKSHA_DEADCODE_ELIMINATION
+    if (cls->hits_ == 0) { continue; }
+#endif
     if (!cls->annotations_.native_define_) {
       struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
                                    << ";\n";
@@ -1300,6 +1308,9 @@ void compiler::pop_scope_type() {
 }
 void compiler::visit_defer_stmt(defer_stmt *obj) { defers_.push(obj); }
 void compiler::visit_class_stmt(class_stmt *obj) {
+#ifdef YAKSHA_DEADCODE_ELIMINATION
+  if (obj->hits_ == 0) { return; }
+#endif
   /**
    *    struct foo {
    *       int abc;
@@ -1522,7 +1533,11 @@ void compiler::visit_ccode_stmt(ccode_stmt *obj) {
 }
 void compiler::visit_import_stmt(import_stmt *obj) {}
 void compiler::visit_const_stmt(const_stmt *obj) {
-  if (scope_.is_global_level()) {// constant is global
+  if (scope_.is_global_level()) {
+    // constant is global
+#ifdef YAKSHA_DEADCODE_ELIMINATION
+    if (obj->hits_ == 0) { return; }
+#endif
     auto name = prefix(obj->name_->token_, prefix_val_);
     auto *literal_expression = dynamic_cast<literal_expr *>(obj->expression_);
     if (obj->data_type_->const_unwrap()->is_sr()) {
@@ -1542,7 +1557,8 @@ void compiler::visit_const_stmt(const_stmt *obj) {
     }
     literal_expression->accept(this);
     auto exp = pop();
-    auto castable = obj->data_type_->const_unwrap()->auto_cast(exp.second.datatype_, dt_pool_, false, true);
+    auto castable = obj->data_type_->const_unwrap()->auto_cast(
+        exp.second.datatype_, dt_pool_, false, true);
     global_constants_ << this->convert_dt(obj->data_type_) << " " << name;
     if (castable == nullptr) {
       global_constants_ << " = " << exp.first;
@@ -1594,6 +1610,9 @@ ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
 void compiler::visit_nativeconst_stmt(nativeconst_stmt *obj) {
   auto name = prefix(obj->name_->token_, prefix_val_);
   if (scope_.is_global_level()) {// constant is global
+#ifdef YAKSHA_DEADCODE_ELIMINATION
+    if (obj->hits_ == 0) { return; }
+#endif
     global_constants_ << "#define " << name << " (";
     global_constants_ << ::string_utils::unescape(obj->code_str_->token_);
     global_constants_ << ")\n";

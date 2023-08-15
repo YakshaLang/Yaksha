@@ -2,14 +2,7 @@
 #include "yk__lib.h"
 // --forward declarations-- 
 int32_t const  yy__mutex_PLAIN = INT32_C(0);
-int32_t const  yy__mutex_TIMED = INT32_C(1);
-int32_t const  yy__mutex_RECURSIVE = INT32_C(2);
-int32_t const  yy__thread_ERROR = INT32_C(0);
 int32_t const  yy__thread_SUCCESS = INT32_C(1);
-int32_t const  yy__thread_TIMEOUT = INT32_C(2);
-int32_t const  yy__thread_BUSY = INT32_C(3);
-int32_t const  yy__thread_NOMEM = INT32_C(4);
-int32_t const  yy__thread_SLEEP_SUCCES = INT32_C(0);
 int32_t const  yy__pool_IMMEDIATE_SHUTDOWN = INT32_C(1);
 int32_t const  yy__pool_GRACEFUL_SHUTDOWN = INT32_C(2);
 int32_t const  yy__pool_NO_SHUTDOWN = INT32_C(0);
@@ -22,48 +15,11 @@ int32_t const  yy__pool_ERROR_SHUTDOWN = INT32_C(40);
 int32_t const  yy__pool_ERROR_THREAD_FAILURE = INT32_C(50);
 int32_t const  yy__pool_SUCCESS = INT32_C(0);
 int32_t const  yy__argparse_ARGPARSE_DEFAULT = INT32_C(0);
-int32_t const  yy__argparse_ARGPARSE_STOP_AT_NON_OPTION = INT32_C(1);
-int32_t const  yy__argparse_ARGPARSE_IGNORE_UNKNOWN_ARGS = INT32_C(2);
-int32_t const  yy__argparse_ARGPARSE_STOP_AT_NON_AND_IGNORE_UNKNWON = INT32_C(3);
-int32_t const  yy__console_REWIND = INT32_C(0);
-int32_t const  yy__console_RED = INT32_C(1);
-int32_t const  yy__console_GREEN = INT32_C(2);
-int32_t const  yy__console_WHITE = INT32_C(3);
-int32_t const  yy__console_BLUE = INT32_C(4);
-int32_t const  yy__console_PURPLE = INT32_C(5);
-int32_t const  yy__console_YELLOW = INT32_C(6);
-int32_t const  yy__console_CYAN = INT32_C(7);
-#define yy__io_PROT_NONE (PROT_NONE)
-#define yy__io_PROT_READ (PROT_READ)
-#define yy__io_PROT_WRITE (PROT_WRITE)
-#define yy__io_PROT_EXEC (PROT_EXEC)
-#define yy__io_MAP_FILE (MAP_FILE)
-#define yy__io_MAP_SHARED (MAP_SHARED)
-#define yy__io_MAP_PRIVATE (MAP_PRIVATE)
-#define yy__io_MAP_TYPE (MAP_TYPE)
-#define yy__io_MAP_FIXED (MAP_FIXED)
-#define yy__io_MAP_ANONYMOUS (MAP_ANONYMOUS)
-#define yy__io_MAP_ANON (MAP_ANON)
-#define yy__io_MAP_FAILED (MAP_FAILED)
-#define yy__io_MS_ASYNC (MS_ASYNC)
-#define yy__io_MS_SYNC (MS_SYNC)
-#define yy__io_MS_INVALIDATE (MS_INVALIDATE)
-#define yy__io_O_RDONLY (YK__IO_O_RDONLY)
-#define yy__io_O_WRONLY (YK__IO_O_WRONLY)
-#define yy__io_O_RDWR (YK__IO_O_RDWR)
-#define yy__io_O_CREAT (YK__IO_O_CREAT)
-#define yy__io_O_EXCL (YK__IO_O_EXCL)
-#define yy__io_O_APPEND (YK__IO_O_APPEND)
-#define yy__io_O_ASYNC (YK__IO_O_ASYNC)
-#define yy__io_O_CLOEXEC (YK__IO_O_CLOEXEC)
-#define yy__io_O_NONBLOCK (YK__IO_O_NONBLOCK)
-#define yy__io_O_TMPFILE (YK__IO_O_TMPFILE)
 struct yy__raylib_support_CObject;
 struct yy__raylib_support_BuildData;
 #define yy__cpu_Cpu struct yk__cpu_info
 #define yy__mutex_Mutex mtx_t
 #define yy__condition_Condition cnd_t
-#define yy__timespec_TimeSpec struct timespec
 #define yy__thread_Thread thrd_t
 struct yy__pool_ThreadPool;
 #define yy__buffer_StringBuffer yk__sds*
@@ -76,35 +32,6 @@ struct yy__configuration_Config;
 #define yy__argparse_ArgParse struct argparse*
 #define yy__argparse_ArgParseWrapper struct yk__argparse_wrapper*
 #define yy__argparse_Option struct argparse_option
-#define yy__argparse_opt_group(nn__name) (struct argparse_option) OPT_GROUP(nn__name)
-#define yy__console_clear yk__clear
-#define yy__io_File FILE
-#define yy__io_FilePos fpos_t
-#define yy__io_stdin() stdin
-#define yy__io_stdout() stdout
-#define yy__io_stderr() stderr
-#define yy__io_valid(nn__stream) (nn__stream != NULL)
-#define yy__io_fopen yk__io_fopen
-#define yy__io_fclose yk__io_fclose
-#define yy__io_fflush yk__io_fflush
-#define yy__io_fread yk__io_fread
-#define yy__io_fwrite yk__io_fwrite
-#define yy__io_ftell yk__io_ftell
-#define yy__io_fseek_begin(nn__stream, nn__offset) (yk__io_fseek(nn__stream, nn__offset, SEEK_SET))
-#define yy__io_fseek_relative(nn__stream, nn__offset) (yk__io_fseek(nn__stream, nn__offset, SEEK_CUR))
-#define yy__io_fseek_end(nn__stream, nn__offset) (yk__io_fseek(nn__stream, nn__offset, SEEK_END))
-#define yy__io_is_eof yk__io_feof
-#define yy__io_has_error yk__io_ferror
-#define yy__io_clear_error yk__io_clearerr
-#define yy__io_rewind yk__io_rewind
-#define yy__io_mmap mmap
-#define yy__io_munmap munmap
-#define yy__io_mprotect mprotect
-#define yy__io_msync msync
-#define yy__io_mlock mlock
-#define yy__io_munlock munlock
-#define yy__io_open yk__io_open
-#define yy__io_close yk__io_close
 #define yy__toml_Table toml_table_t*
 #define yy__toml_TomlArray toml_array_t*
 #define yy__toml_valid_table(nn__x) (NULL != nn__x)
@@ -112,57 +39,11 @@ struct yy__configuration_Config;
 #define yy__path_mkdir yk__mkdir
 #define yy__path_exists yk__exists
 #define yy__path_readable yk__readable
-#define yy__path_writable yk__writable
 #define yy__path_executable yk__executable
-#define yy__array_new yk__newsdsarray
 #define yy__array_del_str_array yk__delsdsarray
 #define yy__array_dup yk__sdsarraydup
-#define yy__c_VoidPtr void*
-#define yy__c_Size size_t
 #define yy__c_CStr char*
-#define yy__c_CDouble double
-#define yy__c_CBool bool
-#define yy__c_CInt int
-#define yy__c_CLong long
-#define yy__c_CLongLong long long
-#define yy__c_CShort short
-#define yy__c_CChar char
-#define yy__c_CSChar signed char
-#define yy__c_CUInt unsigned int
-#define yy__c_CULong unsigned long
-#define yy__c_CULongLong unsigned long long
-#define yy__c_CUShort unsigned short
-#define yy__c_CUChar unsigned char
-#define yy__c_CFloat float
-#define yy__c_free free
-#define yy__c_calloc calloc
-#define yy__c_realloc realloc
-#define yy__c_malloc malloc
-#define yy__c_itosize(nn__i) ((size_t)nn__i)
 #define yy__c_system system
-#define yy__c_acos acos
-#define yy__c_asin asin
-#define yy__c_atan atan
-#define yy__c_atan2 atan2
-#define yy__c_cos cos
-#define yy__c_cosh cosh
-#define yy__c_sin sin
-#define yy__c_sinh sinh
-#define yy__c_tan tan
-#define yy__c_tanh tanh
-#define yy__c_log log
-#define yy__c_log10 log10
-#define yy__c_log2 log2
-#define yy__c_pow pow
-#define yy__c_sqrt sqrt
-#define yy__c_ceil ceil
-#define yy__c_fabs fabs
-#define yy__c_floor floor
-#define yy__c_fmod pow
-#define yy__c_memcpy memcpy
-#define yy__c_memmove memmove
-#define yy__c_memset memset
-#define yy__c_memcmp memcmp
 #define yy__strings_valid_cstr(nn__s) (NULL != nn__s)
 #define yy__os_Arguments struct yk__arguments*
 #define yy__os_get_args yk__get_args
@@ -187,50 +68,23 @@ yy__cpu_Cpu yy__cpu_info();
 int32_t yy__mutex_init(yy__mutex_Mutex*, int32_t);
 void yy__mutex_destroy(yy__mutex_Mutex*);
 int32_t yy__mutex_lock(yy__mutex_Mutex*);
-int32_t yy__mutex_trylock(yy__mutex_Mutex*);
 int32_t yy__mutex_unlock(yy__mutex_Mutex*);
 int32_t yy__condition_init(yy__condition_Condition*);
 void yy__condition_destroy(yy__condition_Condition*);
 int32_t yy__condition_signal(yy__condition_Condition*);
 int32_t yy__condition_broadcast(yy__condition_Condition*);
 int32_t yy__condition_wait(yy__condition_Condition*, yy__mutex_Mutex*);
-int32_t yy__condition_timed_wait(yy__condition_Condition*, yy__mutex_Mutex*, yy__timespec_TimeSpec*);
-bool yy__timespec_get_utc_now(yy__timespec_TimeSpec*);
-int64_t yy__timespec_compare_ex(yy__timespec_TimeSpec*, yy__timespec_TimeSpec*);
-bool yy__timespec_greater(yy__timespec_TimeSpec, yy__timespec_TimeSpec);
-bool yy__timespec_lessser(yy__timespec_TimeSpec, yy__timespec_TimeSpec);
-bool yy__timespec_equal(yy__timespec_TimeSpec, yy__timespec_TimeSpec);
-void yy__timespec_add_nanoseconds(yy__timespec_TimeSpec*, int64_t);
-void yy__timespec_add_seconds(yy__timespec_TimeSpec*, int32_t);
-yy__timespec_TimeSpec yy__timespec_create();
-yy__timespec_TimeSpec yy__timespec_create_ex(int32_t);
-yy__timespec_TimeSpec yy__timespec_now();
-yy__timespec_TimeSpec yy__timespec_in_future(int32_t);
-yy__timespec_TimeSpec yy__timespec_in_future_ex(int32_t, int64_t);
-int32_t yy__timespec_get_seconds(yy__timespec_TimeSpec);
-int64_t yy__timespec_get_nanoseconds(yy__timespec_TimeSpec);
 int32_t yy__thread_create_with_data(yy__thread_Thread*, ykfncptr0, void*);
-int32_t yy__thread_create(yy__thread_Thread*, ykfncptr0);
-yy__thread_Thread yy__thread_current();
-int32_t yy__thread_detach(yy__thread_Thread);
-int32_t yy__thread_equal(yy__thread_Thread, yy__thread_Thread);
 void yy__thread_exit(int32_t);
-int32_t yy__thread_join_with_result(yy__thread_Thread, int32_t*);
 int32_t yy__thread_join(yy__thread_Thread);
-void yy__thread_yield();
-int32_t yy__thread_sleep_ex(yy__timespec_TimeSpec*, yy__timespec_TimeSpec*);
-int32_t yy__thread_sleep(int32_t);
 struct yy__pool_ThreadPool* yy__pool_create(uint8_t, uint32_t);
 int32_t yy__pool_add(struct yy__pool_ThreadPool*, ykfncptr1, void*);
 int32_t yy__pool_destroy(struct yy__pool_ThreadPool*, bool);
 int32_t yy__pool_internal_del_pool(struct yy__pool_ThreadPool*);
 int32_t yy__pool_internal_tpool_work(void*);
 yy__buffer_StringBuffer yy__buffer_new();
-yy__buffer_StringBuffer yy__buffer_new_size(int32_t);
 void yy__buffer_append(yy__buffer_StringBuffer, yk__sds);
-void yy__buffer_prepend(yy__buffer_StringBuffer, yk__sds);
 yk__sds yy__buffer_to_str(yy__buffer_StringBuffer);
-void yy__buffer_join(yy__buffer_StringBuffer, yk__sds*, yk__sds);
 void yy__buffer_del_buf(yy__buffer_StringBuffer);
 yk__sds yy__building_prepare_code(struct yy__configuration_Config*, yk__sds);
 bool yy__building_is_target_macos(yk__sds);
@@ -263,28 +117,19 @@ struct yy__configuration_Config* yy__configuration_create_adhoc_config(yk__sds, 
 void yy__configuration_del_config(struct yy__configuration_Config*);
 yy__argparse_ArgParseWrapper yy__argparse_new_ex(yy__argparse_Option*, yk__sds*, int32_t);
 yy__argparse_ArgParseWrapper yy__argparse_new(yy__argparse_Option*, yk__sds*);
-void yy__argparse_set_description(yy__argparse_ArgParse, yk__sds, yk__sds);
 void yy__argparse_del_argparse(yy__argparse_ArgParseWrapper);
 yy__argparse_ArgParseRemainder yy__argparse_parse(yy__argparse_ArgParse, yk__sds*);
 void yy__argparse_usage(yy__argparse_ArgParse);
 void yy__argparse_del_remainder(yy__argparse_ArgParseRemainder);
-yy__argparse_Option yy__argparse_opt_help();
 yy__argparse_Option yy__argparse_opt_boolean(yk__sds, yk__sds, int32_t*, yk__sds);
 yy__argparse_Option yy__argparse_opt_string(yk__sds, yk__sds, yy__c_CStr*, yk__sds);
-yy__argparse_Option yy__argparse_opt_integer(yk__sds, yk__sds, int32_t*, yk__sds);
-yy__argparse_Option yy__argparse_opt_float(yk__sds, yk__sds, float*, yk__sds);
 yy__argparse_Option yy__argparse_opt_end();
 void yy__console_set_color(int32_t);
-int32_t yy__console_getch();
 void yy__console_color_print(int32_t, yk__sds);
 void yy__console_red(yk__sds);
 void yy__console_green(yk__sds);
-void yy__console_white(yk__sds);
-void yy__console_blue(yk__sds);
-void yy__console_purple(yk__sds);
 void yy__console_yellow(yk__sds);
 void yy__console_cyan(yk__sds);
-bool yy__io_fflush_all();
 yk__sds yy__io_readfile(yk__sds);
 bool yy__io_writefile(yk__sds, yk__sds);
 yy__toml_Table yy__toml_from_str(yk__sds);
@@ -292,38 +137,21 @@ yy__toml_Table yy__toml_get_table(yy__toml_Table, yk__sds);
 yy__toml_TomlArray yy__toml_get_array(yy__toml_Table, yk__sds);
 int32_t yy__toml_array_len(yy__toml_TomlArray);
 yk__sds yy__toml_get_string(yy__toml_Table, yk__sds);
-yk__sds yy__toml_get_string_default(yy__toml_Table, yk__sds, yk__sds);
-bool yy__toml_get_bool(yy__toml_Table, yk__sds);
 bool yy__toml_get_bool_default(yy__toml_Table, yk__sds, bool);
-int32_t yy__toml_get_int(yy__toml_Table, yk__sds);
-int32_t yy__toml_get_int_default(yy__toml_Table, yk__sds, int32_t);
 yk__sds yy__toml_string_at(yy__toml_TomlArray, int32_t);
-yk__sds yy__toml_string_at_default(yy__toml_TomlArray, int32_t, yk__sds);
-bool yy__toml_bool_at(yy__toml_TomlArray, int32_t);
-bool yy__toml_bool_at_default(yy__toml_TomlArray, int32_t, bool);
-int32_t yy__toml_int_at(yy__toml_TomlArray, int32_t);
-int32_t yy__toml_int_at_default(yy__toml_TomlArray, int32_t, int32_t);
 yk__sds* yy__toml_get_string_array(yy__toml_Table, yk__sds);
 void yy__toml_del_table(yy__toml_Table);
 bool yy__path_forward_slash();
 bool yy__path_end_with_slash(yk__sds);
-bool yy__path_end_with_dot(yk__sds);
 yk__sds yy__path_join(yk__sds, yk__sds);
 yk__sds yy__path_basename(yk__sds);
 yk__sds yy__path_dirname(yk__sds);
 yk__sds yy__path_remove_extension(yk__sds);
-yk__sds* yy__array_prefix(yk__sds*, yk__sds);
-yk__sds* yy__array_suffix(yk__sds*, yk__sds);
 yk__sds yy__array_join(yk__sds*, yk__sds);
 yk__sds* yy__array_extend(yk__sds*, yk__sds*);
-bool yy__c_has_command_processor();
 int32_t yy__strings_get_cstr(yy__c_CStr, int32_t);
-void yy__strings_set_cstr(yy__c_CStr, int32_t, int32_t);
 int32_t yy__strings_get(yk__sds, int32_t);
 bool yy__strings_contains(yk__sds, yk__sds);
-bool yy__strings_isempty(yk__sds);
-bool yy__strings_isempty_cstr(yy__c_CStr);
-int32_t yy__strings_ord_cstr(yy__c_CStr);
 int32_t yy__strings_ord(yk__sds);
 bool yy__strings_startswith(yk__sds, yk__sds);
 yk__sds* yy__strings_split(yk__sds, yk__sds);
@@ -338,10 +166,6 @@ void yy__strings_del_str(yy__c_CStr);
 yk__sds yy__strings_cut_from(yk__sds, int32_t);
 yk__sds yy__strings_mid(yk__sds, int32_t, int32_t);
 bool yy__strings_endswith(yk__sds, yk__sds);
-yk__sds yy__strings_spaces(int32_t);
-yk__sds yy__strings_rpad(yk__sds, int32_t);
-yk__sds yy__strings_lpad(yk__sds, int32_t);
-yk__sds yy__os_exe();
 yk__sds yy__os_exe_path();
 yk__sds yy__os_cwd();
 yy__os_ProcessResult yy__os_run(yk__sds*);
@@ -889,128 +713,17 @@ yy__cpu_Cpu yy__cpu_info() { return yk__get_cpu_count(); }
 int32_t yy__mutex_init(yy__mutex_Mutex* nn__mtx, int32_t nn__type) { return mtx_init(nn__mtx, nn__type); }
 void yy__mutex_destroy(yy__mutex_Mutex* nn__mtx) { mtx_destroy(nn__mtx); }
 int32_t yy__mutex_lock(yy__mutex_Mutex* nn__mtx) { return mtx_lock(nn__mtx); }
-int32_t yy__mutex_trylock(yy__mutex_Mutex* nn__mtx) { return mtx_trylock(nn__mtx); }
 int32_t yy__mutex_unlock(yy__mutex_Mutex* nn__mtx) { return mtx_unlock(nn__mtx); }
 int32_t yy__condition_init(yy__condition_Condition* nn__cnd) { return cnd_init(nn__cnd); }
 void yy__condition_destroy(yy__condition_Condition* nn__cnd) { cnd_destroy(nn__cnd); }
 int32_t yy__condition_signal(yy__condition_Condition* nn__cnd) { return cnd_signal(nn__cnd); }
 int32_t yy__condition_broadcast(yy__condition_Condition* nn__cnd) { return cnd_broadcast(nn__cnd); }
 int32_t yy__condition_wait(yy__condition_Condition* nn__cnd, yy__mutex_Mutex* nn__mtx) { return cnd_wait(nn__cnd, nn__mtx); }
-int32_t yy__condition_timed_wait(yy__condition_Condition* nn__cnd, yy__mutex_Mutex* nn__mtx, yy__timespec_TimeSpec* nn__ts) { return cnd_timedwait(nn__cnd, nn__mtx, nn__ts); }
-bool yy__timespec_get_utc_now(yy__timespec_TimeSpec* nn__t) 
-{
-    return timespec_get(nn__t, TIME_UTC) == TIME_UTC;
-}
-int64_t yy__timespec_compare_ex(yy__timespec_TimeSpec* nn__a, yy__timespec_TimeSpec* nn__b) 
-{
-    
-    if (nn__a->tv_sec != nn__b->tv_sec) {
-        return (nn__a->tv_sec - nn__b->tv_sec);
-    } else if (nn__a->tv_nsec != nn__b->tv_nsec) {
-        return (nn__a->tv_nsec - nn__b->tv_nsec);
-    }
-    return 0;
-}
-bool yy__timespec_greater(yy__timespec_TimeSpec yy__timespec_a, yy__timespec_TimeSpec yy__timespec_b) 
-{
-    bool t__0 = (yy__timespec_compare_ex((&(yy__timespec_a)), (&(yy__timespec_b))) > ((int64_t)INT32_C(0)));
-    return t__0;
-}
-bool yy__timespec_lessser(yy__timespec_TimeSpec yy__timespec_a, yy__timespec_TimeSpec yy__timespec_b) 
-{
-    bool t__1 = (yy__timespec_compare_ex((&(yy__timespec_a)), (&(yy__timespec_b))) < ((int64_t)INT32_C(0)));
-    return t__1;
-}
-bool yy__timespec_equal(yy__timespec_TimeSpec yy__timespec_a, yy__timespec_TimeSpec yy__timespec_b) 
-{
-    bool t__2 = (yy__timespec_compare_ex((&(yy__timespec_a)), (&(yy__timespec_b))) == ((int64_t)INT32_C(0)));
-    return t__2;
-}
-void yy__timespec_add_nanoseconds(yy__timespec_TimeSpec* nn__a, int64_t nn__n) 
-{
-    
-    #define NSECS_PER_SECOND 1000000000
-    nn__a->tv_sec += nn__n / NSECS_PER_SECOND;
-    nn__a->tv_nsec += nn__n % NSECS_PER_SECOND;
-    while (nn__a->tv_nsec >= NSECS_PER_SECOND) {
-        nn__a->tv_sec++;
-        nn__a->tv_nsec -= NSECS_PER_SECOND;
-    }
-    #undef NSECS_PER_SECOND
-    return;
-}
-void yy__timespec_add_seconds(yy__timespec_TimeSpec* nn__a, int32_t nn__n) 
-{
-    nn__a->tv_sec += nn__n;
-}
-yy__timespec_TimeSpec yy__timespec_create() 
-{
-    struct timespec t = {0, };
-    t.tv_sec = 0;
-    t.tv_nsec = 0;
-    return t;
-}
-yy__timespec_TimeSpec yy__timespec_create_ex(int32_t nn__seconds) 
-{
-    struct timespec t = {0, };
-    t.tv_sec = nn__seconds;
-    t.tv_nsec = 0;
-    return t;
-}
-yy__timespec_TimeSpec yy__timespec_now() 
-{
-    yy__timespec_TimeSpec yy__timespec_t = yy__timespec_create();
-    yy__timespec_get_utc_now((&(yy__timespec_t)));
-    yy__timespec_TimeSpec t__3 = yy__timespec_t;
-    return t__3;
-}
-yy__timespec_TimeSpec yy__timespec_in_future(int32_t yy__timespec_seconds) 
-{
-    yy__timespec_TimeSpec yy__timespec_t = yy__timespec_create();
-    yy__timespec_get_utc_now((&(yy__timespec_t)));
-    yy__timespec_add_seconds((&(yy__timespec_t)), yy__timespec_seconds);
-    yy__timespec_TimeSpec t__4 = yy__timespec_t;
-    return t__4;
-}
-yy__timespec_TimeSpec yy__timespec_in_future_ex(int32_t yy__timespec_seconds, int64_t yy__timespec_nanoseconds) 
-{
-    yy__timespec_TimeSpec yy__timespec_t = yy__timespec_create();
-    yy__timespec_get_utc_now((&(yy__timespec_t)));
-    yy__timespec_add_seconds((&(yy__timespec_t)), yy__timespec_seconds);
-    yy__timespec_add_nanoseconds((&(yy__timespec_t)), yy__timespec_nanoseconds);
-    yy__timespec_TimeSpec t__5 = yy__timespec_t;
-    return t__5;
-}
-int32_t yy__timespec_get_seconds(yy__timespec_TimeSpec nn__t) 
-{
-    return nn__t.tv_sec;
-}
-int64_t yy__timespec_get_nanoseconds(yy__timespec_TimeSpec nn__t) 
-{
-    return nn__t.tv_nsec;
-}
 int32_t yy__thread_create_with_data(yy__thread_Thread* nn__thr, ykfncptr0 nn__func, void* nn__data) { return thrd_create(nn__thr, nn__func, nn__data); }
-int32_t yy__thread_create(yy__thread_Thread* nn__thr, ykfncptr0 nn__func) 
-{
-    return thrd_create(nn__thr, nn__func, NULL);
-}
-yy__thread_Thread yy__thread_current() { return thrd_current(); }
-int32_t yy__thread_detach(yy__thread_Thread nn__thr) { return thrd_detach(nn__thr); }
-int32_t yy__thread_equal(yy__thread_Thread nn__thr1, yy__thread_Thread nn__thr2) { return thrd_equal(nn__thr1, nn__thr2); }
 void yy__thread_exit(int32_t nn__res) { thrd_exit(nn__res); }
-int32_t yy__thread_join_with_result(yy__thread_Thread nn__thr, int32_t* nn__res) { return thrd_join(nn__thr, nn__res); }
 int32_t yy__thread_join(yy__thread_Thread nn__thr) 
 {
     return thrd_join(nn__thr, NULL);
-}
-void yy__thread_yield() { thrd_yield(); }
-int32_t yy__thread_sleep_ex(yy__timespec_TimeSpec* nn__duration, yy__timespec_TimeSpec* nn__remainder) { return thrd_sleep(nn__duration, nn__remainder); }
-int32_t yy__thread_sleep(int32_t nn__seconds) 
-{
-    struct timespec t = {0, };
-    t.tv_sec = nn__seconds;
-    t.tv_nsec = 0;
-    return thrd_sleep(&t, &t);
 }
 struct yy__pool_ThreadPool* yy__pool_create(uint8_t yy__pool_thread_count, uint32_t yy__pool_queue_size) 
 {
@@ -1215,38 +928,14 @@ yy__buffer_StringBuffer yy__buffer_new()
     srr[0] = yk__sdsempty();
     return srr;
 }
-yy__buffer_StringBuffer yy__buffer_new_size(int32_t nn__s) 
-{
-    yk__sds* srr = calloc(1, sizeof(yk__sds*));
-    srr[0] = yk__sdsempty();
-    srr[0] = yk__sdsgrowzero(srr[0], nn__s);
-    return srr;
-}
 void yy__buffer_append(yy__buffer_StringBuffer nn__buf, yk__sds nn__v) 
 {
     nn__buf[0] = yk__sdscatsds(nn__buf[0], nn__v);
     yk__sdsfree(nn__v);
 }
-void yy__buffer_prepend(yy__buffer_StringBuffer nn__buf, yk__sds nn__v) 
-{
-    yk__sds tmp = nn__buf[0];
-    nn__buf[0] = yk__sdscatsds(nn__v, nn__buf[0]);
-    yk__sdsfree(tmp);;
-}
 yk__sds yy__buffer_to_str(yy__buffer_StringBuffer nn__buf) 
 {
     return yk__sdsdup(nn__buf[0]);
-}
-void yy__buffer_join(yy__buffer_StringBuffer nn__buf, yk__sds* nn__values, yk__sds nn__sep) 
-{
-    if (NULL == nn__values) {
-        yk__sdsfree(nn__sep);
-        return;
-    }
-    yk__sds tmp = yk__sdsjoinsds(nn__values, yk__arrlen(nn__values), nn__sep, yk__sdslen(nn__sep));
-    nn__buf[0] = yk__sdscatsds(nn__buf[0], tmp);
-    yk__sdsfree(tmp);
-    yk__sdsfree(nn__sep);
 }
 void yy__buffer_del_buf(yy__buffer_StringBuffer nn__buf) 
 {
@@ -3123,16 +2812,10 @@ yy__argparse_ArgParseWrapper yy__argparse_new(yy__argparse_Option* yy__argparse_
     yy__argparse_ArgParseWrapper t__0 = yy__argparse_new_ex(yy__argparse_options, yy__argparse_usages, yy__argparse_ARGPARSE_DEFAULT);
     return t__0;
 }
-void yy__argparse_set_description(yy__argparse_ArgParse nn__argp, yk__sds nn__description, yk__sds nn__epilog) { argparse_describe(nn__argp, nn__description, nn__epilog); }
 void yy__argparse_del_argparse(yy__argparse_ArgParseWrapper nn__object) { yk__delargparse(nn__object); }
 yy__argparse_ArgParseRemainder yy__argparse_parse(yy__argparse_ArgParse nn__argp, yk__sds* nn__arguments) { return yk__argparse_parse(nn__argp, nn__arguments); }
 void yy__argparse_usage(yy__argparse_ArgParse nn__argp) { argparse_usage(nn__argp); }
 void yy__argparse_del_remainder(yy__argparse_ArgParseRemainder nn__a) { yk__del_argparse_remainder(nn__a); }
-yy__argparse_Option yy__argparse_opt_help() 
-{
-    return (struct argparse_option)OPT_BOOLEAN('h', yk__sdsnew("help"),
-    NULL, yk__sdsnew("show this help message and exit"), argparse_help_cb, 0, OPT_NONEG);
-}
 yy__argparse_Option yy__argparse_opt_boolean(yk__sds nn__short, yk__sds nn__large, int32_t* nn__result, yk__sds nn__help) 
 {
     struct argparse_option o = ((struct argparse_option) OPT_BOOLEAN(nn__short[0], nn__large, nn__result, nn__help, NULL, 0, 0));
@@ -3142,18 +2825,6 @@ yy__argparse_Option yy__argparse_opt_boolean(yk__sds nn__short, yk__sds nn__larg
 yy__argparse_Option yy__argparse_opt_string(yk__sds nn__short, yk__sds nn__large, yy__c_CStr* nn__result, yk__sds nn__help) 
 {
     struct argparse_option o = ((struct argparse_option) OPT_STRING(nn__short[0], nn__large, nn__result, nn__help, NULL, 0, 0));
-    yk__sdsfree(nn__short);
-    return o;
-}
-yy__argparse_Option yy__argparse_opt_integer(yk__sds nn__short, yk__sds nn__large, int32_t* nn__result, yk__sds nn__help) 
-{
-    struct argparse_option o = ((struct argparse_option) OPT_INTEGER(nn__short[0], nn__large, nn__result, nn__help, NULL, 0, 0));
-    yk__sdsfree(nn__short);
-    return o;
-}
-yy__argparse_Option yy__argparse_opt_float(yk__sds nn__short, yk__sds nn__large, float* nn__result, yk__sds nn__help) 
-{
-    struct argparse_option o = ((struct argparse_option) OPT_FLOAT(nn__short[0], nn__large, nn__result, nn__help, NULL, 0, 0));
     yk__sdsfree(nn__short);
     return o;
 }
@@ -3181,10 +2852,6 @@ void yy__console_set_color(int32_t nn__c)
         yk__set_colour(YK__CONSOLE_CYAN);
     };
 }
-int32_t yy__console_getch() 
-{
-    return yk__getch();
-}
 void yy__console_color_print(int32_t yy__console_color, yk__sds yy__console_x) 
 {
     yy__console_set_color(yy__console_color);
@@ -3205,24 +2872,6 @@ void yy__console_green(yk__sds yy__console_x)
     yk__sdsfree(yy__console_x);
     return;
 }
-void yy__console_white(yk__sds yy__console_x) 
-{
-    yy__console_color_print(INT32_C(3), yk__sdsdup(yy__console_x));
-    yk__sdsfree(yy__console_x);
-    return;
-}
-void yy__console_blue(yk__sds yy__console_x) 
-{
-    yy__console_color_print(INT32_C(4), yk__sdsdup(yy__console_x));
-    yk__sdsfree(yy__console_x);
-    return;
-}
-void yy__console_purple(yk__sds yy__console_x) 
-{
-    yy__console_color_print(INT32_C(5), yk__sdsdup(yy__console_x));
-    yk__sdsfree(yy__console_x);
-    return;
-}
 void yy__console_yellow(yk__sds yy__console_x) 
 {
     yy__console_color_print(INT32_C(6), yk__sdsdup(yy__console_x));
@@ -3234,11 +2883,6 @@ void yy__console_cyan(yk__sds yy__console_x)
     yy__console_color_print(INT32_C(7), yk__sdsdup(yy__console_x));
     yk__sdsfree(yy__console_x);
     return;
-}
-bool yy__io_fflush_all() 
-{
-    bool t__0 = yy__io_fflush(NULL);
-    return t__0;
 }
 yk__sds yy__io_readfile(yk__sds nn__fname) { return yk__io_readfile(nn__fname); }
 bool yy__io_writefile(yk__sds nn__fname, yk__sds nn__data) { return yk__io_writefile(nn__fname, nn__data); }
@@ -3277,51 +2921,12 @@ yk__sds yy__toml_get_string(yy__toml_Table nn__x, yk__sds nn__name)
     }
     return yk__sdsempty();
 }
-yk__sds yy__toml_get_string_default(yy__toml_Table nn__x, yk__sds nn__name, yk__sds nn__default) 
-{
-    toml_datum_t v = toml_string_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
-    if (v.ok) {
-        yk__sds s = yk__sdsnew(v.u.s);
-        free(v.u.s);
-        yk__sdsfree(nn__default);
-        return s;
-    }
-    return nn__default;
-}
-bool yy__toml_get_bool(yy__toml_Table nn__x, yk__sds nn__name) 
-{
-    toml_datum_t v = toml_bool_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
-    if (v.ok) {
-        return (1 == v.u.b);
-    }
-    return false;
-}
 bool yy__toml_get_bool_default(yy__toml_Table nn__x, yk__sds nn__name, bool nn__default) 
 {
     toml_datum_t v = toml_bool_in(nn__x, nn__name);
     yk__sdsfree(nn__name);
     if (v.ok) {
         return (1 == v.u.b);
-    }
-    return nn__default;
-}
-int32_t yy__toml_get_int(yy__toml_Table nn__x, yk__sds nn__name) 
-{
-    toml_datum_t v = toml_int_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
-    if (v.ok) {
-        return v.u.i;
-    }
-    return 0;
-}
-int32_t yy__toml_get_int_default(yy__toml_Table nn__x, yk__sds nn__name, int32_t nn__default) 
-{
-    toml_datum_t v = toml_int_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
-    if (v.ok) {
-        return v.u.i;
     }
     return nn__default;
 }
@@ -3334,49 +2939,6 @@ yk__sds yy__toml_string_at(yy__toml_TomlArray nn__x, int32_t nn__pos)
         return s;
     }
     return yk__sdsempty();
-}
-yk__sds yy__toml_string_at_default(yy__toml_TomlArray nn__x, int32_t nn__pos, yk__sds nn__default) 
-{
-    toml_datum_t v = toml_string_at(nn__x, nn__pos);
-    if (v.ok) {
-        yk__sds s = yk__sdsnew(v.u.s);
-        free(v.u.s);
-        yk__sdsfree(nn__default);
-        return s;
-    }
-    return nn__default;
-}
-bool yy__toml_bool_at(yy__toml_TomlArray nn__x, int32_t nn__pos) 
-{
-    toml_datum_t v = toml_bool_at(nn__x, nn__pos);
-    if (v.ok) {
-        return (1 == v.u.b);
-    }
-    return false;
-}
-bool yy__toml_bool_at_default(yy__toml_TomlArray nn__x, int32_t nn__pos, bool nn__default) 
-{
-    toml_datum_t v = toml_bool_at(nn__x, nn__pos);
-    if (v.ok) {
-        return (1 == v.u.b);
-    }
-    return nn__default;
-}
-int32_t yy__toml_int_at(yy__toml_TomlArray nn__x, int32_t nn__pos) 
-{
-    toml_datum_t v = toml_int_at(nn__x, nn__pos);
-    if (v.ok) {
-        return v.u.i;
-    }
-    return 0;
-}
-int32_t yy__toml_int_at_default(yy__toml_TomlArray nn__x, int32_t nn__pos, int32_t nn__default) 
-{
-    toml_datum_t v = toml_int_at(nn__x, nn__pos);
-    if (v.ok) {
-        return v.u.i;
-    }
-    return nn__default;
 }
 yk__sds* yy__toml_get_string_array(yy__toml_Table yy__toml_x, yk__sds yy__toml_name) 
 {
@@ -3433,54 +2995,40 @@ bool yy__path_end_with_slash(yk__sds yy__path_a)
     yk__sdsfree(yy__path_a);
     return t__0;
 }
-bool yy__path_end_with_dot(yk__sds yy__path_a) 
-{
-    int32_t yy__path_length = yk__sdslen(yy__path_a);
-    if (yy__path_length < INT32_C(1))
-    {
-        yk__sdsfree(yy__path_a);
-        return false;
-    }
-    int32_t yy__path_chr = (yy__path_a[(yy__path_length - INT32_C(1))]);
-    bool yy__path_x = (yy__path_chr == INT32_C(46));
-    bool t__1 = yy__path_x;
-    yk__sdsfree(yy__path_a);
-    return t__1;
-}
 yk__sds yy__path_join(yk__sds yy__path_a, yk__sds yy__path_b) 
 {
     if (yy__path_end_with_slash(yk__sdsdup(yy__path_a)))
     {
-        yk__sds t__2 = yk__sdscatsds(yk__sdsdup(yy__path_a), yy__path_b);
-        yk__sds t__3 = t__2;
+        yk__sds t__1 = yk__sdscatsds(yk__sdsdup(yy__path_a), yy__path_b);
+        yk__sds t__2 = t__1;
         yk__sdsfree(yy__path_b);
         yk__sdsfree(yy__path_a);
-        return t__3;
-        yk__sdsfree(t__2);
+        return t__2;
+        yk__sdsfree(t__1);
     }
 yk__sds yy__path_result = yk__sdsempty();
     if (yy__path_forward_slash())
     {
-        yk__sds t__4 = yk__concat_sds_lit(yy__path_a, "\\", 1);
-        yk__sds t__5 = yk__sdscatsds(yk__sdsdup(t__4), yy__path_b);
+        yk__sds t__3 = yk__concat_sds_lit(yy__path_a, "\\", 1);
+        yk__sds t__4 = yk__sdscatsds(yk__sdsdup(t__3), yy__path_b);
         yk__sdsfree(yy__path_result);
-        yy__path_result = yk__sdsdup(t__5);
-        yk__sdsfree(t__5);
+        yy__path_result = yk__sdsdup(t__4);
         yk__sdsfree(t__4);
+        yk__sdsfree(t__3);
     }
     else
     {
-        yk__sds t__6 = yk__concat_sds_lit(yy__path_a, "/", 1);
-        yk__sds t__7 = yk__sdscatsds(yk__sdsdup(t__6), yy__path_b);
+        yk__sds t__5 = yk__concat_sds_lit(yy__path_a, "/", 1);
+        yk__sds t__6 = yk__sdscatsds(yk__sdsdup(t__5), yy__path_b);
         yk__sdsfree(yy__path_result);
-        yy__path_result = yk__sdsdup(t__7);
-        yk__sdsfree(t__7);
+        yy__path_result = yk__sdsdup(t__6);
         yk__sdsfree(t__6);
+        yk__sdsfree(t__5);
     }
-    yk__sds t__8 = yy__path_result;
+    yk__sds t__7 = yy__path_result;
     yk__sdsfree(yy__path_b);
     yk__sdsfree(yy__path_a);
-    return t__8;
+    return t__7;
 }
 yk__sds yy__path_basename(yk__sds yy__path_p) 
 {
@@ -3488,8 +3036,8 @@ yk__sds yy__path_basename(yk__sds yy__path_p)
     int32_t yy__path_length = yk__sdslen(yy__path_p);
     if (yy__path_length < INT32_C(1))
     {
-        yk__sds t__9 = yy__path_p;
-        return t__9;
+        yk__sds t__8 = yy__path_p;
+        return t__8;
     }
     if (yy__path_end_with_slash(yk__sdsdup(yy__path_p)))
     {
@@ -3513,25 +3061,25 @@ yk__sds yy__path_basename(yk__sds yy__path_p)
     }
     if (yy__path_length <= INT32_C(0))
     {
-        yk__sds t__10 = yy__path_p;
+        yk__sds t__9 = yy__path_p;
         yy__strings_del_str(yy__path_x);
-        return t__10;
+        return t__9;
     }
-    yk__sds t__11 = yy__strings_from_cstrlen_after(yy__path_x, ((yy__path_full_length - yy__path_length) - INT32_C(1)), (yy__path_length + INT32_C(1)));
-    yk__sds yy__path_s = yk__sdsdup(t__11);
-    yk__sds t__12 = yy__path_s;
+    yk__sds t__10 = yy__strings_from_cstrlen_after(yy__path_x, ((yy__path_full_length - yy__path_length) - INT32_C(1)), (yy__path_length + INT32_C(1)));
+    yk__sds yy__path_s = yk__sdsdup(t__10);
+    yk__sds t__11 = yy__path_s;
     yy__strings_del_str(yy__path_x);
-    yk__sdsfree(t__11);
+    yk__sdsfree(t__10);
     yk__sdsfree(yy__path_p);
-    return t__12;
+    return t__11;
 }
 yk__sds yy__path_dirname(yk__sds yy__path_p) 
 {
     int32_t yy__path_length = yk__sdslen(yy__path_p);
     if (yy__path_length <= INT32_C(2))
     {
-        yk__sds t__13 = yy__path_p;
-        return t__13;
+        yk__sds t__12 = yy__path_p;
+        return t__12;
     }
     if (yy__path_end_with_slash(yk__sdsdup(yy__path_p)))
     {
@@ -3558,21 +3106,21 @@ yk__sds yy__path_dirname(yk__sds yy__path_p)
         yk__sdsfree(yy__path_p);
         return yk__sdsnewlen("", 0);
     }
-    yk__sds t__14 = yy__strings_from_cstrlen(yy__path_x, yy__path_length);
-    yk__sds yy__path_s = yk__sdsdup(t__14);
-    yk__sds t__15 = yy__path_s;
+    yk__sds t__13 = yy__strings_from_cstrlen(yy__path_x, yy__path_length);
+    yk__sds yy__path_s = yk__sdsdup(t__13);
+    yk__sds t__14 = yy__path_s;
     yy__strings_del_str(yy__path_x);
-    yk__sdsfree(t__14);
+    yk__sdsfree(t__13);
     yk__sdsfree(yy__path_p);
-    return t__15;
+    return t__14;
 }
 yk__sds yy__path_remove_extension(yk__sds yy__path_p) 
 {
     int32_t yy__path_length = yk__sdslen(yy__path_p);
     if (yy__path_length <= INT32_C(1))
     {
-        yk__sds t__16 = yy__path_p;
-        return t__16;
+        yk__sds t__15 = yy__path_p;
+        return t__15;
     }
     if (yy__path_end_with_slash(yk__sdsdup(yy__path_p)))
     {
@@ -3599,35 +3147,13 @@ yk__sds yy__path_remove_extension(yk__sds yy__path_p)
         yk__sdsfree(yy__path_p);
         return yk__sdsnewlen("", 0);
     }
-    yk__sds t__17 = yy__strings_from_cstrlen(yy__path_x, yy__path_length);
-    yk__sds yy__path_s = yk__sdsdup(t__17);
-    yk__sds t__18 = yy__path_s;
+    yk__sds t__16 = yy__strings_from_cstrlen(yy__path_x, yy__path_length);
+    yk__sds yy__path_s = yk__sdsdup(t__16);
+    yk__sds t__17 = yy__path_s;
     yy__strings_del_str(yy__path_x);
-    yk__sdsfree(t__17);
+    yk__sdsfree(t__16);
     yk__sdsfree(yy__path_p);
-    return t__18;
-}
-yk__sds* yy__array_prefix(yk__sds* nn__sa, yk__sds nn__prefix_str) 
-{
-    if (NULL == nn__sa) return NULL;
-    size_t l = yk__arrlenu(nn__sa);
-    for (size_t x = 0; x < l; x++) {
-        yk__sds tmp = nn__sa[x];
-        nn__sa[x] = yk__sdscatsds(yk__sdsdup(nn__prefix_str), nn__sa[x]);
-        yk__sdsfree(tmp);
-    }
-    yk__sdsfree(nn__prefix_str);
-    return nn__sa;
-}
-yk__sds* yy__array_suffix(yk__sds* nn__sa, yk__sds nn__suffix_str) 
-{
-    if (NULL == nn__sa) return NULL;
-    size_t l = yk__arrlenu(nn__sa);
-    for (size_t x = 0; x < l; x++) {
-        nn__sa[x] = yk__sdscatsds(nn__sa[x], nn__suffix_str);
-    }
-    yk__sdsfree(nn__suffix_str);
-    return nn__sa;
+    return t__17;
 }
 yk__sds yy__array_join(yk__sds* nn__values, yk__sds nn__sep) 
 {
@@ -3651,17 +3177,9 @@ yk__sds* yy__array_extend(yk__sds* nn__a, yk__sds* nn__b)
     }
     return lhs;
 }
-bool yy__c_has_command_processor() 
-{
-    return (!!system(NULL));
-}
 int32_t yy__strings_get_cstr(yy__c_CStr nn__s, int32_t nn__pos) 
 {
     return (int32_t)nn__s[nn__pos];
-}
-void yy__strings_set_cstr(yy__c_CStr nn__s, int32_t nn__pos, int32_t nn__v) 
-{
-    nn__s[nn__pos] = nn__v;;
 }
 int32_t yy__strings_get(yk__sds nn__s, int32_t nn__pos) 
 {
@@ -3675,21 +3193,6 @@ bool yy__strings_contains(yk__sds nn__haystack, yk__sds nn__needle)
     yk__sdsfree(nn__haystack);
     yk__sdsfree(nn__needle);
     return val;
-}
-bool yy__strings_isempty(yk__sds nn__s) 
-{
-    bool x = yk__sdslen(nn__s) == 0;
-    yk__sdsfree(nn__s);
-    return x;
-}
-bool yy__strings_isempty_cstr(yy__c_CStr nn__s) 
-{
-    bool x = strlen(nn__s) == 0;
-    return x;
-}
-int32_t yy__strings_ord_cstr(yy__c_CStr nn__s) 
-{
-    return (int32_t)nn__s[0];
 }
 int32_t yy__strings_ord(yk__sds yy__strings_s) 
 {
@@ -3801,62 +3304,6 @@ bool yy__strings_endswith(yk__sds yy__strings_a, yk__sds yy__strings_b)
     yk__sdsfree(yy__strings_b);
     yk__sdsfree(yy__strings_a);
     return t__2;
-}
-yk__sds yy__strings_spaces(int32_t nn__count) 
-{
-    if (nn__count <= 0) {
-        return yk__sdsempty();
-    }
-    yk__sds s = yk__sdsgrowzero(yk__sdsempty(), nn__count);
-    for (int i = 0; i < nn__count; i++) {
-        s[i] = ' ';
-    }
-    return s;
-}
-yk__sds yy__strings_rpad(yk__sds yy__strings_a, int32_t yy__strings_count) 
-{
-    if (yk__sdslen(yy__strings_a) > yy__strings_count)
-    {
-        yk__sds t__3 = yy__strings_a;
-        return t__3;
-    }
-    int32_t yy__strings_remainder = (yy__strings_count - yk__sdslen(yy__strings_a));
-    yk__sds t__4 = yy__strings_spaces(yy__strings_remainder);
-    yk__sds t__5 = yk__sdscatsds(yk__sdsdup(yy__strings_a), t__4);
-    yk__sds yy__strings_result = yk__sdsdup(t__5);
-    yk__sds t__6 = yy__strings_result;
-    yk__sdsfree(t__5);
-    yk__sdsfree(t__4);
-    yk__sdsfree(yy__strings_a);
-    return t__6;
-}
-yk__sds yy__strings_lpad(yk__sds yy__strings_a, int32_t yy__strings_count) 
-{
-    if (yk__sdslen(yy__strings_a) > yy__strings_count)
-    {
-        yk__sds t__7 = yy__strings_a;
-        return t__7;
-    }
-    int32_t yy__strings_remainder = (yy__strings_count - yk__sdslen(yy__strings_a));
-    yk__sds t__8 = yy__strings_spaces(yy__strings_remainder);
-    yk__sds t__9 = yk__sdscatsds(yk__sdsdup(t__8), yy__strings_a);
-    yk__sds yy__strings_result = yk__sdsdup(t__9);
-    yk__sds t__10 = yy__strings_result;
-    yk__sdsfree(t__9);
-    yk__sdsfree(t__8);
-    yk__sdsfree(yy__strings_a);
-    return t__10;
-}
-yk__sds yy__os_exe() 
-{
-    int length = wai_getExecutablePath(NULL, 0, NULL);
-    char* path = malloc(length + 1);
-    if (path == NULL) return yk__sdsempty();
-    wai_getExecutablePath(path, length, NULL);
-    path[length] = '\0';
-    yk__sds value = yk__sdsnewlen(path, length);
-    free(path);
-    return value;
 }
 yk__sds yy__os_exe_path() 
 {

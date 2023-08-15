@@ -3,7 +3,6 @@
 // --forward declarations-- 
 struct yy__A;
 struct yy__B;
-struct yy__C;
 int32_t yy__main();
 // --structs-- 
 struct yy__A {
@@ -11,9 +10,6 @@ struct yy__A {
 };
 struct yy__B {
     int32_t yy__b;
-};
-struct yy__C {
-    int32_t yy__c;
 };
 // --functions-- 
 int32_t yy__main() 

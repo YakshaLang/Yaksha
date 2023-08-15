@@ -1,23 +1,14 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
-struct yy__class_stuff_A;
-struct yy__class_stuff_B;
 struct yy__class_stuff_C;
 struct yy__Enemy;
 struct yy__Friend;
 struct yy__AnotherFriend;
 typedef int32_t (*ykfncptr0)(void);
-int32_t yy__class_stuff_main();
 int32_t yy__a();
 int32_t yy__main();
 // --structs-- 
-struct yy__class_stuff_A {
-    int32_t yy__class_stuff_a;
-};
-struct yy__class_stuff_B {
-    int32_t yy__class_stuff_b;
-};
 struct yy__class_stuff_C {
     int32_t yy__class_stuff_c;
 };
@@ -33,18 +24,6 @@ struct yy__AnotherFriend {
     int32_t yy__x;
 };
 // --functions-- 
-int32_t yy__class_stuff_main() 
-{
-    struct yy__class_stuff_A* yy__class_stuff_a = calloc(1, sizeof(struct yy__class_stuff_A));
-    yy__class_stuff_a->yy__class_stuff_a = INT32_C(1);
-    struct yy__class_stuff_B* yy__class_stuff_b = calloc(1, sizeof(struct yy__class_stuff_B));
-    yy__class_stuff_b->yy__class_stuff_b = INT32_C(10);
-    yk__printlnint((intmax_t)yy__class_stuff_a->yy__class_stuff_a);
-    int32_t t__0 = yy__class_stuff_b->yy__class_stuff_b;
-    free(yy__class_stuff_b);
-    free(yy__class_stuff_a);
-    return t__0;
-}
 int32_t yy__a() 
 {
     return INT32_C(0);

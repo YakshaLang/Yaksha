@@ -1,5 +1,6 @@
     (defun ykt_at () (yk_create_token YK_TOKEN_AT "@"))
     (defun ykt_colon () (yk_create_token YK_TOKEN_COLON ":"))
+    (defun ykt_semicolon () (yk_create_token YK_TOKEN_SEMICOLON ";"))
     (defun ykt_paren_open () (yk_create_token YK_TOKEN_PAREN_OPEN "("))
     (defun ykt_paren_close () (yk_create_token YK_TOKEN_PAREN_CLOSE ")"))
     (defun ykt_square_bracket_open () (yk_create_token YK_TOKEN_SQUARE_BRACKET_OPEN "["))

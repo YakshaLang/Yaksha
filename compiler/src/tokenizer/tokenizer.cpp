@@ -459,6 +459,10 @@ void tokenizer::tokenize_actual() {
           tokens_.emplace_back(
               c_token(file_, line, pos, ":", token_type::COLON));
           break;
+        case ';':
+          tokens_.emplace_back(
+              c_token(file_, line, pos, ";", token_type::SEMICOLON));
+          break;
         case ',':
           tokens_.emplace_back(
               c_token(file_, line, pos, ",", token_type::COMMA));
