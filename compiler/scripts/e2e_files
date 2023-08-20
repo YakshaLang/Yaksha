@@ -86,3 +86,4 @@ test_data/compiler_tests/string_tests/sr_functional_test_map.yaka
 test_data/compiler_tests/string_tests/returning_strings.yaka
 test_libs/tests.yaka
 test_data/compiler_tests/auto_casting/autocast.yaka
+test_data/compiler_tests/for_loop_test.yaka

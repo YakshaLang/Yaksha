@@ -1,4 +1,42 @@
-#!/usr/bin/env python
+# ==============================================================================================
+# ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
+# ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+# ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
+# Note: libs - MIT license, runtime/3rd - various
+# ==============================================================================================
+# GPLv3:
+# 
+# Yaksha - Programming Language.
+# Copyright (C) 2020 - 2023 Bhathiya Perera
+# 
+# This program is free software: you can redistribute it and/or modify it under the terms
+# of the GNU General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with this program.
+# If not, see https://www.gnu.org/licenses/.
+# 
+# ==============================================================================================
+# Additional Terms:
+# 
+# Please note that any commercial use of the programming language's compiler source code
+# (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
+# with author of the language (Bhathiya Perera).
+# 
+# If you are using it for an open source project, please give credits.
+# Your own project must use GPLv3 license with these additional terms.
+# 
+# You may use programs written in Yaksha/YakshaLisp for any legal purpose
+# (commercial, open-source, closed-source, etc) as long as it agrees
+# to the licenses of linked runtime libraries (see compiler/runtime/README.md).
+# 
+# ==============================================================================================
+# !/usr/bin/env python
 """
 This code generates Abstract Syntax Tree (AST) classes
 WHY? There's a lot of boilerplate code in that, easier to generate.
@@ -13,7 +51,8 @@ import os
 EXPRS = sorted([
     # Assign to a variable
     # We can promote an assignment to a let statement, if so promoted is set to true
-    ("assign", (("token*", "name"), ("token*", "opr"), ("expr*", "right"), ("bool", "promoted"))),
+    ("assign", (("token*", "name"), ("token*", "opr"), ("expr*", "right"), ("bool", "promoted"),
+                ("ykdatatype*", "promoted_data_type"))),
     # Assign to a member
     ("assign_member", (("expr*", "set_oper"), ("token*", "opr"), ("expr*", "right"))),
     # Assign to array object
@@ -98,6 +137,17 @@ STMTS = sorted([
     # for:
     #     println("endless")
     ("forendless", (("token*", "for_keyword"), ("stmt*", "for_body"),)),
+    # C-like for loop
+    # for (x = 0; x < 5; x += 1):
+    #     println(x)
+    ("cfor", (("token*", "for_keyword"), ("token*", "open_paren"),
+              ("expr*", "init_expr"),
+              ("token*", "semi1"),
+              ("expr*", "comparison"),
+              ("token*", "semi2"),
+              ("expr*", "operation"),
+              ("token*", "close_paren"),
+              ("stmt*", "for_body"),)),
     # Block -> COLON, NEW_LINE, STATEMENTS+
     ("block", (("std::vector<stmt*>", "statements"),)),
     # Pass statement is needed to allow for empty blocks
@@ -118,6 +168,8 @@ STMTS = sorted([
     ("def", (("token*", "name"), ("std::vector<parameter>", "params"),
              ("stmt*", "function_body"), ("ykdatatype*", "return_type"), ("annotations", "annotations"))),
     ("class", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
+    ("enum", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
+    ("union", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
     # import io [as io]
     ("import", (("token*", "import_token"), ("std::vector<token*>", "import_names"),
                 ("token*", "name"), ("file_info*", "data"))),
@@ -252,6 +304,7 @@ $AST_POOL$
 struct parameter {
     token* name_;
     ykdatatype* data_type_;
+    token* enum_val_override_;
 };
 /**
 * Name + value item

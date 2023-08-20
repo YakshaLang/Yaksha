@@ -1,3 +1,41 @@
+// ==============================================================================================
+// ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
+// Note: libs - MIT license, runtime/3rd - various
+// ==============================================================================================
+// GPLv3:
+//
+// Yaksha - Programming Language.
+// Copyright (C) 2020 - 2023 Bhathiya Perera
+//
+// This program is free software: you can redistribute it and/or modify it under the terms
+// of the GNU General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+// or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see https://www.gnu.org/licenses/.
+//
+// ==============================================================================================
+// Additional Terms:
+//
+// Please note that any commercial use of the programming language's compiler source code
+// (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
+// with author of the language (Bhathiya Perera).
+//
+// If you are using it for an open source project, please give credits.
+// Your own project must use GPLv3 license with these additional terms.
+//
+// You may use programs written in Yaksha/YakshaLisp for any legal purpose
+// (commercial, open-source, closed-source, etc) as long as it agrees
+// to the licenses of linked runtime libraries (see compiler/runtime/README.md).
+//
+// ==============================================================================================
 // usage_analyser.cpp
 #include "usage_analyser.h"
 #include "ast/parser.h"
@@ -65,8 +103,8 @@ void usage_analyser::visit_get_expr(get_expr *obj) {
   auto lhs = pop_object();
   if (lhs.object_type_ == object_type::MODULE) {
     // try and get from module
-    auto imp = find_import(
-        lhs.module_file_, peek_file_info()->data_->parser_->import_stmts_);
+    auto imp = find_import(lhs.module_file_,
+                           peek_file_info()->data_->parser_->import_stmts_);
     if (imp.first == nullptr && !imp.second) {
       error(obj->dot_, "cannot find imported file: " + lhs.module_file_);
       auto o = ykobject();
@@ -254,7 +292,8 @@ void usage_analyser::visit_const_stmt(const_stmt *obj) {
 }
 void usage_analyser::visit_continue_stmt(continue_stmt *obj) { obj->hits_++; }
 void usage_analyser::visit_def_stmt(def_stmt *obj) {
-  LOG_COMP("usage_analyser: def - " << obj->name_->token_ << " hits = " << obj->hits_);
+  LOG_COMP("usage_analyser: def - " << obj->name_->token_
+                                    << " hits = " << obj->hits_);
   if (obj->hits_ > 0) { return; }
   obj->hits_++;
   for (auto &p : obj->params_) { this->visit_data_type(p.data_type_, p.name_); }
@@ -315,14 +354,11 @@ void usage_analyser::visit_while_stmt(while_stmt *obj) {
 }
 void usage_analyser::visit_data_type(ykdatatype *dt, token *token_for_err) {
   if (dt == nullptr) { return; }
-  if (dt->hits_ > 0) {
-    return;
-  }
+  if (dt->hits_ > 0) { return; }
   dt->hits_++;
-  if (dt->is_primitive()) {
-    return;
-  }
-  if (dt->is_an_array() || dt->is_sm_entry() || dt->is_const() || dt->is_a_pointer()) {
+  if (dt->is_primitive()) { return; }
+  if (dt->is_an_array() || dt->is_sm_entry() || dt->is_const() ||
+      dt->is_a_pointer()) {
     visit_data_type(dt->args_[0], token_for_err);
     return;
   }
@@ -332,25 +368,17 @@ void usage_analyser::visit_data_type(ykdatatype *dt, token *token_for_err) {
     return;
   }
   if (dt->is_tuple()) {
-    for (auto arg: dt->args_) {
-      visit_data_type(arg, token_for_err);
-    }
+    for (auto arg : dt->args_) { visit_data_type(arg, token_for_err); }
     return;
   }
   if (dt->is_function()) {
     auto fi = dt->args_[0];
-    for (auto arg: fi->args_) {
-      visit_data_type(arg, token_for_err);
-    }
+    for (auto arg : fi->args_) { visit_data_type(arg, token_for_err); }
     auto fo = dt->args_[1];
-    for (auto arg: fo->args_) {
-      visit_data_type(arg, token_for_err);
-    }
+    for (auto arg : fo->args_) { visit_data_type(arg, token_for_err); }
     return;
   }
-  if (dt->is_builtin_or_primitive()) {
-    return;
-  }
+  if (dt->is_builtin_or_primitive()) { return; }
   def_class_visitor *dsv = peek_file_info()->data_->dsv_;
   bool pop_import_stack = false;
   if (!dt->module_.empty()) {
@@ -407,3 +435,12 @@ void usage_analyser::pop_import() {
   if (import_stack_.empty()) { return; }
   import_stack_.pop_back();
 }
+void usage_analyser::visit_cfor_stmt(cfor_stmt *obj) {
+  obj->hits_++;
+  if (obj->init_expr_ != nullptr) { obj->init_expr_->accept(this); }
+  if (obj->comparison_ != nullptr) { obj->comparison_->accept(this); }
+  if (obj->operation_ != nullptr) { obj->operation_->accept(this); }
+  obj->for_body_->accept(this);
+}
+void usage_analyser::visit_enum_stmt(enum_stmt *obj) { obj->hits_++; }
+void usage_analyser::visit_union_stmt(union_stmt *obj) { obj->hits_++; }

@@ -1,3 +1,41 @@
+// ==============================================================================================
+// ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
+// Note: libs - MIT license, runtime/3rd - various
+// ==============================================================================================
+// GPLv3:
+//
+// Yaksha - Programming Language.
+// Copyright (C) 2020 - 2023 Bhathiya Perera
+//
+// This program is free software: you can redistribute it and/or modify it under the terms
+// of the GNU General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+// or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see https://www.gnu.org/licenses/.
+//
+// ==============================================================================================
+// Additional Terms:
+//
+// Please note that any commercial use of the programming language's compiler source code
+// (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
+// with author of the language (Bhathiya Perera).
+//
+// If you are using it for an open source project, please give credits.
+// Your own project must use GPLv3 license with these additional terms.
+//
+// You may use programs written in Yaksha/YakshaLisp for any legal purpose
+// (commercial, open-source, closed-source, etc) as long as it agrees
+// to the licenses of linked runtime libraries (see compiler/runtime/README.md).
+//
+// ==============================================================================================
 #include "ast/ast_printer.h"
 #include "ast/parser.h"
 #include "compiler/def_class_visitor.h"
@@ -8,46 +46,6 @@
 #define PROGRAM_NAME "ykashadmp"
 #endif
 using namespace yaksha;
-// trim from start (in place)
-static inline void ltrim(std::string &s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-            return !std::isspace(ch);
-          }));
-}
-// trim from end (in place)
-static inline void rtrim(std::string &s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(),
-                       [](unsigned char ch) { return !std::isspace(ch); })
-              .base(),
-          s.end());
-}
-// trim from both ends (in place)
-static inline void trim(std::string &s) {
-  ltrim(s);
-  rtrim(s);
-}
-// trim from both ends (copying)
-static inline std::string trim_copy(std::string s) {
-  trim(s);
-  return s;
-}
-// https://stackoverflow.com/questions/5878775/how-to-find-and-replace-string
-void replace_all(std::string &s, std::string const &toReplace,
-                 std::string const &replaceWith) {
-  std::ostringstream oss;
-  std::size_t pos = 0;
-  std::size_t prevPos = pos;
-  while (true) {
-    prevPos = pos;
-    pos = s.find(toReplace, pos);
-    if (pos == std::string::npos) { break; }
-    oss << s.substr(prevPos, pos - prevPos);
-    oss << replaceWith;
-    pos += toReplace.size();
-  }
-  oss << s.substr(prevPos);
-  s = oss.str();
-}
 std::string extract_comments(int definition_line, tokenizer &token_extractor) {
   std::size_t position = 0;
   // Skip to first token, after `def, class, const` line
