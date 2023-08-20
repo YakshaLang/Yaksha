@@ -169,8 +169,7 @@ struct builtin_arrsetlencap : builtin {
     } else if (args[0].datatype_->args_[0]->is_m_entry() ||
                args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ = func_name_ + "() does not work with maps";
-    } else if (!(args[1].datatype_->is_an_integer() ||
-                 args[1].datatype_->is_a_const_integer())) {
+    } else if (!(args[1].datatype_->const_unwrap()->is_an_integer())) {
       o.string_val_ = func_name_ + "Second argument to () must be an integer";
     } else {
       return ykobject(dt_pool);// None return
@@ -972,8 +971,7 @@ struct builtin_arrnew : builtin {
       o.string_val_ = "Two arguments must be provided for arrnew() builtin";
     } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
       o.string_val_ = "First argument to arrnew() must be a string literal";
-    } else if (!(args[1].datatype_->is_an_integer() ||
-                 args[1].datatype_->is_a_const_integer())) {
+    } else if (!(args[1].datatype_->const_unwrap()->is_an_integer())) {
       o.string_val_ = "Second argument to arrnew() must be an int";
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
@@ -1123,7 +1121,7 @@ struct builtin_iif : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "iif() builtin expects 3 arguments";
-    } else if (!(args[0].datatype_->is_bool_or_const_bool())) {
+    } else if (!(args[0].datatype_->const_unwrap()->is_bool())) {
       o.string_val_ = "First argument to iif() must be a bool";
     } else if (*args[1].datatype_->const_unwrap() !=
                *args[2].datatype_->const_unwrap()) {
@@ -1465,10 +1463,7 @@ struct builtin_make : builtin {
       ykdatatype *parsed_dt_original =
           dt_parser->parse(data_type, import_aliases, filepath);
       if (parsed_dt_original != nullptr) {
-        ykdatatype *parsed_dt = parsed_dt_original;
-        if (parsed_dt_original->is_const()) {
-          parsed_dt = parsed_dt_original->args_[0];// Extract const
-        }
+        ykdatatype *parsed_dt = parsed_dt_original->const_unwrap();
         if (parsed_dt->is_function_input() || parsed_dt->is_function_output() ||
             parsed_dt->is_m_entry() || parsed_dt->is_sm_entry() ||
             parsed_dt->is_none() || parsed_dt->is_const()) {

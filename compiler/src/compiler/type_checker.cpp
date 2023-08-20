@@ -415,8 +415,8 @@ void type_checker::visit_logical_expr(logical_expr *obj) {
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
-  if (!(lhs.is_primitive_or_obj() && lhs.datatype_->is_bool_or_const_bool() &&
-        rhs.is_primitive_or_obj() && rhs.datatype_->is_bool_or_const_bool())) {
+  if (!(lhs.is_primitive_or_obj() && lhs.datatype_->const_unwrap()->is_bool() &&
+        rhs.is_primitive_or_obj() && rhs.datatype_->const_unwrap()->is_bool())) {
     error(obj->opr_, "Both LHS and RHS of logical"
                      " operator need to be boolean");
   }
@@ -427,10 +427,10 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
   obj->right_->accept(this);
   auto rhs = pop();
   if (rhs.is_primitive_or_obj() &&
-      (rhs.datatype_->is_a_number_or_const_number() ||
-       rhs.datatype_->is_bool_or_const_bool())) {
+      (rhs.datatype_->const_unwrap()->is_a_number() ||
+       rhs.datatype_->const_unwrap()->is_bool())) {
     if (obj->opr_->type_ == token_type::KEYWORD_NOT &&
-        !rhs.datatype_->is_bool_or_const_bool()) {
+        !rhs.datatype_->const_unwrap()->is_bool()) {
       error(obj->opr_,
             "Invalid unary operation. Not operator must follow a boolean.");
     } else if (obj->opr_->type_ == token_type::TILDE &&
@@ -565,7 +565,7 @@ void type_checker::visit_if_stmt(if_stmt *obj) {
   obj->expression_->accept(this);
   auto bool_expression = pop();
   if (!bool_expression.is_primitive_or_obj() ||
-      !bool_expression.datatype_->is_bool_or_const_bool()) {
+      !bool_expression.datatype_->const_unwrap()->is_bool()) {
     error(obj->if_keyword_, "Invalid boolean expression used");
   }
   scope_.push();
@@ -618,7 +618,7 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
 void type_checker::visit_while_stmt(while_stmt *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
-  if (!exp.is_primitive_or_obj() || !exp.datatype_->is_bool_or_const_bool()) {
+  if (!exp.is_primitive_or_obj() || !exp.datatype_->const_unwrap()->is_bool()) {
     error(obj->while_keyword_,
           "While statement expression need to be a boolean");
   }
@@ -715,8 +715,7 @@ void type_checker::visit_class_stmt(class_stmt *obj) {
 void type_checker::visit_del_stmt(del_stmt *obj) {
   obj->expression_->accept(this);
   auto deletable_expression = pop();
-  ykdatatype *dt = deletable_expression.datatype_;
-  if (dt->is_const()) { dt = dt->args_[0]; }
+  ykdatatype *dt = deletable_expression.datatype_->const_unwrap();
   // Cannot delete int, bool. But we can delete sr and str
   if (deletable_expression.is_primitive_or_obj() && dt->is_primitive() &&
       !dt->is_str() && !dt->is_sr()) {
@@ -1094,8 +1093,7 @@ void type_checker::validate_member(name_val &member, class_stmt *class_st) {
   }
   member.value_->accept(this);
   auto set_value = pop();
-  ykdatatype *member_dt = set_value.datatype_;
-  if (member_dt->is_const()) { member_dt = member_dt->args_[0]; }
+  ykdatatype *member_dt = set_value.datatype_->const_unwrap();
   if (*class_member_dt != *member_dt) {
     error(member.name_, "data types mismatch");
   }
