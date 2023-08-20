@@ -1,0 +1,23 @@
+def add(a: int, b: int) -> int: a + b
+
+# Above is a mini function, if the last statement is an expression_statement we can promote it to be a return statement
+# A kind of a syntax sugar that simplifies things a lot
+
+def main() -> int:
+    for (x = 0; x < 10; x = x + 1):
+        println(x)
+
+    a: str = ""
+    for (x = 0; x < 4; x += 1):
+        a += "hello "
+    println(a)
+
+    b: str = ""
+    c: str = "x"
+    for (b += c; b != "xxx"; b += c): pass
+    println(b)
+
+    for (x = 0; x < 10i8; x = add(x, 2i8)):
+        println(x)
+
+    return 0

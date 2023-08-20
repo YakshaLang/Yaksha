@@ -1,3 +1,41 @@
+// ==============================================================================================
+// ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
+// Note: libs - MIT license, runtime/3rd - various
+// ==============================================================================================
+// GPLv3:
+//
+// Yaksha - Programming Language.
+// Copyright (C) 2020 - 2023 Bhathiya Perera
+//
+// This program is free software: you can redistribute it and/or modify it under the terms
+// of the GNU General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+// or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see https://www.gnu.org/licenses/.
+//
+// ==============================================================================================
+// Additional Terms:
+//
+// Please note that any commercial use of the programming language's compiler source code
+// (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
+// with author of the language (Bhathiya Perera).
+//
+// If you are using it for an open source project, please give credits.
+// Your own project must use GPLv3 license with these additional terms.
+//
+// You may use programs written in Yaksha/YakshaLisp for any legal purpose
+// (commercial, open-source, closed-source, etc) as long as it agrees
+// to the licenses of linked runtime libraries (see compiler/runtime/README.md).
+//
+// ==============================================================================================
 // type_checker.cpp
 #include "type_checker.h"
 #include "ast/parser.h"
@@ -8,11 +46,22 @@ type_checker::type_checker(std::string filepath, codefiles *cf,
                            def_class_visitor *dcv, ykdt_pool *pool,
                            gc_pool<token> *token_pool)
     : cf_(cf), dt_pool_(pool), scope_(pool), builtins_(pool, token_pool),
-      defs_classes_(dcv), filepath_(std::move(filepath)) {
+      defs_classes_(dcv), filepath_(std::move(filepath)),
+      ast_pool_(new ast_pool{}), magic_return_token_(new token{}) {
   import_stmts_alias_ =
       cf->get_or_null(filepath_)->data_->parser_->import_stmts_alias_;
+  // create a magic_return_token so last expression of a function can be promoted to return
+  magic_return_token_->token_ = "return";
+  magic_return_token_->file_ = "desugar";
+  magic_return_token_->original_ = "return";
+  magic_return_token_->line_ = 0;
+  magic_return_token_->pos_ = 0;
+  magic_return_token_->type_ = token_type::KEYWORD_RETURN;
 }
-type_checker::~type_checker() = default;
+type_checker::~type_checker() {
+  delete ast_pool_;
+  delete magic_return_token_;
+}
 void type_checker::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
   auto rhs = pop();
@@ -35,6 +84,7 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
   }
   if (obj->promoted_) {
     object.datatype_ = object.datatype_->const_unwrap();
+    obj->promoted_data_type_ = object.datatype_;
     handle_assigns(obj->opr_, object, rhs);
     scope_.define(name, object);
   } else {
@@ -443,17 +493,18 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
       scope_.define(name, data);
     }
   }
-  if (obj->annotations_.native_ || obj->annotations_.native_macro_) {
-    auto body = dynamic_cast<block_stmt *>(obj->function_body_);
+  auto body = dynamic_cast<block_stmt *>(obj->function_body_);
+  if (obj->annotations_.native_ || obj->annotations_.native_macro_ ||
+      obj->annotations_.native_define_) {
     if (body->statements_.size() != 1) {
-      error(obj->name_,
-            "@native or @nativemacro function must have only 1 statement");
+      error(obj->name_, "@native, @nativemacro, @nativedefine function must "
+                        "have only 1 statement");
     } else {
       auto st = body->statements_[0]->get_type();
       if (st != ast_type::STMT_PASS && st != ast_type::STMT_CCODE) {
-        error(obj->name_,
-              "@native or @nativemacro function must have only 1 statement,"
-              " which must be of type ccode or pass.");
+        error(obj->name_, "@native, @nativemacro, @nativedefine function must "
+                          "have only 1 statement,"
+                          " which must be of type ccode or pass.");
       }
       if (obj->annotations_.native_ && st == ast_type::STMT_PASS &&
           obj->annotations_.native_arg_.empty()) {
@@ -465,6 +516,11 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
         error("@nativemacro function must have a valid argument if pass is "
               "used as the statement");
       }
+      if (obj->annotations_.native_define_ && st == ast_type::STMT_PASS &&
+          obj->annotations_.native_define_arg_.empty()) {
+        error("@nativedefine function must have a valid argument if pass is "
+              "used as the statement");
+      }
       if (obj->annotations_.native_ && st == ast_type::STMT_CCODE &&
           !obj->annotations_.native_arg_.empty()) {
         error("@native function must not have an argument if ccode is used");
@@ -474,8 +530,26 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
         error(
             "@nativemacro function must not have an argument if ccode is used");
       }
+      if (obj->annotations_.native_define_ && st == ast_type::STMT_CCODE &&
+          !obj->annotations_.native_define_arg_.empty()) {
+        error("@nativedefine function must not have an argument if ccode is "
+              "used");
+      }
     }
   } else {
+    obj->accept(&return_checker_);
+    if (!return_checker_.errors_.empty()) {
+      if (body->statements_.back()->get_type() == ast_type::STMT_EXPRESSION) {
+        // last statement is an expression statement
+        auto st_ex = dynamic_cast<expression_stmt *>(body->statements_.back());
+        body->statements_.pop_back();// remove last one
+        auto last_return = ast_pool_->c_return_stmt(
+            magic_return_token_, st_ex->expression_, nullptr);
+        body->statements_.push_back(last_return);
+      } else {
+        errors_.push_back(return_checker_.errors_.back());
+      }
+    }
     obj->function_body_->accept(this);
   }
   scope_.pop();
@@ -1064,3 +1138,21 @@ void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
   }
 }
 void type_checker::visit_macro_call_expr(macro_call_expr *obj) {}
+void type_checker::visit_cfor_stmt(cfor_stmt *obj) {
+  push_scope_type(ast_type::STMT_WHILE);
+  scope_.push();
+  if (obj->init_expr_ != nullptr) { obj->init_expr_->accept(this); }
+  if (obj->comparison_ != nullptr) {
+    obj->comparison_->accept(this);
+    auto comp = pop();
+    if (!comp.datatype_->const_unwrap()->is_bool()) {
+      error(obj->semi1_, "Comparision must be a boolean operation");
+    }
+  }
+  if (obj->operation_ != nullptr) { obj->operation_->accept(this); }
+  obj->for_body_->accept(this);
+  scope_.pop();
+  pop_scope_type();
+}
+void type_checker::visit_enum_stmt(enum_stmt *obj) {}
+void type_checker::visit_union_stmt(union_stmt *obj) {}

@@ -1,3 +1,41 @@
+// ==============================================================================================
+// ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
+// Note: libs - MIT license, runtime/3rd - various
+// ==============================================================================================
+// GPLv3:
+//
+// Yaksha - Programming Language.
+// Copyright (C) 2020 - 2023 Bhathiya Perera
+//
+// This program is free software: you can redistribute it and/or modify it under the terms
+// of the GNU General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+// or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see https://www.gnu.org/licenses/.
+//
+// ==============================================================================================
+// Additional Terms:
+//
+// Please note that any commercial use of the programming language's compiler source code
+// (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
+// with author of the language (Bhathiya Perera).
+//
+// If you are using it for an open source project, please give credits.
+// Your own project must use GPLv3 license with these additional terms.
+//
+// You may use programs written in Yaksha/YakshaLisp for any legal purpose
+// (commercial, open-source, closed-source, etc) as long as it agrees
+// to the licenses of linked runtime libraries (see compiler/runtime/README.md).
+//
+// ==============================================================================================
 // compiler.h
 #ifndef COMPILER_H
 #define COMPILER_H
@@ -14,8 +52,8 @@
 #include "def_class_visitor.h"
 #include "entry_struct_func_compiler.h"
 #include "tokenizer/token.h"
-#include "utilities/defer_stack_stack.h"
 #include "utilities/cpp_util.h"
+#include "utilities/defer_stack_stack.h"
 #include <sstream>
 namespace yaksha {
   struct compiler_output {
@@ -101,6 +139,9 @@ namespace yaksha {
                                const ykdatatype *rhs_datatype,
                                const ykdatatype *lhs_datatype) override;
     std::string wrap_in_paren(const std::string &code) const override;
+    void visit_cfor_stmt(cfor_stmt *obj) override;
+    void visit_enum_stmt(enum_stmt *obj) override;
+    void visit_union_stmt(union_stmt *obj) override;
 
 private:
     void push_scope_type(ast_type scope_type);
@@ -108,7 +149,7 @@ private:
     void pop_scope_type();
     void write_indent(std::stringstream &where) const;
     void write_prev_indent(std::stringstream &where) const;
-    static void write_end_statement(std::stringstream &where);
+    void write_end_statement(std::stringstream &where);
     void push(const std::string &expr, const ykobject &data_type);
     void error(token *tok, const std::string &message);
     void error(const std::string &message);
@@ -122,6 +163,9 @@ private:
     int indent_{0};
     // Counter for temp variables.
     long temp_{0};
+    // inline
+    bool inline_mode_{false};
+    long statements_{0};
     builtins builtins_;
     /**
      * Function declarations, etc
@@ -170,7 +214,7 @@ private:
     std::string
     prefix_function_arg(const std::pair<std::string, ykobject> &arg_val);
     void perform_assign(std::pair<std::string, ykobject> &lhs,
-                         std::pair<std::string, ykobject> &rhs,
+                        std::pair<std::string, ykobject> &rhs,
                         token *operator_token, bool assign_variable,
                         bool lhs_mutates);
     static void obj_calloc(const std::string &name, std::stringstream &code);
@@ -182,7 +226,9 @@ private:
     void cast_numbers(const ykdatatype *castable,
                       std::pair<std::string, ykobject> &lhs,
                       std::pair<std::string, ykobject> &rhs);
-    void write_casted_rhs(std::stringstream& stream, std::pair<std::string, ykobject> &rhs, ykdatatype *lhsu);
+    void write_casted_rhs(std::stringstream &stream,
+                          std::pair<std::string, ykobject> &rhs,
+                          ykdatatype *lhsu);
   };
 }// namespace yaksha
 #endif

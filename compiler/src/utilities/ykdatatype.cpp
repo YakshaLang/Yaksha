@@ -1,3 +1,41 @@
+// ==============================================================================================
+// ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
+// Note: libs - MIT license, runtime/3rd - various
+// ==============================================================================================
+// GPLv3:
+//
+// Yaksha - Programming Language.
+// Copyright (C) 2020 - 2023 Bhathiya Perera
+//
+// This program is free software: you can redistribute it and/or modify it under the terms
+// of the GNU General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+// or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see https://www.gnu.org/licenses/.
+//
+// ==============================================================================================
+// Additional Terms:
+//
+// Please note that any commercial use of the programming language's compiler source code
+// (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
+// with author of the language (Bhathiya Perera).
+//
+// If you are using it for an open source project, please give credits.
+// Your own project must use GPLv3 license with these additional terms.
+//
+// You may use programs written in Yaksha/YakshaLisp for any legal purpose
+// (commercial, open-source, closed-source, etc) as long as it agrees
+// to the licenses of linked runtime libraries (see compiler/runtime/README.md).
+//
+// ==============================================================================================
 // ykdatatype.cpp
 #include "ykdatatype.h"
 #include "compiler/compiler_utils.h"
@@ -224,22 +262,15 @@ ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, ykdt_pool *pool,
   auto ri = +rhsu->primitive_type_;
   if (lhsu->is_a_string() && rhsu->is_a_string()) {
     castable = pool->create("str");
-  } else if (li > 0 && li < 1000 &&
-             ri > 0 && ri < 1000) {
-    if (assignment && li < ri) {
-      return nullptr;
-    }
+  } else if (li > 0 && li < 1000 && ri > 0 && ri < 1000) {
+    if (assignment && li < ri) { return nullptr; }
     if (li > ri) {
-      if (li > 1 && li < 12 && (li - ri) <= 1) {
-        return nullptr;
-      }
+      if (li > 1 && li < 12 && (li - ri) <= 1) { return nullptr; }
       castable = pool->create(lhsu->type_);
       castable->widen_rhs = true;
       castable->widen_lhs = false;
     } else {
-      if (ri > 1 && ri < 12 && (ri - li) <= 1) {
-        return nullptr;
-      }
+      if (ri > 1 && ri < 12 && (ri - li) <= 1) { return nullptr; }
       castable = pool->create(rhsu->type_);
       castable->widen_rhs = false;
       castable->widen_lhs = true;

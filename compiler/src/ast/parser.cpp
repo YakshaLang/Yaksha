@@ -1,3 +1,41 @@
+// ==============================================================================================
+// ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
+// Note: libs - MIT license, runtime/3rd - various
+// ==============================================================================================
+// GPLv3:
+//
+// Yaksha - Programming Language.
+// Copyright (C) 2020 - 2023 Bhathiya Perera
+//
+// This program is free software: you can redistribute it and/or modify it under the terms
+// of the GNU General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+// or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see https://www.gnu.org/licenses/.
+//
+// ==============================================================================================
+// Additional Terms:
+//
+// Please note that any commercial use of the programming language's compiler source code
+// (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
+// with author of the language (Bhathiya Perera).
+//
+// If you are using it for an open source project, please give credits.
+// Your own project must use GPLv3 license with these additional terms.
+//
+// You may use programs written in Yaksha/YakshaLisp for any legal purpose
+// (commercial, open-source, closed-source, etc) as long as it agrees
+// to the licenses of linked runtime libraries (see compiler/runtime/README.md).
+//
+// ==============================================================================================
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "misc-no-recursion"
 // parser.cpp
@@ -451,9 +489,6 @@ token *parser::consume_or_eof(token_type t, const std::string &message) {
   throw error(peek(), message);
 }
 stmt *parser::declaration_statement() {
-  token *var_name = nullptr;
-  expr *exp = nullptr;
-  token *data_type = nullptr;
   try {
     if (match({token_type::KEYWORD_IMPORT})) { return import_statement(); }
     if (match({token_type::KEYWORD_RUNTIMEFEATURE})) {
@@ -465,44 +500,49 @@ stmt *parser::declaration_statement() {
     }
     if (match({token_type::AT})) { return attempt_parse_def_or_class(); }
     if (!match({token_type::NAME})) { return statement(); }
-    var_name = previous();
-    // Colon should come after name for a variable declaration
-    if (!match({token_type::COLON})) {
-      recede();
-      return statement();
-    }
-    auto dt = parse_datatype();
-    // `= expression` bit is optional
-    if (match({token_type::EQ})) {
-      if (check(token_type::KEYWORD_CCODE)) {
-        auto ccode_token = advance();
-        auto cc = peek();
-        if (!(token_type::STRING == cc->type_ ||
-              token_type::THREE_QUOTE_STRING == cc->type_)) {
-          throw error(ccode_token,
-                      "Expected ccode statement to have a string literal.");
-        }
-        if (!dt->is_const()) {
-          throw error(ccode_token, "Variable on LHS needs to be a const");
-        }
-        advance();
-        // We are in native constant
-        consume_or_eof(
-            token_type::NEW_LINE,
-            "Expect new line after code text for native const declaration.");
-        return pool_.c_nativeconst_stmt(var_name, dt, ccode_token, cc);
-      } else {
-        exp = expression();
-      }
-    }
-    consume_or_eof(token_type::NEW_LINE,
-                   "Expect new line after value for variable declaration.");
-    if (dt->is_const()) { return pool_.c_const_stmt(var_name, dt, exp); }
-    return pool_.c_let_stmt(var_name, dt, exp);
+    return parse_named_let_statement();
   } catch (parsing_error &ignored) {
     synchronize_parser();
     return nullptr;
   }
+}
+stmt *parser::parse_named_let_statement() {
+  token *var_name = nullptr;
+  expr *exp = nullptr;
+  var_name = previous();
+  // Colon should come after name for a variable declaration
+  if (!match({token_type::COLON})) {
+    recede();
+    return statement();
+  }
+  auto dt = parse_datatype();
+  // `= expression` bit is optional
+  if (match({token_type::EQ})) {
+    if (check(token_type::KEYWORD_CCODE)) {
+      auto ccode_token = advance();
+      auto cc = peek();
+      if (!(token_type::STRING == cc->type_ ||
+            token_type::THREE_QUOTE_STRING == cc->type_)) {
+        throw error(ccode_token,
+                    "Expected ccode statement to have a string literal.");
+      }
+      if (!dt->is_const()) {
+        throw error(ccode_token, "Variable on LHS needs to be a const");
+      }
+      advance();
+      // We are in native constant
+      consume_or_eof(
+          token_type::NEW_LINE,
+          "Expect new line after code text for native const declaration.");
+      return pool_.c_nativeconst_stmt(var_name, dt, ccode_token, cc);
+    } else {
+      exp = expression();
+    }
+  }
+  consume_or_eof(token_type::NEW_LINE,
+                 "Expect new line after value for variable declaration.");
+  if (dt->is_const()) { return pool_.c_const_stmt(var_name, dt, exp); }
+  return pool_.c_let_stmt(var_name, dt, exp);
 }
 expr *parser::assignment() {
   auto exp = or_op();
@@ -514,7 +554,8 @@ expr *parser::assignment() {
     auto val = assignment();
     if (exp->get_type() == ast_type::EXPR_VARIABLE) {
       auto name = (dynamic_cast<variable_expr *>(exp))->name_;
-      return pool_.c_assign_expr(name, assignment_operator, val, false);
+      return pool_.c_assign_expr(name, assignment_operator, val, false,
+                                 nullptr);
     } else if (exp->get_type() == ast_type::EXPR_GET) {
       auto get = (dynamic_cast<get_expr *>(exp));
       auto set_expr = pool_.c_set_expr(get->lhs_, get->dot_, get->item_);
@@ -579,6 +620,26 @@ stmt *parser::for_statement() {
     control_flow_--;
     return pool_.c_foreach_stmt(for_keyword, name, dt, in_k, for_source,
                                 for_body);
+  } else if (check(token_type::PAREN_OPEN)) {
+    // c-for
+    // for (x = 0; x < 5; x += 1) BLOCK
+    auto paren_open = consume(token_type::PAREN_OPEN, "'(' must be present");
+    expr *init_expr = nullptr;
+    expr *comparision_expr = nullptr;
+    expr *post_expr = nullptr;
+    token *semi1 = nullptr;
+    token *semi2 = nullptr;
+    if (!check(token_type::SEMICOLON)) { init_expr = expression(); }
+    semi1 = consume(token_type::SEMICOLON, "Semicolon must be present");
+    if (!check(token_type::SEMICOLON)) { comparision_expr = expression(); }
+    semi2 = consume(token_type::SEMICOLON, "Semicolon must be present");
+    if (!check(token_type::PAREN_CLOSE)) { post_expr = expression(); }
+    auto paren_close = consume(token_type::PAREN_CLOSE, "')' must be present");
+    auto for_body = block_statement();
+    control_flow_--;
+    return pool_.c_cfor_stmt(for_keyword, paren_open, init_expr, semi1,
+                             comparision_expr, semi2, post_expr, paren_close,
+                             for_body);
   }
   control_flow_--;
   throw error(for_keyword, "invalid for loop");
@@ -631,7 +692,7 @@ stmt *parser::def_statement(annotations ants) {
   auto return_dt = parse_datatype();
   auto body = dynamic_cast<block_stmt *>(block_statement());
   // Void function must have a return at the end to ensure strings are freed.
-  if (!ants.native_macro_ && !ants.native_ &&
+  if (!ants.native_macro_ && !ants.native_ && !ants.native_define_ &&
       return_dt->is_builtin_or_primitive() && return_dt->is_none()) {
     if (body->statements_.back()->get_type() != ast_type::STMT_RETURN) {
       body->statements_.emplace_back(
