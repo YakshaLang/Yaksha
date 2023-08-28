@@ -735,7 +735,7 @@ ykdatatype *parser::parse_datatype() {
     } while (match({token_type::COMMA}));
     consume(token_type::SQUARE_BRACKET_CLOSE, "Must have a closing ']'");
   }
-  if (dt->is_an_array() || dt->is_a_pointer() || dt->is_const() ||
+  if (dt->is_array() || dt->is_ptr() || dt->is_const() ||
       dt->is_sm_entry()) {
     if (dt->args_.size() != 1) {
       throw error(
@@ -911,7 +911,7 @@ stmt *parser::import_statement() {
 }
 void parser::rescan_datatypes() {
   for (auto &dt : datatypes_from_modules_) {
-    if (dt->is_builtin_or_primitive()) continue;
+    if (dt->const_unwrap()->is_builtin_or_primitive()) continue;
     auto import_alias = dt->module_;
     auto module_data = import_stmts_alias_[import_alias];
     dt->module_ = module_data->data_->filepath_.string();

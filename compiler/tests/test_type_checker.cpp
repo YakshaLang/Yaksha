@@ -5,36 +5,36 @@
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
 // GPLv3:
-// 
+//
 // Yaksha - Programming Language.
 // Copyright (C) 2020 - 2023 Bhathiya Perera
-// 
+//
 // This program is free software: you can redistribute it and/or modify it under the terms
 // of the GNU General Public License as published by the Free Software Foundation,
 // either version 3 of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License along with this program.
 // If not, see https://www.gnu.org/licenses/.
-// 
+//
 // ==============================================================================================
 // Additional Terms:
-// 
+//
 // Please note that any commercial use of the programming language's compiler source code
 // (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
 // with author of the language (Bhathiya Perera).
-// 
+//
 // If you are using it for an open source project, please give credits.
 // Your own project must use GPLv3 license with these additional terms.
-// 
+//
 // You may use programs written in Yaksha/YakshaLisp for any legal purpose
 // (commercial, open-source, closed-source, etc) as long as it agrees
 // to the licenses of linked runtime libraries (see compiler/runtime/README.md).
-// 
+//
 // ==============================================================================================
 #include "catch2/catch.hpp"
 #include "compiler/multifile_compiler.h"
@@ -134,7 +134,7 @@ TEST_CASE("type checker: First argument must be a string literal for arrnew(). "
       "First argument to arrnew() must be a string literal");
 }
 TEST_CASE("type checker: Second argument must be int for arrnew()") {
-  test_typechecker_snippet("a: Array[int] = arrnew(\"int\", \"10\")",
+  test_typechecker_snippet(R"(a: Array[int] = arrnew("int", "10"))",
                            "Second argument to arrnew() must be an int");
 }
 TEST_CASE("type checker: Must assign to proper data structure for arrnew()") {
@@ -215,55 +215,61 @@ TEST_CASE(
       "    return 0",
       "Binary operation between two different data types are not supported");
 }
-TEST_CASE(
-    "type checker: str constants are not supported") {
-  test_typechecker_snippet_full(
-      "A:Const[str] = \"hello\"\n"
-      "def main() -> int:\n"
-      "    a: int = 1\n"
-      "    b: bool = a == A\n"
-      "    return 0",
-      "Only number/bool/sr constants are supported");
+TEST_CASE("type checker: str constants are not supported") {
+  test_typechecker_snippet_full("A:Const[str] = \"hello\"\n"
+                                "def main() -> int:\n"
+                                "    a: int = 1\n"
+                                "    b: bool = a == A\n"
+                                "    return 0",
+                                "Only number/bool/sr constants are supported");
 }
-TEST_CASE(
-    "type checker: sr constants are supported") {
-  test_typechecker_snippet_full_ok(
-      "A:Const[sr] = \"hello\"\n"
-      "def main() -> int:\n"
-      "    return 0");
+TEST_CASE("type checker: sr constants are supported") {
+  test_typechecker_snippet_full_ok("A:Const[sr] = \"hello\"\n"
+                                   "def main() -> int:\n"
+                                   "    return 0");
 }
 TEST_CASE("type checker: different type of numbers used in operators bitwise") {
-  test_typechecker_snippet(
-      "a: int = 1\n"
-      "    b: i8 = a & 1i8\n",
-      "Cannot assign between 2 different data types.");
+  test_typechecker_snippet("a: int = 1\n"
+                           "    b: i8 = a & 1i8\n",
+                           "Cannot assign between 2 different data types.");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators mul/div/rem") {
-  test_typechecker_snippet(
-      "a: int = 1\n"
-      "    b: i8 = a * 1i8\n",
-      "Cannot assign between 2 different data types.");
+  test_typechecker_snippet("a: int = 1\n"
+                           "    b: i8 = a * 1i8\n",
+                           "Cannot assign between 2 different data types.");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators comparison") {
-  test_typechecker_snippet_ok(
-      "a: i8 = 1i8\n"
-      "    b: bool = a <= 77346\n");
-  test_typechecker_snippet_ok(
-      "a: int = 1\n"
-      "    b: bool = a <= 1i8\n");
-  test_typechecker_snippet(
-      "a: int = 1\n"
-      "    b: bool = a <= \"gah\"\n",
-      "< > <= >= operators work only for numbers");
+  test_typechecker_snippet_ok("a: i8 = 1i8\n"
+                              "    b: bool = a <= 77346\n");
+  test_typechecker_snippet_ok("a: int = 1\n"
+                              "    b: bool = a <= 1i8\n");
+  test_typechecker_snippet("a: int = 1\n"
+                           "    b: bool = a <= \"gah\"\n",
+                           "< > <= >= operators work only for numbers");
 }
-TEST_CASE("type checker: + operator does not work for anything other than "
-          "numbers and str") {
+TEST_CASE("type checker: + operator with just 2 booleans") {
   test_typechecker_snippet(
       "a: bool = True\n"
       "    b: bool = a + False\n",
-      "+ operator works only for numbers of same type or strings");
+      "+ operator works only for numbers of same type or strings,"
+      " (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+}
+TEST_CASE("type checker: + operator with just 2 booleans (one is const)") {
+  test_typechecker_snippet(
+      "a: Const[bool] = True\n"
+      "    b: bool = a + False\n",
+      "+ operator works only for numbers of same type or strings,"
+      " (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+}
+TEST_CASE("type checker: + operator with just 2 booleans (both are const)") {
+  test_typechecker_snippet(
+      "a: Const[bool] = True\n"
+      "    b: Const[bool] = False\n"
+      "    c: Const[bool] = a + b\n",
+      "+ operator works only for numbers of same type or strings,"
+      " (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
 }
 TEST_CASE("type checker: cannot compare tuples with ==") {
   test_typechecker_snippet(
@@ -335,16 +341,16 @@ TEST_CASE("type checker: func call too much arguments") {
 }
 TEST_CASE("type checker: func call parameter and argument mismatches") {
   test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
-                                "    pass\n"
-                                "def main() -> int:\n"
-                                "    fnc(1, False)\n"
-                                "    return 0");
-  test_typechecker_snippet_full("def fnc(a: i8, b: int) -> None:\n"
                                    "    pass\n"
                                    "def main() -> int:\n"
-                                   "    fnc(1i32, False)\n"
-                                   "    return 0",
-                                   "Parameter & argument 1 mismatches");
+                                   "    fnc(1, False)\n"
+                                   "    return 0");
+  test_typechecker_snippet_full("def fnc(a: i8, b: int) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    fnc(1i32, False)\n"
+                                "    return 0",
+                                "Parameter & argument 1 mismatches");
   test_typechecker_snippet_full("def fnc(a: int, b: i8) -> None:\n"
                                 "    pass\n"
                                 "def main() -> int:\n"
@@ -355,10 +361,10 @@ TEST_CASE("type checker: func call parameter and argument mismatches") {
 TEST_CASE("type checker: func call parameter and argument mismatches first "
           "argument") {
   test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
-                                "    pass\n"
-                                "def main() -> int:\n"
-                                "    fnc(False, 3)\n"
-                                "    return 0");
+                                   "    pass\n"
+                                   "def main() -> int:\n"
+                                   "    fnc(False, 3)\n"
+                                   "    return 0");
   test_typechecker_snippet_full("def fnc(a: i8, b: int) -> None:\n"
                                 "    pass\n"
                                 "def main() -> int:\n"
@@ -369,12 +375,12 @@ TEST_CASE("type checker: func call parameter and argument mismatches first "
 TEST_CASE(
     "type checker: func call parameter and argument mismatches for varargs") {
   test_typechecker_snippet_full_ok("@nativedefine(\"test\")\n"
-                                "@varargs\n"
-                                "def fnc(a: int, b: int) -> None:\n"
-                                "    pass\n"
-                                "def main() -> int:\n"
-                                "    fnc(1, 3, 2, 3, False)\n"
-                                "    return 0");
+                                   "@varargs\n"
+                                   "def fnc(a: int, b: int) -> None:\n"
+                                   "    pass\n"
+                                   "def main() -> int:\n"
+                                   "    fnc(1, 3, 2, 3, False)\n"
+                                   "    return 0");
   test_typechecker_snippet_full("@nativedefine(\"test\")\n"
                                 "@varargs\n"
                                 "def fnc(a: int, b: int) -> None:\n"
@@ -385,13 +391,12 @@ TEST_CASE(
                                 "Variable argument: 5 mismatches");
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
-  test_typechecker_snippet_full_ok(
-      "def fnc(a: int, b: int) -> None:\n"
-      "    pass\n"
-      "def main() -> int:\n"
-      "    f1: Function[In[int,int],Out] = fnc\n"
-      "    f1(1, False)\n"
-      "    return 0");
+  test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
+                                   "    pass\n"
+                                   "def main() -> int:\n"
+                                   "    f1: Function[In[int,int],Out] = fnc\n"
+                                   "    f1(1, False)\n"
+                                   "    return 0");
   test_typechecker_snippet_full(
       "def fnc(a: int, b: i8) -> None:\n"
       "    pass\n"
@@ -403,13 +408,12 @@ TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches first "
           "argument") {
-  test_typechecker_snippet_full_ok(
-      "def fnc(a: int, b: int) -> None:\n"
-      "    pass\n"
-      "def main() -> int:\n"
-      "    f1: Function[In[int,int],Out] = fnc\n"
-      "    f1(False, 1)\n"
-      "    return 0");
+  test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
+                                   "    pass\n"
+                                   "def main() -> int:\n"
+                                   "    f1: Function[In[int,int],Out] = fnc\n"
+                                   "    f1(False, 1)\n"
+                                   "    return 0");
   test_typechecker_snippet_full(
       "def fnc(a: i8, b: int) -> None:\n"
       "    pass\n"
@@ -698,5 +702,36 @@ TEST_CASE("type checker: Certain comparisions are not allowed") {
                                 "        b += \"x\"\n"
                                 "        println(b)\n"
                                 "    return 0\n",
-                                "Failed to compile c like for loop, this comparison expression cannot be used here.");
+                                "Failed to compile c like for loop, this "
+                                "comparison expression cannot be used here.");
+}
+TEST_CASE("type checker: Widening u8 + i8 cannot happen") {
+  test_typechecker_snippet(
+      "a = 1i8 + 2u8",
+      "+ operator works only for numbers of same type or strings, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+}
+TEST_CASE("type checker: Widening u8 + i16 can happen") {
+  test_typechecker_snippet_ok("a: i16 = 2u8 + 1i16");
+}
+TEST_CASE("type checker: Widening u8 + i32 can happen") {
+  test_typechecker_snippet_ok("a: i32 = 2u8 + 1i32");
+}
+TEST_CASE("type checker: Widening u8 + i64 can happen") {
+  test_typechecker_snippet_ok("a = 2u8 + 1i64");
+}
+TEST_CASE("type checker: Widening u16 + i8 cannot happen") {
+  test_typechecker_snippet(
+      "a = 2u16 + 1i8",
+      "+ operator works only for numbers of same type or strings, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+}
+TEST_CASE("type checker: Widening u16 + i16 cannot happen") {
+  test_typechecker_snippet(
+      "a = 2u16 + 1i16",
+      "+ operator works only for numbers of same type or strings, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+}
+TEST_CASE("type checker: Widening u16 + i32 can happen") {
+  test_typechecker_snippet_ok("a = 2u16 + 1i32");
+}
+TEST_CASE("type checker: Widening u16 + i64 can happen") {
+  test_typechecker_snippet_ok("a: i64 = 2u16 + 1i64");
 }
