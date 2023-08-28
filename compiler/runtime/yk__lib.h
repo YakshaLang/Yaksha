@@ -3583,3 +3583,8 @@ int yk__quicksort(void *arr, size_t item_size, size_t elements,
 #include "_include_bstr.c"
 #endif
 #endif
+#ifndef YAKSHA_SKIP_2S_COMPLIMENT_CHECK
+#if (-1 & 3) != 3
+#error "Yaksha expects 2's compliment"
+#endif
+#endif
