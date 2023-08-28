@@ -59,7 +59,7 @@ struct builtin_arrput : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for arrput() builtin";
-    } else if (!args[0].datatype_->is_an_array()) {
+    } else if (!args[0].datatype_->is_array()) {
       o.string_val_ = "First argument to arrput() must be an Array[?]";
     } else if (*(args[0].datatype_->args_[0]) !=
                *args[1].datatype_->const_unwrap()) {
@@ -115,7 +115,7 @@ struct builtin_arrpop : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for arrpop() builtin";
-    } else if (!args[0].datatype_->is_an_array()) {
+    } else if (!args[0].datatype_->is_array()) {
       o.string_val_ = "Argument to arrpop() must be an Array[?]";
     } else if (args[0].datatype_->args_[0]->is_m_entry() ||
                args[0].datatype_->args_[0]->is_sm_entry()) {
@@ -163,7 +163,7 @@ struct builtin_arrsetlencap : builtin {
     if (args.size() != 2) {
       o.string_val_ =
           "Two arguments must be provided for " + func_name_ + "() builtin";
-    } else if (!args[0].datatype_->is_an_array()) {
+    } else if (!args[0].datatype_->is_array()) {
       o.string_val_ =
           "First argument to " + func_name_ + "() must be an Array[?]";
     } else if (args[0].datatype_->args_[0]->is_m_entry() ||
@@ -288,7 +288,7 @@ struct builtin_len : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for len() builtin";
-    } else if (!args[0].datatype_->const_unwrap()->is_an_array() &&
+    } else if (!args[0].datatype_->const_unwrap()->is_array() &&
                !args[0].datatype_->const_unwrap()->is_a_string()) {
       o.string_val_ = "Argument to len() must be an Array or a string";
     } else {
@@ -315,14 +315,14 @@ struct builtin_len : builtin {
       code << u.size();
     } else if (args[0].second.datatype_->const_unwrap()->is_sr()) {
       code << "yk__bstr_len(" << args[0].first << ")";
-    } else if (args[0].second.datatype_->const_unwrap()->is_an_array() &&
+    } else if (args[0].second.datatype_->const_unwrap()->is_array() &&
                args[0]
                    .second.datatype_->const_unwrap()
                    ->args_[0]
                    ->is_sm_entry()) {
       // Array[SMEntry[V]]
       code << "yk__shlen(" << args[0].first << ")";
-    } else if (args[0].second.datatype_->const_unwrap()->is_an_array() &&
+    } else if (args[0].second.datatype_->const_unwrap()->is_array() &&
                args[0]
                    .second.datatype_->const_unwrap()
                    ->args_[0]
@@ -441,7 +441,7 @@ struct builtin_unref : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for unref() builtin";
-    } else if (!args[0].datatype_->is_a_pointer()) {
+    } else if (!args[0].datatype_->is_ptr()) {
       o.string_val_ = "Argument to unref() must be a Ptr[?]";
     } else {
       return ykobject(args[0].datatype_->args_[0]);
@@ -480,7 +480,7 @@ struct builtin_shnew : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for shnew() builtin";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                !args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ = "Argument to shnew() must match with Array[SMEntry[?]]";
     } else {
@@ -519,7 +519,7 @@ struct builtin_shget : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for shget() builtin";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                !args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ =
           "First argument to shget() must match with Array[SMEntry[?]]";
@@ -566,7 +566,7 @@ struct builtin_shgeti : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for shgeti() builtin";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                !args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ =
           "First argument to shgeti() must match with Array[SMEntry[?]]";
@@ -613,7 +613,7 @@ struct builtin_shput : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "Three arguments must be provided for shput() builtin";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                !args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ =
           "First argument to shput() must match with Array[SMEntry[?]]";
@@ -726,7 +726,7 @@ struct builtin_hmnew : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for hmnew() builtin";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ = "Argument to hmnew() must match with Array[MEntry[K,V]]";
     } else {
@@ -763,7 +763,7 @@ struct builtin_hmget : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for hmget() builtin";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ =
           "First argument to hmget() must match with Array[MEntry[K,V]]";
@@ -808,7 +808,7 @@ struct builtin_hmgeti : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for hmgeti() builtin";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ =
           "First argument to hmgeti() must match with Array[MEntry[K,V]]";
@@ -853,7 +853,7 @@ struct builtin_hmput : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "Three arguments must be provided for hmput() builtin";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ =
           "First argument to hmput() must match with Array[MEntry[K,V]]";
@@ -902,7 +902,7 @@ struct builtin_qsort : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for sort() builtin";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                (args[0].datatype_->args_[0]->is_m_entry() ||
                 args[0].datatype_->args_[0]->is_m_entry())) {
       o.string_val_ = "First argument to sort() must be an Array[T]";
@@ -1200,7 +1200,7 @@ struct builtin_functional : builtin {
     auto o = ykobject(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = name_ + "() builtin expects 3 arguments";
-    } else if (!args[0].datatype_->is_an_array() ||
+    } else if (!args[0].datatype_->is_array() ||
                args[0].datatype_->args_[0]->is_m_entry() ||
                args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ = "First argument to " + name_ + "() must be a an Array[T]";

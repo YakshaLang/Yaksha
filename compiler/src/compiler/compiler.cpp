@@ -125,13 +125,13 @@ void compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
     body_ << lhs.first << " = " << prefix_function_arg(rhs);
   } else if (rhs.second.is_primitive_or_obj() &&
              operator_token->type_ == token_type::MOD_EQ &&
-             rhs.second.datatype_->is_f32()) {
+             rhs.second.datatype_->const_unwrap()->is_f32()) {
     // f32 %=
     body_ << lhs.first << " = "
           << "remainderf(" << lhs.first + ", " + rhs.first + ")";
   } else if (rhs.second.is_primitive_or_obj() &&
              operator_token->type_ == token_type::MOD_EQ &&
-             rhs.second.datatype_->is_f64()) {
+             rhs.second.datatype_->const_unwrap()->is_f64()) {
     // f64 %=
     body_ << lhs.first << " = "
           << "remainder(" << lhs.first + ", " + rhs.first + ")";
@@ -341,11 +341,11 @@ void compiler::compile_simple_bin_op(
     const binary_expr *obj, const token_type &operator_type,
     const std::pair<std::string, ykobject> &lhs,
     const std::pair<std::string, ykobject> &rhs) {
-  if (lhs.second.is_primitive_or_obj() && lhs.second.datatype_->is_f32() &&
+  if (lhs.second.is_primitive_or_obj() && lhs.second.datatype_->const_unwrap()->is_f32() &&
       obj->opr_->type_ == token_type::MOD) {// Float %
     push("remainderf(" + lhs.first + ", " + rhs.first + ")", lhs.second);
   } else if (lhs.second.is_primitive_or_obj() &&
-             lhs.second.datatype_->is_f64() &&
+             lhs.second.datatype_->const_unwrap()->is_f64() &&
              obj->opr_->type_ == token_type::MOD) {// Double %
     push("remainder(" + lhs.first + ", " + rhs.first + ")", lhs.second);
   } else if (operator_type == token_type::LESS ||
@@ -1059,7 +1059,7 @@ void compiler::visit_let_stmt(let_stmt *obj) {
             << " = ((struct yk__bstr){.s = YK__EMPTY_STRING_BSTR,"
                " .l = 0, .t = yk__bstr_static})";
     }
-  } else if (obj->data_type_->is_an_array()) {
+  } else if (obj->data_type_->is_array()) {
     object = ykobject(obj->data_type_);
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
@@ -1210,7 +1210,7 @@ std::string compiler::temp(const std::string &custom_prefix) {
   return name;
 }
 std::string compiler::convert_dt(ykdatatype *basic_dt) {
-  if (basic_dt->is_an_array() || basic_dt->is_a_pointer()) {
+  if (basic_dt->is_array() || basic_dt->is_ptr()) {
     // int32_t*, yk__sds*, etc
     return convert_dt(basic_dt->args_[0]) + "*";
   } else if (basic_dt->is_const()) {
@@ -1225,7 +1225,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "int8_t";
   } else if (basic_dt->is_i16()) {
     return "int16_t";
-  } else if (basic_dt->is_int() || basic_dt->is_i32()) {
+  } else if (basic_dt->is_i32()) {
     return "int32_t";
   } else if (basic_dt->is_i64()) {
     return "int64_t";
@@ -1241,7 +1241,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
     return "bool";
   } else if (basic_dt->is_none()) {
     return "void";
-  } else if (basic_dt->is_float() || basic_dt->is_f32()) {
+  } else if (basic_dt->is_f32()) {
     return "float";
   } else if (basic_dt->is_f64()) {
     return "double";
@@ -1388,13 +1388,13 @@ void compiler::visit_del_stmt(del_stmt *obj) {
   obj->expression_->accept(this);
   auto name = pop();
   if (name.second.is_primitive_or_obj() &&
-      name.second.datatype_->is_primitive() &&
-      !name.second.datatype_->is_str() &&
+      name.second.datatype_->const_unwrap()->is_primitive() &&
+      !name.second.datatype_->const_unwrap()->is_str() &&
       !name.second.datatype_->const_unwrap()->is_sr()) {
     return;
   }
   write_indent(body_);
-  if (name.second.datatype_->is_an_array()) {
+  if (name.second.datatype_->is_array()) {
     if (name.second.datatype_->args_[0]->is_sm_entry()) {
       body_ << "yk__shfree(" << name.first << ")";
     } else if (name.second.datatype_->args_[0]->is_m_entry()) {
@@ -1521,7 +1521,7 @@ void compiler::visit_square_bracket_access_expr(
   auto rhs = pop();
   obj->name_->accept(this);
   auto lhs = pop();
-  if (lhs.second.datatype_->is_an_array()) {
+  if (lhs.second.datatype_->is_array()) {
     auto b = ykobject(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {
@@ -1540,7 +1540,7 @@ void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
   auto rhs = pop();
   obj->name_->accept(this);
   auto lhs = pop();
-  if (lhs.second.datatype_->is_an_array()) {
+  if (lhs.second.datatype_->is_array()) {
     auto b = ykobject(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {

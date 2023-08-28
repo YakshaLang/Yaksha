@@ -407,7 +407,7 @@ bool multifile_compiler::has_invalid_main_func(
       std::cerr << "Critical !! main() function must not have parameters";
       has_errors = true;
     }
-    if (!main_function->return_type_->is_int()) {
+    if (!main_function->return_type_->is_i32()) {
       std::cerr << "Critical !! main() function must return an integer";
       has_errors = true;
     }

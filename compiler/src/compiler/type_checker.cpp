@@ -140,7 +140,7 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
     case token_type::SHL:
     case token_type::SHR:
       if (!(DT_VERIFY(castable, lhs, rhs, a->is_an_integer()))) {
-        error(obj->opr_, "^ & | << >> operators work only for integers");
+        error(obj->opr_, "^ & | << >> operators work only for integers, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
       } else if (castable != nullptr) {
         rhs.datatype_ = castable;
       }
@@ -150,7 +150,7 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
     case token_type::MUL:
     case token_type::SUB:
       if (!(DT_VERIFY(castable, lhs, rhs, a->is_a_number()))) {
-        error(obj->opr_, "% - * / operators work only for numbers");
+        error(obj->opr_, "% - * / operators work only for numbers, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
       } else if (castable != nullptr) {
         rhs.datatype_ = castable;
       }
@@ -164,7 +164,7 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
       }
       if (!(DT_MATCH(lhs, rhs, (a->is_a_number() || a->is_a_string())))) {
         error(obj->opr_,
-              "+ operator works only for numbers of same type or strings");
+              "+ operator works only for numbers of same type or strings, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
       }
       if (lhs.datatype_->const_unwrap()->is_sr()) {// sr + sr -> str
         push(ykobject(dt_pool_->create("str")));
@@ -204,8 +204,8 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
         } else {
           to_comp = lhs.datatype_->const_unwrap();
         }
-        if (!(to_comp->is_any_ptr() || to_comp->is_an_array() ||
-              to_comp->is_a_string() || to_comp->is_a_pointer() ||
+        if (!(to_comp->is_any_ptr() || to_comp->is_array() ||
+              to_comp->is_a_string() || to_comp->is_ptr() ||
               to_comp->is_any_ptr_to_const() || to_comp->is_none() ||
               !to_comp->is_builtin_or_primitive())) {
           error(obj->opr_, "Datatype cannot be compared with None");
@@ -764,7 +764,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     push(obj);
     return;
   }
-  if (!lhs.is_primitive_or_obj() || lhs.datatype_->is_primitive()) {
+  if (!lhs.is_primitive_or_obj() || lhs.datatype_->const_unwrap()->is_primitive()) {
     error(dot, "Invalid dot operator, LHS need to be an object");
     push(ykobject(dt_pool_));
     return;
@@ -814,7 +814,7 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
   name_expr->accept(this);
   auto arr_var = pop();
   ykdatatype *arr_data_type = arr_var.datatype_->const_unwrap();
-  if (arr_data_type->is_an_array() || arr_data_type->is_a_pointer()) {
+  if (arr_data_type->is_array() || arr_data_type->is_ptr()) {
     auto placeholder = ykobject(dt_pool_);
     placeholder.datatype_ = arr_data_type->args_[0];
     // --- OK ---
@@ -850,7 +850,7 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
     // --- OK ---
     push(placeholder);
     if (placeholder.datatype_->is_const() && mutate) {
-      error(sqb_token, "Mutating an imutable element");
+      error(sqb_token, "Mutating an immutable element");
     }
     return;
   }
@@ -1024,10 +1024,10 @@ void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {
 void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
-  if (!exp.datatype_->is_an_array()) {
+  if (!exp.datatype_->is_array()) {
     error(obj->for_keyword_, "foreach iteration must use an array");
   }
-  if ((exp.datatype_->is_an_array() &&
+  if ((exp.datatype_->is_array() &&
        (exp.datatype_->args_[0]->is_sm_entry() ||
         exp.datatype_->args_[0]->is_m_entry()))) {
     error(obj->for_keyword_,
@@ -1065,7 +1065,7 @@ void type_checker::visit_compins_stmt(compins_stmt *obj) {
 }
 class_stmt *type_checker::find_class(token *tok, ykdatatype *data_type) {
   // If this is a primitive / builtin it is not a user defined class
-  if (data_type->is_builtin_or_primitive()) {
+  if (data_type->const_unwrap()->is_builtin_or_primitive()) {
     error(tok, "primitives/builtins cannot be created as a struct literal");
     return nullptr;
   }
