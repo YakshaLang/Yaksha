@@ -13,12 +13,15 @@ public interface YakshaTypes {
   IElementType ANNOTATION_ARG = new YakshaElementType("ANNOTATION_ARG");
   IElementType ANY_WS = new YakshaElementType("ANY_WS");
   IElementType ARGUMENTS = new YakshaElementType("ARGUMENTS");
+  IElementType ASSIGNMENT_OPER = new YakshaElementType("ASSIGNMENT_OPER");
   IElementType ASSIGNMENT_STATEMENT = new YakshaElementType("ASSIGNMENT_STATEMENT");
   IElementType ASSIGNMENT_STATEMENT_WO_INDENT = new YakshaElementType("ASSIGNMENT_STATEMENT_WO_INDENT");
   IElementType BITWISE = new YakshaElementType("BITWISE");
   IElementType BREAK_STATEMENT = new YakshaElementType("BREAK_STATEMENT");
   IElementType CCODE_STATEMENT = new YakshaElementType("CCODE_STATEMENT");
   IElementType CCODE_STATEMENT_WO_INDENT = new YakshaElementType("CCODE_STATEMENT_WO_INDENT");
+  IElementType CFOR_EXPR = new YakshaElementType("CFOR_EXPR");
+  IElementType CFOR_STATEMENT = new YakshaElementType("CFOR_STATEMENT");
   IElementType CLASS_BITS = new YakshaElementType("CLASS_BITS");
   IElementType CLASS_BLOCK = new YakshaElementType("CLASS_BLOCK");
   IElementType CLASS_FIELD = new YakshaElementType("CLASS_FIELD");
@@ -143,6 +146,7 @@ public interface YakshaTypes {
   IElementType OPERATOR_PLUS_EQ = new YakshaTokenType("OPERATOR_PLUS_EQ");
   IElementType OPERATOR_REMAINDER = new YakshaTokenType("OPERATOR_REMAINDER");
   IElementType OPERATOR_REMAINDER_EQ = new YakshaTokenType("OPERATOR_REMAINDER_EQ");
+  IElementType OPERATOR_SEMICOLON = new YakshaTokenType("OPERATOR_SEMICOLON");
   IElementType OPERATOR_SHL = new YakshaTokenType("OPERATOR_SHL");
   IElementType OPERATOR_SHL_EQ = new YakshaTokenType("OPERATOR_SHL_EQ");
   IElementType OPERATOR_SHR = new YakshaTokenType("OPERATOR_SHR");
@@ -169,6 +173,9 @@ public interface YakshaTypes {
       else if (type == ARGUMENTS) {
         return new YakshaArgumentsImpl(node);
       }
+      else if (type == ASSIGNMENT_OPER) {
+        return new YakshaAssignmentOperImpl(node);
+      }
       else if (type == ASSIGNMENT_STATEMENT) {
         return new YakshaAssignmentStatementImpl(node);
       }
@@ -186,6 +193,12 @@ public interface YakshaTypes {
       }
       else if (type == CCODE_STATEMENT_WO_INDENT) {
         return new YakshaCcodeStatementWoIndentImpl(node);
+      }
+      else if (type == CFOR_EXPR) {
+        return new YakshaCforExprImpl(node);
+      }
+      else if (type == CFOR_STATEMENT) {
+        return new YakshaCforStatementImpl(node);
       }
       else if (type == CLASS_BITS) {
         return new YakshaClassBitsImpl(node);

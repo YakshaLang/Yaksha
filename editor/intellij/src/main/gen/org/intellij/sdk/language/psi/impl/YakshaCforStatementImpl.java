@@ -11,14 +11,14 @@ import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
 
-public class YakshaAssignmentStatementWoIndentImpl extends ASTWrapperPsiElement implements YakshaAssignmentStatementWoIndent {
+public class YakshaCforStatementImpl extends ASTWrapperPsiElement implements YakshaCforStatement {
 
-  public YakshaAssignmentStatementWoIndentImpl(@NotNull ASTNode node) {
+  public YakshaCforStatementImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YakshaVisitor visitor) {
-    visitor.visitAssignmentStatementWoIndent(this);
+    visitor.visitCforStatement(this);
   }
 
   @Override
@@ -29,14 +29,20 @@ public class YakshaAssignmentStatementWoIndentImpl extends ASTWrapperPsiElement 
 
   @Override
   @NotNull
-  public YakshaAssignmentOper getAssignmentOper() {
-    return findNotNullChildByClass(YakshaAssignmentOper.class);
+  public List<YakshaCforExpr> getCforExprList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaCforExpr.class);
   }
 
   @Override
   @NotNull
-  public List<YakshaExp> getExpList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaExp.class);
+  public YakshaDefBlock getDefBlock() {
+    return findNotNullChildByClass(YakshaDefBlock.class);
+  }
+
+  @Override
+  @Nullable
+  public YakshaExp getExp() {
+    return findChildByClass(YakshaExp.class);
   }
 
 }

@@ -247,6 +247,28 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
+  //                                        OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ
+  public static boolean assignment_oper(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment_oper")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, ASSIGNMENT_OPER, "<assignment oper>");
+    r = consumeToken(b, OPERATOR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_PLUS_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_MINUS_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_MUL_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_DIV_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_REMAINDER_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_SHL_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_SHR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_B_AND_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_B_OR_EQ);
+    if (!r) r = consumeToken(b, OPERATOR_B_XOR_EQ);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // I assignment_statement_wo_indent
   public static boolean assignment_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignment_statement")) return false;
@@ -260,15 +282,14 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
-  //  OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
+  // exp S? assignment_oper S? exp S? NL
   public static boolean assignment_statement_wo_indent(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignment_statement_wo_indent")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ASSIGNMENT_STATEMENT_WO_INDENT, "<assignment statement wo indent>");
     r = exp(b, l + 1);
     r = r && assignment_statement_wo_indent_1(b, l + 1);
-    r = r && assignment_statement_wo_indent_2(b, l + 1);
+    r = r && assignment_oper(b, l + 1);
     r = r && assignment_statement_wo_indent_3(b, l + 1);
     r = r && exp(b, l + 1);
     r = r && assignment_statement_wo_indent_5(b, l + 1);
@@ -282,25 +303,6 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "assignment_statement_wo_indent_1")) return false;
     consumeToken(b, S);
     return true;
-  }
-
-  // OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
-  //  OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ
-  private static boolean assignment_statement_wo_indent_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment_statement_wo_indent_2")) return false;
-    boolean r;
-    r = consumeToken(b, OPERATOR_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_PLUS_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_MINUS_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_MUL_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_DIV_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_REMAINDER_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_SHL_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_SHR_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_B_AND_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_B_OR_EQ);
-    if (!r) r = consumeToken(b, OPERATOR_B_XOR_EQ);
-    return r;
   }
 
   // S?
@@ -450,6 +452,144 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   // S?
   private static boolean ccode_statement_wo_indent_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ccode_statement_wo_indent_3")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // exp assignment_oper exp | exp
+  public static boolean cfor_expr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_expr")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, CFOR_EXPR, "<cfor expr>");
+    r = cfor_expr_0(b, l + 1);
+    if (!r) r = exp(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // exp assignment_oper exp
+  private static boolean cfor_expr_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_expr_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = exp(b, l + 1);
+    r = r && assignment_oper(b, l + 1);
+    r = r && exp(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // I KW_FOR S? OPERATOR_OPEN_P S? cfor_expr? S? OPERATOR_SEMICOLON S? exp? S? OPERATOR_SEMICOLON S? cfor_expr? S? OPERATOR_CLOSE_P S? OPERATOR_COLON S? def_block
+  public static boolean cfor_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement")) return false;
+    if (!nextTokenIs(b, I)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, I, KW_FOR);
+    r = r && cfor_statement_2(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_OPEN_P);
+    r = r && cfor_statement_4(b, l + 1);
+    r = r && cfor_statement_5(b, l + 1);
+    r = r && cfor_statement_6(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_SEMICOLON);
+    r = r && cfor_statement_8(b, l + 1);
+    r = r && cfor_statement_9(b, l + 1);
+    r = r && cfor_statement_10(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_SEMICOLON);
+    r = r && cfor_statement_12(b, l + 1);
+    r = r && cfor_statement_13(b, l + 1);
+    r = r && cfor_statement_14(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_CLOSE_P);
+    r = r && cfor_statement_16(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_COLON);
+    r = r && cfor_statement_18(b, l + 1);
+    r = r && def_block(b, l + 1);
+    exit_section_(b, m, CFOR_STATEMENT, r);
+    return r;
+  }
+
+  // S?
+  private static boolean cfor_statement_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_2")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean cfor_statement_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_4")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // cfor_expr?
+  private static boolean cfor_statement_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_5")) return false;
+    cfor_expr(b, l + 1);
+    return true;
+  }
+
+  // S?
+  private static boolean cfor_statement_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_6")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean cfor_statement_8(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_8")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // exp?
+  private static boolean cfor_statement_9(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_9")) return false;
+    exp(b, l + 1);
+    return true;
+  }
+
+  // S?
+  private static boolean cfor_statement_10(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_10")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean cfor_statement_12(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_12")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // cfor_expr?
+  private static boolean cfor_statement_13(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_13")) return false;
+    cfor_expr(b, l + 1);
+    return true;
+  }
+
+  // S?
+  private static boolean cfor_statement_14(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_14")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean cfor_statement_16(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_16")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean cfor_statement_18(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfor_statement_18")) return false;
     consumeToken(b, S);
     return true;
   }
@@ -660,7 +800,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? (KW_CCODE S? STRING| literal) S? NL
+  // IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? (KW_CCODE? S? STRING| literal) S? NL
   public static boolean const_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "const_statement")) return false;
     if (!nextTokenIs(b, IDENTIFIER)) return false;
@@ -709,7 +849,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // KW_CCODE S? STRING| literal
+  // KW_CCODE? S? STRING| literal
   private static boolean const_statement_8(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "const_statement_8")) return false;
     boolean r;
@@ -720,16 +860,23 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // KW_CCODE S? STRING
+  // KW_CCODE? S? STRING
   private static boolean const_statement_8_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "const_statement_8_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, KW_CCODE);
+    r = const_statement_8_0_0(b, l + 1);
     r = r && const_statement_8_0_1(b, l + 1);
     r = r && consumeToken(b, STRING);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  // KW_CCODE?
+  private static boolean const_statement_8_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "const_statement_8_0_0")) return false;
+    consumeToken(b, KW_CCODE);
+    return true;
   }
 
   // S?
@@ -931,7 +1078,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement
-  //   | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
+  //   | forendless_statement | cfor_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
   //   | let_statement | empty_line | continue_statement | break_statement | dsl_inner_block | COMMENT
   public static boolean def_bits(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "def_bits")) return false;
@@ -945,6 +1092,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = while_statement(b, l + 1);
     if (!r) r = foreach_statement(b, l + 1);
     if (!r) r = forendless_statement(b, l + 1);
+    if (!r) r = cfor_statement(b, l + 1);
     if (!r) r = del_statement(b, l + 1);
     if (!r) r = defer_statement(b, l + 1);
     if (!r) r = return_statement(b, l + 1);

@@ -41,7 +41,7 @@ import_statement ::= KW_IMPORT S IDENTIFIER (OPERATOR_DOT IDENTIFIER)* (S KW_AS 
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
     methods=[getImportPath getName setName getNameIdentifier getPresentation]
 }
-const_statement ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? (KW_CCODE S? STRING| literal) S? NL {
+const_statement ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? (KW_CCODE? S? STRING| literal) S? NL {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
     methods=[getName setName getNameIdentifier getPresentation]
@@ -71,7 +71,7 @@ def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERA
 def_params ::= def_param (S? OPERATOR_COMMA S? def_param)*
 def_param ::= IDENTIFIER S? OPERATOR_COLON S? data_type
 def_bits ::= pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement
-  | forendless_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
+  | forendless_statement | cfor_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
   | let_statement | empty_line | continue_statement | break_statement | dsl_inner_block | COMMENT
 single_line_def_bits ::= pass_statement_wo_indent | ccode_statement_wo_indent | del_statement_wo_indent
   | defer_statement_wo_indent | return_statement_wo_indent | expr_statement_wo_indent | assignment_statement_wo_indent
@@ -86,6 +86,7 @@ else_statement ::= I KW_ELSE S? OPERATOR_COLON S? def_block
 while_statement ::= I KW_WHILE S? exp S? OPERATOR_COLON S? def_block
 foreach_statement ::= I KW_FOR S? IDENTIFIER (S? OPERATOR_COLON S? data_type)? S? KW_IN S? exp S? OPERATOR_COLON S? def_block
 forendless_statement ::= I KW_FOR S? OPERATOR_COLON S? def_block
+cfor_statement ::= I KW_FOR S? OPERATOR_OPEN_P S? cfor_expr? S? OPERATOR_SEMICOLON S? exp? S? OPERATOR_SEMICOLON S? cfor_expr? S? OPERATOR_CLOSE_P S? OPERATOR_COLON S? def_block
 dsl_inner_block ::= I IDENTIFIER (OPERATOR_DOT IDENTIFIER)? OPERATOR_NOT_SYMBOL S? OPERATOR_CURLY_OPEN S? lisp_body? S? OPERATOR_CURLY_CLOSE S? OPERATOR_COLON? S? def_block
 
 // Simple statements
@@ -104,11 +105,15 @@ defer_statement_wo_indent ::= KW_DEFER S? KW_DEL? S? exp NL
 expr_statement ::= I expr_statement_wo_indent
 expr_statement_wo_indent ::= exp S? NL
 assignment_statement ::= I assignment_statement_wo_indent
-assignment_statement_wo_indent ::= exp S? (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
- OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)  S? exp S? NL
+assignment_statement_wo_indent ::= exp S? assignment_oper S? exp S? NL
 let_statement ::= I IDENTIFIER S? OPERATOR_COLON S? data_type S? (OPERATOR_EQ S? exp S?)? NL
 
 // Expression Recursion
+cfor_expr ::= exp assignment_oper exp | exp
+
+assignment_oper ::= (OPERATOR_EQ | OPERATOR_PLUS_EQ | OPERATOR_MINUS_EQ | OPERATOR_MUL_EQ | OPERATOR_DIV_EQ |
+                                       OPERATOR_REMAINDER_EQ | OPERATOR_SHL_EQ | OPERATOR_SHR_EQ | OPERATOR_B_AND_EQ | OPERATOR_B_OR_EQ | OPERATOR_B_XOR_EQ)
+
 exp ::= S? logic_or S?
 logic_or ::= logic_and (S? OPERATOR_OR S? logic_and)* | logic_and
 logic_and ::= comparison (S? OPERATOR_AND S? comparison)* | comparison

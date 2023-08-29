@@ -17,6 +17,9 @@ public interface YakshaDefBits extends PsiElement {
   YakshaCcodeStatement getCcodeStatement();
 
   @Nullable
+  YakshaCforStatement getCforStatement();
+
+  @Nullable
   YakshaContinueStatement getContinueStatement();
 
   @Nullable

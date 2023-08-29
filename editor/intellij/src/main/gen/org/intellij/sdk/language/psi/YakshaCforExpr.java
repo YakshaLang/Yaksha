@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YakshaAssignmentStatementWoIndent extends PsiElement {
+public interface YakshaCforExpr extends PsiElement {
 
-  @NotNull
+  @Nullable
   YakshaAssignmentOper getAssignmentOper();
 
   @NotNull

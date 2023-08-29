@@ -27,6 +27,10 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitAssignmentOper(@NotNull YakshaAssignmentOper o) {
+    visitPsiElement(o);
+  }
+
   public void visitAssignmentStatement(@NotNull YakshaAssignmentStatement o) {
     visitPsiElement(o);
   }
@@ -48,6 +52,14 @@ public class YakshaVisitor extends PsiElementVisitor {
   }
 
   public void visitCcodeStatementWoIndent(@NotNull YakshaCcodeStatementWoIndent o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCforExpr(@NotNull YakshaCforExpr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCforStatement(@NotNull YakshaCforStatement o) {
     visitPsiElement(o);
   }
 

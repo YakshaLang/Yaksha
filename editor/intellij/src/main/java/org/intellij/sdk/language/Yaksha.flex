@@ -165,6 +165,8 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
 
   "not"                              { return YakshaTypes.OPERATOR_NOT; }
   "!"                              { return YakshaTypes.OPERATOR_NOT_SYMBOL; }
+  ";"                              { return YakshaTypes.OPERATOR_SEMICOLON; }
+
   "~"                              { return YakshaTypes.OPERATOR_B_NOT; }
   "or"                              { return YakshaTypes.OPERATOR_OR; }
   "and"                              { return YakshaTypes.OPERATOR_AND; }

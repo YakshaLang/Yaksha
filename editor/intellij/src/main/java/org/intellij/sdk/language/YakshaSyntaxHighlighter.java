@@ -90,6 +90,7 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
             .add(YakshaTypes.OPERATOR_B_NOT)
             .add(YakshaTypes.OPERATOR_CURLY_OPEN)
             .add(YakshaTypes.OPERATOR_CURLY_CLOSE)
+            .add(YakshaTypes.OPERATOR_SEMICOLON)
             .build();
 
     private static final Set<IElementType> YK_KW = ImmutableSet.<IElementType>builder()
