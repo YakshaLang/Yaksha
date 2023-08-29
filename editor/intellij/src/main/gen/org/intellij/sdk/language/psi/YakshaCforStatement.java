@@ -5,12 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YakshaAssignmentStatementWoIndent extends PsiElement {
+public interface YakshaCforStatement extends PsiElement {
 
   @NotNull
-  YakshaAssignmentOper getAssignmentOper();
+  List<YakshaCforExpr> getCforExprList();
 
   @NotNull
-  List<YakshaExp> getExpList();
+  YakshaDefBlock getDefBlock();
+
+  @Nullable
+  YakshaExp getExp();
 
 }

@@ -59,6 +59,8 @@ public class YakshaDocs {
             .put("binarydata", BuiltinDoc.b("binarydata(\"data\") -> Const[Ptr[Const[u8]]]", "Create constant binary " +
                     "data (must pass in a string literal).\nReturns Const[Ptr[Const[u8]]] that does not need to be " +
                     "deleted."))
+            .put("inlinec", BuiltinDoc.b("inlinec(\"T\", \"ccode\") -> T", "Inline C code"))
+            .put("make", BuiltinDoc.b("make(\"T\") -> Ptr[T]", "Allocate a single element of given object"))
             .build();
     public static final Set<String> BUILTIN_FUNCTION_NAMES = BUILTIN_FUNCTIONS.keySet();
     public static final Set<String> LISP_BUILTIN_NAMES = Set.of("ykt_xor_eq", "ykt_xor", "ykt_tilde", "ykt_sub_eq",

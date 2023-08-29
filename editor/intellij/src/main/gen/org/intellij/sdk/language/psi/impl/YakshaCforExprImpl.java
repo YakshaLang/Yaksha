@@ -11,14 +11,14 @@ import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
 
-public class YakshaAssignmentStatementWoIndentImpl extends ASTWrapperPsiElement implements YakshaAssignmentStatementWoIndent {
+public class YakshaCforExprImpl extends ASTWrapperPsiElement implements YakshaCforExpr {
 
-  public YakshaAssignmentStatementWoIndentImpl(@NotNull ASTNode node) {
+  public YakshaCforExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YakshaVisitor visitor) {
-    visitor.visitAssignmentStatementWoIndent(this);
+    visitor.visitCforExpr(this);
   }
 
   @Override
@@ -28,9 +28,9 @@ public class YakshaAssignmentStatementWoIndentImpl extends ASTWrapperPsiElement 
   }
 
   @Override
-  @NotNull
+  @Nullable
   public YakshaAssignmentOper getAssignmentOper() {
-    return findNotNullChildByClass(YakshaAssignmentOper.class);
+    return findChildByClass(YakshaAssignmentOper.class);
   }
 
   @Override
