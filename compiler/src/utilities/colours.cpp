@@ -103,7 +103,7 @@ void yaksha::colour_print(colour c, const std::string &content,
 }
 #endif
 bool yaksha::is_stdout_a_terminal() {
-#if defined(YAKSHA_DEBUG) || defined(YAKSHA_FAST_TESTS)
+#if defined(YAKSHA_DEBUG)
   return false;
 #else
   return ISATTY(FILENO(stdout));
