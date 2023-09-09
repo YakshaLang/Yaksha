@@ -66,45 +66,46 @@ int lisp_execute_file(char *file_path) {
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
   yaksha_macros mm{};
-  yaksha_lisp_tokenizer tokenizer{&mm};
-  tokenizer.tokenize(file_name, data, mm.get_yk_token_pool());
-  if (!tokenizer.errors_.empty()) {
-    errors::print_errors(tokenizer.errors_);
+  yaksha_lisp_tokenizer* tokenizer = mm.create_tokenizer();
+  tokenizer->tokenize(file_name, data, mm.get_yk_token_pool());
+  if (!tokenizer->errors_.empty()) {
+    errors::print_errors(tokenizer->errors_);
     return EXIT_FAILURE;
   }
-  yaksha_lisp_parser parser{&tokenizer, &mm};
-  parser.parse();
-  if (!parser.errors_.empty()) {
-    errors::print_errors(parser.errors_);
+  yaksha_lisp_parser *parser = mm.create_parser(tokenizer);
+  parser->parse();
+  if (!parser->errors_.empty()) {
+    errors::print_errors(parser->errors_);
     return EXIT_FAILURE;
   }
-  yaksha_envmap environment{&mm};
-  environment.setup_builtins();
-  environment.setup_prelude();
+  std::string f_path{file_path};
+  std::unordered_map<std::string, import_stmt*> no_imports{};
+  mm.init_env(f_path, no_imports);
+  yaksha_envmap *environment = mm.validate_and_get_environment_root(f_path);
   try {
-    environment.eval(parser.exprs_);
+    environment->eval(parser->exprs_);
   } catch (parsing_error &ex) {
     errors::print_error(std::cerr, ex);
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
 }
-void eval_line(const std::string &code, yaksha_envmap *environment) {
-  yaksha_lisp_tokenizer tokenizer{environment->get_memory_manager()};
-  tokenizer.tokenize("repl.lisp", code,
-                     environment->get_memory_manager()->get_yk_token_pool());
-  if (!tokenizer.errors_.empty()) {
-    errors::print_errors(tokenizer.errors_);
+void eval_line(const std::string &code, yaksha_envmap *environment, yaksha_macros* mm) {
+  yaksha_lisp_tokenizer *tokenizer = mm->create_tokenizer();
+  tokenizer->tokenize("repl.lisp", code,
+                     mm->get_yk_token_pool());
+  if (!tokenizer->errors_.empty()) {
+    errors::print_errors(tokenizer->errors_);
     return;
   }
-  yaksha_lisp_parser parser{&tokenizer, environment->get_memory_manager()};
-  parser.parse();
-  if (!parser.errors_.empty()) {
-    errors::print_errors(parser.errors_);
+  yaksha_lisp_parser * parser = mm->create_parser(tokenizer);
+  parser->parse();
+  if (!parser->errors_.empty()) {
+    errors::print_errors(parser->errors_);
     return;
   }
   try {
-    auto result = environment->eval(parser.exprs_);
+    auto result = environment->eval(parser->exprs_);
     if (result != nullptr) { std::cout << colours::cyan("-> ") << result; }
   } catch (parsing_error &ex) { errors::print_error(std::cerr, ex); }
 }
@@ -120,9 +121,9 @@ int lisp_repl() {
   std::cout << "Type in expressions to evaluate them.\n";
   std::cout << "Input " << colours::cyan("(exit)") << " to exit from repl.\n";
   yaksha_macros mm{};
-  yaksha_envmap environment{&mm};
-  environment.setup_builtins();
-  environment.setup_prelude();
+  std::unordered_map<std::string, import_stmt*> no_imports{};
+  mm.init_env("repl.lisp", no_imports);
+  yaksha_envmap *environment = mm.validate_and_get_environment_root("repl.lisp");
 #ifdef PRINT_BUILTINS_YAKSHA_LISP
   std::cout << "Builtins:: ";
   bool first = true;
@@ -147,7 +148,7 @@ int lisp_repl() {
       exit = true;
       continue;
     }
-    eval_line(line, &environment);
+    eval_line(line, environment, &mm);
     std::cout << "\n";
   }
   return EXIT_SUCCESS;
