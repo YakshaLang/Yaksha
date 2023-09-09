@@ -221,7 +221,7 @@ def handle_args(args: os.Arguments) -> int:
     arrput(options, argparse.opt_string("a", "assets", getref(assets_path), "specify assets directory for web builds"))
     arrput(options, argparse.opt_boolean("4", "wasm4", getref(wasm4), "wasm4 build"))
     arrput(options, argparse.opt_boolean("S", "silent", getref(silent_mode), "do not print anything except errors"))
-    arrput(options, argparse.opt_boolean("N", "nothread", getref(no_parallel), "no parallel builds (for debugging)"))
+    arrput(options, argparse.opt_boolean("N", "nothread", getref(no_parallel), "no parallel build & disable optimization (for debugging)"))
     arrput(options, argparse.opt_end())
 
     a: argparse.ArgParseWrapper = argparse.new(options, usages)
