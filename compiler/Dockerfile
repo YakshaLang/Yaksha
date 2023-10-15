@@ -33,6 +33,7 @@ ADD scripts /app/scripts
 ADD libs /app/libs
 ADD runtime /app/runtime
 ADD carpntr /app/carpntr
+ADD test_libs /app/test_libs
 ADD bin/test.txt /app/test.txt
 RUN mkdir "/app/bin"
 

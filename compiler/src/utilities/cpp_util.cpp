@@ -58,7 +58,9 @@ std::string yaksha::get_my_exe_path() {
   if (path == nullptr) { return ""; }
   wai_getModulePath(path, length, nullptr);
   path[length] = '\0';
-  return std::string{path,
-                     static_cast<std::basic_string<char>::size_type>(length)};
+  auto exe_path = std::string{
+      path, static_cast<std::basic_string<char>::size_type>(length)};
+  free(path);
+  return exe_path;
 }
 #endif
