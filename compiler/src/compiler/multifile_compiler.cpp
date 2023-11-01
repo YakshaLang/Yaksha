@@ -51,7 +51,7 @@ multifile_compiler::compile(const std::string &main_file) {
   LOG_COMP("compile:" << main_file);
   auto libs_path = std::filesystem::path{get_my_exe_path()}.parent_path();
   libs_path = libs_path.parent_path() / "libs";
-  return compile(main_file, libs_path);
+  return compile(main_file, libs_path.string());
 }
 //
 multifile_compiler_result

@@ -152,7 +152,7 @@ std::string ws2s(const std::wstring &wide) {
                  [](wchar_t c) { return (char) c; });
   return str;
 }
-int execute_process(std::filesystem::path carpntr_path, int argc,
+int execute_process(const std::filesystem::path& carpntr_path, int argc,
                     char **arguments) {
   std::string argument{};
   ArgvQuote(ws2s(carpntr_path.wstring()), argument, false);
