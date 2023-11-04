@@ -1007,55 +1007,61 @@ void compiler::visit_let_stmt(let_stmt *obj) {
     error(obj->name_,
           "Failed to compile let statement. (Use of non compilable data type)");
   }
-  if (obj->data_type_->is_str()) {
-    object = ykobject(dt_pool_->create("str"));
+  if (obj->data_type_->const_unwrap()->is_str()) {
+    object = ykobject(obj->data_type_);
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
       write_indent(body_);
       if (exp.second.datatype_->const_unwrap()->is_str()) {
-        body_ << "yk__sds " << name << " = "
+        body_ << convert_dt(object.datatype_) << " " << name << " = "
               << "yk__sdsdup(" << exp.first << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_sr()) {
-        body_ << "yk__sds " << name << " = "
+        body_ << convert_dt(object.datatype_) << " "  << name << " = "
               << "yk__bstr_copy_to_sds(" << exp.first << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
         auto u = string_utils::unescape(exp.second.string_val_);
-        body_ << "yk__sds " << name << " = "
+        body_ << convert_dt(object.datatype_) << " "  << name << " = "
               << "yk__sdsnewlen(\"" << string_utils::escape(u) << "\" , "
               << u.size() << ")";
       } else {
         error("Failed to compile assign to string.");
       }
     } else {
-      body_ << "yk__sds " << name << " = "
+      body_ << convert_dt(object.datatype_) << " "  << name << " = "
             << "yk__sdsempty()";
     }
     // If there is an expression, go to that, pop(), duplicate and assign.
     // If there is not an expression, assign yk__sdsempty()
     // Add to deletions
     deletions_.push(name, "yk__sdsfree(" + name + ")");
-  } else if (obj->data_type_->is_sr() || obj->data_type_->is_string_literal()) {
-    object = ykobject(dt_pool_->create("sr"));
+  } else if (obj->data_type_->const_unwrap()->is_sr() || obj->data_type_->const_unwrap()->is_string_literal()) {
+    if (obj->data_type_->is_const()) {
+      auto const_wrapper = dt_pool_->create("Const");
+      const_wrapper->args_.emplace_back(dt_pool_->create("sr"));
+      object = ykobject(const_wrapper);
+    } else {
+      object = ykobject(dt_pool_->create("sr"));
+    }
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
       write_indent(body_);
       if (exp.second.datatype_->const_unwrap()->is_str()) {
-        body_ << "struct yk__bstr " << name << " = yk__bstr_h(" << exp.first
+        body_ << convert_dt(object.datatype_) << " " << name << " = yk__bstr_h(" << exp.first
               << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_sr()) {
-        body_ << "struct yk__bstr " << name << " = " << exp.first;
+        body_ << convert_dt(object.datatype_) << " " << name << " = " << exp.first;
       } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
         auto u = string_utils::unescape(exp.second.string_val_);
-        body_ << "struct yk__bstr " << name << " = "
+        body_ << convert_dt(object.datatype_) << " " << name << " = "
               << "yk__bstr_s(\"" << string_utils::escape(u) << "\" , "
               << u.size() << ")";
       } else {
         error("Failed to compile assign to sr.");
       }
     } else {
-      body_ << "struct yk__bstr " << name
+      body_ << convert_dt(object.datatype_) << " " << name
             << " = ((struct yk__bstr){.s = YK__EMPTY_STRING_BSTR,"
                " .l = 0, .t = yk__bstr_static})";
     }

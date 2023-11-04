@@ -1,0 +1,57 @@
+BANANA: Const[sr] = "Banana"
+
+def main() -> int:
+    a: str = "Banana"
+    b: Const[str] = "Banana"
+    c: Const[sr] = "Banana"
+    d: sr = "Banana"
+    e = "Banana"
+
+    println(a == "Banana")
+    println(b == "Banana")
+    println(c == "Banana")
+    println(d == "Banana")
+    println(e == "Banana")
+    println("Banana" == a)
+    println("Banana" == b)
+    println("Banana" == c)
+    println("Banana" == d)
+    println("Banana" == e)
+
+    println(a == BANANA)
+    println(a == a)
+    println(a == b)
+    println(a == c)
+    println(a == d)
+    println(a == e)
+
+    println(b == BANANA)
+    println(b == a)
+    println(b == b)
+    println(b == c)
+    println(b == d)
+    println(b == e)
+
+    println(c == BANANA)
+    println(c == a)
+    println(c == b)
+    println(c == c)
+    println(c == d)
+    println(c == e)
+
+    println(d == BANANA)
+    println(d == a)
+    println(d == b)
+    println(d == c)
+    println(d == d)
+    println(d == e)
+
+    println(e == BANANA)
+    println(e == a)
+    println(e == b)
+    println(e == c)
+    println(e == d)
+    println(e == e)
+
+    println(BANANA == "Banana")
+    0

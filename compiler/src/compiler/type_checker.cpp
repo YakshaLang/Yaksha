@@ -925,7 +925,7 @@ void type_checker::visit_import_stmt(import_stmt *obj) {
   // Not required to be type checked
 }
 void type_checker::visit_const_stmt(const_stmt *obj) {
-  if (!obj->data_type_->args_[0]->is_bool() &&
+  if (scope_.is_global_level() && !obj->data_type_->args_[0]->is_bool() &&
       !obj->data_type_->args_[0]->is_a_number() &&
       !obj->data_type_->args_[0]->is_sr()) {
     error(obj->name_, "Only number/bool/sr constants are supported");
@@ -940,9 +940,8 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
     auto expression_data = pop();
     ykdatatype *expression_dt = expression_data.datatype_->const_unwrap();
     if (obj->data_type_->args_[0]->is_sr() &&
-        expression_dt->is_string_literal()) {
-      // sr and literal is allowed
-      return;
+        !expression_dt->is_string_literal()) {
+      error(obj->name_, "Const[sr] must use a string literal at the RHS.");
     }
     if (*(obj->data_type_->args_[0]) != *expression_dt) {
       auto castable = obj->data_type_->args_[0]->auto_cast(

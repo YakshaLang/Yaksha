@@ -483,3 +483,8 @@ TEST_CASE("compiler: auto cast bool count") {
       "../test_data/compiler_tests/auto_casting/autocastboolcount.yaka", "autocastboolcount.yaka",
       "../test_data/compiler_tests/output/autocastboolcount.tokens");
 }
+TEST_CASE("compiler: sr with const") {
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/string_tests/sr_with_const.yaka", "sr_with_const.yaka",
+      "../test_data/compiler_tests/output/sr_with_const.tokens");
+}
