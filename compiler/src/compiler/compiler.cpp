@@ -74,7 +74,7 @@ void compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
       (lhs.second.datatype_->const_unwrap()->is_a_number() ||
        lhs.second.datatype_->const_unwrap()->is_bool())) {
     // Number cast that we can do here
-    body_ << lhs.first << operator_token->token_;
+    body_ << lhs.first << " " << operator_token->token_ << " ";
     cast_numbers(castable, lhs, rhs);
     if (lhs.second.is_primitive_or_obj() &&
         lhs.second.datatype_->const_unwrap()->is_f32() &&
@@ -87,7 +87,7 @@ void compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
     } else {
       body_ << rhs.first;
     }
-    LOG_COMP("cast assign:" << lhs.first << " = " << rhs.first);
+    LOG_COMP("cast assign:" << lhs.first << " " << operator_token->token_ << " " << rhs.first);
   } else if (rhs.second.is_primitive_or_obj() &&
              rhs.second.datatype_->const_unwrap()->is_a_string() &&
              operator_token->type_ == token_type::EQ) {

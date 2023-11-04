@@ -10,7 +10,7 @@ int32_t yy__main()
     bool yy__b = true;
     for (int32_t yy__x = INT32_C(0);(yy__x < INT32_C(10));yy__x = (yy__x + INT32_C(1)))
     {
-        yy__a+=((int32_t)(((yy__b) ? 1 : 0)));
+        yy__a += ((int32_t)(((yy__b) ? 1 : 0)));
     }
     yk__printlnint((intmax_t)yy__a);
     return INT32_C(0);
