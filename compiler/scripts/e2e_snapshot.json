@@ -57,6 +57,7 @@
   "test_data/compiler_tests/string_tests/sr_functional_test_map.yaka": ">> map sr test <<\nmap to_lengths ==>\n5\n5\n3\n3\n3\n>> countif int test <<\nmap to_pow2 ==>\n1\n4\n9\n16\n25\n36\n49\n64\n81\n100\ncompleted.\ntrue\n\nreturn := 0",
   "test_data/compiler_tests/string_tests/sr_with_const.yaka": "True\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nFalse\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\n\nreturn := 0",
   "test_data/compiler_tests/string_tests/str_to_sr_create_str_lit.yaka": "Printing sr: Oi\nPrinting sr: Ha\n\nreturn := 0",
+  "test_data/compiler_tests/string_tests/strings_const_mixed_tests.yaka": "BananaBanana\nBananaBanana\nBananaBanana\nBananaBanana\nBananaBanana\nBananaBananaBananaBanana\nBananaBanana\n\nreturn := 0",
   "test_data/compiler_tests/string_tests/variables_using_sr.yaka": "Printing sr: Oi\nPrinting str: Oi oi\n\nreturn := 0",
   "test_data/compiler_tests/test1.yaka": "Hello World\n\nreturn := 0",
   "test_data/compiler_tests/test2.yaka": "3628800\n362880\n40320\n5040\n720\n120\n24\n6\n2\n1\naaaaaaaaaab\n2 From defer --> Program Completed\n1 From defer --> Program Completed\n\nreturn := 0",

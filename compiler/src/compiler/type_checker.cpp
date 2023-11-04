@@ -940,7 +940,7 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
     auto expression_data = pop();
     ykdatatype *expression_dt = expression_data.datatype_->const_unwrap();
     if (obj->data_type_->args_[0]->is_sr() &&
-        !expression_dt->is_string_literal()) {
+        !expression_dt->is_string_literal() && scope_.is_global_level()) {
       error(obj->name_, "Const[sr] must use a string literal at the RHS.");
     }
     if (*(obj->data_type_->args_[0]) != *expression_dt) {

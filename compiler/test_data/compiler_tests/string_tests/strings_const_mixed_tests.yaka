@@ -1,0 +1,29 @@
+BANANA: Const[sr] = "Banana"
+
+def f1(v: Const[str]) -> Const[str]: v
+def f2(v: Const[str]) -> sr: v
+def f3(v: Const[sr]) -> Const[sr]: v
+def f4(v: sr) -> Const[sr]: v
+def f5(v: str) -> Const[sr]: v
+def f6(v: Const[str]) -> str: v
+
+def main() -> int:
+    a: str = f4("Banana")
+    b: Const[str] = "Banana"
+    c: Const[sr] = f5("Banana")
+    d: sr = "Banana"
+    e = "Banana"
+
+    println(f1(a) + "Banana")
+    println(f2(b) + BANANA)
+    println(f3(c) + "Banana")
+    println(f1(d) + "Banana")
+    println(e + "Banana")
+
+    a += b
+    a += f6(d)
+    a += e
+    println(f1(a))
+
+    println(BANANA + "Banana")
+    0

@@ -104,7 +104,7 @@ void compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
                           rhs.second.datatype_->const_unwrap(),
                           lhs.second.datatype_->const_unwrap());
   } else if (rhs.second.is_primitive_or_obj() &&
-             rhs.second.datatype_->is_a_string() &&
+             rhs.second.datatype_->const_unwrap()->is_a_string() &&
              operator_token->type_ == token_type::PLUS_EQ) {
     // -- str +=
     if (rhs.second.datatype_->const_unwrap()->is_str()) {
