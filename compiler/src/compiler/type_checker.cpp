@@ -1144,7 +1144,7 @@ void type_checker::visit_cfor_stmt(cfor_stmt *obj) {
     obj->comparison_->accept(this);
     auto comp = pop();
     if (!comp.datatype_->const_unwrap()->is_bool()) {
-      error(obj->semi1_, "Comparision must be a boolean operation");
+      error(obj->semi1_, "Comparison must be a boolean operation");
     }
   }
   if (obj->operation_ != nullptr) { obj->operation_->accept(this); }

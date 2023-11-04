@@ -478,3 +478,8 @@ TEST_CASE("compiler: c like for loop") {
       "../test_data/compiler_tests/for_loop_test.yaka", "for_loop_test.yaka",
       "../test_data/compiler_tests/output/for_loop_test.tokens");
 }
+TEST_CASE("compiler: auto cast bool count") {
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/auto_casting/autocastboolcount.yaka", "autocastboolcount.yaka",
+      "../test_data/compiler_tests/output/autocastboolcount.tokens");
+}

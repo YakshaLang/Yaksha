@@ -1,0 +1,7 @@
+def main() -> int:
+    a = 0
+    b = True
+    for (x = 0; x < 10; x = x + 1):
+        a += b
+    println(a)
+    0
