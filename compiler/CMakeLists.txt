@@ -18,6 +18,9 @@ file(COPY ${CMAKE_BINARY_DIR}/test.txt
 include_directories(src)
 include_directories(tests)
 include_directories(${UTF8_DIR})
+# Add reproc
+set(REPROC++ ON)
+add_subdirectory(3rd/reproc)
 
 ## Enable below to use address sanitizer
 # add_compile_options(-O1 -g -fsanitize=address -fno-omit-frame-pointer)
