@@ -7,6 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(CMAKE_INSTALL_PREFIX build})
 set(UTF8_DIR 3rd/utfcpp/source)
+set(REPROC_DIR 3rd/reproc)
 
 get_filename_component(CMAKE_BINARY_DIR "bin" ABSOLUTE)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -18,9 +19,11 @@ file(COPY ${CMAKE_BINARY_DIR}/test.txt
 include_directories(src)
 include_directories(tests)
 include_directories(${UTF8_DIR})
+include_directories(${REPROC_DIR}/reproc/include)
+include_directories(${REPROC_DIR}/reproc++/include)
 # Add reproc
 set(REPROC++ ON)
-add_subdirectory(3rd/reproc)
+add_subdirectory(${REPROC_DIR})
 
 ## Enable below to use address sanitizer
 # add_compile_options(-O1 -g -fsanitize=address -fno-omit-frame-pointer)
@@ -50,6 +53,8 @@ endif()
 add_executable(yakshac src/comp_main.cpp runtime/whereami.c)
 target_link_libraries(yakshac PUBLIC ${SYS_LIBS})
 target_link_libraries(yakshac PUBLIC library_yaksha)
+target_link_libraries(yakshac PUBLIC reproc)
+target_link_libraries(yakshac PUBLIC reproc++)
 target_compile_features(yakshac PRIVATE cxx_std_17)
 
 # -- yakshavz - visualizer --
@@ -57,12 +62,17 @@ add_executable(yakshavz src/viz_main.cpp)
 target_link_libraries(yakshavz PUBLIC ${SYS_LIBS})
 target_link_libraries(yakshavz PUBLIC library_yaksha)
 target_compile_features(yakshavz PRIVATE cxx_std_17)
+target_link_libraries(yakshavz PUBLIC reproc)
+target_link_libraries(yakshavz PUBLIC reproc++)
+
 
 # -- yakshadmp - syntax extractor --
 add_executable(yakshadmp src/dump.cpp)
 target_link_libraries(yakshadmp PUBLIC ${SYS_LIBS})
 target_link_libraries(yakshadmp PUBLIC library_yaksha)
 target_compile_features(yakshadmp PRIVATE cxx_std_17)
+target_link_libraries(yakshadmp PUBLIC reproc++)
+
 
 # -- ykreload - compiler --
 if(MSVC)
@@ -74,6 +84,8 @@ endif (MSVC)
 add_executable(yaksha src/yk.cpp src/carpntr_wrapper.cpp runtime/whereami.c)
 target_link_libraries(yaksha PUBLIC ${SYS_LIBS})
 target_link_libraries(yaksha PUBLIC library_yaksha)
+target_link_libraries(yaksha PUBLIC reproc)
+target_link_libraries(yaksha PUBLIC reproc++)
 target_compile_features(yaksha PRIVATE cxx_std_17)
 
 # -- raylib-parser - raylib-parser --
@@ -88,6 +100,8 @@ add_executable(YakshaTests ${YAKSHA_SOURCE_FILES} ${YAKSHA_TEST_FILES} tests/tes
 target_compile_definitions(YakshaTests PUBLIC TESTING)
 target_link_libraries(YakshaTests PRIVATE Catch2::Catch2)
 target_link_libraries(YakshaTests PUBLIC ${SYS_LIBS})
+target_link_libraries(YakshaTests PUBLIC reproc)
+target_link_libraries(YakshaTests PUBLIC reproc++)
 target_compile_features(YakshaTests PRIVATE cxx_std_17)
 # Add to CTest
 include(CTest)
@@ -104,6 +118,8 @@ else()
     add_executable(YakshaFuzz tests/fuzz_main.cpp runtime/whereami.c)
 endif()
 target_link_libraries(YakshaFuzz PUBLIC ${SYS_LIBS})
+target_link_libraries(YakshaFuzz PUBLIC reproc)
+target_link_libraries(YakshaFuzz PUBLIC reproc++)
 target_link_libraries(YakshaFuzz PUBLIC library_yaksha)
 target_compile_features(YakshaFuzz PRIVATE cxx_std_17)
 

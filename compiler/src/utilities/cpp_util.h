@@ -42,9 +42,12 @@
  */
 #ifndef CPP_UTIL_H
 #define CPP_UTIL_H
+#include "reproc++/reproc.hpp"
+#include "reproc++/run.hpp"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <vector>
 // ╔╦╗┌─┐┌┬┐┌─┐┬  ┌─┐┌┬┐┌─┐  ╔╦╗┌─┐┌─┐┬┌─┐
 //  ║ ├┤ │││├─┘│  ├─┤ │ ├┤   ║║║├─┤│ ┬││
 //  ╩ └─┘┴ ┴┴  ┴─┘┴ ┴ ┴ └─┘  ╩ ╩┴ ┴└─┘┴└─┘
@@ -149,21 +152,33 @@ namespace yaksha {
     return s;
   }
   // https://stackoverflow.com/questions/5878775/how-to-find-and-replace-string
-  static inline void replace_all(std::string &s, std::string const &toReplace,
-                                 std::string const &replaceWith) {
+  static inline void replace_all(std::string &s, std::string const &to_replace,
+                                 std::string const &replace_with) {
     std::ostringstream oss;
     std::size_t pos = 0;
-    std::size_t prevPos = pos;
+    std::size_t prev_position = pos;
     while (true) {
-      prevPos = pos;
-      pos = s.find(toReplace, pos);
+      prev_position = pos;
+      pos = s.find(to_replace, pos);
       if (pos == std::string::npos) { break; }
-      oss << s.substr(prevPos, pos - prevPos);
-      oss << replaceWith;
-      pos += toReplace.size();
+      oss << s.substr(prev_position, pos - prev_position);
+      oss << replace_with;
+      pos += to_replace.size();
     }
-    oss << s.substr(prevPos);
+    oss << s.substr(prev_position);
     s = oss.str();
+  }
+  static int exec(std::vector<std::string> &cmd, int deadline_ms = -1) {
+    int status = -1;
+    std::error_code ec;
+    reproc::options options;
+    options.redirect.parent = true;
+    if (deadline_ms > 0) {
+      options.deadline = reproc::milliseconds(deadline_ms);
+    }
+    // std::tie is like unpacking a tuple
+    std::tie(status, ec) = reproc::run(cmd, options);
+    return ec ? ec.value() : status;
   }
 }// namespace yaksha
 #endif

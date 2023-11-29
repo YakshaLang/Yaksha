@@ -263,6 +263,11 @@ namespace yaksha {
     sorted_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
     static yaksha_lisp_value *
     reversed_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
+    static yaksha_lisp_value *
+        os_exec_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
+    static yaksha_lisp_value *
+    os_shell_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
+
     // --
     static yaksha_lisp_value *
     system_lock_root_scope_(const std::vector<yaksha_lisp_value *> &args,

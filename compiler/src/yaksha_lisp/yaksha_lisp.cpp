@@ -954,6 +954,11 @@ void yaksha_envmap::setup_builtins() {
       create_builtin(this, "is_module", yaksha_lisp_builtins::is_module_));
   set("access_module", create_builtin(this, "access_module",
                                       yaksha_lisp_builtins::access_module_));
+  set("os_exec", create_builtin(this, "os_exec",
+                                      yaksha_lisp_builtins::os_exec_));
+  set("os_shell", create_builtin(this, "os_shell",
+                                yaksha_lisp_builtins::os_shell_));
+
   // magic_dot -> map_get or access_module
   set("magic_dot",
       create_builtin(this, "magic_dot", yaksha_lisp_builtins::magic_dot_));

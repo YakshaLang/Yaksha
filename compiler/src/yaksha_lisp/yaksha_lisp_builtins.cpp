@@ -1708,3 +1708,39 @@ yaksha_lisp_builtins::reversed_(const std::vector<yaksha_lisp_value *> &args,
   std::reverse(v->list_.begin(), v->list_.end());
   return v;
 }
+yaksha_lisp_value *
+yaksha_lisp_builtins::os_exec_(const std::vector<yaksha_lisp_value *> &args,
+                               yaksha_envmap *env) {
+  if (args.empty()) {
+    throw parsing_error{"os_exec takes at least 1 argument", "", 0, 0};
+  }
+  auto e_args = eval_args(args, env);
+  std::vector<std::string> cmd_args;
+  for (auto & e_arg : e_args) {
+    if (e_arg->type_ != yaksha_lisp_value_type::STRING) {
+      throw parsing_error{"os_exec takes only string arguments", "", 0, 0};
+    }
+    cmd_args.push_back(e_arg->str_);
+  }
+  auto result = exec(cmd_args);
+  return env->create_number(result);
+}
+yaksha_lisp_value *
+yaksha_lisp_builtins::os_shell_(const std::vector<yaksha_lisp_value *> &args,
+                                yaksha_envmap *env) {
+  if (args.size() != 1) {
+    throw parsing_error{"os_shell takes 1 argument", "", 0, 0};
+  }
+  auto e_args = eval_args(args, env);
+  std::vector<std::string> cmd_args;
+#if defined(YAKSHA_OS_WINDOWS)
+  cmd_args.emplace_back("cmd");
+  cmd_args.emplace_back("/C");
+#else
+  cmd_args.emplace_back("sh");
+  cmd_args.emplace_back("-c");
+#endif
+  cmd_args.push_back(e_args[0]->str_);
+  auto result = exec(cmd_args);
+  return env->create_number(result);
+}
