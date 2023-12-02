@@ -17,6 +17,6 @@
 [submodule "compiler/runtime/net/mbedtls"]
 	path = compiler/runtime/net/mbedtls
 	url = https://github.com/Mbed-TLS/mbedtls.git
-[submodule "compiler/runtime/net/mongoose"]
-	path = compiler/runtime/net/mongoose
-	url = https://github.com/cesanta/mongoose.git
+[submodule "compiler/runtime/net/civetweb"]
+	path = compiler/runtime/net/civetweb
+	url = https://github.com/civetweb/civetweb.git
