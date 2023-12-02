@@ -49,29 +49,23 @@ if(UNIX AND NOT APPLE)
     list(APPEND SYS_LIBS m dl pthread)
 endif()
 
+set(YAKSHA_COMMON_LIBS ${SYS_LIBS} library_yaksha reproc reproc++)
+
 # -- yakshac - compiler --
 add_executable(yakshac src/comp_main.cpp runtime/whereami.c)
-target_link_libraries(yakshac PUBLIC ${SYS_LIBS})
-target_link_libraries(yakshac PUBLIC library_yaksha)
-target_link_libraries(yakshac PUBLIC reproc)
-target_link_libraries(yakshac PUBLIC reproc++)
+target_link_libraries(yakshac PUBLIC ${YAKSHA_COMMON_LIBS})
 target_compile_features(yakshac PRIVATE cxx_std_17)
 
 # -- yakshavz - visualizer --
 add_executable(yakshavz src/viz_main.cpp)
-target_link_libraries(yakshavz PUBLIC ${SYS_LIBS})
-target_link_libraries(yakshavz PUBLIC library_yaksha)
+target_link_libraries(yakshavz PUBLIC ${YAKSHA_COMMON_LIBS})
 target_compile_features(yakshavz PRIVATE cxx_std_17)
-target_link_libraries(yakshavz PUBLIC reproc)
-target_link_libraries(yakshavz PUBLIC reproc++)
 
 
 # -- yakshadmp - syntax extractor --
 add_executable(yakshadmp src/dump.cpp)
-target_link_libraries(yakshadmp PUBLIC ${SYS_LIBS})
-target_link_libraries(yakshadmp PUBLIC library_yaksha)
+target_link_libraries(yakshadmp PUBLIC ${YAKSHA_COMMON_LIBS})
 target_compile_features(yakshadmp PRIVATE cxx_std_17)
-target_link_libraries(yakshadmp PUBLIC reproc++)
 
 
 # -- ykreload - compiler --
@@ -82,10 +76,7 @@ endif (MSVC)
 
 # -- yaksha binary --
 add_executable(yaksha src/yk.cpp src/carpntr_wrapper.cpp runtime/whereami.c)
-target_link_libraries(yaksha PUBLIC ${SYS_LIBS})
-target_link_libraries(yaksha PUBLIC library_yaksha)
-target_link_libraries(yaksha PUBLIC reproc)
-target_link_libraries(yaksha PUBLIC reproc++)
+target_link_libraries(yaksha PUBLIC ${YAKSHA_COMMON_LIBS})
 target_compile_features(yaksha PRIVATE cxx_std_17)
 
 # -- raylib-parser - raylib-parser --
@@ -114,14 +105,11 @@ if(DEFINED ENV{YAKSHA_FUZZ})
     set(CMAKE_CXX_FLAGS "-fsanitize=fuzzer,address -g -O1")
     add_executable(YakshaFuzz ${YAKSHA_SOURCE_FILES}  tests/fuzz_main.cpp runtime/whereami.c)
     target_compile_definitions(YakshaFuzz PUBLIC YAKSHA_LLVM_FUZZ)
-else()
-    add_executable(YakshaFuzz tests/fuzz_main.cpp runtime/whereami.c)
+    target_link_libraries(YakshaFuzz PUBLIC ${SYS_LIBS})
+    target_link_libraries(YakshaFuzz PUBLIC reproc)
+    target_link_libraries(YakshaFuzz PUBLIC reproc++)
+    target_compile_features(YakshaFuzz PRIVATE cxx_std_17)
 endif()
-target_link_libraries(YakshaFuzz PUBLIC ${SYS_LIBS})
-target_link_libraries(YakshaFuzz PUBLIC reproc)
-target_link_libraries(YakshaFuzz PUBLIC reproc++)
-target_link_libraries(YakshaFuzz PUBLIC library_yaksha)
-target_compile_features(YakshaFuzz PRIVATE cxx_std_17)
 
 # CMake Build for carpntr
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
