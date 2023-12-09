@@ -624,7 +624,7 @@ yaksha_lisp_builtins::while_(const std::vector<yaksha_lisp_value *> &args,
   auto cond = args[0];
   // assign rest to body
   auto body = std::vector<yaksha_lisp_value *>{args.begin() + 1, args.end()};
-  while (env->is_truthy(env->eval(cond))) {
+  while (yaksha::yaksha_envmap::is_truthy(env->eval(cond))) {
     for (auto body_part : body) { env->eval(body_part); }
   }
   return env->create_nil();

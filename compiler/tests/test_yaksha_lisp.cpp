@@ -618,6 +618,21 @@ TEST_CASE("yaksha_lisp: for loop iterate a list") {
         (if (== x 6) (= success 1))
         )");
 }
+TEST_CASE("yaksha_lisp: for loop iterate a range") {
+  test_snippet_execute(R"(
+        (def x 0)
+        (for i (range 1 4) (= x (+ x i)))
+        (if (== x 6) (= success 1))
+        )");
+}
+TEST_CASE("yaksha_lisp: while loop simple") {
+  test_snippet_execute(R"(
+        (def x 0)
+        (while (< x 3) (= x (+ x 1)))
+        (if (== x 3) (= success 1))
+        )");
+}
+
 TEST_CASE("yaksha_lisp: map_keys, map_values, map_remove") {
   test_snippet_execute(R"(
         (def m @{a: 1, b: 2, c: 3})
