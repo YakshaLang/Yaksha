@@ -566,7 +566,24 @@ yaksha_lisp_builtins::for_(const std::vector<yaksha_lisp_value *> &args,
   auto body = std::vector<yaksha_lisp_value *>{args.begin() + 2, args.end()};
   yaksha_lisp_value *last = nullptr;
   for (auto &x : list->list_) {
-    env->set(symbol->expr_->token_->token_, x);
+    bool set_completed = false;
+    try {
+      // try to set the value
+      env->set(symbol->expr_->token_->token_, x, false);
+      set_completed = true;
+    } catch (const parsing_error &e) {
+    }
+    if (!set_completed) {
+      try {
+        // try to define it if we cannot set it
+        env->set(symbol->expr_->token_->token_, x, true);
+        set_completed = true;
+      } catch (const parsing_error &e) {
+      }
+    }
+    if (!set_completed) {
+      throw parsing_error{"for failed to set symbol", "", 0, 0};
+    }
     auto e_args = eval_args(body, env);
     last = e_args[e_args.size() - 1];
   }

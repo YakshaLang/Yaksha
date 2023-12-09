@@ -611,6 +611,13 @@ TEST_CASE("yaksha_lisp: map_set, map_get, map_has") {
         (if (== x 2) (= success 1))
         )");
 }
+TEST_CASE("yaksha_lisp: for loop iterate a list") {
+  test_snippet_execute(R"(
+        (def x 0)
+        (for i (list 1 2 3) (= x (+ x i)))
+        (if (== x 6) (= success 1))
+        )");
+}
 TEST_CASE("yaksha_lisp: map_keys, map_values, map_remove") {
   test_snippet_execute(R"(
         (def m @{a: 1, b: 2, c: 3})
