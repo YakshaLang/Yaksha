@@ -8,12 +8,129 @@
 [![.github/workflows/release.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/release.yml/badge.svg)](https://github.com/YakshaLang/Yaksha/actions/workflows/release.yml)
 
 
+## Overview
+
+Welcome to Yaksha an offside-rule based language (Python inspired) that compiles to C99 with Lisp based macros.
+
+
+## Examples
+
+### Offside Rule (Python inspired) Syntax
+
+```python
+# Example Yaksha Code
+def main() -> int:
+    println("Hello World")
+    return 0
+```
+
+```python
+# return can be omitted
+def main() -> int: 0
+```
+
+### Compile time macros (YakshaLisp)
+
+```python
+# ╔═╗┌─┐┌┬┐┌─┐┬┬  ┌─┐  ╔╦╗┬┌┬┐┌─┐
+# ║  │ ││││├─┘││  ├┤    ║ ││││├┤
+# ╚═╝└─┘┴ ┴┴  ┴┴─┘└─┘   ╩ ┴┴ ┴└─┘
+# ╔═╗┬┌─┐┌─┐  ╔╗ ┬ ┬┌─┐┌─┐
+# ╠╣ │┌─┘┌─┘  ╠╩╗│ │┌─┘┌─┘
+# ╚  ┴└─┘└─┘  ╚═╝└─┘└─┘└─┘
+macros!{
+    (defun to_fb (n) (+ (if (== n 1) "" " ") (cond
+        ((== 0 (modulo n 15)) "FizzBuzz")
+        ((== 0 (modulo n 3)) "Fizz")
+        ((== 0 (modulo n 5)) "Buzz")
+        (true (to_string n))
+        )))
+    (defun fizzbuzz () (list (yk_create_token YK_TOKEN_STRING (reduce + (map to_fb (range 1 101))))))
+    (yk_register {dsl fizzbuzz fizzbuzz})
+}
+
+def main() -> int:
+    println(fizzbuzz!{})
+    0
+```
+
+
+## Key Features
+
+- **Python like Syntax**: The language syntax is reminiscent of Python, making it accessible and easy to learn for developers familiar with Python and C.
+
+- **Compilation to C99**: Yaksha compiles to C99, enabling efficient execution. Has support for full threads. (No such a thing as GIL).
+
+- **WebAssembly Support**: The compiled code can be further transformed into WebAssembly, allowing Yaksha programs to run seamlessly in web browsers. (Just enable emascipten shell and run `yaksha build`)
+
+- **Lisp-based Macros**: Dive into advanced meta programming with a Lisp-based macro language, offering powerful tools for zero-cost abstraction and code generation. (There are metamacros too!, allowing you to write macros in YakshaLisp to be used at YakshaLisp level)
+
+- **Raylib Integration**: Yaksha integrates with the Raylib game development library, enabling developers to create games with ease.
+
+- **WASM4 Fantasy Console Integration**: Yaksha provides library support for the WASM4 fantasy console, allowing developers to create games for the WASM4 fantasy console. (You just need w4 binary in PATH)
+
+- **IntelliJ/Notepad++/VsCode Support**: Yaksha provides syntax highlighting support for the IntelliJ, Notepad++, and VsCode editors. (Just grab it from release)
+  - IntelliJ is more feature rich. 🎉 (Supports goto definition, find usages, etc)
+  ![auto-complete](https://raw.githubusercontent.com/YakshaLang/Yaksha/91683551ea1332b772a00a54c8fa1ca4700d00ff/editor/intellij/screenshots/AutoComplete.gif)
+
+
+- **Cross Platform**: Yaksha is cross-platform, works on Windows, Linux, and macOS ( 🟠 macOS is work in progress, installer is not yet provided). You can even cross compile to WASM (using Emscripten) on Linux / Windows for browser execution. Yaksha bundles `zig` compiler (use `zig cc`) for cross compilation, allowing you to compile multiple targets from a single machine.
+
+- **Playground is a full Debian x86 VM running in browser**: Yaksha playground is a full linux terminal with all the tools you need to develop Yaksha programs. (https://yaksha.pages.dev/)
+
+- **Static binaries**: Yaksha provides static binaries for Linux (musl) (Using `zig cc`).
+
+- **Hot reloading (raylib games/apps)** - (🟠 Currently only works in Windows)
+
+
+## Why Yaksha?
+
+- **Web Apps**: The seamless integration with WebAssembly makes Yaksha an excellent choice for browser-based applications.
+
+- **Mini Game Development**: The Raylib integration and WASM4 fantasy console support make Yaksha a great choice for game development.
+
+- **Console Applications**: Yaksha is a great choice for console applications, providing a simple and efficient language for developing command-line tools. (Library is cross-platform, so you can use it to develop cross-platform console applications).
+
+- **Meta Programming**: The Lisp-based macro language facilitates advanced meta programming, empowering developers with expressive code generation capabilities. You can do lot in compile time without going into madness of things like template meta programming (in C++) or `#define` macros. You can even use meta-macros to write macros in YakshaLisp to be used at YakshaLisp level. (YakshaLisp is a garbage-collected language unlike Yaksha).
+
+- **New Philosophy**: Yaksha is a new language with a new philosophy. Yaksha use offside rule (Python inspired) syntax, and at the same time we use a Lisp based macro system. I think these two things complement each other very well.
+    - **In other words** - Allowing us to explore dualism and harmony of opposites in a programming language. 🧠🤯
+
+## Why not Yaksha?
+
+- **Yaksha is not Python**: Although Yaksha's syntax is inspired by Python, it is not a Python clone. The language is designed to be familiar to Python developers, but it is not a drop-in replacement for Python (and never will be).
+- **Yaksha is not a scripting language**: Yaksha is a compiled language, not a scripting language. It is designed to be compiled to C. It is not intended to be interpreted. However, YakshaLisp can be used as a scripting language (`yaksha lisp script.lsp`).
+- **Yaksha is not Rust**: Yaksha compiles to C, and it does not provide compile time safety checks like Rust. However, it is heavily type-checked during compile time (may have bugs at the infancy of the language). Additionally `defer` is supported for much simpler resource management. 
+- **Yaksha is not a Lisp**: Yaksha is not a Lisp, but it does provide a Lisp-based macro language for meta programming.
+- **Yaksha is not a mature language (🟠 Yet)**: Yaksha is still in its infancy. It is not yet ready for production use. (If you fancy a challenge, feel free to try it out!)
+- **Yaksha is not Object-Oriented (🟠 Yet)**: Yaksha is not an object-oriented language. It is procedural programming language with a Lisp-based macro language for meta programming.
+- **DLL/So/Dylib or static library creation is not supported (🟠 Yet)**: This maybe available in future. Currently, you can only create executables.
+- You are allergic to indentation based syntax, Lisp, C(99) or meta programming.
+- Logo is too scary for you.
+
+
+## Getting Started
+
+To explore the language and its capabilities, refer to the [Yaksha Documentation](https://yakshalang.github.io/documentation). This comprehensive guide covers the philosophy, syntax, and features of Yaksha.
+
+## Demos
+
+Check out the fun demos showcasing Yaksha's capabilities: 😺
+
+- [Fractal Tree Demo](https://yakshalang.github.io/static_demos/tree/wind_tree.html): Experience Yaksha compiled to WebAssembly running in the browser.
+
+- [Space Blast Demo](https://yakshalang.github.io/static_demos/space_blast/space_blast.html): Have fun with a space-themed game.
+
+## Contribution
+
+We welcome contributions and feedback. Please use [GitHub Issues](https://github.com/YakshaLang/Yaksha/issues) for bug reports, feature requests, and head to discord for discussions. If you prefer forums you can use GitHub discussions.
+
 # Documentation
 
-* [Standard Library](https://yakshalang.github.io/library-docs.html)
-* [Tutorials](https://yakshalang.github.io/Tutorials/)
 * [Documentation](https://yakshalang.github.io/documentation)
-* [Proposals](https://github.com/YakshaLang/YAMA/tree/main/proposals)
+* [Tutorials](https://yakshalang.github.io/Tutorials/)
+* [Standard Library](https://yakshalang.github.io/library-docs.html)
+* [Proposals](https://github.com/YakshaLang/yakshalang.github.io/tree/main/yaksha_proposals)
 * [Demos with source code](https://yakshalang.github.io/demos.html)
 * [(B)log](https://yakshalang.github.io/blog.html)
 * [Plan / Tasks](https://trello.com/b/f25EcuX6/%F0%9F%91%BF-yaksha-tasks)
