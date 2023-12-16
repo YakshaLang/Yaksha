@@ -9,7 +9,7 @@
 * [Standard Library](https://yakshalang.github.io/library-docs.html)
 * [Tutorials](https://yakshalang.github.io/Tutorials/)
 * [Documentation](https://yakshalang.github.io/documentation)
-* [Proposals](https://github.com/YakshaLang/YAMA/tree/main/proposals)
+* [Proposals](https://github.com/YakshaLang/yakshalang.github.io/tree/main/yaksha_proposals)
 * [Demos with source code](https://yakshalang.github.io/demos.html)
 * [(B)log](https://yakshalang.github.io/blog.html)
 * [Plan / Tasks](https://trello.com/b/f25EcuX6/%F0%9F%91%BF-yaksha-tasks)
