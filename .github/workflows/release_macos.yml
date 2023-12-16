@@ -7,7 +7,7 @@ env:
   PYTHONIOENCODING: utf-8
   PYTHONLEGACYWINDOWSSTDIO: utf-8
 jobs:
-  release:
+  release-macos:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

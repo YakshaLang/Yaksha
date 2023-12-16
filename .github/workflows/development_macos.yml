@@ -8,7 +8,7 @@ env:
   PYTHONLEGACYWINDOWSSTDIO: utf-8
 
 jobs:
-  check-ubuntu-x86_64:
+  check-macos-x86_64:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
