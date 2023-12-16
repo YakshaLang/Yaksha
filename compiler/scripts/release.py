@@ -39,6 +39,7 @@
 import ast
 import configparser
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -51,10 +52,19 @@ ROOT = os.path.realpath(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 MAX_EXECUTION_TIME_SEC = 60 * 60
 PATHS = []
 
+MAC_OS = sys.platform.startswith('darw')  # noqa
 WINDOWS_OS = sys.platform.startswith('win')
-CURRENT_PLATFORM_KEY = "windows-x86_64" if WINDOWS_OS else "linux-x86_64"
+ARM_CPU = platform.processor() == "arm"
+ARCH = "aarch64" if ARM_CPU else "x86_64"
+CURRENT_PLATFORM_KEY = f"linux-{ARCH}"
+if WINDOWS_OS:
+    CURRENT_PLATFORM_KEY = f"windows-{ARCH}"
+if MAC_OS:
+    CURRENT_PLATFORM_KEY = f"macos-{ARCH}"
 BUNDLED_ZIG_VERSION = "0.9.1"
 COMPILER_BINARIES = ["yaksha.exe", "yakshac.exe"] if WINDOWS_OS else ["yaksha", "yakshac"]
+MUST_HAVE_BIN = set(["yaksha", "carpntr", "zig"])  # noqa
+SCRIPT_STATUS = 0
 
 
 @contextmanager
@@ -181,14 +191,14 @@ def download(url: str, sha256_hash: str) -> (bool, str):
 
 
 def execute(args: list):
-    fuzz_process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8",
-                                    universal_newlines=True, env=dict(os.environ))
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8",
+                            universal_newlines=True, env=dict(os.environ))
     try:
-        so, se = fuzz_process.communicate(timeout=MAX_EXECUTION_TIME_SEC)
-        return_value = fuzz_process.returncode
+        so, se = proc.communicate(timeout=MAX_EXECUTION_TIME_SEC)
+        return_value = proc.returncode
     except subprocess.TimeoutExpired:
-        fuzz_process.kill()
-        fuzz_process.communicate()
+        proc.kill()
+        proc.communicate()
         print("Timed out - ", Colors.fail(repr(args)))
         return -1
     if return_value != 0:
@@ -233,6 +243,7 @@ def package(arch: str, directory: str):
 
 
 def copy_binaries(section: Section, target_location):
+    global SCRIPT_STATUS
     binaries = section.binaries
     suffix = section.exe_suffix
     for bin_name in binaries:
@@ -245,6 +256,10 @@ def copy_binaries(section: Section, target_location):
                 break
         else:
             print(Colors.red(bin_name), "❌")
+            # WHY:
+            # If we do not have yaksha or carpntr binaries, it is a useless build
+            if bin_name in MUST_HAVE_BIN:
+                SCRIPT_STATUS = 1
 
 
 def create_package(directory, name, ext):
@@ -285,7 +300,8 @@ def build_release(name: str):
     shutil.rmtree(directory)
     shutil.rmtree(temp)
     # final message
-    print(Colors.green("all done."), "🎉")
+    if SCRIPT_STATUS == 0:
+        print(Colors.green("all done."), "🎉")
 
 
 def build_releases():
@@ -337,6 +353,19 @@ def compile_carpntr():
     with navigate(carpntr_path):
         with updated_path():
             execute([sys.executable, "bootstrap_me.py"])
+    # WHY?
+    # carpntr fails to build as native on Mac (M2 in my case)
+    # so this fixes it in case that has happened
+    if MAC_OS and not os.path.exists(os.path.join(carpntr_build_path, "bootstrapped-carpntr")):
+        shutil.copyfile(os.path.join(carpntr_build_path, f"bootstrapped-carpntr-{ARCH}-macos-gnu"),
+                        os.path.join(carpntr_build_path, "bootstrapped-carpntr"))
+        execute(["chmod", "+x", os.path.join(carpntr_build_path, "bootstrapped-carpntr")])
+        with navigate(carpntr_path):
+            with updated_path():
+                execute(["build/bootstrapped-carpntr"])
+        shutil.copyfile(os.path.join(carpntr_build_path, f"carpntr-{ARCH}-macos-gnu"),
+                        os.path.join(carpntr_build_path, "carpntr"))
+        execute(["chmod", "+x", os.path.join(carpntr_build_path, "carpntr")])
     global PATHS
     PATHS.append(carpntr_build_path)
 
@@ -348,6 +377,11 @@ def compile_hammer():
     with navigate(hammer_path):
         with updated_path():
             execute(["carpntr"])
+    # Workaround for native build issue on Mac M2 CPU
+    if MAC_OS and not os.path.exists(os.path.join(hammer_build_path, "hammer")):
+        shutil.copyfile(os.path.join(hammer_build_path, f"hammer-{ARCH}-macos-gnu"),
+                        os.path.join(hammer_build_path, "hammer"))
+        execute(["chmod", "+x", os.path.join(hammer_build_path, "hammer")])
     global PATHS
     PATHS.append(hammer_build_path)
 
@@ -376,10 +410,17 @@ def ensure_temp():
         print(Colors.fail("Failed to create temp_path:"), temp_path)
 
 
-if __name__ == "__main__":
+def main():
     # Set work directory to be that of project root.
     os.chdir(ROOT)
     ensure_temp()
     compile_release()
     print("-" * 40)
     build_releases()
+    if SCRIPT_STATUS != 0:
+        print(Colors.red("Release failed 💀"))
+    sys.exit(SCRIPT_STATUS)
+
+
+if __name__ == "__main__":
+    main()

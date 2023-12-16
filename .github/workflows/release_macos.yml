@@ -11,8 +11,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [macos-11]
     steps:
+    - name: Install 7z
+      run: brew install p7zip
+    - name: cmake
+      run: brew install cmake
     - name: Checkout git repo
       uses: actions/checkout@v2
       with:
