@@ -164,7 +164,7 @@ TEST_CASE("gc_pool: mark sweep with few freed") {
 }
 TEST_CASE("gc_pool: random test") {
   for (int i = 0; i < 80; i++) {
-    size_t initial_size = rand() % 200;
+    size_t initial_size = 1 + rand() % 200;
     gc_pool<test_object> pool{initial_size};
     size_t count = 0;
     for (test_object *ptr = pool.m_free_doubly_linked_list_; ptr != nullptr;
@@ -172,7 +172,7 @@ TEST_CASE("gc_pool: random test") {
       ++count;
     }
     REQUIRE(count == initial_size);
-    size_t alloc_count = rand() % 200;
+    size_t alloc_count = 1 + rand() % 200;
     size_t mark_count = 0;
     for (int j = 0; j < alloc_count - 1; j++) {
       test_object *ptr = pool.allocate();
