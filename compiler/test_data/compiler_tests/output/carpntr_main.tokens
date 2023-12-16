@@ -30467,7 +30467,7 @@
     ["output.c",3622,5,"return","KEYWORD_RETURN"],
     ["output.c",3622,12,"yk__sdsnewlen","NAME"],
     ["output.c",3622,25,"(","PAREN_OPEN"],
-    ["output.c",3622,27,"0.0.4","STRING"],
+    ["output.c",3622,27,"0.0.5","STRING"],
     ["output.c",3622,33,",","COMMA"],
     ["output.c",3622,35,"5","INTEGER_DECIMAL"],
     ["output.c",3622,36,")","PAREN_CLOSE"],
