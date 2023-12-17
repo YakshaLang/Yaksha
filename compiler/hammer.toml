@@ -35,3 +35,7 @@ sources=["src/carpntr_wrapper.cpp", "runtime/whereami.c",
 name="yaksha"
 out_dir="bin/hammer.bin"
 args_link=["-static", "-O2"]
+# Operating system specific arguments
+windows_args_link=["-lws2_32"]
+linux_args_link=["-lrt"]
+macos_args_link=[]

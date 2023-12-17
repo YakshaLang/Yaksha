@@ -52,6 +52,9 @@ class Binary:
     args_link: Array[str]
     cpp: bool
     sources: Array[str]
+    windows_args_link: Array[str]
+    linux_args_link: Array[str]
+    macos_args_link: Array[str]
 
 class HammerConfig:
     # [compilation]
@@ -87,6 +90,9 @@ def load_binary(t: toml.Table, c: HammerConfig, binary_name: str) -> Binary:
     b.out_dir = toml.get_string_default(t, "out_dir", ".")
     b.main_file = toml.get_string_default(t, "main_file", "")
     b.sources = toml.get_string_array(t, "sources")
+    b.windows_args_link = toml.get_string_array(t, "windows_args_link")
+    b.linux_args_link = toml.get_string_array(t, "linux_args_link")
+    b.macos_args_link = toml.get_string_array(t, "macos_args_link")
     if len(b.main_file) == 0:
         arrput(c.errors, "Empty main file for: " + binary_name)
     b.cpp = strings.endswith(b.main_file, ".cpp")
@@ -130,6 +136,9 @@ def load() -> HammerConfig:
 def del_binary(b: Binary) -> None:
     sarr.del_str_array(b.args_link)
     sarr.del_str_array(b.sources)
+    sarr.del_str_array(b.windows_args_link)
+    sarr.del_str_array(b.linux_args_link)
+    sarr.del_str_array(b.macos_args_link)
     del b.main_file
     del b.name
     del b.out_dir
