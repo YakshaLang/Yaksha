@@ -12,6 +12,8 @@ jobs:
     strategy:
       matrix:
         os: [windows-2019]
+    permissions:
+      contents: write
     steps:
     - name: Checkout git repo
       uses: actions/checkout@v2
@@ -23,6 +25,6 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          main/compiler/comp_output_test/yaksha_v*.zip
-          main/compiler/comp_output_test/yaksha_v*.7z
+        files: main/compiler/comp_output_test/yaksha_v*.7z
+        draft: 'true'
+        fail_on_unmatched_files: 'false'

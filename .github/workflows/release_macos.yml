@@ -12,6 +12,8 @@ jobs:
     strategy:
       matrix:
         os: [macos-11]
+    permissions:
+      contents: write
     steps:
     - name: Install software
       run: brew install cmake ninja gcc p7zip
@@ -25,6 +27,6 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          main/compiler/comp_output_test/yaksha_v*.zip
-          main/compiler/comp_output_test/yaksha_v*.7z
+        files: main/compiler/comp_output_test/yaksha_v*.7z
+        draft: 'true'
+        fail_on_unmatched_files: 'false'

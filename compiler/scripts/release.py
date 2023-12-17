@@ -314,9 +314,6 @@ def build_release(name: str):
     # create package .7z
     archive = create_package(directory, name, ".7z")
     print(Colors.blue(os.path.basename(archive)), "✔️")
-    # create package .zip
-    archive = create_package(directory, name, ".zip")
-    print(Colors.blue(os.path.basename(archive)), "✔️")
     # clean up
     shutil.rmtree(directory)
     shutil.rmtree(temp)
