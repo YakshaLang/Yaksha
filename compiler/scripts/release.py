@@ -52,6 +52,9 @@ ROOT = os.path.realpath(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 MAX_EXECUTION_TIME_SEC = 60 * 60
 PATHS = []
 
+MACOS_RELEASE_FILTER = ["macos", "linux"]
+WINDOWS_RELEASE_FILTER = ["windows"]
+
 MAC_OS = sys.platform.startswith('darw')  # noqa
 WINDOWS_OS = sys.platform.startswith('win')
 ARM_CPU = platform.processor() == "arm"
@@ -123,6 +126,24 @@ class Colors:
         return Colors.FAIL + str(text) + Colors.ENDC
 
 
+def contains_any(haystack: str, needles: List[str]) -> bool:
+    for needle in needles:
+        if needle in haystack:
+            return True
+    return False
+
+
+def filter_releases(releases: List[str]) -> List[str]:
+    filtered = releases
+    if WINDOWS_OS:
+        filtered = [r for r in releases if contains_any(r, WINDOWS_RELEASE_FILTER)]
+    if MAC_OS:
+        filtered = [r for r in releases if contains_any(r, MACOS_RELEASE_FILTER)]
+    print(Colors.cyan("targets:"), releases, Colors.cyan("selected:"), filtered)
+    print()
+    return filtered
+
+
 class Section:
     def __init__(self, obj, parent):
         self._obj = obj
@@ -144,7 +165,7 @@ class Config:
         self._configuration.read(os.path.join(ROOT, "scripts/release.ini"))
         self.version = str(self._configuration["main"]["version"]).strip()
         self.temp = os.path.join(ROOT, str(self._configuration["main"]["temp"])).strip()
-        self.releases = ast.literal_eval(str(self._configuration["main"]["releases"]).strip())
+        self.releases = filter_releases(ast.literal_eval(str(self._configuration["main"]["releases"]).strip()))
 
     def section(self, name) -> Section:
         return Section(self._configuration[name], self._configuration)

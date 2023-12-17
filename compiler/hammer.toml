@@ -13,7 +13,7 @@
 # Note that all the paths are relative in current directory
 #
 [compilation]
-targets=["x86_64-linux-musl", "x86_64-windows-gnu", "aarch64-macos-gnu", "x86_64-macos-gnu"]
+targets=["x86_64-linux-musl", "x86_64-linux-gnu", "x86_64-windows-gnu", "aarch64-macos-gnu", "x86_64-macos-gnu"]
 args_c_or_cpp=["-O2", "-fPIC"]
 args_cpp=["-std=c++17"]
 args_c=["-std=c99"]
