@@ -105,6 +105,7 @@ void yy__building_build_objects_sequential(struct yy__building_BObject**);
 void yy__building_build_objects(struct yy__building_BObject**);
 void yy__building_cleanup_buildables(struct yy__building_BObject**);
 bool yy__building_keep_ray_objects(yk__sds, bool);
+bool yy__building_is_arm64_cpu();
 yk__sds* yy__building_create_args(struct yy__configuration_Config*, yk__sds, yk__sds, yk__sds, yk__sds*);
 void yy__building_print_target_eq(yk__sds, bool);
 int32_t yy__building_build_target(struct yy__configuration_Config*, yk__sds, yk__sds, yk__sds, yk__sds*, bool);
@@ -1245,6 +1246,16 @@ bool yy__building_keep_ray_objects(yk__sds yy__building_element, bool yy__buildi
     yk__sdsfree(yy__building_element);
     return t__25;
 }
+bool yy__building_is_arm64_cpu() 
+{
+    
+    #if defined(__arm64__) || defined(__aarch64__) || defined(__arm64)
+        return true;
+    #else
+        return false;
+    #endif
+    ;
+}
 yk__sds* yy__building_create_args(struct yy__configuration_Config* yy__building_c, yk__sds yy__building_code_path, yk__sds yy__building_build_path, yk__sds yy__building_target, yk__sds* yy__building_raylib_args) 
 {
     bool yy__building_native = (yk__sdslen(yy__building_target) == INT32_C(0));
@@ -1411,6 +1422,11 @@ yk__sds* yy__building_create_args(struct yy__configuration_Config* yy__building_
     {
         yk__arrput(yy__building_args, yk__sdsnewlen("-target", 7));
         yk__arrput(yy__building_args, yk__sdsnewlen("wasm32-wasi-musl", 16));
+    }
+    if ((yy__building_native && yy__building_is_arm64_cpu()) && yy__building_is_target_macos(yk__sdsdup(yy__building_target)))
+    {
+        yk__arrput(yy__building_args, yk__sdsnewlen("-target", 7));
+        yk__arrput(yy__building_args, yk__sdsnewlen("aarch64-macos-gnu", 17));
     }
     yy__building_length = yk__arrlen(yy__building_c->yy__configuration_c_code->yy__configuration_runtime_feature_c_code);
     yy__building_x = INT32_C(0);

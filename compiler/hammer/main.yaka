@@ -95,6 +95,17 @@ def is_target_macos(target_to_check: str) -> bool:
         return os.is_macos()
     return strings.contains(target_to_check, "macos")
 
+@native
+def is_arm64_cpu() -> bool:
+    # way to detect if we are running m1/m2/etc macos
+    ccode """
+    #if defined(__arm64__) || defined(__aarch64__) || defined(__arm64)
+        return true;
+    #else
+        return false;
+    #endif
+    """
+
 def is_target_windows(target_to_check: str) -> bool:
     # Check if given target is windows, if target == native, check if we are running windows
     native: bool = target_to_check == "native"
@@ -120,6 +131,10 @@ def get_base_args(c: conf.HammerConfig, target: str, cpp: bool) -> Array[str]:
     if not (target == "native"):
         arrput(args, "-target")
         arrput(args, target)
+    # m1/m2/etc must not build for native, instead build for "aarch64-macos-gnu"
+    if target == "native" and is_arm64_cpu() and is_target_macos(target):
+        arrput(args, "-target")
+        arrput(args, "aarch64-macos-gnu")
     args = sarr.extend(args, c.args_c_or_cpp)
     if cpp:
         args = sarr.extend(args, c.args_cpp)

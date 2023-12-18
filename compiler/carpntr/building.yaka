@@ -231,6 +231,17 @@ def keep_ray_objects(element: str, negate: bool) -> bool:
         return not obj
     return obj
 
+@native
+def is_arm64_cpu() -> bool:
+    # way to detect if we are running m1/m2/etc macos
+    ccode """
+    #if defined(__arm64__) || defined(__aarch64__) || defined(__arm64)
+        return true;
+    #else
+        return false;
+    #endif
+    """
+
 def create_args(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> Array[str]:
     # Create arguments for compilation on to a string array
     # This string array need to be deleted
@@ -291,6 +302,10 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     if target == "wasm4":
         arrput(args, "-target")
         arrput(args, "wasm32-wasi-musl")
+    # m1/m2/etc must not build for native, instead build for "aarch64-macos-gnu"
+    if native and is_arm64_cpu() and is_target_macos(target):
+        arrput(args, "-target")
+        arrput(args, "aarch64-macos-gnu")
     # runtime c codes
     length = len(c.c_code.runtime_feature_c_code)
     x = 0
