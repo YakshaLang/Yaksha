@@ -95,14 +95,11 @@ namespace yaksha {
     [[nodiscard]] ykdatatype *auto_cast(ykdatatype *rhs, ykdt_pool *pool,
                                         bool lhs_mutates, bool assignment);
     [[nodiscard]] std::string as_string() const;
-
     // meta type
     [[nodiscard]] bool is_primitive() const;
     [[nodiscard]] bool is_builtin_or_primitive() const;
-
     // const type modifier
     [[nodiscard]] bool is_const() const;
-
     // number types
     [[nodiscard]] bool is_i8() const;
     [[nodiscard]] bool is_i16() const;
@@ -114,18 +111,14 @@ namespace yaksha {
     [[nodiscard]] bool is_u64() const;
     [[nodiscard]] bool is_f32() const;
     [[nodiscard]] bool is_f64() const;
-
     // none type
     [[nodiscard]] bool is_none() const;
-
     // strings
     [[nodiscard]] bool is_str() const;
     [[nodiscard]] bool is_sr() const;
     [[nodiscard]] bool is_string_literal() const;
-
     // bool
     [[nodiscard]] bool is_bool() const;
-
     // containers or container parts
     [[nodiscard]] bool is_array() const;
     [[nodiscard]] bool is_ptr() const;
@@ -137,15 +130,13 @@ namespace yaksha {
     [[nodiscard]] bool is_any_ptr() const;
     [[nodiscard]] bool is_any_ptr_to_const() const;
     [[nodiscard]] bool is_tuple() const;
-
     // match a combination of primitives
     [[nodiscard]] bool is_a_number() const;
     [[nodiscard]] bool is_an_integer() const;
     [[nodiscard]] bool is_a_signed_integer() const;
-    [[nodiscard]] bool is_an_unsigned_integer() const; 
-    [[nodiscard]] bool is_a_string() const; 
-    [[nodiscard]] bool is_a_float() const; 
-
+    [[nodiscard]] bool is_an_unsigned_integer() const;
+    [[nodiscard]] bool is_a_string() const;
+    [[nodiscard]] bool is_a_float() const;
     token *token_{};
     std::string type_{};
     std::string module_{};

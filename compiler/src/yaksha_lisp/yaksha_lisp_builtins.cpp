@@ -571,15 +571,13 @@ yaksha_lisp_builtins::for_(const std::vector<yaksha_lisp_value *> &args,
       // try to set the value
       env->set(symbol->expr_->token_->token_, x, false);
       set_completed = true;
-    } catch (const parsing_error &e) {
-    }
+    } catch (const parsing_error &e) {}
     if (!set_completed) {
       try {
         // try to define it if we cannot set it
         env->set(symbol->expr_->token_->token_, x, true);
         set_completed = true;
-      } catch (const parsing_error &e) {
-      }
+      } catch (const parsing_error &e) {}
     }
     if (!set_completed) {
       throw parsing_error{"for failed to set symbol", "", 0, 0};
@@ -1733,7 +1731,7 @@ yaksha_lisp_builtins::os_exec_(const std::vector<yaksha_lisp_value *> &args,
   }
   auto e_args = eval_args(args, env);
   std::vector<std::string> cmd_args;
-  for (auto & e_arg : e_args) {
+  for (auto &e_arg : e_args) {
     if (e_arg->type_ != yaksha_lisp_value_type::STRING) {
       throw parsing_error{"os_exec takes only string arguments", "", 0, 0};
     }

@@ -735,8 +735,7 @@ ykdatatype *parser::parse_datatype() {
     } while (match({token_type::COMMA}));
     consume(token_type::SQUARE_BRACKET_CLOSE, "Must have a closing ']'");
   }
-  if (dt->is_array() || dt->is_ptr() || dt->is_const() ||
-      dt->is_sm_entry()) {
+  if (dt->is_array() || dt->is_ptr() || dt->is_const() || dt->is_sm_entry()) {
     if (dt->args_.size() != 1) {
       throw error(
           dt->token_,

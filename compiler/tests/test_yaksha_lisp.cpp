@@ -632,7 +632,6 @@ TEST_CASE("yaksha_lisp: while loop simple") {
         (if (== x 3) (= success 1))
         )");
 }
-
 TEST_CASE("yaksha_lisp: map_keys, map_values, map_remove") {
   test_snippet_execute(R"(
         (def m @{a: 1, b: 2, c: 3})
@@ -777,8 +776,8 @@ TEST_CASE("yaksha_lisp: '::' syntax sugar to get from map") {
     )");
 }
 TEST_CASE("yaksha_lisp: os_exec test") {
-std::stringstream ss{};
-ss << "(system_enable_print)";
+  std::stringstream ss{};
+  ss << "(system_enable_print)";
 #if defined(YAKSHA_OS_WINDOWS)
   ss << R"((print (os_exec "cmd" "/C" "echo hello")))";
 #else

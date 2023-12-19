@@ -61,10 +61,9 @@
 #if !defined(_MSC_VER) && (defined(_WIN32) || defined(_WIN64))
 #include "reloader_alt.cpp"
 #elif defined(__APPLE__)
-int reloader_main(int argc, char** argv) {
-    std::cerr << colours::red(
-            "yaksha reload is not supported yet in macos\n");
-    return 1;
+int reloader_main(int argc, char **argv) {
+  std::cerr << colours::red("yaksha reload is not supported yet in macos\n");
+  return 1;
 }
 #else
 #include "reloader.cpp"

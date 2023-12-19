@@ -66,7 +66,7 @@ int lisp_execute_file(char *file_path) {
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
   yaksha_macros mm{};
-  yaksha_lisp_tokenizer* tokenizer = mm.create_tokenizer();
+  yaksha_lisp_tokenizer *tokenizer = mm.create_tokenizer();
   tokenizer->tokenize(file_name, data, mm.get_yk_token_pool());
   if (!tokenizer->errors_.empty()) {
     errors::print_errors(tokenizer->errors_);
@@ -79,7 +79,7 @@ int lisp_execute_file(char *file_path) {
     return EXIT_FAILURE;
   }
   std::string f_path{file_path};
-  std::unordered_map<std::string, import_stmt*> no_imports{};
+  std::unordered_map<std::string, import_stmt *> no_imports{};
   mm.init_env(f_path, no_imports);
   yaksha_envmap *environment = mm.validate_and_get_environment_root(f_path);
   try {
@@ -90,15 +90,15 @@ int lisp_execute_file(char *file_path) {
   }
   return EXIT_SUCCESS;
 }
-void eval_line(const std::string &code, yaksha_envmap *environment, yaksha_macros* mm) {
+void eval_line(const std::string &code, yaksha_envmap *environment,
+               yaksha_macros *mm) {
   yaksha_lisp_tokenizer *tokenizer = mm->create_tokenizer();
-  tokenizer->tokenize("repl.lisp", code,
-                     mm->get_yk_token_pool());
+  tokenizer->tokenize("repl.lisp", code, mm->get_yk_token_pool());
   if (!tokenizer->errors_.empty()) {
     errors::print_errors(tokenizer->errors_);
     return;
   }
-  yaksha_lisp_parser * parser = mm->create_parser(tokenizer);
+  yaksha_lisp_parser *parser = mm->create_parser(tokenizer);
   parser->parse();
   if (!parser->errors_.empty()) {
     errors::print_errors(parser->errors_);
@@ -121,9 +121,10 @@ int lisp_repl() {
   std::cout << "Type in expressions to evaluate them.\n";
   std::cout << "Input " << colours::cyan("(exit)") << " to exit from repl.\n";
   yaksha_macros mm{};
-  std::unordered_map<std::string, import_stmt*> no_imports{};
+  std::unordered_map<std::string, import_stmt *> no_imports{};
   mm.init_env("repl.lisp", no_imports);
-  yaksha_envmap *environment = mm.validate_and_get_environment_root("repl.lisp");
+  yaksha_envmap *environment =
+      mm.validate_and_get_environment_root("repl.lisp");
 #ifdef PRINT_BUILTINS_YAKSHA_LISP
   std::cout << "Builtins:: ";
   bool first = true;

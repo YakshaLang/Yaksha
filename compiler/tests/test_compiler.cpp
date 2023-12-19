@@ -480,16 +480,19 @@ TEST_CASE("compiler: c like for loop") {
 }
 TEST_CASE("compiler: auto cast bool count") {
   test_compile_yaka_file(
-      "../test_data/compiler_tests/auto_casting/autocastboolcount.yaka", "autocastboolcount.yaka",
+      "../test_data/compiler_tests/auto_casting/autocastboolcount.yaka",
+      "autocastboolcount.yaka",
       "../test_data/compiler_tests/output/autocastboolcount.tokens");
 }
 TEST_CASE("compiler: sr with const") {
   test_compile_yaka_file(
-      "../test_data/compiler_tests/string_tests/sr_with_const.yaka", "sr_with_const.yaka",
+      "../test_data/compiler_tests/string_tests/sr_with_const.yaka",
+      "sr_with_const.yaka",
       "../test_data/compiler_tests/output/sr_with_const.tokens");
 }
 TEST_CASE("compiler: various string operations with const") {
   test_compile_yaka_file(
-      "../test_data/compiler_tests/string_tests/strings_const_mixed_tests.yaka", "strings_const_mixed_tests.yaka",
+      "../test_data/compiler_tests/string_tests/strings_const_mixed_tests.yaka",
+      "strings_const_mixed_tests.yaka",
       "../test_data/compiler_tests/output/strings_const_mixed_tests.tokens");
 }

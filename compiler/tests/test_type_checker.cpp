@@ -254,14 +254,16 @@ TEST_CASE("type checker: + operator with just 2 booleans") {
       "a: bool = True\n"
       "    b: bool = a + False\n",
       "+ operator works only for numbers of same type or strings,"
-      " (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+      " (widening may occur between smaller to larger numbers, and this is not "
+      "a valid case of auto widening)");
 }
 TEST_CASE("type checker: + operator with just 2 booleans (one is const)") {
   test_typechecker_snippet(
       "a: Const[bool] = True\n"
       "    b: bool = a + False\n",
       "+ operator works only for numbers of same type or strings,"
-      " (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+      " (widening may occur between smaller to larger numbers, and this is not "
+      "a valid case of auto widening)");
 }
 TEST_CASE("type checker: + operator with just 2 booleans (both are const)") {
   test_typechecker_snippet(
@@ -269,7 +271,8 @@ TEST_CASE("type checker: + operator with just 2 booleans (both are const)") {
       "    b: Const[bool] = False\n"
       "    c: Const[bool] = a + b\n",
       "+ operator works only for numbers of same type or strings,"
-      " (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+      " (widening may occur between smaller to larger numbers, and this is not "
+      "a valid case of auto widening)");
 }
 TEST_CASE("type checker: cannot compare tuples with ==") {
   test_typechecker_snippet(
@@ -708,7 +711,9 @@ TEST_CASE("type checker: Certain comparisions are not allowed") {
 TEST_CASE("type checker: Widening u8 + i8 cannot happen") {
   test_typechecker_snippet(
       "a = 1i8 + 2u8",
-      "+ operator works only for numbers of same type or strings, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+      "+ operator works only for numbers of same type or strings, (widening "
+      "may occur between smaller to larger numbers, and this is not a valid "
+      "case of auto widening)");
 }
 TEST_CASE("type checker: Widening u8 + i16 can happen") {
   test_typechecker_snippet_ok("a: i16 = 2u8 + 1i16");
@@ -722,12 +727,16 @@ TEST_CASE("type checker: Widening u8 + i64 can happen") {
 TEST_CASE("type checker: Widening u16 + i8 cannot happen") {
   test_typechecker_snippet(
       "a = 2u16 + 1i8",
-      "+ operator works only for numbers of same type or strings, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+      "+ operator works only for numbers of same type or strings, (widening "
+      "may occur between smaller to larger numbers, and this is not a valid "
+      "case of auto widening)");
 }
 TEST_CASE("type checker: Widening u16 + i16 cannot happen") {
   test_typechecker_snippet(
       "a = 2u16 + 1i16",
-      "+ operator works only for numbers of same type or strings, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+      "+ operator works only for numbers of same type or strings, (widening "
+      "may occur between smaller to larger numbers, and this is not a valid "
+      "case of auto widening)");
 }
 TEST_CASE("type checker: Widening u16 + i32 can happen") {
   test_typechecker_snippet_ok("a = 2u16 + 1i32");

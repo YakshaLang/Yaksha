@@ -87,7 +87,8 @@ void compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
     } else {
       body_ << rhs.first;
     }
-    LOG_COMP("cast assign:" << lhs.first << " " << operator_token->token_ << " " << rhs.first);
+    LOG_COMP("cast assign:" << lhs.first << " " << operator_token->token_ << " "
+                            << rhs.first);
   } else if (rhs.second.is_primitive_or_obj() &&
              rhs.second.datatype_->const_unwrap()->is_a_string() &&
              operator_token->type_ == token_type::EQ) {
@@ -341,7 +342,8 @@ void compiler::compile_simple_bin_op(
     const binary_expr *obj, const token_type &operator_type,
     const std::pair<std::string, ykobject> &lhs,
     const std::pair<std::string, ykobject> &rhs) {
-  if (lhs.second.is_primitive_or_obj() && lhs.second.datatype_->const_unwrap()->is_f32() &&
+  if (lhs.second.is_primitive_or_obj() &&
+      lhs.second.datatype_->const_unwrap()->is_f32() &&
       obj->opr_->type_ == token_type::MOD) {// Float %
     push("remainderf(" + lhs.first + ", " + rhs.first + ")", lhs.second);
   } else if (lhs.second.is_primitive_or_obj() &&
@@ -1017,25 +1019,26 @@ void compiler::visit_let_stmt(let_stmt *obj) {
         body_ << convert_dt(object.datatype_) << " " << name << " = "
               << "yk__sdsdup(" << exp.first << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_sr()) {
-        body_ << convert_dt(object.datatype_) << " "  << name << " = "
+        body_ << convert_dt(object.datatype_) << " " << name << " = "
               << "yk__bstr_copy_to_sds(" << exp.first << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
         auto u = string_utils::unescape(exp.second.string_val_);
-        body_ << convert_dt(object.datatype_) << " "  << name << " = "
+        body_ << convert_dt(object.datatype_) << " " << name << " = "
               << "yk__sdsnewlen(\"" << string_utils::escape(u) << "\" , "
               << u.size() << ")";
       } else {
         error("Failed to compile assign to string.");
       }
     } else {
-      body_ << convert_dt(object.datatype_) << " "  << name << " = "
+      body_ << convert_dt(object.datatype_) << " " << name << " = "
             << "yk__sdsempty()";
     }
     // If there is an expression, go to that, pop(), duplicate and assign.
     // If there is not an expression, assign yk__sdsempty()
     // Add to deletions
     deletions_.push(name, "yk__sdsfree(" + name + ")");
-  } else if (obj->data_type_->const_unwrap()->is_sr() || obj->data_type_->const_unwrap()->is_string_literal()) {
+  } else if (obj->data_type_->const_unwrap()->is_sr() ||
+             obj->data_type_->const_unwrap()->is_string_literal()) {
     if (obj->data_type_->is_const()) {
       auto const_wrapper = dt_pool_->create("Const");
       const_wrapper->args_.emplace_back(dt_pool_->create("sr"));
@@ -1048,10 +1051,11 @@ void compiler::visit_let_stmt(let_stmt *obj) {
                                 : compile_expression(obj->expression_);
       write_indent(body_);
       if (exp.second.datatype_->const_unwrap()->is_str()) {
-        body_ << convert_dt(object.datatype_) << " " << name << " = yk__bstr_h(" << exp.first
-              << ")";
+        body_ << convert_dt(object.datatype_) << " " << name << " = yk__bstr_h("
+              << exp.first << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_sr()) {
-        body_ << convert_dt(object.datatype_) << " " << name << " = " << exp.first;
+        body_ << convert_dt(object.datatype_) << " " << name << " = "
+              << exp.first;
       } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
         auto u = string_utils::unescape(exp.second.string_val_);
         body_ << convert_dt(object.datatype_) << " " << name << " = "

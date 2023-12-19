@@ -140,7 +140,10 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
     case token_type::SHL:
     case token_type::SHR:
       if (!(DT_VERIFY(castable, lhs, rhs, a->is_an_integer()))) {
-        error(obj->opr_, "^ & | << >> operators work only for integers, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+        error(obj->opr_,
+              "^ & | << >> operators work only for integers, (widening may "
+              "occur between smaller to larger numbers, and this is not a "
+              "valid case of auto widening)");
       } else if (castable != nullptr) {
         rhs.datatype_ = castable;
       }
@@ -150,7 +153,9 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
     case token_type::MUL:
     case token_type::SUB:
       if (!(DT_VERIFY(castable, lhs, rhs, a->is_a_number()))) {
-        error(obj->opr_, "% - * / operators work only for numbers, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+        error(obj->opr_, "% - * / operators work only for numbers, (widening "
+                         "may occur between smaller to larger numbers, and "
+                         "this is not a valid case of auto widening)");
       } else if (castable != nullptr) {
         rhs.datatype_ = castable;
       }
@@ -164,7 +169,9 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
       }
       if (!(DT_MATCH(lhs, rhs, (a->is_a_number() || a->is_a_string())))) {
         error(obj->opr_,
-              "+ operator works only for numbers of same type or strings, (widening may occur between smaller to larger numbers, and this is not a valid case of auto widening)");
+              "+ operator works only for numbers of same type or strings, "
+              "(widening may occur between smaller to larger numbers, and this "
+              "is not a valid case of auto widening)");
       }
       if (lhs.datatype_->const_unwrap()->is_sr()) {// sr + sr -> str
         push(ykobject(dt_pool_->create("str")));
@@ -416,7 +423,8 @@ void type_checker::visit_logical_expr(logical_expr *obj) {
   obj->right_->accept(this);
   auto rhs = pop();
   if (!(lhs.is_primitive_or_obj() && lhs.datatype_->const_unwrap()->is_bool() &&
-        rhs.is_primitive_or_obj() && rhs.datatype_->const_unwrap()->is_bool())) {
+        rhs.is_primitive_or_obj() &&
+        rhs.datatype_->const_unwrap()->is_bool())) {
     error(obj->opr_, "Both LHS and RHS of logical"
                      " operator need to be boolean");
   }
@@ -764,7 +772,8 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     push(obj);
     return;
   }
-  if (!lhs.is_primitive_or_obj() || lhs.datatype_->const_unwrap()->is_primitive()) {
+  if (!lhs.is_primitive_or_obj() ||
+      lhs.datatype_->const_unwrap()->is_primitive()) {
     error(dot, "Invalid dot operator, LHS need to be an object");
     push(ykobject(dt_pool_));
     return;
@@ -1026,9 +1035,8 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   if (!exp.datatype_->is_array()) {
     error(obj->for_keyword_, "foreach iteration must use an array");
   }
-  if ((exp.datatype_->is_array() &&
-       (exp.datatype_->args_[0]->is_sm_entry() ||
-        exp.datatype_->args_[0]->is_m_entry()))) {
+  if ((exp.datatype_->is_array() && (exp.datatype_->args_[0]->is_sm_entry() ||
+                                     exp.datatype_->args_[0]->is_m_entry()))) {
     error(obj->for_keyword_,
           "Cannot use foreach iteration for SMEntry and MEntry.");
   }

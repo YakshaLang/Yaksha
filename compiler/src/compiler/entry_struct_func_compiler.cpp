@@ -37,9 +37,9 @@
 //
 // ==============================================================================================
 // entry_struct_func_compiler.cpp
-#include <iostream>
-#include <iomanip>
 #include "entry_struct_func_compiler.h"
+#include <iomanip>
+#include <iostream>
 using namespace yaksha;
 entry_struct_func_compiler::entry_struct_func_compiler(ykdt_pool *pool)
     : pool_(pool), counter_(0), autogen_structs_list_(), autogen_structs_(),
