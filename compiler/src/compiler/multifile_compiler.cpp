@@ -346,7 +346,7 @@ void multifile_compiler::step_3_macros_setup(codefiles &cf) {
         f->step_ >= scanning_step::MACROS_SETUP_DONE) {
       continue;
     }
-    f->data_->parser_->step_3_excute_macros(&cf.yaksha_macros_);
+    f->data_->parser_->step_3_execute_macros(&cf.yaksha_macros_);
     if (f->data_->parser_->errors_.empty()) {
       f->step_ = scanning_step::MACROS_SETUP_DONE;
     } else {

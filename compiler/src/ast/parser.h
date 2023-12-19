@@ -55,7 +55,7 @@ namespace yaksha {
     ~parser();
     // stepwise preprocess dsl macros
     void step_1_parse_token_soup();
-    void step_3_excute_macros(macro_processor *mp);
+    void step_3_execute_macros(macro_processor *mp);
     void step_4_expand_macros(macro_processor *mp, gc_pool<token> *token_pool);
     // facade for preprocess dsl macros (all above steps are done here, for tests)
     void preprocess(macro_processor *mp, gc_pool<token> *token_pool);

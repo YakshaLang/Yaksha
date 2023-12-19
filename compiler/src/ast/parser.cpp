@@ -932,7 +932,7 @@ stmt *parser::runtimefeature_statement() {
 void parser::preprocess(macro_processor *mp, gc_pool<token> *token_pool) {
   step_1_parse_token_soup();
   /* step_2_initialize_env */ mp->init_env(filepath_, import_stmts_alias_);
-  step_3_excute_macros(mp);
+  step_3_execute_macros(mp);
   step_4_expand_macros(mp, token_pool);
 }
 void parser::step_4_expand_macros(macro_processor *mp,
@@ -1009,7 +1009,7 @@ void parser::step_4_expand_macros(macro_processor *mp,
                          err.tok_.pos_);
   }
 }
-void parser::step_3_excute_macros(macro_processor *mp) {
+void parser::step_3_execute_macros(macro_processor *mp) {
   try {
     std::vector<macros_stmt *> macros_stmts{};
     for (auto macro_stmt : soup_statements_) {
