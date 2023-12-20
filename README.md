@@ -11,13 +11,13 @@
 
 # Documentation
 
-* [Standard Library](https://yakshalang.github.io/library-docs.html)
-* [Tutorials](https://yakshalang.github.io/tutorials.html)
-* [Documentation](https://yakshalang.github.io/documentation.html)
-* [Proposals](https://github.com/YakshaLang/YAMA/tree/main/proposals) [Read Proposals](https://yakshalang.github.io/documentation.html)
-* [Demos with source code](https://yakshalang.github.io/demos.html)
-* [(B)log](https://yakshalang.github.io/blog.html)
-* [Plan / Tasks](https://trello.com/b/f25EcuX6/%F0%9F%91%BF-yaksha-tasks)
+* [📚 Standard Library](https://yakshalang.github.io/library-docs.html)
+* [🐣 Tutorials](https://yakshalang.github.io/tutorials.html)
+* [📄 Documentation](https://yakshalang.github.io/documentation.html)
+* [💍 Proposals Repo](https://github.com/YakshaLang/yakshalang.github.io/tree/main/yaksha_proposals) [📖 Read Proposals](https://yakshalang.github.io/yama.html)
+* [😈 Demos with source code](https://yakshalang.github.io/demos.html)
+* [🤔 (B)log](https://yakshalang.github.io/blog.html)
+* [✅ Plan / Tasks](https://trello.com/b/f25EcuX6/%F0%9F%91%BF-yaksha-tasks)
 
 # Communities
 
