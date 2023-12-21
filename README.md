@@ -2,7 +2,7 @@
 
 ---------
 
-![https://yakshalang.github.io/](https://yakshalang.github.io/images/yk-banner.png)
+![https://yakshalang.github.io/](https://yakshalang.github.io/imgs/yk-banner1.png)
 
 [![.github/workflows/development.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/development.yml/badge.svg)](https://github.com/YakshaLang/Yaksha/actions/workflows/development.yml)
 [![.github/workflows/development_macos.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/development_macos.yml/badge.svg)](https://github.com/YakshaLang/Yaksha/actions/workflows/development_macos.yml)
@@ -11,12 +11,13 @@
 
 # Documentation
 
-* [📚 Standard Library](https://yakshalang.github.io/library-docs.html)
-* [🐣 Tutorials](https://yakshalang.github.io/tutorials.html)
-* [📄 Documentation](https://yakshalang.github.io/documentation.html)
-* [💍 Proposals Repo](https://github.com/YakshaLang/yakshalang.github.io/tree/main/yaksha_proposals) [📖 Read Proposals](https://yakshalang.github.io/yama.html)
-* [😈 Demos with source code](https://yakshalang.github.io/demos.html)
-* [🤔 (B)log](https://yakshalang.github.io/blog.html)
+* [📚 Standard Library](https://yakshalang.github.io/lib/)
+* [🐣 Tutorials](https://yakshalang.github.io/tutorials/)
+* [📄 Documentation](https://yakshalang.github.io/docs/)
+* [💍 Proposals Repo](https://github.com/YakshaLang/yakshalang.github.io/tree/main/src/pages/yama) [📖 Read Proposals](https://yakshalang.github.io/yama/)
+* [😈 Demos with source code](https://yakshalang.github.io/demos/)
+* [⚽️ Playground](https://yaksha.pages.dev)
+* [🤔 (B)log](https://yakshalang.github.io/blog/)
 * [✅ Plan / Tasks](https://trello.com/b/f25EcuX6/%F0%9F%91%BF-yaksha-tasks)
 
 # Communities
