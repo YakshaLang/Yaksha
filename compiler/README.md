@@ -2,7 +2,7 @@
 
 ---------
 
-![https://yakshalang.github.io/](https://yakshalang.github.io/images/yk-banner.png)
+![https://yakshalang.github.io/](https://yakshalang.github.io/imgs/yk-banner1.png)
 
 ---------
 ```text
