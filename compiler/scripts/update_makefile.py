@@ -44,7 +44,8 @@ Update CMakeLists.txt with .cpp & .h files.
 import os.path
 from typing import List, Tuple
 
-IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp", "utf8proc_data.c", "print_str.c", "dump.cpp",
+IGNORE = ["main.cpp", "test_main.cpp", "fuzz_main.cpp", "viz_main.cpp",
+          "ast_json.cpp", "utf8proc_data.c", "print_str.c", "dump.cpp",
           "comp_main.cpp", "reloader.cpp", "reloader_alt.cpp", "yk__wasm4_libc.c",
           "yk__fake_whereami.c", "yk.cpp", "carpntr_wrapper.cpp", "lisp_main.cpp",
           "html_gen.cpp", "_include_io.c", "_include_mman_win.c", "_include_bstr.c"]

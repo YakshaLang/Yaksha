@@ -79,6 +79,7 @@ file_info *codefiles::initialize_parsing_or_null(const std::string &code,
   path_to_fi_[str_path] = fi;
   prefixes_.insert({"yy__"});
   files_.emplace_back(fi);
+  this->main_file_info_ = fi;
   for (auto imp : fi->data_->parser_->import_stmts_) {
     auto import_data = scan_or_null(imp);
     if (import_data == nullptr) { return nullptr; }
@@ -117,6 +118,7 @@ file_info *codefiles::initialize_parsing_or_null(const std::string &filename) {
   path_to_fi_[str_path] = fi;
   prefixes_.insert({"yy__"});
   files_.emplace_back(fi);
+  this->main_file_info_ = fi;
   for (auto imp : fi->data_->parser_->import_stmts_) {
     auto import_data = scan_or_null(imp);
     if (import_data == nullptr) { return nullptr; }

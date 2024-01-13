@@ -49,6 +49,11 @@
 #include "comp_main.cpp"
 #undef main
 #undef PROGRAM_NAME
+#define PROGRAM_NAME "yaksha ast"
+#define main ast_main
+#include "ast_json.cpp"
+#undef main
+#undef PROGRAM_NAME
 // dump_main(int: argc, char** argv)
 #define PROGRAM_NAME "yaksha dump"
 #define main dump_main
@@ -134,6 +139,8 @@ void display_help() {
   std::cout << colours::green(
       " # Compile a given file (must have main() function), library "
       "path is required if libs are used\n");
+  std::cout << "yaksha ast file_path.yaka [libs_path]\n";
+  std::cout << colours::green(" # Compile Yaksha to a JSON representation of the AST\n");
   std::cout << "yaksha reload dll_path/dll.so\n";
   std::cout << colours::green(" # Run given hot-reload .dll/.dylib/.so file\n");
   std::cout << "yaksha viz file_path.yaka\n";
@@ -162,6 +169,7 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
   }
   if (first_arg == "compile") { return compiler_main(argc - 1, &argv[1]); }
+  if (first_arg == "ast") { return ast_main(argc - 1, &argv[1]); }
   if (first_arg == "reload") { return reloader_main(argc - 1, &argv[1]); }
   if (first_arg == "viz") { return viz_main(argc - 1, &argv[1]); }
   if (first_arg == "dump") { return dump_main(argc - 1, &argv[1]); }

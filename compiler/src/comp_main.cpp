@@ -54,9 +54,9 @@ int main(int argc, char *argv[]) {
   try {
     multifile_compiler mc{};
     codegen_c cg{};
-    if (argc == 2) {// Just script is passed
+    if (argc == 2) {// Just code.yaka is passed
       result = mc.compile(argv[1], &cg);
-    } else {// Script + LIBS_PARENT_PATH
+    } else { // code.yaka + LIBS_PARENT_PATH
       result = mc.compile(argv[1], argv[2], &cg);
     }
     if (result.failed_) { return EXIT_FAILURE; }

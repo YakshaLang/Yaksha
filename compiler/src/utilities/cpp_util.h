@@ -122,6 +122,7 @@ constexpr auto operator+(T e) noexcept
 #else
 #define LOG_COMP(msg)
 #endif
+// Enable below to perform dead code elimination
 #ifndef YAKSHA_DEADCODE_ELIMINATION
 #define YAKSHA_DEADCODE_ELIMINATION
 #endif
