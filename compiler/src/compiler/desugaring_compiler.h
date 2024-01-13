@@ -47,7 +47,7 @@
 #include <string>
 #include <vector>
 namespace yaksha {
-  struct compiler;
+  struct to_c_compiler;
   /**
    * Desugaring compiler
    *    - Desugaring also happens at parser
@@ -59,7 +59,7 @@ namespace yaksha {
     explicit desugaring_compiler(ast_pool *ast_pool_obj,
                                  ykdt_pool *dt_pool_obj);
     std::vector<stmt *> desugar(const std::vector<stmt *> &statements,
-                                compiler *compiler_obj);
+                                to_c_compiler *compiler_obj);
     ~desugaring_compiler() override;
 
 private:
@@ -77,7 +77,7 @@ private:
     token *ccode_token_;
     token *less_token_;
     token *plus_eq_token_;
-    compiler *compiler_obj_;
+    to_c_compiler *compiler_obj_;
     std::vector<token *> internal_token_pool_;
     token *create_name(const std::string &name);
     token *create_int_literal(const std::string &lit);

@@ -36,21 +36,21 @@
 // to the licenses of linked runtime libraries (see compiler/runtime/README.md).
 //
 // ==============================================================================================
-// compiler.cpp
-#include "compiler.h"
+// to_c_compiler.cpp
+#include "to_c_compiler.h"
 #include "ast/parser.h"
 #include <cinttypes>
 using namespace yaksha;
-compiler::compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
+to_c_compiler::to_c_compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
                    entry_struct_func_compiler *esc, gc_pool<token> *token_pool)
     : defs_classes_(defs_classes), scope_(pool), dt_pool_(pool),
       builtins_(pool, token_pool), ast_pool_(new ast_pool()), esc_(esc),
       desugar_(new desugaring_compiler{ast_pool_, dt_pool_}) {}
-compiler::~compiler() {
+to_c_compiler::~to_c_compiler() {
   delete ast_pool_;
   delete desugar_;
 }
-void compiler::visit_assign_expr(assign_expr *obj) {
+void to_c_compiler::visit_assign_expr(assign_expr *obj) {
   if (obj->promoted_) {
     auto let_st = ast_pool_->c_let_stmt(obj->name_, nullptr, obj->right_);
     let_st->accept(this);
@@ -63,7 +63,7 @@ void compiler::visit_assign_expr(assign_expr *obj) {
   auto o = std::make_pair(name, object);
   perform_assign(o, rhs, obj->opr_, true, true);
 }
-void compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
+void to_c_compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
                               std::pair<std::string, ykobject> &rhs,
                               token *operator_token, bool assign_variable,
                               bool lhs_mutates) {
@@ -141,7 +141,7 @@ void compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
   }
   write_end_statement(body_);
 }
-void compiler::visit_binary_expr(binary_expr *obj) {
+void to_c_compiler::visit_binary_expr(binary_expr *obj) {
   token_type operator_type = obj->opr_->type_;
   // Vist left side of the binary expression and right side.
   // This should give us the data types from the 2 stacks we maintain.
@@ -313,7 +313,7 @@ void compiler::visit_binary_expr(binary_expr *obj) {
   }
   // Note: type checker prevents compiler coming here with non integer data types
 }
-void compiler::cast_numbers(
+void to_c_compiler::cast_numbers(
     const ykdatatype *castable, std::pair<std::string, ykobject> &lhs,
     std::pair<std::string, ykobject> &rhs) {// --- number casting ---
   std::pair<std::string, ykobject> &wider_dt =
@@ -338,7 +338,7 @@ void compiler::cast_numbers(
                         << rhs.second.datatype_->as_string() << "--"
                         << rhs.first);
 }
-void compiler::compile_simple_bin_op(
+void to_c_compiler::compile_simple_bin_op(
     const binary_expr *obj, const token_type &operator_type,
     const std::pair<std::string, ykobject> &lhs,
     const std::pair<std::string, ykobject> &rhs) {
@@ -363,7 +363,7 @@ void compiler::compile_simple_bin_op(
          lhs.second);
   }
 }
-void compiler::visit_fncall_expr(fncall_expr *obj) {
+void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
   auto name_pair = pop();
   auto name = name_pair.first;
@@ -440,17 +440,17 @@ void compiler::visit_fncall_expr(fncall_expr *obj) {
     error(obj->paren_token_, "Invalid function call compilation");
   }
 }
-void compiler::compile_obj_creation(const std::string &name,
+void to_c_compiler::compile_obj_creation(const std::string &name,
                                     std::stringstream &code,
                                     ykdatatype *return_type) {
   obj_calloc(name, code);
   auto data = ykobject(return_type);
   push(code.str(), data);
 }
-void compiler::obj_calloc(const std::string &name, std::stringstream &code) {
+void to_c_compiler::obj_calloc(const std::string &name, std::stringstream &code) {
   code << "calloc(1, sizeof(struct " << name << "))";
 }
-void compiler::compile_function_call(
+void to_c_compiler::compile_function_call(
     fncall_expr *obj, const std::string &name, std::stringstream &code,
     ykdatatype *return_type, const std::vector<ykdatatype *> &parameters,
     bool varargs_fnc) {
@@ -497,7 +497,7 @@ void compiler::compile_function_call(
     push(code.str(), ykobject(return_type));
   }
 }
-void compiler::compile_string_assign(
+void to_c_compiler::compile_string_assign(
     token *t, std::stringstream &code,
     const std::pair<std::string, ykobject> &rhs, const ykdatatype *rhs_datatype,
     const ykdatatype *lhs_datatype) {// param - sr, arg - sr
@@ -537,7 +537,7 @@ void compiler::compile_string_assign(
   }
 }
 std::string
-compiler::prefix_function_arg(const std::pair<std::string, ykobject> &arg_val) {
+to_c_compiler::prefix_function_arg(const std::pair<std::string, ykobject> &arg_val) {
   if (arg_val.second.object_type_ == object_type::MODULE_FUNCTION) {
     auto module_file = arg_val.second.module_file_;
     auto module_fn = arg_val.second.string_val_;
@@ -548,7 +548,7 @@ compiler::prefix_function_arg(const std::pair<std::string, ykobject> &arg_val) {
     return prefix(arg_val.first, prefix_val_);
   }
 }
-void compiler::visit_grouping_expr(grouping_expr *obj) {
+void to_c_compiler::visit_grouping_expr(grouping_expr *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
   if (exp.second.datatype_->is_string_literal()) {
@@ -563,11 +563,11 @@ void compiler::visit_grouping_expr(grouping_expr *obj) {
   }
   push(wrap_in_paren(code), exp.second);
 }
-std::string compiler::wrap_in_paren(const std::string &code) const {
+std::string to_c_compiler::wrap_in_paren(const std::string &code) const {
   if (!should_wrap_in_paren(code)) { return code; }
   return "(" + code + ")";
 }
-bool compiler::should_wrap_in_paren(const std::string &code) {
+bool to_c_compiler::should_wrap_in_paren(const std::string &code) {
   bool should_group = false;
   // seems scary
   for (std::string::size_type i = 1; i < code.size() - 1; ++i) {
@@ -595,7 +595,7 @@ bool compiler::should_wrap_in_paren(const std::string &code) {
   }
   return should_group;
 }
-std::string compiler::conv_integer_literal(token_type token_type_val,
+std::string to_c_compiler::conv_integer_literal(token_type token_type_val,
                                            token *literal_token) {
   switch (token_type_val) {
     case token_type::INTEGER_DECIMAL:
@@ -652,7 +652,7 @@ std::string compiler::conv_integer_literal(token_type token_type_val,
       return "<><>";
   }
 }
-void compiler::visit_literal_expr(literal_expr *obj) {
+void to_c_compiler::visit_literal_expr(literal_expr *obj) {
   auto data_type_tok = obj->literal_token_->type_;
   if (data_type_tok == token_type::STRING ||
       data_type_tok == token_type::THREE_QUOTE_STRING) {
@@ -729,7 +729,7 @@ void compiler::visit_literal_expr(literal_expr *obj) {
     push("<><>", ykobject(dt_pool_));
   }
 }
-void compiler::visit_logical_expr(logical_expr *obj) {
+void to_c_compiler::visit_logical_expr(logical_expr *obj) {
   obj->left_->accept(this);
   auto lhs = pop();
   obj->right_->accept(this);
@@ -743,7 +743,7 @@ void compiler::visit_logical_expr(logical_expr *obj) {
   push("(" + lhs.first + operator_token + rhs.first + ")",
        ykobject(true, dt_pool_));
 }
-void compiler::visit_unary_expr(unary_expr *obj) {
+void to_c_compiler::visit_unary_expr(unary_expr *obj) {
   // Note: this is not supported by strings only numbers/floats
   // Type checker should find an error if we use unary with a string.
   obj->right_->accept(this);
@@ -752,7 +752,7 @@ void compiler::visit_unary_expr(unary_expr *obj) {
   if (obj->opr_->type_ == token_type::KEYWORD_NOT) { operator_token = "!"; }
   push(wrap_in_paren(operator_token + wrap_in_paren(rhs.first)), rhs.second);
 }
-void compiler::visit_variable_expr(variable_expr *obj) {
+void to_c_compiler::visit_variable_expr(variable_expr *obj) {
   // Compiler is visiting a variable, can get data type from scope_
   auto name = prefix(obj->name_->token_, prefix_val_);
   if (builtins_.has_builtin(obj->name_->token_)) {
@@ -779,7 +779,7 @@ void compiler::visit_variable_expr(variable_expr *obj) {
     push(name, object);
   }
 }
-void compiler::visit_block_stmt(block_stmt *obj) {
+void to_c_compiler::visit_block_stmt(block_stmt *obj) {
   // block will be compiled to '{' + statements + '}'
   body_ << "\n";
   write_prev_indent(body_);
@@ -795,21 +795,21 @@ void compiler::visit_block_stmt(block_stmt *obj) {
   write_prev_indent(body_);
   body_ << "}\n";
 }
-void compiler::visit_break_stmt(break_stmt *obj) {
+void to_c_compiler::visit_break_stmt(break_stmt *obj) {
   defers_.write_upto_loop(this);
   deletions_.write_upto_loop(body_, indent_);
   write_indent(body_);
   body_ << "break";
   write_end_statement(body_);
 }
-void compiler::visit_continue_stmt(continue_stmt *obj) {
+void to_c_compiler::visit_continue_stmt(continue_stmt *obj) {
   defers_.write_upto_loop(this);
   deletions_.write_upto_loop(body_, indent_);
   write_indent(body_);
   body_ << "continue";
   write_end_statement(body_);
 }
-void compiler::visit_def_stmt(def_stmt *obj) {
+void to_c_compiler::visit_def_stmt(def_stmt *obj) {
 #ifdef YAKSHA_DEADCODE_ELIMINATION
   if (obj->hits_ == 0) { return; }
 #endif
@@ -939,7 +939,7 @@ void compiler::visit_def_stmt(def_stmt *obj) {
   scope_.pop();
   pop_scope_type();
 }
-void compiler::visit_expression_stmt(expression_stmt *obj) {
+void to_c_compiler::visit_expression_stmt(expression_stmt *obj) {
   obj->expression_->accept(this);
   if (expr_stack_.empty()) { return; }
   auto exp = pop();
@@ -947,7 +947,7 @@ void compiler::visit_expression_stmt(expression_stmt *obj) {
   body_ << exp.first;
   write_end_statement(body_);
 }
-void compiler::visit_if_stmt(if_stmt *obj) {
+void to_c_compiler::visit_if_stmt(if_stmt *obj) {
   // if () -> block
   obj->expression_->accept(this);
   auto if_expr = pop();
@@ -986,7 +986,7 @@ void compiler::visit_if_stmt(if_stmt *obj) {
     scope_.pop();
   }
 }
-void compiler::visit_let_stmt(let_stmt *obj) {
+void to_c_compiler::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_, prefix_val_);
   auto object = ykobject(dt_pool_);
   std::pair<std::string, ykobject> resulting_pair;
@@ -1107,7 +1107,7 @@ void compiler::visit_let_stmt(let_stmt *obj) {
   write_end_statement(body_);
   scope_.define(name, object);
 }
-void compiler::write_casted_rhs(
+void to_c_compiler::write_casted_rhs(
     std::stringstream &stream, std::pair<std::string, ykobject> &rhs,
     ykdatatype *lhsu) {// We need to cast RHS to appropriate DT
   stream << " = ";
@@ -1120,12 +1120,12 @@ void compiler::write_casted_rhs(
   }
   stream << "))";
 }
-void compiler::visit_pass_stmt(pass_stmt *obj) {
+void to_c_compiler::visit_pass_stmt(pass_stmt *obj) {
   write_indent(body_);
   body_ << "// pass";
   write_end_statement(body_);
 }
-void compiler::visit_return_stmt(return_stmt *obj) {
+void to_c_compiler::visit_return_stmt(return_stmt *obj) {
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto rhs = pop();
@@ -1169,7 +1169,7 @@ void compiler::visit_return_stmt(return_stmt *obj) {
     write_end_statement(body_);
   }
 }
-void compiler::visit_while_stmt(while_stmt *obj) {
+void to_c_compiler::visit_while_stmt(while_stmt *obj) {
   // NOTE: desugar compiler rewrites all loops to
   // while True|False:
   //    if not expr:
@@ -1191,35 +1191,35 @@ void compiler::visit_while_stmt(while_stmt *obj) {
   defers_.pop_defer_stack();
   deletions_.pop_delete_stack();
 }
-void compiler::write_indent(std::stringstream &where) const {
+void to_c_compiler::write_indent(std::stringstream &where) const {
   if (inline_mode_) { return; }
   ::write_indent(where, indent_);
 }
-void compiler::write_end_statement(std::stringstream &where) {
+void to_c_compiler::write_end_statement(std::stringstream &where) {
   statements_++;
   if (inline_mode_) { return; }
   where << ";\n";
 }
-void compiler::indent() { indent_++; }
-void compiler::dedent() {
+void to_c_compiler::indent() { indent_++; }
+void to_c_compiler::dedent() {
   if (indent_ == 0) { return; }
   indent_--;
 }
-std::string compiler::temp() {
+std::string to_c_compiler::temp() {
   // temp names will start with t__, so they will look like t__0, t__1, ...
   std::string name = "t__";
   name += std::to_string(temp_);
   temp_++;
   return name;
 }
-std::string compiler::temp(const std::string &custom_prefix) {
+std::string to_c_compiler::temp(const std::string &custom_prefix) {
   // temp names will start with prefix, so they will look like prefix0, prefix1, ...
   std::string name = custom_prefix;
   name += std::to_string(temp_);
   temp_++;
   return name;
 }
-std::string compiler::convert_dt(ykdatatype *basic_dt) {
+std::string to_c_compiler::convert_dt(ykdatatype *basic_dt) {
   if (basic_dt->is_array() || basic_dt->is_ptr()) {
     // int32_t*, yk__sds*, etc
     return convert_dt(basic_dt->args_[0]) + "*";
@@ -1282,7 +1282,7 @@ std::string compiler::convert_dt(ykdatatype *basic_dt) {
   error("Failed to compile data type:" + basic_dt->as_string());
   return "<data type unknown>";
 }
-compiler_output compiler::compile(codefiles *cf, file_info *fi) {
+compiler_output to_c_compiler::compile(codefiles *cf, file_info *fi) {
   // ------ Set to members for ease of access ---------
   this->cf_ = cf;
   this->prefix_val_ = fi->prefix_;
@@ -1332,36 +1332,36 @@ compiler_output compiler::compile(codefiles *cf, file_info *fi) {
           global_constants_.str(),
           errors_};
 }
-void compiler::push(const std::string &expr, const ykobject &data_type) {
+void to_c_compiler::push(const std::string &expr, const ykobject &data_type) {
   expr_stack_.push_back(expr);
   type_stack_.push_back(data_type);
 }
-std::pair<std::string, ykobject> compiler::pop() {
+std::pair<std::string, ykobject> to_c_compiler::pop() {
   auto p = std::make_pair(expr_stack_.back(), type_stack_.back());
   expr_stack_.pop_back();
   type_stack_.pop_back();
   return p;
 }
-void compiler::write_prev_indent(std::stringstream &where) const {
+void to_c_compiler::write_prev_indent(std::stringstream &where) const {
   if (inline_mode_) { return; }
   auto indent = indent_ - 1;
   ::write_indent(where, indent);
 }
-void compiler::push_scope_type(ast_type scope_type) {
+void to_c_compiler::push_scope_type(ast_type scope_type) {
   this->scope_type_stack_.emplace_back(scope_type);
 }
-ast_type compiler::peek_scope_type() {
+ast_type to_c_compiler::peek_scope_type() {
   if (this->scope_type_stack_.empty()) {
     return ast_type::STMT_PASS;// Pass is used for unknown
   }
   return this->scope_type_stack_.back();
 }
-void compiler::pop_scope_type() {
+void to_c_compiler::pop_scope_type() {
   if (this->scope_type_stack_.empty()) { return; }
   this->scope_type_stack_.pop_back();
 }
-void compiler::visit_defer_stmt(defer_stmt *obj) { defers_.push(obj); }
-void compiler::visit_class_stmt(class_stmt *obj) {
+void to_c_compiler::visit_defer_stmt(defer_stmt *obj) { defers_.push(obj); }
+void to_c_compiler::visit_class_stmt(class_stmt *obj) {
 #ifdef YAKSHA_DEADCODE_ELIMINATION
   if (obj->hits_ == 0) { return; }
 #endif
@@ -1394,7 +1394,7 @@ void compiler::visit_class_stmt(class_stmt *obj) {
   classes_ << "}";
   write_end_statement(classes_);
 }
-void compiler::visit_del_stmt(del_stmt *obj) {
+void to_c_compiler::visit_del_stmt(del_stmt *obj) {
   obj->expression_->accept(this);
   auto name = pop();
   if (name.second.is_primitive_or_obj() &&
@@ -1423,7 +1423,7 @@ void compiler::visit_del_stmt(del_stmt *obj) {
   }
   write_end_statement(body_);
 }
-void compiler::visit_get_expr(get_expr *obj) {
+void to_c_compiler::visit_get_expr(get_expr *obj) {
   obj->lhs_->accept(this);
   auto lhs = pop();
   if (lhs.second.object_type_ == object_type::MODULE) {
@@ -1495,7 +1495,7 @@ void compiler::visit_get_expr(get_expr *obj) {
   }
   error(obj->dot_, "Failed to compile dot access");
 }
-void compiler::visit_set_expr(set_expr *obj) {
+void to_c_compiler::visit_set_expr(set_expr *obj) {
   obj->lhs_->accept(this);
   auto lhs = pop();
   auto item = obj->item_->token_;
@@ -1518,14 +1518,14 @@ void compiler::visit_set_expr(set_expr *obj) {
     }
   }
 }
-void compiler::visit_assign_member_expr(assign_member_expr *obj) {
+void to_c_compiler::visit_assign_member_expr(assign_member_expr *obj) {
   obj->set_oper_->accept(this);// before  a.b, after a->b
   auto lhs = pop();
   obj->right_->accept(this);
   auto rhs = pop();
   perform_assign(lhs, rhs, obj->opr_, false, true);
 }
-void compiler::visit_square_bracket_access_expr(
+void to_c_compiler::visit_square_bracket_access_expr(
     square_bracket_access_expr *obj) {
   obj->index_expr_->accept(this);
   auto rhs = pop();
@@ -1545,7 +1545,7 @@ void compiler::visit_square_bracket_access_expr(
     push("<><>", ykobject(dt_pool_));
   }
 }
-void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
+void to_c_compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
   obj->index_expr_->accept(this);
   auto rhs = pop();
   obj->name_->accept(this);
@@ -1564,7 +1564,7 @@ void compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
     push("<><>", ykobject(dt_pool_));
   }
 }
-void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
+void to_c_compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
   obj->assign_oper_->accept(this);
   auto lhs = pop();
   obj->right_->accept(this);
@@ -1580,13 +1580,13 @@ void compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
     perform_assign(lhs, rhs, obj->opr_, false, true);
   }
 }
-void compiler::visit_ccode_stmt(ccode_stmt *obj) {
+void to_c_compiler::visit_ccode_stmt(ccode_stmt *obj) {
   write_indent(body_);
   body_ << ::string_utils::unescape(obj->code_str_->token_);
   write_end_statement(body_);
 }
-void compiler::visit_import_stmt(import_stmt *obj) {}
-void compiler::visit_const_stmt(const_stmt *obj) {
+void to_c_compiler::visit_import_stmt(import_stmt *obj) {}
+void to_c_compiler::visit_const_stmt(const_stmt *obj) {
   if (scope_.is_global_level()) {
     // constant is global
 #ifdef YAKSHA_DEADCODE_ELIMINATION
@@ -1626,17 +1626,17 @@ void compiler::visit_const_stmt(const_stmt *obj) {
     let_stmt_obj->accept(this);
   }
 }
-void compiler::write_statement(std::string code_line) {
+void to_c_compiler::write_statement(std::string code_line) {
   write_indent(body_);
   body_ << code_line;
   write_end_statement(body_);
 }
-void compiler::write_statement_no_end(std::string code_line) {
+void to_c_compiler::write_statement_no_end(std::string code_line) {
   write_indent(body_);
   body_ << code_line << "\n";
 }
-void compiler::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
-ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
+void to_c_compiler::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
+ykdatatype *to_c_compiler::function_to_datatype(const ykobject &arg) {
   def_stmt *funct;
   if (arg.object_type_ == object_type::FUNCTION) {
     funct = defs_classes_.get_function(arg.string_val_);
@@ -1661,7 +1661,7 @@ ykdatatype *compiler::function_to_datatype(const ykobject &arg) {
   }
   return fnc;
 }
-void compiler::visit_nativeconst_stmt(nativeconst_stmt *obj) {
+void to_c_compiler::visit_nativeconst_stmt(nativeconst_stmt *obj) {
   auto name = prefix(obj->name_->token_, prefix_val_);
   if (scope_.is_global_level()) {// constant is global
 #ifdef YAKSHA_DEADCODE_ELIMINATION
@@ -1682,25 +1682,25 @@ void compiler::visit_nativeconst_stmt(nativeconst_stmt *obj) {
     scope_.define(name, object);
   }
 }
-void compiler::error(token *tok, const std::string &message) {
+void to_c_compiler::error(token *tok, const std::string &message) {
   auto err = parsing_error{message, tok};
   errors_.emplace_back(err);
 }
-void compiler::error(const std::string &message) {
+void to_c_compiler::error(const std::string &message) {
   auto err = parsing_error{message, "", 0, 0};
   err.token_set_ = false;
   errors_.emplace_back(err);
 }
-void compiler::visit_foreach_stmt(foreach_stmt *obj) {
+void to_c_compiler::visit_foreach_stmt(foreach_stmt *obj) {
   // Not supported directly by compiler
 }
-void compiler::visit_forendless_stmt(forendless_stmt *obj) {
+void to_c_compiler::visit_forendless_stmt(forendless_stmt *obj) {
   // Not supported directly by compiler
 }
-std::string compiler::prefix_token(token *p_token) {
+std::string to_c_compiler::prefix_token(token *p_token) {
   return ::prefix(p_token->token_, prefix_val_);
 }
-void compiler::visit_compins_stmt(compins_stmt *obj) {
+void to_c_compiler::visit_compins_stmt(compins_stmt *obj) {
   // Add given item to scope
   auto name = prefix(obj->name_->token_, prefix_val_);
   auto object = ykobject(obj->data_type_);
@@ -1710,14 +1710,14 @@ void compiler::visit_compins_stmt(compins_stmt *obj) {
   }
   scope_.define(name, object);
 }
-std::pair<std::string, ykobject> compiler::compile_expression(expr *ex) {
+std::pair<std::string, ykobject> to_c_compiler::compile_expression(expr *ex) {
   ex->accept(this);
   auto p = std::make_pair(expr_stack_.back(), type_stack_.back());
   expr_stack_.pop_back();
   type_stack_.pop_back();
   return p;
 }
-void compiler::visit_curly_call_expr(curly_call_expr *obj) {
+void to_c_compiler::visit_curly_call_expr(curly_call_expr *obj) {
   obj->dt_expr_->accept(this);
   auto name_pair = pop();
   auto name = name_pair.first;
@@ -1792,10 +1792,10 @@ void compiler::visit_curly_call_expr(curly_call_expr *obj) {
   error(obj->curly_open_, "Failed to compile struct literal");
   push("<><>", ykobject(dt_pool_));
 }
-void compiler::visit_macro_call_expr(macro_call_expr *obj) {
+void to_c_compiler::visit_macro_call_expr(macro_call_expr *obj) {
   // Not supported directly by compiler
 }
-void compiler::visit_cfor_stmt(cfor_stmt *obj) {
+void to_c_compiler::visit_cfor_stmt(cfor_stmt *obj) {
   write_indent(body_);
   push_scope_type(ast_type::STMT_WHILE);
   scope_.push();
@@ -1855,5 +1855,5 @@ void compiler::visit_cfor_stmt(cfor_stmt *obj) {
   defers_.pop_defer_stack();
   deletions_.pop_delete_stack();
 }
-void compiler::visit_enum_stmt(enum_stmt *obj) {}
-void compiler::visit_union_stmt(union_stmt *obj) {}
+void to_c_compiler::visit_enum_stmt(enum_stmt *obj) {}
+void to_c_compiler::visit_union_stmt(union_stmt *obj) {}

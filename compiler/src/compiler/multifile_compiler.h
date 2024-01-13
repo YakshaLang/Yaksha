@@ -40,21 +40,19 @@
 #ifndef MULTIFILE_COMPILER_H
 #define MULTIFILE_COMPILER_H
 #include "ast/codefiles.h"
+#include "codegen.h"
+#include "compiler/comp_result.h"
 #include "tokenizer/token.h"
 #include "utilities/gc_pool.h"
 #include <string>
 namespace yaksha {
-  struct multifile_compiler_result {
-    bool failed_;
-    std::string code_;
-  };
   struct multifile_compiler {
-    multifile_compiler_result compile(const std::string &main_file);
-    multifile_compiler_result compile(const std::string &main_file,
-                                      const std::string &libs_path);
-    multifile_compiler_result compile(const std::string &code, bool use_code,
-                                      const std::string &main_file,
-                                      const std::string &libs_path);
+    comp_result compile(const std::string &main_file, codegen *code_generator);
+    comp_result compile(const std::string &main_file,
+                        const std::string &libs_path, codegen *code_generator);
+    comp_result compile(const std::string &code, bool use_code,
+                        const std::string &main_file,
+                        const std::string &libs_path, codegen *code_generator);
 
 private:
     gc_pool<token> token_pool_{};
@@ -64,8 +62,8 @@ private:
     void step_3_macros_setup(codefiles &cf);
     void step_4_expand_macros(codefiles &cf);
     void step_5_parse(codefiles &cf);
-    multifile_compiler_result compile_all(codefiles &cf,
-                                          file_info *main_file_info);
+    comp_result compile_all(codefiles &cf, file_info *main_file_info,
+                            codegen *code_generator);
     bool step_6_rescan_imports(codefiles &cf, file_info *main_file_info) const;
     void step_7_verify_import_rescan_done(codefiles &cf) const;
     bool has_any_failures(codefiles &cf) const;

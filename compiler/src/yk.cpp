@@ -99,10 +99,11 @@ struct yk_compile_result {
 yk_compile_result compile(char *main_file, size_t main_file_len,
                           char *library_path, size_t library_path_len) {
   yaksha::multifile_compiler mc{};
-  yaksha::multifile_compiler_result result;
+  yaksha::codegen_c cg{};
+  yaksha::comp_result result;
   std::string main_file_str{main_file, main_file_len};
   std::string lib_path_str{library_path, library_path_len};
-  result = mc.compile(main_file_str, lib_path_str);
+  result = mc.compile(main_file_str, lib_path_str, &cg);
   // ---
   char *compile_result = nullptr;
   if (!result.failed_) {

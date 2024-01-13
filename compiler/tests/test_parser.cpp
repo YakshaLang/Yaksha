@@ -40,6 +40,7 @@
 #include "ast/parser.h"
 #include "btest.h"
 #include "catch2/catch.hpp"
+#include "compiler/codegen_c.h"
 #include "compiler/multifile_compiler.h"
 #include "file_formats/tokens_file.h"
 #include "tokenizer/block_analyzer.h"
@@ -91,8 +92,9 @@ static void test_parser_yaka_file(const std::string &A, std::string B,
 }
 static void TEST_SNIPPET_FULL(const std::string &S, const std::string &E) {
   multifile_compiler mc{};
+  codegen_c cg{};
   const std::string &xa = S;
-  auto result = mc.compile(xa, true, "dummy.yaka", ".");
+  auto result = mc.compile(xa, true, "dummy.yaka", ".", &cg);
   REQUIRE(result.failed_ == true);
   REQUIRE(!yaksha::errors::error_capture.empty());
   REQUIRE(yaksha::errors::has_error(E));

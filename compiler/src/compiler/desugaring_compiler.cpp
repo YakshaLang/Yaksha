@@ -38,7 +38,7 @@
 // ==============================================================================================
 // desugaring_compiler.cpp
 #include "desugaring_compiler.h"
-#include "compiler/compiler.h"
+#include "compiler/to_c_compiler.h"
 using namespace yaksha;
 desugaring_compiler::desugaring_compiler(ast_pool *ast_pool_obj,
                                          ykdt_pool *dt_pool_obj)
@@ -313,7 +313,7 @@ stmt *desugaring_compiler::desugar(stmt *obj) {
 }
 std::vector<stmt *>
 desugaring_compiler::desugar(const std::vector<stmt *> &statements,
-                             compiler *compiler_obj) {
+                             to_c_compiler *compiler_obj) {
   this->compiler_obj_ = compiler_obj;
   for (stmt *st : statements) { st->accept(this); }
   return global_statements_;

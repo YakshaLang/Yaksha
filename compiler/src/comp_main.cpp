@@ -36,6 +36,7 @@
 // to the licenses of linked runtime libraries (see compiler/runtime/README.md).
 //
 // ==============================================================================================
+#include "compiler/codegen_c.h"
 #include "compiler/multifile_compiler.h"
 #include "utilities/error_printer.h"
 #include <iostream>
@@ -49,13 +50,14 @@ int main(int argc, char *argv[]) {
               << " script.yaka [LIBS_PARENT_PATH]\n";
     return EXIT_FAILURE;
   }
-  multifile_compiler_result result;
+  comp_result result;
   try {
     multifile_compiler mc{};
+    codegen_c cg{};
     if (argc == 2) {// Just script is passed
-      result = mc.compile(argv[1]);
+      result = mc.compile(argv[1], &cg);
     } else {// Script + LIBS_PARENT_PATH
-      result = mc.compile(argv[1], argv[2]);
+      result = mc.compile(argv[1], argv[2], &cg);
     }
     if (result.failed_) { return EXIT_FAILURE; }
   } catch (parsing_error &e) { errors::print_errors({e}); }

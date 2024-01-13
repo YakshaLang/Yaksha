@@ -37,6 +37,7 @@
 //
 // ==============================================================================================
 #include "catch2/catch.hpp"
+#include "compiler/codegen_c.h"
 #include "compiler/multifile_compiler.h"
 #include "file_formats/tokens_file.h"
 #include "tokenizer/tokenizer.h"
@@ -46,7 +47,8 @@ using namespace yaksha;
 static void test_compile_yaka_file(const std::string &A, const std::string &B,
                                    const std::string &C) {
   multifile_compiler mc{};
-  auto result = mc.compile(A);
+  codegen_c cg{};
+  auto result = mc.compile(A, &cg);
   REQUIRE(result.failed_ == false);
   gc_pool<token> token_pool{};
   tokenizer c_code{"output.c", result.code_, &token_pool};

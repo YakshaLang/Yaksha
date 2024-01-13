@@ -36,9 +36,9 @@
 // to the licenses of linked runtime libraries (see compiler/runtime/README.md).
 //
 // ==============================================================================================
-// compiler.h
-#ifndef COMPILER_H
-#define COMPILER_H
+// to_c_compiler.h
+#ifndef TO_C_COMPILER_H
+#define TO_C_COMPILER_H
 #include "ast/ast.h"
 #include "ast/codefiles.h"
 #include "ast/environment_stack.h"
@@ -48,6 +48,7 @@
 #include "compiler/desugaring_compiler.h"
 #include "compiler/function_datatype_extractor.h"
 #include "compiler/statement_writer.h"
+#include "compiler/comp_result.h"
 #include "datatype_compiler.h"
 #include "def_class_visitor.h"
 #include "entry_struct_func_compiler.h"
@@ -56,22 +57,14 @@
 #include "utilities/defer_stack_stack.h"
 #include <sstream>
 namespace yaksha {
-  struct compiler_output {
-    std::string struct_forward_declarations_{};
-    std::string function_forward_declarations_{};
-    std::string classes_{};
-    std::string body_{};
-    std::string global_constants_{};
-    std::vector<parsing_error> errors_{};
-  };
-  struct compiler : expr_visitor,
+  struct to_c_compiler : expr_visitor,
                     stmt_visitor,
                     datatype_compiler,
                     statement_writer,
                     function_datatype_extractor {
-    compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
+    to_c_compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
              entry_struct_func_compiler *esc, gc_pool<token> *token_pool);
-    ~compiler() override;
+    ~to_c_compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
     ykdatatype *function_to_datatype(const ykobject &arg) override;
     void visit_assign_expr(assign_expr *obj) override;
