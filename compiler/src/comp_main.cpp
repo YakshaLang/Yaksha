@@ -7,7 +7,7 @@
 // GPLv3:
 //
 // Yaksha - Programming Language.
-// Copyright (C) 2020 - 2023 Bhathiya Perera
+// Copyright (C) 2020 - 2024 Bhathiya Perera
 //
 // This program is free software: you can redistribute it and/or modify it under the terms
 // of the GNU General Public License as published by the Free Software Foundation,
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     codegen_c cg{};
     if (argc == 2) {// Just code.yaka is passed
       result = mc.compile(argv[1], &cg);
-    } else { // code.yaka + LIBS_PARENT_PATH
+    } else {// code.yaka + LIBS_PARENT_PATH
       result = mc.compile(argv[1], argv[2], &cg);
     }
     if (result.failed_) { return EXIT_FAILURE; }

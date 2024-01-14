@@ -7,7 +7,7 @@
 // GPLv3:
 //
 // Yaksha - Programming Language.
-// Copyright (C) 2020 - 2023 Bhathiya Perera
+// Copyright (C) 2020 - 2024 Bhathiya Perera
 //
 // This program is free software: you can redistribute it and/or modify it under the terms
 // of the GNU General Public License as published by the Free Software Foundation,
@@ -42,7 +42,8 @@
 #include <cinttypes>
 using namespace yaksha;
 to_c_compiler::to_c_compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
-                   entry_struct_func_compiler *esc, gc_pool<token> *token_pool)
+                             entry_struct_func_compiler *esc,
+                             gc_pool<token> *token_pool)
     : defs_classes_(defs_classes), scope_(pool), dt_pool_(pool),
       builtins_(pool, token_pool), ast_pool_(new ast_pool()), esc_(esc),
       desugar_(new desugaring_compiler{ast_pool_, dt_pool_}) {}
@@ -64,9 +65,9 @@ void to_c_compiler::visit_assign_expr(assign_expr *obj) {
   perform_assign(o, rhs, obj->opr_, true, true);
 }
 void to_c_compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
-                              std::pair<std::string, ykobject> &rhs,
-                              token *operator_token, bool assign_variable,
-                              bool lhs_mutates) {
+                                   std::pair<std::string, ykobject> &rhs,
+                                   token *operator_token, bool assign_variable,
+                                   bool lhs_mutates) {
   auto castable = lhs.second.datatype_->auto_cast(rhs.second.datatype_,
                                                   dt_pool_, lhs_mutates, true);
   write_indent(body_);
@@ -442,13 +443,14 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
   }
 }
 void to_c_compiler::compile_obj_creation(const std::string &name,
-                                    std::stringstream &code,
-                                    ykdatatype *return_type) {
+                                         std::stringstream &code,
+                                         ykdatatype *return_type) {
   obj_calloc(name, code);
   auto data = ykobject(return_type);
   push(code.str(), data);
 }
-void to_c_compiler::obj_calloc(const std::string &name, std::stringstream &code) {
+void to_c_compiler::obj_calloc(const std::string &name,
+                               std::stringstream &code) {
   code << "calloc(1, sizeof(struct " << name << "))";
 }
 void to_c_compiler::compile_function_call(
@@ -537,8 +539,8 @@ void to_c_compiler::compile_string_assign(
     code << "yk__sdsdup(" << rhs.first << ")";// pretend it is fine?
   }
 }
-std::string
-to_c_compiler::prefix_function_arg(const std::pair<std::string, ykobject> &arg_val) {
+std::string to_c_compiler::prefix_function_arg(
+    const std::pair<std::string, ykobject> &arg_val) {
   if (arg_val.second.object_type_ == object_type::MODULE_FUNCTION) {
     auto module_file = arg_val.second.module_file_;
     auto module_fn = arg_val.second.string_val_;
@@ -597,7 +599,7 @@ bool to_c_compiler::should_wrap_in_paren(const std::string &code) {
   return should_group;
 }
 std::string to_c_compiler::conv_integer_literal(token_type token_type_val,
-                                           token *literal_token) {
+                                                token *literal_token) {
   switch (token_type_val) {
     case token_type::INTEGER_DECIMAL:
     case token_type::INTEGER_HEX:
@@ -1258,9 +1260,9 @@ std::string to_c_compiler::temp(const std::string &custom_prefix) {
   return name;
 }
 std::string to_c_compiler::convert_dt(ykdatatype *basic_dt,
-                                 datatype_location dt_location,
-                                 std::string extra_data_1,
-                                 std::string extra_data_2) {
+                                      datatype_location dt_location,
+                                      std::string extra_data_1,
+                                      std::string extra_data_2) {
   if (basic_dt->is_array() || basic_dt->is_ptr()) {
     // int32_t*, yk__sds*, etc
     return convert_dt(basic_dt->args_[0], datatype_location::STRUCT, "", "") +
@@ -1594,7 +1596,8 @@ void to_c_compiler::visit_square_bracket_access_expr(
     push("<><>", ykobject(dt_pool_));
   }
 }
-void to_c_compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) {
+void to_c_compiler::visit_square_bracket_set_expr(
+    square_bracket_set_expr *obj) {
   obj->index_expr_->accept(this);
   auto rhs = pop();
   obj->name_->accept(this);

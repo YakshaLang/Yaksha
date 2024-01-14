@@ -7,7 +7,7 @@
 // GPLv3:
 //
 // Yaksha - Programming Language.
-// Copyright (C) 2020 - 2023 Bhathiya Perera
+// Copyright (C) 2020 - 2024 Bhathiya Perera
 //
 // This program is free software: you can redistribute it and/or modify it under the terms
 // of the GNU General Public License as published by the Free Software Foundation,
@@ -140,7 +140,8 @@ void display_help() {
       " # Compile a given file (must have main() function), library "
       "path is required if libs are used\n");
   std::cout << "yaksha ast file_path.yaka [libs_path]\n";
-  std::cout << colours::green(" # Compile Yaksha to a JSON representation of the AST\n");
+  std::cout << colours::green(
+      " # Compile Yaksha to a JSON representation of the AST\n");
   std::cout << "yaksha reload dll_path/dll.so\n";
   std::cout << colours::green(" # Run given hot-reload .dll/.dylib/.so file\n");
   std::cout << "yaksha viz file_path.yaka\n";

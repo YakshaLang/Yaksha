@@ -7,7 +7,7 @@
 // GPLv3:
 //
 // Yaksha - Programming Language.
-// Copyright (C) 2020 - 2023 Bhathiya Perera
+// Copyright (C) 2020 - 2024 Bhathiya Perera
 //
 // This program is free software: you can redistribute it and/or modify it under the terms
 // of the GNU General Public License as published by the Free Software Foundation,
@@ -43,12 +43,12 @@
 #include "ast/codefiles.h"
 #include "ast/environment_stack.h"
 #include "builtins/builtins.h"
+#include "compiler/comp_result.h"
 #include "compiler/compiler_utils.h"
 #include "compiler/delete_stack_stack.h"
 #include "compiler/desugaring_compiler.h"
 #include "compiler/function_datatype_extractor.h"
 #include "compiler/statement_writer.h"
-#include "compiler/comp_result.h"
 #include "datatype_compiler.h"
 #include "def_class_visitor.h"
 #include "entry_struct_func_compiler.h"
@@ -58,12 +58,12 @@
 #include <sstream>
 namespace yaksha {
   struct to_c_compiler : expr_visitor,
-                    stmt_visitor,
-                    datatype_compiler,
-                    statement_writer,
-                    function_datatype_extractor {
+                         stmt_visitor,
+                         datatype_compiler,
+                         statement_writer,
+                         function_datatype_extractor {
     to_c_compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
-             entry_struct_func_compiler *esc, gc_pool<token> *token_pool);
+                  entry_struct_func_compiler *esc, gc_pool<token> *token_pool);
     ~to_c_compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
     ykdatatype *function_to_datatype(const ykobject &arg) override;

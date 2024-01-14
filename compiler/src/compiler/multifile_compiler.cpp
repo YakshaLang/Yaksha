@@ -7,7 +7,7 @@
 // GPLv3:
 //
 // Yaksha - Programming Language.
-// Copyright (C) 2020 - 2023 Bhathiya Perera
+// Copyright (C) 2020 - 2024 Bhathiya Perera
 //
 // This program is free software: you can redistribute it and/or modify it under the terms
 // of the GNU General Public License as published by the Free Software Foundation,
@@ -46,26 +46,26 @@
 #include "usage_analyser.h"
 #include "utilities/error_printer.h"
 using namespace yaksha;
-comp_result
-multifile_compiler::compile(const std::string &main_file, codegen *code_generator) {
+comp_result multifile_compiler::compile(const std::string &main_file,
+                                        codegen *code_generator) {
   LOG_COMP("compile:" << main_file);
   auto libs_path = std::filesystem::path{get_my_exe_path()}.parent_path();
   libs_path = libs_path.parent_path() / "libs";
   return compile(main_file, libs_path.string(), code_generator);
 }
 //
-comp_result
-multifile_compiler::compile(const std::string &main_file,
-                            const std::string &libs_path, codegen *code_generator) {
+comp_result multifile_compiler::compile(const std::string &main_file,
+                                        const std::string &libs_path,
+                                        codegen *code_generator) {
   std::string empty_code{};
   LOG_COMP("compile:" << main_file);
   return compile(empty_code, false, main_file, libs_path, code_generator);
 }
 // With input code
-comp_result
-multifile_compiler::compile(const std::string &code, bool use_code,
-                            const std::string &main_file,
-                            const std::string &libs_path, codegen *code_generator) {
+comp_result multifile_compiler::compile(const std::string &code, bool use_code,
+                                        const std::string &main_file,
+                                        const std::string &libs_path,
+                                        codegen *code_generator) {
   LOG_COMP("compile:" << main_file);
   std::filesystem::path library_parent{libs_path};
   codefiles cf{library_parent};
@@ -166,8 +166,9 @@ bool multifile_compiler::step_6_rescan_imports(
   }
   return should_bail;
 }
-comp_result
-multifile_compiler::compile_all(codefiles &cf, file_info *main_file_info, codegen* code_generator) {
+comp_result multifile_compiler::compile_all(codefiles &cf,
+                                            file_info *main_file_info,
+                                            codegen *code_generator) {
   LOG_COMP("compile all");
   bool has_errors = false;
   // Extract defs and structs

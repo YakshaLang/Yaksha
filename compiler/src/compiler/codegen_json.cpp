@@ -16,9 +16,7 @@ std::string to_json_compiler::compile(file_info *fi) {
   json_ << "\"file\": \"" << fi->filepath_.string() << "\",\n";
   json_ << "\"ast\": [\n";
   auto statements = fi->data_->parser_->stmts_;
-  for (auto stmt : statements) {
-    stmt->accept(this);
-  }
+  for (auto stmt : statements) { stmt->accept(this); }
   json_ << "]\n";
   json_ << "}\n";
   return json_.str();
@@ -61,7 +59,7 @@ void to_json_compiler::visit_def_stmt(def_stmt *obj) {
   json_ << "\"type\": \"def\",\n";
   json_ << "\"name\": \"" << name << "\",\n";
   json_ << "\"params\": [\n";
-  for (auto& param: obj->params_) {
+  for (auto &param : obj->params_) {
     json_ << "{\n";
     json_ << "\"name\": \"" << param.name_->token_ << "\",\n";
     json_ << "\"type\": \"" << param.data_type_->as_string() << "\"\n";
@@ -70,7 +68,7 @@ void to_json_compiler::visit_def_stmt(def_stmt *obj) {
   json_ << "],\n";
   json_ << "\"return_type\": \"" << obj->return_type_->as_string() << "\",\n";
   json_ << "\"body\": [\n";
-  obj->function_body_->accept(this); // visit block_stmt
+  obj->function_body_->accept(this);// visit block_stmt
   json_ << "]\n";
   json_ << "},\n";
 }
@@ -86,8 +84,7 @@ void to_json_compiler::visit_let_stmt(let_stmt *obj) {}
 void to_json_compiler::visit_nativeconst_stmt(nativeconst_stmt *obj) {}
 void to_json_compiler::visit_pass_stmt(pass_stmt *obj) {}
 void to_json_compiler::visit_return_stmt(return_stmt *obj) {}
-void to_json_compiler::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
-}
+void to_json_compiler::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
 void to_json_compiler::visit_union_stmt(union_stmt *obj) {
   // Placeholder statement - this is not parsed
 }
