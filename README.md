@@ -151,7 +151,7 @@ We welcome contributions and feedback. Please use [GitHub Issues](https://github
 ```text
  ==============================================================================================
  ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
- ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+ ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
  ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
  Note: libs - MIT license, runtime/3rd - various
  ==============================================================================================

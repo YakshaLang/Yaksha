@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -110,7 +110,9 @@ namespace yaksha {
      * @param basic_dt data type as a token.
      * @return converted data type.
      */
-    std::string convert_dt(ykdatatype *basic_dt) override;
+    std::string convert_dt(ykdatatype *basic_dt, datatype_location dt_location,
+                           std::string extra_data_1,
+                           std::string extra_data_2) override;
     /**
      * @return unique temp variable name
      */

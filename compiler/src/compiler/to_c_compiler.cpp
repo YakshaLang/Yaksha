@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -330,7 +330,8 @@ void to_c_compiler::cast_numbers(
     code = "((" + code + ") ? 1 : 0)";
   }
   to_widen.first = "((" +
-                   convert_dt(wider_dt.second.datatype_->const_unwrap()) +
+                   convert_dt(wider_dt.second.datatype_->const_unwrap(),
+                              datatype_location::STRUCT, "", "") +
                    ")(" + code + "))";
   to_widen.second.datatype_ = wider_dt.second.datatype_->const_unwrap();
   LOG_COMP("cast_num: " << lhs.second.datatype_->as_string() << "--"
@@ -853,7 +854,8 @@ void to_c_compiler::visit_def_stmt(def_stmt *obj) {
   // ::================================::
   // Create declaration in header section
   // ::================================::
-  auto return_type = convert_dt(obj->return_type_);
+  auto return_type =
+      convert_dt(obj->return_type_, datatype_location::STRUCT, "", "");
   function_forward_declarations_ << return_type << " " << name << "(";
   first = true;
   for (auto para : obj->params_) {
@@ -862,7 +864,8 @@ void to_c_compiler::visit_def_stmt(def_stmt *obj) {
     } else {
       first = false;
     }
-    function_forward_declarations_ << convert_dt(para.data_type_);
+    function_forward_declarations_
+        << convert_dt(para.data_type_, datatype_location::STRUCT, "", "");
   }
   function_forward_declarations_ << ")";
   write_end_statement(function_forward_declarations_);
@@ -878,7 +881,8 @@ void to_c_compiler::visit_def_stmt(def_stmt *obj) {
     } else {
       first = false;
     }
-    body_ << convert_dt(para.data_type_) << " "
+    body_ << convert_dt(para.data_type_, datatype_location::STRUCT, "", "")
+          << " "
           << prefix(para.name_->token_,
                     obj->annotations_.native_ ? "nn__" : prefix_val_);
   }
@@ -1016,21 +1020,25 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
                                 : compile_expression(obj->expression_);
       write_indent(body_);
       if (exp.second.datatype_->const_unwrap()->is_str()) {
-        body_ << convert_dt(object.datatype_) << " " << name << " = "
+        body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
+              << " " << name << " = "
               << "yk__sdsdup(" << exp.first << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_sr()) {
-        body_ << convert_dt(object.datatype_) << " " << name << " = "
+        body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
+              << " " << name << " = "
               << "yk__bstr_copy_to_sds(" << exp.first << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
         auto u = string_utils::unescape(exp.second.string_val_);
-        body_ << convert_dt(object.datatype_) << " " << name << " = "
+        body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
+              << " " << name << " = "
               << "yk__sdsnewlen(\"" << string_utils::escape(u) << "\" , "
               << u.size() << ")";
       } else {
         error("Failed to compile assign to string.");
       }
     } else {
-      body_ << convert_dt(object.datatype_) << " " << name << " = "
+      body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
+            << " " << name << " = "
             << "yk__sdsempty()";
     }
     // If there is an expression, go to that, pop(), duplicate and assign.
@@ -1051,36 +1059,63 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
                                 : compile_expression(obj->expression_);
       write_indent(body_);
       if (exp.second.datatype_->const_unwrap()->is_str()) {
-        body_ << convert_dt(object.datatype_) << " " << name << " = yk__bstr_h("
-              << exp.first << ")";
+        body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
+              << " " << name << " = yk__bstr_h(" << exp.first << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_sr()) {
-        body_ << convert_dt(object.datatype_) << " " << name << " = "
-              << exp.first;
+        body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
+              << " " << name << " = " << exp.first;
       } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
         auto u = string_utils::unescape(exp.second.string_val_);
-        body_ << convert_dt(object.datatype_) << " " << name << " = "
+        body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
+              << " " << name << " = "
               << "yk__bstr_s(\"" << string_utils::escape(u) << "\" , "
               << u.size() << ")";
       } else {
         error("Failed to compile assign to sr.");
       }
     } else {
-      body_ << convert_dt(object.datatype_) << " " << name
+      body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
+            << " " << name
             << " = ((struct yk__bstr){.s = YK__EMPTY_STRING_BSTR,"
                " .l = 0, .t = yk__bstr_static})";
     }
-  } else if (obj->data_type_->is_array()) {
+  } else if (obj->data_type_->const_unwrap()->is_array()) {
     object = ykobject(obj->data_type_);
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
       write_indent(body_);
-      body_ << convert_dt(obj->data_type_) << " " << name;
+      body_ << convert_dt(obj->data_type_, datatype_location::STRUCT, "", "")
+            << " " << name;
       body_ << " = " << exp.first;
     } else {
       write_indent(body_);
-      body_ << convert_dt(obj->data_type_) << " " << name;
+      body_ << convert_dt(obj->data_type_, datatype_location::STRUCT, "", "")
+            << " " << name;
       body_ << " = NULL";
+    }
+  } else if (obj->data_type_->const_unwrap()->is_fixed_size_array()) {
+    object = ykobject(obj->data_type_);
+    if (obj->expression_ != nullptr) {
+      auto exp = (visited_expr) ? resulting_pair
+                                : compile_expression(obj->expression_);
+      write_indent(body_);
+      // write following --
+      // data_type name[size]
+      body_ << convert_dt(obj->data_type_->const_unwrap()->args_[0],
+                          datatype_location::STRUCT, "", "")
+            << " " << name << "["
+            << obj->data_type_->const_unwrap()->args_[1]->dimension_ << "]";
+      body_ << " = " << exp.first;
+    } else {
+      write_indent(body_);
+      // write following --
+      // data_type name[size]
+      body_ << convert_dt(obj->data_type_->const_unwrap()->args_[0],
+                          datatype_location::STRUCT, "", "")
+            << " " << name << "["
+            << obj->data_type_->const_unwrap()->args_[1]->dimension_ << "]";
+      body_ << " = {}";
     }
   } else {
     object = ykobject(obj->data_type_);
@@ -1090,7 +1125,8 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
       auto castable = obj->data_type_->const_unwrap()->auto_cast(
           exp.second.datatype_, dt_pool_, false, true);
       write_indent(body_);
-      body_ << convert_dt(obj->data_type_) << " " << name;
+      body_ << convert_dt(obj->data_type_, datatype_location::STRUCT, "", "")
+            << " " << name;
       if (exp.second.is_a_function()) {
         body_ << " = " << prefix_function_arg(exp);
       } else if (castable == nullptr) {
@@ -1101,7 +1137,8 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
       }
     } else {
       write_indent(body_);
-      body_ << convert_dt(obj->data_type_) << " " << name;
+      body_ << convert_dt(obj->data_type_, datatype_location::STRUCT, "", "")
+            << " " << name;
     }
   }
   write_end_statement(body_);
@@ -1112,7 +1149,7 @@ void to_c_compiler::write_casted_rhs(
     ykdatatype *lhsu) {// We need to cast RHS to appropriate DT
   stream << " = ";
   stream << "((";
-  stream << convert_dt(lhsu) << ")(";
+  stream << convert_dt(lhsu, datatype_location::STRUCT, "", "") << ")(";
   if (rhs.second.datatype_->const_unwrap()->is_bool()) {
     stream << "((" << rhs.first << ") ? 1 : 0)";
   } else {
@@ -1148,8 +1185,9 @@ void to_c_compiler::visit_return_stmt(return_stmt *obj) {
       // First we assign return value to a temp variable
       std::string temp_name = temp();
       write_indent(body_);
-      body_ << convert_dt(rhs.second.datatype_) << " " << temp_name << " = "
-            << rhs.first;
+      body_ << convert_dt(rhs.second.datatype_, datatype_location::STRUCT, "",
+                          "")
+            << " " << temp_name << " = " << rhs.first;
       write_end_statement(body_);
       return_val = temp_name;
     }
@@ -1219,12 +1257,20 @@ std::string to_c_compiler::temp(const std::string &custom_prefix) {
   temp_++;
   return name;
 }
-std::string to_c_compiler::convert_dt(ykdatatype *basic_dt) {
+std::string to_c_compiler::convert_dt(ykdatatype *basic_dt,
+                                 datatype_location dt_location,
+                                 std::string extra_data_1,
+                                 std::string extra_data_2) {
   if (basic_dt->is_array() || basic_dt->is_ptr()) {
     // int32_t*, yk__sds*, etc
-    return convert_dt(basic_dt->args_[0]) + "*";
+    return convert_dt(basic_dt->args_[0], datatype_location::STRUCT, "", "") +
+           "*";
+  } else if (basic_dt->is_fixed_size_array()) {
+    return convert_dt(basic_dt->args_[0], datatype_location::STRUCT, "", "") +
+           "[" + basic_dt->args_[1]->token_->token_ + "]";
   } else if (basic_dt->is_const()) {
-    return convert_dt(basic_dt->args_[0]) + " const ";
+    return convert_dt(basic_dt->args_[0], datatype_location::STRUCT, "", "") +
+           " const ";
   } else if (basic_dt->is_str()) {
     return "yk__sds";
   } else if (basic_dt->is_sr()) {
@@ -1384,7 +1430,7 @@ void to_c_compiler::visit_class_stmt(class_stmt *obj) {
   for (auto member : obj->members_) {
     write_indent(classes_);
     auto member_name = prefix(member.name_->token_, prefix_val_);
-    auto dt = convert_dt(member.data_type_);
+    auto dt = convert_dt(member.data_type_, datatype_location::STRUCT, "", "");
     classes_ << dt << " " << member_name;
     write_end_statement(classes_);
   }
@@ -1400,7 +1446,8 @@ void to_c_compiler::visit_del_stmt(del_stmt *obj) {
   if (name.second.is_primitive_or_obj() &&
       name.second.datatype_->const_unwrap()->is_primitive() &&
       !name.second.datatype_->const_unwrap()->is_str() &&
-      !name.second.datatype_->const_unwrap()->is_sr()) {
+      !name.second.datatype_->const_unwrap()->is_sr() &&
+      !name.second.datatype_->const_unwrap()->is_fixed_size_array()) {
     return;
   }
   write_indent(body_);
@@ -1531,7 +1578,9 @@ void to_c_compiler::visit_square_bracket_access_expr(
   auto rhs = pop();
   obj->name_->accept(this);
   auto lhs = pop();
-  if (lhs.second.datatype_->is_array()) {
+  // TODO verify if we can access Const[FixedArr[int, 10]]
+  if (lhs.second.datatype_->is_array() ||
+      lhs.second.datatype_->is_fixed_size_array()) {
     auto b = ykobject(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {
@@ -1550,7 +1599,8 @@ void to_c_compiler::visit_square_bracket_set_expr(square_bracket_set_expr *obj) 
   auto rhs = pop();
   obj->name_->accept(this);
   auto lhs = pop();
-  if (lhs.second.datatype_->is_array()) {
+  if (lhs.second.datatype_->is_array() ||
+      lhs.second.datatype_->is_fixed_size_array()) {
     auto b = ykobject(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {
@@ -1613,7 +1663,9 @@ void to_c_compiler::visit_const_stmt(const_stmt *obj) {
     auto exp = pop();
     auto castable = obj->data_type_->const_unwrap()->auto_cast(
         exp.second.datatype_, dt_pool_, false, true);
-    global_constants_ << this->convert_dt(obj->data_type_) << " " << name;
+    global_constants_ << this->convert_dt(obj->data_type_,
+                                          datatype_location::STRUCT, "", "")
+                      << " " << name;
     if (castable == nullptr) {
       global_constants_ << " = " << exp.first;
     } else {
@@ -1676,7 +1728,8 @@ void to_c_compiler::visit_nativeconst_stmt(nativeconst_stmt *obj) {
     // something like
     // a: Const[int] = ccode """1 + 1"""
     // int yk__a = 1 + 1
-    body_ << convert_dt(obj->data_type_) << " " << name;
+    body_ << convert_dt(obj->data_type_, datatype_location::STRUCT, "", "")
+          << " " << name;
     body_ << " = " << ::string_utils::unescape(obj->code_str_->token_);
     write_end_statement(body_);
     scope_.define(name, object);
@@ -1753,7 +1806,7 @@ void to_c_compiler::visit_curly_call_expr(curly_call_expr *obj) {
     }
     if (class_info->annotations_.on_stack_) {
       // ---------- On stack --------
-      code << "((" << convert_dt(dt) << ")"
+      code << "((" << convert_dt(dt, datatype_location::STRUCT, "", "") << ")"
            << "{";
       bool first = true;
       for (auto const &para : obj->values_) {
@@ -1774,7 +1827,8 @@ void to_c_compiler::visit_curly_call_expr(curly_call_expr *obj) {
       // ---------- On heap --------
       auto temp_name = temp();
       write_indent(body_);
-      body_ << convert_dt(dt) << " " << temp_name << " = ";
+      body_ << convert_dt(dt, datatype_location::STRUCT, "", "") << " "
+            << temp_name << " = ";
       obj_calloc(prefixed_class_name, body_);
       write_end_statement(body_);
       for (auto const &para : obj->values_) {

@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -111,6 +111,8 @@ private:
     void visit_cfor_stmt(cfor_stmt *obj) override;
     void visit_enum_stmt(enum_stmt *obj) override;
     void visit_union_stmt(union_stmt *obj) override;
+    void desugar_fixed_arr_foreach(foreach_stmt *obj);
+    void desugar_arr_foreach(foreach_stmt *obj);
   };
 }// namespace yaksha
 #endif

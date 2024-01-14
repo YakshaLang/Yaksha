@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -289,7 +289,8 @@ struct builtin_len : builtin {
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for len() builtin";
     } else if (!args[0].datatype_->const_unwrap()->is_array() &&
-               !args[0].datatype_->const_unwrap()->is_a_string()) {
+               !args[0].datatype_->const_unwrap()->is_a_string() &&
+               !args[0].datatype_->const_unwrap()->is_fixed_size_array()) {
       o.string_val_ = "Argument to len() must be an Array or a string";
     } else {
       return ykobject(dt_pool->create("int"));
@@ -329,6 +330,10 @@ struct builtin_len : builtin {
                    ->is_m_entry()) {
       // Array[MEntry[K,V]]
       code << "yk__hmlen(" << args[0].first << ")";
+    } else if (args[0]
+                   .second.datatype_->const_unwrap()
+                   ->is_fixed_size_array()) {
+      code << args[0].second.datatype_->const_unwrap()->dimension_;
     } else {
       code << "yk__arrlen(" << args[0].first << ")";
     }
@@ -704,8 +709,9 @@ struct builtin_cast : builtin {
     } else if (args[1].second.datatype_->is_none()) {
       code << "NULL";
     } else {
-      code << "((" << dt_compiler->convert_dt(out_dt) << ")" << args[1].first
-           << ")";
+      code << "(("
+           << dt_compiler->convert_dt(out_dt, datatype_location::CAST, "", "")
+           << ")" << args[1].first << ")";
     }
     o = ykobject(out_dt);
     return {code.str(), o};
@@ -900,6 +906,8 @@ struct builtin_qsort : builtin {
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     auto o = ykobject(dt_pool);
+    // TODO verify if we want to allow this for fixed size arrays
+    // ?
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for sort() builtin";
     } else if (!args[0].datatype_->is_array() ||
@@ -948,7 +956,9 @@ struct builtin_qsort : builtin {
     std::stringstream code{};
     o = ykobject(args[0].second.datatype_->args_[0]);
     code << "(yk__quicksort(" << args[0].first << ",sizeof("
-         << dt_compiler->convert_dt(args[0].second.datatype_->args_[0]) << ")"
+         << dt_compiler->convert_dt(args[0].second.datatype_->args_[0],
+                                    datatype_location::SIZEOF_, "", "")
+         << ")"
          << ",yk__arrlenu(" << args[0].first << ")," << args[1].first
          << ") == 0)";
     return {code.str(), o};
@@ -1006,7 +1016,10 @@ struct builtin_arrnew : builtin {
     auto array_dt = dt_pool->create("Array");
     array_dt->args_.emplace_back(element_data_type);
     auto array_var = st_writer->temp();
-    code << dt_compiler->convert_dt(array_dt) << " " << array_var << " = NULL";
+    // TODO we need to check if this is a string literal
+    code << dt_compiler->convert_dt(array_dt, datatype_location::VARIABLE, "",
+                                    "")
+         << " " << array_var << " = NULL";
     st_writer->write_statement(code.str());
     code.str("");
     code.clear();
@@ -1015,6 +1028,93 @@ struct builtin_arrnew : builtin {
     code.str("");
     code.clear();
     code << array_var;
+    o = ykobject(array_dt);
+    return {code.str(), o};
+  }
+};
+//
+// ┌─┐┬  ┐ ┬┌─┐┌┬┐┌─┐┬─┐┬─┐
+// ├┤ │ ┌┴┬┘├┤  ││├─┤├┬┘├┬┘
+// └  ┴ ┴ └─└─┘─┴┘┴ ┴┴└─┴└─
+//
+struct builtin_fixed_arr : builtin {
+  ykobject
+  verify(const std::vector<ykobject> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         ykdt_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = ykobject(dt_pool);
+    if (args.empty()) {
+      o.string_val_ = "fixedarr() builtin expects >= 1 arguments";
+    } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
+      o.string_val_ = "First argument to fixedarr() must be a string literal";
+    } else {
+      auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
+      auto data_type = lit->literal_token_->token_;
+      ykdatatype *parsed_dt =
+          dt_parser->parse(data_type, import_aliases, filepath);
+      if (parsed_dt == nullptr) {
+        o.string_val_ = "Invalid data type provided to fixedarr()";
+      } else {
+        size_t length = args.size();
+        for (size_t i = 1; i < length; i++) {
+          if (!dt_slot_matcher->slot_match(args[i], parsed_dt)) {
+            o.string_val_ = "All arguments must match with data type passed "
+                            "to first argument for fixedarr() builtin";
+            o.object_type_ = object_type::ERROR_DETECTED;
+            return o;
+          }
+        }
+        ykdatatype *array_wrapper = dt_pool->create("FixedArr");
+        array_wrapper->args_.emplace_back(parsed_dt);
+        // Add fixed array length
+        array_wrapper->args_.emplace_back(
+            dt_pool->create(std::to_string(length - 1)));
+        array_wrapper->inlinable_literal_ = true;
+        return ykobject(array_wrapper);
+      }
+    }
+    o.object_type_ = object_type::ERROR_DETECTED;
+    return o;
+  }
+  std::pair<std::string, ykobject>
+  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          ykdt_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
+    auto o = ykobject(dt_pool);
+    std::stringstream code{};
+    auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
+    auto element_data_type =
+        dt_parser->parse(dt->literal_token_->token_, import_aliases, filepath);
+    auto array_dt = dt_pool->create("FixedArr");
+    array_dt->args_.emplace_back(element_data_type);
+    // Add fixed array length
+    array_dt->args_.emplace_back(
+        dt_pool->create(std::to_string(args.size() - 1)));
+    array_dt->inlinable_literal_ = true;// this can be inlined
+    // ------------------------
+    code << "{";
+    size_t length = args.size();
+    for (size_t i = 1; i < length; i++) {
+      // TODO see if this and array() require to check Const[str]?
+      // TODO clearly define Const[xx] possible data types?
+      // TODO should Const even be a datatype?, isn't it just a modifier?
+      if (i != 1) { code << ", "; }
+      if (element_data_type->is_a_string()) {
+        dt_compiler->compile_string_assign(
+            dt->literal_token_, code, args[i],
+            args[i].second.datatype_->const_unwrap(), element_data_type);
+      } else {
+        code << args[i].first;
+      }
+    }
+    code << "}";
     o = ykobject(array_dt);
     return {code.str(), o};
   }
@@ -1078,7 +1178,8 @@ struct builtin_array : builtin {
     auto array_dt = dt_pool->create("Array");
     array_dt->args_.emplace_back(element_data_type);
     auto array_var = st_writer->temp();
-    code << dt_compiler->convert_dt(array_dt) << " " << array_var << " = NULL";
+    code << dt_compiler->convert_dt(array_dt, datatype_location::STRUCT, "", "")
+         << " " << array_var << " = NULL";
     st_writer->write_statement(code.str());
     code.str("");
     code.clear();
@@ -1197,10 +1298,12 @@ struct builtin_functional : builtin {
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    // TODO what about Const[FixedArr[...]] and Const[Array[...]]
     auto o = ykobject(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = name_ + "() builtin expects 3 arguments";
-    } else if (!args[0].datatype_->is_array() ||
+    } else if ((!args[0].datatype_->is_array() &&
+                !args[0].datatype_->is_fixed_size_array()) ||
                args[0].datatype_->args_[0]->is_m_entry() ||
                args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ = "First argument to " + name_ + "() must be a an Array[T]";
@@ -1230,12 +1333,14 @@ struct builtin_functional : builtin {
     } else {
       dt = args[1].second.datatype_;
     }
+    auto fixed_array = dt->args_[0]->is_fixed_size_array();
     ykdatatype *fn_out =
         dt->args_[1]->args_[0];// Function[In[T, K], Out[O]] access O
     ykdatatype *template_dt =
         args[0].second.datatype_->args_[0];// Array[T] access T
     std::string i = st_writer->temp();
-    std::string len_temp = st_writer->temp();
+    std::string len_temp =
+        fixed_array ? dt->args_[0]->token_->token_ : st_writer->temp();
     std::string arr_temp = st_writer->temp();
     std::string elm_temp = st_writer->temp();
     std::string k_temp = st_writer->temp();
@@ -1244,16 +1349,20 @@ struct builtin_functional : builtin {
     std::string rt_init = "NULL";
     ykdatatype *arr1 = dt_pool->create("Array");
     // Copy pointer to array to a temp
-    code << dt_compiler->convert_dt(args[0].second.datatype_) << " " << arr_temp
-         << " = " << args[0].first;
+    code << dt_compiler->convert_dt(args[0].second.datatype_,
+                                    datatype_location::STRUCT, "", "")
+         << " " << arr_temp << " = " << args[0].first;
     write_statement(code, st_writer);
     // Copy K value to temp
-    code << dt_compiler->convert_dt(args[2].second.datatype_) << " " << k_temp
-         << " = " << args[2].first;
+    code << dt_compiler->convert_dt(args[2].second.datatype_,
+                                    datatype_location::STRUCT, "", "")
+         << " " << k_temp << " = " << args[2].first;
     write_statement(code, st_writer);
-    // Get length of this array
-    code << "size_t " << len_temp << " = yk__arrlenu(" << arr_temp << ")";
-    write_statement(code, st_writer);
+    if (!fixed_array) {
+      // Get length of this array
+      code << "size_t " << len_temp << " = yk__arrlenu(" << arr_temp << ")";
+      write_statement(code, st_writer);
+    }
     // Create returning value temp
     switch (fnc_type_) {
       case fnc::FOREACH:
@@ -1272,8 +1381,9 @@ struct builtin_functional : builtin {
         arr1->args_.emplace_back(fn_out);
         return_val_type = arr1;
     }
-    code << dt_compiler->convert_dt(return_val_type) << " " << return_temp
-         << " = " << rt_init;
+    code << dt_compiler->convert_dt(return_val_type, datatype_location::STRUCT,
+                                    "", "")
+         << " " << return_temp << " = " << rt_init;
     write_statement(code, st_writer);
     // For each element
     code << "for (size_t " << i << " = 0; " << i << " < " << len_temp << "; "
@@ -1281,15 +1391,19 @@ struct builtin_functional : builtin {
     write_statement_no_end(code, st_writer);
     st_writer->indent();
     if (template_dt->is_str()) {
-      code << dt_compiler->convert_dt(template_dt) << " " << elm_temp
-           << " = yk__sdsdup(" << arr_temp << "[" << i << "])";
+      code << dt_compiler->convert_dt(template_dt, datatype_location::STRUCT,
+                                      "", "")
+           << " " << elm_temp << " = yk__sdsdup(" << arr_temp << "[" << i
+           << "])";
     } else {
-      code << dt_compiler->convert_dt(template_dt) << " " << elm_temp << " = "
-           << arr_temp << "[" << i << "]";
+      code << dt_compiler->convert_dt(template_dt, datatype_location::STRUCT,
+                                      "", "")
+           << " " << elm_temp << " = " << arr_temp << "[" << i << "]";
     }
     write_statement(code, st_writer);
-    code << dt_compiler->convert_dt(fn_out) << " " << fn_out_temp << " = "
-         << args[1].first << "(" << elm_temp << ", " << k_temp << ")";
+    code << dt_compiler->convert_dt(fn_out, datatype_location::STRUCT, "", "")
+         << " " << fn_out_temp << " = " << args[1].first << "(" << elm_temp
+         << ", " << k_temp << ")";
     write_statement(code, st_writer);
     switch (fnc_type_) {
       case fnc::FOREACH:
@@ -1495,7 +1609,10 @@ struct builtin_make : builtin {
         dt_parser->parse(data_type, import_aliases, filepath);
     auto o = ykobject(dt_pool);
     std::stringstream code{};
-    code << "calloc(1, sizeof(" << dt_compiler->convert_dt(parsed_dt) << "))";
+    code << "calloc(1, sizeof("
+         << dt_compiler->convert_dt(parsed_dt, datatype_location::STRUCT, "",
+                                    "")
+         << "))";
     ykdatatype *dt = dt_pool->create("Ptr");
     dt->args_.emplace_back(parsed_dt);
     o.datatype_ = dt;
@@ -1574,6 +1691,7 @@ builtins::builtins(ykdt_pool *dt_pool, gc_pool<token> *token_pool)
   builtins_.insert({"arrsetcap", new builtin_arrsetlencap{"arrsetcap"}});
   builtins_.insert({"arrsetlen", new builtin_arrsetlencap{"arrsetlen"}});
   builtins_.insert({"array", new builtin_array{}});
+  builtins_.insert({"fixedarr", new builtin_fixed_arr{}});
   builtins_.insert({"print", new builtin_print{"print"}});
   builtins_.insert({"println", new builtin_print{"println"}});
   builtins_.insert({"len", new builtin_len{}});

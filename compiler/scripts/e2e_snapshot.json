@@ -6,6 +6,8 @@
   "test_data/byol/lisp.yaka": "error: FileNotFound\n\nreturn := 255",
   "test_data/compiler_tests/all_integers.yaka": "\n\nreturn := 0",
   "test_data/compiler_tests/array_test.yaka": "Printing [a]\n1\n2\n3\n4\n5\n6\n7\nPrinting [b]\nHello\nWorld\nHaha\n\nreturn := 0",
+  "test_data/compiler_tests/arrays/fixed_arr_loop.yaka": "Fixed Array looping\n\nreturn := 0",
+  "test_data/compiler_tests/arrays/simple_fixed_arr.yaka": "Creating a fixed array\n6\n\nreturn := 0",
   "test_data/compiler_tests/arrstack.yaka": "3\n2\n1\n\nreturn := 0",
   "test_data/compiler_tests/auto_casting/autocast.yaka": "\"a\" = 1\n\"b\" = 2\n\"c\" = 3\n\"d\" = 6\n\"e\" = 7\n\"f\" = 2\n\"g\" = 6.000000\n\"h\" = 7.000000\n\"i\" = 6.000000\n\"j\" = 1.000000\n\"k\" = 5.000000\n\"l\" = 1\n\"A\" = 10\n\"B\" = 10\n\"C\" = 0\n\nreturn := 0",
   "test_data/compiler_tests/auto_casting/autocastboolcount.yaka": "10\n\nreturn := 0",

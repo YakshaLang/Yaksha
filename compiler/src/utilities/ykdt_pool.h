@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -47,6 +47,8 @@ namespace yaksha {
     ~ykdt_pool();
     ykdatatype *create(std::string tok);
     ykdatatype *create(std::string tok, std::string module);
+    ykdatatype *create_dimension(token *tok, std::string fpath);
+    ykdatatype *create_dimension(int x);
 
 private:
     std::vector<ykdatatype *> pool_;

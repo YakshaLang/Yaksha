@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -81,8 +81,12 @@ namespace yaksha {
     TUPLE,
     // Function[In[str],Out]
     FUNCTION,
-    F_IN,
-    F_OUT,
+    F_IN, // ----- special metadata
+    F_OUT,// ----- special metadata
+    // Fixed Size Array
+    // FixedArr[int, 10] // <--- 10 is the size, stored in dimension
+    FIXED_ARRAY,
+    DIMENSION,// ----- special metadata
   };
   struct ykdt_pool;
   struct ykdatatype {
@@ -130,6 +134,8 @@ namespace yaksha {
     [[nodiscard]] bool is_any_ptr() const;
     [[nodiscard]] bool is_any_ptr_to_const() const;
     [[nodiscard]] bool is_tuple() const;
+    [[nodiscard]] bool is_fixed_size_array() const;
+    [[nodiscard]] bool is_dimension() const;
     // match a combination of primitives
     [[nodiscard]] bool is_a_number() const;
     [[nodiscard]] bool is_an_integer() const;
@@ -141,11 +147,15 @@ namespace yaksha {
     std::string type_{};
     std::string module_{};
     std::vector<ykdatatype *> args_;
+    int dimension_{-1};
     ykprimitive primitive_type_{ykprimitive::NOT_A_PRIMITIVE};
     ykbuiltin builtin_type_{ykbuiltin::NOT_A_BUILTIN};
     bool widen_rhs{false};
     bool widen_lhs{false};
     size_t hits_{0};
+    // for distinguishing between fixedarr(...) and variable_to_fixedarr
+    // TODO see if we can get rid of :sr: datatype
+    bool inlinable_literal_{false};
 
 private:
     void write_to_str(std::stringstream &s) const;

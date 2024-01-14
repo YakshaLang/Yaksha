@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -99,6 +99,14 @@ static void TEST_SNIPPET_FULL(const std::string &S, const std::string &E) {
   REQUIRE(!yaksha::errors::error_capture.empty());
   REQUIRE(yaksha::errors::has_error(E));
 }
+static void TEST_SNIPPET_FULL_OK(const std::string &S) {
+  multifile_compiler mc{};
+  codegen_c cg{};
+  const std::string &xa = S;
+  auto result = mc.compile(xa, true, "dummy.yaka", ".", &cg);
+  REQUIRE(result.failed_ == false);
+  REQUIRE(yaksha::errors::error_capture.empty());
+}
 TEST_CASE("parser: Hello World") {
   test_parser_yaka_file("../test_data/compiler_tests/test1.yaka", "test1.yaka",
                         "../test_data/compiler_tests/output/test1.ast.tokens");
@@ -146,14 +154,14 @@ TEST_CASE("parser: Negative numbers") {
                         "sample_negative_numbers.yaka",
                         "../test_data/sample_negative_numbers.yaka.ast.tokens");
 }
-TEST_CASE("type checker: break used outside loop") {
+TEST_CASE("parser: break used outside loop") {
   TEST_SNIPPET_FULL("def main() -> int:\n"
                     "    break\n"
                     "    b: bool = False\n"
                     "    return 0",
                     "Invalid assignment target!");
 }
-TEST_CASE("type checker: continue used outside loop") {
+TEST_CASE("parser: continue used outside loop") {
   TEST_SNIPPET_FULL("continue\n"
                     "def main() -> int:\n"
                     "    c: bool = False\n"
@@ -180,4 +188,45 @@ TEST_CASE("parser: mini blocks") {
   test_parser_yaka_file(
       "../test_data/compiler_tests/smallest.yaka", "smallest.yaka",
       "../test_data/compiler_tests/output/smallest.ast.tokens");
+}
+TEST_CASE("parser: parse FixedArr") {
+  TEST_SNIPPET_FULL_OK("def main() -> int:\n"
+                       "    a: FixedArr[int, 10]\n"
+                       "    return 0");
+}
+TEST_CASE("parser: parse FixedArr with non integer size") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: FixedArr[int, str]\n"
+                    "    return 0",
+                    "FixedArr must have a data type argument and a dimension "
+                    "arg. Example: FixedArr[i8, 10]");
+}
+TEST_CASE("parser: parse FixedArr with integer as first arg") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: FixedArr[10, 10]\n"
+                    "    return 0",
+                    "FixedArr must have a data type argument and a dimension "
+                    "arg. Example: FixedArr[i8, 10]");
+}
+TEST_CASE("parser: parse FixedArr with MEntry") {
+  TEST_SNIPPET_FULL(
+      "def main() -> int:\n"
+      "    a: FixedArr[MEntry[int, int], 3]\n"
+      "    return 0",
+      "FixedArr cannot have a SMEntry/MEntry as the data type argument.");
+}
+TEST_CASE("parser: function trying to return a FixedArr") {
+  TEST_SNIPPET_FULL("def bad() -> FixedArr[int, 10]:\n"
+                    "    a: FixedArr[int, 10]\n"
+                    "    return a\n"
+                    "def main() -> int:\n"
+                    "    return 0",
+                    "Functions cannot return fixed size arrays. Use Array or "
+                    "wrap in a Tuple.");
+}
+TEST_CASE("parser: function data type returns FixedArr") {
+  TEST_SNIPPET_FULL("def main() -> int:\n"
+                    "    a: Function[In[int], Out[FixedArr[int, 10]]]\n"
+                    "    return 0",
+                    "A function cannot return a fixed size array. Use Array or wrap in a Tuple.");
 }

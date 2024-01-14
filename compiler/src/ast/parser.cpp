@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -619,7 +619,7 @@ stmt *parser::for_statement() {
     auto for_body = block_statement();
     control_flow_--;
     return pool_.c_foreach_stmt(for_keyword, name, dt, in_k, for_source,
-                                for_body);
+                                for_body, nullptr);
   } else if (check(token_type::PAREN_OPEN)) {
     // c-for
     // for (x = 0; x < 5; x += 1) BLOCK
@@ -702,12 +702,17 @@ stmt *parser::def_statement(annotations ants) {
   return pool_.c_def_stmt(name, params, body, return_dt, std::move(ants));
 }
 ykdatatype *parser::parse_datatype() {
-  if (!match({token_type::NAME, token_type::KEYWORD_NONE})) {
+  if (!match({token_type::NAME, token_type::KEYWORD_NONE,
+              token_type::INTEGER_DECIMAL})) {
     throw error(peek(), "Must have a data type.");
   }
   ykdatatype *dt;
   auto tk = previous();
   if (match({token_type::DOT})) {
+    // None.XXX or 4.XXX are invalid it needs to be mod.Name
+    if (tk->type_ != token_type::NAME) {
+      throw error(tk, "Must have a name before dot");
+    }
     auto after_dot = consume(token_type::NAME, "Must have a name after dot");
     auto module_import_alias = tk->token_;
     if (import_stmts_alias_.find(module_import_alias) ==
@@ -716,20 +721,37 @@ ykdatatype *parser::parse_datatype() {
     }
     dt = dt_pool_->create(after_dot->token_, module_import_alias);
     datatypes_from_modules_.emplace_back(dt);
+  } else if (tk->type_ == token_type::INTEGER_DECIMAL) {
+    dt = dt_pool_->create_dimension(tk, filepath_);
   } else {
     dt = dt_pool_->create(tk->token_, filepath_);
   }
+  auto error_throwing_token = previous();
   if (match({token_type::SQUARE_BRACKET_OPEN})) {
-    if (dt->is_primitive() || dt->is_any_ptr()) {
+    if (dt->is_primitive() || dt->is_any_ptr() || dt->is_any_ptr_to_const() ||
+        dt->is_dimension()) {
       throw error(
-          dt->token_,
+          error_throwing_token,
           "Primitive data types / AnyPtr cannot have internal data types.");
     }
     do {
       auto arg = parse_datatype();
       if (arg->is_none()) {
-        throw error(dt->token_,
+        throw error(error_throwing_token,
                     "None cannot be used as an argument for a data type.");
+      }
+      // WHY?: Dimension can only be used as an argument for a fixed size array.
+      if (arg->is_dimension() && !dt->is_fixed_size_array()) {
+        throw error(error_throwing_token,
+                    "Dimension can only be used as an argument for a fixed "
+                    "size array.");
+      }
+      // WHY?: Function In/Out can only be used as an argument for a function.
+      if (!dt->is_function() &&
+          (arg->is_function_input() || arg->is_function_output())) {
+        throw error(
+            error_throwing_token,
+            "Function In/Out can only be used as an argument for a function.");
       }
       dt->args_.push_back(arg);
     } while (match({token_type::COMMA}));
@@ -738,29 +760,50 @@ ykdatatype *parser::parse_datatype() {
   if (dt->is_array() || dt->is_ptr() || dt->is_const() || dt->is_sm_entry()) {
     if (dt->args_.size() != 1) {
       throw error(
-          dt->token_,
+          error_throwing_token,
           "Array/Ptr/Const/SMEntry/Out must only have a single data type arg");
     }
   }
+  if (dt->is_fixed_size_array() &&
+      (dt->args_.size() != 2 || !dt->args_[1]->is_dimension() ||
+       dt->args_[0]->is_dimension())) {
+    throw error(error_throwing_token,
+                "FixedArr must have a data type argument and a dimension arg."
+                " Example: FixedArr[i8, 10]");
+  }
+  if (dt->is_fixed_size_array() && dt->args_.size() > 1 &&
+      (dt->args_[0]->const_unwrap()->is_sm_entry() ||
+       dt->args_[0]->const_unwrap()->is_m_entry())) {
+    throw error(
+        error_throwing_token,
+        "FixedArr cannot have a SMEntry/MEntry as the data type argument.");
+  }
   if (dt->is_m_entry()) {
     if (dt->args_.size() != 2) {
-      throw error(dt->token_, "MEntry must only have a two data types args");
+      throw error(error_throwing_token,
+                  "MEntry must only have a two data types args");
     }
   }
   if (dt->is_function() &&
       (dt->args_.size() != 2 || !dt->args_[0]->is_function_input() ||
        !dt->args_[1]->is_function_output())) {
-    throw error(dt->token_, "Function must have both In and Out in order");
+    throw error(error_throwing_token,
+                "Function must have both In and Out in order");
   }
   if (dt->is_function_output() && dt->args_.size() > 1) {
-    throw error(dt->token_,
+    throw error(error_throwing_token,
                 "Function's Out datatype must have 0 or 1 arguments");
   }
+  if (dt->is_function_output() && dt->args_.size() == 1 &&
+      dt->args_[0]->const_unwrap()->is_fixed_size_array()) {
+    throw error(error_throwing_token, "A function cannot return a fixed size "
+                                      "array. Use Array or wrap in a Tuple.");
+  }
   if (dt->is_tuple() && dt->args_.empty()) {
-    throw error(dt->token_, "Tuple must have at least one argument");
+    throw error(error_throwing_token, "Tuple must have at least one argument");
   }
   if (dt->is_const() && dt->args_[0]->is_const()) {
-    throw error(dt->token_, "Const[Const[?]] is invalid data type");
+    throw error(error_throwing_token, "Const[Const[?]] is invalid data type");
   }
   return dt;
 }

@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -81,6 +81,11 @@ void def_class_visitor::visit_def_stmt(def_stmt *obj) {
   if (obj->annotations_.varargs_ && obj->params_.size() <= 1) {
     error(obj->name_,
           "@varargs only works with functions that have at least 2 arguments.");
+    return;
+  }
+  if (obj->return_type_->const_unwrap()->is_fixed_size_array()) {
+    error(obj->name_, "Functions cannot return fixed size arrays. Use Array or "
+                      "wrap in a Tuple.");
     return;
   }
   function_names_.push_back(name);

@@ -1,0 +1,9 @@
+def main() -> int:
+    println("Creating a fixed array")
+    a: FixedArr[int, 3]
+    a[0] = 1
+    a[1] = 2
+    a[2] = 3
+    b = a[0] + a[1] + a[2]
+    println(b)
+    return 0

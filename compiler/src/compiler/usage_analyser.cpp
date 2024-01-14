@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -357,7 +357,8 @@ void usage_analyser::visit_data_type(ykdatatype *dt, token *token_for_err) {
   if (dt->hits_ > 0) { return; }
   dt->hits_++;
   if (dt->is_primitive()) { return; }
-  if (dt->is_array() || dt->is_sm_entry() || dt->is_const() || dt->is_ptr()) {
+  if (dt->is_array() || dt->is_sm_entry() || dt->is_const() || dt->is_ptr() ||
+      dt->is_fixed_size_array()) {
     visit_data_type(dt->args_[0], token_for_err);
     return;
   }

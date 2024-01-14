@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -212,9 +212,9 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
           to_comp = lhs.datatype_->const_unwrap();
         }
         if (!(to_comp->is_any_ptr() || to_comp->is_array() ||
-              to_comp->is_a_string() || to_comp->is_ptr() ||
-              to_comp->is_any_ptr_to_const() || to_comp->is_none() ||
-              !to_comp->is_builtin_or_primitive())) {
+              to_comp->is_fixed_size_array() || to_comp->is_a_string() ||
+              to_comp->is_ptr() || to_comp->is_any_ptr_to_const() ||
+              to_comp->is_none() || !to_comp->is_builtin_or_primitive())) {
           error(obj->opr_, "Datatype cannot be compared with None");
           break;
         }
@@ -823,7 +823,8 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
   name_expr->accept(this);
   auto arr_var = pop();
   ykdatatype *arr_data_type = arr_var.datatype_->const_unwrap();
-  if (arr_data_type->is_array() || arr_data_type->is_ptr()) {
+  if (arr_data_type->is_array() || arr_data_type->is_ptr() ||
+      arr_data_type->is_fixed_size_array()) {
     auto placeholder = ykobject(dt_pool_);
     placeholder.datatype_ = arr_data_type->args_[0];
     // --- OK ---
@@ -841,6 +842,8 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
     }
     auto lexp = dynamic_cast<literal_expr *>(index_expr);
     // TODO support other literal types for tuple access.
+    //   We should be able to also use a const time expression for tuple access as well.
+    //   current behaviour is annoying, but it's fine for now.
     if (lexp->literal_token_->type_ != token_type::INTEGER_DECIMAL) {
       push(ykobject(dt_pool_));
       error(sqb_token,
@@ -875,6 +878,24 @@ void type_checker::visit_assign_arr_expr(assign_arr_expr *obj) {
 }
 void type_checker::handle_assigns(token *oper, const ykobject &lhs,
                                   const ykobject &rhs) {
+  // TODO: add support for assign to fixed array without overflowing.
+  //  Basically assign as much elements as possible to LHS from RHS (FixedArr, Array, or sr/str/lit),
+  //  keep any leftover as is. (We assume whoever assigns knows what they are doing) :)
+  //  however, we cannot assign if the args_[0] is a const in a FixedArray, so check for this.
+  // ---
+  // TODO verify What if lhs is a tuple? We can't assign to a tuple,
+  //  but we can assign to a tuple element, so we might be able to assign between 2 tuples of exact same type?
+  //  if any element in a tuple is a const, then we cannot assign to it.?
+  //  we can either skip the const element, or error out. (TBD)
+  //
+  if (lhs.datatype_->const_unwrap()->is_fixed_size_array()) {
+    error(oper, "Cannot assign to a FixedArr[..]. FixedArr variables are not "
+                "assignable.");
+  }
+  if (lhs.datatype_->const_unwrap()->is_tuple()) {
+    error(oper,
+          "Cannot assign to a Tuple[..]. Tuple variables are not assignable.");
+  }
   if (lhs.datatype_->is_const()) { error(oper, "Cannot assign to a constant"); }
   if (rhs.is_a_function() && !slot_match(rhs, lhs.datatype_)) {
     error(oper, "You can only assign a (matching) function to a "
@@ -1032,21 +1053,31 @@ void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {
 void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   obj->expression_->accept(this);
   auto exp = pop();
-  if (!exp.datatype_->is_array()) {
+  // Derive data type of foreach-s expression and fill it to AST
+  obj->expr_datatype_ = exp.datatype_;
+  // TODO: see if we can add similar data types to rest of the AST objects?
+  //   if, while, del, defer, return?
+  if (!exp.datatype_->const_unwrap()->is_array() &&
+      !exp.datatype_->const_unwrap()->is_fixed_size_array()) {
     error(obj->for_keyword_, "foreach iteration must use an array");
   }
-  if ((exp.datatype_->is_array() && (exp.datatype_->args_[0]->is_sm_entry() ||
-                                     exp.datatype_->args_[0]->is_m_entry()))) {
+  if ((exp.datatype_->const_unwrap()->is_array() &&
+       !exp.datatype_->const_unwrap()->args_.empty() &&
+       (exp.datatype_->const_unwrap()->args_[0]->is_sm_entry() ||
+        exp.datatype_->const_unwrap()->args_[0]->is_m_entry()))) {
     error(obj->for_keyword_,
           "Cannot use foreach iteration for SMEntry and MEntry.");
   }
-  if (exp.datatype_->args_.empty()) {
+  if (exp.datatype_->const_unwrap()->args_.empty()) {
     // We do not have any information to continue
+    // continuing here will cause a segfault
     return;
   }
-  // Infer data type of foreach
-  if (obj->data_type_ == nullptr) { obj->data_type_ = exp.datatype_->args_[0]; }
-  auto lhs = exp.datatype_->args_[0];
+  // Infer data type of foreach and fill it to AST
+  if (obj->data_type_ == nullptr) {
+    obj->data_type_ = exp.datatype_->const_unwrap()->args_[0];
+  }
+  auto lhs = exp.datatype_->const_unwrap()->args_[0];
   auto rhs = obj->data_type_;
   if ((*lhs != *rhs)) {
     error(obj->for_keyword_,

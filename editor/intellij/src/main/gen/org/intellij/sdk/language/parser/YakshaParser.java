@@ -1034,7 +1034,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // data_type_identifier | PRIMITIVE_DATA_TYPE | KW_NONE
+  // data_type_identifier | PRIMITIVE_DATA_TYPE | KW_NONE | NUMBER
   public static boolean data_type_bit(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "data_type_bit")) return false;
     boolean r;
@@ -1042,6 +1042,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = data_type_identifier(b, l + 1);
     if (!r) r = consumeToken(b, PRIMITIVE_DATA_TYPE);
     if (!r) r = consumeToken(b, KW_NONE);
+    if (!r) r = consumeToken(b, NUMBER);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

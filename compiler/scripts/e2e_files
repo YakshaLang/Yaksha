@@ -90,3 +90,5 @@ test_data/compiler_tests/for_loop_test.yaka
 test_data/compiler_tests/auto_casting/autocastboolcount.yaka
 test_data/compiler_tests/string_tests/sr_with_const.yaka
 test_data/compiler_tests/string_tests/strings_const_mixed_tests.yaka
+test_data/compiler_tests/arrays/simple_fixed_arr.yaka
+test_data/compiler_tests/arrays/fixed_arr_loop.yaka

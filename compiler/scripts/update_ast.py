@@ -1,6 +1,6 @@
 # ==============================================================================================
 # ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-# ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+# ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 # ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 # Note: libs - MIT license, runtime/3rd - various
 # ==============================================================================================
@@ -132,7 +132,8 @@ STMTS = sorted([
     # for x in expr:
     #     println(x)
     ("foreach", (("token*", "for_keyword"), ("token*", "name"), ("ykdatatype*", "data_type"),
-                 ("token*", "in_keyword"), ("expr*", "expression"), ("stmt*", "for_body"),)),
+                 ("token*", "in_keyword"), ("expr*", "expression"), ("stmt*", "for_body"),
+                 ("ykdatatype*", "expr_datatype"),)),
     # For loop - endless loop
     # for:
     #     println("endless")

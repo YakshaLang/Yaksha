@@ -1,0 +1,18 @@
+def main() -> int:
+    println("Fixed Array looping")
+    a: FixedArr[int, 3]
+    a[0] = 1
+    a[1] = 2
+    a[2] = 3
+    b: FixedArr[sr, 3]
+    b[0] = "hello"
+    b[1] = "world"
+    b[2] = "!"
+
+    for a_item in a:
+        println(a_item)
+
+    for b_item in b:
+        println(b_item)
+
+    return 0

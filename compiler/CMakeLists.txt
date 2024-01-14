@@ -49,7 +49,7 @@ if(UNIX AND NOT APPLE)
     list(APPEND SYS_LIBS m dl pthread)
 endif()
 
-set(YAKSHA_COMMON_LIBS ${SYS_LIBS} library_yaksha reproc reproc++)
+set(YAKSHA_COMMON_LIBS ${SYS_LIBS} library_yaksha reproc++)
 
 # -- yakshac - compiler --
 add_executable(yakshac src/comp_main.cpp runtime/whereami.c)
@@ -91,7 +91,6 @@ add_executable(YakshaTests ${YAKSHA_SOURCE_FILES} ${YAKSHA_TEST_FILES} tests/tes
 target_compile_definitions(YakshaTests PUBLIC TESTING)
 target_link_libraries(YakshaTests PRIVATE Catch2::Catch2)
 target_link_libraries(YakshaTests PUBLIC ${SYS_LIBS})
-target_link_libraries(YakshaTests PUBLIC reproc)
 target_link_libraries(YakshaTests PUBLIC reproc++)
 target_compile_features(YakshaTests PRIVATE cxx_std_17)
 # Add to CTest
@@ -106,7 +105,6 @@ if(DEFINED ENV{YAKSHA_FUZZ})
     add_executable(YakshaFuzz ${YAKSHA_SOURCE_FILES}  tests/fuzz_main.cpp runtime/whereami.c)
     target_compile_definitions(YakshaFuzz PUBLIC YAKSHA_LLVM_FUZZ)
     target_link_libraries(YakshaFuzz PUBLIC ${SYS_LIBS})
-    target_link_libraries(YakshaFuzz PUBLIC reproc)
     target_link_libraries(YakshaFuzz PUBLIC reproc++)
     target_compile_features(YakshaFuzz PRIVATE cxx_std_17)
 endif()

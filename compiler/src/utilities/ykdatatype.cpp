@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -54,7 +54,9 @@ ykdatatype::ykdatatype(token *primitive_dt) {
   find_builtin_or_primitive();
 }
 void ykdatatype::find_builtin_or_primitive() {
-  if (token_->token_ == "i8") {
+  if (token_->type_ == token_type::INTEGER_DECIMAL) {
+    builtin_type_ = ykbuiltin::DIMENSION;
+  } else if (token_->token_ == "i8") {
     primitive_type_ = ykprimitive::I8;
   } else if (token_->token_ == "i16") {
     primitive_type_ = ykprimitive::I16;
@@ -106,6 +108,8 @@ void ykdatatype::find_builtin_or_primitive() {
     builtin_type_ = ykbuiltin::ANY_PTR_TO_CONST;
   } else if (token_->token_ == "Tuple") {
     builtin_type_ = ykbuiltin::TUPLE;
+  } else if (token_->token_ == "FixedArr") {
+    builtin_type_ = ykbuiltin::FIXED_ARRAY;
   }
 }
 ykdatatype::~ykdatatype() { delete (token_); }
@@ -265,4 +269,10 @@ ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, ykdt_pool *pool,
     }
   }
   return castable;
+}
+bool ykdatatype::is_fixed_size_array() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::FIXED_ARRAY;
+}
+bool ykdatatype::is_dimension() const {
+  return !is_primitive() && builtin_type_ == ykbuiltin::DIMENSION;
 }

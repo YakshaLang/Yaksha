@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -237,7 +237,7 @@ void desugaring_compiler::visit_while_stmt(while_stmt *obj) {
   pre_continue_stack_.pop_back();
   statement_stack_.back()->emplace_back(simplified_while);
 }
-void desugaring_compiler::visit_foreach_stmt(foreach_stmt *obj) {
+void desugaring_compiler::desugar_arr_foreach(foreach_stmt *obj) {
   // desugar
   auto array_holder = compiler_obj_->temp("yy__") + "t";
   auto array_holder_tok = create_name(array_holder);
@@ -279,8 +279,8 @@ void desugaring_compiler::visit_foreach_stmt(foreach_stmt *obj) {
   pre_continue_stack_.emplace_back(counter_incr);
   auto desugared = desugar(obj->for_body_);
   pre_continue_stack_.pop_back();
-  auto *desugard_for_body = dynamic_cast<block_stmt *>(desugared);
-  for (stmt *st : desugard_for_body->statements_) {
+  auto *desugared_for_body = dynamic_cast<block_stmt *>(desugared);
+  for (stmt *st : desugared_for_body->statements_) {
     new_while_body.emplace_back(st);
   }
   // While body    ->     counter += 1
@@ -294,6 +294,92 @@ void desugaring_compiler::visit_foreach_stmt(foreach_stmt *obj) {
                               ast_pool_->c_block_stmt(new_while_body));
   // Desugar again using while desugar!
   desugared_while->accept(this);
+}
+void desugaring_compiler::desugar_fixed_arr_foreach(foreach_stmt *obj) {
+  auto expression_dt = obj->expr_datatype_->const_unwrap();
+  auto array_holder = compiler_obj_->temp("yy__") + "t";
+  auto array_holder_tok = create_name(array_holder);
+  auto counter = compiler_obj_->temp("yy__") + "t";
+  auto counter_tok = create_name(counter);
+  auto prefixed_name = compiler_obj_->prefix_token(obj->name_);
+  auto length_str = std::to_string(expression_dt->args_[1]->dimension_);
+  auto length_tok = create_int_literal(length_str);
+  // -----------------------------------------
+  // New statement:
+  // if the expression can be inlined
+  //    array_holder: FixedArr[T] = expression
+  // if the expression cannot be inlined
+  //    array_holder: Ptr[FixedArr[T]] = expression
+  // TODO before I forget, ensure that the Ptr[Function] is not allowed as a Function is ptr...
+  ykdatatype *arr;
+  if (expression_dt->inlinable_literal_) {
+    arr = dt_pool_->create("FixedArr");
+    arr->args_.push_back(obj->data_type_);
+    arr->args_.push_back(
+        dt_pool_->create_dimension(expression_dt->args_[1]->dimension_));
+    statement_stack_.back()->emplace_back(
+        ast_pool_->c_let_stmt(array_holder_tok, arr, obj->expression_));
+  } else {
+    arr = dt_pool_->create("Ptr");
+    ykdatatype *fixed_arr = dt_pool_->create("FixedArr");
+    fixed_arr->args_.push_back(obj->data_type_);
+    fixed_arr->args_.push_back(
+        dt_pool_->create_dimension(expression_dt->args_[1]->dimension_));
+    arr->args_.push_back(fixed_arr);
+    statement_stack_.back()->emplace_back(ast_pool_->c_let_stmt(
+        array_holder_tok, arr,
+        ast_pool_->c_fncall_expr(
+            ast_pool_->c_variable_expr(create_name("getref")), paren_token_,
+            {obj->expression_})));
+  }
+  // New statement -> counter: int = 0
+  statement_stack_.back()->emplace_back(ast_pool_->c_let_stmt(
+      counter_tok, dt_pool_->create("int"),
+      ast_pool_->c_literal_expr(create_int_literal("0"))));
+  // While body
+  std::vector<stmt *> new_while_body{};
+  // While body -> #yaksha-define yy__item h__array[h__counter]
+  // While body -> expose yy__item ==> obj->name + obj->data_type
+  std::string desugar_rewrite;
+  if (expression_dt->inlinable_literal_) {
+    desugar_rewrite = "(*(" + array_holder + ")[" + counter + "])";
+  } else {
+    desugar_rewrite = "(" + array_holder + "[" + counter + "])";
+  }
+  new_while_body.emplace_back(ast_pool_->c_compins_stmt(
+      obj->name_, obj->data_type_, create_str_literal(desugar_rewrite), nullptr,
+      nullptr));
+  // Create counter += 1 statement
+  auto counter_incr = ast_pool_->c_expression_stmt(ast_pool_->c_assign_expr(
+      counter_tok, plus_eq_token_,
+      ast_pool_->c_literal_expr(create_int_literal("1")), false, nullptr));
+  // desugar body (add counter += 1 before continue)
+  pre_continue_stack_.emplace_back(counter_incr);
+  auto desugared = desugar(obj->for_body_);
+  pre_continue_stack_.pop_back();
+  auto *desugared_for_body = dynamic_cast<block_stmt *>(desugared);
+  for (stmt *st : desugared_for_body->statements_) {
+    new_while_body.emplace_back(st);
+  }
+  // While body -> counter += 1
+  new_while_body.emplace_back(counter_incr);
+  // New statement -> while counter < length: + While body
+  auto counter_less_length = ast_pool_->c_binary_expr(
+      ast_pool_->c_variable_expr(counter_tok), less_token_,
+      ast_pool_->c_literal_expr(length_tok));
+  auto desugared_while =
+      ast_pool_->c_while_stmt(while_token_, counter_less_length,
+                              ast_pool_->c_block_stmt(new_while_body));
+  // Desugar again using while desugar!
+  desugared_while->accept(this);
+}
+void desugaring_compiler::visit_foreach_stmt(foreach_stmt *obj) {
+  auto expression_dt = obj->expr_datatype_->const_unwrap();
+  if (expression_dt->is_fixed_size_array()) {
+    desugar_fixed_arr_foreach(obj);
+  } else {
+    desugar_arr_foreach(obj);
+  }
 }
 void desugaring_compiler::visit_forendless_stmt(forendless_stmt *obj) {
   // convert to a while True:

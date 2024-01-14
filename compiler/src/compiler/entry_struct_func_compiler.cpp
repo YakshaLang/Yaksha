@@ -1,6 +1,6 @@
 // ==============================================================================================
 // ╦  ┬┌─┐┌─┐┌┐┌┌─┐┌─┐    Yaksha Programming Language
-// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + exta terms. Please see below.
+// ║  ││  ├┤ │││└─┐├┤     is Licensed with GPLv3 + extra terms. Please see below.
 // ╩═╝┴└─┘└─┘┘└┘└─┘└─┘
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
@@ -67,7 +67,9 @@ std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
   }
   std::stringstream code{};
   code << "struct ykentry" << d.incremented_id_ << " { "
-       << dtc->convert_dt(d.key_dt_) << " key; " << dtc->convert_dt(d.val_dt_)
+       << dtc->convert_dt(d.key_dt_, datatype_location::STRUCT, "", "")
+       << " key; "
+       << dtc->convert_dt(d.val_dt_, datatype_location::STRUCT, "", "")
        << " value; };\n";
   code_ << code.str();
   autogen_structs_list_.emplace_back(d);
@@ -113,7 +115,8 @@ entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
   if (output->args_.empty()) {
     code << "void ";
   } else if (output->args_.size() == 1) {
-    code << dtc->convert_dt(output->args_[0]) << " ";
+    code << dtc->convert_dt(output->args_[0], datatype_location::STRUCT, "", "")
+         << " ";
   } else {
     // Must not happen
     code << "<><>";
@@ -130,7 +133,7 @@ entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
       } else {
         code << ", ";
       }
-      code << dtc->convert_dt(dt);
+      code << dtc->convert_dt(dt, datatype_location::STRUCT, "", "");
     }
   }
   code << ");\n";
@@ -161,7 +164,8 @@ std::string entry_struct_func_compiler::compile_tuple(ykdatatype *tuple_dt,
   code << "struct yktuple" << d.incremented_id_ << " {";
   size_t i = 1;
   for (ykdatatype *dt_arg : d.tuple_dt_->args_) {
-    code << " " << dtc->convert_dt(dt_arg) << " e" << i << ";";
+    code << " " << dtc->convert_dt(dt_arg, datatype_location::STRUCT, "", "")
+         << " e" << i << ";";
     i++;
   }
   code << " };\n";
