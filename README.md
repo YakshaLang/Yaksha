@@ -18,7 +18,7 @@
 * [😈 Demos with source code](https://yakshalang.github.io/demos/)
 * [⚽️ Playground](https://yaksha.pages.dev)
 * [🤔 (B)log](https://yakshalang.github.io/blog/)
-* [✅ Plan / Tasks](https://trello.com/b/f25EcuX6/%F0%9F%91%BF-yaksha-tasks)
+* [✅ Plan / Tasks](https://github.com/orgs/YakshaLang/projects/4/views/1)
 
 # Communities
 
