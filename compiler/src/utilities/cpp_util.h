@@ -48,6 +48,11 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <fstream>
+#include <streambuf>
+#include <string>
+#include <cerrno>
+
 // ╔╦╗┌─┐┌┬┐┌─┐┬  ┌─┐┌┬┐┌─┐  ╔╦╗┌─┐┌─┐┬┌─┐
 //  ║ ├┤ │││├─┘│  ├─┤ │ ├┤   ║║║├─┤│ ┬││
 //  ╩ └─┘┴ ┴┴  ┴─┘┴ ┴ ┴ └─┘  ╩ ╩┴ ┴└─┘┴└─┘
@@ -180,6 +185,14 @@ namespace yaksha {
     // std::tie is like unpacking a tuple
     std::tie(status, ec) = reproc::run(cmd, options);
     return ec ? ec.value() : status;
+  }
+  static std::string read_file(const std::string& filename) {
+    std::ifstream in(filename, std::ios::in | std::ios::binary);
+    if (in.good() && in.is_open()) {
+      return {(std::istreambuf_iterator<char>(in)),
+                          std::istreambuf_iterator<char>()};
+    }
+    return "";
   }
 }// namespace yaksha
 #endif

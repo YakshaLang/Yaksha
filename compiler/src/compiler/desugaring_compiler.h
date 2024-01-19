@@ -66,8 +66,10 @@ private:
     std::vector<std::vector<stmt *> *> statement_stack_;
     std::vector<stmt *> global_statements_;
     std::vector<stmt *> pre_continue_stack_;
+    std::vector<token *> internal_token_pool_;
     ast_pool *ast_pool_;
     ykdt_pool *dt_pool_;
+
     token *true_token_;
     token *while_token_;
     token *break_token_;
@@ -78,7 +80,6 @@ private:
     token *less_token_;
     token *plus_eq_token_;
     to_c_compiler *compiler_obj_;
-    std::vector<token *> internal_token_pool_;
     token *create_name(const std::string &name);
     token *create_int_literal(const std::string &lit);
     token *create_str_literal(const std::string &string_literal_content);

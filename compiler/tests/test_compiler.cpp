@@ -44,26 +44,41 @@
 #include <filesystem>
 #include <string>
 using namespace yaksha;
-static void test_compile_yaka_file(const std::string &A, const std::string &C) {
+static void test_compile_yaka_file(const std::string &yaka_code_file, const std::string &tokens_file) {
   multifile_compiler mc{};
   codegen_c cg{};
-  auto result = mc.compile(A, &cg);
+  auto result = mc.compile(yaka_code_file, &cg);
   REQUIRE(result.failed_ == false);
   gc_pool<token> token_pool{};
-  tokenizer c_code{"output.c", result.code_, &token_pool};
-  c_code.tokenize();
-  auto token_snapshot = yaksha::load_token_dump(C, &token_pool);
-  yaksha::save_token_dump(C, c_code.tokens_);
-  auto yaksha_file_path = std::filesystem::path{A};
-  auto tokens_file_path = std::filesystem::path{C};
+
+  // create .c file path
+  auto yaksha_file_path = std::filesystem::path{yaka_code_file};
+  auto tokens_file_path = std::filesystem::path{tokens_file};
   std::string c_code_file =
       (tokens_file_path.parent_path() / yaksha_file_path.filename()).string() +
       ".output.c";
+
+  // --------------------------------------------
+
+  // load snapshot
+  auto token_snapshot = yaksha::load_token_dump(tokens_file, &token_pool);
+
+  // tokenize the generated tokens_file code
+  tokenizer c_code{"output.c", result.code_, &token_pool};
+  c_code.tokenize();
+
+  // save the tokens to a file
+  yaksha::save_token_dump(tokens_file, c_code.tokens_);
+
+  // write .c file
   std::ofstream save_file(c_code_file);
   REQUIRE(save_file.is_open() == true);
   save_file << result.code_;
   save_file.close();
+
+  // compare current tokens with snapshot
   REQUIRE(c_code.tokens_.size() == token_snapshot.size());
+
   for (int i = 0; i < token_snapshot.size(); i++) {
     auto parsed = c_code.tokens_[i];
     auto snapshot = token_snapshot[i];
