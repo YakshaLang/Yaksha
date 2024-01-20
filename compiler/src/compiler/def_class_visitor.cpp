@@ -108,8 +108,7 @@ void def_class_visitor::extract(const std::vector<stmt *> &statements) {
         statement_type == ast_type::STMT_NATIVECONST) {
       st->accept(this);
     } else {
-      // TODO can we find out if there's a token for this statement type?
-      error(nullptr, "Invalid statement detected."
+      error(st->locate(), "Invalid statement detected."
                      " Only def, class, import, runtimefeature"
                      " or constant statements are supported at module level.");
     }
