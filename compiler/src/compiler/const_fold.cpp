@@ -3,7 +3,7 @@
 using namespace yaksha;
 const_fold::const_fold(ast_pool *ast_pool, ykdt_pool *dt_pool)
     : statement_stack_(), global_statements_(), ast_pool_(ast_pool),
-      dt_pool_(dt_pool), context_pool_(), internal_token_pool_() {
+      dt_pool_(dt_pool), context_pool_(), internal_token_pool_(), errors_() {
   // ---
   statement_stack_.emplace_back(&global_statements_);
 };
@@ -62,39 +62,53 @@ void const_fold::visit_block_stmt(block_stmt *obj) {
   statement_stack_.back()->emplace_back(
       wrap(ast_pool_->c_block_stmt(unwrap_vector_stmt(block_statements))));
 }
-void const_fold::visit_break_stmt(break_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
-void const_fold::visit_ccode_stmt(ccode_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
+void const_fold::visit_break_stmt(break_stmt *obj) { store_statement(obj); }
+void const_fold::visit_ccode_stmt(ccode_stmt *obj) { store_statement(obj); }
 void const_fold::visit_cfor_stmt(cfor_stmt *obj) {
   statement_stack_.back()->emplace_back(wrap(obj));
 }
-void const_fold::visit_class_stmt(class_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
-void const_fold::visit_compins_stmt(compins_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
+void const_fold::visit_class_stmt(class_stmt *obj) { store_statement(obj); }
+void const_fold::visit_compins_stmt(compins_stmt *obj) { store_statement(obj); }
 void const_fold::visit_const_stmt(const_stmt *obj) {
+  // a: Const[int] = 1     // ok - literal
+  // b: Const[int] = a + 2 // ok - evaluate to literal
+  // c: Const[int] = a + b // ok - evaluate to literal
+  // d: Const[int] = user_input() // error - not a literal
+  // TODO -- const statements in local scopes, RHS does not need to be a literal
+  // TODO -- const statements in global scope, RHS must be a literal or evaluate to a literal
+  if (obj->data_type_ == nullptr) {
+    error("Expected a data type", obj->name_);
+    store_statement(obj);
+    return;
+  }
+  if (obj->expression_ == nullptr) {
+    error("Expected an expression", obj->name_);
+    store_statement(obj);
+    return;
+  }
+  // TODO if this is already a literal then we can just store it
+  // see if we can evaluate the expression and simplify it to a literal
+  //  if not then we can let the rest of the system handle it as an error
+  obj->expression_->accept(this);
+  const_fold_context *val = peek_last_or_null();
+  if (val == nullptr) {
+    error("Failed to evaluate expression", obj->name_);
+    store_statement(obj);
+    return;
+  }
+  // TODO convert the result to a literal, if it is a literal
+  //   else we can let the rest of the system handle it as an error
   statement_stack_.back()->emplace_back(wrap(obj));
 }
 void const_fold::visit_continue_stmt(continue_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
+  store_statement(obj);
 }
 void const_fold::visit_def_stmt(def_stmt *obj) {
   statement_stack_.back()->emplace_back(wrap(obj));
 }
-void const_fold::visit_defer_stmt(defer_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
-void const_fold::visit_del_stmt(del_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
-void const_fold::visit_enum_stmt(enum_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
+void const_fold::visit_defer_stmt(defer_stmt *obj) { store_statement(obj); }
+void const_fold::visit_del_stmt(del_stmt *obj) { store_statement(obj); }
+void const_fold::visit_enum_stmt(enum_stmt *obj) { store_statement(obj); }
 void const_fold::visit_expression_stmt(expression_stmt *obj) {
   statement_stack_.back()->emplace_back(wrap(obj));
 }
@@ -107,27 +121,21 @@ void const_fold::visit_forendless_stmt(forendless_stmt *obj) {
 void const_fold::visit_if_stmt(if_stmt *obj) {
   statement_stack_.back()->emplace_back(wrap(obj));
 }
-void const_fold::visit_import_stmt(import_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
+void const_fold::visit_import_stmt(import_stmt *obj) { store_statement(obj); }
 void const_fold::visit_let_stmt(let_stmt *obj) {
   statement_stack_.back()->emplace_back(wrap(obj));
 }
 void const_fold::visit_nativeconst_stmt(nativeconst_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
+  store_statement(obj);
 }
-void const_fold::visit_pass_stmt(pass_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
+void const_fold::visit_pass_stmt(pass_stmt *obj) { store_statement(obj); }
 void const_fold::visit_return_stmt(return_stmt *obj) {
   statement_stack_.back()->emplace_back(wrap(obj));
 }
 void const_fold::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
-  statement_stack_.back()->emplace_back(wrap(obj));
+  store_statement(obj);
 }
-void const_fold::visit_union_stmt(union_stmt *obj) { // this feature is not implemented yet
-  statement_stack_.back()->emplace_back(wrap(obj));
-}
+void const_fold::visit_union_stmt(union_stmt *obj) { store_statement(obj); }
 void const_fold::visit_while_stmt(while_stmt *obj) {
   statement_stack_.back()->emplace_back(wrap(obj));
 }
@@ -149,13 +157,31 @@ const_fold_context *const_fold::new_context() {
   context_pool_.emplace_back(con);
   return con;
 }
+void const_fold::error(const std::string &message, token *token) {
+  if (token == nullptr) {
+    errors_.emplace_back(message, "-", 0, 0);
+    return;
+  }
+  errors_.emplace_back(message, token);
+}
+void const_fold::store_statement(stmt *obj) {
+  statement_stack_.back()->emplace_back(wrap(obj));
+}
 std::vector<stmt *> const_fold::unwrap_vector_stmt(
     const std::vector<const_fold_context *> &to_unwrap) {
   std::vector<stmt *> unwrapped{};
   for (auto &it : to_unwrap) {
     if (it->context_type_ == const_fold_context_type::CFT_STMT) {
       unwrapped.emplace_back(it->expr_or_stmt_.stmt_val_);
+    } else {
+      error("Expected a statement", nullptr);
     }
   }
   return unwrapped;
+}
+const_fold_context *const_fold::peek_last_or_null() {
+  if (statement_stack_.empty() || statement_stack_.back()->empty()) {
+    return nullptr;
+  }
+  return statement_stack_.back()->back();
 }

@@ -158,6 +158,7 @@ namespace yaksha {
     virtual ~expr() = default;
     virtual void accept(expr_visitor *v) = 0;
     virtual ast_type get_type() = 0;
+    virtual token *locate() = 0;
     size_t hits_{0};
   };
   // ------- statement base class ------
@@ -165,6 +166,7 @@ namespace yaksha {
     virtual ~stmt() = default;
     virtual void accept(stmt_visitor *v) = 0;
     virtual ast_type get_type() = 0;
+    virtual token *locate() = 0;
     size_t hits_{0};
   };
   // ------- expressions ------
@@ -173,6 +175,7 @@ namespace yaksha {
                 ykdatatype *promoted_data_type);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     token *opr_;
     expr *right_;
@@ -183,6 +186,7 @@ namespace yaksha {
     assign_arr_expr(expr *assign_oper, token *opr, expr *right);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *assign_oper_;
     token *opr_;
     expr *right_;
@@ -191,6 +195,7 @@ namespace yaksha {
     assign_member_expr(expr *set_oper, token *opr, expr *right);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *set_oper_;
     token *opr_;
     expr *right_;
@@ -199,6 +204,7 @@ namespace yaksha {
     binary_expr(expr *left, token *opr, expr *right);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *left_;
     token *opr_;
     expr *right_;
@@ -208,6 +214,7 @@ namespace yaksha {
                     std::vector<name_val> values, token *curly_close);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *dt_expr_;
     token *curly_open_;
     std::vector<name_val> values_;
@@ -217,6 +224,7 @@ namespace yaksha {
     fncall_expr(expr *name, token *paren_token, std::vector<expr *> args);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *name_;
     token *paren_token_;
     std::vector<expr *> args_;
@@ -225,6 +233,7 @@ namespace yaksha {
     get_expr(expr *lhs, token *dot, token *item);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *lhs_;
     token *dot_;
     token *item_;
@@ -233,18 +242,21 @@ namespace yaksha {
     explicit grouping_expr(expr *expression);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *expression_;
   };
   struct literal_expr : expr {
     explicit literal_expr(token *literal_token);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *literal_token_;
   };
   struct logical_expr : expr {
     logical_expr(expr *left, token *opr, expr *right);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *left_;
     token *opr_;
     expr *right_;
@@ -255,6 +267,7 @@ namespace yaksha {
                     token *close_paren_token);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *path_;
     token *name_;
     token *not_symbol_tok_;
@@ -266,6 +279,7 @@ namespace yaksha {
     set_expr(expr *lhs, token *dot, token *item);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *lhs_;
     token *dot_;
     token *item_;
@@ -274,6 +288,7 @@ namespace yaksha {
     square_bracket_access_expr(expr *name, token *sqb_token, expr *index_expr);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *name_;
     token *sqb_token_;
     expr *index_expr_;
@@ -282,6 +297,7 @@ namespace yaksha {
     square_bracket_set_expr(expr *name, token *sqb_token, expr *index_expr);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *name_;
     token *sqb_token_;
     expr *index_expr_;
@@ -290,6 +306,7 @@ namespace yaksha {
     unary_expr(token *opr, expr *right);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *opr_;
     expr *right_;
   };
@@ -297,6 +314,7 @@ namespace yaksha {
     explicit variable_expr(token *name);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
   };
   // ------- statements ------
@@ -304,18 +322,21 @@ namespace yaksha {
     explicit block_stmt(std::vector<stmt *> statements);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     std::vector<stmt *> statements_;
   };
   struct break_stmt : stmt {
     explicit break_stmt(token *break_token);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *break_token_;
   };
   struct ccode_stmt : stmt {
     ccode_stmt(token *ccode_keyword, token *code_str);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *ccode_keyword_;
     token *code_str_;
   };
@@ -325,6 +346,7 @@ namespace yaksha {
               token *close_paren, stmt *for_body);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *for_keyword_;
     token *open_paren_;
     expr *init_expr_;
@@ -340,6 +362,7 @@ namespace yaksha {
                annotations annotations);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     std::vector<parameter> members_;
     annotations annotations_;
@@ -349,6 +372,7 @@ namespace yaksha {
                  ykdatatype *meta2, void *meta3);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     ykdatatype *data_type_;
     token *meta1_;
@@ -359,6 +383,7 @@ namespace yaksha {
     const_stmt(token *name, ykdatatype *data_type, expr *expression);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     ykdatatype *data_type_;
     expr *expression_;
@@ -367,6 +392,7 @@ namespace yaksha {
     explicit continue_stmt(token *continue_token);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *continue_token_;
   };
   struct def_stmt : stmt {
@@ -374,6 +400,7 @@ namespace yaksha {
              ykdatatype *return_type, annotations annotations);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     std::vector<parameter> params_;
     stmt *function_body_;
@@ -384,6 +411,7 @@ namespace yaksha {
     defer_stmt(token *defer_keyword, expr *expression, stmt *del_statement);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *defer_keyword_;
     expr *expression_;
     stmt *del_statement_;
@@ -392,6 +420,7 @@ namespace yaksha {
     del_stmt(token *del_keyword, expr *expression);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *del_keyword_;
     expr *expression_;
   };
@@ -401,6 +430,7 @@ namespace yaksha {
                    token *curly_close);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     token *name2_;
     token *not_symbol_tok_;
@@ -412,6 +442,7 @@ namespace yaksha {
     elif_stmt(token *elif_keyword, expr *expression, stmt *elif_branch);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *elif_keyword_;
     expr *expression_;
     stmt *elif_branch_;
@@ -421,6 +452,7 @@ namespace yaksha {
               annotations annotations);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     std::vector<parameter> members_;
     annotations annotations_;
@@ -429,6 +461,7 @@ namespace yaksha {
     explicit expression_stmt(expr *expression);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     expr *expression_;
   };
   struct foreach_stmt : stmt {
@@ -437,6 +470,7 @@ namespace yaksha {
                  ykdatatype *expr_datatype);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *for_keyword_;
     token *name_;
     ykdatatype *data_type_;
@@ -449,6 +483,7 @@ namespace yaksha {
     forendless_stmt(token *for_keyword, stmt *for_body);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *for_keyword_;
     stmt *for_body_;
   };
@@ -457,6 +492,7 @@ namespace yaksha {
             token *else_keyword, stmt *else_branch);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *if_keyword_;
     expr *expression_;
     stmt *if_branch_;
@@ -468,6 +504,7 @@ namespace yaksha {
                 token *name, file_info *data);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *import_token_;
     std::vector<token *> import_names_;
     token *name_;
@@ -477,6 +514,7 @@ namespace yaksha {
     let_stmt(token *name, ykdatatype *data_type, expr *expression);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     ykdatatype *data_type_;
     expr *expression_;
@@ -486,6 +524,7 @@ namespace yaksha {
                 std::vector<token *> lisp_code, token *curly_close);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *macros_token_;
     token *not_symbol_tok_;
     token *curly_open_;
@@ -497,6 +536,7 @@ namespace yaksha {
                      token *code_str);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     ykdatatype *data_type_;
     token *ccode_keyword_;
@@ -506,6 +546,7 @@ namespace yaksha {
     explicit pass_stmt(token *pass_token);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *pass_token_;
   };
   struct return_stmt : stmt {
@@ -513,6 +554,7 @@ namespace yaksha {
                 ykdatatype *result_type);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *return_keyword_;
     expr *expression_;
     ykdatatype *result_type_;
@@ -521,6 +563,7 @@ namespace yaksha {
     runtimefeature_stmt(token *runtimefeature_token, token *feature);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *runtimefeature_token_;
     token *feature_;
   };
@@ -528,6 +571,7 @@ namespace yaksha {
     explicit token_soup_stmt(std::vector<token *> soup);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     std::vector<token *> soup_;
   };
   struct union_stmt : stmt {
@@ -535,6 +579,7 @@ namespace yaksha {
                annotations annotations);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *name_;
     std::vector<parameter> members_;
     annotations annotations_;
@@ -543,6 +588,7 @@ namespace yaksha {
     while_stmt(token *while_keyword, expr *expression, stmt *while_body);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
+    token *locate() override;
     token *while_keyword_;
     expr *expression_;
     stmt *while_body_;

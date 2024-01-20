@@ -69,7 +69,6 @@ private:
     std::vector<token *> internal_token_pool_;
     ast_pool *ast_pool_;
     ykdt_pool *dt_pool_;
-
     token *true_token_;
     token *while_token_;
     token *break_token_;
