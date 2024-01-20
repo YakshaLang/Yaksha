@@ -109,7 +109,8 @@ namespace yaksha {
     std::vector<parsing_error> errors_;
 
 private:
-    // Why inner is a pointer, because we clean it up in individual blocks
+    // Why inner is a pointer:
+    // at the start I push global_statements_ to statement_stack_ and it should be the last one remaining
     std::vector<std::vector<const_fold_context *> *> statement_stack_;
     std::vector<const_fold_context *> global_statements_;
     std::vector<const_fold_context *> pre_continue_stack_;
@@ -125,8 +126,7 @@ private:
     const_fold_context *new_context();
     std::vector<stmt *>
     unwrap_vector_stmt(const std::vector<const_fold_context *> &to_unwrap);
-    void error(const std::string &message,
-               token *token);
+    void error(const std::string &message, token *token);
     void store_statement(stmt *obj);
     const_fold_context *peek_last_or_null();
   };

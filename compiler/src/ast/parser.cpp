@@ -295,6 +295,17 @@ std::vector<stmt *> parser::parse() {
     if (decl == nullptr) { return stmts_; }
     stmts_.emplace_back(decl);
   }
+  // Mark global constants
+  for (stmt *st : stmts_) {
+    if (st->get_type() == ast_type::STMT_CONST) {
+      auto casted = dynamic_cast<const_stmt *>(st);
+      casted->is_global_ = true;
+    }
+    if (st->get_type() == ast_type::STMT_NATIVECONST) {
+      auto casted = dynamic_cast<nativeconst_stmt *>(st);
+      casted->is_global_ = true;
+    }
+  }
   return stmts_;
 }
 void parser::synchronize_parser() {
@@ -534,14 +545,14 @@ stmt *parser::parse_named_let_statement() {
       consume_or_eof(
           token_type::NEW_LINE,
           "Expect new line after code text for native const declaration.");
-      return pool_.c_nativeconst_stmt(var_name, dt, ccode_token, cc);
+      return pool_.c_nativeconst_stmt(var_name, dt, ccode_token, cc, false);
     } else {
       exp = expression();
     }
   }
   consume_or_eof(token_type::NEW_LINE,
                  "Expect new line after value for variable declaration.");
-  if (dt->is_const()) { return pool_.c_const_stmt(var_name, dt, exp); }
+  if (dt->is_const()) { return pool_.c_const_stmt(var_name, dt, exp, false); }
   return pool_.c_let_stmt(var_name, dt, exp);
 }
 expr *parser::assignment() {

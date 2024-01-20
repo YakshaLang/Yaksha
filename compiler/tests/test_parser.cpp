@@ -76,7 +76,8 @@ static void test_parser_yaka_file(const std::string &yaka_code_file_input) {
       // -------------------------------------------------------------------
       // AST tokens from snapshot
       auto snapshot_code = read_file(snapshot_filename);
-      tokenizer snapshot_code_tokenizer{"ast_out.l", snapshot_code, &token_pool};
+      tokenizer snapshot_code_tokenizer{"ast_out.l", snapshot_code,
+                                        &token_pool};
       snapshot_code_tokenizer.tokenize();
       auto token_snapshot = snapshot_code_tokenizer.tokens_;
       // Save current tokens
@@ -222,5 +223,6 @@ TEST_CASE("parser: function data type returns FixedArr") {
   TEST_SNIPPET_FULL("def main() -> int:\n"
                     "    a: Function[In[int], Out[FixedArr[int, 10]]]\n"
                     "    return 0",
-                    "A function cannot return a fixed size array. Use Array or wrap in a Tuple.");
+                    "A function cannot return a fixed size array. Use Array or "
+                    "wrap in a Tuple.");
 }

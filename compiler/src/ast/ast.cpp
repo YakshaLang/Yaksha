@@ -274,14 +274,16 @@ stmt *ast_pool::c_compins_stmt(token *name, ykdatatype *data_type, token *meta1,
   cleanup_stmt_.push_back(o);
   return o;
 }
-const_stmt::const_stmt(token *name, ykdatatype *data_type, expr *expression)
-    : name_(name), data_type_(data_type), expression_(expression) {}
+const_stmt::const_stmt(token *name, ykdatatype *data_type, expr *expression,
+                       bool is_global)
+    : name_(name), data_type_(data_type), expression_(expression),
+      is_global_(is_global) {}
 void const_stmt::accept(stmt_visitor *v) { v->visit_const_stmt(this); }
 ast_type const_stmt::get_type() { return ast_type::STMT_CONST; }
 token *const_stmt::locate() { return name_; }
 stmt *ast_pool::c_const_stmt(token *name, ykdatatype *data_type,
-                             expr *expression) {
-  auto o = new const_stmt(name, data_type, expression);
+                             expr *expression, bool is_global) {
+  auto o = new const_stmt(name, data_type, expression, is_global);
   cleanup_stmt_.push_back(o);
   return o;
 }
@@ -428,17 +430,20 @@ stmt *ast_pool::c_let_stmt(token *name, ykdatatype *data_type,
   return o;
 }
 nativeconst_stmt::nativeconst_stmt(token *name, ykdatatype *data_type,
-                                   token *ccode_keyword, token *code_str)
+                                   token *ccode_keyword, token *code_str,
+                                   bool is_global)
     : name_(name), data_type_(data_type), ccode_keyword_(ccode_keyword),
-      code_str_(code_str) {}
+      code_str_(code_str), is_global_(is_global) {}
 void nativeconst_stmt::accept(stmt_visitor *v) {
   v->visit_nativeconst_stmt(this);
 }
 ast_type nativeconst_stmt::get_type() { return ast_type::STMT_NATIVECONST; }
 token *nativeconst_stmt::locate() { return name_; }
 stmt *ast_pool::c_nativeconst_stmt(token *name, ykdatatype *data_type,
-                                   token *ccode_keyword, token *code_str) {
-  auto o = new nativeconst_stmt(name, data_type, ccode_keyword, code_str);
+                                   token *ccode_keyword, token *code_str,
+                                   bool is_global) {
+  auto o =
+      new nativeconst_stmt(name, data_type, ccode_keyword, code_str, is_global);
   cleanup_stmt_.push_back(o);
   return o;
 }
