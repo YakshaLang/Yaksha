@@ -516,31 +516,31 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
       }
       if (obj->annotations_.native_ && st == ast_type::STMT_PASS &&
           obj->annotations_.native_arg_.empty()) {
-        error("@native function must have a valid argument if pass is used as "
+        error(obj->name_, "@native function must have a valid argument if pass is used as "
               "the statement");
       }
       if (obj->annotations_.native_macro_ && st == ast_type::STMT_PASS &&
           obj->annotations_.native_macro_arg_.empty()) {
-        error("@nativemacro function must have a valid argument if pass is "
+        error(obj->name_, "@nativemacro function must have a valid argument if pass is "
               "used as the statement");
       }
       if (obj->annotations_.native_define_ && st == ast_type::STMT_PASS &&
           obj->annotations_.native_define_arg_.empty()) {
-        error("@nativedefine function must have a valid argument if pass is "
+        error(obj->name_, "@nativedefine function must have a valid argument if pass is "
               "used as the statement");
       }
       if (obj->annotations_.native_ && st == ast_type::STMT_CCODE &&
           !obj->annotations_.native_arg_.empty()) {
-        error("@native function must not have an argument if ccode is used");
+        error(obj->name_, "@native function must not have an argument if ccode is used");
       }
       if (obj->annotations_.native_macro_ && st == ast_type::STMT_CCODE &&
           !obj->annotations_.native_macro_arg_.empty()) {
-        error(
-            "@nativemacro function must not have an argument if ccode is used");
+        error(obj->name_,
+              "@nativemacro function must not have an argument if ccode is used");
       }
       if (obj->annotations_.native_define_ && st == ast_type::STMT_CCODE &&
           !obj->annotations_.native_define_arg_.empty()) {
-        error("@nativedefine function must not have an argument if ccode is "
+        error(obj->name_, "@nativedefine function must not have an argument if ccode is "
               "used");
       }
     }
@@ -690,7 +690,7 @@ void type_checker::push_scope_type(ast_type scope_type) {
 }
 ast_type type_checker::peek_scope_type() {
   if (this->scope_type_stack_.empty()) {
-    return ast_type::STMT_PASS;// Pass is used for unknown
+    return ast_type::STMT_PASS; // Pass is used for unknown
   }
   return this->scope_type_stack_.back();
 }
