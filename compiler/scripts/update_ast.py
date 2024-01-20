@@ -45,7 +45,24 @@ Never modify generated code, as that defeats the purpose of code gen.
 This script updates ast.h and ast.cpp
 """
 import os
-
+EXPR_LOCATIONS = {
+    "assign": "name_",
+    "assign_member": "opr_",
+    "assign_arr": "opr_",
+    "binary": "opr_",
+    "logical": "opr_",
+    "grouping": "expression_->locate()",
+    "literal": "literal_token_",
+    "unary": "opr_",
+    "variable": "name_",
+    "fncall": "name_->locate()",
+    "curly_call": "curly_open_",
+    "macro_call": "name_",
+    "square_bracket_access": "sqb_token_",
+    "square_bracket_set": "sqb_token_",
+    "set": "dot_",
+    "get": "dot_",
+}
 # Different kind of expressions
 # expression type name is followed by content of the class
 EXPRS = sorted([
@@ -91,6 +108,36 @@ EXPRS = sorted([
     ("get", (("expr*", "lhs"), ("token*", "dot"), ("token*", "item"))),
 ], key=lambda x: x[0])
 # Do not add visitor methods for this stmt type
+STMT_LOCATIONS = {
+    "macros": "macros_token_",
+    "dsl_macro": "name_",
+    "token_soup": "soup_[0]",
+    "return": "return_keyword_",
+    "defer": "defer_keyword_",
+    "del": "del_keyword_",
+    "expression": "expression_->locate()",
+    "ccode": "ccode_keyword_",
+    "if": "if_keyword_",
+    "elif": "elif_keyword_",
+    "while": "while_keyword_",
+    "foreach": "for_keyword_",
+    "forendless": "for_keyword_",
+    "cfor": "for_keyword_",
+    "block": "statements_[0]->locate()",
+    "pass": "pass_token_",
+    "continue": "continue_token_",
+    "break": "break_token_",
+    "let": "name_",
+    "const": "name_",
+    "nativeconst": "name_",
+    "def": "name_",
+    "class": "name_",
+    "enum": "name_",
+    "union": "name_",
+    "import": "import_token_",
+    "runtimefeature": "runtimefeature_token_",
+    "compins": "name_",
+}
 IGNORE_VISITS_STMT = {"elif", "macros", "token_soup", "dsl_macro"}
 # Different kinds of statements
 STMTS = sorted([
@@ -198,6 +245,7 @@ struct $R$_expr : expr {
   $EXPLICIT$$R$_expr($PARAMS$);
   void accept(expr_visitor *v) override;
   ast_type get_type() override;
+  token* locate() override;
 $STATE$
 };
 """.strip()
@@ -217,6 +265,9 @@ void $R$_expr::accept(expr_visitor *v) {
 ast_type $R$_expr::get_type() {
   return ast_type::EXPR_$RU$;
 }
+token* $R$_expr::locate() {
+  return $LOCATION_FIELD$;
+}
 expr *ast_pool::c_$R$_expr($PARAMS$) {
   auto o = new $R$_expr($PARAMS_NO_TYPES$);
   cleanup_expr_.push_back(o);
@@ -230,6 +281,9 @@ ast_type $R$_expr::get_type() {
   return ast_type::EXPR_$RU$;
 }
 void $R$_expr::accept(expr_visitor *v) {
+}
+token* $R$_expr::locate() {
+  return $LOCATION_FIELD$;
 }
 expr *ast_pool::c_$R$_expr($PARAMS$) {
   auto o = new $R$_expr($PARAMS_NO_TYPES$);
@@ -284,6 +338,7 @@ struct expr {
   virtual ~expr() = default;
   virtual void accept(expr_visitor *v) = 0;
   virtual ast_type get_type() = 0;
+  virtual token* locate() = 0;
   size_t hits_{0};
 };
 // ------- statement base class ------
@@ -291,6 +346,7 @@ struct stmt {
   virtual ~stmt() = default;
   virtual void accept(stmt_visitor *v) = 0;
   virtual ast_type get_type() = 0;
+  virtual token* locate() = 0;
   size_t hits_{0};
 };
 // ------- expressions ------
@@ -409,9 +465,10 @@ def c_explicit(x):
     return explicit
 
 
-def c_impl(types, impl_template: str) -> str:
+def c_impl(types, impl_template: str, locations: dict) -> str:
     return "\n".join([impl_template
                      .replace("$R$", c_r(x))
+                     .replace("$LOCATION_FIELD$", locations.get(c_r(x), "nullptr"))
                      .replace("$RU$", c_r(x).upper())
                      .replace("$PARAMS$", c_params(x))
                      .replace("$FILL_STATE_PARAMS$", c_fill_state_params(x))
@@ -419,9 +476,9 @@ def c_impl(types, impl_template: str) -> str:
 
 
 def c_cpp_file():
-    impl_expr = c_impl(EXPRS, CPP_EXPR)
-    impl_stmt = c_impl([x for x in STMTS if x[0] not in IGNORE_VISITS_STMT], CPP_STMT)
-    impl_stmt += c_impl([x for x in STMTS if x[0] in IGNORE_VISITS_STMT], CPP_STMT_NO_ACCEPT)
+    impl_expr = c_impl(EXPRS, CPP_EXPR, EXPR_LOCATIONS)
+    impl_stmt = c_impl([x for x in STMTS if x[0] not in IGNORE_VISITS_STMT], CPP_STMT, STMT_LOCATIONS)
+    impl_stmt += c_impl([x for x in STMTS if x[0] in IGNORE_VISITS_STMT], CPP_STMT_NO_ACCEPT, STMT_LOCATIONS)
     return CPP_FILE.replace("$EXPRESSIONS_IMPL$", impl_expr) \
         .replace("$STATEMENTS_IMPL$", impl_stmt)
 

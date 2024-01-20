@@ -48,14 +48,13 @@ namespace yaksha {
   struct const_fold_context {
     ykdatatype *type_ = nullptr;
     const_fold_type fold_type_ = const_fold_type::CFT_UNKNOWN;
-    const_fold_context_type context_type_ =
-        const_fold_context_type::CFT_VALUE;
+    const_fold_context_type context_type_ = const_fold_context_type::CFT_VALUE;
     bool is_const_ = false;
     std::string error_msg_{};
     // values
     const_fold_value_holder value_ = {.int8_val_ = 0};
     expr_or_stmt expr_or_stmt_ = {.expr_val_ = nullptr};
-    token* token_ = nullptr;
+    token *token_ = nullptr;
   };
   /**
    * Partially evaluates expressions that can be evaluated at compile time
@@ -107,22 +106,29 @@ namespace yaksha {
     void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
     void visit_union_stmt(union_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
+    std::vector<parsing_error> errors_;
 
 private:
     // Why inner is a pointer, because we clean it up in individual blocks
-    std::vector<std::vector<const_fold_context*> *> statement_stack_;
-    std::vector<const_fold_context*> global_statements_;
-    std::vector<const_fold_context*> pre_continue_stack_;
+    std::vector<std::vector<const_fold_context *> *> statement_stack_;
+    std::vector<const_fold_context *> global_statements_;
+    std::vector<const_fold_context *> pre_continue_stack_;
     // pools
-    std::vector<const_fold_context*> context_pool_; // to delete
-    std::vector<token *> internal_token_pool_; // to delete
-    ast_pool *ast_pool_; // this is a passed in pointer and will not need to delete
-    ykdt_pool *dt_pool_; // this is a passed in pointer and will not need to delete
+    std::vector<const_fold_context *> context_pool_;// to delete
+    std::vector<token *> internal_token_pool_;      // to delete
+    ast_pool
+        *ast_pool_;// this is a passed in pointer and will not need to delete
+    ykdt_pool
+        *dt_pool_;// this is a passed in pointer and will not need to delete
     const_fold_context *wrap(stmt *statement);
     const_fold_context *wrap(expr *expression);
     const_fold_context *new_context();
     std::vector<stmt *>
-    unwrap_vector_stmt(const std::vector<const_fold_context *>& to_unwrap);
+    unwrap_vector_stmt(const std::vector<const_fold_context *> &to_unwrap);
+    void error(const std::string &message,
+               token *token);
+    void store_statement(stmt *obj);
+    const_fold_context *peek_last_or_null();
   };
 }// namespace yaksha
 #endif

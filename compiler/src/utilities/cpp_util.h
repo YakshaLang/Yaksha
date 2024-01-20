@@ -45,14 +45,13 @@
 #include "reproc++/reproc.hpp"
 #include "reproc++/run.hpp"
 #include <algorithm>
+#include <cerrno>
+#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <vector>
-#include <fstream>
 #include <streambuf>
 #include <string>
-#include <cerrno>
-
+#include <vector>
 // ╔╦╗┌─┐┌┬┐┌─┐┬  ┌─┐┌┬┐┌─┐  ╔╦╗┌─┐┌─┐┬┌─┐
 //  ║ ├┤ │││├─┘│  ├─┤ │ ├┤   ║║║├─┤│ ┬││
 //  ╩ └─┘┴ ┴┴  ┴─┘┴ ┴ ┴ └─┘  ╩ ╩┴ ┴└─┘┴└─┘
@@ -186,11 +185,11 @@ namespace yaksha {
     std::tie(status, ec) = reproc::run(cmd, options);
     return ec ? ec.value() : status;
   }
-  static std::string read_file(const std::string& filename) {
+  static std::string read_file(const std::string &filename) {
     std::ifstream in(filename, std::ios::in | std::ios::binary);
     if (in.good() && in.is_open()) {
       return {(std::istreambuf_iterator<char>(in)),
-                          std::istreambuf_iterator<char>()};
+              std::istreambuf_iterator<char>()};
     }
     return "";
   }
