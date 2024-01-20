@@ -193,5 +193,15 @@ namespace yaksha {
     }
     return "";
   }
+  static void write_file(const std::string &result,
+                         const std::string &c_code_file) {
+    std::ofstream save_file(c_code_file);
+    if (!save_file.is_open()) {
+      std::cerr << "Failed to open file: " << c_code_file << std::endl;
+      return;
+    }
+    save_file << result;
+    save_file.close();
+  }
 }// namespace yaksha
 #endif
