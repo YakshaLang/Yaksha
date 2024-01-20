@@ -380,13 +380,15 @@ namespace yaksha {
     void *meta3_;
   };
   struct const_stmt : stmt {
-    const_stmt(token *name, ykdatatype *data_type, expr *expression);
+    const_stmt(token *name, ykdatatype *data_type, expr *expression,
+               bool is_global);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
     token *name_;
     ykdatatype *data_type_;
     expr *expression_;
+    bool is_global_;
   };
   struct continue_stmt : stmt {
     explicit continue_stmt(token *continue_token);
@@ -533,7 +535,7 @@ namespace yaksha {
   };
   struct nativeconst_stmt : stmt {
     nativeconst_stmt(token *name, ykdatatype *data_type, token *ccode_keyword,
-                     token *code_str);
+                     token *code_str, bool is_global);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
@@ -541,6 +543,7 @@ namespace yaksha {
     ykdatatype *data_type_;
     token *ccode_keyword_;
     token *code_str_;
+    bool is_global_;
   };
   struct pass_stmt : stmt {
     explicit pass_stmt(token *pass_token);
@@ -630,7 +633,8 @@ namespace yaksha {
                        annotations annotations);
     stmt *c_compins_stmt(token *name, ykdatatype *data_type, token *meta1,
                          ykdatatype *meta2, void *meta3);
-    stmt *c_const_stmt(token *name, ykdatatype *data_type, expr *expression);
+    stmt *c_const_stmt(token *name, ykdatatype *data_type, expr *expression,
+                       bool is_global);
     stmt *c_continue_stmt(token *continue_token);
     stmt *c_def_stmt(token *name, std::vector<parameter> params,
                      stmt *function_body, ykdatatype *return_type,
@@ -659,7 +663,8 @@ namespace yaksha {
                         token *curly_open, std::vector<token *> lisp_code,
                         token *curly_close);
     stmt *c_nativeconst_stmt(token *name, ykdatatype *data_type,
-                             token *ccode_keyword, token *code_str);
+                             token *ccode_keyword, token *code_str,
+                             bool is_global);
     stmt *c_pass_stmt(token *pass_token);
     stmt *c_return_stmt(token *return_keyword, expr *expression,
                         ykdatatype *result_type);

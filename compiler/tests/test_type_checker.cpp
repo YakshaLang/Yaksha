@@ -70,7 +70,6 @@ static void test_typechecker_snippet(const std::string &S,
   xa += (S);
   xa += "\n"
         "    return 0";
-
   auto result = mc.compile(xa, true, "dummy.yaka", "../libs", &cg);
   REQUIRE(result.failed_ == true);
   REQUIRE(!yaksha::errors::error_capture.empty());

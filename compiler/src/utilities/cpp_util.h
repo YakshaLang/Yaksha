@@ -185,6 +185,7 @@ namespace yaksha {
     std::tie(status, ec) = reproc::run(cmd, options);
     return ec ? ec.value() : status;
   }
+  // basic file io
   static std::string read_file(const std::string &filename) {
     std::ifstream in(filename, std::ios::in | std::ios::binary);
     if (in.good() && in.is_open()) {
