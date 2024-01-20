@@ -39,6 +39,7 @@
 // to_c_compiler.cpp
 #include "to_c_compiler.h"
 #include "ast/parser.h"
+#include "literal_utils.h"
 #include <cinttypes>
 using namespace yaksha;
 to_c_compiler::to_c_compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
@@ -601,54 +602,44 @@ bool to_c_compiler::should_wrap_in_paren(const std::string &code) {
 std::string to_c_compiler::conv_integer_literal(token_type token_type_val,
                                                 token *literal_token) {
   switch (token_type_val) {
-    case token_type::INTEGER_DECIMAL:
-    case token_type::INTEGER_HEX:
-    case token_type::INTEGER_DECIMAL_8:
-    case token_type::INTEGER_HEX_8:
-    case token_type::INTEGER_DECIMAL_16:
-    case token_type::INTEGER_HEX_16:
-    case token_type::INTEGER_DECIMAL_64:
-    case token_type::INTEGER_HEX_64:
-    case token_type::UINTEGER_DECIMAL:
-    case token_type::UINTEGER_HEX:
-    case token_type::UINTEGER_DECIMAL_8:
-    case token_type::UINTEGER_HEX_8:
-    case token_type::UINTEGER_DECIMAL_16:
-    case token_type::UINTEGER_HEX_16:
-    case token_type::UINTEGER_DECIMAL_64:
-    case token_type::UINTEGER_HEX_64:
-      return literal_token->token_;// no need to modify
     case token_type::INTEGER_BIN:
     case token_type::INTEGER_BIN_8:
     case token_type::INTEGER_BIN_16:
-    case token_type::INTEGER_BIN_64: {
-      std::string part = literal_token->token_.substr(2);
-      std::intmax_t number = std::strtoimax(part.c_str(), nullptr, 2);
-      return std::to_string(number);
-    }
+    case token_type::INTEGER_BIN_64:
     case token_type::UINTEGER_BIN:
     case token_type::UINTEGER_BIN_8:
     case token_type::UINTEGER_BIN_16:
-    case token_type::UINTEGER_BIN_64: {
-      std::string part = literal_token->token_.substr(2);
-      std::uintmax_t number = std::strtoumax(part.c_str(), nullptr, 2);
-      return std::to_string(number);
-    }
+    case token_type::UINTEGER_BIN_64:
     case token_type::INTEGER_OCT:
     case token_type::INTEGER_OCT_8:
     case token_type::INTEGER_OCT_16:
-    case token_type::INTEGER_OCT_64: {
-      std::string part = literal_token->token_.substr(2);
-      std::intmax_t number = std::strtoimax(part.c_str(), nullptr, 8);
-      return std::to_string(number);
-    }
+    case token_type::INTEGER_OCT_64:
     case token_type::UINTEGER_OCT:
     case token_type::UINTEGER_OCT_8:
     case token_type::UINTEGER_OCT_16:
-    case token_type::UINTEGER_OCT_64: {
-      std::string part = literal_token->token_.substr(2);
-      std::uintmax_t number = std::strtoumax(part.c_str(), nullptr, 8);
-      return std::to_string(number);
+    case token_type::UINTEGER_OCT_64:
+    case token_type::INTEGER_DECIMAL:
+    case token_type::INTEGER_DECIMAL_8:
+    case token_type::INTEGER_DECIMAL_16:
+    case token_type::INTEGER_DECIMAL_64:
+    case token_type::UINTEGER_DECIMAL:
+    case token_type::UINTEGER_DECIMAL_8:
+    case token_type::UINTEGER_DECIMAL_16:
+    case token_type::UINTEGER_DECIMAL_64:
+    case token_type::INTEGER_HEX:
+    case token_type::INTEGER_HEX_8:
+    case token_type::INTEGER_HEX_16:
+    case token_type::INTEGER_HEX_64:
+    case token_type::UINTEGER_HEX:
+    case token_type::UINTEGER_HEX_8:
+    case token_type::UINTEGER_HEX_16:
+    case token_type::UINTEGER_HEX_64: {
+      literal_conversion_result conversion_result = ::convert_literal(token_type_val, literal_token);
+      if (conversion_result.type_ == literal_type::LT_INVALID) {
+        error(literal_token, conversion_result.error_);
+        return "<><>";
+      }
+      return conversion_result.decimal_string_;
     }
     default:
       error(literal_token, "Failed to compile integer literal");

@@ -118,7 +118,7 @@ int32_t yy__main()
     yk__printstr("v=");
     yk__printlnint((intmax_t)yy__v);
     yk__printstr("r=");
-    int32_t yy__r = (((INT32_C(1) << INT32_C(2)) ^ (INT32_C(0xDEADBEEF) & INT32_C(0xCAFE))) | (INT32_C(0xBEE0) >> INT32_C(1)));
+    int32_t yy__r = (((INT32_C(1) << INT32_C(2)) ^ (INT32_C(57005) & INT32_C(51966))) | (INT32_C(48864) >> INT32_C(1)));
     yk__printlnint((intmax_t)yy__r);
     yk__sds yy__s = yk__sdsnewlen("Hello" , 5);
     yy__s = yk__append_sds_lit(yy__s, " World" , 6);

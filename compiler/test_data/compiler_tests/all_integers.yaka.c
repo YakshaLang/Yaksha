@@ -46,14 +46,14 @@ int32_t yy__dec_numbers()
 }
 int32_t yy__hex_numbers() 
 {
-    int8_t yy__a = INT8_C(0xA);
-    int16_t yy__b = INT16_C(0xB);
-    int32_t yy__c = INT32_C(0xC);
-    int64_t yy__d = INT64_C(0xD);
-    uint8_t yy__e = UINT8_C(0xE);
-    uint16_t yy__f = UINT16_C(0xF);
-    uint32_t yy__g = UINT32_C(0x9);
-    uint64_t yy__h = UINT64_C(0x8);
+    int8_t yy__a = INT8_C(10);
+    int16_t yy__b = INT16_C(11);
+    int32_t yy__c = INT32_C(12);
+    int64_t yy__d = INT64_C(13);
+    uint8_t yy__e = UINT8_C(14);
+    uint16_t yy__f = UINT16_C(15);
+    uint32_t yy__g = UINT32_C(9);
+    uint64_t yy__h = UINT64_C(8);
     return INT32_C(0);
 }
 int32_t yy__main() 
