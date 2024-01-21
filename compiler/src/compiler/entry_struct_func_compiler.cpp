@@ -46,7 +46,7 @@ entry_struct_func_compiler::entry_struct_func_compiler(ykdt_pool *pool)
       autogen_func_typedefs_(), autogen_func_typedef_list_(),
       counter_functions_(0), code_(), code_fnc_(), counter_tuples_(0),
       autogen_tuple_list_(), autogen_tuples_(), code_tuples_(),
-      counter_bin_data_(0), autogen_bin_data_(), bin_data_() {}
+      counter_bin_data_(0), autogen_bin_data_(), bin_data_(), counter_fxa_(0) {}
 std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
                                                 datatype_compiler *dtc) {
   std::string repr = entry_dt->as_string();
@@ -210,4 +210,41 @@ void entry_struct_func_compiler::compile_binary_data_to(
     std::stringstream &target) {
   target << bin_data_.str();
 }
+std::string
+entry_struct_func_compiler::compile_fixed_array(ykdatatype *fixed_array_dt,
+                                                 datatype_compiler *dtc) {
+  std::string fxa_str = fixed_array_dt->as_string();
+  if (autogen_fxa_.find(fxa_str) != autogen_fxa_.end()) {
+    return "ykfxa" + std::to_string(autogen_fxa_[fxa_str]);
+  }
+  // Check assumption that must not happen
+  if (!fixed_array_dt->is_fixed_size_array() || fixed_array_dt->args_.size() != 2 ||
+      fixed_array_dt->args_[0]->is_sm_entry() || fixed_array_dt->args_[1]->is_m_entry()) {
+    // Must not happen
+    return "<><>";
+  }
+  // -- convert
+  // typedef ARG0 ykfxa##num[ARG1];
+  std::stringstream code{};
+  ykdatatype *target_datatype = fixed_array_dt->args_[0];
+  ykdatatype *size_specifier = fixed_array_dt->args_[1];
+  code << "typedef ";
+    code << dtc->convert_dt(target_datatype, datatype_location::STRUCT, "", "")
+         << " ";
+  unsigned int current_num = counter_fxa_++;
+  code << "ykfxa" << current_num << "[";
+  code << size_specifier->token_->token_;
+  code << "];\n";
+  // write the finalized code here
+  code_fxa_ << code.str();
+  tuple_data d{fixed_array_dt, current_num};
+  autogen_fxa_list_.emplace_back(d);
+  autogen_fxa_[fxa_str] = current_num;
+  return "ykfxa" + std::to_string(current_num);
+}
+void entry_struct_func_compiler::compiled_fixed_array_to(
+    std::stringstream &target) {
+  target << code_fxa_.str();
+}
+bool entry_struct_func_compiler::has_fixed_arrays() { return !autogen_fxa_.empty(); }
 entry_struct_func_compiler::~entry_struct_func_compiler() = default;

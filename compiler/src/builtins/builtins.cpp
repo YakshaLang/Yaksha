@@ -1069,8 +1069,7 @@ struct builtin_fixed_arr : builtin {
         ykdatatype *array_wrapper = dt_pool->create("FixedArr");
         array_wrapper->args_.emplace_back(parsed_dt);
         // Add fixed array length
-        array_wrapper->args_.emplace_back(
-            dt_pool->create(std::to_string(length - 1)));
+        array_wrapper->args_.emplace_back( dt_pool->create_dimension(length - 1));
         array_wrapper->inlinable_literal_ = true;
         return ykobject(array_wrapper);
       }
@@ -1095,8 +1094,7 @@ struct builtin_fixed_arr : builtin {
     auto array_dt = dt_pool->create("FixedArr");
     array_dt->args_.emplace_back(element_data_type);
     // Add fixed array length
-    array_dt->args_.emplace_back(
-        dt_pool->create(std::to_string(args.size() - 1)));
+    array_dt->args_.emplace_back( dt_pool->create_dimension(args.size() - 1));
     array_dt->inlinable_literal_ = true;// this can be inlined
     // ------------------------
     code << "{";

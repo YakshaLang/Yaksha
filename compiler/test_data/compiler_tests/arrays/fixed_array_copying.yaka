@@ -1,0 +1,16 @@
+def main() -> int:
+    a: FixedArr[int, 3]
+    a[0] = 1
+    a[1] = 2
+    a[2] = 3
+    # this does not work for now :(
+    # b = a
+    # so we have to do this
+    b: FixedArr[int, 3]
+    b[0] = a[0]
+    b[1] = a[1]
+    b[2] = a[2]
+    # just print it
+    println(a[0] + a[1] + a[2])
+    println(b[0] + b[1] + b[2])
+    return 0

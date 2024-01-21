@@ -7,13 +7,16 @@ int32_t yy__main();
 // --functions-- 
 int32_t yy__main() 
 {
-    yk__printlnstr("Creating a fixed array");
     ykfxa0 yy__a = {};
     yy__a[INT32_C(0)] = INT32_C(1);
     yy__a[INT32_C(1)] = INT32_C(2);
     yy__a[INT32_C(2)] = INT32_C(3);
-    int32_t yy__b = ((yy__a[INT32_C(0)] + yy__a[INT32_C(1)]) + yy__a[INT32_C(2)]);
-    yk__printlnint((intmax_t)yy__b);
+    ykfxa0 yy__b = {};
+    yy__b[INT32_C(0)] = yy__a[INT32_C(0)];
+    yy__b[INT32_C(1)] = yy__a[INT32_C(1)];
+    yy__b[INT32_C(2)] = yy__a[INT32_C(2)];
+    yk__printlnint((intmax_t)((yy__a[INT32_C(0)] + yy__a[INT32_C(1)]) + yy__a[INT32_C(2)]));
+    yk__printlnint((intmax_t)((yy__b[INT32_C(0)] + yy__b[INT32_C(1)]) + yy__b[INT32_C(2)]));
     return INT32_C(0);
 }
 #if defined(YK__MINIMAL_MAIN)

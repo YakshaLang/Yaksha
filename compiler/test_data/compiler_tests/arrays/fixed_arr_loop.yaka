@@ -15,4 +15,7 @@ def main() -> int:
     for b_item in b:
         println(b_item)
 
+    for c_item in fixedarr("int", 1, 2, 3, 4):
+        println(c_item)
+
     return 0

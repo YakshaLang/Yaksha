@@ -1094,20 +1094,18 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
                                 : compile_expression(obj->expression_);
       write_indent(body_);
       // write following --
-      // data_type name[size]
-      body_ << convert_dt(obj->data_type_->const_unwrap()->args_[0],
+      // ykfxa name
+      body_ << convert_dt(obj->data_type_,
                           datatype_location::STRUCT, "", "")
-            << " " << name << "["
-            << obj->data_type_->const_unwrap()->args_[1]->dimension_ << "]";
+            << " " << name;
       body_ << " = " << exp.first;
     } else {
       write_indent(body_);
       // write following --
       // data_type name[size]
-      body_ << convert_dt(obj->data_type_->const_unwrap()->args_[0],
+      body_ << convert_dt(obj->data_type_,
                           datatype_location::STRUCT, "", "")
-            << " " << name << "["
-            << obj->data_type_->const_unwrap()->args_[1]->dimension_ << "]";
+            << " " << name;
       body_ << " = {}";
     }
   } else {
@@ -1259,8 +1257,7 @@ std::string to_c_compiler::convert_dt(ykdatatype *basic_dt,
     return convert_dt(basic_dt->args_[0], datatype_location::STRUCT, "", "") +
            "*";
   } else if (basic_dt->is_fixed_size_array()) {
-    return convert_dt(basic_dt->args_[0], datatype_location::STRUCT, "", "") +
-           "[" + basic_dt->args_[1]->token_->token_ + "]";
+    return esc_->compile_fixed_array(basic_dt, this);
   } else if (basic_dt->is_const()) {
     return convert_dt(basic_dt->args_[0], datatype_location::STRUCT, "", "") +
            " const ";

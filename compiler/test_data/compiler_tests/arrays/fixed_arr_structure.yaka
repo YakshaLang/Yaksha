@@ -1,0 +1,30 @@
+struct A:
+    a: int
+    b: FixedArr[int, 3]
+    c: FixedArr[int, 3]
+
+struct B:
+    nested: FixedArr[FixedArr[int, 2], 2]
+    ptr_nested: Ptr[FixedArr[int, 2]]
+    nested_ptr: FixedArr[Ptr[int], 2]
+    ptr_nested_ptr: Ptr[FixedArr[Ptr[int], 2]]
+    nested_ptr_ptr: FixedArr[Ptr[Ptr[int]], 2]
+    nested_func: FixedArr[Function[In[int],Out[int]], 2]
+    nested_const_ptr: FixedArr[Const[Ptr[int]], 2]
+
+def main() -> int:
+    a: A
+    a.a = 1
+    a.b[0] = 2
+    a.b[1] = 3
+    a.b[2] = 4
+    a.c[0] = 5
+    a.c[1] = 6
+    a.c[2] = 7
+    b: B
+    b.nested[0][0] = 8
+    b.nested[0][1] = 9
+    b.nested[1][0] = 10
+    b.nested[1][1] = 11
+    println(b.nested[0][0])
+    return 0

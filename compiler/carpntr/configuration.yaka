@@ -93,6 +93,8 @@ class Config:
     libs_path: str
     zig_compiler_path: str
     emcc_compiler_path: str
+    gcc_compiler_path: str
+    clang_compiler_path: str
     emrun_path: str
     w4_path: str
     c_code: CCode
@@ -506,6 +508,8 @@ def del_config(c: Config) -> None:
     del c.libs_path
     del c.zig_compiler_path
     del c.emcc_compiler_path
+    del c.gcc_compiler_path
+    del c.clang_compiler_path
     del c.emrun_path
     del c.w4_path
     del c
