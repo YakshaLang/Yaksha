@@ -58,9 +58,9 @@ struct yy__configuration_Config;
 #define yy__os_Arguments struct yk__arguments*
 #define yy__os_get_args yk__get_args
 #define yy__os_ProcessResult struct yk__process_result*
-struct yktuple0;
-typedef int32_t (*ykfncptr0)(void*);
-typedef void (*ykfncptr1)(void*);
+struct yt_tuple_fn_in_any_ptr_out_any_ptr;
+typedef int32_t (*yt_fn_in_any_ptr_out_int)(void*);
+typedef void (*yt_fn_in_any_ptr_out)(void*);
 struct yy__raylib_support_CObject* yy__raylib_support_fill_arguments(yk__sds, struct yy__raylib_support_CObject*, bool);
 struct yy__raylib_support_CObject* yy__raylib_support_fill_web_arguments(yk__sds, struct yy__raylib_support_CObject*);
 struct yy__raylib_support_CObject* yy__raylib_support_co(yk__sds, yk__sds, yk__sds, bool, bool);
@@ -84,11 +84,11 @@ void yy__condition_destroy(yy__condition_Condition*);
 int32_t yy__condition_signal(yy__condition_Condition*);
 int32_t yy__condition_broadcast(yy__condition_Condition*);
 int32_t yy__condition_wait(yy__condition_Condition*, yy__mutex_Mutex*);
-int32_t yy__thread_create_with_data(yy__thread_Thread*, ykfncptr0, void*);
+int32_t yy__thread_create_with_data(yy__thread_Thread*, yt_fn_in_any_ptr_out_int, void*);
 void yy__thread_exit(int32_t);
 int32_t yy__thread_join(yy__thread_Thread);
 struct yy__pool_ThreadPool* yy__pool_create(uint8_t, uint32_t);
-int32_t yy__pool_add(struct yy__pool_ThreadPool*, ykfncptr1, void*);
+int32_t yy__pool_add(struct yy__pool_ThreadPool*, yt_fn_in_any_ptr_out, void*);
 int32_t yy__pool_destroy(struct yy__pool_ThreadPool*, bool);
 int32_t yy__pool_internal_del_pool(struct yy__pool_ThreadPool*);
 int32_t yy__pool_internal_tpool_work(void*);
@@ -210,7 +210,7 @@ struct yy__pool_ThreadPool {
     yy__mutex_Mutex yy__pool_lock;
     yy__condition_Condition yy__pool_notify;
     yy__thread_Thread* yy__pool_threads;
-    struct yktuple0* yy__pool_queue;
+    struct yt_tuple_fn_in_any_ptr_out_any_ptr* yy__pool_queue;
     int32_t yy__pool_thread_count;
     int32_t yy__pool_queue_size;
     int32_t yy__pool_head;
@@ -273,7 +273,7 @@ struct yy__configuration_Config {
     struct yy__configuration_Compilation* yy__configuration_compilation;
     yk__sds* yy__configuration_errors;
 };
-struct yktuple0 { ykfncptr1 e1; void* e2; };
+struct yt_tuple_fn_in_any_ptr_out_any_ptr { yt_fn_in_any_ptr_out e1; void* e2; };
 // --functions-- 
 struct yy__raylib_support_CObject* yy__raylib_support_fill_arguments(yk__sds yy__raylib_support_src_path, struct yy__raylib_support_CObject* yy__raylib_support_c, bool yy__raylib_support_dll) 
 {
@@ -732,7 +732,7 @@ void yy__condition_destroy(yy__condition_Condition* nn__cnd) { cnd_destroy(nn__c
 int32_t yy__condition_signal(yy__condition_Condition* nn__cnd) { return cnd_signal(nn__cnd); }
 int32_t yy__condition_broadcast(yy__condition_Condition* nn__cnd) { return cnd_broadcast(nn__cnd); }
 int32_t yy__condition_wait(yy__condition_Condition* nn__cnd, yy__mutex_Mutex* nn__mtx) { return cnd_wait(nn__cnd, nn__mtx); }
-int32_t yy__thread_create_with_data(yy__thread_Thread* nn__thr, ykfncptr0 nn__func, void* nn__data) { return thrd_create(nn__thr, nn__func, nn__data); }
+int32_t yy__thread_create_with_data(yy__thread_Thread* nn__thr, yt_fn_in_any_ptr_out_int nn__func, void* nn__data) { return thrd_create(nn__thr, nn__func, nn__data); }
 void yy__thread_exit(int32_t nn__res) { thrd_exit(nn__res); }
 int32_t yy__thread_join(yy__thread_Thread nn__thr) 
 {
@@ -790,7 +790,7 @@ struct yy__pool_ThreadPool* yy__pool_create(uint8_t yy__pool_thread_count, uint3
     struct yy__pool_ThreadPool* t__4 = yy__pool_tpool;
     return t__4;
 }
-int32_t yy__pool_add(struct yy__pool_ThreadPool* yy__pool_tpool, ykfncptr1 yy__pool_func, void* yy__pool_arg) 
+int32_t yy__pool_add(struct yy__pool_ThreadPool* yy__pool_tpool, yt_fn_in_any_ptr_out yy__pool_func, void* yy__pool_arg) 
 {
     int32_t yy__pool_err = yy__pool_SUCCESS;
     int32_t yy__pool_next = INT32_C(0);
@@ -906,7 +906,7 @@ int32_t yy__pool_internal_del_pool(struct yy__pool_ThreadPool* yy__pool_tpool)
 int32_t yy__pool_internal_tpool_work(void* yy__pool_tpool_obj) 
 {
     struct yy__pool_ThreadPool* yy__pool_tpool = ((struct yy__pool_ThreadPool*)yy__pool_tpool_obj);
-    struct yktuple0 yy__pool_task;
+    struct yt_tuple_fn_in_any_ptr_out_any_ptr yy__pool_task;
     while (true)
     {
         yy__mutex_lock((&(yy__pool_tpool->yy__pool_lock)));
@@ -927,7 +927,7 @@ int32_t yy__pool_internal_tpool_work(void* yy__pool_tpool_obj)
         yy__pool_tpool->yy__pool_head = (((yy__pool_tpool->yy__pool_head + INT32_C(1))) % yy__pool_tpool->yy__pool_queue_size);
         yy__pool_tpool->yy__pool_count -= INT32_C(1);
         yy__mutex_unlock((&(yy__pool_tpool->yy__pool_lock)));
-        ykfncptr1 yy__pool_fnc = yy__pool_task.e1;
+        yt_fn_in_any_ptr_out yy__pool_fnc = yy__pool_task.e1;
         yy__pool_fnc(yy__pool_task.e2);
     }
     yy__pool_tpool->yy__pool_started -= INT32_C(1);

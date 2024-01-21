@@ -1,7 +1,7 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
-typedef yk__sds (*ykfncptr0)(yk__sds);
+typedef yk__sds (*yt_fn_in_str_out_str)(yk__sds);
 yk__sds yy__normal(yk__sds);
 yk__sds yy__sqb(yk__sds);
 int32_t yy__main();
@@ -23,7 +23,7 @@ yk__sds yy__sqb(yk__sds yy__s)
 }
 int32_t yy__main() 
 {
-    ykfncptr0 yy__a;
+    yt_fn_in_str_out_str yy__a;
     yy__a = (true ? yy__normal : yy__sqb);
     yk__sds t__4 = yy__a(yk__sdsnewlen("Hello World", 11));
     yk__printlnstr(t__4);

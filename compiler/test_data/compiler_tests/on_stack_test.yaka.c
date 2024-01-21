@@ -5,7 +5,7 @@ struct yy__class_stuff_C;
 struct yy__Enemy;
 struct yy__Friend;
 struct yy__AnotherFriend;
-typedef int32_t (*ykfncptr0)(void);
+typedef int32_t (*yt_fn_in_out_int)(void);
 int32_t yy__a();
 int32_t yy__main();
 // --structs-- 
@@ -30,8 +30,8 @@ int32_t yy__a()
 }
 int32_t yy__main() 
 {
-    ykfncptr0 yy__b = yy__a;
-    ykfncptr0 yy__d = yy__a;
+    yt_fn_in_out_int yy__b = yy__a;
+    yt_fn_in_out_int yy__d = yy__a;
     struct yk__bstr yy__e = yk__bstr_s("Hello world" , 11);
     struct yy__Enemy* t__0 = NULL;
     yk__arrsetlen(t__0, INT32_C(2));

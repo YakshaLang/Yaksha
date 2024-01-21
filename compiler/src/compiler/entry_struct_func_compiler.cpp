@@ -40,18 +40,26 @@
 #include "entry_struct_func_compiler.h"
 #include <iomanip>
 #include <iostream>
+const std::vector<std::pair<std::string, std::string>> REPLACEMENTS = {
+    {"function", "fn"},
+    {"m_entry", "pair"},
+    {"_s_pair_", "_pair_str_"},
+    {"fixed_arr", "arr"}};
 using namespace yaksha;
 entry_struct_func_compiler::entry_struct_func_compiler(ykdt_pool *pool)
     : pool_(pool), counter_(0), autogen_structs_list_(), autogen_structs_(),
       autogen_func_typedefs_(), autogen_func_typedef_list_(),
       counter_functions_(0), code_(), code_fnc_(), counter_tuples_(0),
       autogen_tuple_list_(), autogen_tuples_(), code_tuples_(),
-      counter_bin_data_(0), autogen_bin_data_(), bin_data_(), counter_fxa_(0) {}
+      counter_bin_data_(0), autogen_bin_data_(), bin_data_(), counter_fxa_(0),
+      forward_decls_(), name_improvements_() {}
 std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
                                                 datatype_compiler *dtc) {
   std::string repr = entry_dt->as_string();
   if (autogen_structs_.find(repr) != autogen_structs_.end()) {
-    return "struct ykentry" + std::to_string(autogen_structs_[repr]);
+    return "struct " +
+           improve_name(repr,
+                        "ykentry" + std::to_string(autogen_structs_[repr]));
   }
   entry_data d{};
   d.incremented_id_ = counter_++;
@@ -66,7 +74,9 @@ std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
     return "<><>";
   }
   std::stringstream code{};
-  code << "struct ykentry" << d.incremented_id_ << " { "
+  std::string name =
+      improve_name(repr, "ykentry" + std::to_string(d.incremented_id_));
+  code << "struct " << name << " { "
        << dtc->convert_dt(d.key_dt_, datatype_location::STRUCT, "", "")
        << " key; "
        << dtc->convert_dt(d.val_dt_, datatype_location::STRUCT, "", "")
@@ -74,16 +84,12 @@ std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
   code_ << code.str();
   autogen_structs_list_.emplace_back(d);
   autogen_structs_[repr] = d.incremented_id_;
-  return "struct ykentry" + std::to_string(d.incremented_id_);
+  forward_decls_ << "struct " << name << ";\n";
+  return "struct " + improve_name(repr, name);
 }
 void entry_struct_func_compiler::compile_forward_declarations(
     std::stringstream &target) {
-  for (auto &e : autogen_structs_list_) {
-    target << "struct ykentry" << e.incremented_id_ << ";\n";
-  }
-  for (auto &e : autogen_tuple_list_) {
-    target << "struct yktuple" << e.incremented_id_ << ";\n";
-  }
+  target << forward_decls_.str();
 }
 void entry_struct_func_compiler::compile_structures(std::stringstream &target) {
   target << code_.str();
@@ -97,7 +103,8 @@ entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
                                                 datatype_compiler *dtc) {
   std::string fdt_str = function_dt->as_string();
   if (autogen_func_typedefs_.find(fdt_str) != autogen_func_typedefs_.end()) {
-    return "ykfncptr" + std::to_string(autogen_func_typedefs_[fdt_str]);
+    return improve_name(
+        fdt_str, "ykfncptr" + std::to_string(autogen_func_typedefs_[fdt_str]));
   }
   // Check assumption that must not happen
   if (!function_dt->is_function() || function_dt->args_.size() != 2 ||
@@ -122,7 +129,9 @@ entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
     code << "<><>";
   }
   unsigned int current_num = counter_functions_++;
-  code << "(*ykfncptr" << current_num << ")(";
+  std::string name =
+      improve_name(fdt_str, "ykfncptr" + std::to_string(current_num));
+  code << "(*" << name << ")(";
   if (input->args_.empty()) {
     code << "void";
   } else {
@@ -142,7 +151,7 @@ entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
   func_data d{input, output, current_num};
   autogen_func_typedef_list_.emplace_back(d);
   autogen_func_typedefs_[fdt_str] = current_num;
-  return "ykfncptr" + std::to_string(current_num);
+  return name;
 }
 void entry_struct_func_compiler::compile_function_defs(
     std::stringstream &target) {
@@ -155,13 +164,17 @@ std::string entry_struct_func_compiler::compile_tuple(ykdatatype *tuple_dt,
                                                       datatype_compiler *dtc) {
   std::string repr = tuple_dt->as_string();
   if (autogen_tuples_.find(repr) != autogen_tuples_.end()) {
-    return "struct yktuple" + std::to_string(autogen_tuples_[repr]);
+    std::string name =
+        improve_name(repr, "yktuple" + std::to_string(autogen_tuples_[repr]));
+    return "struct " + name;
   }
   tuple_data d{};
   d.incremented_id_ = counter_tuples_++;
   d.tuple_dt_ = tuple_dt;
   std::stringstream code{};
-  code << "struct yktuple" << d.incremented_id_ << " {";
+  std::string name =
+      improve_name(repr, "yktuple" + std::to_string(d.incremented_id_));
+  code << "struct " << name << " {";
   size_t i = 1;
   for (ykdatatype *dt_arg : d.tuple_dt_->args_) {
     code << " " << dtc->convert_dt(dt_arg, datatype_location::STRUCT, "", "")
@@ -172,7 +185,8 @@ std::string entry_struct_func_compiler::compile_tuple(ykdatatype *tuple_dt,
   code_ << code.str();
   autogen_tuple_list_.emplace_back(d);
   autogen_tuples_[repr] = d.incremented_id_;
-  return "struct yktuple" + std::to_string(d.incremented_id_);
+  forward_decls_ << "struct " << name << ";\n";
+  return "struct " + name;
 }
 bool entry_struct_func_compiler::has_bin_data() {
   return !autogen_bin_data_.empty();
@@ -212,14 +226,17 @@ void entry_struct_func_compiler::compile_binary_data_to(
 }
 std::string
 entry_struct_func_compiler::compile_fixed_array(ykdatatype *fixed_array_dt,
-                                                 datatype_compiler *dtc) {
+                                                datatype_compiler *dtc) {
   std::string fxa_str = fixed_array_dt->as_string();
   if (autogen_fxa_.find(fxa_str) != autogen_fxa_.end()) {
-    return "ykfxa" + std::to_string(autogen_fxa_[fxa_str]);
+    return improve_name(fxa_str,
+                        "ykfxa" + std::to_string(autogen_fxa_[fxa_str]));
   }
   // Check assumption that must not happen
-  if (!fixed_array_dt->is_fixed_size_array() || fixed_array_dt->args_.size() != 2 ||
-      fixed_array_dt->args_[0]->is_sm_entry() || fixed_array_dt->args_[1]->is_m_entry()) {
+  if (!fixed_array_dt->is_fixed_size_array() ||
+      fixed_array_dt->args_.size() != 2 ||
+      fixed_array_dt->args_[0]->is_sm_entry() ||
+      fixed_array_dt->args_[1]->is_m_entry()) {
     // Must not happen
     return "<><>";
   }
@@ -229,10 +246,12 @@ entry_struct_func_compiler::compile_fixed_array(ykdatatype *fixed_array_dt,
   ykdatatype *target_datatype = fixed_array_dt->args_[0];
   ykdatatype *size_specifier = fixed_array_dt->args_[1];
   code << "typedef ";
-    code << dtc->convert_dt(target_datatype, datatype_location::STRUCT, "", "")
-         << " ";
+  code << dtc->convert_dt(target_datatype, datatype_location::STRUCT, "", "")
+       << " ";
   unsigned int current_num = counter_fxa_++;
-  code << "ykfxa" << current_num << "[";
+  std::string name =
+      improve_name(fxa_str, "ykfxa" + std::to_string(current_num));
+  code << name << "[";
   code << size_specifier->token_->token_;
   code << "];\n";
   // write the finalized code here
@@ -240,11 +259,72 @@ entry_struct_func_compiler::compile_fixed_array(ykdatatype *fixed_array_dt,
   tuple_data d{fixed_array_dt, current_num};
   autogen_fxa_list_.emplace_back(d);
   autogen_fxa_[fxa_str] = current_num;
-  return "ykfxa" + std::to_string(current_num);
+  return name;
 }
 void entry_struct_func_compiler::compiled_fixed_array_to(
     std::stringstream &target) {
   target << code_fxa_.str();
 }
-bool entry_struct_func_compiler::has_fixed_arrays() { return !autogen_fxa_.empty(); }
+bool entry_struct_func_compiler::has_fixed_arrays() {
+  return !autogen_fxa_.empty();
+}
+std::string sanitize_name(const std::string &input) {
+  auto is_valid_char = [](char c) { return std::isalnum(c) || c == '_'; };
+  std::string result;
+  for (size_t i = 0; i < input.length(); ++i) {
+    char c = input[i];
+    if (is_valid_char(c)) {
+      if (std::isupper(c)) {
+        result += "_";
+        result += static_cast<char>(std::tolower(c));
+      } else {
+        result += c;
+      }
+    } else {
+      result += '_';
+    }
+  }
+  // Remove double underscores
+  std::size_t dunder = result.find("__");
+  while (dunder != std::string::npos) {
+    result.erase(dunder, 1);
+    dunder = result.find("__");
+  }
+  // Remove leading and trailing underscores
+  result.erase(result.begin(),
+               std::find_if(result.begin(), result.end(),
+                            [](unsigned char ch) { return ch != '_'; }));
+  result.erase(std::find_if(result.rbegin(), result.rend(),
+                            [](unsigned char ch) { return ch != '_'; })
+                   .base(),
+               result.end());
+  result = "yt_" + result;
+  // Replace
+  for (const auto &replacement : REPLACEMENTS) {
+    size_t pos;
+    while ((pos = result.find(replacement.first)) != std::string::npos) {
+      result.replace(pos, replacement.first.length(), replacement.second);
+    }
+  }
+  return result;
+}
+std::string entry_struct_func_compiler::improve_name(
+    const std::string &yaksha_datatype_string,
+    const std::string &numbered_name) {
+  if (name_improvements_.find(yaksha_datatype_string) !=
+      name_improvements_.end()) {
+    return name_improvements_[yaksha_datatype_string];
+  }
+  std::string improved = sanitize_name(yaksha_datatype_string);
+  // too large use numbered name
+  if (improved.size() > 60 || improved.empty()) { improved = numbered_name; }
+  // conflict, so use numbered name
+  if (reverse_name_improvements_.find(improved) !=
+      reverse_name_improvements_.end()) {
+    improved = numbered_name;
+  }
+  name_improvements_[yaksha_datatype_string] = improved;
+  reverse_name_improvements_[improved] = yaksha_datatype_string;
+  return improved;
+}
 entry_struct_func_compiler::~entry_struct_func_compiler() = default;
