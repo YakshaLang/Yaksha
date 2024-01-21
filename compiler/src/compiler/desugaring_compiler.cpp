@@ -310,7 +310,6 @@ void desugaring_compiler::desugar_fixed_arr_foreach(foreach_stmt *obj) {
   //    array_holder: FixedArr[T] = expression
   // if the expression cannot be inlined
   //    array_holder: Ptr[FixedArr[T]] = expression
-  // TODO before I forget, ensure that the Ptr[Function] is not allowed as a Function is ptr...
   ykdatatype *arr;
   if (expression_dt->inlinable_literal_) {
     arr = dt_pool_->create("FixedArr");
@@ -341,8 +340,8 @@ void desugaring_compiler::desugar_fixed_arr_foreach(foreach_stmt *obj) {
   // While body -> #yaksha-define yy__item h__array[h__counter]
   // While body -> expose yy__item ==> obj->name + obj->data_type
   std::string desugar_rewrite;
-  if (expression_dt->inlinable_literal_) {
-    desugar_rewrite = "(*(" + array_holder + ")[" + counter + "])";
+  if (!expression_dt->inlinable_literal_) {
+    desugar_rewrite = "((*" + array_holder + ")[" + counter + "])";
   } else {
     desugar_rewrite = "(" + array_holder + "[" + counter + "])";
   }

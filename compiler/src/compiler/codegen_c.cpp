@@ -73,6 +73,9 @@ comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool) {
     cf->esc_->compile_forward_declarations(c_code);
   }
   if (cf->esc_->has_functions()) { cf->esc_->compile_function_defs(c_code); }
+  if (cf->esc_->has_fixed_arrays()) {
+    cf->esc_->compiled_fixed_array_to(c_code);
+  }
   c_code << function_forward_decls.str();
   c_code << "// --structs-- \n";
   c_code << struct_body.str();

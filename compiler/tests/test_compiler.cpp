@@ -352,3 +352,11 @@ TEST_CASE("compiler: fixed arrays - foreach loop / sr") {
   test_compile_yaka_file(
       "../test_data/compiler_tests/arrays/fixed_arr_loop.yaka");
 }
+TEST_CASE("compiler: fixed arrays - copying when assigned") {
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/arrays/fixed_array_copying.yaka");
+}
+TEST_CASE("compiler: fixed arrays - structure data types") {
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/arrays/fixed_arr_structure.yaka");
+}

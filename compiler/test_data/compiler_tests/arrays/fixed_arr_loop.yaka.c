@@ -1,21 +1,26 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
+typedef int32_t ykfxa0[3];
+typedef struct yk__bstr ykfxa1[3];
+typedef int32_t ykfxa2[3];
+typedef struct yk__bstr ykfxa3[3];
+typedef int32_t ykfxa4[4];
 int32_t yy__main();
 // --structs-- 
 // --functions-- 
 int32_t yy__main() 
 {
     yk__printlnstr("Fixed Array looping");
-    int32_t yy__a[3] = {};
+    ykfxa0 yy__a = {};
     yy__a[INT32_C(0)] = INT32_C(1);
     yy__a[INT32_C(1)] = INT32_C(2);
     yy__a[INT32_C(2)] = INT32_C(3);
-    struct yk__bstr yy__b[3] = {};
+    ykfxa1 yy__b = {};
     yy__b[INT32_C(0)] = yk__bstr_s("hello", 5);
     yy__b[INT32_C(1)] = yk__bstr_s("world", 5);
     yy__b[INT32_C(2)] = yk__bstr_s("!", 1);
-    int32_t[3]* yy__0t = (&(yy__a));
+    ykfxa2* yy__0t = (&(yy__a));
     int32_t yy__1t = INT32_C(0);
     while (true)
     {
@@ -23,10 +28,10 @@ int32_t yy__main()
         {
             break;
         }
-        yk__printlnint((intmax_t)(yy__0t[yy__1t]));
+        yk__printlnint((intmax_t)((*yy__0t)[yy__1t]));
         yy__1t += INT32_C(1);
     }
-    struct yk__bstr[3]* yy__2t = (&(yy__b));
+    ykfxa3* yy__2t = (&(yy__b));
     int32_t yy__3t = INT32_C(0);
     while (true)
     {
@@ -34,8 +39,19 @@ int32_t yy__main()
         {
             break;
         }
-        yk__printlnstr(yk__bstr_get_reference((yy__2t[yy__3t])));
+        yk__printlnstr(yk__bstr_get_reference(((*yy__2t)[yy__3t])));
         yy__3t += INT32_C(1);
+    }
+    ykfxa4 yy__4t = {INT32_C(1), INT32_C(2), INT32_C(3), INT32_C(4)};
+    int32_t yy__5t = INT32_C(0);
+    while (true)
+    {
+        if (!(((yy__5t < INT32_C(4)))))
+        {
+            break;
+        }
+        yk__printlnint((intmax_t)(yy__4t[yy__5t]));
+        yy__5t += INT32_C(1);
     }
     return INT32_C(0);
 }

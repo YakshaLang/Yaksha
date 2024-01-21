@@ -110,7 +110,7 @@ namespace yaksha {
 
 private:
     // Why inner is a pointer:
-    // at the start I push global_statements_ to statement_stack_ and it should be the last one remaining
+    //  at the start I push global_statements_ to statement_stack_ and it should be the last one remaining
     std::vector<std::vector<const_fold_context *> *> statement_stack_;
     std::vector<const_fold_context *> global_statements_;
     std::vector<const_fold_context *> pre_continue_stack_;

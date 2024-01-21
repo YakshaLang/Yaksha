@@ -64,13 +64,16 @@ namespace yaksha {
     std::string compile_function_dt(ykdatatype *function_dt,
                                     datatype_compiler *dtc);
     std::string compile_binary_data(const std::string &data);
+    std::string compile_fixed_array(ykdatatype *fixed_array_dt, datatype_compiler *dtc);
     void compile_forward_declarations(std::stringstream &target);
     void compile_structures(std::stringstream &target);
     void compile_function_defs(std::stringstream &target);
     void compile_binary_data_to(std::stringstream &target);
+    void compiled_fixed_array_to(std::stringstream &target);
     bool has_structures();
     bool has_functions();
     bool has_bin_data();
+    bool has_fixed_arrays();
     ~entry_struct_func_compiler();
 
 private:
@@ -94,6 +97,11 @@ private:
     unsigned int counter_bin_data_;
     std::unordered_map<std::string, unsigned int> autogen_bin_data_;
     std::stringstream bin_data_;
+    // Auto generated fixed array, typedefs
+    unsigned int counter_fxa_;
+    std::vector<tuple_data> autogen_fxa_list_;
+    std::unordered_map<std::string, unsigned int> autogen_fxa_;
+    std::stringstream code_fxa_;
   };
 }// namespace yaksha
 #endif

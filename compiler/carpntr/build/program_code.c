@@ -264,6 +264,8 @@ struct yy__configuration_Config {
     yk__sds yy__configuration_libs_path;
     yk__sds yy__configuration_zig_compiler_path;
     yk__sds yy__configuration_emcc_compiler_path;
+    yk__sds yy__configuration_gcc_compiler_path;
+    yk__sds yy__configuration_clang_compiler_path;
     yk__sds yy__configuration_emrun_path;
     yk__sds yy__configuration_w4_path;
     struct yy__configuration_CCode* yy__configuration_c_code;
@@ -2841,6 +2843,8 @@ void yy__configuration_del_config(struct yy__configuration_Config* yy__configura
     yk__sdsfree(yy__configuration_c->yy__configuration_libs_path);
     yk__sdsfree(yy__configuration_c->yy__configuration_zig_compiler_path);
     yk__sdsfree(yy__configuration_c->yy__configuration_emcc_compiler_path);
+    yk__sdsfree(yy__configuration_c->yy__configuration_gcc_compiler_path);
+    yk__sdsfree(yy__configuration_c->yy__configuration_clang_compiler_path);
     yk__sdsfree(yy__configuration_c->yy__configuration_emrun_path);
     yk__sdsfree(yy__configuration_c->yy__configuration_w4_path);
     free(yy__configuration_c);
