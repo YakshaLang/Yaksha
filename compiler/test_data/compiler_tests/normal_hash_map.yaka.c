@@ -1,14 +1,14 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
-struct ykentry0;
+struct yt_pair_int_int;
 int32_t yy__main();
 // --structs-- 
-struct ykentry0 { int32_t key; int32_t value; };
+struct yt_pair_int_int { int32_t key; int32_t value; };
 // --functions-- 
 int32_t yy__main() 
 {
-    struct ykentry0* yy__m = NULL;
+    struct yt_pair_int_int* yy__m = NULL;
     ;
     yk__hmput(yy__m, INT32_C(1), INT32_C(42));
     yk__hmput(yy__m, INT32_C(100), INT32_C(10000));

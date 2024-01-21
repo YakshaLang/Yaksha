@@ -3,13 +3,13 @@
 // --forward declarations-- 
 struct yy__A;
 struct yy__B;
-typedef int32_t (*ykfncptr0)(int32_t);
+typedef int32_t (*yt_fn_in_int_out_int)(int32_t);
 typedef int32_t ykfxa0[3];
 typedef int32_t ykfxa1[2];
 typedef ykfxa1 ykfxa2[2];
 typedef int32_t* ykfxa3[2];
 typedef int32_t** ykfxa4[2];
-typedef ykfncptr0 ykfxa5[2];
+typedef yt_fn_in_int_out_int ykfxa5[2];
 typedef int32_t* const  ykfxa6[2];
 int32_t yy__main();
 // --structs-- 

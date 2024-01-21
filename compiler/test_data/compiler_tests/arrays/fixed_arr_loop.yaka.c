@@ -3,9 +3,9 @@
 // --forward declarations-- 
 typedef int32_t ykfxa0[3];
 typedef struct yk__bstr ykfxa1[3];
-typedef int32_t ykfxa2[3];
-typedef struct yk__bstr ykfxa3[3];
-typedef int32_t ykfxa4[4];
+typedef int32_t yt_arr_int_3[3];
+typedef struct yk__bstr yt_arr_sr_3[3];
+typedef int32_t yt_arr_int_4[4];
 int32_t yy__main();
 // --structs-- 
 // --functions-- 
@@ -20,7 +20,7 @@ int32_t yy__main()
     yy__b[INT32_C(0)] = yk__bstr_s("hello", 5);
     yy__b[INT32_C(1)] = yk__bstr_s("world", 5);
     yy__b[INT32_C(2)] = yk__bstr_s("!", 1);
-    ykfxa2* yy__0t = (&(yy__a));
+    yt_arr_int_3* yy__0t = (&(yy__a));
     int32_t yy__1t = INT32_C(0);
     while (true)
     {
@@ -31,7 +31,7 @@ int32_t yy__main()
         yk__printlnint((intmax_t)((*yy__0t)[yy__1t]));
         yy__1t += INT32_C(1);
     }
-    ykfxa3* yy__2t = (&(yy__b));
+    yt_arr_sr_3* yy__2t = (&(yy__b));
     int32_t yy__3t = INT32_C(0);
     while (true)
     {
@@ -42,7 +42,7 @@ int32_t yy__main()
         yk__printlnstr(yk__bstr_get_reference(((*yy__2t)[yy__3t])));
         yy__3t += INT32_C(1);
     }
-    ykfxa4 yy__4t = {INT32_C(1), INT32_C(2), INT32_C(3), INT32_C(4)};
+    yt_arr_int_4 yy__4t = {INT32_C(1), INT32_C(2), INT32_C(3), INT32_C(4)};
     int32_t yy__5t = INT32_C(0);
     while (true)
     {

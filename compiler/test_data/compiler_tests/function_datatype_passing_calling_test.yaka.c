@@ -1,9 +1,9 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
-typedef yk__sds (*ykfncptr0)(yk__sds);
+typedef yk__sds (*yt_fn_in_str_out_str)(yk__sds);
 yk__sds yy__world_formatter(yk__sds);
-void yy__formatted_print(ykfncptr0, yk__sds);
+void yy__formatted_print(yt_fn_in_str_out_str, yk__sds);
 int32_t yy__main();
 // --structs-- 
 // --functions-- 
@@ -16,7 +16,7 @@ yk__sds yy__world_formatter(yk__sds yy__item)
     yk__sdsfree(yy__item);
     return t__1;
 }
-void yy__formatted_print(ykfncptr0 yy__formatter, yk__sds yy__item) 
+void yy__formatted_print(yt_fn_in_str_out_str yy__formatter, yk__sds yy__item) 
 {
     yk__sds t__2 = yy__formatter(yk__sdsdup(yy__item));
     yk__printlnstr(t__2);

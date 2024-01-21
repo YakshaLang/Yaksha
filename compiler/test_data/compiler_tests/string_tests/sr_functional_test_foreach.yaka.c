@@ -1,8 +1,8 @@
 // YK
 #include "yk__lib.h"
 // --forward declarations-- 
-typedef bool (*ykfncptr0)(struct yk__bstr, int32_t);
-typedef bool (*ykfncptr1)(int32_t, int32_t);
+typedef bool (*yt_fn_in_sr_int_out_bool)(struct yk__bstr, int32_t);
+typedef bool (*yt_fn_in_int_int_out_bool)(int32_t, int32_t);
 bool yy__print_sr(struct yk__bstr, int32_t);
 bool yy__print_add_n(int32_t, int32_t);
 bool yy__print_upto_n(int32_t, int32_t);
@@ -33,7 +33,7 @@ bool yy__print_upto_n(int32_t yy__a, int32_t yy__n)
 int32_t yy__main() 
 {
     yk__printlnstr(">> foreach sr test <<");
-    ykfncptr0 yy__f = yy__print_sr;
+    yt_fn_in_sr_int_out_bool yy__f = yy__print_sr;
     struct yk__bstr* t__0 = NULL;
     yk__arrsetcap(t__0, 5);
     yk__arrput(t__0, yk__bstr_s("Hello", 5));
@@ -63,7 +63,7 @@ int32_t yy__main()
     }
     t__13;
     yk__printlnstr(">> foreach int test <<");
-    ykfncptr1 yy__fi = yy__print_add_n;
+    yt_fn_in_int_int_out_bool yy__fi = yy__print_add_n;
     int32_t* t__15 = NULL;
     yk__arrsetcap(t__15, 10);
     yk__arrput(t__15, INT32_C(1));
