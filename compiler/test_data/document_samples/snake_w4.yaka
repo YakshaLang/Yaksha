@@ -30,6 +30,7 @@ def set_random_point(p: Point) -> Point:
     y: i16 = cast("i16", random.random_u64() % 20u64)
     p.x = x
     p.y = y
+    return p
 
 def random_point() -> Point:
     p: Point = Point()

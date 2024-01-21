@@ -63,3 +63,8 @@ test_data/document_samples/gui_window
 /bin/Release/
 /test_libs/tests
 /test_libs/tests.c
+!test_data/document_samples/wind_tree.yaka.c
+!test_data/document_samples/factorial.yaka.c
+!test_data/document_samples/notes.yaka.c
+!test_data/document_samples/snake_w4.yaka.c
+!test_data/document_samples/threading_test.yaka.c

@@ -109,7 +109,7 @@ def i2s(x: int, target: Array[u8]) -> bool:
     clear_buf(target)
     pos: int = 0
     y: int = x
-    if x > 9999999999 or x < -999999999:
+    if x > 999999999 or x < -99999999:
         target[0] = cast("u8", charat(cast("str", charset), 10))
         return False
     if x < 0:

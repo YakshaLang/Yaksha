@@ -329,6 +329,15 @@ TEST_CASE("compiler: doc sample - wind_tree") {
 TEST_CASE("compiler: doc sample - factorial") {
   test_compile_yaka_file("../test_data/document_samples/factorial.yaka");
 }
+TEST_CASE("compiler: doc sample - notes") {
+  test_compile_yaka_file("../test_data/document_samples/notes.yaka");
+}
+TEST_CASE("compiler: doc sample - snake") {
+  test_compile_yaka_file("../test_data/document_samples/snake_w4.yaka");
+}
+TEST_CASE("compiler: doc sample - threading test") {
+  test_compile_yaka_file("../test_data/document_samples/threading_test.yaka");
+}
 TEST_CASE("compiler: c like for loop") {
   test_compile_yaka_file("../test_data/compiler_tests/for_loop_test.yaka");
 }
