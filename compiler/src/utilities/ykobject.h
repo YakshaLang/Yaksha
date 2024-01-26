@@ -39,12 +39,60 @@
 // ykobject.h
 #ifndef YKOBJECT_H
 #define YKOBJECT_H
+#include "ast/ast.h"
 #include "tokenizer/string_utils.h"
 #include "tokenizer/token.h"
 #include "ykdatatype.h"
 #include "ykdt_pool.h"
 #include <string>
 namespace yaksha {
+  enum class const_fold_type {
+    CFT_INT8,
+    CFT_INT16,
+    CFT_INT32,
+    CFT_INT64,
+    CFT_UINT8,
+    CFT_UINT16,
+    CFT_UINT32,
+    CFT_UINT64,
+    CFT_FLOAT,
+    CFT_DOUBLE,
+    CFT_BOOL,
+    CFT_STRING, /* str, sr, string literal --> will not support strings (some optimizations are done at later stage) */
+    CFT_NONE,
+    CFT_NON_PRIMITIVE, /* array, map, tuple, fixed-array -> will not support */
+    CFT_UNKNOWN,
+    CFT_ERROR_OCCURRED
+    // TODO see if we can remove unused
+  };
+  enum class const_fold_context_type {
+    CFT_EXPR, /* this is an expression that cannot be folded */
+    CFT_STMT,
+    CFT_ERROR_OCCURRED, // TODO perhaps we can remove this?
+    CFT_VALUE, /* this is a folded value */
+               // TODO see if we can remove below
+    CFT_GARBAGE_VALUE /* this is a garbage value, also an expression that cannot be folded */
+  };
+  struct const_fold_value_holder {
+    intmax_t int_val_{0};
+    uintmax_t uint_val_{0};
+    float float_val_{0.0f};
+    double double_val_{0.0};
+    bool bool_val_{false};
+  };
+  struct expr_or_stmt {
+    expr *expr_val_{nullptr};
+    stmt *stmt_val_{nullptr};
+  };
+  struct const_fold_context {
+    const_fold_type fold_type_ = const_fold_type::CFT_UNKNOWN;
+    const_fold_context_type context_type_ = const_fold_context_type::CFT_VALUE;
+    std::string error_msg_{};
+    // values
+    const_fold_value_holder value_{};
+    expr_or_stmt expr_or_stmt_{};
+    token *token_{nullptr};
+  };
   enum class object_type {
     PRIMITIVE_OR_OBJ,
     FUNCTION,
@@ -55,9 +103,13 @@ namespace yaksha {
     MODULE,
     MODULE_CLASS,
     MODULE_FUNCTION,
+    // --------------------
+    // Only used for constant folding
+    CONST_FOLD_VALUE
   };
   struct ykobject {
     ykobject();
+    explicit ykobject(const_fold_context *cfc);
     explicit ykobject(ykdatatype *dt);
     explicit ykobject(int i, ykdt_pool *pool);
     explicit ykobject(bool b, ykdt_pool *pool);
@@ -67,16 +119,17 @@ namespace yaksha {
     explicit ykobject(ykdt_pool *pool);
     [[nodiscard]] bool is_primitive_or_obj() const;
     [[nodiscard]] bool is_a_function() const;
-    int integer_val_{0};
+    int integer_val_{0}; // TODO see if this field can be removed
     std::string string_val_{};
     std::string module_file_{};
     std::string module_name_{};
     bool desugar_rewrite_needed_{false};
     std::string desugar_rewrite_{};
-    double double_val_{};
-    bool bool_val_{};
+    double double_val_{}; // TODO see if this can be removed
+    bool bool_val_{}; // TODO see if this can be removed
     object_type object_type_{object_type::PRIMITIVE_OR_OBJ};
     ykdatatype *datatype_{nullptr};
+    const_fold_context *fold_context_{nullptr};
   };
 }// namespace yaksha
 #endif

@@ -2,59 +2,37 @@
 #ifndef CONST_FOLD_H
 #define CONST_FOLD_H
 #include "ast/ast.h"
+#include "utilities/ykobject.h"
+#include "ast/environment_stack.h"
 namespace yaksha {
-  enum class const_fold_type {
-    CFT_INT8,
-    CFT_INT16,
-    CFT_INT32,
-    CFT_INT64,
-    CFT_UINT8,
-    CFT_UINT16,
-    CFT_UINT32,
-    CFT_UINT64,
-    CFT_FLOAT,
-    CFT_DOUBLE,
-    CFT_BOOL,
-    CFT_STRING, /* str, sr, string literal --> will not support strings (some optimizations are done at later stage) */
-    CFT_NONE,
-    CFT_NON_PRIMITIVE, /* array, map, tuple, fixed-array -> will not support */
-    CFT_UNKNOWN,
-    CFT_ERROR_OCCURRED
-  };
-  enum class const_fold_context_type {
-    CFT_EXPR, /* this is an expression that cannot be folded */
-    CFT_STMT,
-    CFT_ERROR_OCCURRED,
-    CFT_VALUE, /* this is a folded value */
-    CFT_GARBAGE_VALUE /* this is a garbage value, also an expression that cannot be folded */
-  };
-  union const_fold_value_holder {
-    int8_t int8_val_;
-    int16_t int16_val_;
-    int32_t int32_val_;
-    int64_t int64_val_;
-    uint8_t uint8_val_;
-    uint16_t uint16_val_;
-    uint32_t uint32_val_;
-    uint64_t uint64_val_;
-    float float_val_;
-    double double_val_;
-    bool bool_val_;
-  };
-  union expr_or_stmt {
-    expr *expr_val_;
-    stmt *stmt_val_;
-  };
-  struct const_fold_context {
-    ykdatatype *type_ = nullptr;
-    const_fold_type fold_type_ = const_fold_type::CFT_UNKNOWN;
-    const_fold_context_type context_type_ = const_fold_context_type::CFT_VALUE;
-    bool is_const_ = false;
-    std::string error_msg_{};
-    // values
-    const_fold_value_holder value_ = {.int8_val_ = 0};
-    expr_or_stmt expr_or_stmt_ = {.expr_val_ = nullptr};
-    token *token_ = nullptr;
+  struct cf_evaluator {
+    // TODO numeric value casting? think what we can do about it?
+    //   can I use same i64/u64 for all? this might mean how overflow happen in a number might be different isn't it?
+    //   but, we kind of can do it, since we are basically optimizing the code.
+    //   but we should not mix uint / int
+    //   uint -> int, ok? but int -> uint? no, we can't do that
+    //   uint/int -> float -> double ok
+    //   bool -> int/uint/float/double ok
+    explicit cf_evaluator(std::vector<const_fold_context *> *context_pool);
+    ~cf_evaluator() = default;
+    const_fold_context * add(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * sub(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * mul(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * div(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * mod(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * pow(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * bit_and(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * bit_or(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * bit_xor(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * bit_not(const_fold_context *lhs);
+    const_fold_context * bit_lshift(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * bit_rshift(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * logical_and(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * logical_or(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context * logical_not(const_fold_context *lhs);
+    const_fold_context * unary_minus(const_fold_context *lhs);
+    private:
+      std::vector<const_fold_context *> *context_pool_;
   };
   /**
    * Partially evaluates expressions that can be evaluated at compile time
@@ -109,6 +87,7 @@ namespace yaksha {
     std::vector<parsing_error> errors_;
 
 private:
+    environment_stack env_stack_;
     // Why inner is a pointer:
     //  at the start I push global_statements_ to statement_stack_ and it should be the last one remaining
     std::vector<std::vector<const_fold_context *> *> statement_stack_;
@@ -129,6 +108,13 @@ private:
     void error(const std::string &message, token *token);
     void store_statement(stmt *obj);
     const_fold_context *peek_last_or_null();
+    void store_expression(expr *obj);
+    void store(const_fold_context *obj);
+    const_fold_context *pop_last_or_null();
+    expr *pop_last_expr_or_null();
+    token *new_token(token *location_token, token_type token_type,
+                     std::string token_str);
+    expr *to_expr_or_null(const_fold_context *val);
   };
 }// namespace yaksha
 #endif

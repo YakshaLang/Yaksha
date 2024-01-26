@@ -11,15 +11,16 @@ namespace yaksha {
     LT_F64,
     LT_INVALID,
   };
-  union literal_number {
-    intmax_t i64_;
-    uintmax_t u64_;
-    double f64_;
-    float f32_;
+  // TODO can we reuse context data type? or make this usable in constant folding context?
+  struct literal_number {
+    intmax_t i64_{0};
+    uintmax_t u64_{0};
+    float f32_{0.0f};
+    double f64_{0.0};
   };
   struct literal_conversion_result {
     literal_type type_ = literal_type::LT_INVALID;
-    literal_number number_ = {.i64_ = 0};
+    literal_number number_{};
     std::string error_{};
     std::string decimal_string_{};
   };
