@@ -77,3 +77,5 @@ ykobject::ykobject(ykdatatype *dt) {
   object_type_ = object_type::PRIMITIVE_OR_OBJ;
 }
 ykobject::ykobject() : object_type_(object_type::UNKNOWN_OBJECT) {}
+ykobject::ykobject(const_fold_context *fold_context)
+    : fold_context_(fold_context), object_type_(object_type::CONST_FOLD_VALUE) {}
