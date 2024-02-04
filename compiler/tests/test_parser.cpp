@@ -76,6 +76,11 @@ static void test_parser_yaka_file(const std::string &yaka_code_file_input) {
       // -------------------------------------------------------------------
       // AST tokens from snapshot
       auto snapshot_code = read_file(snapshot_filename);
+#ifdef YAKSHA_OS_WINDOWS
+      // fix windows line endings
+      // (git might covert line endings to CRLF)
+      replace_all(snapshot_code, "\r\n", "\n");
+#endif
       tokenizer snapshot_code_tokenizer{"ast_out.l", snapshot_code,
                                         &token_pool};
       snapshot_code_tokenizer.tokenize();
