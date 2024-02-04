@@ -53,6 +53,11 @@ static void test_compile_yaka_file(const std::string &yaka_code_file) {
   std::string c_code_file = yaka_code_file + ".c";
   // load snapshot --> myfile.yaka.c
   std::string snapshot_code = read_file(c_code_file);
+#ifdef YAKSHA_OS_WINDOWS
+  // fix windows line endings
+  // (git might covert line endings to CRLF)
+  replace_all(snapshot_code, "\r\n", "\n");
+#endif
   std::vector<token *> token_snapshot;
   tokenizer c_code_snapshot{"output.c", snapshot_code, &token_pool};
   c_code_snapshot.tokenize();
