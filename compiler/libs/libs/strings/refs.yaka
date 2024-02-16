@@ -1,0 +1,16 @@
+import libs.c
+
+@native("yk__bstr_get_reference")
+def unwrap(a: sr) -> Const[c.CStr]:
+    # Get internal string reference from sr
+    pass
+
+@native("yk__bstr_c")
+def wrap_cstr(s: c.CStr, length: int) -> sr:
+    # Wrap a c.CStr as a sr
+    pass
+
+def wrap(s: sr) -> sr:
+    # Wrap a str/literal/sr (if a sr is passed in reference is not wrapped again) as sr
+    # This takes advantage of the auto-casting
+    return s

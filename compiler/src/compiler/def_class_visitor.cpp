@@ -174,11 +174,13 @@ void def_class_visitor::visit_nativeconst_stmt(nativeconst_stmt *obj) {
           "Should be Const[x], only single data type can be specified");
     return;
   }
+#ifdef YAKSHA_NATIVE_CONST_ONLY_NUM
   if (!obj->data_type_->args_[0]->is_a_number() &&
       !obj->data_type_->args_[0]->is_bool()) {
     error(obj->name_, "Only number and boolean constants are supported.");
     return;
   }
+#endif
   global_native_const_names_.push_back(name);
   global_native_consts_.insert({name, obj});
 }
