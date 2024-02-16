@@ -1395,10 +1395,10 @@ std::vector<token *> yaksha_macros::expand_dsl(
     };
   }
   if (env->has_map(KEY_IMPORT_REFERENCE)) {
-    env->set(KEY_IMPORT_REFERENCE, env->create_string(KEY_IMPORT_REFERENCE),
+    env->set(KEY_IMPORT_REFERENCE, env->create_string(imported_macro),
              false);
   } else {
-    env->set(KEY_IMPORT_REFERENCE, env->create_string(KEY_IMPORT_REFERENCE),
+    env->set(KEY_IMPORT_REFERENCE, env->create_string(imported_macro),
              true);
   }
   yaksha_lisp_value *result = nullptr;
