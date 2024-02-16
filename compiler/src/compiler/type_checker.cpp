@@ -747,6 +747,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     bool has_func = imported->data_->dsv_->has_function(member_item->token_);
     bool has_class = imported->data_->dsv_->has_class(member_item->token_);
     bool has_const = imported->data_->dsv_->has_const(member_item->token_);
+    bool has_native_const = imported->data_->dsv_->has_native_const(member_item->token_);
     auto obj = ykobject(dt_pool_);
     if (has_class) {
       obj.object_type_ = object_type::MODULE_CLASS;
@@ -759,10 +760,17 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
       obj.string_val_ = member_item->token_;
       obj.module_file_ = lhs.string_val_;
       obj.module_name_ = lhs.module_name_;
-    } else if (has_const) {
-      auto glob = imported->data_->dsv_->get_const(member_item->token_);
+    } else if (has_const || has_native_const) {
+      ykdatatype *dt;
+      if (has_const) {
+        auto glob = imported->data_->dsv_->get_const(member_item->token_);
+        dt = glob->data_type_;
+      } else {
+        auto glob = imported->data_->dsv_->get_native_const(member_item->token_);
+        dt = glob->data_type_;
+      }
       obj.object_type_ = object_type::PRIMITIVE_OR_OBJ;
-      obj.datatype_ = glob->data_type_;
+      obj.datatype_ = dt;
       obj.string_val_ = member_item->token_;
       obj.module_file_ = lhs.string_val_;
       obj.module_name_ = lhs.module_name_;
