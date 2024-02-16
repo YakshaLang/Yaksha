@@ -44,6 +44,10 @@ import libs.os.path
 import libs.io
 import libs.console
 
+CLANG: Const[int] = 44
+GCC: Const[int] = 33
+NOT_FOUND: Const[int] = 0
+
 class CCode:
     # CCode section of yaksha.toml
     # defines - Injected defines for the generated c code
@@ -95,6 +99,8 @@ class Config:
     emcc_compiler_path: str
     gcc_compiler_path: str
     clang_compiler_path: str
+    alt_compiler: int
+    use_alt_compiler: bool
     emrun_path: str
     w4_path: str
     c_code: CCode
@@ -174,10 +180,36 @@ def find_zig_compiler(c: Config) -> None:
     if len(zig) > 0:
         c.zig_compiler_path = zig
         return
-    # Not finding zig is a problem if we are not building for web
-    if not c.compilation.web:
+    # -------------------------------------
+    # WASM4 compilation require zig
+    if c.compilation.wasm4:
         arrput(c.errors, "Failed to find zig in PATH")
+        c.zig_compiler_path = "<not found>"
+        return
+    # -------------------------------------
+    # Let's attempt to use gcc or clang as a fallback
+    gcc: str = os.which("gcc")
+    clang: str = os.which("clang")
+    found_altenative = len(gcc) > 0 or len(clang) > 0
+    c.alt_compiler = NOT_FOUND
+    # -------------------------------------
+    if len(gcc) > 0:
+        c.gcc_compiler_path = gcc
+        c.alt_compiler = GCC
+    else:
+        c.gcc_compiler_path = "<not found>"
+    # -------------------------------------
+    if len(clang) > 0:
+        c.clang_compiler_path = clang
+        c.alt_compiler = CLANG
+    else:
+        c.clang_compiler_path = "<not found>"
+    # -------------------------------------
+    # Not finding zig is a problem if we are not building for web
+    if not c.compilation.web and not found_altenative:
+        arrput(c.errors, "Failed to find zig/clang/gcc in PATH")
     c.zig_compiler_path = "<not found>"
+    c.use_alt_compiler = found_altenative
 
 def find_emsdk(c: Config) -> None:
     # Find emcc/emrun(.exe) binary file

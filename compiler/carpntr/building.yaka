@@ -5,36 +5,36 @@
 # Note: libs - MIT license, runtime/3rd - various
 # ==============================================================================================
 # GPLv3:
-# 
+#
 # Yaksha - Programming Language.
 # Copyright (C) 2020 - 2024 Bhathiya Perera
-# 
+#
 # This program is free software: you can redistribute it and/or modify it under the terms
 # of the GNU General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see https://www.gnu.org/licenses/.
-# 
+#
 # ==============================================================================================
 # Additional Terms:
-# 
+#
 # Please note that any commercial use of the programming language's compiler source code
 # (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
 # with author of the language (Bhathiya Perera).
-# 
+#
 # If you are using it for an open source project, please give credits.
 # Your own project must use GPLv3 license with these additional terms.
-# 
+#
 # You may use programs written in Yaksha/YakshaLisp for any legal purpose
 # (commercial, open-source, closed-source, etc) as long as it agrees
 # to the licenses of linked runtime libraries (see compiler/runtime/README.md).
-# 
+#
 # ==============================================================================================
 import libs.console
 import libs.io
@@ -242,6 +242,11 @@ def is_arm64_cpu() -> bool:
     #endif
     """
 
+def get_alt_compiler(c: carp.Config) -> str:
+    if c.alt_compiler == carp.GCC:
+        return c.gcc_compiler_path
+    return c.clang_compiler_path
+
 def create_args(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> Array[str]:
     # Create arguments for compilation on to a string array
     # This string array need to be deleted
@@ -251,19 +256,33 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     buildable_objects: Array[BObject]
     ray_objects: Array[str] = filter(raylib_args, keep_ray_objects, False)
     ray_other_args: Array[str] = filter(raylib_args, keep_ray_objects, True)
+    alt_compiler: str = ""
+    if c.use_alt_compiler:
+        alt_compiler = get_alt_compiler(c)
     defer sarr.del_str_array(ray_objects)
     defer sarr.del_str_array(ray_other_args)
     if c.compilation.wasm4:
+        # We cannot use alt compiler for wasm4
         args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Wno-newline-eof", "-Wno-parentheses-equality", "-MMD", "-MP", "-Oz")
     elif c.compilation.web:
+        # We cannot use alt compiler or zig for web
         args = array("str", c.emcc_compiler_path, "-std=c99", "-Oz", "-Wno-newline-eof", "-Wno-parentheses-equality")
     elif c.compilation.raylib_hot_reloading_dll:
         # Reduce the compilation level if we are doing hot reloading
-        args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-O1", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
+        if c.use_alt_compiler:
+            args = array("str", alt_compiler, "-std=c99", "-O1", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
+        else:
+            args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-O1", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
     elif c.compilation.disable_parallel_build:
-        args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-O0", "-fPIC")
+        if c.use_alt_compiler:
+            args = array("str", alt_compiler, "-std=c99", "-O0", "-fPIC")
+        else:
+            args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-O0", "-fPIC")
     else:
-        args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
+        if c.use_alt_compiler:
+            args = array("str", alt_compiler, "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
+        else:
+            args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
     # If not macos do link time optimization
     # If we are hot reloading, do not waste time with actually doing link time optimization and wasting time
     if not is_target_macos(target) and not c.compilation.raylib_hot_reloading_dll and not c.compilation.disable_parallel_build:
@@ -303,7 +322,7 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         arrput(args, "-target")
         arrput(args, "wasm32-wasi-musl")
     # m1/m2/etc must not build for native, instead build for "aarch64-macos-gnu"
-    if native and is_arm64_cpu() and is_target_macos(target):
+    if native and is_arm64_cpu() and is_target_macos(target) and not c.use_alt_compiler:
         arrput(args, "-target")
         arrput(args, "aarch64-macos-gnu")
     # runtime c codes
@@ -440,6 +459,9 @@ def build(c: carp.Config, code: str) -> int:
         target = "web"
 
     target_count: int = len(c.compilation.targets)
+    # Disable cross compilation if we are using an alt compiler
+    if c.use_alt_compiler:
+        target_count = 0
     raylib_args: Array[str]
     defer sarr.del_str_array(raylib_args)
 
@@ -474,7 +496,7 @@ def build(c: carp.Config, code: str) -> int:
 
     # Building other targets
     cnt: int = 0
-    while cnt < len(c.compilation.targets):
+    while cnt < target_count:
         target = c.compilation.targets[cnt]
         failed_count = failed_count + build_target(c, code_path, build_path, target, raylib_args, False)
         cnt = cnt + 1
