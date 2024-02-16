@@ -1,0 +1,28 @@
+class A:
+    a: str
+
+def new_a() -> A:
+    x = A()
+    x.a = "hello world"
+    return x
+
+def del_a(x: A) -> None:
+    del x.a
+    del x
+
+def get_a(x: A) -> str:
+    a = x.a
+    return a
+
+def use_a(x: A) -> None:
+    y: str = ""
+    y = get_a(x)
+    println(y)
+
+def main() -> int:
+    x = new_a()
+    defer del_a(x)
+    use_a(x)
+    use_a(x)
+    use_a(x)
+    0

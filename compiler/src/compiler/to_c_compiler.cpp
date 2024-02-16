@@ -53,6 +53,8 @@ to_c_compiler::~to_c_compiler() {
   delete desugar_;
 }
 void to_c_compiler::visit_assign_expr(assign_expr *obj) {
+  LOG_COMP("assign: " << obj->name_->token_ << " " << obj->opr_->token_ << " "
+                      << obj->right_->locate()->token_ << " | promoted = " << obj->promoted_);
   if (obj->promoted_) {
     auto let_st = ast_pool_->c_let_stmt(obj->name_, nullptr, obj->right_);
     let_st->accept(this);
@@ -370,9 +372,11 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
   auto name_pair = pop();
   auto name = name_pair.first;
+  LOG_COMP("fncall: " << name << " args = " << obj->args_.size());
   std::stringstream code{};
   // Depending on the fact that this is a function or class, we will call or create object
   if (name_pair.second.object_type_ == object_type::BUILTIN_FUNCTION) {
+    LOG_COMP("builtin: "<< name);
     std::vector<std::pair<std::string, ykobject>> args{};
     int i = 0;
     for (auto arg : obj->args_) {
@@ -393,6 +397,8 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
     auto module_file = name_pair.second.module_file_;
     auto module_class = name_pair.second.string_val_;
     auto module_prefix = cf_->get_or_null(module_file)->prefix_;
+    LOG_COMP("module class: " << name << " file=" << module_file << " class=" << module_class
+                              << " prefix=" << module_prefix);
     auto class_ =
         cf_->get_or_null(module_file)->data_->dsv_->get_class(module_class);
     if (class_->annotations_.on_stack_) {
@@ -407,6 +413,8 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
     auto module_info = cf_->get_or_null(module_file);
     auto module_prefix = module_info->prefix_;
     auto prefixed_fn_name = prefix(module_fn, module_prefix);
+    LOG_COMP("module function: " << name << " file=" << module_file << " fn=" << module_fn
+                                 << " prefix=" << module_prefix);
     auto fndef = module_info->data_->dsv_->get_function(module_fn);
     auto fn_return = fndef->return_type_;
     std::vector<ykdatatype *> params{};
@@ -415,6 +423,7 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
     compile_function_call(obj, prefixed_fn_name, code, fn_return, params,
                           fndef->annotations_.varargs_);
   } else if (defs_classes_.has_function(name)) {
+    LOG_COMP("local_function: " << name);
     auto fn_def = defs_classes_.get_function(name);
     auto return_type = fn_def->return_type_;
     std::vector<ykdatatype *> params{};
@@ -423,13 +432,15 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
     compile_function_call(obj, prefix(name, prefix_val_), code, return_type,
                           params, fn_def->annotations_.varargs_);
   } else if (defs_classes_.has_class(name)) {
+    LOG_COMP("local_class:" << name);
     auto class_ = defs_classes_.get_class(name);
     if (class_->annotations_.on_stack_) {
       error(obj->paren_token_, "Cannot construct an @onstack object");
     }
     compile_obj_creation(prefix(name, prefix_val_), code,
-                         dt_pool_->create(name));
+                         dt_pool_->create(name, this->filepath_));
   } else if (name_pair.second.datatype_->is_function()) {
+    LOG_COMP("function_pointer: " << name);
     auto ret_type = name_pair.second.datatype_->args_[1];
     ykdatatype *return_type;
     if (ret_type->args_.empty()) {
@@ -807,6 +818,7 @@ void to_c_compiler::visit_def_stmt(def_stmt *obj) {
 #ifdef YAKSHA_DEADCODE_ELIMINATION
   if (obj->hits_ == 0) { return; }
 #endif
+  LOG_COMP("compiling def_stmt: " << obj->name_->token_);
   auto name = prefix(obj->name_->token_, prefix_val_);
   if (obj->annotations_.native_define_) {
     struct_forward_declarations_ << "#define " << name << " "
@@ -991,6 +1003,7 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
   LOG_COMP("let lhs: " << name);
   // infer data type based on RHS if we do not have a data type here
   if (obj->data_type_ == nullptr) {
+    LOG_COMP("need to infer type for let: " << name);
     visited_expr = true;
     resulting_pair = compile_expression(obj->expression_);
     if (resulting_pair.second.is_a_function()) {
