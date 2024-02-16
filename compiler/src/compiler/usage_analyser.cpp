@@ -292,10 +292,10 @@ void usage_analyser::visit_const_stmt(const_stmt *obj) {
 }
 void usage_analyser::visit_continue_stmt(continue_stmt *obj) { obj->hits_++; }
 void usage_analyser::visit_def_stmt(def_stmt *obj) {
-  LOG_COMP("usage_analyser: def - " << obj->name_->token_
-                                    << " hits = " << obj->hits_);
   if (obj->hits_ > 0) { return; }
   obj->hits_++;
+  LOG_COMP("usage_analyser: def - " << obj->name_->token_
+                                    << " hits = " << obj->hits_);
   for (auto &p : obj->params_) { this->visit_data_type(p.data_type_, p.name_); }
   obj->function_body_->accept(this);
 }

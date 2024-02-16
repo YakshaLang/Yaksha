@@ -374,3 +374,6 @@ TEST_CASE("compiler: fixed arrays - structure data types") {
   test_compile_yaka_file(
       "../test_data/compiler_tests/arrays/fixed_arr_structure.yaka");
 }
+TEST_CASE("compiler: bug-fix - access struct str member") {
+  test_compile_yaka_file("../test_data/bug_fixes/struct_str_return.yaka");
+}

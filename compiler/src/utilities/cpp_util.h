@@ -121,6 +121,9 @@ constexpr auto operator+(T e) noexcept
 #endif
 // -----------------------
 // ------------- debug logs for compiling ---------
+// Enable below for compiler / macro debugging
+// #define PRINT_PREPROCESSOR_OUTPUT
+// #define YAKSHA_DEBUG_COMPILE
 #ifdef YAKSHA_DEBUG_COMPILE
 #define LOG_COMP(msg) YAKSHA_DEBUG_LOG("[COMP] " << msg)
 #else

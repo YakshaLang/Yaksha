@@ -257,6 +257,8 @@ struct builtin_print : builtin {
     } else if (dt->is_none()) {
       code << "yk__" << func_name_ << "str(\"None\")";
     } else if (dt->is_bool()) {
+      // If bool is a literal just print a string literal
+      //   else use a conditional
       if (rhs.first == "true") {
         code << "yk__" << func_name_ << "str(\"True\")";
       } else if (rhs.first == "false") {
