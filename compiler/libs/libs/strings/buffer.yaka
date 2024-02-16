@@ -19,34 +19,46 @@ def new_size(s: int) -> StringBuffer:
     return srr"""
 
 @native
-def append(buf: StringBuffer, v: str) -> None:
+def append(buf: StringBuffer, v: sr) -> None:
     # Append a string to string buffer
-    ccode """nn__buf[0] = yk__sdscatsds(nn__buf[0], nn__v);
-    yk__sdsfree(nn__v)"""
+    ccode """nn__buf[0] = yk__sdscatlen(nn__buf[0], yk__bstr_get_reference(nn__v), yk__bstr_len(nn__v))"""
 
 @native
-def prepend(buf: StringBuffer, v: str) -> None:
+def prepend(buf: StringBuffer, v: sr) -> None:
     # Prepend a string to string buffer
     ccode """yk__sds tmp = nn__buf[0];
-    nn__buf[0] = yk__sdscatsds(nn__v, nn__buf[0]);
+    nn__buf[0] = yk__sdscatsds(yk__bstr_copy_to_sds(nn__v), nn__buf[0]);
     yk__sdsfree(tmp);"""
 
 @native
 def to_str(buf: StringBuffer) -> str:
-    # Get a new string out of string buffer
+    # Get a new string copy out of string buffer
     ccode """return yk__sdsdup(nn__buf[0])"""
 
 @native
-def join(buf: StringBuffer, values: Array[str], sep: str) -> None:
+def to_sr(buf: StringBuffer) -> sr:
+    # Get a string reference out of string buffer
+    ccode """return yk__bstr_h(nn__buf[0])"""
+
+@native
+def join(buf: StringBuffer, values: Array[str], sep: sr) -> None:
     # Join given values in array with provided seperator and append this to string
     ccode """if (NULL == nn__values) {
-        yk__sdsfree(nn__sep);
         return;
     }
-    yk__sds tmp = yk__sdsjoinsds(nn__values, yk__arrlen(nn__values), nn__sep, yk__sdslen(nn__sep));
+    yk__sds tmp = yk__sdsjoinsds(nn__values, yk__arrlen(nn__values), yk__bstr_get_reference(nn__sep), yk__bstr_len(nn__sep));
     nn__buf[0] = yk__sdscatsds(nn__buf[0], tmp);
-    yk__sdsfree(tmp);
-    yk__sdsfree(nn__sep)"""
+    yk__sdsfree(tmp)"""
+
+def join_sr(buf: StringBuffer, values: Array[sr], sep: sr) -> None:
+    # Join given values in array with provided seperator and append this to string buffer
+    length = len(values)
+    if (length == 0):
+        return
+    for (i = 0; i < length; i = i + 1):
+        append(buf, values[i])
+        if (i < length - 1):
+            append(buf, sep)
 
 @native
 def del_buf(buf: StringBuffer) -> None:

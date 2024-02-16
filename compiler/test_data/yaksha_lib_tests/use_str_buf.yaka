@@ -1,0 +1,27 @@
+import libs.strings.buffer as b
+import libs.strings.array as sarr
+
+def use_str_buf() -> None:
+    b1 = b.new()
+    defer b.del_buf(b1)
+    data = sarr.new(2, "Hello", "World")
+    defer sarr.del_str_array(data)
+
+    b.join(b1, data, ",")
+    b.prepend(b1, "str: ")
+    println(b.to_sr(b1))
+
+def use_sr_buf() -> None:
+    b1 = b.new()
+    defer b.del_buf(b1)
+    data = array("sr", "Hello", "World")
+    defer del data
+
+    b.join_sr(b1, data, ",")
+    b.prepend(b1, "sr: ")
+    println(b.to_sr(b1))
+
+def main() -> int:
+    use_str_buf()
+    use_sr_buf()
+    0

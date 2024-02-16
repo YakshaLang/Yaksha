@@ -40,5 +40,3 @@ yk__sds yk__concat_lit_lit(const char* lhs, size_t lhs_len, const char* rhs, siz
 
 size_t yk__bstr_len(struct yk__bstr b);
 const char* yk__bstr_get_reference(struct  yk__bstr b);
-// TODO use c99 model to inline these at somepoint https://www.greenend.org.uk/rjk/tech/inline.html
-//  Also see sds code, it also uses static inline, we can use that
