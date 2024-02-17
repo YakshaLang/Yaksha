@@ -297,6 +297,7 @@ void usage_analyser::visit_def_stmt(def_stmt *obj) {
   LOG_COMP("usage_analyser: def - " << obj->name_->token_
                                     << " hits = " << obj->hits_);
   for (auto &p : obj->params_) { this->visit_data_type(p.data_type_, p.name_); }
+  this->visit_data_type(obj->return_type_, obj->name_);
   obj->function_body_->accept(this);
 }
 void usage_analyser::visit_defer_stmt(defer_stmt *obj) {
