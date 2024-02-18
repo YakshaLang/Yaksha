@@ -13,7 +13,7 @@ macros! {
         (list (yk_create_token YK_TOKEN_NAME "inlinec")
             (ykt_paren_open)
             (ykt_string (+ "Const[" yk_import_ref ".Char]")) (ykt_comma)
-            (ykt_string (+ "'" elem::value "'") (ykt_paren_close))))
+            (ykt_string (+ "'" elem::value "'")) (ykt_paren_close)))
     (yk_register {dsl const_str const_str})
     (yk_register {dsl cstr cstr})
     # c.const_str!{"Hi"} --> create a const char * const --> inlinec("Const[Ptr[Const[Char]]]", "\"Hi\"")

@@ -1759,3 +1759,23 @@ yaksha_lisp_builtins::os_shell_(const std::vector<yaksha_lisp_value *> &args,
   auto result = exec(cmd_args);
   return env->create_number(result);
 }
+yaksha_lisp_value *yaksha_lisp_builtins::explode_string_(
+    const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env) {
+  if (args.size() != 1) {
+    throw parsing_error{"explode_string takes 1 argument", "", 0, 0};
+  }
+  auto e_args = eval_args(args, env);
+  auto arg = e_args[0];
+  if (arg->type_ != yaksha_lisp_value_type::STRING) {
+    throw parsing_error{"explode_string takes a string as argument", "", 0, 0};
+  }
+  auto result = env->create_val();
+  result->type_ = yaksha_lisp_value_type::LIST;
+  for (auto c : arg->str_) {
+    auto val = env->create_val();
+    val->type_ = yaksha_lisp_value_type::STRING;
+    val->str_ = c;
+    result->list_.push_back(val);
+  }
+  return result;
+}

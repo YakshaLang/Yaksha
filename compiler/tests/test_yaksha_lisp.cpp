@@ -425,6 +425,15 @@ TEST_CASE("yaksha_lisp: test pop") {
     (if (and (== (pop x) 3) (== x (list 1 2))) (= success 1))
     )");
 }
+TEST_CASE("yaksha_lisp: test explode string") {
+  test_snippet_execute(R"(
+    (= x (explode_string "123"))
+    (= x (tail x))
+    (pop x)
+    (= s (reduce + x))
+    (if (== s "2") (= success 1))
+    )");
+}
 TEST_CASE("yaksha_lisp: test lambda") {
   test_snippet_execute(R"(
     (if (== ((lambda (x) (+ x 1)) 1) 2) (= success 1))
