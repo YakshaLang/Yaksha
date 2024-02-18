@@ -222,3 +222,7 @@ def memset(dest: VoidPtr, character: CInt, size: Size) -> VoidPtr:
 @nativedefine("memcmp")
 def memcmp(str1: VoidPtr, str2: VoidPtr, size: Size) -> CInt:
     pass
+
+@nativedefine("strlen")
+def cstrlen(s: CStr) -> Size:
+    pass
