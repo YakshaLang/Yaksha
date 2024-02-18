@@ -3,6 +3,7 @@
   "test_data/bad_inputs/arrput_map.yaka": "arrput_map.yaka:5:16 at \")\" --> arrput() does not work with maps\n\nreturn := 255",
   "test_data/bad_inputs/bad_input_sort_with_wrong_args.yaka": "bad_input_sort_with_wrong_args.yaka:32:21 at \")\" --> Comparison must match with Function[In[Const[AnyPtrToConst],Const[AnyPtrToConst]],Out[int]]\n\nreturn := 255",
   "test_data/bug_fixes/comment_break_indent.yaka": "3\n\nreturn := 0",
+  "test_data/bug_fixes/struct_str_return.yaka": "hello world\nhello world\nhello world\n\nreturn := 0",
   "test_data/byol/lisp.yaka": "error: FileNotFound\n\nreturn := 255",
   "test_data/compiler_tests/all_integers.yaka": "\n\nreturn := 0",
   "test_data/compiler_tests/array_test.yaka": "Printing [a]\n1\n2\n3\n4\n5\n6\n7\nPrinting [b]\nHello\nWorld\nHaha\n\nreturn := 0",
@@ -92,5 +93,6 @@
   "test_data/sample_negative_numbers.yaka": "sample_negative_numbers.yaka:1:1 at \"a\" --> Invalid statement detected. Only def, class, import, runtimefeature or constant statements are supported at module level.\nCritical !! main() function must be present\n\nreturn := 255",
   "test_data/simple_programs/defer_test.yaka": "1\n2\n3\n4\n\nreturn := 0",
   "test_data/test_compiler.yaka": "3628800\n362880\n40320\n5040\n720\n120\n24\n6\n2\n1\naaaaaaaaaab\n2 From defer --> Program Completed\n1 From defer --> Program Completed\n\nreturn := 0",
+  "test_data/yaksha_lib_tests/use_str_buf.yaka": "str: Hello,World\nsr: Hello,World\n\nreturn := 0",
   "test_libs/tests.yaka": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\u2566 \u2566\u2554\u2550\u2557\u2566\u2554\u2550\u250c\u2500\u2510\u252c \u252c\u2554\u2550\u2557\n\u255a\u2566\u255d\u2560\u2550\u2563\u2560\u2569\u2557\u2514\u2500\u2510\u251c\u2500\u2524\u2560\u2550\u2563\n \u2569 \u2569 \u2569\u2569 \u2569\u2514\u2500\u2518\u2534 \u2534\u2569 \u2569\n  \u2554\u2566\u2557\u2554\u2550\u2557\u2554\u2550\u2557\u2554\u2566\u2557\u2554\u2550\u2557\n   \u2551 \u2551\u2563 \u255a\u2550\u2557 \u2551 \u255a\u2550\u2557\n   \u2569 \u255a\u2550\u255d\u255a\u2550\u255d \u2569 \u255a\u2550\u255d\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nTEST - assumptions\n  success <- char is 1 byte\n  success <- int is 4 byte\nTEST - libs.strings.contains\n  success <- strings.contains(\"\", \"\")\n  success <- strings.contains(\"a\", \"a\")\n  success <- strings.contains(\"ab\", \"a\")\n  success <- strings.contains(\"a\", \"ab\")\nTEST - libs.strings.startswith\n  success <- strings.startswith(\"\", \"\")\n  success <- strings.startswith(\"a\", \"a\")\n  success <- strings.startswith(\"ab\", \"a\")\n\nreturn := 0"
 }

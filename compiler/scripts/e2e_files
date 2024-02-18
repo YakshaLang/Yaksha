@@ -93,4 +93,4 @@ test_data/compiler_tests/string_tests/strings_const_mixed_tests.yaka
 test_data/compiler_tests/arrays/simple_fixed_arr.yaka
 test_data/compiler_tests/arrays/fixed_arr_loop.yaka
 test_data/yaksha_lib_tests/use_str_buf.yaka
-test_data/compiler_tests/arrays/struct_str_return.yaka
+test_data/bug_fixes/struct_str_return.yaka
