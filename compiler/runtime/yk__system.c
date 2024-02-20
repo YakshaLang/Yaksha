@@ -132,9 +132,11 @@ void yk__printlnstr(const char *str) {
 #if defined(_WIN32) || defined(_WIN64)
 #include <direct.h>
 #define GetCurrentDir _wgetcwd
+#define ChangeDirectory _wchdir
 #else
 #include <unistd.h>
 #define GetCurrentDir getcwd
+#define ChangeDirectory chdir
 #endif
 char *yk__get_current_dir_path() {
 #if defined(_WIN32) || defined(_WIN64)
@@ -155,6 +157,26 @@ char *yk__get_current_dir_path() {
     return NULL;
   }
   return buff;
+#endif
+}
+bool yk__change_current_dir_path(yk__sds path) {
+  if (path == NULL || !yk__sdslen(path)) {
+    yk__sdsfree(path);
+    return false;
+  }
+#if defined(_WIN32) || defined(_WIN64)
+  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(path);
+  if (wpath == NULL) {
+    return false;
+  }
+  int result = ChangeDirectory(wpath);
+  yk__sdsfree(path);
+  free(wpath);
+  return result == 0;
+#else
+  int result = ChangeDirectory(path);
+  yk__sdsfree(path);
+  return result == 0;
 #endif
 }
 ////// File stuff ///////////

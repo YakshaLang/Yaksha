@@ -53,6 +53,10 @@ def cwd() -> str:
     free(path);
     return value"""
 
+@nativedefine("yk__change_current_dir_path")
+def chdir(path: str) -> bool:
+    # Change current working directory
+    pass
 
 @nativedefine("struct yk__process_result*")
 class ProcessResult:
