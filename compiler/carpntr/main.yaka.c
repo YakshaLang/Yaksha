@@ -690,7 +690,6 @@ yk__sds* yy__raylib_support_get_raylib_args(struct yy__configuration_Config* yy_
         yy__raylib_support_arguments = yy__array_extend(yy__raylib_support_arguments, yy__raylib_support_o_files);
         if (yy__os_is_windows())
         {
-            yk__arrput(yy__raylib_support_arguments, yk__sdsnewlen("-Wl,--subsystem,windows", 23));
             yk__arrput(yy__raylib_support_arguments, yk__sdsnewlen("-DYK__WINDOWS_HIDE_CONSOLE", 26));
         }
     }
