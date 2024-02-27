@@ -10,13 +10,14 @@ class Utf8IterateState:
     codepoint: int
 
 @native
-def new_iter(s: str) -> Utf8IterateState:
+def new_iter(s: sr) -> Utf8IterateState:
     # Create a new iterator from given string
     ccode """struct utf8proc_iter_state* x = calloc(1, sizeof(struct utf8proc_iter_state));
     if (x == NULL) return x;
-    x->str_original = (utf8proc_uint8_t *) nn__s;
-    x->str_position = (utf8proc_uint8_t *) nn__s;
-    x->length = yk__sdslen(nn__s);
+    const char* s = yk__bstr_get_reference(nn__s);
+    x->str_original = (utf8proc_uint8_t *) s;
+    x->str_position = (utf8proc_uint8_t *) s;
+    x->length = yk__bstr_len(nn__s);
     x->step_size = 0;
     x->codepoint = -1;
     return x"""
@@ -24,7 +25,7 @@ def new_iter(s: str) -> Utf8IterateState:
 @native
 def del_iter(s: Utf8IterateState) -> None:
     # Delete the iterator object after done
-    ccode """yk__sdsfree((yk__sds)nn__s->str_original);
+    ccode """if (nn__s == NULL) return;
     free(nn__s)"""
 
 @native

@@ -22,25 +22,22 @@ def valid_array(x: TomlArray) -> bool:
     ccode """(NULL != nn__x)"""
 
 @native
-def from_str(x: str) -> Table:
+def from_str(x: sr) -> Table:
     # Parse to a TOML Table from given string
     ccode """char errbuf[200];
-    toml_table_t* t = toml_parse(nn__x, errbuf, sizeof(errbuf));
-    yk__sdsfree(nn__x);
+    toml_table_t* t = toml_parse(yk__bstr_get_reference(nn__x), errbuf, sizeof(errbuf));
     return t"""
 
 @native
-def get_table(x: Table, name: str) -> Table:
+def get_table(x: Table, name: sr) -> Table:
     # Get a Table from given name
-    ccode """toml_table_t* t = toml_table_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
+    ccode """toml_table_t* t = toml_table_in(nn__x, yk__bstr_get_reference(nn__name));
     return t"""
 
 @native
-def get_array(x: Table, name: str) -> TomlArray:
+def get_array(x: Table, name: sr) -> TomlArray:
     # Get any array from table object
-    ccode """toml_array_t* t = toml_array_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
+    ccode """toml_array_t* t = toml_array_in(nn__x, yk__bstr_get_reference(nn__name));
     return t"""
 
 @native
@@ -50,10 +47,9 @@ def array_len(x: TomlArray) -> int:
     return toml_array_nelem(nn__x)"""
 
 @native
-def get_string(x: Table, name: str) -> str:
+def get_string(x: Table, name: sr) -> str:
     # Get a string from table or empty if fails
-    ccode """toml_datum_t v = toml_string_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
+    ccode """toml_datum_t v = toml_string_in(nn__x, yk__bstr_get_reference(nn__name));
     if (v.ok) {
         yk__sds s = yk__sdsnew(v.u.s);
         free(v.u.s);
@@ -62,53 +58,47 @@ def get_string(x: Table, name: str) -> str:
     return yk__sdsempty()"""
 
 @native
-def get_string_default(x: Table, name: str, default: str) -> str:
+def get_string_default(x: Table, name: sr, default: sr) -> str:
     # Get a string from table or given default
-    ccode """toml_datum_t v = toml_string_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
+    ccode """toml_datum_t v = toml_string_in(nn__x, yk__bstr_get_reference(nn__name));
     if (v.ok) {
         yk__sds s = yk__sdsnew(v.u.s);
         free(v.u.s);
-        yk__sdsfree(nn__default);
         return s;
     }
-    return nn__default"""
+    return yk__bstr_copy_to_sds(nn__default)"""
 
 @native
-def get_bool(x: Table, name: str) -> bool:
+def get_bool(x: Table, name: sr) -> bool:
     # Get a bool from table or false if fails
-    ccode """toml_datum_t v = toml_bool_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
+    ccode """toml_datum_t v = toml_bool_in(nn__x, yk__bstr_get_reference(nn__name));
     if (v.ok) {
         return (1 == v.u.b);
     }
     return false"""
 
 @native
-def get_bool_default(x: Table, name: str, default: bool) -> bool:
+def get_bool_default(x: Table, name: sr, default: bool) -> bool:
     # Get a bool from table or given default
-    ccode """toml_datum_t v = toml_bool_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
+    ccode """toml_datum_t v = toml_bool_in(nn__x, yk__bstr_get_reference(nn__name));
     if (v.ok) {
         return (1 == v.u.b);
     }
     return nn__default"""
 
 @native
-def get_int(x: Table, name: str) -> int:
+def get_int(x: Table, name: sr) -> int:
     # Get an int from table or 0 if fails
-    ccode """toml_datum_t v = toml_int_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
+    ccode """toml_datum_t v = toml_int_in(nn__x, yk__bstr_get_reference(nn__name));
     if (v.ok) {
         return v.u.i;
     }
     return 0"""
 
 @native
-def get_int_default(x: Table, name: str, default: int) -> int:
+def get_int_default(x: Table, name: sr, default: int) -> int:
     # Get an int from table or given default
-    ccode """toml_datum_t v = toml_int_in(nn__x, nn__name);
-    yk__sdsfree(nn__name);
+    ccode """toml_datum_t v = toml_int_in(nn__x, yk__bstr_get_reference(nn__name));
     if (v.ok) {
         return v.u.i;
     }
@@ -129,16 +119,15 @@ def string_at(x: TomlArray, pos: int) -> str:
     return yk__sdsempty()"""
 
 @native
-def string_at_default(x: TomlArray, pos: int, default: str) -> str:
+def string_at_default(x: TomlArray, pos: int, default: sr) -> str:
     # Get string from array at location or given default
     ccode """toml_datum_t v = toml_string_at(nn__x, nn__pos);
     if (v.ok) {
         yk__sds s = yk__sdsnew(v.u.s);
         free(v.u.s);
-        yk__sdsfree(nn__default);
         return s;
     }
-    return nn__default"""
+    return yk__bstr_copy_to_sds(nn__default)"""
 
 @native
 def bool_at(x: TomlArray, pos: int) -> bool:
@@ -178,7 +167,7 @@ def int_at_default(x: TomlArray, pos: int, default: int) -> int:
 
 ############ Convenient methods
 
-def get_string_array(x: Table, name: str) -> Array[str]:
+def get_string_array(x: Table, name: sr) -> Array[str]:
     # Get an array as native string array
     str_array: Array[str]
     arr: TomlArray = get_array(x, name)

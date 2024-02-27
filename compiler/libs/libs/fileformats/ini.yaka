@@ -11,35 +11,26 @@ def del_ini(object: Ini) -> None:
     ccode """ini_destroy(nn__object)"""
 
 @native
-def from_str(ini_data: str) -> Ini:
+def from_str(ini_data: sr) -> Ini:
     # Parse INI file from given string data
-    ccode """ini_t* ini = ini_load(nn__ini_data);
-    yk__sdsfree(nn__ini_data);
+    ccode """ini_t* ini = ini_load(yk__bstr_get_reference(nn__ini_data));
     return ini"""
 
 @native
-def get(object: Ini, section: str, property: str) -> str:
+def get(object: Ini, section: sr, property: sr) -> str:
     # Get a property in given section
     # Empty string is returned if we cannot find the section
-    ccode """ 
-    int section = ini_find_section(nn__object, nn__section, yk__sdslen(nn__section));
+    ccode """
+    int section = ini_find_section(nn__object, yk__bstr_get_reference(nn__section), yk__bstr_len(nn__section));
     if (section == INI_NOT_FOUND) {
-        yk__sdsfree(nn__section);
-        yk__sdsfree(nn__property);
         return yk__sdsempty();
     }
-    int prop ini_find_property(nn__object, section, nn__property, yk__sdslen(nn__property));
+    int prop ini_find_property(nn__object, yk__bstr_get_reference(section), yk__bstr_get_reference(nn__property), yk__bstr_len(nn__property));
     if (prop == INI_NOT_FOUND) {
-        yk__sdsfree(nn__section);
-        yk__sdsfree(nn__property);
         return yk__sdsempty();
     }
-    char const* data = ini_property_value(nn__object), section, prop);
+    char const* data = ini_property_value(nn__object), yk__bstr_get_reference(section), prop);
     if (data == NULL) {
-        yk__sdsfree(nn__section);
-        yk__sdsfree(nn__property);
         return yk__sdsempty();
     }
-    yk__sdsfree(nn__section);
-    yk__sdsfree(nn__property);    
     return yk__sdsnew(data)"""

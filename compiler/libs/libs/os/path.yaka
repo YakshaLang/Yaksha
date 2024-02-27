@@ -38,7 +38,7 @@ def executable(p: str) -> bool:
     # Is an executable?
     pass
 
-def end_with_slash(a: str) -> bool:
+def end_with_slash(a: sr) -> bool:
     # Does the given string end with slash?
     length: int = len(a)
     if length < 1:
@@ -47,7 +47,7 @@ def end_with_slash(a: str) -> bool:
     x: bool = chr == 47 or chr == 92
     return x
 
-def end_with_dot(a: str) -> bool:
+def end_with_dot(a: sr) -> bool:
     # Does the given string end with slash?
     length: int = len(a)
     if length < 1:
@@ -56,7 +56,7 @@ def end_with_dot(a: str) -> bool:
     x: bool = chr == 46
     return x
 
-def join(a: str, b: str) -> str:
+def join(a: sr, b: sr) -> str:
     # Do a path join
     if end_with_slash(a):
         return a + b
@@ -99,7 +99,7 @@ def dirname(p: str) -> str:
     length: int = len(p)
     if length <= 2:
         return p
-    # Ignore last character        
+    # Ignore last character
     if end_with_slash(p):
         length = length - 1
     x: c.CStr = strings.to_cstr(p)
