@@ -958,8 +958,8 @@ void yaksha_envmap::setup_builtins() {
       create_builtin(this, "os_exec", yaksha_lisp_builtins::os_exec_));
   set("os_shell",
       create_builtin(this, "os_shell", yaksha_lisp_builtins::os_shell_));
-  set("explode_string",
-      create_builtin(this, "explode_string", yaksha_lisp_builtins::explode_string_));
+  set("explode_string", create_builtin(this, "explode_string",
+                                       yaksha_lisp_builtins::explode_string_));
   // magic_dot -> map_get or access_module
   set("magic_dot",
       create_builtin(this, "magic_dot", yaksha_lisp_builtins::magic_dot_));
@@ -1397,11 +1397,9 @@ std::vector<token *> yaksha_macros::expand_dsl(
     };
   }
   if (env->has_map(KEY_IMPORT_REFERENCE)) {
-    env->set(KEY_IMPORT_REFERENCE, env->create_string(imported_macro),
-             false);
+    env->set(KEY_IMPORT_REFERENCE, env->create_string(imported_macro), false);
   } else {
-    env->set(KEY_IMPORT_REFERENCE, env->create_string(imported_macro),
-             true);
+    env->set(KEY_IMPORT_REFERENCE, env->create_string(imported_macro), true);
   }
   yaksha_lisp_value *result = nullptr;
   if (dsl_macro_input.empty()) {

@@ -38,11 +38,9 @@
 // ==============================================================================================
 // colors.cpp
 #include "colours.h"
-#include "cpp_util.h"
 using namespace yaksha;
 #include <iostream>
 #if defined(_WIN32) || defined(_WIN64)
-#include <conio.h>
 #include <cstdio>
 #include <io.h>
 #include <windows.h>

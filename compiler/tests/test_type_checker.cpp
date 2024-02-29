@@ -228,7 +228,7 @@ TEST_CASE("type checker: str constants are not supported") {
                                 "    a: int = 1\n"
                                 "    b: bool = a == A\n"
                                 "    return 0",
-                                "Only number/bool/sr constants are supported");
+                                "Only number/bool/sr constants are supported.");
 }
 TEST_CASE("type checker: sr constants are supported") {
   test_typechecker_snippet_full_ok("A:Const[sr] = \"hello\"\n"

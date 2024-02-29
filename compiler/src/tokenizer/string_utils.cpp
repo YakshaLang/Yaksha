@@ -207,6 +207,47 @@ std::string yaksha::string_utils::escape(const std::string &raw_string,
   }
   return buf_;
 }
+std::string yaksha::string_utils::escape_json(const std::string &raw_string) {
+  std::string buf_{};
+  auto buf = std::back_inserter(buf_);
+  auto iterator = raw_string.begin();
+  auto end = raw_string.end();
+  while (iterator != end) {
+    auto current = utf8::peek_next(iterator, end);
+    if (current == STR_ESCAPE_CHAR || current == '\"') {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>(current), buf);
+    } else if (current == '\a') {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('a'), buf);
+    } else if (current == '\b') {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('b'), buf);
+    } else if (current == '\f') {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('f'), buf);
+    } else if (current == '\n') {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('n'), buf);
+    } else if (current == '\r') {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('r'), buf);
+    } else if (current == '\t') {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('t'), buf);
+    } else if (current == '\v') {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('v'), buf);
+    } else if (current == 0) {
+      utf8::append(static_cast<char32_t>(STR_ESCAPE_CHAR), buf);
+      utf8::append(static_cast<char32_t>('0'), buf);
+    } else {
+      utf8::append(static_cast<char32_t>(current), buf);
+    }
+    utf8::next(iterator, end);
+  }
+  return buf_;
+}
 template<typename T>
 std::string int_to_oct(T i) {
   std::stringstream stream;

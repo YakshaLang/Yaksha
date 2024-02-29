@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
   comp_result result;
   try {
     multifile_compiler mc{};
+    mc.main_required_ = false;
     codegen_json cg{};
     if (argc == 2) {// Just code.yaka is passed
       result = mc.compile(argv[1], &cg);

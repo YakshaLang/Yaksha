@@ -39,9 +39,11 @@
 #include "ast/ast_printer.h"
 #include "ast/parser.h"
 #include "compiler/def_class_visitor.h"
+#include "compiler/multifile_compiler.h"
 #include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
 #include "utilities/error_printer.h"
+#include "yaksha_lisp/yaksha_lisp.h"
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "ykashadmp"
 #endif
@@ -75,11 +77,6 @@ std::string extract_comments(int definition_line, tokenizer &token_extractor) {
   }
   return comments.str();
 }
-std::string escape_comment(const std::string &v) {
-  std::string escaped = string_utils::escape(v, false);
-  replace_all(escaped, "\\'", "'");
-  return escaped;
-}
 void display_datatype(ykdatatype *dt);
 void display_dt_args(std::vector<ykdatatype *> &args) {
   bool first = true;
@@ -93,10 +90,10 @@ void display_dt_args(std::vector<ykdatatype *> &args) {
   }
 }
 void display_datatype(ykdatatype *dt) {
-  std::cout << "{ \"type\": \""
-            << string_utils::escape(dt->token_->token_, false) << "\"";
+  std::cout << "{ \"type\": \"" << string_utils::escape_json(dt->token_->token_)
+            << "\"";
   if (!dt->module_.empty()) {
-    std::cout << ", \"module\": \"" << string_utils::escape(dt->module_, false)
+    std::cout << ", \"module\": \"" << string_utils::escape_json(dt->module_)
               << "\"";
   }
   if (!dt->args_.empty()) {
@@ -110,8 +107,8 @@ void display_const(const_stmt *const_statement, tokenizer &token_extractor) {
   std::string comment =
       extract_comments(const_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
-            << string_utils::escape(const_statement->name_->token_, false)
-            << "\", \"comment\": \"" << escape_comment(comment)
+            << string_utils::escape_json(const_statement->name_->token_)
+            << "\", \"comment\": \"" << string_utils::escape_json(comment)
             << "\", \"datatype\": ";
   display_datatype(const_statement->data_type_);
   std::cout << " }";
@@ -121,8 +118,8 @@ void display_const(nativeconst_stmt *const_statement,
   std::string comment =
       extract_comments(const_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
-            << string_utils::escape(const_statement->name_->token_, false)
-            << "\", \"comment\": \"" << escape_comment(comment)
+            << string_utils::escape_json(const_statement->name_->token_)
+            << "\", \"comment\": \"" << string_utils::escape_json(comment)
             << "\", \"datatype\": ";
   display_datatype(const_statement->data_type_);
   std::cout << " }";
@@ -136,7 +133,7 @@ void display_params(std::vector<parameter> &params) {
       std::cout << ",";
     }
     std::cout << "{ \"name\": \""
-              << string_utils::escape(param.name_->token_, false)
+              << string_utils::escape_json(param.name_->token_)
               << "\", \"datatype\": ";
     display_datatype(param.data_type_);
     std::cout << "}";
@@ -146,28 +143,32 @@ void display_annotations(annotations &annotations) {
   bool first = true;
   if (annotations.native_) {
     std::cout << "{ \"name\": \"@native\", \"argument\": \""
-              << string_utils::escape(annotations.native_arg_, false) << "\" }";
+              << string_utils::escape_json(annotations.native_arg_) << "\" }";
     first = false;
   }
   if (annotations.native_define_) {
     if (!first) { std::cout << ","; }
     std::cout << "{ \"name\": \"@nativedefine\", \"argument\": \""
-              << string_utils::escape(annotations.native_define_arg_, false)
+              << string_utils::escape_json(annotations.native_define_arg_)
               << "\" }";
     first = false;
   }
   if (annotations.native_macro_) {
     if (!first) { std::cout << ","; }
     std::cout << "{ \"name\": \"@nativemacro\", \"argument\": \""
-              << string_utils::escape(annotations.native_macro_arg_, false)
+              << string_utils::escape_json(annotations.native_macro_arg_)
               << "\" }";
     first = false;
   }
   if (annotations.template_) {
     if (!first) { std::cout << ","; }
     std::cout << "{ \"name\": \"@template\", \"argument\": \""
-              << string_utils::escape(annotations.template_arg_, false)
-              << "\" }";
+              << string_utils::escape_json(annotations.template_arg_) << "\" }";
+    first = false;
+  }
+  if (annotations.on_stack_) {
+    if (!first) { std::cout << ","; }
+    std::cout << "{ \"name\": \"@onstack\" }";
     first = false;
   }
   if (annotations.varargs_) {
@@ -179,8 +180,8 @@ void display_fnc(def_stmt *def_statement, tokenizer &token_extractor) {
   std::string comment =
       extract_comments(def_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
-            << string_utils::escape(def_statement->name_->token_, false)
-            << "\", \"comment\": \"" << escape_comment(comment)
+            << string_utils::escape_json(def_statement->name_->token_)
+            << "\", \"comment\": \"" << string_utils::escape_json(comment)
             << "\", \"return_type\": ";
   display_datatype(def_statement->return_type_);
   std::cout << ", \"parameters\": [";
@@ -193,8 +194,8 @@ void display_cls(class_stmt *class_statement, tokenizer &token_extractor) {
   std::string comment =
       extract_comments(class_statement->name_->line_, token_extractor);
   std::cout << "\n{ \"name\": \""
-            << string_utils::escape(class_statement->name_->token_, false)
-            << "\", \"comment\": \"" << escape_comment(comment)
+            << string_utils::escape_json(class_statement->name_->token_)
+            << "\", \"comment\": \"" << string_utils::escape_json(comment)
             << "\", \"members\": [";
   display_params(class_statement->members_);
   std::cout << "], \"annotations\": [";
@@ -209,22 +210,59 @@ void display_import_path(import_stmt *import_statement) {
     } else {
       std::cout << ",";
     }
-    std::cout << "\"" << string_utils::escape(name->token_, false) << "\"";
+    std::cout << "\"" << string_utils::escape_json(name->token_) << "\"";
   }
 }
 void display_import(import_stmt *import_statement) {
   std::cout << "\n{ \"alias\": \""
-            << string_utils::escape(import_statement->name_->token_, false)
+            << string_utils::escape_json(import_statement->name_->token_)
             << "\", \"path\": [";
   display_import_path(import_statement);
   std::cout << "] }";
 }
+std::string yaksha_lisp_value_type_to_str(yaksha_lisp_value_type p) {
+  switch (p) {
+    case yaksha_lisp_value_type::BUILTIN:
+      return "BUILTIN";
+    case yaksha_lisp_value_type::EXPR:
+      return "EXPR";
+    case yaksha_lisp_value_type::LAMBDA:
+      return "LAMBDA";
+    case yaksha_lisp_value_type::LIST:
+      return "LIST";
+    case yaksha_lisp_value_type::MAP:
+      return "MAP";
+    case yaksha_lisp_value_type::METAMACRO:
+      return "METAMACRO";
+    case yaksha_lisp_value_type::MODULE:
+      return "MODULE";
+    case yaksha_lisp_value_type::NUMBER:
+      return "NUMBER";
+    case yaksha_lisp_value_type::STRING:
+      return "STRING";
+  }
+  return "UNKNOWN";
+}
 void display(def_class_visitor &df, parser &parser_object,
-             tokenizer &token_extractor) {
+             tokenizer &token_extractor, yaksha_envmap *macro_env) {
   std::cout << "{";
+  // Dump macro environment
+  std::cout << "\"macro_env\": [";
+  bool first = true;
+  for (auto &macro : macro_env->symbols_) {
+    if (first) {
+      first = false;
+    } else {
+      std::cout << ",";
+    }
+    std::cout << "{\"name\": \"" << string_utils::escape_json(macro.first)
+              << "\", \"type\": \""
+              << yaksha_lisp_value_type_to_str(macro.second->type_) << "\" }";
+  }
+  std::cout << "],";
   // Dump imports
   std::cout << "\n \"imports\": [";
-  bool first = true;
+  first = true;
   for (auto import_statement : parser_object.import_stmts_) {
     if (first) {
       first = false;
@@ -281,13 +319,12 @@ int main(int argc, char *argv[]) {
     std::cerr << "Usage: " << PROGRAM_NAME << " script.yaka\n";
     return EXIT_FAILURE;
   }
+  multifile_compiler mc{};
+  mc.main_required_ = false;
+  do_nothing_codegen cg{};
   std::string file_name{argv[1]};
-  std::ifstream script_file(file_name);
-  if (!script_file.good()) {
-    std::cerr << "Failed to read file:" << file_name << "\n";
-    return EXIT_FAILURE;
-  }
   gc_pool<token> token_pool{};
+  std::ifstream script_file{file_name};
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
   tokenizer token_extractor{file_name, data, &token_pool};
@@ -296,27 +333,19 @@ int main(int argc, char *argv[]) {
     errors::print_errors(token_extractor.errors_);
     return EXIT_FAILURE;
   }
-  block_analyzer block_scanner{token_extractor.tokens_, &token_pool};
-  block_scanner.analyze();
-  ykdt_pool dt_pool{};
+  auto result = mc.compile(file_name, &cg);
+  if (result.failed_) {
+    std::cerr << "Failed:" << file_name << "\n";
+    return EXIT_FAILURE;
+  }
   try {
-    parser parser_obj{file_name, block_scanner.tokens_, &dt_pool};
-    auto tree = parser_obj.parse();
-    if (!tree.empty() && parser_obj.errors_.empty()) {
-      auto builtins_obj = new builtins{&dt_pool, &token_pool};
-      def_class_visitor def_visitor{builtins_obj};
-      def_visitor.extract(tree);
-      delete builtins_obj;
-      // def visitor should extract functions, classes & consts
-      if (!def_visitor.errors_.empty()) {
-        errors::print_errors(def_visitor.errors_);
-        return EXIT_FAILURE;
-      }
-      display(def_visitor, parser_obj, token_extractor);
-    } else {
-      errors::print_errors(parser_obj.errors_);
-      return EXIT_FAILURE;
-    }
+    auto &cf = mc.get_codefiles();
+    auto main_files = cf.main_file_info_;
+    auto &tree = main_files->data_->parser_->stmts_;
+    auto macro_env = cf.yaksha_macros_.validate_and_get_environment_root(
+        main_files->filepath_.string());
+    display(*(main_files->data_->dsv_), *(main_files->data_->parser_),
+            token_extractor, macro_env);
   } catch (parsing_error &p) {
     std::cerr << "Parsing failed " << p.message_ << "\n";
     return EXIT_FAILURE;

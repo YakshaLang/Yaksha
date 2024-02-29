@@ -43,21 +43,35 @@
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "yakshac"
 #endif
+#include "utilities/argparser.h"
 using namespace yaksha;
 int main(int argc, char *argv[]) {
-  if (argc != 2 && argc != 3) {
-    std::cerr << "Usage: " << PROGRAM_NAME
-              << " script.yaka [LIBS_PARENT_PATH]\n";
+  auto args = argparser::ARGS(PROGRAM_NAME, "Compile Yaksha code to C code", "");
+  auto help = argparser::OP_BOOL('h', "--help", "Print this help message");
+  auto no_main = argparser::OP_BOOL('N', "--no-main", "Disable main() check");
+  args.optional_ = {&help, &no_main};
+  auto code = argparser::PO("mainfile.yaka", "Yaksha code file.");
+  auto lib = argparser::PO_OPT("[LIBS_PARENT_PATH]", "Path to the parent directory of the libraries");
+  args.positional_ = {&code, &lib};
+  argparser::parse_args(argc, argv, args);
+  if (help.is_set_) {
+    argparser::print_help(args);
+    return EXIT_SUCCESS;
+  }
+  if (!args.errors_.empty()) {
+    argparser::print_errors(args);
+    argparser::print_help(args);
     return EXIT_FAILURE;
   }
   comp_result result;
   try {
     multifile_compiler mc{};
+    mc.main_required_ = !no_main.is_set_;
     codegen_c cg{};
-    if (argc == 2) {// Just code.yaka is passed
-      result = mc.compile(argv[1], &cg);
+    if (!lib.is_set_) {// Just code.yaka is passed
+      result = mc.compile(code.value_, &cg);
     } else {// code.yaka + LIBS_PARENT_PATH
-      result = mc.compile(argv[1], argv[2], &cg);
+      result = mc.compile(code.value_, lib.value_, &cg);
     }
     if (result.failed_) { return EXIT_FAILURE; }
   } catch (parsing_error &e) { errors::print_errors({e}); }

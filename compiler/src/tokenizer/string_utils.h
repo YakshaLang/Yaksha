@@ -247,6 +247,7 @@ namespace yaksha::string_utils {
  * @return escaped string (newlines -> \n)
  */
   std::string escape(const std::string &raw_string);
+  std::string escape_json(const std::string &raw_string);
   std::string escape_binary_string(const std::string &raw_string,
                                    bool escape_question_mark);
   std::string escape(const std::string &raw_string, bool escape_question_mark);

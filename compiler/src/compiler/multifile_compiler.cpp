@@ -68,14 +68,14 @@ comp_result multifile_compiler::compile(const std::string &code, bool use_code,
                                         codegen *code_generator) {
   LOG_COMP("compile:" << main_file);
   std::filesystem::path library_parent{libs_path};
-  codefiles cf{library_parent};
+  cf_ = new codefiles{library_parent};
   // Step 0) First of all, we initialize parsing
   // In this step, we initialize all files we know of at this point
   file_info *main_file_info;
   if (!use_code) {
-    main_file_info = cf.initialize_parsing_or_null(main_file);
+    main_file_info = cf_->initialize_parsing_or_null(main_file);
   } else {
-    main_file_info = cf.initialize_parsing_or_null(code, main_file);
+    main_file_info = cf_->initialize_parsing_or_null(code, main_file);
   }
   LOG_COMP("init parsing");
   if (main_file_info == nullptr) {
@@ -84,35 +84,35 @@ comp_result multifile_compiler::compile(const std::string &code, bool use_code,
   }
   bool all_files_all_successful = false;
   while (!all_files_all_successful) {
-    step_1_scan_macro_soup(cf);
+    step_1_scan_macro_soup();
     LOG_COMP("macro soup scanned");
-    step_2_initialize_preprocessor_env(cf);
+    step_2_initialize_preprocessor_env();
     LOG_COMP("preprocessor init");
-    step_3_macros_setup(cf);
+    step_3_macros_setup();
     LOG_COMP("setup macros!");
-    step_4_expand_macros(cf);
+    step_4_expand_macros();
     LOG_COMP("expand");
-    step_5_parse(cf);
+    step_5_parse();
     LOG_COMP("parse");
-    bool should_bail = step_6_rescan_imports(cf, main_file_info);
+    bool should_bail = step_6_rescan_imports();
     if (should_bail) {
       LOG_COMP("rescan failed");
       return {true, ""};
     }
-    step_7_verify_import_rescan_done(cf);
+    step_7_verify_import_rescan_done();
     LOG_COMP("rescan done");
-    should_bail = has_any_failures(cf);
+    should_bail = has_any_failures();
     if (should_bail) {
       LOG_COMP("parsing failures found");
       return {true, ""};
     }
-    all_files_all_successful = all_success(cf);
+    all_files_all_successful = all_success();
   }
-  return compile_all(cf, main_file_info, code_generator);
+  return compile_all(code_generator);
 }
-bool multifile_compiler::has_any_failures(codefiles &cf) const {
+bool multifile_compiler::has_any_failures() const {
   bool should_bail = false;
-  for (auto f : cf.files_) {
+  for (auto f : cf_->files_) {
     if (f->step_ == scanning_step::FAILURE) {
       LOG_COMP("has failure:" << f->filepath_.string());
       should_bail = true;
@@ -121,10 +121,10 @@ bool multifile_compiler::has_any_failures(codefiles &cf) const {
   }
   return should_bail;
 }
-bool multifile_compiler::all_success(codefiles &cf) const {
+bool multifile_compiler::all_success() const {
   LOG_COMP("verify if parsing is successful");
   bool all_ok = true;
-  for (auto f : cf.files_) {
+  for (auto f : cf_->files_) {
     if (f->step_ != scanning_step::ALL_PARSING_SUCCESSFUL) {
       all_ok = false;
       break;
@@ -132,9 +132,9 @@ bool multifile_compiler::all_success(codefiles &cf) const {
   }
   return all_ok;
 }
-void multifile_compiler::step_7_verify_import_rescan_done(codefiles &cf) const {
+void multifile_compiler::step_7_verify_import_rescan_done() const {
   LOG_COMP("verify rescan completed");
-  for (auto f : cf.files_) {
+  for (auto f : cf_->files_) {
     if (f->step_ == scanning_step::FAILURE ||
         f->step_ < scanning_step::PARSE_DONE) {
       continue;
@@ -150,12 +150,12 @@ void multifile_compiler::step_7_verify_import_rescan_done(codefiles &cf) const {
     if (all_imports_ok) { f->step_ = scanning_step::ALL_PARSING_SUCCESSFUL; }
   }
 }
-bool multifile_compiler::step_6_rescan_imports(
-    codefiles &cf, file_info *main_file_info) const {
+bool multifile_compiler::step_6_rescan_imports() const {
   LOG_COMP("rescan imports");
+  auto main_file_info = cf_->main_file_info_;
   bool should_bail = false;
   for (auto imp : main_file_info->data_->parser_->import_stmts_) {
-    auto import_data = cf.scan_or_null(imp);
+    auto import_data = cf_->scan_or_null(imp);
     if (import_data == nullptr) {
       std::cerr << "Failed to rescan imports:" << main_file_info->filepath_
                 << "\n";
@@ -166,15 +166,14 @@ bool multifile_compiler::step_6_rescan_imports(
   }
   return should_bail;
 }
-comp_result multifile_compiler::compile_all(codefiles &cf,
-                                            file_info *main_file_info,
-                                            codegen *code_generator) {
+comp_result multifile_compiler::compile_all(codegen *code_generator) {
   LOG_COMP("compile all");
+  auto main_file_info = cf_->main_file_info_;
   bool has_errors = false;
   // Extract defs and structs
-  for (auto f : cf.files_) {
+  for (auto f : cf_->files_) {
     LOG_COMP("file:" << f->filepath_.string());
-    auto builtins_obj = new builtins(&cf.pool_, &token_pool_);
+    auto builtins_obj = new builtins(&(cf_->pool_), &token_pool_);
     f->data_->dsv_ = new def_class_visitor(builtins_obj);
     f->data_->dsv_->extract(f->data_->parser_->stmts_);
     LOG_COMP("dsv extract:" << f->filepath_.string());
@@ -186,21 +185,22 @@ comp_result multifile_compiler::compile_all(codefiles &cf,
     delete builtins_obj;
   }
   LOG_COMP("post loop");
-  has_errors = has_invalid_main_func(main_file_info);
+  has_errors |= has_invalid_main_func(main_file_info);
   if (has_errors) {
     LOG_COMP("has invalid main");
     return {true, ""};
   }
-  LOG_COMP("has a main()");
+  LOG_COMP("has a main() or no main required");
   // Ensure all data types have the proper module
-  for (auto f : cf.files_) { f->data_->parser_->rescan_datatypes(); }
+  for (auto f : cf_->files_) { f->data_->parser_->rescan_datatypes(); }
   // Type check all files
-  for (auto f : cf.files_) {
-    f->data_->type_checker_ = new type_checker(
-        f->filepath_.string(), &cf, f->data_->dsv_, &cf.pool_, &token_pool_);
+  for (auto f : cf_->files_) {
+    f->data_->type_checker_ =
+        new type_checker(f->filepath_.string(), cf_, f->data_->dsv_,
+                         &(cf_->pool_), &token_pool_);
     // TODO create a function in the type checker to do this
     for (auto impo : f->data_->parser_->import_stmts_) {
-      auto obj = ykobject(&cf.pool_);
+      auto obj = ykobject(&(cf_->pool_));
       obj.object_type_ = object_type::MODULE;
       obj.string_val_ = impo->data_->filepath_.string();
       obj.module_file_ = impo->data_->filepath_.string();
@@ -227,12 +227,12 @@ comp_result multifile_compiler::compile_all(codefiles &cf,
     LOG_COMP("usage analyser found errors");
     return {true, ""};
   }
-  return code_generator->emit(&cf, &token_pool_);
+  return code_generator->emit(cf_, &token_pool_);
 }
-void multifile_compiler::step_5_parse(codefiles &cf) {
+void multifile_compiler::step_5_parse() {
   LOG_COMP("parsing: parsing to yaksha AST");
   // Step 5) Parse the file
-  for (auto f : cf.files_) {
+  for (auto f : cf_->files_) {
     if (f->step_ == scanning_step::FAILURE ||
         f->step_ >= scanning_step::PARSE_DONE) {
       continue;
@@ -247,15 +247,16 @@ void multifile_compiler::step_5_parse(codefiles &cf) {
     }
   }
 }
-void multifile_compiler::step_4_expand_macros(codefiles &cf) {
+void multifile_compiler::step_4_expand_macros() {
   LOG_COMP("parsing: dsl macro expansion");
   // Step 4) Expand macros
-  for (auto f : cf.files_) {
+  for (auto f : cf_->files_) {
     if (f->step_ == scanning_step::FAILURE ||
         f->step_ >= scanning_step::MACROS_EXPANDED) {
       continue;
     }
-    f->data_->parser_->step_4_expand_macros(&cf.yaksha_macros_, &token_pool_);
+    f->data_->parser_->step_4_expand_macros(&(cf_->yaksha_macros_),
+                                            &token_pool_);
     if (f->data_->parser_->errors_.empty()) {
       f->step_ = scanning_step::MACROS_EXPANDED;
     } else {
@@ -266,15 +267,15 @@ void multifile_compiler::step_4_expand_macros(codefiles &cf) {
     }
   }
 }
-void multifile_compiler::step_3_macros_setup(codefiles &cf) {
+void multifile_compiler::step_3_macros_setup() {
   LOG_COMP("parsing: macros setup by executing all macros statements");
   // Step 3) Macros setup by executing all macros statements
-  for (auto f : cf.files_) {
+  for (auto f : cf_->files_) {
     if (f->step_ == scanning_step::FAILURE ||
         f->step_ >= scanning_step::MACROS_SETUP_DONE) {
       continue;
     }
-    f->data_->parser_->step_3_execute_macros(&cf.yaksha_macros_);
+    f->data_->parser_->step_3_execute_macros(&(cf_->yaksha_macros_));
     if (f->data_->parser_->errors_.empty()) {
       f->step_ = scanning_step::MACROS_SETUP_DONE;
     } else {
@@ -285,10 +286,10 @@ void multifile_compiler::step_3_macros_setup(codefiles &cf) {
     }
   }
 }
-void multifile_compiler::step_2_initialize_preprocessor_env(codefiles &cf) {
+void multifile_compiler::step_2_initialize_preprocessor_env() {
   LOG_COMP("parsing: initialize preprocessing lisp environments for each file");
   // Step 2) initialize preprocessing lisp environments for each file
-  for (auto f : cf.files_) {
+  for (auto f : cf_->files_) {
     if (f->step_ == scanning_step::FAILURE ||
         f->step_ >= scanning_step::ENV_CREATED) {
       continue;
@@ -296,7 +297,7 @@ void multifile_compiler::step_2_initialize_preprocessor_env(codefiles &cf) {
     std::string fp = f->filepath_.string();
     LOG_COMP("parsing: initialize preprocessing lisp environments for " << fp);
     try {
-      cf.yaksha_macros_.init_env(fp, f->data_->parser_->import_stmts_alias_);
+      cf_->yaksha_macros_.init_env(fp, f->data_->parser_->import_stmts_alias_);
       f->step_ = scanning_step::ENV_CREATED;
     } catch (const parsing_error &ex) { /* redefining imports, etc */
       std::cerr << "Failed to initialize lisp-macro env:" << f->filepath_
@@ -306,10 +307,10 @@ void multifile_compiler::step_2_initialize_preprocessor_env(codefiles &cf) {
     }
   }
 }
-void multifile_compiler::step_1_scan_macro_soup(codefiles &cf) {
+void multifile_compiler::step_1_scan_macro_soup() {
   LOG_COMP("parsing: scan macro soup");
   // Step 1) Scan macro soup
-  for (auto f : cf.files_) {
+  for (auto f : cf_->files_) {
     if (f->step_ == scanning_step::FAILURE ||
         f->step_ >= scanning_step::SOUP_SCAN_DONE) {
       continue;
@@ -327,6 +328,7 @@ void multifile_compiler::step_1_scan_macro_soup(codefiles &cf) {
 }
 bool multifile_compiler::has_invalid_main_func(
     file_info *main_file_info) const {
+  if (!main_required_) { return false; }
   LOG_COMP("checking do we have a main()");
   bool has_errors = false;
   if (main_file_info->data_->dsv_->has_function("main")) {
@@ -344,4 +346,10 @@ bool multifile_compiler::has_invalid_main_func(
     has_errors = true;
   }
   return has_errors;
+}
+multifile_compiler::~multifile_compiler() { delete cf_; }
+codefiles &multifile_compiler::get_codefiles() const { return *cf_; }
+comp_result do_nothing_codegen::emit(codefiles *cf,
+                                     gc_pool<token> *token_pool) {
+  return comp_result{false, ""};
 }

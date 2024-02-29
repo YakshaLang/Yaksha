@@ -46,28 +46,36 @@
 #include "utilities/gc_pool.h"
 #include <string>
 namespace yaksha {
+  struct do_nothing_codegen : codegen {
+    ~do_nothing_codegen() override = default;
+    comp_result emit(codefiles *cf, gc_pool<token> *token_pool) override;
+  };
   struct multifile_compiler {
+    multifile_compiler() = default;
+    ~multifile_compiler();
     comp_result compile(const std::string &main_file, codegen *code_generator);
     comp_result compile(const std::string &main_file,
                         const std::string &libs_path, codegen *code_generator);
     comp_result compile(const std::string &code, bool use_code,
                         const std::string &main_file,
                         const std::string &libs_path, codegen *code_generator);
+    [[nodiscard]] codefiles &get_codefiles() const;
+    bool main_required_ = true;
 
 private:
     gc_pool<token> token_pool_{};
-    bool has_invalid_main_func(file_info *main_file_info) const;
-    void step_1_scan_macro_soup(codefiles &cf);
-    void step_2_initialize_preprocessor_env(codefiles &cf);
-    void step_3_macros_setup(codefiles &cf);
-    void step_4_expand_macros(codefiles &cf);
-    void step_5_parse(codefiles &cf);
-    comp_result compile_all(codefiles &cf, file_info *main_file_info,
-                            codegen *code_generator);
-    bool step_6_rescan_imports(codefiles &cf, file_info *main_file_info) const;
-    void step_7_verify_import_rescan_done(codefiles &cf) const;
-    bool has_any_failures(codefiles &cf) const;
-    bool all_success(codefiles &cf) const;
+    void step_1_scan_macro_soup();
+    void step_2_initialize_preprocessor_env();
+    void step_3_macros_setup();
+    void step_4_expand_macros();
+    void step_5_parse();
+    [[nodiscard]] bool step_6_rescan_imports() const;
+    void step_7_verify_import_rescan_done() const;
+    comp_result compile_all(codegen *code_generator);
+    [[nodiscard]] bool has_any_failures() const;
+    [[nodiscard]] bool has_invalid_main_func(file_info *main_file_info) const;
+    [[nodiscard]] bool all_success() const;
+    codefiles *cf_{nullptr};
   };
 }// namespace yaksha
 #endif

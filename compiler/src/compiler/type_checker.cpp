@@ -966,7 +966,7 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
   if (scope_.is_global_level() && !obj->data_type_->args_[0]->is_bool() &&
       !obj->data_type_->args_[0]->is_a_number() &&
       !obj->data_type_->args_[0]->is_sr()) {
-    error(obj->name_, "Only number/bool/sr constants are supported");
+    error(obj->name_, "Only number/bool/sr constants are supported.");
   }
   if (obj->expression_ == nullptr) {
     error(obj->name_, "Need a value for the constant");

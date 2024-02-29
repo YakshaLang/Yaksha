@@ -253,8 +253,8 @@ def vector3_max(v1: rl.Vector3, v2: rl.Vector3) -> rl.Vector3:
     ccode """Vector3Max(nn__v1, nn__v2)"""
 
 @nativemacro
-def vector3_barycenter(p: rl.Vector3, a: rl.Vector3, b: rl.Vector3, c: rl.Vector3) -> rl.Vector3:
-    ccode """Vector3Barycenter(nn__p, nn__a, nn__b, nn__c)"""
+def vector3_barycenter(p: rl.Vector3, a: rl.Vector3, b: rl.Vector3, c_arg: rl.Vector3) -> rl.Vector3:
+    ccode """Vector3Barycenter(nn__p, nn__a, nn__b, nn__c_arg)"""
 
 @nativemacro
 def vector3_unproject(source: rl.Vector3, projection: rl.Matrix, view: rl.Matrix) -> rl.Vector3:

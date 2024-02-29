@@ -5,36 +5,36 @@
 # Note: libs - MIT license, runtime/3rd - various
 # ==============================================================================================
 # GPLv3:
-# 
+#
 # Yaksha - Programming Language.
 # Copyright (C) 2020 - 2024 Bhathiya Perera
-# 
+#
 # This program is free software: you can redistribute it and/or modify it under the terms
 # of the GNU General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see https://www.gnu.org/licenses/.
-# 
+#
 # ==============================================================================================
 # Additional Terms:
-# 
+#
 # Please note that any commercial use of the programming language's compiler source code
 # (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
 # with author of the language (Bhathiya Perera).
-# 
+#
 # If you are using it for an open source project, please give credits.
 # Your own project must use GPLv3 license with these additional terms.
-# 
+#
 # You may use programs written in Yaksha/YakshaLisp for any legal purpose
 # (commercial, open-source, closed-source, etc) as long as it agrees
 # to the licenses of linked runtime libraries (see compiler/runtime/README.md).
-# 
+#
 # ==============================================================================================
 import glob
 import json
@@ -142,6 +142,10 @@ def cleanup_structure(structure: dict, mod_name: str) -> dict:
         [cleanup_parameter(x, mod_name, imports) for x in structure["global_consts"]], key=lambda x: x["name"])
     structure["classes"] = sorted([cleanup_class(x, mod_name, imports) for x in structure["classes"]],
                                   key=lambda x: x["name"])
+    macro_env = sorted([x["name"] for x in structure["macro_env"]])
+    del structure["macro_env"]
+    dsl_prefix = "yaksha#macro#dsl#"
+    structure["macros"] = [x[len(dsl_prefix):] + "!" for x in macro_env if x.startswith(dsl_prefix)]
 
     return structure
 
@@ -228,6 +232,9 @@ def display_param(buf: Buf, param: dict):
     buf.append_red(": ")
     display_datatype(buf, param["datatype"])
 
+def display_mac(buf: Buf, mac: str):
+    buf.append_green("macro ")
+    buf.append_cyan(mac)
 
 def display_function(buf: Buf, fnc: dict):
     buf.append_green("def ")
@@ -290,6 +297,12 @@ def main():
         print(Colors.cyan("## ") + Colors.blue(yaksha_mod))
         print("---")
         print("```yaksha")
+
+        for f in structures[yaksha_mod]["macros"]:
+            buf = Buf()
+            display_mac(buf, f)
+            print(buf.build_color())
+
         for f in structures[yaksha_mod]["global_consts"]:
             buf = Buf()
             display_param(buf, f)

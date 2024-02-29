@@ -38,7 +38,7 @@
 // ==============================================================================================
 // cpp_util.h
 /**
- * C Preprocessor utilities
+ * C++ utilities
  */
 #ifndef CPP_UTIL_H
 #define CPP_UTIL_H
