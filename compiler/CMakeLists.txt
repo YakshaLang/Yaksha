@@ -57,13 +57,13 @@ target_link_libraries(yakshac PUBLIC ${YAKSHA_COMMON_LIBS})
 target_compile_features(yakshac PRIVATE cxx_std_17)
 
 # -- yakshavz - visualizer --
-add_executable(yakshavz src/viz_main.cpp)
+add_executable(yakshavz src/viz_main.cpp runtime/whereami.c)
 target_link_libraries(yakshavz PUBLIC ${YAKSHA_COMMON_LIBS})
 target_compile_features(yakshavz PRIVATE cxx_std_17)
 
 
 # -- yakshadmp - syntax extractor --
-add_executable(yakshadmp src/dump.cpp)
+add_executable(yakshadmp src/dump.cpp runtime/whereami.c)
 target_link_libraries(yakshadmp PUBLIC ${YAKSHA_COMMON_LIBS})
 target_compile_features(yakshadmp PRIVATE cxx_std_17)
 
