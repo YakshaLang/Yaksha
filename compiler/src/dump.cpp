@@ -70,7 +70,7 @@ std::string extract_comments(int definition_line, tokenizer &token_extractor) {
       } else {
         comments << "\n";
       }
-      comments << trim_copy(token->token_);
+      comments << rtrim_copy(token->token_);
     } else {
       break;
     }
@@ -257,7 +257,25 @@ void display(def_class_visitor &df, parser &parser_object,
     }
     std::cout << "{\"name\": \"" << string_utils::escape_json(macro.first)
               << "\", \"type\": \""
-              << yaksha_lisp_value_type_to_str(macro.second->type_) << "\" }";
+              << yaksha_lisp_value_type_to_str(macro.second->type_) << "\"";
+    if (macro.first.rfind("metadata#", 0) == 0) {
+      std::stringstream metadata{};
+      metadata << macro.second;
+      std::cout << ", \"meta\": \"" << string_utils::escape_json(metadata.str())
+                << "\"";
+      if (macro.second->type_ == yaksha_lisp_value_type::LIST &&
+          macro.second->list_.size() == 3) {
+        auto first_expr = macro.second->list_[0];
+        if (first_expr->type_ == yaksha_lisp_value_type::EXPR &&
+            first_expr->expr_->type_ == yaksha_lisp_expr_type::TERMINAL) {
+          auto tok = first_expr->expr_->token_;
+          auto comment = extract_comments(tok->line_, token_extractor);
+          std::cout << ", \"comment\": \"" <<
+            string_utils::escape_json(comment) << "\"";
+        }
+      }
+    }
+    std::cout << " }";
   }
   std::cout << "],";
   // Dump imports

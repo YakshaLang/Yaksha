@@ -142,10 +142,13 @@ def cleanup_structure(structure: dict, mod_name: str) -> dict:
         [cleanup_parameter(x, mod_name, imports) for x in structure["global_consts"]], key=lambda x: x["name"])
     structure["classes"] = sorted([cleanup_class(x, mod_name, imports) for x in structure["classes"]],
                                   key=lambda x: x["name"])
-    macro_env = sorted([x["name"] for x in structure["macro_env"]])
+    macro_env = sorted([(x["name"], x) for x in structure["macro_env"]], key=lambda x: x[0])
     del structure["macro_env"]
     dsl_prefix = "yaksha#macro#dsl#"
-    structure["macros"] = [x[len(dsl_prefix):] + "!" for x in macro_env if x.startswith(dsl_prefix)]
+    meta_prefix = "metadata#" + dsl_prefix
+    macro_comments = { x[0][len(meta_prefix):] : x[1]["comment"] for x in macro_env if x[0].startswith(meta_prefix)}
+    macros = [ x[0][len(dsl_prefix):] for x in macro_env if x[0].startswith(dsl_prefix)]
+    structure["macros"] = [{"name": x + "!", "comment": macro_comments.get(x, "") } for x in macros ]
 
     return structure
 
@@ -223,7 +226,7 @@ def display_comment(buf: Buf, element: dict):
         comment_lines = comment.splitlines(keepends=False)
         for single_comment in comment_lines:
             buf.append('\n')
-            buf.append_yellow("# ")
+            buf.append_yellow("#")
             buf.append_yellow(single_comment)
 
 
@@ -232,9 +235,9 @@ def display_param(buf: Buf, param: dict):
     buf.append_red(": ")
     display_datatype(buf, param["datatype"])
 
-def display_mac(buf: Buf, mac: str):
+def display_mac(buf: Buf, mac: dict):
     buf.append_green("macro ")
-    buf.append_cyan(mac)
+    buf.append_cyan(mac["name"])
 
 def display_function(buf: Buf, fnc: dict):
     buf.append_green("def ")
@@ -301,6 +304,7 @@ def main():
         for f in structures[yaksha_mod]["macros"]:
             buf = Buf()
             display_mac(buf, f)
+            display_comment(buf, f)
             print(buf.build_color())
 
         for f in structures[yaksha_mod]["global_consts"]:

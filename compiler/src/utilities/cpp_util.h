@@ -159,6 +159,10 @@ namespace yaksha {
     trim(s);
     return s;
   }
+  static inline std::string rtrim_copy(std::string s) {
+    rtrim(s);
+    return s;
+  }
   // https://stackoverflow.com/questions/5878775/how-to-find-and-replace-string
   static inline void replace_all(std::string &s, std::string const &to_replace,
                                  std::string const &replace_with) {

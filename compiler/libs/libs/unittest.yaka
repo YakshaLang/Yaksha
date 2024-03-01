@@ -92,8 +92,26 @@ macros! {
         (list (ykt_keyword_return) (yk_create_token YK_TOKEN_NAME "$x") (ykt_newline) (ykt_dedent))
     ))
     (yk_register {dsl assert_true assert_true})
+    # unittest.assert_true!{"description" x} - assert that this is true
     (yk_register {dsl assert_false assert_false})
+    # unittest.assert_false!{"description" x} - assert that this is false
     (yk_register {dsl test_case test_case})
+    # unittest.test_case!{"name"}: - start a test case definition
+    #
+    # # --- Ensure you use below imports as is ---
+    #
+    # import libs.unittest as u
+    # import libs.console as console
+    #
+    # u.test_case!{"assumptions"}:
+    #     u.assert_true!{"char is 1 byte" (1 == inlinec("int", "sizeof(char)"))}
+    #     x = 1
+    #     u.assert_true!{"int is 4 byte" (4 == inlinec("int", "sizeof(yy__x)"))}
+    #     u.end_test_case!{}
+    #
+    # u.run_all!{}
     (yk_register {dsl end_test_case end_test_case})
+    # see unittest.test_case example above
     (yk_register {dsl run_all run_all})
+    # unittest.run_all!{} - put this at the end to run all unit tests you created
 }

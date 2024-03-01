@@ -63,7 +63,9 @@ const std::string YAKSHA_LISP_PRELUDE = R"<><><><>(
         (def macro_name (repr (index type_name_func 1)))
         (def macro_func (eval (index type_name_func 2)))
         (def target (+ "yaksha#macro#" macro_type "#" macro_name))
+        (def macro_metadata (+ "metadata#" target))
         (map_set (parent) target macro_func)
+        (map_set (parent) macro_metadata type_name_func)
     )
     # =========== #
     #  Constants
