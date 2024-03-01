@@ -12,6 +12,23 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #endif
+#ifndef ssize_t
+#define ssize_t intmax_t
+#endif
+// Below code is originally from mman-win32
+//
+/*
+ * sys/mman.h
+ * mman-win32
+ */
+#ifndef _WIN32_WINNT// Allow use of features specific to Windows XP or later.
+#define _WIN32_WINNT                                                           \
+  0x0501// Change this to the appropriate value to target other versions of Windows.
+#endif
+/* All the headers include this file. */
+#ifndef _MSC_VER
+#include <_mingw.h>
+#endif
 // clang-format on
 void yk__printint(intmax_t to_print) {
 #if defined(_WIN32) || defined(_WIN64)
