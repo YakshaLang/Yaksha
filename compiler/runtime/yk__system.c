@@ -25,8 +25,7 @@
 #define _WIN32_WINNT                                                           \
   0x0501// Change this to the appropriate value to target other versions of Windows.
 #endif
-/* All the headers include this file. */
-#ifndef _MSC_VER
+#if  !defined(_MSC_VER) && (defined(_WIN32) || defined(_WIN64))
 #include <_mingw.h>
 #endif
 // clang-format on
