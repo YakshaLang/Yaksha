@@ -338,7 +338,10 @@ def main():
         if header in PREFIXES:
             print(PREFIXES[header])
         print(Colors.cyan("## ") + Colors.blue(yaksha_mod))
+        summary_file.append("# --------------------------------------------------")
         summary_file.append(header)
+        summary_file.append("# --------------------------------------------------")
+
         print("```yaksha")
 
         for f in structures[yaksha_mod]["macros"]:
@@ -367,6 +370,7 @@ def main():
             print(buf.build_color())
             summary_file.append(buf.build())
 
+        summary_file.append("\n")
         print("```")
         print()
 
