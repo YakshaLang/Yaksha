@@ -4,6 +4,8 @@ cd /app || exit 1
 mkdir build
 mkdir bin
 mkdir bin/fuzz
+cp /app/test.txt bin/test.txt
+find . -type f -exec dos2unix {} \;
 cd test_data || exit 1
 dos2unix *
 cd ..

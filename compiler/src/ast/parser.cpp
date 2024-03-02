@@ -733,7 +733,11 @@ ykdatatype *parser::parse_datatype() {
     dt = dt_pool_->create(after_dot->token_, module_import_alias);
     datatypes_from_modules_.emplace_back(dt);
   } else if (tk->type_ == token_type::INTEGER_DECIMAL) {
-    dt = dt_pool_->create_dimension(tk, filepath_);
+    try {
+      dt = dt_pool_->create_dimension(tk, filepath_);
+    } catch (std::out_of_range &e) {
+      throw error(tk, "Integer value is out of range");
+    }
   } else {
     dt = dt_pool_->create(tk->token_, filepath_);
   }
