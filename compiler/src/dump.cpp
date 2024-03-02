@@ -42,7 +42,6 @@
 #include "compiler/multifile_compiler.h"
 #include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
-#include "utilities/error_printer.h"
 #include "yaksha_lisp/yaksha_lisp.h"
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "ykashadmp"
@@ -339,6 +338,8 @@ int main(int argc, char *argv[]) {
   }
   multifile_compiler mc{};
   mc.main_required_ = false;
+  mc.check_types_ = false;
+  mc.usage_analysis_ = false;
   do_nothing_codegen cg{};
   std::string file_name{argv[1]};
   gc_pool<token> token_pool{};
@@ -359,7 +360,6 @@ int main(int argc, char *argv[]) {
   try {
     auto &cf = mc.get_codefiles();
     auto main_files = cf.main_file_info_;
-    auto &tree = main_files->data_->parser_->stmts_;
     auto macro_env = cf.yaksha_macros_.validate_and_get_environment_root(
         main_files->filepath_.string());
     display(*(main_files->data_->dsv_), *(main_files->data_->parser_),

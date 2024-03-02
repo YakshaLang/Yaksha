@@ -146,9 +146,9 @@ def cleanup_structure(structure: dict, mod_name: str) -> dict:
     del structure["macro_env"]
     dsl_prefix = "yaksha#macro#dsl#"
     meta_prefix = "metadata#" + dsl_prefix
-    macro_comments = { x[0][len(meta_prefix):] : x[1]["comment"] for x in macro_env if x[0].startswith(meta_prefix)}
-    macros = [ x[0][len(dsl_prefix):] for x in macro_env if x[0].startswith(dsl_prefix)]
-    structure["macros"] = [{"name": x + "!", "comment": macro_comments.get(x, "") } for x in macros ]
+    macro_comments = {x[0][len(meta_prefix):]: x[1]["comment"] for x in macro_env if x[0].startswith(meta_prefix)}
+    macros = [x[0][len(dsl_prefix):] for x in macro_env if x[0].startswith(dsl_prefix)]
+    structure["macros"] = [{"name": x + "!", "comment": macro_comments.get(x, "")} for x in macros]
 
     return structure
 
@@ -235,9 +235,11 @@ def display_param(buf: Buf, param: dict):
     buf.append_red(": ")
     display_datatype(buf, param["datatype"])
 
+
 def display_mac(buf: Buf, mac: dict):
     buf.append_green("macro ")
     buf.append_cyan(mac["name"])
+
 
 def display_function(buf: Buf, fnc: dict):
     buf.append_green("def ")
@@ -268,12 +270,47 @@ def display_class(buf: Buf, fnc: dict):
 
 #####################################
 
+PREFIXES = {
+    "## libs": """---
+layout: '../layouts/LibsLayout.astro'
+---
+
+import Note from '../components/Note.astro';
+
+
+# Core
+Core library can be accessed by importing `libs`.
+
+<Note> This import name is subject to change.  </Note>
+
+""",
+    "## raylib": """
+# Raylib
+Raylib can be accessed by importing `raylib`.
+<Note>raylib is created by Ramon Santamaria and contributors.</Note>
+<Note>Yaksha wraps raylib using a generator script.</Note>
+
+""",
+    "## w4": """
+# WASM4
+Support for WASM4 fantasy console. 
+Additionally following function in `libs` work.
+* `libs.random.random_u64`
+* `libs.random.set_seed`
+
+<Note>wasm4 is created by Bruno Garcia and contributors.</Note>
+<Note>Yaksha wraps `wasm4.h`.</Note>
+
+"""
+}
+
+
 def main():
     structures = {}
     files = []
     # Scan
     for mod_full_filepath in glob.glob(os.path.join(LIBS_DIR, '**', '*.yaka'), recursive=True):
-        print("!!!<!-- parsing", Colors.cyan(mod_full_filepath), "-->")
+        # print("<!-- parsing", Colors.cyan(mod_full_filepath), "-->")
         yaksha_mod = as_full_mod(mod_full_filepath.replace(LIBS_DIR, "")[1:])
         sout, serr, ret = execute(DUMPER + " \"" + mod_full_filepath + "\"")
         if ret != 0:
@@ -295,10 +332,11 @@ def main():
     # Sort
     files = sorted(files, key=lambda x: x[0])
     # Display
-    print("---")
     for yaksha_mod, mod_full_filepath in files:
+        header = "## " + yaksha_mod
+        if header in PREFIXES:
+            print(PREFIXES[header])
         print(Colors.cyan("## ") + Colors.blue(yaksha_mod))
-        print("---")
         print("```yaksha")
 
         for f in structures[yaksha_mod]["macros"]:
@@ -324,8 +362,7 @@ def main():
             print(buf.build_color())
 
         print("```")
-        print("---")
-
+        print()
 
 if __name__ == "__main__":
     main()
