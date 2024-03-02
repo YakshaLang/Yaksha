@@ -1,20 +1,10 @@
 FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
-ARG CMAKE_VERSION=3.22.0
 ARG ZIG_VERSION=0.9.1
-RUN apt-get update && apt-get -y -q install clang-12 clang-tools git wget build-essential python3 libssl-dev lcov gcovr dos2unix
-
-RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz \
-  && tar -zxf cmake-${CMAKE_VERSION}.tar.gz \
-  && cd cmake-${CMAKE_VERSION} \
-  && ./bootstrap \
-  && make -j4 \
-  && make install
-
+RUN apt-get update && apt-get -y -q install clang-12 clang-tools git wget build-essential python3 libssl-dev lcov gcovr dos2unix cmake ninja-build
 
 RUN   ln -s /usr/bin/clang-12 /usr/bin/clang \
       && ln -s /usr/bin/clang++-12 /usr/bin/clang++
-
 
 RUN apt-get -y -q install python3-pip && pip3 install tqdm
 
@@ -36,5 +26,7 @@ ADD carpntr /app/carpntr
 ADD test_libs /app/test_libs
 ADD bin/test.txt /app/test.txt
 RUN mkdir "/app/bin"
+RUN dos2unix /app/scripts/*.py
+RUN dos2unix /app/scripts/*.sh
 
 ENTRYPOINT ["/app/scripts/code-coverage.sh"]

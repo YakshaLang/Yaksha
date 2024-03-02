@@ -348,7 +348,7 @@ int main(int argc, char *argv[]) {
   tokenizer token_extractor{file_name, data, &token_pool};
   token_extractor.tokenize();
   if (!token_extractor.errors_.empty()) {
-    errors::print_errors(token_extractor.errors_);
+    mc.error_printer_.print_errors(token_extractor.errors_);
     return EXIT_FAILURE;
   }
   auto result = mc.compile(file_name, &cg);
@@ -365,7 +365,7 @@ int main(int argc, char *argv[]) {
     display(*(main_files->data_->dsv_), *(main_files->data_->parser_),
             token_extractor, macro_env);
   } catch (parsing_error &p) {
-    std::cerr << "Parsing failed " << p.message_ << "\n";
+    mc.error_printer_.print_error(std::cerr, p);
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;

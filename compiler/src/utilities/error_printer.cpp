@@ -38,8 +38,46 @@
 // ==============================================================================================
 // Note this file only has things to compile during TESTING
 #include "utilities/error_printer.h"
-#ifdef YAKSHA_TESTING
 namespace yaksha::errors {
-  std::vector<std::string> error_capture{};
-}
+  void error_printer::print_token(std::ostream &output, const token &tok) {
+    output << tok.file_ << colours::green(":") << tok.line_ + 1
+           << colours::green(":") << tok.pos_;
+    if (tok.type_ == token_type::END_OF_FILE) {
+      output << " at EOF";
+    } else if (tok.type_ != token_type::TK_UNKNOWN_TOKEN_DETECTED) {
+      output << " at "
+             << colours::cyan(string_utils::repr_string(tok.original_));
+    } else {
+      output << " ";
+    }
+  }
+  void error_printer::print_error(std::ostream &output,
+                                  const parsing_error &err) {
+#ifdef YAKSHA_TESTING
+    error_capture.push_back(err.message_);
 #endif
+    if (!err.token_set_) {
+      output << colours::red(err.message_);
+      return;
+    }
+    auto tok = err.tok_;
+    print_token(output, tok);
+    output << " --> " << colours::red(err.message_);
+  }
+#ifdef YAKSHA_TESTING
+  bool error_printer::has_error(const std::string &error_message) {
+    for (auto &e : error_capture) {
+      if (e == error_message) { return true; }
+    }
+    return false;
+  }
+  bool error_printer::has_any_error() { return !error_capture.empty(); }
+  bool error_printer::has_no_errors() { return error_capture.empty(); }
+#endif
+  void error_printer::print_errors(const std::vector<parsing_error> &errors) {
+    for (auto &err : errors) {
+      print_error(std::cerr, err);
+      std::cerr << "\n";
+    }
+  }
+}// namespace yaksha::errors

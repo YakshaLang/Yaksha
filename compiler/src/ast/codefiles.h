@@ -42,6 +42,7 @@
 #include "ast/ast.h"
 #include "compiler/entry_struct_func_compiler.h"
 #include "tokenizer/tokenizer.h"
+#include "utilities/error_printer.h"
 #include "utilities/ykdt_pool.h"
 #include "yaksha_lisp/yaksha_lisp.h"
 #include <filesystem>
@@ -52,7 +53,7 @@
 #include <vector>
 namespace yaksha {
   struct codefiles {
-    explicit codefiles(std::filesystem::path &libs_path);
+    codefiles(std::filesystem::path &libs_path, errors::error_printer *ep);
     ~codefiles();
     file_info *get_or_null(const std::string &f);
     file_info *initialize_parsing_or_null(const std::string &filename);
@@ -81,6 +82,7 @@ private:
     std::filesystem::path libs_path_{};
     std::unordered_map<std::intptr_t, std::filesystem::path>
         import_to_path_cache_{};
+    errors::error_printer *ep_{nullptr};
   };
 }// namespace yaksha
 #endif

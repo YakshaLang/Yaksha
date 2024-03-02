@@ -5,28 +5,31 @@ mkdir build
 mkdir bin
 mkdir bin/fuzz
 cp /app/test.txt bin/test.txt
+find . -type f -exec dos2unix {} \;
 set -e
 cd build || exit 1
 # Build project
-cmake -S .. -B . -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -fPIC -O0 -fsanitize=address -static-libasan -g"
+cmake -G Ninja -S .. -B . -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -fPIC -O0 -fsanitize=address -static-libasan -g"
 cmake --build . -- -j 24
-# Fix test data by converting them all to unix format
-cd ../test_data || exit 1
-dos2unix *
-cd ../bin || exit 1
 # Run test cases
 echo "██    ██ ███    ██ ██ ████████     ████████ ███████ ███████ ████████"
 echo "██    ██ ████   ██ ██    ██           ██    ██      ██         ██"
 echo "██    ██ ██ ██  ██ ██    ██           ██    █████   ███████    ██"
 echo "██    ██ ██  ██ ██ ██    ██           ██    ██           ██    ██"
 echo " ██████  ██   ████ ██    ██           ██    ███████ ███████    ██"
-./YakshaTests
+ninja test
 # Build carpntr
 cd ../carpntr
+rm -rf build
+mkdir build
 python3 bootstrap_me.py
+# Disable exit on error so we can run the rest of the commands
+set +e
 cd ../scripts
 # Run e2e tests
 python3 e2e.py
+# Run yaksha ast
+../bin/yaksha ast ../carpntr/main.yaka
 # Run libdocs.py
 mkdir ../comp_output_test
 python3 libdocs.py

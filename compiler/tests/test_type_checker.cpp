@@ -44,25 +44,22 @@
 using namespace yaksha;
 static void test_typechecker_yaka_file(const std::string &A,
                                        const std::string &E) {
-  yaksha::errors::error_capture.clear();
   multifile_compiler mc{};
   codegen_c cg{};
   auto result = mc.compile(A, &cg);
   REQUIRE(result.failed_ == true);
-  REQUIRE(!yaksha::errors::error_capture.empty());
-  REQUIRE(yaksha::errors::has_error(E));
+  REQUIRE(mc.error_printer_.has_any_error());
+  REQUIRE(mc.error_printer_.has_error(E));
 }
 static void test_typechecker_ok_yaka_file(const std::string &A) {
-  yaksha::errors::error_capture.clear();
   multifile_compiler mc{};
   codegen_c cg{};
   auto result = mc.compile(A, &cg);
   REQUIRE(result.failed_ == false);
-  REQUIRE(yaksha::errors::error_capture.empty());
+  REQUIRE(mc.error_printer_.has_no_errors());
 }
 static void test_typechecker_snippet(const std::string &S,
                                      const std::string &E) {
-  yaksha::errors::error_capture.clear();
   multifile_compiler mc{};
   codegen_c cg{};
   std::string xa = "def main() -> int:\n";
@@ -72,11 +69,10 @@ static void test_typechecker_snippet(const std::string &S,
         "    return 0";
   auto result = mc.compile(xa, true, "dummy.yaka", "../libs", &cg);
   REQUIRE(result.failed_ == true);
-  REQUIRE(!yaksha::errors::error_capture.empty());
-  REQUIRE(yaksha::errors::has_error(E));
+  REQUIRE(mc.error_printer_.has_any_error());
+  REQUIRE(mc.error_printer_.has_error(E));
 }
 static void test_typechecker_snippet_ok(const std::string &S) {
-  yaksha::errors::error_capture.clear();
   multifile_compiler mc{};
   codegen_c cg{};
   std::string xa = "def main() -> int:\n";
@@ -86,27 +82,25 @@ static void test_typechecker_snippet_ok(const std::string &S) {
         "    return 0";
   auto result = mc.compile(xa, true, "dummy.yaka", "../libs", &cg);
   REQUIRE(result.failed_ == false);
-  REQUIRE(yaksha::errors::error_capture.empty());
+  REQUIRE(mc.error_printer_.has_no_errors());
 }
 static void test_typechecker_snippet_full(const std::string &S,
                                           const std::string &E) {
-  yaksha::errors::error_capture.clear();
   multifile_compiler mc{};
   codegen_c cg{};
   const std::string &xa = S;
   auto result = mc.compile(xa, true, "dummy.yaka", "../libs", &cg);
   REQUIRE(result.failed_ == true);
-  REQUIRE(!yaksha::errors::error_capture.empty());
-  REQUIRE(yaksha::errors::has_error(E));
+  REQUIRE(mc.error_printer_.has_any_error());
+  REQUIRE(mc.error_printer_.has_error(E));
 }
 static void test_typechecker_snippet_full_ok(const std::string &S) {
-  yaksha::errors::error_capture.clear();
   multifile_compiler mc{};
   codegen_c cg{};
   const std::string &xa = S;
   auto result = mc.compile(xa, true, "dummy.yaka", "../libs", &cg);
   REQUIRE(result.failed_ == false);
-  REQUIRE(yaksha::errors::error_capture.empty());
+  REQUIRE(mc.error_printer_.has_no_errors());
 }
 TEST_CASE("type checker: Bad function for qsort") {
   test_typechecker_yaka_file(

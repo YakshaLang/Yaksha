@@ -43,12 +43,13 @@
 #include "codegen.h"
 #include "compiler/comp_result.h"
 #include "tokenizer/token.h"
+#include "utilities/error_printer.h"
 #include "utilities/gc_pool.h"
 #include <string>
 namespace yaksha {
   struct do_nothing_codegen : codegen {
     ~do_nothing_codegen() override = default;
-    comp_result emit(codefiles *cf, gc_pool<token> *token_pool) override;
+    comp_result emit(codefiles *cf, gc_pool<token> *token_pool, errors::error_printer* ep) override;
   };
   struct multifile_compiler {
     multifile_compiler() = default;
@@ -63,6 +64,7 @@ namespace yaksha {
     bool main_required_ = true;
     bool check_types_ = true;
     bool usage_analysis_ = true;
+    errors::error_printer error_printer_{};
 
 private:
     gc_pool<token> token_pool_{};

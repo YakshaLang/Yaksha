@@ -47,63 +47,37 @@
 #include <utilities/colours.h>
 #include <vector>
 namespace yaksha::errors {
+  struct error_printer {
+    error_printer() = default;
+    /**
+     * Print a problematic token
+     * @param output where to write the output to
+     * @param tok token object
+     */
+    void print_token(std::ostream &output, const token &tok);
+    /**
+     * Print a single error
+     * @param output where to write the error message
+     * @param err error object
+     */
+    void print_error(std::ostream &output, const parsing_error &err);
 #ifdef YAKSHA_TESTING
-  // Note: this is defined in error_printer.cpp
-  // This is used for type checker testing
-  extern std::vector<std::string> error_capture;
+    bool has_error(const std::string &error_message);
+    bool has_any_error();
+    bool has_no_errors();
 #endif
-  /**
-   * Print a problematic token
-   * @param output where to write the output to
-   * @param tok token object
-   */
-  static inline void print_token(std::ostream &output, const token &tok) {
-    output << tok.file_ << colours::green(":") << tok.line_ + 1
-           << colours::green(":") << tok.pos_;
-    if (tok.type_ == token_type::END_OF_FILE) {
-      output << " at EOF";
-    } else if (tok.type_ != token_type::TK_UNKNOWN_TOKEN_DETECTED) {
-      output << " at "
-             << colours::cyan(string_utils::repr_string(tok.original_));
-    } else {
-      output << " ";
-    }
-  }
-  /**
-   * Print a single error
-   * @param output where to write the error message
-   * @param err error object
-   */
-  static inline void print_error(std::ostream &output,
-                                 const parsing_error &err) {
+    /**
+     * Print a vector of errors to std::cerr
+     * @param errors errors to print
+     */
+    void print_errors(const std::vector<parsing_error> &errors);
+
+private:
 #ifdef YAKSHA_TESTING
-    error_capture.push_back(err.message_);
+    // Note: this is defined in error_printer.cpp
+    // This is used for type checker testing
+    std::vector<std::string> error_capture{};
 #endif
-    if (!err.token_set_) {
-      output << colours::red(err.message_);
-      return;
-    }
-    auto tok = err.tok_;
-    print_token(output, tok);
-    output << " --> " << colours::red(err.message_);
-  }
-#ifdef YAKSHA_TESTING
-  static bool has_error(const std::string &error_message) {
-    for (auto &e : error_capture) {
-      if (e == error_message) { return true; }
-    }
-    return false;
-  }
-#endif
-  /**
-   * Print a vector of errors to std::cerr
-   * @param errors errors to print
-   */
-  static inline void print_errors(const std::vector<parsing_error> &errors) {
-    for (auto &err : errors) {
-      print_error(std::cerr, err);
-      std::cerr << "\n";
-    }
-  }
+  };
 }// namespace yaksha::errors
 #endif

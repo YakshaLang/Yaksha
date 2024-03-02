@@ -157,9 +157,10 @@ int main(int argc, char *argv[]) {
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
   tokenizer token_extractor{file_name, data, &token_pool};
+  errors::error_printer ep{};
   token_extractor.tokenize();
   if (!token_extractor.errors_.empty()) {
-    errors::print_errors(token_extractor.errors_);
+    ep.print_errors(token_extractor.errors_);
     return EXIT_FAILURE;
   }
   // Now to print stuff

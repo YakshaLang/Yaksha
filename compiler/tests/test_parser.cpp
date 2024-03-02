@@ -112,8 +112,8 @@ static void TEST_SNIPPET_FULL(const std::string &S, const std::string &E) {
   const std::string &xa = S;
   auto result = mc.compile(xa, true, "dummy.yaka", ".", &cg);
   REQUIRE(result.failed_ == true);
-  REQUIRE(!yaksha::errors::error_capture.empty());
-  REQUIRE(yaksha::errors::has_error(E));
+  REQUIRE(mc.error_printer_.has_any_error());
+  REQUIRE(mc.error_printer_.has_error(E));
 }
 static void TEST_SNIPPET_FULL_OK(const std::string &S) {
   multifile_compiler mc{};
@@ -121,7 +121,7 @@ static void TEST_SNIPPET_FULL_OK(const std::string &S) {
   const std::string &xa = S;
   auto result = mc.compile(xa, true, "dummy.yaka", ".", &cg);
   REQUIRE(result.failed_ == false);
-  REQUIRE(yaksha::errors::error_capture.empty());
+  REQUIRE(mc.error_printer_.has_no_errors());
 }
 TEST_CASE("parser: Hello World") {
   test_parser_yaka_file("../test_data/compiler_tests/test1.yaka");

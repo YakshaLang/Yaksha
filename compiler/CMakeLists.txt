@@ -25,13 +25,15 @@ include_directories(${REPROC_DIR}/reproc++/include)
 set(REPROC++ ON)
 add_subdirectory(${REPROC_DIR})
 
-## Enable below to use address sanitizer
-# add_compile_options(-O1 -g -fsanitize=address -fno-omit-frame-pointer)
-# add_link_options(-g -fsanitize=address)
+if(DEFINED ENV{YAKSHA_ADDRESS_SANITIZER})
+    add_compile_options(-O1 -g -fsanitize=address -fno-omit-frame-pointer)
+    add_link_options(-g -fsanitize=address)
+endif()
 
-## Enable below to use undefined behaviour sanitizer
-# add_compile_options(-O1 -g -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -fno-omit-frame-pointer)
-# add_link_options(-g -fsanitize=undefined -fsanitize=integer -fsanitize=nullability)
+if(DEFINED ENV{YAKSHA_UNDEFINED_SANITIZER})
+    add_compile_options(-O1 -g -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -fno-omit-frame-pointer)
+    add_link_options(-g -fsanitize=undefined -fsanitize=integer -fsanitize=nullability)
+endif()
 
 set(YAKSHA_SOURCE_FILES
         src/ast/ast.h src/ast/ast_printer.h src/ast/ast_vis.h src/ast/codefiles.h src/ast/environment.h src/ast/environment_stack.h src/ast/parser.h src/builtins/builtin.h src/builtins/builtins.h src/compiler/codegen.h src/compiler/codegen_c.h src/compiler/codegen_json.h src/compiler/comp_result.h src/compiler/compiler_utils.h src/compiler/const_fold.h src/compiler/datatype_compiler.h src/compiler/datatype_parser.h src/compiler/def_class_visitor.h src/compiler/delete_stack.h src/compiler/delete_stack_stack.h src/compiler/desugaring_compiler.h src/compiler/entry_struct_func_compiler.h src/compiler/function_datatype_extractor.h src/compiler/literal_utils.h src/compiler/multifile_compiler.h src/compiler/return_checker.h src/compiler/slot_matcher.h src/compiler/statement_writer.h src/compiler/to_c_compiler.h src/compiler/type_checker.h src/compiler/usage_analyser.h src/file_formats/ic_tokens_file.h src/file_formats/tokens_file.h src/ic2c/ic2c.h src/ic2c/ic_ast.h src/ic2c/ic_compiler.h src/ic2c/ic_level2_parser.h src/ic2c/ic_level2_tokenizer.h src/ic2c/ic_line_splicer.h src/ic2c/ic_optimizer.h src/ic2c/ic_parser.h src/ic2c/ic_peek_ahead_iter.h src/ic2c/ic_preprocessor.h src/ic2c/ic_simple_character_iter.h src/ic2c/ic_token.h src/ic2c/ic_tokenizer.h src/ic2c/ic_trigraph_translater.h src/tokenizer/block_analyzer.h src/tokenizer/string_utils.h src/tokenizer/token.h src/tokenizer/tokenizer.h src/utilities/annotation.h src/utilities/annotations.h src/utilities/argparser.h src/utilities/colours.h src/utilities/cpp_util.h src/utilities/defer_stack.h src/utilities/defer_stack_stack.h src/utilities/error_printer.h src/utilities/gc_pool.h src/utilities/human_id.h src/utilities/ykdatatype.h src/utilities/ykdt_pool.h src/utilities/ykobject.h src/yaksha_lisp/macro_processor.h src/yaksha_lisp/prelude.h src/yaksha_lisp/yaksha_lisp.h src/yaksha_lisp/yaksha_lisp_builtins.h src/ast/ast.cpp src/ast/ast_printer.cpp src/ast/ast_vis.cpp src/ast/codefiles.cpp src/ast/environment.cpp src/ast/environment_stack.cpp src/ast/parser.cpp src/builtins/builtins.cpp src/compiler/codegen_c.cpp src/compiler/codegen_json.cpp src/compiler/compiler_utils.cpp src/compiler/const_fold.cpp src/compiler/def_class_visitor.cpp src/compiler/delete_stack.cpp src/compiler/delete_stack_stack.cpp src/compiler/desugaring_compiler.cpp src/compiler/entry_struct_func_compiler.cpp src/compiler/literal_utils.cpp src/compiler/multifile_compiler.cpp src/compiler/return_checker.cpp src/compiler/to_c_compiler.cpp src/compiler/type_checker.cpp src/compiler/usage_analyser.cpp src/file_formats/ic_tokens_file.cpp src/file_formats/tokens_file.cpp src/ic2c/ic2c.cpp src/ic2c/ic_ast.cpp src/ic2c/ic_compiler.cpp src/ic2c/ic_level2_parser.cpp src/ic2c/ic_level2_tokenizer.cpp src/ic2c/ic_line_splicer.cpp src/ic2c/ic_optimizer.cpp src/ic2c/ic_parser.cpp src/ic2c/ic_peek_ahead_iter.cpp src/ic2c/ic_preprocessor.cpp src/ic2c/ic_tokenizer.cpp src/ic2c/ic_trigraph_translater.cpp src/tokenizer/block_analyzer.cpp src/tokenizer/string_utils.cpp src/tokenizer/tokenizer.cpp src/utilities/annotation.cpp src/utilities/annotations.cpp src/utilities/colours.cpp src/utilities/cpp_util.cpp src/utilities/defer_stack.cpp src/utilities/defer_stack_stack.cpp src/utilities/error_printer.cpp src/utilities/human_id.cpp src/utilities/ykdatatype.cpp src/utilities/ykdt_pool.cpp src/utilities/ykobject.cpp src/yaksha_lisp/yaksha_lisp.cpp src/yaksha_lisp/yaksha_lisp_builtins.cpp) # update_makefile.py SRC
@@ -70,8 +72,8 @@ target_compile_features(yakshadmp PRIVATE cxx_std_17)
 
 # -- ykreload - compiler --
 if(MSVC)
-add_executable(ykreload src/reloader.cpp)
-target_compile_features(yakshac PRIVATE cxx_std_17)
+    add_executable(ykreload src/reloader.cpp)
+    target_compile_features(yakshac PRIVATE cxx_std_17)
 endif (MSVC)
 
 # -- yaksha binary --
@@ -100,14 +102,16 @@ catch_discover_tests(YakshaTests)
 
 # Adding Fuzzer Binary
 # ---------------------
+add_executable(YakshaFuzz ${YAKSHA_SOURCE_FILES}  tests/fuzz_main.cpp runtime/whereami.c)
 if(DEFINED ENV{YAKSHA_FUZZ})
     set(CMAKE_CXX_FLAGS "-fsanitize=fuzzer,address -g -O1")
-    add_executable(YakshaFuzz ${YAKSHA_SOURCE_FILES}  tests/fuzz_main.cpp runtime/whereami.c)
     target_compile_definitions(YakshaFuzz PUBLIC YAKSHA_LLVM_FUZZ)
-    target_link_libraries(YakshaFuzz PUBLIC ${SYS_LIBS})
-    target_link_libraries(YakshaFuzz PUBLIC reproc++)
-    target_compile_features(YakshaFuzz PRIVATE cxx_std_17)
 endif()
+target_compile_definitions(YakshaFuzz PUBLIC TESTING)
+target_link_libraries(YakshaFuzz PUBLIC ${SYS_LIBS})
+target_link_libraries(YakshaFuzz PUBLIC reproc++)
+target_compile_features(YakshaFuzz PRIVATE cxx_std_17)
+
 
 # CMake Build for carpntr
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")

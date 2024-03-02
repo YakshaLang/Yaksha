@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
   return lisp_execute_file(argv[1]);
 }
 int lisp_execute_file(char *file_path) {
+  errors::error_printer ep{};
   std::string file_name{file_path};
   std::ifstream script_file(file_name);
   if (!script_file.good()) {
@@ -69,13 +70,13 @@ int lisp_execute_file(char *file_path) {
   yaksha_lisp_tokenizer *tokenizer = mm.create_tokenizer();
   tokenizer->tokenize(file_name, data, mm.get_yk_token_pool());
   if (!tokenizer->errors_.empty()) {
-    errors::print_errors(tokenizer->errors_);
+    ep.print_errors(tokenizer->errors_);
     return EXIT_FAILURE;
   }
   yaksha_lisp_parser *parser = mm.create_parser(tokenizer);
   parser->parse();
   if (!parser->errors_.empty()) {
-    errors::print_errors(parser->errors_);
+    ep.print_errors(parser->errors_);
     return EXIT_FAILURE;
   }
   std::string f_path{file_path};
@@ -85,29 +86,29 @@ int lisp_execute_file(char *file_path) {
   try {
     environment->eval(parser->exprs_);
   } catch (parsing_error &ex) {
-    errors::print_error(std::cerr, ex);
+    ep.print_error(std::cerr, ex);
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
 }
 void eval_line(const std::string &code, yaksha_envmap *environment,
-               yaksha_macros *mm) {
+               yaksha_macros *mm, errors::error_printer &ep) {
   yaksha_lisp_tokenizer *tokenizer = mm->create_tokenizer();
   tokenizer->tokenize("repl.lisp", code, mm->get_yk_token_pool());
   if (!tokenizer->errors_.empty()) {
-    errors::print_errors(tokenizer->errors_);
+    ep.print_errors(tokenizer->errors_);
     return;
   }
   yaksha_lisp_parser *parser = mm->create_parser(tokenizer);
   parser->parse();
   if (!parser->errors_.empty()) {
-    errors::print_errors(parser->errors_);
+    ep.print_errors(parser->errors_);
     return;
   }
   try {
     auto result = environment->eval(parser->exprs_);
     if (result != nullptr) { std::cout << colours::cyan("-> ") << result; }
-  } catch (parsing_error &ex) { errors::print_error(std::cerr, ex); }
+  } catch (parsing_error &ex) { ep.print_error(std::cerr, ex); }
 }
 int lisp_repl() {
   std::cout << colours::red("                                 \n"
@@ -140,6 +141,7 @@ int lisp_repl() {
   std::cout << "\n";
 #endif
   bool exit = false;
+  errors::error_printer ep{};
   while (!exit) {
     std::string line{};
     std::cout << colours::green(">> ");
@@ -149,7 +151,7 @@ int lisp_repl() {
       exit = true;
       continue;
     }
-    eval_line(line, environment, &mm);
+    eval_line(line, environment, &mm, ep);
     std::cout << "\n";
   }
   return EXIT_SUCCESS;

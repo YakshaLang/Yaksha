@@ -44,9 +44,9 @@
 #include "utilities/error_printer.h"
 #include <optional>
 using namespace yaksha;
-codefiles::codefiles(std::filesystem::path &libs_path)
+codefiles::codefiles(std::filesystem::path &libs_path, errors::error_printer *ep)
     : current_path_(std::filesystem::current_path()), prefixes_(),
-      path_to_fi_(), libs_path_{libs_path}, pool_() {
+      path_to_fi_(), libs_path_{libs_path}, pool_(), ep_{ep} {
   esc_ = new entry_struct_func_compiler(&pool_);
 }
 codefiles::~codefiles() {
@@ -217,14 +217,14 @@ file_data *codefiles::parse_or_null(const std::string &data,
   auto *t = new tokenizer{file_name, data, yaksha_macros_.get_yk_token_pool()};
   t->tokenize();
   if (!t->errors_.empty()) {
-    errors::print_errors(t->errors_);
+    ep_->print_errors(t->errors_);
     delete (t);
     return nullptr;
   }
   auto *b = new block_analyzer{t->tokens_, yaksha_macros_.get_yk_token_pool()};
   b->analyze();
   if (!b->errors_.empty()) {
-    errors::print_errors(b->errors_);
+    ep_->print_errors(b->errors_);
     delete (t);
     delete (b);
     return nullptr;
@@ -232,7 +232,7 @@ file_data *codefiles::parse_or_null(const std::string &data,
   auto *p = new parser(file_name, b->tokens_, &pool_);
   p->step_1_parse_token_soup();
   if (!b->errors_.empty()) {
-    errors::print_errors(b->errors_);
+    ep_->print_errors(b->errors_);
     delete (t);
     delete (b);
     delete (p);

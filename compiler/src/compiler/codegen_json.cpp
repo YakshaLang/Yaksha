@@ -44,7 +44,7 @@
 using namespace yaksha;
 codegen_json::codegen_json() = default;
 codegen_json::~codegen_json() = default;
-comp_result codegen_json::emit(codefiles *cf, gc_pool<token> *token_pool) {
+comp_result codegen_json::emit(codefiles *cf, gc_pool<token> *token_pool, errors::error_printer* ep) {
   //  return {false, to_json.compile(cf->main_file_info_)};
   std::stringstream multi_file_json{};
   multi_file_json << "{\n";

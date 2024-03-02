@@ -68,7 +68,7 @@ comp_result multifile_compiler::compile(const std::string &code, bool use_code,
                                         codegen *code_generator) {
   LOG_COMP("compile:" << main_file);
   std::filesystem::path library_parent{libs_path};
-  cf_ = new codefiles{library_parent};
+  cf_ = new codefiles{library_parent, &error_printer_};
   // Step 0) First of all, we initialize parsing
   // In this step, we initialize all files we know of at this point
   file_info *main_file_info;
@@ -179,7 +179,7 @@ comp_result multifile_compiler::compile_all(codegen *code_generator) {
     LOG_COMP("dsv extract:" << f->filepath_.string());
     if (!f->data_->dsv_->errors_.empty()) {
       LOG_COMP("dsv errors");
-      errors::print_errors(f->data_->dsv_->errors_);
+      error_printer_.print_errors(f->data_->dsv_->errors_);
       has_errors = true;
     }
     delete builtins_obj;
@@ -210,7 +210,7 @@ comp_result multifile_compiler::compile_all(codegen *code_generator) {
       }
       f->data_->type_checker_->check(f->data_->parser_->stmts_);
       if (!f->data_->type_checker_->errors_.empty()) {
-        errors::print_errors(f->data_->type_checker_->errors_);
+        error_printer_.print_errors(f->data_->type_checker_->errors_);
         LOG_COMP("type checker found errors: " << f->filepath_.string());
         has_errors = true;
       }
@@ -226,12 +226,12 @@ comp_result multifile_compiler::compile_all(codegen *code_generator) {
     usage_analyser ua{main_file_info};
     ua.analyse();
     if (!ua.errors_.empty()) {
-      errors::print_errors(ua.errors_);
+      error_printer_.print_errors(ua.errors_);
       LOG_COMP("usage analyser found errors");
       return {true, ""};
     }
   }
-  return code_generator->emit(cf_, &token_pool_);
+  return code_generator->emit(cf_, &token_pool_, &error_printer_);
 }
 void multifile_compiler::step_5_parse() {
   LOG_COMP("parsing: parsing to yaksha AST");
@@ -246,7 +246,7 @@ void multifile_compiler::step_5_parse() {
       f->step_ = scanning_step::PARSE_DONE;
     } else {
       std::cerr << "Failed to parse:" << f->filepath_ << "\n";
-      errors::print_errors(f->data_->parser_->errors_);
+      error_printer_.print_errors(f->data_->parser_->errors_);
       f->step_ = scanning_step::FAILURE;
     }
   }
@@ -266,7 +266,7 @@ void multifile_compiler::step_4_expand_macros() {
     } else {
       std::cerr << "Failed to expand dsl!{} in lisp-macro env:" << f->filepath_
                 << "\n";
-      errors::print_errors(f->data_->parser_->errors_);
+      error_printer_.print_errors(f->data_->parser_->errors_);
       f->step_ = scanning_step::FAILURE;
     }
   }
@@ -285,7 +285,7 @@ void multifile_compiler::step_3_macros_setup() {
     } else {
       std::cerr << "Failed to execute macros!{} in lisp-macro env:"
                 << f->filepath_ << "\n";
-      errors::print_errors(f->data_->parser_->errors_);
+      error_printer_.print_errors(f->data_->parser_->errors_);
       f->step_ = scanning_step::FAILURE;
     }
   }
@@ -306,7 +306,7 @@ void multifile_compiler::step_2_initialize_preprocessor_env() {
     } catch (const parsing_error &ex) { /* redefining imports, etc */
       std::cerr << "Failed to initialize lisp-macro env:" << f->filepath_
                 << "\n";
-      errors::print_error(std::cerr, ex);
+      error_printer_.print_error(std::cerr, ex);
       f->step_ = scanning_step::FAILURE;
     }
   }
@@ -325,7 +325,7 @@ void multifile_compiler::step_1_scan_macro_soup() {
     } else {
       std::cerr << "Failed to parse non-preprocessed tokens:" << f->filepath_
                 << "\n";
-      errors::print_errors(f->data_->parser_->errors_);
+      error_printer_.print_errors(f->data_->parser_->errors_);
       f->step_ = scanning_step::FAILURE;
     }
   }
@@ -354,6 +354,6 @@ bool multifile_compiler::has_invalid_main_func(
 multifile_compiler::~multifile_compiler() { delete cf_; }
 codefiles &multifile_compiler::get_codefiles() const { return *cf_; }
 comp_result do_nothing_codegen::emit(codefiles *cf,
-                                     gc_pool<token> *token_pool) {
+                                     gc_pool<token> *token_pool, errors::error_printer* ep) {
   return comp_result{false, ""};
 }

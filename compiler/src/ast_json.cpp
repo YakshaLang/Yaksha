@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
   comp_result result;
+  multifile_compiler mc{};
   try {
-    multifile_compiler mc{};
     mc.main_required_ = check_main.is_set_;
     mc.check_types_ = check_types.is_set_;
     mc.usage_analysis_ = false; // disable usage analysis as JSON will dump all
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
       result = mc.compile(code.value_, lib.value_, &cg);
     }
     if (result.failed_) { return EXIT_FAILURE; }
-  } catch (parsing_error &e) { errors::print_errors({e}); }
+  } catch (parsing_error &e) { mc.error_printer_.print_error(std::cerr, e); }
   std::cout << result.code_;
   return EXIT_SUCCESS;
 }

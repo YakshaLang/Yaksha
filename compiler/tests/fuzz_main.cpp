@@ -39,6 +39,7 @@
 #include "ast/ast_printer.h"
 #include "ast/ast_vis.h"
 #include "ast/parser.h"
+#include "compiler/codegen_c.h"
 #include "compiler/multifile_compiler.h"
 #include "compiler/type_checker.h"
 #include "file_formats/tokens_file.h"
@@ -47,12 +48,13 @@
 #include "utilities/error_printer.h"
 using namespace yaksha;
 void test_ast(const std::string &data, const std::string &file_name) {
+  errors::error_printer ep{};
   gc_pool<token> token_pool{};
   tokenizer t{file_name, data, &token_pool};
   ykdt_pool dt_pool{};
   t.tokenize();
   if (!t.errors_.empty()) {
-    errors::print_errors(t.errors_);
+    ep.print_errors(t.errors_);
     return;
   }
   block_analyzer b{t.tokens_, &token_pool};
@@ -67,7 +69,7 @@ void test_ast(const std::string &data, const std::string &file_name) {
       ast_vis vr{};
       vr.print(tree);
     } else {
-      errors::print_errors(p.errors_);
+      ep.print_errors(p.errors_);
       return;
     }
   } catch (parsing_error &p) {
@@ -78,7 +80,8 @@ void test_ast(const std::string &data, const std::string &file_name) {
 }
 void test_compiler(const std::string &filepath) {
   multifile_compiler mc{};
-  auto result = mc.compile(filepath, "/app/libs");
+  codegen_c cg{};
+  auto result = mc.compile(filepath, "/app/libs", &cg);
   std::cout << "Success : " << (result.failed_ ? "No\n" : "Yes\n");
   std::cout << result.code_ << "\n";
 }
@@ -89,7 +92,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   std::string lib_path = "/app/libs";
   test_ast(code, fname);
   multifile_compiler mc{};
-  mc.compile(code, true, fname, lib_path);
+  codegen_c cg{};
+  mc.compile(code, true, fname, lib_path, &cg);
   return 0;
 }
 #else

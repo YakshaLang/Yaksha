@@ -63,9 +63,10 @@ int main(int argc, char *argv[]) {
                    std::istreambuf_iterator<char>());
   gc_pool<token> token_pool{};
   tokenizer t{file_name, data, &token_pool};
+  errors::error_printer ep{};
   t.tokenize();
   if (!t.errors_.empty()) {
-    errors::print_errors(t.errors_);
+    ep.print_errors(t.errors_);
     return EXIT_FAILURE;
   }
   block_analyzer b{t.tokens_, &token_pool};
@@ -75,7 +76,7 @@ int main(int argc, char *argv[]) {
     parser p{file_name, b.tokens_, &dt_pool};
     auto tree = p.parse();
     if (tree.empty() || !p.errors_.empty()) {
-      errors::print_errors(p.errors_);
+      ep.print_errors(p.errors_);
       write_token_dump(std::cerr, b.tokens_);
       return EXIT_FAILURE;
     }
