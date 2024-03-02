@@ -308,6 +308,7 @@ Additionally following function in `libs` work.
 def main():
     structures = {}
     files = []
+    summary_file = []
     # Scan
     for mod_full_filepath in glob.glob(os.path.join(LIBS_DIR, '**', '*.yaka'), recursive=True):
         # print("<!-- parsing", Colors.cyan(mod_full_filepath), "-->")
@@ -337,6 +338,7 @@ def main():
         if header in PREFIXES:
             print(PREFIXES[header])
         print(Colors.cyan("## ") + Colors.blue(yaksha_mod))
+        summary_file.append(header)
         print("```yaksha")
 
         for f in structures[yaksha_mod]["macros"]:
@@ -344,25 +346,32 @@ def main():
             display_mac(buf, f)
             display_comment(buf, f)
             print(buf.build_color())
+            summary_file.append(buf.build())
 
         for f in structures[yaksha_mod]["global_consts"]:
             buf = Buf()
             display_param(buf, f)
             display_comment(buf, f)
             print(buf.build_color())
+            summary_file.append(buf.build())
 
         for f in structures[yaksha_mod]["classes"]:
             buf = Buf()
             display_class(buf, f)
             print(buf.build_color())
+            summary_file.append(buf.build())
 
         for f in structures[yaksha_mod]["functions"]:
             buf = Buf()
             display_function(buf, f)
             print(buf.build_color())
+            summary_file.append(buf.build())
 
         print("```")
         print()
+
+    with open(os.path.join(OUTPUT_DIR, "docs.yaka"), "w+", encoding="utf-8") as h:
+        h.write("\n".join(summary_file))
 
 if __name__ == "__main__":
     main()
