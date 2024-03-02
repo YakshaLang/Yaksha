@@ -61,6 +61,8 @@ namespace yaksha {
                         const std::string &libs_path, codegen *code_generator);
     [[nodiscard]] codefiles &get_codefiles() const;
     bool main_required_ = true;
+    bool check_types_ = true;
+    bool usage_analysis_ = true;
 
 private:
     gc_pool<token> token_pool_{};

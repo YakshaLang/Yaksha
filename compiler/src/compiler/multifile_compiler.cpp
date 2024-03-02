@@ -191,41 +191,45 @@ comp_result multifile_compiler::compile_all(codegen *code_generator) {
     return {true, ""};
   }
   LOG_COMP("has a main() or no main required");
-  // Ensure all data types have the proper module
-  for (auto f : cf_->files_) { f->data_->parser_->rescan_datatypes(); }
-  // Type check all files
-  for (auto f : cf_->files_) {
-    f->data_->type_checker_ =
-        new type_checker(f->filepath_.string(), cf_, f->data_->dsv_,
-                         &(cf_->pool_), &token_pool_);
-    // TODO create a function in the type checker to do this
-    for (auto impo : f->data_->parser_->import_stmts_) {
-      auto obj = ykobject(&(cf_->pool_));
-      obj.object_type_ = object_type::MODULE;
-      obj.string_val_ = impo->data_->filepath_.string();
-      obj.module_file_ = impo->data_->filepath_.string();
-      obj.module_name_ = impo->name_->token_;
-      f->data_->type_checker_->scope_.define_global(impo->name_->token_, obj);
+  if (check_types_) {
+    // Ensure all data types have the proper module
+    for (auto f : cf_->files_) { f->data_->parser_->rescan_datatypes(); }
+    // Type check all files
+    for (auto f : cf_->files_) {
+      f->data_->type_checker_ =
+          new type_checker(f->filepath_.string(), cf_, f->data_->dsv_,
+                           &(cf_->pool_), &token_pool_);
+      // TODO create a function in the type checker to do this
+      for (auto impo : f->data_->parser_->import_stmts_) {
+        auto obj = ykobject(&(cf_->pool_));
+        obj.object_type_ = object_type::MODULE;
+        obj.string_val_ = impo->data_->filepath_.string();
+        obj.module_file_ = impo->data_->filepath_.string();
+        obj.module_name_ = impo->name_->token_;
+        f->data_->type_checker_->scope_.define_global(impo->name_->token_, obj);
+      }
+      f->data_->type_checker_->check(f->data_->parser_->stmts_);
+      if (!f->data_->type_checker_->errors_.empty()) {
+        errors::print_errors(f->data_->type_checker_->errors_);
+        LOG_COMP("type checker found errors: " << f->filepath_.string());
+        has_errors = true;
+      }
     }
-    f->data_->type_checker_->check(f->data_->parser_->stmts_);
-    if (!f->data_->type_checker_->errors_.empty()) {
-      errors::print_errors(f->data_->type_checker_->errors_);
-      LOG_COMP("type checker found errors: " << f->filepath_.string());
-      has_errors = true;
+    if (has_errors) {
+      LOG_COMP("found type checking errors");
+      return {true, ""};
     }
   }
-  if (has_errors) {
-    LOG_COMP("found type checking errors");
-    return {true, ""};
-  }
-  // Statement usage analysis
-  // So we know which 'functions / classes / consts' are actually used
-  usage_analyser ua{main_file_info};
-  ua.analyse();
-  if (!ua.errors_.empty()) {
-    errors::print_errors(ua.errors_);
-    LOG_COMP("usage analyser found errors");
-    return {true, ""};
+  if (usage_analysis_) {
+    // Statement usage analysis
+    // So we know which 'functions / classes / consts' are actually used
+    usage_analyser ua{main_file_info};
+    ua.analyse();
+    if (!ua.errors_.empty()) {
+      errors::print_errors(ua.errors_);
+      LOG_COMP("usage analyser found errors");
+      return {true, ""};
+    }
   }
   return code_generator->emit(cf_, &token_pool_);
 }

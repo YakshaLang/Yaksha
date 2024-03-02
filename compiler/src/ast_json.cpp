@@ -43,22 +43,38 @@
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "ast"
 #endif
+#include "utilities/argparser.h"
 using namespace yaksha;
 int main(int argc, char *argv[]) {
-  if (argc != 2 && argc != 3) {
-    std::cerr << "Usage: " << PROGRAM_NAME
-              << " script.yaka [LIBS_PARENT_PATH]\n";
+  auto args = argparser::ARGS(PROGRAM_NAME, "Compile Yaksha AST to Json", "");
+  auto help = argparser::OP_BOOL('h', "--help", "Print this help message");
+  auto check_main = argparser::OP_BOOL('c', "--check-main", "Enable main() check");
+  auto check_types = argparser::OP_BOOL('t', "--check-types", "Enable type checking");
+  args.optional_ = {&help, &check_main, &check_types};
+  auto code = argparser::PO("mainfile.yaka", "Yaksha code file.");
+  auto lib = argparser::PO_OPT("[LIBS_PARENT_PATH]", "Path to the parent directory of the libraries");
+  args.positional_ = {&code, &lib};
+  argparser::parse_args(argc, argv, args);
+  if (help.is_set_) {
+    argparser::print_help(args);
+    return EXIT_SUCCESS;
+  }
+  if (!args.errors_.empty()) {
+    argparser::print_errors(args);
+    argparser::print_help(args);
     return EXIT_FAILURE;
   }
   comp_result result;
   try {
     multifile_compiler mc{};
-    mc.main_required_ = false;
+    mc.main_required_ = check_main.is_set_;
+    mc.check_types_ = check_types.is_set_;
+    mc.usage_analysis_ = false; // disable usage analysis as JSON will dump all
     codegen_json cg{};
-    if (argc == 2) {// Just code.yaka is passed
-      result = mc.compile(argv[1], &cg);
+    if (!lib.is_set_) {// Just code.yaka is passed
+      result = mc.compile(code.value_, &cg);
     } else {// code.yaka + LIBS_PARENT_PATH
-      result = mc.compile(argv[1], argv[2], &cg);
+      result = mc.compile(code.value_, lib.value_, &cg);
     }
     if (result.failed_) { return EXIT_FAILURE; }
   } catch (parsing_error &e) { errors::print_errors({e}); }
