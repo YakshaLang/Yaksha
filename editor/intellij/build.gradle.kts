@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.guava:guava:31.1-jre")
+    implementation("com.google.guava:guava:33.0.0-jre")
     implementation("com.google.code.gson:gson:2.9.1")
 }
 

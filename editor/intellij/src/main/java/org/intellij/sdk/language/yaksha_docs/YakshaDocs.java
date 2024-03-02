@@ -189,6 +189,11 @@ public class YakshaDocs {
                 return cl.genDoc(importPath);
             }
         }
+        for (YakshaMacro y: documentation.macros) {
+            if (y.name.equals(name)) {
+                return y.genDoc(importPath);
+            }
+        }
         return "";
     }
 
@@ -236,10 +241,20 @@ public class YakshaDocs {
     public static class Doc {
         public List<Import> imports;
         public List<GlobalConstant> global_consts;
+        public List<YakshaMacro> macros;
         public List<Fn> functions;
         public List<Cls> classes;
 
         public void fill(DefaultMutableTreeNode lib, String filterLowerCase) {
+            macros.forEach(m -> {
+                if (keepOut(filterLowerCase, m.getRepr(), m.getTypeText())) {
+                    return;
+                }
+                DefaultMutableTreeNode node = new DefaultMutableTreeNode(DocWithIcon.dwi(m.getRepr(),
+                        YakshaIcons.MACRO));
+                addComments(m.getTypeText(), node);
+                lib.add(node);
+            });
             global_consts.forEach(c -> {
                 if (keepOut(filterLowerCase, c.getRepr(), c.getTypeText())) {
                     return;
@@ -268,6 +283,7 @@ public class YakshaDocs {
                 addComments(c.getTypeText(), node);
                 lib.add(node);
             });
+
         }
     }
 
@@ -295,6 +311,26 @@ public class YakshaDocs {
             b.description(comment.replace("\n", "<br />"));
             b.keyValue("<b>Kind</b>", "Constant");
             b.keyValue("Data Type", datatype.toString());
+            return b.build();
+        }
+    }
+    public static class YakshaMacro {
+        public String name;
+        public String comment;
+
+        public String getRepr() {
+            return name;
+        }
+
+        public String getTypeText() {
+            return comment;
+        }
+
+        public String genDoc(final String importPath) {
+            DocBuilder b = new DocBuilder();
+            b.title(importPath + "." + name);
+            b.description(comment.replace("\n", "<br />"));
+            b.keyValue("<b>Kind</b>", "Macro");
             return b.build();
         }
     }

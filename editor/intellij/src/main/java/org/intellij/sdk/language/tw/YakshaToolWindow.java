@@ -19,7 +19,7 @@ public class YakshaToolWindow {
     private JTree documentationTree;
     private JTextField filterText;
 
-    private Debouncer debouncer = new Debouncer();
+    private final Debouncer debouncer = new Debouncer();
 
     public static class Debouncer {
         private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
