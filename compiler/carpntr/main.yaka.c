@@ -3733,7 +3733,7 @@ yk__sds yy__os_which(yk__sds yy__os_binary)
 }
 yk__sds yy__libs_version() 
 {
-    return yk__sdsnewlen("0.0.6", 5);
+    return yk__sdsnewlen("0.0.7", 5);
 }
 void yy__print_banner() 
 {
