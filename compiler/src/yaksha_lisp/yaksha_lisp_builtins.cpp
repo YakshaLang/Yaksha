@@ -45,6 +45,10 @@
 using namespace yaksha;
 // TODO make the code here nicer, too much copy pasta
 static bool yaksha_macro_print_allowed = false;
+static inline std::size_t ensure_unsigned(std::int64_t x) {
+  if (x < 0) { throw parsing_error{"negative number", "", 0, 0}; }
+  return static_cast<std::size_t>(x);
+}
 static yaksha_lisp_value *
 eq_operator(yaksha_envmap *env,
             const std::vector<yaksha_lisp_value *> &e_args) {
@@ -571,13 +575,13 @@ yaksha_lisp_builtins::for_(const std::vector<yaksha_lisp_value *> &args,
       // try to set the value
       env->set(symbol->expr_->token_->token_, x, false);
       set_completed = true;
-    } catch (const parsing_error &e) {}
+    } catch (const parsing_error &e) { intentionally_ignored(e); }
     if (!set_completed) {
       try {
         // try to define it if we cannot set it
         env->set(symbol->expr_->token_->token_, x, true);
         set_completed = true;
-      } catch (const parsing_error &e) {}
+      } catch (const parsing_error &e) { intentionally_ignored(e); }
     }
     if (!set_completed) {
       throw parsing_error{"for failed to set symbol", "", 0, 0};
@@ -771,7 +775,10 @@ yaksha_lisp_builtins::try_(const std::vector<yaksha_lisp_value *> &args,
   }
   try {
     return env->eval(exp->expr_);
-  } catch (const parsing_error &e) { return env->create_nil(); }
+  } catch (const parsing_error &e) {
+    intentionally_ignored(e);
+    return env->create_nil();
+  }
 }
 yaksha_lisp_value *
 yaksha_lisp_builtins::try_catch_(const std::vector<yaksha_lisp_value *> &args,
@@ -1005,6 +1012,7 @@ yaksha_lisp_builtins::read_file_(const std::vector<yaksha_lisp_value *> &args,
     result->str_ = str;
     return result;
   } catch (std::exception &ex) {
+    intentionally_ignored(ex);
     throw parsing_error{"read_file failed", "", 0, 0};
   }
 }
@@ -1031,6 +1039,7 @@ yaksha_lisp_builtins::write_file_(const std::vector<yaksha_lisp_value *> &args,
     t.close();
     return env->create_val();
   } catch (std::exception &ex) {
+    intentionally_ignored(ex);
     throw parsing_error{"write_file failed", "", 0, 0};
   }
 }
@@ -1096,7 +1105,7 @@ yaksha_lisp_builtins::insert_(const std::vector<yaksha_lisp_value *> &args,
   if (pos->type_ != yaksha_lisp_value_type::NUMBER) {
     throw parsing_error{"insert takes a number as second argument", "", 0, 0};
   }
-  if (pos->num_ < 0 || pos->num_ > list->list_.size()) {
+  if (pos->num_ < 0 || ensure_unsigned(pos->num_) > list->list_.size()) {
     throw parsing_error{"insert position out of range", "", 0, 0};
   }
   list->list_.insert(list->list_.begin() + pos->num_, elem);
@@ -1117,7 +1126,7 @@ yaksha_lisp_builtins::remove_(const std::vector<yaksha_lisp_value *> &args,
   if (pos->type_ != yaksha_lisp_value_type::NUMBER) {
     throw parsing_error{"remove takes a number as second argument", "", 0, 0};
   }
-  if (pos->num_ < 0 || pos->num_ >= list->list_.size()) {
+  if (pos->num_ < 0 || ensure_unsigned(pos->num_) >= list->list_.size()) {
     throw parsing_error{"remove position out of range", "", 0, 0};
   }
   list->list_.erase(list->list_.begin() + pos->num_);
@@ -1286,13 +1295,13 @@ yaksha_lisp_builtins::setdef_(const std::vector<yaksha_lisp_value *> &args,
     env->set(name->expr_->token_->token_, val, false);
     LOG_COMP("trying to define success");
     return val;
-  } catch (const parsing_error &ignored) {}
+  } catch (const parsing_error &ignored) { intentionally_ignored(ignored); }
   LOG_COMP("trying to set");
   try {
     env->set(name->expr_->token_->token_, val, true);
     LOG_COMP("trying to set success");
     return val;
-  } catch (const parsing_error &ignored) {}
+  } catch (const parsing_error &ignored) { intentionally_ignored(ignored); }
   throw parsing_error{"= failed to set or define value", "", 0, 0};
 }
 yaksha_lisp_value *
@@ -1308,7 +1317,7 @@ yaksha_lisp_builtins::index_(const std::vector<yaksha_lisp_value *> &args,
       idx->type_ == yaksha_lisp_value_type::NUMBER) {
     auto result = env->create_val();
     result->type_ = yaksha_lisp_value_type::STRING;
-    if (idx->num_ < 0 || idx->num_ >= item->str_.size()) {
+    if (idx->num_ < 0 || ensure_unsigned(idx->num_) >= item->str_.size()) {
       throw parsing_error{"index out of bounds", "", 0, 0};
     }
     result->str_ = item->str_.substr(idx->num_, 1);
@@ -1316,7 +1325,7 @@ yaksha_lisp_builtins::index_(const std::vector<yaksha_lisp_value *> &args,
   }
   if (item->type_ == yaksha_lisp_value_type::LIST &&
       idx->type_ == yaksha_lisp_value_type::NUMBER) {
-    if (idx->num_ < 0 || idx->num_ >= item->list_.size()) {
+    if (idx->num_ < 0 || ensure_unsigned(idx->num_) >= item->list_.size()) {
       throw parsing_error{"index out of bounds", "", 0, 0};
     }
     return copy_val(env, item->list_[idx->num_]);

@@ -5,43 +5,43 @@
 // Note: libs - MIT license, runtime/3rd - various
 // ==============================================================================================
 // GPLv3:
-// 
+//
 // Yaksha - Programming Language.
 // Copyright (C) 2020 - 2024 Bhathiya Perera
-// 
+//
 // This program is free software: you can redistribute it and/or modify it under the terms
 // of the GNU General Public License as published by the Free Software Foundation,
 // either version 3 of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License along with this program.
 // If not, see https://www.gnu.org/licenses/.
-// 
+//
 // ==============================================================================================
 // Additional Terms:
-// 
+//
 // Please note that any commercial use of the programming language's compiler source code
 // (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
 // with author of the language (Bhathiya Perera).
-// 
+//
 // If you are using it for an open source project, please give credits.
 // Your own project must use GPLv3 license with these additional terms.
-// 
+//
 // You may use programs written in Yaksha/YakshaLisp for any legal purpose
 // (commercial, open-source, closed-source, etc) as long as it agrees
 // to the licenses of linked runtime libraries (see compiler/runtime/README.md).
-// 
+//
 // ==============================================================================================
 // const_fold.h
 #ifndef CONST_FOLD_H
 #define CONST_FOLD_H
 #include "ast/ast.h"
-#include "utilities/ykobject.h"
 #include "ast/environment_stack.h"
+#include "utilities/ykobject.h"
 namespace yaksha {
   struct cf_evaluator {
     // TODO numeric value casting? think what we can do about it?
@@ -53,24 +53,32 @@ namespace yaksha {
     //   bool -> int/uint/float/double ok
     explicit cf_evaluator(std::vector<const_fold_context *> *context_pool);
     ~cf_evaluator() = default;
-    const_fold_context * add(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * sub(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * mul(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * div(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * mod(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * pow(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * bit_and(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * bit_or(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * bit_xor(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * bit_not(const_fold_context *lhs);
-    const_fold_context * bit_lshift(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * bit_rshift(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * logical_and(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * logical_or(const_fold_context *lhs, const_fold_context *rhs);
-    const_fold_context * logical_not(const_fold_context *lhs);
-    const_fold_context * unary_minus(const_fold_context *lhs);
-    private:
-      std::vector<const_fold_context *> *context_pool_;
+    const_fold_context *add(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context *sub(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context *mul(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context *div(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context *mod(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context *pow(const_fold_context *lhs, const_fold_context *rhs);
+    const_fold_context *bit_and(const_fold_context *lhs,
+                                const_fold_context *rhs);
+    const_fold_context *bit_or(const_fold_context *lhs,
+                               const_fold_context *rhs);
+    const_fold_context *bit_xor(const_fold_context *lhs,
+                                const_fold_context *rhs);
+    const_fold_context *bit_not(const_fold_context *lhs);
+    const_fold_context *bit_lshift(const_fold_context *lhs,
+                                   const_fold_context *rhs);
+    const_fold_context *bit_rshift(const_fold_context *lhs,
+                                   const_fold_context *rhs);
+    const_fold_context *logical_and(const_fold_context *lhs,
+                                    const_fold_context *rhs);
+    const_fold_context *logical_or(const_fold_context *lhs,
+                                   const_fold_context *rhs);
+    const_fold_context *logical_not(const_fold_context *lhs);
+    const_fold_context *unary_minus(const_fold_context *lhs);
+
+private:
+    std::vector<const_fold_context *> *context_pool_;
   };
   /**
    * Partially evaluates expressions that can be evaluated at compile time

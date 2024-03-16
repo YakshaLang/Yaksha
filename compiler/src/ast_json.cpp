@@ -48,11 +48,14 @@ using namespace yaksha;
 int main(int argc, char *argv[]) {
   auto args = argparser::ARGS(PROGRAM_NAME, "Compile Yaksha AST to Json", "");
   auto help = argparser::OP_BOOL('h', "--help", "Print this help message");
-  auto check_main = argparser::OP_BOOL('c', "--check-main", "Enable main() check");
-  auto check_types = argparser::OP_BOOL('t', "--check-types", "Enable type checking");
+  auto check_main =
+      argparser::OP_BOOL('c', "--check-main", "Enable main() check");
+  auto check_types =
+      argparser::OP_BOOL('t', "--check-types", "Enable type checking");
   args.optional_ = {&help, &check_main, &check_types};
   auto code = argparser::PO("mainfile.yaka", "Yaksha code file.");
-  auto lib = argparser::PO_OPT("[LIBS_PARENT_PATH]", "Path to the parent directory of the libraries");
+  auto lib = argparser::PO_OPT("[LIBS_PARENT_PATH]",
+                               "Path to the parent directory of the libraries");
   args.positional_ = {&code, &lib};
   argparser::parse_args(argc, argv, args);
   if (help.is_set_) {
@@ -69,7 +72,7 @@ int main(int argc, char *argv[]) {
   try {
     mc.main_required_ = check_main.is_set_;
     mc.check_types_ = check_types.is_set_;
-    mc.usage_analysis_ = false; // disable usage analysis as JSON will dump all
+    mc.usage_analysis_ = false;// disable usage analysis as JSON will dump all
     codegen_json cg{};
     if (!lib.is_set_) {// Just code.yaka is passed
       result = mc.compile(code.value_, &cg);

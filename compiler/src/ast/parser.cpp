@@ -282,6 +282,14 @@ token *parser::consume(token_type t, const std::string &message) {
   if (check(t)) return advance();
   throw error(peek(), message);
 }
+token *parser::consume_any_of(std::initializer_list<token_type> types,
+                              const std::string &message) {
+  if (is_at_end()) { throw error(peek(), message); }
+  for (auto t : types) {
+    if (check(t)) return advance();
+  }
+  throw error(peek(), message);
+}
 parsing_error parser::error(token *tok, const std::string &message) {
   auto err = parsing_error{message, tok};
   handle_error(err);
@@ -502,6 +510,9 @@ token *parser::consume_or_eof(token_type t, const std::string &message) {
 stmt *parser::declaration_statement() {
   try {
     if (match({token_type::KEYWORD_IMPORT})) { return import_statement(); }
+    if (match({token_type::KEYWORD_DIRECTIVE})) {
+      return directive_statement();
+    }
     if (match({token_type::KEYWORD_RUNTIMEFEATURE})) {
       return runtimefeature_statement();
     }
@@ -513,6 +524,7 @@ stmt *parser::declaration_statement() {
     if (!match({token_type::NAME})) { return statement(); }
     return parse_named_let_statement();
   } catch (parsing_error &ignored) {
+    intentionally_ignored(ignored);
     synchronize_parser();
     return nullptr;
   }
@@ -736,6 +748,7 @@ ykdatatype *parser::parse_datatype() {
     try {
       dt = dt_pool_->create_dimension(tk, filepath_);
     } catch (std::out_of_range &e) {
+      intentionally_ignored(e);
       throw error(tk, "Integer value is out of range");
     }
   } else {
@@ -986,6 +999,62 @@ stmt *parser::runtimefeature_statement() {
   consume_or_eof(token_type::NEW_LINE,
                  "Expect new line after value for runtimefeature statement.");
   return pool_.c_runtimefeature_stmt(runtime_feature_kw, cc);
+}
+curly_call_expr *parser::match_directive_options() {
+  auto curly_open = previous();
+  std::vector<name_val> values{};
+  if (!check(token_type::CURLY_BRACKET_CLOSE)) {
+    do {
+      auto member_name =
+          consume(token_type::NAME, "Directive key must be present");
+      consume(token_type::COLON, "Colon must be present between key and value");
+      auto got_str =
+          match({token_type::STRING, token_type::THREE_QUOTE_STRING});
+      if (!got_str) {
+        throw error(member_name, "Directive value must be a string literal");
+      }
+      auto exp = pool_.c_literal_expr(previous());
+      values.emplace_back(name_val{member_name, exp});
+    } while (match({token_type::COMMA}));
+  }
+  auto curly_close = consume(token_type::CURLY_BRACKET_CLOSE,
+                             "directive options must end with '}'");
+  return dynamic_cast<curly_call_expr *>(
+      pool_.c_curly_call_expr(nullptr, curly_open, values, curly_close));
+}
+stmt *parser::directive_statement() {
+  // directive name="str" name2="str" ... (name|ccode) ("STR")? (NEW_LINE|EOF)
+  auto directive_keyword = previous();
+  std::initializer_list<token_type> name_or_ccode = {token_type::NAME,
+                                                     token_type::KEYWORD_CCODE};
+  token *name = nullptr;
+  token *param_value = nullptr;
+  std::vector<parameter> params{};
+  while (match(name_or_ccode)) {
+    name = previous();
+    auto cc = peek();
+    if (cc->type_ == token_type::EQ) {
+      // this is a parameter
+      consume(token_type::EQ, "Expected '=' after directive parameter name");
+      // now consume a string
+      param_value = consume_any_of(
+          {token_type::STRING, token_type::THREE_QUOTE_STRING},
+          "Expected string literal for directive parameter value");
+      auto param = parameter{name, nullptr, param_value};
+      params.emplace_back(param);
+    } else {
+      break;
+    }
+  }
+  if (peek()->type_ == token_type::STRING ||
+      peek()->type_ == token_type::THREE_QUOTE_STRING) {
+    param_value = advance();
+  } else {
+    param_value = nullptr;
+  }
+  consume_or_eof(token_type::NEW_LINE,
+                 "Expect new line after value for directive statement.");
+  return pool_.c_directive_stmt(directive_keyword, params, name, param_value);
 }
 void parser::preprocess(macro_processor *mp, gc_pool<token> *token_pool) {
   step_1_parse_token_soup();

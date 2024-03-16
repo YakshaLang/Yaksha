@@ -49,7 +49,8 @@
 namespace yaksha {
   struct do_nothing_codegen : codegen {
     ~do_nothing_codegen() override = default;
-    comp_result emit(codefiles *cf, gc_pool<token> *token_pool, errors::error_printer* ep) override;
+    comp_result emit(codefiles *cf, gc_pool<token> *token_pool,
+                     errors::error_printer *ep) override;
   };
   struct multifile_compiler {
     multifile_compiler() = default;

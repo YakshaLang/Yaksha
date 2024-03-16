@@ -44,7 +44,8 @@
 using namespace yaksha;
 codegen_json::codegen_json() = default;
 codegen_json::~codegen_json() = default;
-comp_result codegen_json::emit(codefiles *cf, gc_pool<token> *token_pool, errors::error_printer* ep) {
+comp_result codegen_json::emit(codefiles *cf, gc_pool<token> *token_pool,
+                               errors::error_printer *ep) {
   //  return {false, to_json.compile(cf->main_file_info_)};
   std::stringstream multi_file_json{};
   multi_file_json << "{\n";
@@ -66,8 +67,8 @@ comp_result codegen_json::emit(codefiles *cf, gc_pool<token> *token_pool, errors
 std::string to_json_compiler::compile(file_info *fi) {
   // Compile the main file to a JSON
   json_ << "{\n";
-  json_ << "\"file_path\": \"" << string_utils::escape_json(fi->filepath_.string())
-        << "\",\n";
+  json_ << "\"file_path\": \""
+        << string_utils::escape_json(fi->filepath_.string()) << "\",\n";
   json_ << "\"description\": \"Yaksha code export\",\n";
   json_ << "\"version\": \"1.0\",\n";
   json_ << "\"mangle_prefix\": \"" << fi->prefix_ << "\",\n";
@@ -86,23 +87,24 @@ void to_json_compiler::write_annotations(const annotations &anns) {
   json_ << "\"annotations\": [\n";
   if (anns.native_) {
     json_ << "{\"type\": \"native\", ";
-    json_ << "\"value\": \"" << string_utils::escape_json(anns.native_arg_) << "\"}";
+    json_ << "\"value\": \"" << string_utils::escape_json(anns.native_arg_)
+          << "\"}";
     w++;
   }
   if (anns.native_define_) {
     if (w > 0) { json_ << ", "; }
     json_ << "{\"type\": \"native_define\", ";
-    json_ << "\"value\": \"" << string_utils::escape_json(anns.native_define_arg_)
-          << "\"}";
+    json_ << "\"value\": \""
+          << string_utils::escape_json(anns.native_define_arg_) << "\"}";
     w++;
   }
   if (anns.native_macro_) {
     if (w > 0) { json_ << ", "; }
     json_ << "{\"type\": \"native_macro\", ";
-    json_ << "\"value\": \"" << string_utils::escape_json(anns.native_macro_arg_)
-          << "\"}";
+    json_ << "\"value\": \""
+          << string_utils::escape_json(anns.native_macro_arg_) << "\"}";
   }
-  json_ << "],\n"; // NEEDS comma here
+  json_ << "],\n";// NEEDS comma here
 }
 void to_json_compiler::write_location(expr *obj) {
   auto loc = obj->locate();
@@ -137,7 +139,8 @@ void to_json_compiler::visit_assign_expr(assign_expr *obj) {
     json_ << "\"promoted\": true,\n";
     json_ << "\"name\": \"" << obj->name_->token_ << "\",\n";
     write_location(obj);
-    json_ << "\"datatype\": \"" << string_utils::escape_json(obj->promoted_data_type_->as_string())
+    json_ << "\"datatype\": \""
+          << string_utils::escape_json(obj->promoted_data_type_->as_string())
           << "\",\n";
     json_ << "\"value\": ";
     obj->right_->accept(this);
@@ -236,8 +239,8 @@ void to_json_compiler::visit_literal_expr(literal_expr *obj) {
   write_location(obj);
   json_ << "\"token\": \"" << token_to_str(obj->literal_token_->type_)
         << "\",\n";
-  json_ << "\"value\": \"" << string_utils::escape_json(obj->literal_token_->token_)
-        << "\"\n";
+  json_ << "\"value\": \""
+        << string_utils::escape_json(obj->literal_token_->token_) << "\"\n";
   json_ << "}\n";
 }
 void to_json_compiler::visit_logical_expr(logical_expr *obj) {
@@ -358,7 +361,8 @@ void to_json_compiler::visit_class_stmt(class_stmt *obj) {
   for (auto &field : obj->members_) {
     json_ << "{\n";
     json_ << "\"name\": \"" << field.name_->token_ << "\",\n";
-    json_ << "\"datatype\": \"" << string_utils::escape_json(field.data_type_->as_string()) << "\"\n";
+    json_ << "\"datatype\": \""
+          << string_utils::escape_json(field.data_type_->as_string()) << "\"\n";
     json_ << "}\n";
     if (&field != &obj->members_.back()) { json_ << ","; }
   }
@@ -374,7 +378,8 @@ void to_json_compiler::visit_const_stmt(const_stmt *obj) {
   json_ << "\"type\": \"const\",\n";
   json_ << "\"ccode\": false,\n";
   json_ << "\"name\": \"" << obj->name_->token_ << "\",\n";
-  json_ << "\"datatype\": \"" << string_utils::escape_json(obj->data_type_->as_string()) << "\",\n";
+  json_ << "\"datatype\": \""
+        << string_utils::escape_json(obj->data_type_->as_string()) << "\",\n";
   json_ << "\"value\": ";
   obj->expression_->accept(this);
   json_ << "\n}\n";
@@ -396,12 +401,14 @@ void to_json_compiler::visit_def_stmt(def_stmt *obj) {
   for (auto &param : obj->params_) {
     json_ << "{\n";
     json_ << "\"name\": \"" << param.name_->token_ << "\",\n";
-    json_ << "\"type\": \"" << string_utils::escape_json(param.data_type_->as_string()) << "\"\n";
+    json_ << "\"type\": \""
+          << string_utils::escape_json(param.data_type_->as_string()) << "\"\n";
     json_ << "}\n";
     if (&param != &obj->params_.back()) { json_ << ","; }
   }
   json_ << "],\n";
-  json_ << "\"return_type\": \"" << string_utils::escape_json(obj->return_type_->as_string()) << "\",\n";
+  json_ << "\"return_type\": \""
+        << string_utils::escape_json(obj->return_type_->as_string()) << "\",\n";
   json_ << "\"body\": [\n";
   obj->function_body_->accept(this);// visit block_stmt
   json_ << "]\n";
@@ -445,7 +452,8 @@ void to_json_compiler::visit_foreach_stmt(foreach_stmt *obj) {
   write_location(obj);
   json_ << "\"type\": \"foreach\",\n";
   json_ << "\"name\": \"" << obj->name_->token_ << "\",\n";
-  json_ << "\"datatype\": \"" << string_utils::escape_json(obj->data_type_->as_string()) << "\",\n";
+  json_ << "\"datatype\": \""
+        << string_utils::escape_json(obj->data_type_->as_string()) << "\",\n";
   json_ << "\"expression\": ";
   obj->expression_->accept(this);
   json_ << ",\n";
@@ -512,7 +520,9 @@ void to_json_compiler::visit_let_stmt(let_stmt *obj) {
   write_location(obj);
   json_ << "\"type\": \"let\",\n";
   json_ << "\"name\": \"" << obj->name_->token_ << "\",",
-      json_ << "\"datatype\": \"" << string_utils::escape_json(obj->data_type_->as_string()) << "\"\n";
+      json_ << "\"datatype\": \""
+            << string_utils::escape_json(obj->data_type_->as_string())
+            << "\"\n";
   if (obj->expression_ != nullptr) {
     json_ << ",\"value\": ";
     obj->expression_->accept(this);
@@ -525,7 +535,8 @@ void to_json_compiler::visit_nativeconst_stmt(nativeconst_stmt *obj) {
   json_ << "\"type\": \"const\",\n";
   json_ << "\"ccode\": true,\n";
   json_ << "\"name\": \"" << obj->name_->token_ << "\",\n";
-  json_ << "\"datatype\": \"" << string_utils::escape_json(obj->data_type_->as_string()) << "\",\n";
+  json_ << "\"datatype\": \""
+        << string_utils::escape_json(obj->data_type_->as_string()) << "\",\n";
   json_ << "\"value\": \"";
   json_ << string_utils::escape_json(obj->code_str_->token_);
   json_ << "\"\n}\n";
@@ -570,6 +581,31 @@ void to_json_compiler::visit_while_stmt(while_stmt *obj) {
   json_ << ",\n";
   json_ << "\"body\": [";
   obj->while_body_->accept(this);
+  json_ << "]\n";
+  json_ << "}\n";
+}
+void to_json_compiler::visit_directive_stmt(directive_stmt *obj) {
+  json_ << "{\n";
+  write_location(obj);
+  json_ << "\"type\": \"directive\",\n";
+  json_ << "\"directive\": \""
+        << string_utils::escape_json(obj->directive_type_->token_) << "\",";
+  if (obj->directive_val_ != nullptr) {
+    json_ << "\"argument\": \""
+          << string_utils::escape_json(obj->directive_val_->token_) << "\",";
+  }
+  json_ << "\"parameters\": [\n";
+  for (auto &param : obj->values_) {
+    json_ << "{\n";
+    json_ << "\"name\": \"" << string_utils::escape_json(param.name_->token_)
+          << "\",\n";
+    json_ << "\"value\": \""
+          << string_utils::escape_json(param.enum_val_override_->token_)
+          << "\"\n";
+    json_ << "\n";
+    json_ << "}\n";
+    if (&param != &obj->values_.back()) { json_ << ","; }
+  }
   json_ << "]\n";
   json_ << "}\n";
 }

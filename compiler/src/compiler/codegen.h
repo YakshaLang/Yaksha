@@ -47,7 +47,8 @@ namespace yaksha {
   struct token;
   struct codegen {
     virtual ~codegen() = default;
-    virtual comp_result emit(codefiles *cf, gc_pool<token> *token_pool, errors::error_printer* ep) = 0;
+    virtual comp_result emit(codefiles *cf, gc_pool<token> *token_pool,
+                             errors::error_printer *ep) = 0;
 
 private:
   };

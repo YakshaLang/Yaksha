@@ -40,6 +40,7 @@
 #include "ic_tokenizer.h"
 #include "ic_token.h"
 #include "tokenizer/string_utils.h"
+#include "utilities/cpp_util.h"
 using namespace yaksha;
 enum class ic_tokenizer_state { NORMAL, PATH_SPEC_EXPECTED };
 ic_tokenizer::ic_tokenizer(std::string file, std::string data)
@@ -98,11 +99,13 @@ void ic_tokenizer::tokenize() {
   try {
     tokenize_internal();
   } catch (utf8::exception &ignored) {
+    intentionally_ignored(ignored);
     errors_.emplace_back(
         "Invalid UTF-8 detected for input file. Will not continue.", nullptr);
   } catch (string_utils::string_error &ex) {
+    intentionally_ignored(ex);
     errors_.emplace_back("Invalid String:" + ex.message_, nullptr);
-  } catch (ic_parsing_error &ignored) {}
+  } catch (ic_parsing_error &ignored) { intentionally_ignored(ignored); }
 }
 // TODO handle digraph # character, ## character as well
 // TODO add a test case for digraphs each

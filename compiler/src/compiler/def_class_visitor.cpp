@@ -105,12 +105,14 @@ void def_class_visitor::extract(const std::vector<stmt *> &statements) {
         statement_type == ast_type::STMT_CONST ||
         statement_type == ast_type::STMT_IMPORT ||
         statement_type == ast_type::STMT_RUNTIMEFEATURE ||
-        statement_type == ast_type::STMT_NATIVECONST) {
+        statement_type == ast_type::STMT_NATIVECONST ||
+        statement_type == ast_type::STMT_DIRECTIVE) {
       st->accept(this);
     } else {
-      error(st->locate(), "Invalid statement detected."
-                     " Only def, class, import, runtimefeature"
-                     " or constant statements are supported at module level.");
+      error(st->locate(),
+            "Invalid statement detected."
+            " Only def, class, import, runtimefeature"
+            " or constant statements are supported at module level.");
     }
   }
 }
@@ -281,3 +283,56 @@ void def_class_visitor::visit_macro_call_expr(macro_call_expr *obj) {}
 void def_class_visitor::visit_cfor_stmt(cfor_stmt *obj) {}
 void def_class_visitor::visit_enum_stmt(enum_stmt *obj) {}
 void def_class_visitor::visit_union_stmt(union_stmt *obj) {}
+void def_class_visitor::visit_directive_stmt(directive_stmt *obj) {
+  obj->hits_ = 1;// Always consider this to be used!
+  auto directive_type = obj->directive_type_->token_;
+  /* these must have no STR argument */
+  bool zero_arg_directive =
+      // (Global flag) No need to check for main()
+      directive_type == "no_main" ||// TODO
+      // (Global flag) If a function takes 'str' parameters, it is thrown as an error)
+      directive_type == "ban_str_params" ||// TODO
+      // (Global flag) Directly substitute '@nativedefine' or 'native constants'
+      directive_type == "apply_nativedefine";// TODO
+  /* ========================================================================= */
+  /* these must have the argument string, and it cannot be empty */
+  bool must_have_arg_directive =
+      // Write this raw code directly to output!
+      directive_type == "ccode" ||
+      // (Global) Include path -I <arg>
+      directive_type == "c_include_path" ||// TODO
+      // (Global) -L <arg>
+      directive_type == "c_lib_path" ||// TODO
+      // Write #include "arg"
+      directive_type == "c_include" ||
+      // Write #include <arg>
+      directive_type == "c_sys_include" ||
+      // Compile and link with this '.c' file's .o file, in addition to output code
+      // --> can also take, c_compile_arg, c_define parameters for that specific file
+      directive_type == "c_file" ||// TODO
+      // (Global) Link with this, -l<arg>, for example
+      directive_type == "c_lib" ||// TODO
+      // (Global) use this compilation argument for all code files
+      directive_type == "c_compile_arg" ||// TODO
+      // (Global) when all .o objects are linked together, use these arguments
+      directive_type == "c_link_arg" ||// TODO
+      // (Global) use these arguments for linking or compiling
+      directive_type == "c_compile_or_link_arg" ||// TODO
+      // (Global) define this when compiling. -D<arg>
+      directive_type == "c_define";// TODO
+  if (zero_arg_directive || must_have_arg_directive) {
+    if (zero_arg_directive && obj->directive_val_ != nullptr) {
+      error(obj->directive_val_,
+            "Directive must not have a string literal argument");
+    }
+    if (must_have_arg_directive && (obj->directive_val_ == nullptr ||
+                                    obj->directive_val_->token_.empty())) {
+      error(obj->directive_val_,
+            "Directive must have a string literal argument");
+    }
+  } else {
+    error(obj->directive_type_,
+          "Invalid directive. Only no_main, no_string and ccode are supported");
+  }
+  directives_.push_back(obj);
+}

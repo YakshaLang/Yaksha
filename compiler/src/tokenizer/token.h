@@ -154,6 +154,7 @@ namespace yaksha {
     KEYWORD_DEF,
     KEYWORD_DEFER,
     KEYWORD_DEL,
+    KEYWORD_DIRECTIVE,
     KEYWORD_ELIF,
     KEYWORD_ELSE,
     KEYWORD_FOR,
@@ -188,6 +189,7 @@ namespace yaksha {
       case token_type::KEYWORD_DEF:
       case token_type::KEYWORD_DEFER:
       case token_type::KEYWORD_DEL:
+      case token_type::KEYWORD_DIRECTIVE:
       case token_type::KEYWORD_ELIF:
       case token_type::KEYWORD_ELSE:
       case token_type::KEYWORD_FOR:
@@ -322,6 +324,7 @@ namespace yaksha {
     if (t == token_type::KEYWORD_DEF) return "KEYWORD_DEF";
     if (t == token_type::KEYWORD_DEFER) return "KEYWORD_DEFER";
     if (t == token_type::KEYWORD_DEL) return "KEYWORD_DEL";
+    if (t == token_type::KEYWORD_DIRECTIVE) return "KEYWORD_DIRECTIVE";
     if (t == token_type::KEYWORD_ELIF) return "KEYWORD_ELIF";
     if (t == token_type::KEYWORD_ELSE) return "KEYWORD_ELSE";
     if (t == token_type::KEYWORD_FOR) return "KEYWORD_FOR";
@@ -448,6 +451,7 @@ namespace yaksha {
     if (t == "KEYWORD_DEF") return token_type::KEYWORD_DEF;
     if (t == "KEYWORD_DEFER") return token_type::KEYWORD_DEFER;
     if (t == "KEYWORD_DEL") return token_type::KEYWORD_DEL;
+    if (t == "KEYWORD_DIRECTIVE") return token_type::KEYWORD_DIRECTIVE;
     if (t == "KEYWORD_ELIF") return token_type::KEYWORD_ELIF;
     if (t == "KEYWORD_ELSE") return token_type::KEYWORD_ELSE;
     if (t == "KEYWORD_FOR") return token_type::KEYWORD_FOR;
@@ -481,6 +485,7 @@ namespace yaksha {
     if (t == "def") return token_type::KEYWORD_DEF;
     if (t == "defer") return token_type::KEYWORD_DEFER;
     if (t == "del") return token_type::KEYWORD_DEL;
+    if (t == "directive") return token_type::KEYWORD_DIRECTIVE;
     if (t == "elif") return token_type::KEYWORD_ELIF;
     if (t == "else") return token_type::KEYWORD_ELSE;
     if (t == "for") return token_type::KEYWORD_FOR;
@@ -599,22 +604,23 @@ namespace yaksha {
     if (n == 28967) return token_type::KEYWORD_DEF;
     if (n == 28968) return token_type::KEYWORD_DEFER;
     if (n == 28969) return token_type::KEYWORD_DEL;
-    if (n == 28970) return token_type::KEYWORD_ELIF;
-    if (n == 28971) return token_type::KEYWORD_ELSE;
-    if (n == 28972) return token_type::KEYWORD_FOR;
-    if (n == 28973) return token_type::KEYWORD_FROM;
-    if (n == 28974) return token_type::KEYWORD_IF;
-    if (n == 28975) return token_type::KEYWORD_IMPORT;
-    if (n == 28976) return token_type::KEYWORD_IN;
-    if (n == 28977) return token_type::KEYWORD_MACROS;
-    if (n == 28978) return token_type::KEYWORD_NOT;
-    if (n == 28979) return token_type::KEYWORD_OR;
-    if (n == 28980) return token_type::KEYWORD_PASS;
-    if (n == 28981) return token_type::KEYWORD_RETURN;
-    if (n == 28982) return token_type::KEYWORD_RUNTIMEFEATURE;
-    if (n == 28983) return token_type::KEYWORD_STRUCT;
-    if (n == 28984) return token_type::KEYWORD_TRY;
-    if (n == 28985) return token_type::KEYWORD_WHILE;
+    if (n == 28970) return token_type::KEYWORD_DIRECTIVE;
+    if (n == 28971) return token_type::KEYWORD_ELIF;
+    if (n == 28972) return token_type::KEYWORD_ELSE;
+    if (n == 28973) return token_type::KEYWORD_FOR;
+    if (n == 28974) return token_type::KEYWORD_FROM;
+    if (n == 28975) return token_type::KEYWORD_IF;
+    if (n == 28976) return token_type::KEYWORD_IMPORT;
+    if (n == 28977) return token_type::KEYWORD_IN;
+    if (n == 28978) return token_type::KEYWORD_MACROS;
+    if (n == 28979) return token_type::KEYWORD_NOT;
+    if (n == 28980) return token_type::KEYWORD_OR;
+    if (n == 28981) return token_type::KEYWORD_PASS;
+    if (n == 28982) return token_type::KEYWORD_RETURN;
+    if (n == 28983) return token_type::KEYWORD_RUNTIMEFEATURE;
+    if (n == 28984) return token_type::KEYWORD_STRUCT;
+    if (n == 28985) return token_type::KEYWORD_TRY;
+    if (n == 28986) return token_type::KEYWORD_WHILE;
     return token_type::TK_UNKNOWN_TOKEN_DETECTED;
   }
   static inline int64_t token_to_numeric_id(const token_type &t) {
@@ -717,22 +723,23 @@ namespace yaksha {
     if (t == token_type::KEYWORD_DEF) return 28967;
     if (t == token_type::KEYWORD_DEFER) return 28968;
     if (t == token_type::KEYWORD_DEL) return 28969;
-    if (t == token_type::KEYWORD_ELIF) return 28970;
-    if (t == token_type::KEYWORD_ELSE) return 28971;
-    if (t == token_type::KEYWORD_FOR) return 28972;
-    if (t == token_type::KEYWORD_FROM) return 28973;
-    if (t == token_type::KEYWORD_IF) return 28974;
-    if (t == token_type::KEYWORD_IMPORT) return 28975;
-    if (t == token_type::KEYWORD_IN) return 28976;
-    if (t == token_type::KEYWORD_MACROS) return 28977;
-    if (t == token_type::KEYWORD_NOT) return 28978;
-    if (t == token_type::KEYWORD_OR) return 28979;
-    if (t == token_type::KEYWORD_PASS) return 28980;
-    if (t == token_type::KEYWORD_RETURN) return 28981;
-    if (t == token_type::KEYWORD_RUNTIMEFEATURE) return 28982;
-    if (t == token_type::KEYWORD_STRUCT) return 28983;
-    if (t == token_type::KEYWORD_TRY) return 28984;
-    if (t == token_type::KEYWORD_WHILE) return 28985;
+    if (t == token_type::KEYWORD_DIRECTIVE) return 28970;
+    if (t == token_type::KEYWORD_ELIF) return 28971;
+    if (t == token_type::KEYWORD_ELSE) return 28972;
+    if (t == token_type::KEYWORD_FOR) return 28973;
+    if (t == token_type::KEYWORD_FROM) return 28974;
+    if (t == token_type::KEYWORD_IF) return 28975;
+    if (t == token_type::KEYWORD_IMPORT) return 28976;
+    if (t == token_type::KEYWORD_IN) return 28977;
+    if (t == token_type::KEYWORD_MACROS) return 28978;
+    if (t == token_type::KEYWORD_NOT) return 28979;
+    if (t == token_type::KEYWORD_OR) return 28980;
+    if (t == token_type::KEYWORD_PASS) return 28981;
+    if (t == token_type::KEYWORD_RETURN) return 28982;
+    if (t == token_type::KEYWORD_RUNTIMEFEATURE) return 28983;
+    if (t == token_type::KEYWORD_STRUCT) return 28984;
+    if (t == token_type::KEYWORD_TRY) return 28985;
+    if (t == token_type::KEYWORD_WHILE) return 28986;
     return 0;
   }
   static inline bool is_number_token(const token_type &t) {
@@ -916,6 +923,7 @@ namespace yaksha {
     if (t == token_type::KEYWORD_DEF) return (value == "def");
     if (t == token_type::KEYWORD_DEFER) return (value == "defer");
     if (t == token_type::KEYWORD_DEL) return (value == "del");
+    if (t == token_type::KEYWORD_DIRECTIVE) return (value == "directive");
     if (t == token_type::KEYWORD_ELIF) return (value == "elif");
     if (t == token_type::KEYWORD_ELSE) return (value == "else");
     if (t == token_type::KEYWORD_FOR) return (value == "for");

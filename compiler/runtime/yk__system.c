@@ -102,7 +102,7 @@ wchar_t *yk__utf8_to_utf16_null_terminated(const char *str) {
   if (strlen(str) >= 3 && str[0] == (char) 0xef && str[1] == (char) 0xbb &&
       str[2] == (char) 0xbf)
     str += 3;
-  size_t pwcl = MultiByteToWideChar(cp, 0, str, -1, NULL, 0);
+  int pwcl = MultiByteToWideChar(cp, 0, str, -1, NULL, 0);
   wchar_t *pwcs = (wchar_t *) malloc(sizeof(wchar_t) * (pwcl + 1));
   pwcl = MultiByteToWideChar(cp, 0, str, -1, pwcs, pwcl + 1);
   pwcs[pwcl] = '\0';
@@ -111,9 +111,9 @@ wchar_t *yk__utf8_to_utf16_null_terminated(const char *str) {
 char *yk__utf16_to_utf8_null_terminated(const wchar_t *pwcs) {
   if (!pwcs) return NULL;
   UINT cp = CP_UTF8;
-  size_t pmbl = WideCharToMultiByte(cp, 0, pwcs, -1, NULL, 0, NULL, NULL);
+  int pmbl = WideCharToMultiByte(cp, 0, pwcs, -1, NULL, 0, NULL, NULL);
   char *pmbs = (char *) malloc(sizeof(char) * (pmbl + 1));
-  pmbl = WideCharToMultiByte(cp, 0, pwcs, wcslen(pwcs), pmbs, pmbl, NULL, NULL);
+  pmbl = WideCharToMultiByte(cp, 0, pwcs, (int) wcslen(pwcs), pmbs, pmbl, NULL, NULL);
   pmbs[pmbl] = '\0';
   return pmbs;
 }

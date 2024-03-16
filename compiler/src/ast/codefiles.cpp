@@ -44,7 +44,8 @@
 #include "utilities/error_printer.h"
 #include <optional>
 using namespace yaksha;
-codefiles::codefiles(std::filesystem::path &libs_path, errors::error_printer *ep)
+codefiles::codefiles(std::filesystem::path &libs_path,
+                     errors::error_printer *ep)
     : current_path_(std::filesystem::current_path()), prefixes_(),
       path_to_fi_(), libs_path_{libs_path}, pool_(), ep_{ep} {
   esc_ = new entry_struct_func_compiler(&pool_);

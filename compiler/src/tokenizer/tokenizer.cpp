@@ -208,6 +208,7 @@ void tokenizer::tokenize() {
   try {
     tokenize_actual();
   } catch (utf8::exception &ignored) {
+    intentionally_ignored(ignored);
     errors_.emplace_back(parsing_error{
         "Invalid UTF-8 detected for input file. Will not continue.", nullptr});
   } catch (string_utils::string_error &ex) {

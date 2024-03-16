@@ -68,9 +68,9 @@ namespace yaksha {
   enum class const_fold_context_type {
     CFT_EXPR, /* this is an expression that cannot be folded */
     CFT_STMT,
-    CFT_ERROR_OCCURRED, // TODO perhaps we can remove this?
-    CFT_VALUE, /* this is a folded value */
-               // TODO see if we can remove below
+    CFT_ERROR_OCCURRED,// TODO perhaps we can remove this?
+    CFT_VALUE,         /* this is a folded value */
+                       // TODO see if we can remove below
     CFT_GARBAGE_VALUE /* this is a garbage value, also an expression that cannot be folded */
   };
   struct const_fold_value_holder {
@@ -119,14 +119,14 @@ namespace yaksha {
     explicit ykobject(ykdt_pool *pool);
     [[nodiscard]] bool is_primitive_or_obj() const;
     [[nodiscard]] bool is_a_function() const;
-    int integer_val_{0}; // TODO see if this field can be removed
+    int integer_val_{0};// TODO see if this field can be removed
     std::string string_val_{};
     std::string module_file_{};
     std::string module_name_{};
     bool desugar_rewrite_needed_{false};
     std::string desugar_rewrite_{};
-    double double_val_{}; // TODO see if this can be removed
-    bool bool_val_{}; // TODO see if this can be removed
+    double double_val_{};// TODO see if this can be removed
+    bool bool_val_{};    // TODO see if this can be removed
     object_type object_type_{object_type::PRIMITIVE_OR_OBJ};
     ykdatatype *datatype_{nullptr};
     const_fold_context *fold_context_{nullptr};

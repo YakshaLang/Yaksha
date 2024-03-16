@@ -44,7 +44,8 @@ namespace yaksha {
   struct codegen_c : codegen {
     codegen_c();
     ~codegen_c() override;
-    comp_result emit(codefiles *cf, gc_pool<token> *token_pool, errors::error_printer* ep) override;
+    comp_result emit(codefiles *cf, gc_pool<token> *token_pool,
+                     errors::error_printer *ep) override;
 
 private:
   };

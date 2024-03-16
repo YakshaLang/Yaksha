@@ -38,6 +38,7 @@
 // ==============================================================================================
 // ic_parser.cpp
 #include "ic_parser.h"
+#include "utilities/cpp_util.h"
 #include <algorithm>
 #include <cassert>
 using namespace yaksha;
@@ -52,6 +53,7 @@ void ic_parser::parse() {
     try {
       statements_.emplace_back(preprocessor_statement());
     } catch (ic_parsing_error &ex) {
+      intentionally_ignored(ex);
       // synchronize
       while (peek()->type_ != ic_token_type::NEWLINE && !is_at_end()) {
         advance();

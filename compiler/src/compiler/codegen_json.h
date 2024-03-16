@@ -45,7 +45,8 @@ namespace yaksha {
   struct codegen_json : codegen {
     codegen_json();
     ~codegen_json() override;
-    comp_result emit(codefiles *cf, gc_pool<token> *token_pool, errors::error_printer* ep) override;
+    comp_result emit(codefiles *cf, gc_pool<token> *token_pool,
+                     errors::error_printer *ep) override;
 
 private:
   };
@@ -94,6 +95,8 @@ private:
     void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
     void visit_union_stmt(union_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
+    void visit_directive_stmt(directive_stmt *obj) override;
+    ~to_json_compiler() override = default;
 
 private:
     std::stringstream json_{};

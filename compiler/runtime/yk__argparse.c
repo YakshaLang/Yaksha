@@ -2,7 +2,7 @@
 struct yk__arg_remainder *yk__argparse_parse(struct argparse *argparse_obj,
                                              yk__sds *array) {
   // Create a ready for destruction
-  int argc = yk__arrlen(array);
+  size_t argc = yk__arrlen(array);
   const char **argv = NULL;
   argv = malloc(argc * sizeof(yk__sds));
   for (int i = 0; i < argc; i++) { argv[i] = (char *) array[i]; }

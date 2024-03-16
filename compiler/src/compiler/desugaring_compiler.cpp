@@ -441,5 +441,12 @@ token *desugaring_compiler::create_str_literal(
 void desugaring_compiler::visit_cfor_stmt(cfor_stmt *obj) {
   statement_stack_.back()->emplace_back(obj);
 }
-void desugaring_compiler::visit_enum_stmt(enum_stmt *obj) {}
-void desugaring_compiler::visit_union_stmt(union_stmt *obj) {}
+void desugaring_compiler::visit_enum_stmt(enum_stmt *obj) {
+  statement_stack_.back()->emplace_back(obj);
+}
+void desugaring_compiler::visit_union_stmt(union_stmt *obj) {
+  statement_stack_.back()->emplace_back(obj);
+}
+void desugaring_compiler::visit_directive_stmt(directive_stmt *obj) {
+  statement_stack_.back()->emplace_back(obj);
+}

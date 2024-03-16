@@ -211,5 +211,7 @@ namespace yaksha {
     save_file << result;
     save_file.close();
   }
+  template<typename T>
+  static inline void intentionally_ignored(const T &) {}
 }// namespace yaksha
 #endif

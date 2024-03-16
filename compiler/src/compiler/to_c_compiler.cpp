@@ -54,7 +54,8 @@ to_c_compiler::~to_c_compiler() {
 }
 void to_c_compiler::visit_assign_expr(assign_expr *obj) {
   LOG_COMP("assign: " << obj->name_->token_ << " " << obj->opr_->token_ << " "
-                      << obj->right_->locate()->token_ << " | promoted = " << obj->promoted_);
+                      << obj->right_->locate()->token_
+                      << " | promoted = " << obj->promoted_);
   if (obj->promoted_) {
     auto let_st = ast_pool_->c_let_stmt(obj->name_, nullptr, obj->right_);
     let_st->accept(this);
@@ -376,7 +377,7 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
   std::stringstream code{};
   // Depending on the fact that this is a function or class, we will call or create object
   if (name_pair.second.object_type_ == object_type::BUILTIN_FUNCTION) {
-    LOG_COMP("builtin: "<< name);
+    LOG_COMP("builtin: " << name);
     std::vector<std::pair<std::string, ykobject>> args{};
     int i = 0;
     for (auto arg : obj->args_) {
@@ -397,8 +398,8 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
     auto module_file = name_pair.second.module_file_;
     auto module_class = name_pair.second.string_val_;
     auto module_prefix = cf_->get_or_null(module_file)->prefix_;
-    LOG_COMP("module class: " << name << " file=" << module_file << " class=" << module_class
-                              << " prefix=" << module_prefix);
+    LOG_COMP("module class: " << name << " file=" << module_file << " class="
+                              << module_class << " prefix=" << module_prefix);
     auto class_ =
         cf_->get_or_null(module_file)->data_->dsv_->get_class(module_class);
     if (class_->annotations_.on_stack_) {
@@ -413,8 +414,8 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
     auto module_info = cf_->get_or_null(module_file);
     auto module_prefix = module_info->prefix_;
     auto prefixed_fn_name = prefix(module_fn, module_prefix);
-    LOG_COMP("module function: " << name << " file=" << module_file << " fn=" << module_fn
-                                 << " prefix=" << module_prefix);
+    LOG_COMP("module function: " << name << " file=" << module_file << " fn="
+                                 << module_fn << " prefix=" << module_prefix);
     auto fndef = module_info->data_->dsv_->get_function(module_fn);
     auto fn_return = fndef->return_type_;
     std::vector<ykdatatype *> params{};
@@ -645,7 +646,8 @@ std::string to_c_compiler::conv_integer_literal(token_type token_type_val,
     case token_type::UINTEGER_HEX_8:
     case token_type::UINTEGER_HEX_16:
     case token_type::UINTEGER_HEX_64: {
-      literal_conversion_result conversion_result = ::convert_literal(token_type_val, literal_token);
+      literal_conversion_result conversion_result =
+          ::convert_literal(token_type_val, literal_token);
       if (conversion_result.type_ == literal_type::LT_INVALID) {
         error(literal_token, conversion_result.error_);
         return "<><>";
@@ -1108,16 +1110,14 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
       write_indent(body_);
       // write following --
       // ykfxa name
-      body_ << convert_dt(obj->data_type_,
-                          datatype_location::STRUCT, "", "")
+      body_ << convert_dt(obj->data_type_, datatype_location::STRUCT, "", "")
             << " " << name;
       body_ << " = " << exp.first;
     } else {
       write_indent(body_);
       // write following --
       // data_type name[size]
-      body_ << convert_dt(obj->data_type_,
-                          datatype_location::STRUCT, "", "")
+      body_ << convert_dt(obj->data_type_, datatype_location::STRUCT, "", "")
             << " " << name;
       body_ << " = {}";
     }
@@ -1915,3 +1915,21 @@ void to_c_compiler::visit_cfor_stmt(cfor_stmt *obj) {
 }
 void to_c_compiler::visit_enum_stmt(enum_stmt *obj) {}
 void to_c_compiler::visit_union_stmt(union_stmt *obj) {}
+void to_c_compiler::visit_directive_stmt(directive_stmt *obj) {
+  if (obj->directive_type_->token_ == "ccode") {
+    write_indent(body_);
+    body_ << ::string_utils::unescape(obj->directive_val_->token_);
+    write_end_statement(body_);
+  } else if (obj->directive_type_->token_ == "c_include") {
+    write_indent(body_);
+    body_ << "#include \""
+          << ::string_utils::unescape(obj->directive_val_->token_) << "\"";
+    write_end_statement(body_);
+  } else if (obj->directive_type_->token_ == "c_sys_include") {
+    write_indent(body_);
+    body_ << "#include <"
+          << ::string_utils::unescape(obj->directive_val_->token_) << ">";
+    write_end_statement(body_);
+  }
+  // ignore other directives
+}

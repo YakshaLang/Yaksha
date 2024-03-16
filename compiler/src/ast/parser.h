@@ -162,6 +162,10 @@ private:
     token *magic_return_token_;
     token *sugar_else_;
     stmt *parse_named_let_statement();
+    stmt *directive_statement();
+    curly_call_expr *match_directive_options();
+    token *consume_any_of(std::initializer_list<token_type> types,
+                          const std::string &message);
   };
 }// namespace yaksha
 #endif

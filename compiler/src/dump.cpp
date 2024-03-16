@@ -269,8 +269,8 @@ void display(def_class_visitor &df, parser &parser_object,
             first_expr->expr_->type_ == yaksha_lisp_expr_type::TERMINAL) {
           auto tok = first_expr->expr_->token_;
           auto comment = extract_comments(tok->line_, token_extractor);
-          std::cout << ", \"comment\": \"" <<
-            string_utils::escape_json(comment) << "\"";
+          std::cout << ", \"comment\": \"" << string_utils::escape_json(comment)
+                    << "\"";
         }
       }
     }

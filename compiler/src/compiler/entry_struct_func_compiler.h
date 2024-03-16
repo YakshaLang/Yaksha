@@ -64,7 +64,8 @@ namespace yaksha {
     std::string compile_function_dt(ykdatatype *function_dt,
                                     datatype_compiler *dtc);
     std::string compile_binary_data(const std::string &data);
-    std::string compile_fixed_array(ykdatatype *fixed_array_dt, datatype_compiler *dtc);
+    std::string compile_fixed_array(ykdatatype *fixed_array_dt,
+                                    datatype_compiler *dtc);
     void compile_forward_declarations(std::stringstream &target);
     void compile_structures(std::stringstream &target);
     void compile_function_defs(std::stringstream &target);
@@ -77,7 +78,8 @@ namespace yaksha {
     ~entry_struct_func_compiler();
 
 private:
-    std::string improve_name(const std::string &yaksha_datatype_string, const std::string& numbered_name);
+    std::string improve_name(const std::string &yaksha_datatype_string,
+                             const std::string &numbered_name);
     std::unordered_map<std::string, std::string> name_improvements_;
     std::unordered_map<std::string, std::string> reverse_name_improvements_;
     // ------------------------------------------------

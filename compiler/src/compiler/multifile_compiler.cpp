@@ -353,7 +353,7 @@ bool multifile_compiler::has_invalid_main_func(
 }
 multifile_compiler::~multifile_compiler() { delete cf_; }
 codefiles &multifile_compiler::get_codefiles() const { return *cf_; }
-comp_result do_nothing_codegen::emit(codefiles *cf,
-                                     gc_pool<token> *token_pool, errors::error_printer* ep) {
+comp_result do_nothing_codegen::emit(codefiles *cf, gc_pool<token> *token_pool,
+                                     errors::error_printer *ep) {
   return comp_result{false, ""};
 }

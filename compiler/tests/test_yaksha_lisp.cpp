@@ -154,7 +154,7 @@ void no_crash_test(std::string text) {
     env.setup_builtins();
     env.eval(parser.exprs_);
   } catch (const parsing_error &ex) {
-    // ignore
+    intentionally_ignored(ex);
   }
 }
 TEST_CASE("yaksha_lisp: expected ')'") {

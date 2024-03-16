@@ -113,6 +113,7 @@ private:
     void visit_union_stmt(union_stmt *obj) override;
     void desugar_fixed_arr_foreach(foreach_stmt *obj);
     void desugar_arr_foreach(foreach_stmt *obj);
+    void visit_directive_stmt(directive_stmt *obj) override;
   };
 }// namespace yaksha
 #endif

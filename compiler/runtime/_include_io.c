@@ -85,7 +85,7 @@ int64_t yk__io_ftell(FILE *stream) {
 #endif
 }
 bool yk__io_fseek(FILE *stream, int64_t offset, int origin) {
-  return stream != NULL && fseek(stream, offset, origin) == 0;
+  return stream != NULL && fseek(stream, (long)offset, origin) == 0;
 }
 bool yk__io_fgetpos(FILE *stream, fpos_t *pos) {
   return stream != NULL && pos != NULL && fgetpos(stream, pos) == 0;

@@ -189,6 +189,7 @@ void yaksha_lisp_parser::parse() {
       auto de = parse_expr();
       exprs_.emplace_back(de);
     } catch (parsing_error &e) {
+      intentionally_ignored(e);
       // Skip an element and see if we can parse as possible
       advance();
     }

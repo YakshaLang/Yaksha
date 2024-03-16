@@ -374,6 +374,22 @@ stmt *ast_pool::c_del_stmt(token *del_keyword, expr *expression) {
   cleanup_stmt_.push_back(o);
   return o;
 }
+directive_stmt::directive_stmt(token *directive_token,
+                               std::vector<parameter> values,
+                               token *directive_type, token *directive_val)
+    : directive_token_(directive_token), values_(std::move(values)),
+      directive_type_(directive_type), directive_val_(directive_val) {}
+void directive_stmt::accept(stmt_visitor *v) { v->visit_directive_stmt(this); }
+ast_type directive_stmt::get_type() { return ast_type::STMT_DIRECTIVE; }
+token *directive_stmt::locate() { return directive_token_; }
+stmt *ast_pool::c_directive_stmt(token *directive_token,
+                                 std::vector<parameter> values,
+                                 token *directive_type, token *directive_val) {
+  auto o = new directive_stmt(directive_token, std::move(values),
+                              directive_type, directive_val);
+  cleanup_stmt_.push_back(o);
+  return o;
+}
 enum_stmt::enum_stmt(token *name, std::vector<parameter> members,
                      annotations annotations)
     : name_(name), members_(std::move(members)), annotations_(annotations) {}

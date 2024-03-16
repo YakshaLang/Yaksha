@@ -445,3 +445,4 @@ void usage_analyser::visit_cfor_stmt(cfor_stmt *obj) {
 }
 void usage_analyser::visit_enum_stmt(enum_stmt *obj) { obj->hits_++; }
 void usage_analyser::visit_union_stmt(union_stmt *obj) { obj->hits_++; }
+void usage_analyser::visit_directive_stmt(directive_stmt *obj) {}

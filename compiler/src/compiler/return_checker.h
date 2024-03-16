@@ -68,6 +68,7 @@ namespace yaksha {
     void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
     void visit_union_stmt(union_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
+    void visit_directive_stmt(directive_stmt *obj) override;
     std::vector<parsing_error> errors_{};
     std::vector<bool> found_returns_{};
 

@@ -45,7 +45,8 @@
 using namespace yaksha;
 codegen_c::codegen_c() = default;
 codegen_c::~codegen_c() = default;
-comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool, errors::error_printer* ep) {
+comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool,
+                            errors::error_printer *ep) {
   // Compile all files.
   bool has_errors = false;
   std::stringstream struct_forward_decls{};

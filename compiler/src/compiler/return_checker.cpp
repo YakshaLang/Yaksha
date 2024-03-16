@@ -103,3 +103,4 @@ void return_checker::pop() {
   if (found_returns_.empty()) { return; }
   found_returns_.pop_back();
 }
+void return_checker::visit_directive_stmt(directive_stmt *obj) {}

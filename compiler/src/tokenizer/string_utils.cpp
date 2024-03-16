@@ -38,6 +38,7 @@
 // ==============================================================================================
 // string_utils.cpp
 #include "tokenizer/string_utils.h"
+#include "utilities/cpp_util.h"
 #include <iomanip>
 #include <sstream>
 #include <utility>
@@ -309,6 +310,7 @@ std::string yaksha::string_utils::escape(const std::string &raw_string) {
   try {
     return escape(raw_string, true);
   } catch (utf8::invalid_utf8 &ignored) {
+    intentionally_ignored(ignored);
     return escape_binary_string(raw_string, true);
   }
 }
@@ -388,9 +390,7 @@ std::string yaksha::string_utils::html_escape(const std::string &raw_string) {
       }
       utf8::next(iterator, end);
     }
-  } catch (utf8::invalid_utf8 &ignored) {
-    // ignore
-  }
+  } catch (utf8::invalid_utf8 &ignored) { intentionally_ignored(ignored); }
   return buf_;
 }
 yaksha::string_utils::string_error::string_error(std::string s)

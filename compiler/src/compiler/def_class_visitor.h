@@ -105,12 +105,14 @@ namespace yaksha {
     void visit_cfor_stmt(cfor_stmt *obj) override;
     void visit_enum_stmt(enum_stmt *obj) override;
     void visit_union_stmt(union_stmt *obj) override;
+    void visit_directive_stmt(directive_stmt *obj) override;
     std::vector<std::string> function_names_{};
     std::vector<std::string> class_names_{};
     std::vector<std::string> global_const_names_{};
     std::vector<std::string> global_native_const_names_{};
     std::vector<parsing_error> errors_{};
     std::unordered_set<std::string> runtime_features_{};
+    std::vector<directive_stmt *> directives_{};
 
 private:
     std::unordered_map<std::string, def_stmt *> functions_{};

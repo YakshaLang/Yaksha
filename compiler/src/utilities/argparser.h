@@ -84,8 +84,8 @@ namespace yaksha::argparser {
     std::string program_name_{};
     std::string program_description_{};
     std::string epilog_{};
-    std::vector<optional_arg*> optional_{};
-    std::vector<positional_arg*> positional_{};
+    std::vector<optional_arg *> optional_{};
+    std::vector<positional_arg *> positional_{};
     std::vector<std::string> remaining_{};
     std::vector<std::string> errors_{};
   };
@@ -164,19 +164,24 @@ namespace yaksha::argparser {
       size_t len = arg->name_.size();
       if (len > max_po_len) { max_po_len = len; }
     }
-    std::cout << colours::cyan("==============================================\n");
-    std::cout << "Usage: " << colours::green(args.program_name_) << " [options]";
+    std::cout << colours::cyan(
+        "==============================================\n");
+    std::cout << "Usage: " << colours::green(args.program_name_)
+              << " [options]";
     for (const positional_arg *arg : args.positional_) {
       std::cout << " " << arg->name_;
     }
     std::cout << "\n";
     std::cout << colours::magenta(args.program_description_) << "\n";
-    std::cout << colours::cyan("==============================================\n");
+    std::cout << colours::cyan(
+        "==============================================\n");
     std::cout << colours::yellow("Options:\n");
     for (const optional_arg *arg : args.optional_) {
       size_t len = arg->long_name_.size() + 3;
       if (arg->has_arg_) { len += 6; }
-      std::cout << colours::cyan("  -") << colours::cyan(std::string(1, arg->short_name_)) << colours::red(", ");
+      std::cout << colours::cyan("  -")
+                << colours::cyan(std::string(1, arg->short_name_))
+                << colours::red(", ");
       std::cout << colours::cyan(arg->long_name_);
       if (arg->has_arg_) { std::cout << colours::magenta(" <arg>"); }
       std::cout << std::string(max_op_len - len + 3, ' ');
