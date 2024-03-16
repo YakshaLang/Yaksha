@@ -84,6 +84,7 @@ comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool,
   rf.insert(rf.end(), runtime_features.begin(), runtime_features.end());
   std::sort(rf.begin(), rf.end());
   std::stringstream c_code{};
+  // TODO deprecate runtimefeature
   // Write the feature requirements
   // ---
   // Format: // YK --> no requirements

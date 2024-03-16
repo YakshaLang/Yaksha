@@ -52,6 +52,20 @@
 #include <unordered_set>
 #include <vector>
 namespace yaksha {
+  struct directives {
+    // Flags
+    bool no_main_{false};
+    bool apply_native_define_{false};
+    bool no_libs_{false};
+    // Conditional directives
+    std::vector<directive_stmt *> include_paths_{};
+    std::vector<directive_stmt *> library_paths_{};
+    std::vector<directive_stmt *> libraries_{};
+    std::vector<directive_stmt *> compile_args_{};
+    std::vector<directive_stmt *> link_args_{};
+    std::vector<directive_stmt *> defines_{};
+    std::vector<directive_stmt *> c_files_{};
+  };
   struct codefiles {
     codefiles(std::filesystem::path &libs_path, errors::error_printer *ep);
     ~codefiles();
@@ -65,6 +79,7 @@ namespace yaksha {
     ykdt_pool pool_;
     yaksha_macros yaksha_macros_{};
     entry_struct_func_compiler *esc_;
+    directives directives_{};
 
 private:
     file_data *parse_or_null(std::filesystem::path &file_name);

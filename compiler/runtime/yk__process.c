@@ -66,7 +66,7 @@ size_t yk__windows_quote_argument(yk__sds argument, yk__sds *output,
   if (NULL != output) { *output = yk__sdsempty(); }
   yk__append(output, "\"");
   for (size_t i = 0; i < input_length; ++i) {
-    unsigned NumberBackslashes = 0;
+    int NumberBackslashes = 0;
     while (i < input_length && argument[i] == '\\') {
       ++i;
       ++NumberBackslashes;

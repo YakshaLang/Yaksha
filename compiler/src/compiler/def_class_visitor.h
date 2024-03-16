@@ -52,8 +52,9 @@ namespace yaksha {
    *
    * We also extract classes in this phase
    */
+  struct codefiles;
   struct def_class_visitor : expr_visitor, stmt_visitor {
-    explicit def_class_visitor(builtins *builtins);
+    def_class_visitor(builtins *builtins, codefiles *cf);
     ~def_class_visitor() override;
     void extract(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
@@ -112,7 +113,6 @@ namespace yaksha {
     std::vector<std::string> global_native_const_names_{};
     std::vector<parsing_error> errors_{};
     std::unordered_set<std::string> runtime_features_{};
-    std::vector<directive_stmt *> directives_{};
 
 private:
     std::unordered_map<std::string, def_stmt *> functions_{};
@@ -120,7 +120,10 @@ private:
     std::unordered_map<std::string, const_stmt *> global_consts_{};
     std::unordered_map<std::string, nativeconst_stmt *> global_native_consts_{};
     builtins *builtins_;
+    codefiles *cf_;
     void error(token *tok, const std::string &message);
+    bool has_zero_arg_directive(directive_stmt *obj);
+    bool has_one_arg_directive(directive_stmt *obj);
   };
 }// namespace yaksha
 #endif

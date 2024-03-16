@@ -7,14 +7,14 @@
 
 ## Licensing
 
-* By contributing, you agree to the LICENSE of this repository. (GPLv3 + extra terms -- for compiler, MIT for libraries, various for runtime libraries).
-* Your code will be bound by the same LICENSE in particular subfolder.
-* Main developer - `Bhathiya Perera` holds the right to dual license any future versions of Yaksha (compiler, binary distribution, etc) as needed.
-* Main developer - `Bhathiya Perera` may relicense Yaksha (compiler, binary distribution, etc) to a different open source license.
+* By contributing, you agree to the LICENCE of this repository. (GPLv3 + extra terms -- for compiler, MIT for libraries, various for runtime libraries).
+* Your code will be bound by the same LICENCE in particular sub-folder.
+* Main developer - `Bhathiya Perera` holds the right to dual licence any future versions of Yaksha (compiler, binary distribution, etc) as needed.
+* Main developer - `Bhathiya Perera` may license Yaksha (compiler, binary distribution, etc) to a different open source licence.
 * Donations or contributions does not grant you ability to redistribute / repackage without agreeing to GPLv3 + extra terms. (Unless you are explicitly allowed)
 * Any new C library added to runtime needs to be properly attributed to original authors. 
 
-## Demos
+## Demos / Projects built with Yaksha
 
 * Example if you build a game or CLI tool you can license it however you want.
 * If you get it working with WASM, consider adding it to the demos. (If so please put your name / github account in the PR to the website repo)

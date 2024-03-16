@@ -174,7 +174,7 @@ comp_result multifile_compiler::compile_all(codegen *code_generator) {
   for (auto f : cf_->files_) {
     LOG_COMP("file:" << f->filepath_.string());
     auto builtins_obj = new builtins(&(cf_->pool_), &token_pool_);
-    f->data_->dsv_ = new def_class_visitor(builtins_obj);
+    f->data_->dsv_ = new def_class_visitor(builtins_obj, cf_);
     f->data_->dsv_->extract(f->data_->parser_->stmts_);
     LOG_COMP("dsv extract:" << f->filepath_.string());
     if (!f->data_->dsv_->errors_.empty()) {

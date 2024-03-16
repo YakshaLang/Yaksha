@@ -38,12 +38,13 @@
 // ==============================================================================================
 // def_class_visitor.cpp
 #include "def_class_visitor.h"
+#include "ast/codefiles.h"
 #include "builtins/builtins.h"
 #include "compiler_utils.h"
 #include <regex>
 using namespace yaksha;
-def_class_visitor::def_class_visitor(builtins *builtins)
-    : builtins_(builtins){};
+def_class_visitor::def_class_visitor(builtins *builtins, codefiles *cf)
+    : builtins_(builtins), cf_(cf){};
 def_class_visitor::~def_class_visitor() = default;
 void def_class_visitor::visit_assign_expr(assign_expr *obj) {}
 void def_class_visitor::visit_binary_expr(binary_expr *obj) {}
@@ -286,40 +287,8 @@ void def_class_visitor::visit_union_stmt(union_stmt *obj) {}
 void def_class_visitor::visit_directive_stmt(directive_stmt *obj) {
   obj->hits_ = 1;// Always consider this to be used!
   auto directive_type = obj->directive_type_->token_;
-  /* these must have no STR argument */
-  bool zero_arg_directive =
-      // (Global flag) No need to check for main()
-      directive_type == "no_main" ||// TODO
-      // (Global flag) If a function takes 'str' parameters, it is thrown as an error)
-      directive_type == "ban_str_params" ||// TODO
-      // (Global flag) Directly substitute '@nativedefine' or 'native constants'
-      directive_type == "apply_nativedefine";// TODO
-  /* ========================================================================= */
-  /* these must have the argument string, and it cannot be empty */
-  bool must_have_arg_directive =
-      // Write this raw code directly to output!
-      directive_type == "ccode" ||
-      // (Global) Include path -I <arg>
-      directive_type == "c_include_path" ||// TODO
-      // (Global) -L <arg>
-      directive_type == "c_lib_path" ||// TODO
-      // Write #include "arg"
-      directive_type == "c_include" ||
-      // Write #include <arg>
-      directive_type == "c_sys_include" ||
-      // Compile and link with this '.c' file's .o file, in addition to output code
-      // --> can also take, c_compile_arg, c_define parameters for that specific file
-      directive_type == "c_file" ||// TODO
-      // (Global) Link with this, -l<arg>, for example
-      directive_type == "c_lib" ||// TODO
-      // (Global) use this compilation argument for all code files
-      directive_type == "c_compile_arg" ||// TODO
-      // (Global) when all .o objects are linked together, use these arguments
-      directive_type == "c_link_arg" ||// TODO
-      // (Global) use these arguments for linking or compiling
-      directive_type == "c_compile_or_link_arg" ||// TODO
-      // (Global) define this when compiling. -D<arg>
-      directive_type == "c_define";// TODO
+  bool zero_arg_directive = has_zero_arg_directive(obj);
+  bool must_have_arg_directive = has_one_arg_directive(obj);
   if (zero_arg_directive || must_have_arg_directive) {
     if (zero_arg_directive && obj->directive_val_ != nullptr) {
       error(obj->directive_val_,
@@ -334,5 +303,77 @@ void def_class_visitor::visit_directive_stmt(directive_stmt *obj) {
     error(obj->directive_type_,
           "Invalid directive. Only no_main, no_string and ccode are supported");
   }
-  directives_.push_back(obj);
+}
+bool def_class_visitor::has_one_arg_directive(directive_stmt *obj) {
+  auto directive_type = obj->directive_type_->token_;
+  /* these must have the argument string, and it cannot be empty */
+  bool must_have_arg_directive = false;
+  // Write this raw code (unescaped) directly to output!  🟡
+  // Write #include "arg"                                 🟡
+  // Write #include <arg>                                 🟡
+  if (directive_type == "ccode" || directive_type == "c_include" ||
+      directive_type == "c_sys_include") {
+    must_have_arg_directive = true;
+  }
+  // (Global) Include path -I <arg>                       🔴
+  if (directive_type == "c_include_path") {
+    must_have_arg_directive = true;
+    cf_->directives_.include_paths_.emplace_back(obj);
+  }
+  // (Global) Library path -L <arg>                       🔴
+  if (directive_type == "c_lib_path") {
+    must_have_arg_directive = true;
+    cf_->directives_.library_paths_.emplace_back(obj);
+  }
+  // Compile and link with this '.c' file's .o file, in addition to output code
+  // --> can also take, c_compile_arg, c_define parameters for that specific file
+  //  will support following parameter                    🔴
+  //  os 1,arch 1,c_define *,c_compile_arg *,inherit_compile_args
+  if (directive_type == "c_file") {
+    must_have_arg_directive = true;
+    cf_->directives_.c_files_.emplace_back(obj);
+  }
+  // (Global) Link with this, -l<arg>, for example        🔴
+  if (directive_type == "c_lib") {
+    must_have_arg_directive = true;
+    cf_->directives_.libraries_.emplace_back(obj);
+  }
+  // (Global) compilation argument for all code files     🔴
+  if (directive_type == "c_compile_arg") {
+    must_have_arg_directive = true;
+    cf_->directives_.compile_args_.emplace_back(obj);
+  }
+  // (Global) use this arg during link time               🔴
+  if (directive_type == "c_link_arg") {
+    must_have_arg_directive = true;
+    cf_->directives_.compile_args_.emplace_back(obj);
+  }
+  // (Global) use this define during compilation time of all .c files
+  //                                                      🔴
+  if (directive_type == "c_define") {
+    must_have_arg_directive = true;
+    cf_->directives_.defines_.emplace_back(obj);
+  }
+  return must_have_arg_directive;
+}
+bool def_class_visitor::has_zero_arg_directive(directive_stmt *obj) {
+  auto directive_type = obj->directive_type_->token_;
+  /* these must have no STR argument */
+  bool zero_arg_directive = false;
+  // (Global flag) No need to check for main()      🔴
+  if (directive_type == "no_main") {
+    zero_arg_directive = true;
+    cf_->directives_.no_main_ = true;
+  }
+  // (Global flag) Directly substitute '@nativedefine' or 'native constants'
+  if (directive_type == "apply_nativedefine") {// 🔴
+    zero_arg_directive = true;
+    cf_->directives_.apply_native_define_ = true;
+  }
+  // (Global flag) no yaksha runtime / libs,        🔴
+  if (directive_type == "no_libs") {
+    zero_arg_directive = true;
+    cf_->directives_.no_libs_ = true;
+  }
+  return zero_arg_directive;
 }
