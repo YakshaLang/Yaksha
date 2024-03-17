@@ -99,6 +99,7 @@ struct builtin_arrput : builtin {
     }
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┬─┐┬─┐┌─┐┌─┐┌─┐
@@ -141,6 +142,7 @@ struct builtin_arrpop : builtin {
     code << "yk__arrpop(" << args[0].first << ")";
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┬─┐┬─┐┌─┐┌─┐┌┬┐┌─┐┌─┐┌─┐
@@ -192,7 +194,7 @@ struct builtin_arrsetlencap : builtin {
          << ")";
     return {code.str(), o};
   }
-
+  bool require_stdlib() override { return true; }
   private:
   std::string func_name_;
 };
@@ -271,7 +273,7 @@ struct builtin_print : builtin {
     }
     return {code.str(), o};
   }
-
+  bool require_stdlib() override { return true; }
   private:
   std::string func_name_;
 };
@@ -342,6 +344,7 @@ struct builtin_len : builtin {
     o = ykobject(dt_pool->create("int"));
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┬ ┬┌─┐┬─┐┌─┐┌┬┐
@@ -389,6 +392,7 @@ struct builtin_charat : builtin {
     o = ykobject(dt_pool->create("int"));
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┌─┐┌┬┐┬─┐┌─┐┌─┐
@@ -432,6 +436,7 @@ struct builtin_getref : builtin {
     o = ykobject(dt);
     return {code.str(), o};
   }
+  bool require_stdlib() override { return false; }
 };
 //
 // ┬ ┬┌┐┌┬─┐┌─┐┌─┐
@@ -471,6 +476,7 @@ struct builtin_unref : builtin {
     o = ykobject(args[0].second.datatype_->args_[0]);
     return {code.str(), o};
   }
+  bool require_stdlib() override { return false; }
 };
 //
 // ┌─┐┬ ┬┌┐┌┌─┐┬ ┬
@@ -510,6 +516,7 @@ struct builtin_shnew : builtin {
     code << "yk__sh_new_strdup(" << args[0].first << ")";
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┬ ┬┌─┐┌─┐┌┬┐
@@ -557,6 +564,7 @@ struct builtin_shget : builtin {
     o = ykobject(args[0].second.datatype_->args_[0]->args_[0]);
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┬ ┬┌─┐┌─┐┌┬┐┬
@@ -604,6 +612,7 @@ struct builtin_shgeti : builtin {
     o = ykobject(dt_pool->create("int"));
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┬ ┬┌─┐┬ ┬┌┬┐
@@ -653,6 +662,7 @@ struct builtin_shput : builtin {
     code << ", " << args[2].first << ")";
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┌─┐┌─┐┌┬┐
@@ -718,6 +728,7 @@ struct builtin_cast : builtin {
     o = ykobject(out_dt);
     return {code.str(), o};
   }
+  bool require_stdlib() override { return false; }
 };
 //
 // ┬ ┬┌┬┐┌┐┌┌─┐┬ ┬
@@ -755,6 +766,7 @@ struct builtin_hmnew : builtin {
     auto o = ykobject(dt_pool);
     return {"", o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┬ ┬┌┬┐┌─┐┌─┐┌┬┐
@@ -800,6 +812,7 @@ struct builtin_hmget : builtin {
     o = ykobject(args[0].second.datatype_->args_[0]->args_[0]);
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┬ ┬┌┬┐┌─┐┌─┐┌┬┐┬
@@ -845,6 +858,7 @@ struct builtin_hmgeti : builtin {
     o = ykobject(dt_pool->create("int"));
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┬ ┬┌┬┐┌─┐┬ ┬┌┬┐
@@ -894,6 +908,7 @@ struct builtin_hmput : builtin {
          << args[2].first << ")";
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐ ┌─┐┌─┐┬─┐┌┬┐
@@ -965,6 +980,7 @@ struct builtin_qsort : builtin {
          << ") == 0)";
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┬─┐┬─┐┌┐┌┌─┐┬ ┬
@@ -1033,6 +1049,7 @@ struct builtin_arrnew : builtin {
     o = ykobject(array_dt);
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┌─┐┬  ┐ ┬┌─┐┌┬┐┌─┐┬─┐┬─┐
@@ -1120,6 +1137,7 @@ struct builtin_fixed_arr : builtin {
     o = ykobject(array_dt);
     return {code.str(), o};
   }
+  bool require_stdlib() override { return false; }
 };
 //
 // ┌─┐┬─┐┬─┐┌─┐┬ ┬
@@ -1208,6 +1226,7 @@ struct builtin_array : builtin {
     o = ykobject(array_dt);
     return {code.str(), o};
   }
+  bool require_stdlib() override { return true; }
 };
 //
 // ┬┬┌─┐
@@ -1275,6 +1294,7 @@ struct builtin_iif : builtin {
     }
     return {code.str(), o};
   }
+  bool require_stdlib() override { return false; }
 };
 //
 // ┌─┐┌─┐┬─┐┌─┐┌─┐┌─┐┬ ┬
@@ -1442,7 +1462,7 @@ struct builtin_functional : builtin {
     code << return_temp;
     return {code.str(), ykobject(return_val_type)};
   }
-
+  bool require_stdlib() override { return true; }
   private:
   void write_statement(std::stringstream &read_stream,
                        statement_writer *st_writer) {
@@ -1546,6 +1566,7 @@ struct builtin_binarydata : builtin {
         dt_parser->parse("Const[Ptr[Const[u8]]]", import_aliases, filepath));
     return {esc->compile_binary_data(raw_string), o};
   }
+  bool require_stdlib() override { return false; }
 };
 //
 // ┌┬┐┌─┐┬┌─┌─┐
@@ -1620,6 +1641,7 @@ struct builtin_make : builtin {
     o.datatype_ = dt;
     return {code.str(), o};
   }
+  bool require_stdlib() override { return false; }
 };
 //
 // ┬┌┐┌┬  ┬┌┐┌┌─┐┌─┐
@@ -1683,6 +1705,7 @@ struct builtin_inlinec : builtin {
     o.datatype_ = parsed_dt;
     return {string_utils::unescape(code->literal_token_->token_), o};
   }
+  bool require_stdlib() override { return false; }
 };
 //=======================================
 builtins::builtins(ykdt_pool *dt_pool, gc_pool<token> *token_pool)
@@ -1736,8 +1759,16 @@ ykobject builtins::verify(
     const std::string &name, const std::vector<ykobject> &args,
     const std::vector<expr *> &arg_expressions,
     const std::unordered_map<std::string, import_stmt *> &import_aliases,
-    const std::string &filepath, slot_matcher *dt_slot_matcher) {
-  return builtins_[name]->verify(args, arg_expressions, this, dt_pool_,
+    const std::string &filepath, slot_matcher *dt_slot_matcher,
+    bool no_stdlib) {
+  auto& builtin_object = builtins_[name];
+  if (builtin_object->require_stdlib() && no_stdlib) {
+    auto o = ykobject(dt_pool_);
+      o.string_val_ = "Builtin '" + name + "' does not work without stdlib.";
+    o.object_type_ = object_type::ERROR_DETECTED;
+    return o;
+  }
+  return builtin_object->verify(args, arg_expressions, this, dt_pool_,
                                  import_aliases, filepath, dt_slot_matcher);
 }
 std::pair<std::string, ykobject> builtins::compile(

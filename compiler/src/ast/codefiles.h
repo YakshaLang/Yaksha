@@ -56,7 +56,7 @@ namespace yaksha {
     // Flags
     bool no_main_{false};
     bool apply_native_define_{false};
-    bool no_libs_{false};
+    bool no_stdlib_{false};
     // Conditional directives
     std::vector<directive_stmt *> include_paths_{};
     std::vector<directive_stmt *> library_paths_{};

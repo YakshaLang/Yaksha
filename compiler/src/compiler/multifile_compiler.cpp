@@ -184,6 +184,13 @@ comp_result multifile_compiler::compile_all(codegen *code_generator) {
     }
     delete builtins_obj;
   }
+  has_errors |= has_not_allowed_imports_for_no_std_lib();
+  if (has_errors) { return {true, ""}; }
+  if (cf_->directives_.no_main_ || !this->main_required_) {
+    LOG_COMP("main is not required");
+    this->main_required_ = false;
+    cf_->directives_.no_main_ = true;
+  }
   LOG_COMP("post loop");
   has_errors |= has_invalid_main_func(main_file_info);
   if (has_errors) {
@@ -353,6 +360,29 @@ bool multifile_compiler::has_invalid_main_func(
 }
 multifile_compiler::~multifile_compiler() { delete cf_; }
 codefiles &multifile_compiler::get_codefiles() const { return *cf_; }
+bool multifile_compiler::has_not_allowed_imports_for_no_std_lib() {
+  if (!cf_->directives_.no_stdlib_) {
+    LOG_COMP("stdlib is allowed");
+    return false;
+  }
+  for (auto f : cf_->files_) {
+    for (auto imp : f->data_->parser_->import_stmts_) {
+      // allow for imports 'libs', 'w4', 'libs.c'
+      if (!imp->import_names_.empty() &&
+          imp->import_names_[0]->token_ == "raylib") {
+        LOG_COMP("in nostdlib mode - raylib is not allowed");
+        return true;
+      }
+      if (imp->import_names_.size() > 1 &&
+          imp->import_names_[0]->token_ == "libs" &&
+          imp->import_names_[1]->token_ != "c") {
+        LOG_COMP("in nostdlib mode only libs,w4,libs.c are allowed")
+        return true;
+      }
+    }
+  }
+  return false;
+}
 comp_result do_nothing_codegen::emit(codefiles *cf, gc_pool<token> *token_pool,
                                      errors::error_printer *ep) {
   return comp_result{false, ""};

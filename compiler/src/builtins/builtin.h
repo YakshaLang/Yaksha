@@ -52,6 +52,7 @@
 namespace yaksha {
   struct builtin {
     virtual ~builtin() = default;
+    virtual bool require_stdlib() = 0;
     virtual ykobject
     verify(const std::vector<ykobject> &args,
            const std::vector<expr *> &arg_expressions,

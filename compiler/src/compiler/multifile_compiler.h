@@ -81,6 +81,7 @@ private:
     [[nodiscard]] bool has_invalid_main_func(file_info *main_file_info) const;
     [[nodiscard]] bool all_success() const;
     codefiles *cf_{nullptr};
+    bool has_not_allowed_imports_for_no_std_lib();
   };
 }// namespace yaksha
 #endif

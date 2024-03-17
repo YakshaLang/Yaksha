@@ -965,7 +965,7 @@ stmt *parser::import_statement() {
   }
   // We can see if we encountered this in pre_parsing
   // If we did, then we can use the pre-parsed data
-  // during preparsing, this section will do nothing as there are no pre_parse stuff
+  // during preparsing, this section will do nothing if there are no pre_parse stuff
   if (pre_parse_import_stmts_alias_.find(name_token->token_) !=
       pre_parse_import_stmts_alias_.end()) {
     auto pre_parse_import = pre_parse_import_stmts_alias_[name_token->token_];

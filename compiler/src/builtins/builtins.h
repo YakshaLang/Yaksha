@@ -76,7 +76,8 @@ namespace yaksha {
     verify(const std::string &name, const std::vector<ykobject> &args,
            const std::vector<expr *> &arg_expressions,
            const std::unordered_map<std::string, import_stmt *> &import_aliases,
-           const std::string &filepath, slot_matcher *dt_slot_matcher);
+           const std::string &filepath, slot_matcher *dt_slot_matcher,
+           bool no_stdlib);
     /**
      * Compile a builtin function call.
      * This assumes verify and has builtin is called.

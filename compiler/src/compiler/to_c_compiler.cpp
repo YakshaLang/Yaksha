@@ -1275,10 +1275,19 @@ std::string to_c_compiler::convert_dt(ykdatatype *basic_dt,
     return convert_dt(basic_dt->args_[0], datatype_location::STRUCT, "", "") +
            " const ";
   } else if (basic_dt->is_str()) {
+    if (this->cf_->directives_.no_stdlib_) {
+      error("no stdlib mode does not allow str");
+    }
     return "yk__sds";
   } else if (basic_dt->is_sr()) {
+    if (this->cf_->directives_.no_stdlib_) {
+      error("no stdlib mode does not allow sr");
+    }
     return "struct yk__bstr";
   } else if (basic_dt->is_string_literal()) {
+    if (this->cf_->directives_.no_stdlib_) {
+      error("no stdlib mode does not allow string literal");
+    }
     return "char const*";
   } else if (basic_dt->is_i8()) {
     return "int8_t";
@@ -1309,6 +1318,9 @@ std::string to_c_compiler::convert_dt(ykdatatype *basic_dt,
   } else if (basic_dt->is_any_ptr_to_const()) {
     return "void const*";
   } else if (basic_dt->is_sm_entry() || basic_dt->is_m_entry()) {
+    if (this->cf_->directives_.no_stdlib_) {
+      error("no stdlib mode does not allow MEntry/SMEntry");
+    }
     // Handle SMEntry and Entry
     return esc_->compile(basic_dt, this);
   } else if (basic_dt->is_function()) {
@@ -1916,6 +1928,7 @@ void to_c_compiler::visit_cfor_stmt(cfor_stmt *obj) {
 void to_c_compiler::visit_enum_stmt(enum_stmt *obj) {}
 void to_c_compiler::visit_union_stmt(union_stmt *obj) {}
 void to_c_compiler::visit_directive_stmt(directive_stmt *obj) {
+  // TODO add support for parameters
   if (obj->directive_type_->token_ == "ccode") {
     write_indent(body_);
     body_ << ::string_utils::unescape(obj->directive_val_->token_);

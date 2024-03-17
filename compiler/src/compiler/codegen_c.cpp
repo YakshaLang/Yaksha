@@ -104,7 +104,11 @@ comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool,
     }
     c_code << "#";
   }
-  c_code << "\n#include \"yk__lib.h\"\n";
+  c_code << "\n";
+  if (!cf->directives_.no_stdlib_) {
+    LOG_COMP("no_stdlib mode");
+    c_code << "#include \"yk__lib.h\"\n";
+  }
   c_code << "// --forward declarations-- \n";
   c_code << global_consts.str();
   if (cf->esc_->has_bin_data()) { cf->esc_->compile_binary_data_to(c_code); }
@@ -122,9 +126,13 @@ comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool,
   if (cf->esc_->has_structures()) { cf->esc_->compile_structures(c_code); }
   c_code << "// --functions-- \n";
   c_code << function_body.str();
-  c_code << "#if defined(YK__MINIMAL_MAIN)\n";
-  c_code << "int main(void) { return yy__main(); }\n";
-  c_code << "#endif";
+  if (!cf->directives_.no_main_) {
+    LOG_COMP("no_main directive is set, no need add the minimal main to the "
+             "generated code.");
+    c_code << "#if defined(YK__MINIMAL_MAIN)\n";
+    c_code << "int main(void) { return yy__main(); }\n";
+    c_code << "#endif";
+  }
   LOG_COMP("c code generated");
   return {false, c_code.str()};
 }

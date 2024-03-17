@@ -360,20 +360,21 @@ bool def_class_visitor::has_zero_arg_directive(directive_stmt *obj) {
   auto directive_type = obj->directive_type_->token_;
   /* these must have no STR argument */
   bool zero_arg_directive = false;
-  // (Global flag) No need to check for main()      🔴
+  // (Global flag) No need to check for main()            🟡
   if (directive_type == "no_main") {
+    // TODO verify parameter count is zero
     zero_arg_directive = true;
     cf_->directives_.no_main_ = true;
   }
   // (Global flag) Directly substitute '@nativedefine' or 'native constants'
-  if (directive_type == "apply_nativedefine") {// 🔴
+  if (directive_type == "apply_nativedefine") { //        🔴
     zero_arg_directive = true;
     cf_->directives_.apply_native_define_ = true;
   }
-  // (Global flag) no yaksha runtime / libs,        🔴
-  if (directive_type == "no_libs") {
+  // (Global flag) no yaksha runtime / libs,              🟡
+  if (directive_type == "no_stdlib") {
     zero_arg_directive = true;
-    cf_->directives_.no_libs_ = true;
+    cf_->directives_.no_stdlib_ = true;
   }
   return zero_arg_directive;
 }
