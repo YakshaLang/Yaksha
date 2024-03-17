@@ -195,6 +195,7 @@ struct builtin_arrsetlencap : builtin {
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
+
   private:
   std::string func_name_;
 };
@@ -274,6 +275,7 @@ struct builtin_print : builtin {
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
+
   private:
   std::string func_name_;
 };
@@ -1249,8 +1251,10 @@ struct builtin_iif : builtin {
                *args[2].datatype_->const_unwrap()) {
       o.string_val_ = "Second and third argument to iif() must be of same type";
     } else if (args[1].is_a_function()) {
-      ykdatatype *arg1_dt = dt_slot_matcher->function_to_datatype(args[1]);
-      ykdatatype *arg2_dt = dt_slot_matcher->function_to_datatype(args[2]);
+      ykdatatype *arg1_dt =
+          dt_slot_matcher->function_to_datatype_or_null(args[1]);
+      ykdatatype *arg2_dt =
+          dt_slot_matcher->function_to_datatype_or_null(args[2]);
       if (arg1_dt != nullptr && arg2_dt != nullptr &&
           *(arg1_dt->const_unwrap()) == *(arg2_dt->const_unwrap())) {
         o = ykobject(arg1_dt);
@@ -1351,7 +1355,7 @@ struct builtin_functional : builtin {
     ykdatatype *dt;
     ykdatatype *return_val_type;
     if (args[1].second.is_a_function()) {
-      dt = fnc_dt_extractor->function_to_datatype(args[1].second);
+      dt = fnc_dt_extractor->function_to_datatype_or_null(args[1].second);
     } else {
       dt = args[1].second.datatype_;
     }
@@ -1463,6 +1467,7 @@ struct builtin_functional : builtin {
     return {code.str(), ykobject(return_val_type)};
   }
   bool require_stdlib() override { return true; }
+
   private:
   void write_statement(std::stringstream &read_stream,
                        statement_writer *st_writer) {
@@ -1483,7 +1488,13 @@ struct builtin_functional : builtin {
     if (function.datatype_->is_function()) {
       dt = function.datatype_;
     } else {
-      dt = dt_slot_matcher->function_to_datatype(function);
+      dt = dt_slot_matcher->function_to_datatype_or_null(function);
+    }
+    if (dt == nullptr) {
+      ykobject o = ykobject(dt_pool);
+      o.string_val_ = "Function argument for builtin " + name_ + " if invalid";
+      o.object_type_ = object_type::ERROR_DETECTED;
+      return o;
     }
     ykobject o = ykobject(dt_pool);
     ykdatatype *template_dt = array.datatype_->args_[0];
@@ -1761,15 +1772,15 @@ ykobject builtins::verify(
     const std::unordered_map<std::string, import_stmt *> &import_aliases,
     const std::string &filepath, slot_matcher *dt_slot_matcher,
     bool no_stdlib) {
-  auto& builtin_object = builtins_[name];
+  auto &builtin_object = builtins_[name];
   if (builtin_object->require_stdlib() && no_stdlib) {
     auto o = ykobject(dt_pool_);
-      o.string_val_ = "Builtin '" + name + "' does not work without stdlib.";
+    o.string_val_ = "Builtin '" + name + "' does not work without stdlib.";
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
   return builtin_object->verify(args, arg_expressions, this, dt_pool_,
-                                 import_aliases, filepath, dt_slot_matcher);
+                                import_aliases, filepath, dt_slot_matcher);
 }
 std::pair<std::string, ykobject> builtins::compile(
     const std::string &name,

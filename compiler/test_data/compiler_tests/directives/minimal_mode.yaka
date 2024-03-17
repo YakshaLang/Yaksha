@@ -1,0 +1,25 @@
+directive no_main
+directive no_stdlib
+directive apply_nativedefine
+directive ccode """
+#ifndef max
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef min
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#endif
+"""
+
+# Below wil be inlined
+@nativedefine("max")
+def max(a: i32, b: i32) -> i32:
+    pass
+
+@nativedefine("min")
+def min(a: i32, b: i32) -> i32:
+    pass
+
+def add(a: i32, b: i32) -> i32:
+    return min(a, b) + max(a, b)
+

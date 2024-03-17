@@ -70,7 +70,14 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
   if (scope_.is_defined(name)) {
     object = scope_.get(name);
   } else {
-    if (rhs.is_a_function()) { rhs.datatype_ = function_to_datatype(rhs); }
+    if (rhs.is_a_function()) {
+      rhs.datatype_ = function_to_datatype_or_null(rhs);
+      if (rhs.datatype_ == nullptr) {
+        error(obj->right_->locate(),
+              "Failed to derive data type of function pointer");
+        return;
+      }
+    }
     if (rhs.datatype_->is_none()) {
       error(obj->opr_, "Cannot infer type when RHS is None");
     }
@@ -309,7 +316,8 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       arguments.push_back(pop());
     }
     auto result = builtins_.verify(name.string_val_, arguments, obj->args_,
-                                   import_stmts_alias_, filepath_, this, cf_->directives_.no_stdlib_);
+                                   import_stmts_alias_, filepath_, this,
+                                   cf_->directives_.no_stdlib_);
     // Error when calling builtin, if so return None as data type
     if (result.object_type_ == object_type::ERROR_DETECTED) {
       error(obj->paren_token_, result.string_val_);
@@ -1002,7 +1010,7 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
 }
 bool type_checker::slot_match(const ykobject &arg, ykdatatype *datatype) {
   if (arg.is_a_function() && datatype->is_function()) {
-    ykdatatype *arg_datatype = function_to_datatype(arg);
+    ykdatatype *arg_datatype = function_to_datatype_or_null(arg);
     return arg_datatype != nullptr && *arg_datatype == *datatype;
   }
   if (arg.is_primitive_or_obj() &&
@@ -1024,7 +1032,7 @@ bool type_checker::slot_match(const ykobject &arg, ykdatatype *datatype) {
   }
   return false;
 }
-ykdatatype *type_checker::function_to_datatype(const ykobject &arg) {
+ykdatatype *type_checker::function_to_datatype_or_null(const ykobject &arg) {
   def_stmt *funct;
   if (arg.object_type_ == object_type::FUNCTION) {
     funct = defs_classes_->get_function(arg.string_val_);

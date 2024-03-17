@@ -51,7 +51,7 @@ namespace yaksha {
      * @param arg argument
      * @return nullptr if failed, else a valid datatype
      */
-    virtual ykdatatype *function_to_datatype(const ykobject &arg) = 0;
+    virtual ykdatatype *function_to_datatype_or_null(const ykobject &arg) = 0;
   };
 }// namespace yaksha
 #endif

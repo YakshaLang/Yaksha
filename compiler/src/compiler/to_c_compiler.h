@@ -66,7 +66,7 @@ namespace yaksha {
                   entry_struct_func_compiler *esc, gc_pool<token> *token_pool);
     ~to_c_compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
-    ykdatatype *function_to_datatype(const ykobject &arg) override;
+    ykdatatype *function_to_datatype_or_null(const ykobject &arg) override;
     void visit_assign_expr(assign_expr *obj) override;
     void visit_binary_expr(binary_expr *obj) override;
     void visit_fncall_expr(fncall_expr *obj) override;

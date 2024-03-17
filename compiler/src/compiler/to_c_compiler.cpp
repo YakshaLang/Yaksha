@@ -417,6 +417,10 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
     LOG_COMP("module function: " << name << " file=" << module_file << " fn="
                                  << module_fn << " prefix=" << module_prefix);
     auto fndef = module_info->data_->dsv_->get_function(module_fn);
+    if (cf_->directives_.apply_native_define_ &&
+        fndef->annotations_.native_define_) {
+      prefixed_fn_name = fndef->annotations_.native_define_arg_;
+    }
     auto fn_return = fndef->return_type_;
     std::vector<ykdatatype *> params{};
     params.reserve(fndef->params_.size());
@@ -426,12 +430,17 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
   } else if (defs_classes_.has_function(name)) {
     LOG_COMP("local_function: " << name);
     auto fn_def = defs_classes_.get_function(name);
+    std::string prefixed_name = prefix(name, prefix_val_);
+    if (cf_->directives_.apply_native_define_ &&
+        fn_def->annotations_.native_define_) {
+      prefixed_name = fn_def->annotations_.native_define_arg_;
+    }
     auto return_type = fn_def->return_type_;
     std::vector<ykdatatype *> params{};
     params.reserve(fn_def->params_.size());
     for (auto &p : fn_def->params_) { params.emplace_back(p.data_type_); }
-    compile_function_call(obj, prefix(name, prefix_val_), code, return_type,
-                          params, fn_def->annotations_.varargs_);
+    compile_function_call(obj, prefixed_name, code, return_type, params,
+                          fn_def->annotations_.varargs_);
   } else if (defs_classes_.has_class(name)) {
     LOG_COMP("local_class:" << name);
     auto class_ = defs_classes_.get_class(name);
@@ -475,6 +484,7 @@ void to_c_compiler::compile_function_call(
   bool first = true;
   size_t arg_size = obj->args_.size();
   size_t param_size = parameters.size();
+  // ---
   for (size_t i = 0; i < arg_size; i++) {
     auto arg = obj->args_[i];
     ykdatatype *param;
@@ -823,6 +833,9 @@ void to_c_compiler::visit_def_stmt(def_stmt *obj) {
   LOG_COMP("compiling def_stmt: " << obj->name_->token_);
   auto name = prefix(obj->name_->token_, prefix_val_);
   if (obj->annotations_.native_define_) {
+    if (cf_->directives_.apply_native_define_) {
+      return;// no need to write native_defines
+    }
     struct_forward_declarations_ << "#define " << name << " "
                                  << obj->annotations_.native_define_arg_
                                  << "\n";
@@ -1009,7 +1022,11 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
     visited_expr = true;
     resulting_pair = compile_expression(obj->expression_);
     if (resulting_pair.second.is_a_function()) {
-      obj->data_type_ = function_to_datatype(resulting_pair.second);
+      obj->data_type_ = function_to_datatype_or_null(resulting_pair.second);
+      if (obj->data_type_ == nullptr) {
+        error(obj->name_, "Failed to derive data type of function pointer");
+        return;
+      }
     } else {
       obj->data_type_ = resulting_pair.second.datatype_
                             ->const_unwrap(); /* set our data type here */
@@ -1704,7 +1721,7 @@ void to_c_compiler::write_statement_no_end(std::string code_line) {
   body_ << code_line << "\n";
 }
 void to_c_compiler::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
-ykdatatype *to_c_compiler::function_to_datatype(const ykobject &arg) {
+ykdatatype *to_c_compiler::function_to_datatype_or_null(const ykobject &arg) {
   def_stmt *funct;
   if (arg.object_type_ == object_type::FUNCTION) {
     funct = defs_classes_.get_function(arg.string_val_);

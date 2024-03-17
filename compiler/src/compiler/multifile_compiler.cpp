@@ -231,7 +231,11 @@ comp_result multifile_compiler::compile_all(codegen *code_generator) {
     // Statement usage analysis
     // So we know which 'functions / classes / consts' are actually used
     usage_analyser ua{main_file_info};
-    ua.analyse();
+    if (cf_->directives_.no_main_) {
+      ua.analyse_no_main();
+    } else {
+      ua.analyse();
+    }
     if (!ua.errors_.empty()) {
       error_printer_.print_errors(ua.errors_);
       LOG_COMP("usage analyser found errors");

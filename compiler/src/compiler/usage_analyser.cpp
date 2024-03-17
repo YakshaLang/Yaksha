@@ -59,6 +59,14 @@ void usage_analyser::analyse() {
   import_stack_.clear();
   object_stack_.clear();
 }
+void usage_analyser::analyse_no_main() {
+  for (std::string &name : main_->data_->dsv_->function_names_) {
+    LOG_COMP("usage analyser (no main) - found: " << name);
+    main_->data_->dsv_->get_function(name)->accept(this);
+  }
+  import_stack_.clear();
+  object_stack_.clear();
+}
 void usage_analyser::visit_assign_expr(assign_expr *obj) {
   obj->hits_++;
   obj->right_->accept(this);
@@ -445,4 +453,4 @@ void usage_analyser::visit_cfor_stmt(cfor_stmt *obj) {
 }
 void usage_analyser::visit_enum_stmt(enum_stmt *obj) { obj->hits_++; }
 void usage_analyser::visit_union_stmt(union_stmt *obj) { obj->hits_++; }
-void usage_analyser::visit_directive_stmt(directive_stmt *obj) {}
+void usage_analyser::visit_directive_stmt(directive_stmt *obj) { obj->hits_++; }

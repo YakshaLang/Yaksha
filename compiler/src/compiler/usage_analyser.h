@@ -46,6 +46,7 @@ namespace yaksha {
   struct usage_analyser : expr_visitor, stmt_visitor {
     explicit usage_analyser(file_info *main_file_info);
     void analyse();
+    void analyse_no_main();
     void visit_assign_expr(assign_expr *obj) override;
     void visit_assign_arr_expr(assign_arr_expr *obj) override;
     void visit_assign_member_expr(assign_member_expr *obj) override;

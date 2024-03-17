@@ -367,7 +367,7 @@ bool def_class_visitor::has_zero_arg_directive(directive_stmt *obj) {
     cf_->directives_.no_main_ = true;
   }
   // (Global flag) Directly substitute '@nativedefine' or 'native constants'
-  if (directive_type == "apply_nativedefine") { //        🔴
+  if (directive_type == "apply_nativedefine") {//        🔴
     zero_arg_directive = true;
     cf_->directives_.apply_native_define_ = true;
   }
