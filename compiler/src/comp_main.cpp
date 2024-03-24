@@ -50,7 +50,10 @@ int main(int argc, char *argv[]) {
       argparser::ARGS(PROGRAM_NAME, "Compile Yaksha code to C code", "");
   auto help = argparser::OP_BOOL('h', "--help", "Print this help message");
   auto no_main = argparser::OP_BOOL('N', "--no-main", "Disable main() check");
-  args.optional_ = {&help, &no_main};
+  auto no_codegen =
+      argparser::OP_BOOL('d', "--disable-codegen",
+                         "Do not output generated code, instead just print errors.");
+  args.optional_ = {&help, &no_main, &no_codegen};
   auto code = argparser::PO("mainfile.yaka", "Yaksha code file.");
   auto lib = argparser::PO_OPT("[LIBS_PARENT_PATH]",
                                "Path to the parent directory of the libraries");
@@ -70,13 +73,17 @@ int main(int argc, char *argv[]) {
   try {
     mc.main_required_ = !no_main.is_set_;
     codegen_c cg{};
+    do_nothing_codegen dn_cg{};
+    codegen *cg_ptr = &cg;
+    codegen *dn_cg_ptr = &dn_cg;
+    codegen *codegen = (no_codegen.is_set_) ? dn_cg_ptr : cg_ptr;
     if (!lib.is_set_) {// Just code.yaka is passed
-      result = mc.compile(code.value_, &cg);
+      result = mc.compile(code.value_, codegen);
     } else {// code.yaka + LIBS_PARENT_PATH
-      result = mc.compile(code.value_, lib.value_, &cg);
+      result = mc.compile(code.value_, lib.value_, codegen);
     }
     if (result.failed_) { return EXIT_FAILURE; }
   } catch (parsing_error &e) { mc.error_printer_.print_errors({e}); }
-  std::cout << result.code_;
+  if (!no_codegen.is_set_) { std::cout << result.code_; }
   return EXIT_SUCCESS;
 }
