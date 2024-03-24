@@ -13,7 +13,7 @@ def del_ini(object: Ini) -> None:
 @native
 def from_str(ini_data: sr) -> Ini:
     # Parse INI file from given string data
-    ccode """ini_t* ini = ini_load(yk__bstr_get_reference(nn__ini_data));
+    ccode """ini_t* ini = ini_load(yk__bstr_get_reference(nn__ini_data), NULL);
     return ini"""
 
 @native
@@ -25,11 +25,11 @@ def get(object: Ini, section: sr, property: sr) -> str:
     if (section == INI_NOT_FOUND) {
         return yk__sdsempty();
     }
-    int prop ini_find_property(nn__object, yk__bstr_get_reference(section), yk__bstr_get_reference(nn__property), yk__bstr_len(nn__property));
+    int prop = ini_find_property(nn__object, section, yk__bstr_get_reference(nn__property), yk__bstr_len(nn__property));
     if (prop == INI_NOT_FOUND) {
         return yk__sdsempty();
     }
-    char const* data = ini_property_value(nn__object), yk__bstr_get_reference(section), prop);
+    char const* data = ini_property_value(nn__object, section, prop);
     if (data == NULL) {
         return yk__sdsempty();
     }
