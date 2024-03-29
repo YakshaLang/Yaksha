@@ -19,6 +19,9 @@ Bunch of `C` code that standard library depend on.
 | `cr.h`          | Danny Angelo Carminati Grein        | hot reloading capabilities         | [cr.h](https://github.com/fungos/cr)                      | MIT                                                                                    |
 | `endianness.h`  | rofl0r                              | endian conversion                  | [endianness.h](https://github.com/rofl0r/endianness.h)    | MIT/PublicDomain                                                                       |
 
+
+* Warn! net libraries need to be wrapped. They are not used yet.
+
 ### Patches
 
 * argparse - `const char short_name;` was changed to `char short_name;`

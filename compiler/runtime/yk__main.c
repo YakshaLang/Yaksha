@@ -18,7 +18,12 @@ int main(int argc, char *argv[]) {
 #if defined(_WIN32) || defined(_WIN64)
   int result_mode;
   result_mode = _setmode(_fileno(stdout), _O_U16TEXT);
+#if !defined(YK_IGNORE_WINDOWS_CONSOLE_SET_MODE_ERROR)
+  // If we can't set the mode, return -1
+  //   only a concern for a console application
+  //   otherwise, we can ignore this error and let things continue as is
   if (result_mode == -1) { return -1; }
+#endif
 #if defined(YK__WINDOWS_HIDE_CONSOLE)
   ShowWindow(GetConsoleWindow(), SW_HIDE);
   FreeConsole();

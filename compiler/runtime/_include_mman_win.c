@@ -1,3 +1,9 @@
+// Below code is originally from mman-win32
+//
+/*
+ * sys/mman.h
+ * mman-win32
+ */
 #include <errno.h>
 #include <io.h>
 #ifndef FILE_MAP_EXECUTE

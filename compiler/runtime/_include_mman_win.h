@@ -1,3 +1,9 @@
+// Below code is originally from mman-win32
+//
+/*
+ * sys/mman.h
+ * mman-win32
+ */
 #include <time.h>
 #include <sys/types.h>
 #include <stdint.h>
