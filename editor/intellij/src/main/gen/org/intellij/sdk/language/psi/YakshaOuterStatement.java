@@ -20,6 +20,9 @@ public interface YakshaOuterStatement extends PsiElement {
   YakshaDefStatement getDefStatement();
 
   @Nullable
+  YakshaDirectiveStatement getDirectiveStatement();
+
+  @Nullable
   YakshaDslOuterBlock getDslOuterBlock();
 
   @Nullable

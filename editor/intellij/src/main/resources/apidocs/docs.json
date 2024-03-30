@@ -416,6 +416,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CStr"
                 }
               ],
@@ -2537,6 +2538,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "file"
@@ -2657,12 +2659,14 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "size"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "count"
@@ -2680,6 +2684,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "Size"
         }
       },
@@ -2823,12 +2828,14 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "size"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "count"
@@ -2846,6 +2853,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "Size"
         }
       },
@@ -2919,6 +2927,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "length"
@@ -2946,6 +2955,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "length"
@@ -2964,6 +2974,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "file_descriptor"
@@ -2997,6 +3008,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "length"
@@ -3030,6 +3042,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "length"
@@ -3063,6 +3076,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "length"
@@ -3090,6 +3104,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "Size"
             },
             "name": "length"
@@ -3123,6 +3138,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "CInt"
         }
       },
@@ -3612,6 +3628,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CDouble"
             },
             "name": "a"
@@ -3633,6 +3650,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "a"
@@ -3660,6 +3678,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "CDouble"
         }
       },
@@ -5271,6 +5290,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "a"
@@ -5292,6 +5312,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "a"
@@ -5362,6 +5383,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "a"
@@ -5383,6 +5405,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "a"
@@ -5410,6 +5433,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "a"
@@ -5470,6 +5494,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "s"
@@ -5518,6 +5543,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "s"
@@ -5593,6 +5619,7 @@
         "name": "null_cstr",
         "parameters": [],
         "return_type": {
+          "module": "libs.c",
           "type": "CStr"
         }
       },
@@ -5624,6 +5651,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "s"
@@ -5667,6 +5695,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "s"
@@ -5786,6 +5815,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "CStr"
         }
       },
@@ -5801,6 +5831,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "s"
@@ -6338,6 +6369,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CStr"
             }
           ],
@@ -6372,6 +6404,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "s"
@@ -6394,6 +6427,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CStr"
             },
             "name": "s"
@@ -6807,6 +6841,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.timespec",
                   "type": "TimeSpec"
                 }
               ],
@@ -6818,6 +6853,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.timespec",
                   "type": "TimeSpec"
                 }
               ],
@@ -7077,6 +7113,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.thread.mutex",
                   "type": "Mutex"
                 }
               ],
@@ -7088,6 +7125,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.timespec",
                   "type": "TimeSpec"
                 }
               ],
@@ -7125,6 +7163,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.thread.mutex",
                   "type": "Mutex"
                 }
               ],
@@ -7362,12 +7401,14 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.thread.mutex",
               "type": "Mutex"
             },
             "name": "lock"
           },
           {
             "datatype": {
+              "module": "libs.thread.condition",
               "type": "Condition"
             },
             "name": "notify"
@@ -7376,6 +7417,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.thread",
                   "type": "Thread"
                 }
               ],
@@ -8251,11 +8293,11 @@
     "imports": [],
     "macros": [
       {
-        "comment": " unittest.assert_false!{x} - assert that this is false",
+        "comment": " unittest.assert_false!{\"description\" x} - assert that this is false",
         "name": "assert_false!"
       },
       {
-        "comment": " unittest.assert_true!{x} - assert that this is true",
+        "comment": " unittest.assert_true!{\"description\" x} - assert that this is true",
         "name": "assert_true!"
       },
       {
@@ -8394,6 +8436,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "projection"
@@ -8478,6 +8521,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "projection"
@@ -8499,24 +8543,28 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUChar"
             },
             "name": "r"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUChar"
             },
             "name": "g"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUChar"
             },
             "name": "b"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUChar"
             },
             "name": "a"
@@ -8560,18 +8608,21 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "baseSize"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "glyphCount"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "glyphPadding"
@@ -8621,24 +8672,28 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "value"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "offsetX"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "offsetY"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "advanceX"
@@ -8672,24 +8727,28 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "width"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "height"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "mipmaps"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "format"
@@ -8905,6 +8964,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "frameCount"
@@ -8917,6 +8977,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "ctxType"
@@ -8950,30 +9011,35 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "left"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "top"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "right"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "bottom"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "layout"
@@ -9161,6 +9227,7 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "id"
@@ -9194,6 +9261,7 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "id"
@@ -9244,6 +9312,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "frameCount"
@@ -9265,30 +9334,35 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "id"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "width"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "height"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "mipmaps"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "format"
@@ -9310,30 +9384,35 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "id"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "width"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "height"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "mipmaps"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "format"
@@ -9355,30 +9434,35 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "id"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "width"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "height"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "mipmaps"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "format"
@@ -9554,24 +9638,28 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "frameCount"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "sampleRate"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "sampleSize"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "channels"
@@ -10457,6 +10545,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -10470,6 +10559,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -10792,6 +10882,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -10812,6 +10903,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -10823,6 +10915,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CUChar"
             }
           ],
@@ -10845,6 +10938,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -10859,6 +10953,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -10870,6 +10965,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CUChar"
             }
           ],
@@ -10892,6 +10988,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -10912,6 +11009,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -10923,6 +11021,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CUChar"
             }
           ],
@@ -13754,6 +13853,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CInt"
                     }
                   ],
@@ -14446,6 +14546,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -14466,6 +14567,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -14475,6 +14577,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "CStr"
         }
       },
@@ -14606,6 +14709,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -15756,6 +15860,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -15836,6 +15941,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -15865,6 +15971,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -15918,6 +16025,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -15950,6 +16058,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -16046,6 +16155,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -16077,6 +16187,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -16150,6 +16261,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -16181,6 +16293,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -16316,6 +16429,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -16663,6 +16777,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -17012,6 +17127,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -17517,6 +17633,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -20338,6 +20455,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -20349,6 +20467,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CInt"
             }
           ],
@@ -20443,6 +20562,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CUInt"
                 }
               ],
@@ -20454,6 +20574,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CUChar"
             }
           ],
@@ -20478,6 +20599,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "CStr"
         }
       },
@@ -20518,6 +20640,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -20544,6 +20667,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -20599,6 +20723,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -20672,6 +20797,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -20698,6 +20824,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -20757,6 +20884,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -20817,6 +20945,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -20899,6 +21028,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -20995,6 +21125,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -21053,6 +21184,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CUInt"
                 }
               ],
@@ -21134,6 +21266,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -21363,6 +21496,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CInt"
                     }
                   ],
@@ -21381,6 +21515,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "CStr"
         }
       },
@@ -21448,6 +21583,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CUChar"
                     }
                   ],
@@ -21489,6 +21625,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CFloat"
             }
           ],
@@ -23711,6 +23848,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -23807,6 +23945,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "CStr"
         }
       },
@@ -23855,6 +23994,7 @@
                     {
                       "arguments": [
                         {
+                          "module": "libs.c",
                           "type": "CChar"
                         }
                       ],
@@ -23886,6 +24026,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -23946,6 +24087,7 @@
           }
         ],
         "return_type": {
+          "module": "libs.c",
           "type": "CStr"
         }
       },
@@ -23975,6 +24117,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -23990,6 +24133,7 @@
                 {
                   "arguments": [
                     {
+                      "module": "libs.c",
                       "type": "CChar"
                     }
                   ],
@@ -24036,6 +24180,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -24088,6 +24233,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -24119,6 +24265,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -24150,6 +24297,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -24376,6 +24524,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -24444,6 +24593,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CUChar"
                 }
               ],
@@ -24901,6 +25051,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CFloat"
                 }
               ],
@@ -29086,24 +29237,28 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "mode"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "vertexCount"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "vertexAlignment"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "textureId"
@@ -29125,12 +29280,14 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "bufferCount"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "currentBuffer"
@@ -29139,6 +29296,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "rlVertexBuffer"
                 }
               ],
@@ -29150,6 +29308,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "rlDrawCall"
                 }
               ],
@@ -29159,6 +29318,7 @@
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CInt"
             },
             "name": "drawCounter"
@@ -29967,6 +30127,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "rlRenderBatch"
                 }
               ],
@@ -30601,6 +30762,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -30661,6 +30823,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CUInt"
                 }
               ],
@@ -30672,6 +30835,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CUInt"
                 }
               ],
@@ -30683,6 +30847,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CUInt"
                 }
               ],
@@ -30774,6 +30939,7 @@
         "name": "rl_get_matrix_modelview",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -30788,6 +30954,7 @@
         "name": "rl_get_matrix_projection",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -30809,6 +30976,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -30823,6 +30991,7 @@
         "name": "rl_get_matrix_transform",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -30844,6 +31013,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -30869,6 +31039,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -30926,6 +31097,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CInt"
             }
           ],
@@ -31109,6 +31281,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "rlRenderBatch"
         }
       },
@@ -31549,6 +31722,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CUChar"
             }
           ],
@@ -31659,6 +31833,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "rlVertexBuffer"
                 }
               ],
@@ -31670,6 +31845,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "rlDrawCall"
                 }
               ],
@@ -32006,6 +32182,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "view"
@@ -32027,6 +32204,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "proj"
@@ -32048,12 +32226,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "right"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "left"
@@ -32075,12 +32255,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "right"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "left"
@@ -32104,6 +32286,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "rlRenderBatch"
                 }
               ],
@@ -32136,6 +32319,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -32226,6 +32410,7 @@
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
@@ -32505,6 +32690,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "rlRenderBatch"
             },
             "name": "batch"
@@ -34280,18 +34466,21 @@
         "members": [
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUShort"
             },
             "name": "controlId"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUShort"
             },
             "name": "propertyId"
           },
           {
             "datatype": {
+              "module": "libs.c",
               "type": "CUInt"
             },
             "name": "propertyValue"
@@ -34313,6 +34502,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34340,6 +34530,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34373,6 +34564,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34406,6 +34598,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34439,6 +34632,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34451,12 +34645,14 @@
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Color"
             },
             "name": "p_color"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Color"
         }
       },
@@ -34472,6 +34668,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34484,12 +34681,14 @@
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Color"
             },
             "name": "p_color"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Color"
         }
       },
@@ -34505,6 +34704,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34590,6 +34790,7 @@
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Color"
             },
             "name": "p_color"
@@ -34611,6 +34812,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34625,6 +34827,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -34655,6 +34858,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34730,6 +34934,7 @@
         "name": "gui_get_font",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Font"
         }
       },
@@ -34746,6 +34951,7 @@
         "return_type": {
           "arguments": [
             {
+              "module": "libs.c",
               "type": "CUInt"
             }
           ],
@@ -34805,6 +35011,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34829,6 +35036,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -34844,6 +35052,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34887,6 +35096,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -34922,6 +35132,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34949,6 +35160,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -34976,6 +35188,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35003,6 +35216,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35017,6 +35231,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -35047,6 +35262,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35059,6 +35275,7 @@
                     {
                       "arguments": [
                         {
+                          "module": "libs.c",
                           "type": "CChar"
                         }
                       ],
@@ -35082,6 +35299,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -35093,6 +35311,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -35139,6 +35358,7 @@
             {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CChar"
                 }
               ],
@@ -35209,6 +35429,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35248,6 +35469,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35275,6 +35497,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35326,6 +35549,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35338,6 +35562,7 @@
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "content"
@@ -35346,6 +35571,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "Vector2"
                 }
               ],
@@ -35355,6 +35581,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Rectangle"
         }
       },
@@ -35370,6 +35597,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Font"
             },
             "name": "p_font"
@@ -35487,6 +35715,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35538,6 +35767,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35589,6 +35819,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35603,6 +35834,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -35645,6 +35877,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35705,6 +35938,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35717,6 +35951,7 @@
                     {
                       "arguments": [
                         {
+                          "module": "libs.c",
                           "type": "CChar"
                         }
                       ],
@@ -35740,6 +35975,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -35764,6 +36000,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35803,6 +36040,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35842,6 +36080,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35880,6 +36119,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -35904,6 +36144,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35937,6 +36178,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35984,6 +36226,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -35998,6 +36241,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CInt"
                 }
               ],
@@ -36040,6 +36284,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Rectangle"
             },
             "name": "bounds"
@@ -40130,18 +40375,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "left"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "right"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40157,6 +40405,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
@@ -40214,6 +40463,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40228,6 +40478,7 @@
         "name": "matrix_identity",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40243,12 +40494,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40264,24 +40517,28 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "eye"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "target"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "up"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40297,18 +40554,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "left"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "right"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40360,6 +40620,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40399,6 +40660,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40414,6 +40676,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "axis"
@@ -40426,6 +40689,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40447,6 +40711,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40462,12 +40727,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "angle"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40489,6 +40756,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40510,6 +40778,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40525,12 +40794,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "angle"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40564,6 +40835,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40579,18 +40851,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "left"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "right"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40606,12 +40881,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "float16"
         }
       },
@@ -40627,6 +40904,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
@@ -40666,6 +40944,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40681,12 +40960,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -40735,18 +41016,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -40762,6 +41046,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
@@ -40774,6 +41059,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -40789,18 +41075,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -40816,12 +41105,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "p"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
@@ -40843,6 +41134,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "axis"
@@ -40855,6 +41147,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -40888,6 +41181,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -40903,12 +41197,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -40924,18 +41220,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "p_from"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "to"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -40950,6 +41249,7 @@
         "name": "quaternion_identity",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -40965,12 +41265,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -40986,6 +41288,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
@@ -41007,12 +41310,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q2"
@@ -41025,6 +41330,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -41040,18 +41346,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -41067,12 +41376,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q2"
@@ -41085,6 +41396,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -41100,12 +41412,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -41121,6 +41435,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
@@ -41133,6 +41448,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -41148,12 +41464,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q2"
@@ -41166,6 +41484,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -41181,18 +41500,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -41208,6 +41530,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
@@ -41220,6 +41543,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -41235,6 +41559,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
@@ -41243,6 +41568,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "Vector3"
                 }
               ],
@@ -41254,6 +41580,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "libs.c",
                   "type": "CFloat"
                 }
               ],
@@ -41278,12 +41605,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -41299,12 +41628,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Matrix"
         }
       },
@@ -41320,18 +41651,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Quaternion"
         }
       },
@@ -41392,18 +41726,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41419,6 +41756,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
@@ -41431,6 +41769,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41446,12 +41785,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v2"
@@ -41473,24 +41814,28 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "min"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "max"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41506,6 +41851,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
@@ -41524,6 +41870,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41539,12 +41886,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v2"
@@ -41566,12 +41915,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v2"
@@ -41593,18 +41944,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41620,12 +41974,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v2"
@@ -41647,12 +42003,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "p"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "q"
@@ -41674,12 +42032,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41695,6 +42055,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
@@ -41716,6 +42077,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
@@ -41737,12 +42099,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v2"
@@ -41755,6 +42119,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41770,12 +42135,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "start"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "end"
@@ -41797,12 +42164,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "target"
@@ -41815,6 +42184,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41830,18 +42200,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41857,12 +42230,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41878,12 +42253,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41898,6 +42275,7 @@
         "name": "vector2_one",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41913,18 +42291,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "normal"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41940,6 +42321,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
@@ -41952,6 +42334,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41967,6 +42350,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
@@ -41979,6 +42363,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -41994,18 +42379,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -42021,6 +42409,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
@@ -42033,6 +42422,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -42048,18 +42438,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector2"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -42074,6 +42467,7 @@
         "name": "vector2_zero",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Vector2"
         }
       },
@@ -42089,18 +42483,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42116,6 +42513,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
@@ -42128,6 +42526,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42143,12 +42542,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
@@ -42170,30 +42571,35 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "p"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "a"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "b"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "c_arg"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42209,24 +42615,28 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "min"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "max"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42242,6 +42652,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
@@ -42260,6 +42671,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42275,18 +42687,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42302,12 +42717,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
@@ -42329,12 +42746,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
@@ -42356,18 +42775,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42383,12 +42805,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
@@ -42410,12 +42834,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "p"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "q"
@@ -42437,12 +42863,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42460,6 +42888,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "Vector3"
                 }
               ],
@@ -42486,6 +42915,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "Vector3"
                 }
               ],
@@ -42510,12 +42940,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
@@ -42528,6 +42960,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42543,18 +42976,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42570,18 +43006,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42597,18 +43036,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42624,12 +43066,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42645,12 +43089,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42665,6 +43111,7 @@
         "name": "vector3_one",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42682,6 +43129,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "Vector3"
                 }
               ],
@@ -42693,6 +43141,7 @@
             "datatype": {
               "arguments": [
                 {
+                  "module": "raylib",
                   "type": "Vector3"
                 }
               ],
@@ -42717,12 +43166,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42738,18 +43189,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "normal"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42765,12 +43219,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "n"
@@ -42783,6 +43239,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42798,12 +43255,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "axis"
@@ -42816,6 +43275,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42831,18 +43291,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Quaternion"
             },
             "name": "q"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42858,6 +43321,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
@@ -42870,6 +43334,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42885,18 +43350,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v1"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v2"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42912,6 +43380,7 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
@@ -42924,6 +43393,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42939,12 +43409,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "float3"
         }
       },
@@ -42960,18 +43432,21 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "v"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "mat"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -42987,24 +43462,28 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Vector3"
             },
             "name": "source"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "projection"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Matrix"
             },
             "name": "view"
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -43019,6 +43498,7 @@
         "name": "vector3_zero",
         "parameters": [],
         "return_type": {
+          "module": "raylib",
           "type": "Vector3"
         }
       },
@@ -43178,12 +43658,14 @@
         "parameters": [
           {
             "datatype": {
+              "module": "raylib",
               "type": "Color"
             },
             "name": "a"
           },
           {
             "datatype": {
+              "module": "raylib",
               "type": "Color"
             },
             "name": "b"
@@ -43196,6 +43678,7 @@
           }
         ],
         "return_type": {
+          "module": "raylib",
           "type": "Color"
         }
       },

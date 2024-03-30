@@ -103,6 +103,7 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   "for"                          { return YakshaTypes.KW_FOR; }
   "in"                           { return YakshaTypes.KW_IN; }
   "macros"                       { return YakshaTypes.KW_MACROS; }
+  "directive"                       { return YakshaTypes.KW_DIRECTIVE; }
 
 "int" |
 "i8" |

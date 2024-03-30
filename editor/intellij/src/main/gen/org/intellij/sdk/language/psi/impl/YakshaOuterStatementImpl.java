@@ -53,6 +53,12 @@ public class YakshaOuterStatementImpl extends ASTWrapperPsiElement implements Ya
 
   @Override
   @Nullable
+  public YakshaDirectiveStatement getDirectiveStatement() {
+    return findChildByClass(YakshaDirectiveStatement.class);
+  }
+
+  @Override
+  @Nullable
   public YakshaDslOuterBlock getDslOuterBlock() {
     return findChildByClass(YakshaDslOuterBlock.class);
   }
