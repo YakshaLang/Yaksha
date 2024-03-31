@@ -1397,7 +1397,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_DIRECTIVE (S IDENTIFIER S? OPERATOR_EQ S? STRING)* S (IDENTIFIER | KW_CCODE) S STRING? NL
+  // KW_DIRECTIVE (S IDENTIFIER S? OPERATOR_EQ S? STRING)* S (IDENTIFIER | KW_CCODE) (S STRING)? NL
   public static boolean directive_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "directive_statement")) return false;
     if (!nextTokenIs(b, KW_DIRECTIVE)) return false;
@@ -1407,8 +1407,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     r = r && directive_statement_1(b, l + 1);
     r = r && consumeToken(b, S);
     r = r && directive_statement_3(b, l + 1);
-    r = r && consumeToken(b, S);
-    r = r && directive_statement_5(b, l + 1);
+    r = r && directive_statement_4(b, l + 1);
     r = r && consumeToken(b, NL);
     exit_section_(b, m, DIRECTIVE_STATEMENT, r);
     return r;
@@ -1462,11 +1461,21 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // STRING?
-  private static boolean directive_statement_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "directive_statement_5")) return false;
-    consumeToken(b, STRING);
+  // (S STRING)?
+  private static boolean directive_statement_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "directive_statement_4")) return false;
+    directive_statement_4_0(b, l + 1);
     return true;
+  }
+
+  // S STRING
+  private static boolean directive_statement_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "directive_statement_4_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, S, STRING);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
