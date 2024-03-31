@@ -23,19 +23,19 @@ def set_color(c: int) -> None:
     # Set given color
     ccode """if (nn__c == 0) { // rewind
         yk__set_colour(YK__CONSOLE_REWIND);
-    } else if (nn__c == 1) { // red 
+    } else if (nn__c == 1) { // red
         yk__set_colour(YK__CONSOLE_RED);
-    } else if (nn__c == 2) { // green 
+    } else if (nn__c == 2) { // green
         yk__set_colour(YK__CONSOLE_GREEN);
-    } else if (nn__c == 3) { // white 
+    } else if (nn__c == 3) { // white
         yk__set_colour(YK__CONSOLE_WHITE);
-    } else if (nn__c == 4) { // blue 
+    } else if (nn__c == 4) { // blue
         yk__set_colour(YK__CONSOLE_BLUE);
-    } else if (nn__c == 5) { // purple 
+    } else if (nn__c == 5) { // purple
         yk__set_colour(YK__CONSOLE_PURPLE);
-    } else if (nn__c == 6) { // yellow 
+    } else if (nn__c == 6) { // yellow
         yk__set_colour(YK__CONSOLE_YELLOW);
-    } else if (nn__c == 7) { // cyan  
+    } else if (nn__c == 7) { // cyan
         yk__set_colour(YK__CONSOLE_CYAN);
     }"""
 
@@ -54,6 +54,12 @@ def color_print(color: int, x: sr) -> None:
     # Print in given color and then rewind
     set_color(color)
     print(x)
+    set_color(0)
+
+def color_println(color: int, x: sr) -> None:
+    # Print in given color and then rewind
+    set_color(color)
+    println(x)
     set_color(0)
 
 def red(x: sr) -> None:
@@ -83,3 +89,24 @@ def yellow(x: sr) -> None:
 def cyan(x: sr) -> None:
     # Print text in console, in cyan color
     color_print(7, x)
+
+def redln(x: sr) -> None:
+    color_println(1, x)
+
+def greenln(x: sr) -> None:
+    color_println(2, x)
+
+def whiteln(x: sr) -> None:
+    color_println(3, x)
+
+def blueln(x: sr) -> None:
+    color_println(4, x)
+
+def purpleln(x: sr) -> None:
+    color_println(5, x)
+
+def yellowln(x: sr) -> None:
+    color_println(6, x)
+
+def cyanln(x: sr) -> None:
+    color_println(7, x)
