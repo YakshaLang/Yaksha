@@ -187,9 +187,6 @@ expr *parser::factor() {
   return ex;
 }
 expr *parser::unary() {
-  // TODO if it is - token and next is a number literal
-  //   then we can convert it to a negative number literal
-  //   and remove the unary operator
   if (match({token_type::SUB, token_type::KEYWORD_NOT, token_type::TILDE})) {
     auto opr = previous();
     expr *right = unary();
@@ -1051,28 +1048,6 @@ stmt *parser::runtimefeature_statement() {
   consume_or_eof(token_type::NEW_LINE,
                  "Expect new line after value for runtimefeature statement.");
   return pool_.c_runtimefeature_stmt(runtime_feature_kw, cc);
-}
-curly_call_expr *parser::match_directive_options() {
-  auto curly_open = previous();
-  std::vector<name_val> values{};
-  if (!check(token_type::CURLY_BRACKET_CLOSE)) {
-    do {
-      auto member_name =
-          consume(token_type::NAME, "Directive key must be present");
-      consume(token_type::COLON, "Colon must be present between key and value");
-      auto got_str =
-          match({token_type::STRING, token_type::THREE_QUOTE_STRING});
-      if (!got_str) {
-        throw error(member_name, "Directive value must be a string literal");
-      }
-      auto exp = pool_.c_literal_expr(previous());
-      values.emplace_back(name_val{member_name, exp});
-    } while (match({token_type::COMMA}));
-  }
-  auto curly_close = consume(token_type::CURLY_BRACKET_CLOSE,
-                             "directive options must end with '}'");
-  return dynamic_cast<curly_call_expr *>(
-      pool_.c_curly_call_expr(nullptr, curly_open, values, curly_close));
 }
 stmt *parser::directive_statement() {
   // directive name="str" name2="str" ... (name|ccode) ("STR")? (NEW_LINE|EOF)
