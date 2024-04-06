@@ -40,6 +40,7 @@
 #pragma ide diagnostic ignored "misc-no-recursion"
 // parser.cpp
 #include "ast/parser.h"
+#include "compiler/literal_utils.h"
 #include "tokenizer/block_analyzer.h"
 #include "utilities/cpp_util.h"
 #include "yaksha_lisp/macro_processor.h"
@@ -186,9 +187,60 @@ expr *parser::factor() {
   return ex;
 }
 expr *parser::unary() {
+  // TODO if it is - token and next is a number literal
+  //   then we can convert it to a negative number literal
+  //   and remove the unary operator
   if (match({token_type::SUB, token_type::KEYWORD_NOT, token_type::TILDE})) {
     auto opr = previous();
     expr *right = unary();
+    // optimize - then num -> -num
+    if (opr->type_ == token_type::SUB &&
+        right->get_type() == ast_type::EXPR_LITERAL) {
+      auto lit = dynamic_cast<literal_expr *>(right);
+      if (lit->literal_token_->type_ == token_type::FLOAT_NUMBER ||
+          lit->literal_token_->type_ == token_type::DOUBLE_NUMBER ||
+          lit->literal_token_->type_ == token_type::INTEGER_DECIMAL_8 ||
+          lit->literal_token_->type_ == token_type::INTEGER_HEX_8 ||
+          lit->literal_token_->type_ == token_type::INTEGER_OCT_8 ||
+          lit->literal_token_->type_ == token_type::INTEGER_BIN_8 ||
+          lit->literal_token_->type_ == token_type::INTEGER_DECIMAL_16 ||
+          lit->literal_token_->type_ == token_type::INTEGER_HEX_16 ||
+          lit->literal_token_->type_ == token_type::INTEGER_OCT_16 ||
+          lit->literal_token_->type_ == token_type::INTEGER_BIN_16 ||
+          lit->literal_token_->type_ == token_type::INTEGER_DECIMAL ||
+          lit->literal_token_->type_ == token_type::INTEGER_HEX ||
+          lit->literal_token_->type_ == token_type::INTEGER_OCT ||
+          lit->literal_token_->type_ == token_type::INTEGER_BIN ||
+          lit->literal_token_->type_ == token_type::INTEGER_DECIMAL_64 ||
+          lit->literal_token_->type_ == token_type::INTEGER_HEX_64 ||
+          lit->literal_token_->type_ == token_type::INTEGER_OCT_64 ||
+          lit->literal_token_->type_ == token_type::INTEGER_BIN_64) {
+        auto lit_tok = lit->literal_token_;
+        auto converted = convert_literal(lit_tok->type_, lit_tok);
+        if (!converted.error_.empty()) {
+          throw error(lit_tok, converted.error_);
+        }
+        auto bits = get_bits(lit_tok->type_);
+        auto new_token_string = converted.decimal_string_;
+        // if it is a negative number, make it positive
+        if (new_token_string[0] == '-') {
+          lit_tok->token_ = new_token_string.substr(1);
+        } else {// make it negative
+          lit_tok->token_ = "-" + new_token_string;
+        }
+        if (bits == 32) {
+          lit_tok->type_ = token_type::INTEGER_DECIMAL;
+        } else if (bits == 64) {
+          lit_tok->type_ = token_type::INTEGER_DECIMAL_64;
+        } else if (bits == 16) {
+          lit_tok->type_ = token_type::INTEGER_DECIMAL_16;
+        } else if (bits == 8) {
+          lit_tok->type_ = token_type::INTEGER_DECIMAL_8;
+        }
+        // else it is a float / double, keep as is
+        return right;
+      }
+    }
     return pool_.c_unary_expr(opr, right);
   }
   return fncall();

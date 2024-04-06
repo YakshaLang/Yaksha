@@ -13,19 +13,19 @@ void yy__console_set_color(int32_t nn__c)
 {
     if (nn__c == 0) { // rewind
         yk__set_colour(YK__CONSOLE_REWIND);
-    } else if (nn__c == 1) { // red 
+    } else if (nn__c == 1) { // red
         yk__set_colour(YK__CONSOLE_RED);
-    } else if (nn__c == 2) { // green 
+    } else if (nn__c == 2) { // green
         yk__set_colour(YK__CONSOLE_GREEN);
-    } else if (nn__c == 3) { // white 
+    } else if (nn__c == 3) { // white
         yk__set_colour(YK__CONSOLE_WHITE);
-    } else if (nn__c == 4) { // blue 
+    } else if (nn__c == 4) { // blue
         yk__set_colour(YK__CONSOLE_BLUE);
-    } else if (nn__c == 5) { // purple 
+    } else if (nn__c == 5) { // purple
         yk__set_colour(YK__CONSOLE_PURPLE);
-    } else if (nn__c == 6) { // yellow 
+    } else if (nn__c == 6) { // yellow
         yk__set_colour(YK__CONSOLE_YELLOW);
-    } else if (nn__c == 7) { // cyan  
+    } else if (nn__c == 7) { // cyan
         yk__set_colour(YK__CONSOLE_CYAN);
     };
 }

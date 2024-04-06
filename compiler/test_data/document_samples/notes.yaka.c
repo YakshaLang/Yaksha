@@ -186,14 +186,14 @@ bool yy__i2s(int32_t yy__x, uint8_t* yy__target)
     yy__clear_buf(yy__target);
     int32_t yy__pos = INT32_C(0);
     int32_t yy__y = yy__x;
-    if ((yy__x > INT32_C(999999999)) || (yy__x < (-(INT32_C(99999999)))))
+    if ((yy__x > INT32_C(999999999)) || (yy__x < INT32_C(-99999999)))
     {
         yy__target[INT32_C(0)] = ((uint8_t)(((yk__sds)yy__charset)[INT32_C(10)]));
         return false;
     }
     if (yy__x < INT32_C(0))
     {
-        yy__y *= (-(INT32_C(1)));
+        yy__y *= INT32_C(-1);
         yy__target[yy__pos] = ((uint8_t)(((yk__sds)yy__charset)[INT32_C(10)]));
     }
     else

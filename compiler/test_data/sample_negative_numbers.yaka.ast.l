@@ -1,2 +1,2 @@
-(let a:int (- 10))
+(let a:int -10)
 

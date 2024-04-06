@@ -62,6 +62,7 @@ namespace yaksha {
     std::string error_{};
     std::string decimal_string_{};
   };
+  std::size_t get_bits(token_type type);
   literal_conversion_result convert_literal(token_type token_type_val,
                                             token *literal_token);
 }// namespace yaksha

@@ -27,7 +27,7 @@ int32_t yy__main()
     yk__arrput(yy__x, INT32_C(30));
     yk__arrput(yy__x, INT32_C(10));
     yk__arrput(yy__x, INT32_C(40));
-    yk__arrput(yy__x, (-(INT32_C(1))));
+    yk__arrput(yy__x, INT32_C(-1));
     yk__arrput(yy__x, INT32_C(20));
     yk__printlnstr("before:");
     yk__printstr("len=");

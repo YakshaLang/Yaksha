@@ -72,7 +72,7 @@ bool can_fit_in_bits_unsigned(std::uintmax_t number, std::size_t bits) {
   }
   return false;
 }
-std::size_t get_bits(token_type token_type_val) {
+std::size_t yaksha::get_bits(token_type token_type_val) {
   switch (token_type_val) {
     case token_type::INTEGER_BIN_8:
     case token_type::UINTEGER_BIN_8:

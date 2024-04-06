@@ -149,7 +149,7 @@ void yy__snake_up(struct yy__Snake* yy__snake)
     if (yy__snake->yy__direction->yy__y == INT16_C(0))
     {
         yy__snake->yy__direction->yy__x = INT16_C(0);
-        yy__snake->yy__direction->yy__y = (-(INT16_C(1)));
+        yy__snake->yy__direction->yy__y = INT16_C(-1);
     }
     return;
 }
@@ -166,7 +166,7 @@ void yy__snake_left(struct yy__Snake* yy__snake)
 {
     if (yy__snake->yy__direction->yy__x == INT16_C(0))
     {
-        yy__snake->yy__direction->yy__x = (-(INT16_C(1)));
+        yy__snake->yy__direction->yy__x = INT16_C(-1);
         yy__snake->yy__direction->yy__y = INT16_C(0);
     }
     return;
