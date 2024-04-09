@@ -25,7 +25,23 @@
 		},
 		{
 			"name": "constant.numeric.integer.decimal.yaksha",
-			"match": "\\b([1-9]+[0-9]*|0)"
+			"match": "\\b([1-9]+[0-9]*|0)(i8|u8|i16|u16|i32|u32|i64|u64)?"
+		},
+		{
+			"name": "constant.numeric.integer.hexadecimal.yaksha",
+			"match": "\\b0[xX][0-9a-fA-F]+(i8|u8|i16|u16|i32|u32|i64|u64)?"
+		},
+		{
+			"name": "constant.numeric.integer.binary.yaksha",
+			"match": "\\b0[bB][01]+(i8|u8|i16|u16|i32|u32|i64|u64)?"
+		},
+		{
+			"name": "constant.numeric.integer.ocatal.yaksha",
+			"match": "\\b0[oO][0-7]+(i8|u8|i16|u16|i32|u32|i64|u64)?"
+		},
+		{
+			"name": "constant.numeric.float.yaksha",
+			"match": "\\b([1-9]+[0-9]*|0)\\.[0-9]+(f)?"
 		},
 		{
 			"name": "constant.language.yaksha",
@@ -45,15 +61,15 @@
 		},
 		{
 			"name": "keyword.native.related.yaksha",
-			"match": "\\b(ccode|runtimefeature)\\b"
-		},		
+			"match": "\\b(ccode|runtimefeature|directive)\\b"
+		},
 		{
 			"name": "entity.name.type.yaksha",
-			"match": "\\b(int|float|i8|i16|i32|i64|u8|u16|u32|u64|float|f32|f64|Array|Function|In|Const|AnyPtr|Out|SMEntry|MEntry|str|bool|Ptr|Tuple|AnyPtrToConst)\\b"
+			"match": "\\b(int|float|i8|i16|i32|i64|u8|u16|u32|u64|float|f32|f64|Array|Function|In|Const|AnyPtr|Out|SMEntry|MEntry|str|bool|Ptr|Tuple|AnyPtrToConst|FixedArr)\\b"
 		},
 		{
 			"name": "support.function.yaksha",
-			"match": "\\b(print|println|len|arrput|arrpop|arrnew|array|getref|unref|charat|shnew|shput|shget|shgeti|hmnew|hmput|hmget|hmgeti|cast|qsort|iif|foreach|countif|filter|map|binarydata|arrsetlen|arrsetcap)\\b"
+			"match": "\\b(print|println|len|arrput|arrpop|arrnew|array|getref|unref|charat|shnew|shput|shget|shgeti|hmnew|hmput|hmget|hmgeti|cast|qsort|iif|foreach|countif|filter|map|binarydata|arrsetlen|arrsetcap|fixedarr)\\b"
 		},
 		{
 			"name": "keyword.decorator.yaksha",
