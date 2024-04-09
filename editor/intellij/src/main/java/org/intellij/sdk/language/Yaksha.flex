@@ -40,8 +40,8 @@ OctIntegerLiteral = 0 [oO] 0* {OctDigit}+
 OctLongLiteral    = 0 [oO] 0* {OctDigit}+ [iu] (8|16|32|64)
 OctDigit          = [0-7]
 
-BinIntegerLiteral = 0 [ob] 0* {BinDigit}+
-BinLongLiteral    = 0 [ob] 0* {BinDigit}+ [iu] (8|16|32|64)
+BinIntegerLiteral = 0 [bB] 0* {BinDigit}+
+BinLongLiteral    = 0 [bB] 0* {BinDigit}+ [iu] (8|16|32|64)
 BinDigit          = [01]
 
 /* floating point literals */
