@@ -75,9 +75,34 @@ namespace yaksha::errors {
   bool error_printer::has_no_errors() { return error_capture.empty(); }
 #endif
   void error_printer::print_errors(const std::vector<parsing_error> &errors) {
-    for (auto &err : errors) {
-      print_error(std::cerr, err);
-      std::cerr << "\n";
+    if (json_output_) {
+      std::cerr << errors_to_json_lines(errors);
+      return;
+    } else {
+      for (auto &err : errors) {
+        print_error(std::cerr, err);
+        std::cerr << "\n";
+      }
     }
+  }
+  std::string
+  error_printer::errors_to_json_lines(const std::vector<parsing_error> &errors) {
+    std::stringstream ss{};
+    for (auto &err : errors) {
+      ss << "{";
+      if (err.token_set_) {
+        ss << "\"file\":\"" << string_utils::escape_json(err.tok_.file_) << "\",";
+        auto relative_file = std::filesystem::relative(err.tok_.file_, "./").string();
+        ss << "\"relative_file\":\"" << string_utils::escape_json(relative_file) << "\",";
+        ss << "\"line\":" << err.tok_.line_ + 1 << ",";
+        ss << "\"pos\":" << err.tok_.pos_ << ",";
+        ss << "\"message\":\"" << string_utils::escape_json(err.message_) << "\",";
+        ss << "\"token\":\"" << string_utils::escape_json(err.tok_.original_) << "\"";
+      } else {
+        ss << "\"message\":\"" << string_utils::escape_json(err.message_) << "\"";
+      }
+      ss << "}\n";
+    }
+    return ss.str();
   }
 }// namespace yaksha::errors

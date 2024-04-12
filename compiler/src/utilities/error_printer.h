@@ -66,6 +66,7 @@ namespace yaksha::errors {
     bool has_any_error();
     bool has_no_errors();
 #endif
+    bool json_output_ = false;
     /**
      * Print a vector of errors to std::cerr
      * @param errors errors to print
@@ -78,6 +79,7 @@ private:
     // This is used for type checker testing
     std::vector<std::string> error_capture{};
 #endif
+    std::string errors_to_json_lines(const std::vector<parsing_error> &errors);
   };
 }// namespace yaksha::errors
 #endif
