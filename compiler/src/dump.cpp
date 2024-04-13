@@ -42,6 +42,7 @@
 #include "compiler/multifile_compiler.h"
 #include "tokenizer/block_analyzer.h"
 #include "tokenizer/tokenizer.h"
+#include "utilities/argparser.h"
 #include "yaksha_lisp/yaksha_lisp.h"
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "ykashadmp"
@@ -243,8 +244,27 @@ std::string yaksha_lisp_value_type_to_str(yaksha_lisp_value_type p) {
   return "UNKNOWN";
 }
 void display(def_class_visitor &df, parser &parser_object,
-             tokenizer &token_extractor, yaksha_envmap *macro_env) {
+             tokenizer &token_extractor, yaksha_envmap *macro_env,
+             const std::string &current_file, const std::string &lib_path) {
   std::cout << "{";
+  // Write file name, relative filename
+  std::cout << "\"code_file\": \""
+            << string_utils::escape_json(
+                   std::filesystem::absolute(current_file).string())
+            << "\",";
+  std::cout << "\"relative_file\": \""
+            << string_utils::escape_json(
+                   std::filesystem::relative(current_file).string())
+            << "\",";
+  std::cout << "\"code_file_directory\": \""
+            << string_utils::escape_json(
+                   std::filesystem::path(current_file).parent_path().string())
+            << "\",";
+  std::cout << "\"lib_path\": \""
+            << string_utils::escape_json(
+                   std::filesystem::absolute(std::filesystem::path(lib_path))
+                       .string())
+            << "\",";
   // Dump macro environment
   std::cout << "\"macro_env\": [";
   bool first = true;
@@ -332,8 +352,27 @@ void display(def_class_visitor &df, parser &parser_object,
   std::cout << "\n]}" << std::endl;
 }
 int main(int argc, char *argv[]) {
-  if (argc != 2) {
-    std::cerr << "Usage: " << PROGRAM_NAME << " script.yaka\n";
+  auto args = argparser::ARGS(
+      PROGRAM_NAME, "Create simple json dump of contents of a given file", "");
+  auto help = argparser::OP_BOOL('h', "--help", "Print this help message");
+  auto all_files =
+      argparser::OP_BOOL('a', "--all", "Dump docs of all files in the project");
+  auto ignore_libs = argparser::OP_BOOL(
+      'i', "--ignore-libs",
+      "Ignore the library files and only produce output for the main file (or project files).");
+  args.optional_ = {&help, &all_files, &ignore_libs};
+  auto code = argparser::PO("mainfile.yaka", "Yaksha code file.");
+  auto lib = argparser::PO_OPT("[LIBS_PARENT_PATH]",
+                               "Path to the parent directory of the libraries");
+  args.positional_ = {&code, &lib};
+  argparser::parse_args(argc, argv, args);
+  if (help.is_set_) {
+    argparser::print_help(args);
+    return EXIT_SUCCESS;
+  }
+  if (!args.errors_.empty()) {
+    argparser::print_errors(args);
+    argparser::print_help(args);
     return EXIT_FAILURE;
   }
   multifile_compiler mc{};
@@ -341,7 +380,7 @@ int main(int argc, char *argv[]) {
   mc.check_types_ = false;
   mc.usage_analysis_ = false;
   do_nothing_codegen cg{};
-  std::string file_name{argv[1]};
+  std::string file_name = code.value_;
   gc_pool<token> token_pool{};
   std::ifstream script_file{file_name};
   std::string data((std::istreambuf_iterator<char>(script_file)),
@@ -352,18 +391,44 @@ int main(int argc, char *argv[]) {
     mc.error_printer_.print_errors(token_extractor.errors_);
     return EXIT_FAILURE;
   }
-  auto result = mc.compile(file_name, &cg);
-  if (result.failed_) {
-    std::cerr << "Failed:" << file_name << "\n";
-    return EXIT_FAILURE;
+  comp_result result;
+  if (!lib.is_set_) {
+    result = mc.compile(file_name, &cg);
+  } else {
+    result = mc.compile(file_name, lib.value_, &cg);
   }
+  if (result.failed_) { return EXIT_FAILURE; }
   try {
     auto &cf = mc.get_codefiles();
-    auto main_files = cf.main_file_info_;
-    auto macro_env = cf.yaksha_macros_.validate_and_get_environment_root(
-        main_files->filepath_.string());
-    display(*(main_files->data_->dsv_), *(main_files->data_->parser_),
-            token_extractor, macro_env);
+    if (all_files.is_set_) {
+      std::cout << "[";
+      bool first = true;
+      for (auto &file : cf.files_) {
+        // if ignore_libs is set, and if the file is anywhere in the libs_path, ignore it
+        if (ignore_libs.is_set_ && file->filepath_.string().rfind(cf.libs_path_.string(), 0) == 0) {
+          continue;
+        }
+        if (first) {
+          first = false;
+        } else {
+          std::cout << ",";
+        }
+        auto macro_env = cf.yaksha_macros_.validate_and_get_environment_root(
+            file->filepath_.string());
+        display(*(file->data_->dsv_), *(file->data_->parser_),
+                *file->data_->tokenizer_, macro_env, file->filepath_.string(),
+                cf.libs_path_.string());
+      }
+      std::cout << "]" << std::endl;
+    } else {
+      auto main_file_information = cf.main_file_info_;
+      auto macro_env = cf.yaksha_macros_.validate_and_get_environment_root(
+          main_file_information->filepath_.string());
+      display(*(main_file_information->data_->dsv_),
+              *(main_file_information->data_->parser_), token_extractor,
+              macro_env, main_file_information->filepath_.string(),
+              cf.libs_path_.string());
+    }
   } catch (parsing_error &p) {
     mc.error_printer_.print_error(std::cerr, p);
     return EXIT_FAILURE;

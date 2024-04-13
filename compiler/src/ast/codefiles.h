@@ -80,6 +80,7 @@ namespace yaksha {
     yaksha_macros yaksha_macros_{};
     entry_struct_func_compiler *esc_;
     directives directives_{};
+    std::filesystem::path libs_path_{};
 
 private:
     file_data *parse_or_null(std::filesystem::path &file_name);
@@ -94,7 +95,6 @@ private:
     std::unordered_map<std::string, file_info *> path_to_fi_{};
     std::unordered_set<std::string> prefixes_{};
     std::filesystem::path current_path_{};
-    std::filesystem::path libs_path_{};
     std::unordered_map<std::intptr_t, std::filesystem::path>
         import_to_path_cache_{};
     errors::error_printer *ep_{nullptr};
