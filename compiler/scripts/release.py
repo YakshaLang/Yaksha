@@ -263,8 +263,10 @@ def package(arch: str, directory: str):
     execute(args)
 
 def package_tar(arch: str, directory: str):
+    parent = os.path.dirname(directory)
+    directory_name = os.path.basename(directory)
     print(Colors.cyan("packaging"), os.path.basename(arch), "...")
-    args = ["tar", "czf", arch, directory]
+    args = ["tar", "czf", arch, "-C", parent, directory_name]
     execute(args)
 
 def copy_binaries(section: Section, target_location):
