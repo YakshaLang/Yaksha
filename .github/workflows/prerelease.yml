@@ -19,7 +19,7 @@ jobs:
         submodules: 'true'
     - name: Build zips & 7zs
       run: |
-        echo "Running manual release"
+        echo "Running pre release"
         cd main
         git rev-parse HEAD
         python compiler/scripts/manual_release.py
@@ -49,7 +49,7 @@ jobs:
           submodules: 'true'
       - name: Build zips & 7zs
         run: |
-          echo "Running manual release"
+          echo "Running pre release"
           cd main
           pwd
           ls -ltra

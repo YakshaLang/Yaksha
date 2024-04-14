@@ -5,11 +5,8 @@
 ![https://yakshalang.github.io/](https://yakshalang.github.io/imgs/yk-banner1.png)
 
 [![.github/workflows/development.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/development.yml/badge.svg)](https://github.com/YakshaLang/Yaksha/actions/workflows/development.yml)
-[![.github/workflows/development_macos.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/development_macos.yml/badge.svg)](https://github.com/YakshaLang/Yaksha/actions/workflows/development_macos.yml)
 [![.github/workflows/coverage.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/coverage.yml/badge.svg?branch=main&event=workflow_dispatch)](https://github.com/YakshaLang/Yaksha/actions/workflows/coverage.yml)
-[![.github/workflows/fuzz-coverage.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/fuzz-coverage.yml/badge.svg?branch=main&event=workflow_dispatch)](https://github.com/YakshaLang/Yaksha/actions/workflows/fuzz-coverage.yml)
 [![.github/workflows/release.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/release.yml/badge.svg)](https://github.com/YakshaLang/Yaksha/actions/workflows/release.yml)
-[![.github/workflows/release_macos.yml](https://github.com/YakshaLang/Yaksha/actions/workflows/release_macos.yml/badge.svg)](https://github.com/YakshaLang/Yaksha/actions/workflows/release_macos.yml)
 
 # Documentation
 

@@ -1,7 +1,7 @@
 on:
   push:
     tags:
-      - 'v*'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
 env:
   PYTHONIOENCODING: utf-8
@@ -31,3 +31,29 @@ jobs:
           main/compiler/comp_output_test/yaksha_v*.zip
         draft: 'true'
         fail_on_unmatched_files: 'false'
+  release-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-11]
+    permissions:
+      contents: write
+    steps:
+      - name: Install software
+        run: brew install cmake ninja gcc p7zip
+      - name: Checkout git repo
+        uses: actions/checkout@v4
+        with:
+          path: main
+          submodules: 'true'
+      - name: Build zips & 7zs
+        run: python main/compiler/scripts/release.py
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            main/compiler/comp_output_test/yaksha_v*.7z
+            main/compiler/comp_output_test/yaksha_v*.tar.gz
+            main/compiler/comp_output_test/yaksha_v*.zip
+          draft: 'true'
+          fail_on_unmatched_files: 'false'
