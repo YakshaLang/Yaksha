@@ -28,15 +28,15 @@ jobs:
       - name: Configuring CMake
         working-directory: main/compiler/cmake-build-release
         run: |
-          cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ../
+          cmake -DCMAKE_BUILD_TYPE=Release ../ -B .
       - name: Build
         working-directory: main/compiler/cmake-build-release
         run: |
-          ninja all
+          cmake --build .
       - name: Test
         working-directory: main/compiler/cmake-build-release
         run: |
-          ninja test
+          ctest --output-on-failure
   check-ubuntu-x86_64:
     runs-on: ${{ matrix.os }}
     strategy:
