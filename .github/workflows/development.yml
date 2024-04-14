@@ -15,14 +15,13 @@ jobs:
         os: [ubuntu-20.04, ubuntu-22.04]
     steps:
     - name: Checkout git repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         path: main
+        submodules: 'true'
     - name: Preparations
       working-directory: main
       run: |
-        # The 'submodules' option for actions/checkout@v2 doesn't
-        # seem to work. So we manually sync it just in case.
         git submodule init
         git submodule update
         sudo apt update

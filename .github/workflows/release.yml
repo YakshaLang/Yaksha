@@ -16,14 +16,14 @@ jobs:
       contents: write
     steps:
     - name: Checkout git repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         path: main
         submodules: 'true'
     - name: Build zips & 7zs
       run: python main/compiler/scripts/release.py
     - name: Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         files: |
           main/compiler/comp_output_test/yaksha_v*.7z
