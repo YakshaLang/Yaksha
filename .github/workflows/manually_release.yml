@@ -1,0 +1,56 @@
+on:
+  workflow_dispatch:
+env:
+  PYTHONIOENCODING: utf-8
+  PYTHONLEGACYWINDOWSSTDIO: utf-8
+jobs:
+  manual-release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2019]
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout git repo
+      uses: actions/checkout@v2
+      with:
+        path: main
+        submodules: 'true'
+    - name: Build zips & 7zs
+      run: python main/compiler/scripts/manual_release.py
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          main/compiler/comp_output_test/yaksha_v*.7z
+          main/compiler/comp_output_test/yaksha_v*.tar.gz
+          main/compiler/comp_output_test/yaksha_v*.zip
+        draft: 'true'
+        fail_on_unmatched_files: 'false'
+  manual-release-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-11]
+    permissions:
+      contents: write
+    steps:
+      - name: Install software
+        run: brew install cmake ninja gcc p7zip
+      - name: Checkout git repo
+        uses: actions/checkout@v2
+        with:
+          path: main
+          submodules: 'true'
+      - name: Build zips & 7zs
+        run: python main/compiler/scripts/manual_release.py
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            main/compiler/comp_output_test/yaksha_v*.7z
+            main/compiler/comp_output_test/yaksha_v*.tar.gz
+            main/compiler/comp_output_test/yaksha_v*.zip
+          draft: 'true'
+          fail_on_unmatched_files: 'false'

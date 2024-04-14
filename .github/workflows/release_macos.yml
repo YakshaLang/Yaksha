@@ -27,6 +27,9 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: main/compiler/comp_output_test/yaksha_v*.7z
+        files: |
+          main/compiler/comp_output_test/yaksha_v*.7z
+          main/compiler/comp_output_test/yaksha_v*.tar.gz
+          main/compiler/comp_output_test/yaksha_v*.zip
         draft: 'true'
         fail_on_unmatched_files: 'false'
