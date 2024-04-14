@@ -43,9 +43,11 @@
 #include <string>
 using namespace yaksha;
 static void test_compile_yaka_file(const std::string &yaka_code_file) {
+  std::string exe_path = get_my_exe_path();
+  auto libs_path = std::filesystem::path(exe_path).parent_path().parent_path() / "libs";
   multifile_compiler mc{};
   codegen_c cg{};
-  auto result = mc.compile(yaka_code_file, &cg);
+  auto result = mc.compile(yaka_code_file, libs_path.string(), &cg);
   REQUIRE(result.failed_ == false);
   gc_pool<token> token_pool{};
   // --------------------------------------------
