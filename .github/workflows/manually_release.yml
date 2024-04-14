@@ -22,7 +22,7 @@ jobs:
         echo "Running manual release"
         cd main
         git rev-parse HEAD
-        python main/compiler/scripts/manual_release.py
+        python compiler/scripts/manual_release.py
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
@@ -54,7 +54,7 @@ jobs:
           pwd
           ls -ltra
           git rev-parse HEAD
-          python main/compiler/scripts/manual_release.py
+          python compiler/scripts/manual_release.py
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
