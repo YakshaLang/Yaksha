@@ -31,6 +31,7 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release ../ -B .
           cmake --build . --config Release
           cd ..\bin
+          Copy-Item -Path ".\Release\*" -Destination ".\" -Force
           .\YakshaTests.exe
   check-ubuntu-x86_64:
     runs-on: ${{ matrix.os }}
