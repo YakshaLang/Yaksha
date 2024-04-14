@@ -97,7 +97,7 @@ def main() -> int:
   ![auto-complete](https://raw.githubusercontent.com/YakshaLang/Yaksha/91683551ea1332b772a00a54c8fa1ca4700d00ff/editor/intellij/screenshots/AutoComplete.gif)
 
 
-- **Cross Platform**: Yaksha is cross-platform, works on Windows, Linux, and macOS ( 🟠 macOS is work in progress, installer is not yet provided). You can even cross compile to WASM (using Emscripten) on Linux / Windows for browser execution. Yaksha bundles `zig` compiler (use `zig cc`) for cross compilation, allowing you to compile multiple targets from a single machine.
+- **Cross Platform**: Yaksha is cross-platform, works on Windows, Linux, and macOS. You can even cross compile to WASM (using Emscripten) on Linux / Windows for browser execution. Yaksha bundles `zig` compiler (use `zig cc`) for cross compilation, allowing you to compile multiple targets from a single machine.
 
 - **Playground is a full Debian x86 VM running in browser**: Yaksha playground is a full linux terminal with all the tools you need to develop Yaksha programs. (https://yaksha.pages.dev/)
 
