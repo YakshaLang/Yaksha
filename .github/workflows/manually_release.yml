@@ -20,7 +20,7 @@ jobs:
     - name: Build zips & 7zs
       run: |
         echo "Running manual release"
-        pwd
+        cd main
         git rev-parse HEAD
         python main/compiler/scripts/manual_release.py
     - name: Release
@@ -50,7 +50,9 @@ jobs:
       - name: Build zips & 7zs
         run: |
           echo "Running manual release"
+          cd main
           pwd
+          ls -ltra
           git rev-parse HEAD
           python main/compiler/scripts/manual_release.py
       - name: Release
