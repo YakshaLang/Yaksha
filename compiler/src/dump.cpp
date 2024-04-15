@@ -245,26 +245,28 @@ std::string yaksha_lisp_value_type_to_str(yaksha_lisp_value_type p) {
 }
 void display(def_class_visitor &df, parser &parser_object,
              tokenizer &token_extractor, yaksha_envmap *macro_env,
-             const std::string &current_file, const std::string &lib_path) {
+             const std::string &current_file, const std::string &lib_path,
+             bool display_paths) {
   std::cout << "{";
-  // Write file name, relative filename
-  std::cout << "\"code_file\": \""
-            << string_utils::escape_json(
-                   std::filesystem::absolute(current_file).string())
-            << "\",";
-  std::cout << "\"relative_file\": \""
-            << string_utils::escape_json(
-                   std::filesystem::relative(current_file).string())
-            << "\",";
-  std::cout << "\"code_file_directory\": \""
-            << string_utils::escape_json(
-                   std::filesystem::path(current_file).parent_path().string())
-            << "\",";
-  std::cout << "\"lib_path\": \""
-            << string_utils::escape_json(
-                   std::filesystem::absolute(std::filesystem::path(lib_path))
-                       .string())
-            << "\",";
+  if (display_paths) {// Write file name, relative filename
+    std::cout << "\"code_file\": \""
+              << string_utils::escape_json(
+                     std::filesystem::absolute(current_file).string())
+              << "\",";
+    std::cout << "\"relative_file\": \""
+              << string_utils::escape_json(
+                     std::filesystem::relative(current_file).string())
+              << "\",";
+    std::cout << "\"code_file_directory\": \""
+              << string_utils::escape_json(
+                     std::filesystem::path(current_file).parent_path().string())
+              << "\",";
+    std::cout << "\"lib_path\": \""
+              << string_utils::escape_json(
+                     std::filesystem::absolute(std::filesystem::path(lib_path))
+                         .string())
+              << "\",";
+  }
   // Dump macro environment
   std::cout << "\"macro_env\": [";
   bool first = true;
@@ -357,10 +359,14 @@ int main(int argc, char *argv[]) {
   auto help = argparser::OP_BOOL('h', "--help", "Print this help message");
   auto all_files =
       argparser::OP_BOOL('a', "--all", "Dump docs of all files in the project");
-  auto ignore_libs = argparser::OP_BOOL(
-      'i', "--ignore-libs",
-      "Ignore the library files and only produce output for the main file (or project files).");
-  args.optional_ = {&help, &all_files, &ignore_libs};
+  auto ignore_libs =
+      argparser::OP_BOOL('i', "--ignore-libs",
+                         "Ignore the library files and only produce output for "
+                         "the main file (or project files).");
+  auto display_paths = argparser::OP_BOOL(
+      'p', "--display-paths",
+      "Display absolute and relative paths of the files being dumped.");
+  args.optional_ = {&help, &all_files, &ignore_libs, &display_paths};
   auto code = argparser::PO("mainfile.yaka", "Yaksha code file.");
   auto lib = argparser::PO_OPT("[LIBS_PARENT_PATH]",
                                "Path to the parent directory of the libraries");
@@ -405,7 +411,8 @@ int main(int argc, char *argv[]) {
       bool first = true;
       for (auto &file : cf.files_) {
         // if ignore_libs is set, and if the file is anywhere in the libs_path, ignore it
-        if (ignore_libs.is_set_ && file->filepath_.string().rfind(cf.libs_path_.string(), 0) == 0) {
+        if (ignore_libs.is_set_ &&
+            file->filepath_.string().rfind(cf.libs_path_.string(), 0) == 0) {
           continue;
         }
         if (first) {
@@ -417,7 +424,7 @@ int main(int argc, char *argv[]) {
             file->filepath_.string());
         display(*(file->data_->dsv_), *(file->data_->parser_),
                 *file->data_->tokenizer_, macro_env, file->filepath_.string(),
-                cf.libs_path_.string());
+                cf.libs_path_.string(), display_paths.is_set_);
       }
       std::cout << "]" << std::endl;
     } else {
@@ -427,7 +434,7 @@ int main(int argc, char *argv[]) {
       display(*(main_file_information->data_->dsv_),
               *(main_file_information->data_->parser_), token_extractor,
               macro_env, main_file_information->filepath_.string(),
-              cf.libs_path_.string());
+              cf.libs_path_.string(), display_paths.is_set_);
     }
   } catch (parsing_error &p) {
     mc.error_printer_.print_error(std::cerr, p);
