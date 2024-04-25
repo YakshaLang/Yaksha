@@ -170,7 +170,7 @@ void yy__strings_del_cstr(yy__c_CStr);
 void yy__strings_del_str(yy__c_CStr);
 yk__sds yy__strings_cut_from(struct yk__bstr, int32_t);
 yk__sds yy__strings_mid(struct yk__bstr, int32_t, int32_t);
-bool yy__strings_endswith(yk__sds, yk__sds);
+bool yy__strings_endswith(struct yk__bstr, struct yk__bstr);
 yk__sds yy__os_exe_path();
 yk__sds yy__os_cwd();
 yy__os_ProcessResult yy__os_run(yk__sds*);
@@ -1231,7 +1231,7 @@ void yy__building_cleanup_buildables(struct yy__building_BObject** yy__building_
 }
 bool yy__building_keep_ray_objects(yk__sds yy__building_element, bool yy__building_negate) 
 {
-    bool yy__building_obj = yy__strings_endswith(yk__sdsdup(yy__building_element), yk__sdsnewlen(".o", 2));
+    bool yy__building_obj = yy__strings_endswith(yk__bstr_h(yy__building_element), yk__bstr_s(".o", 2));
     if (yy__building_negate)
     {
         bool t__24 = !yy__building_obj;
@@ -3393,23 +3393,19 @@ yk__sds yy__strings_mid(struct yk__bstr nn__a, int32_t nn__position, int32_t nn_
     yk__sds s = yk__sdsnewlen(yk__bstr_get_reference(nn__a) + nn__position, nn__number);
     return s;
 }
-bool yy__strings_endswith(yk__sds yy__strings_a, yk__sds yy__strings_b) 
+bool yy__strings_endswith(struct yk__bstr yy__strings_a, struct yk__bstr yy__strings_b) 
 {
-    if (yk__sdslen(yy__strings_b) > yk__sdslen(yy__strings_a))
+    if (yk__bstr_len(yy__strings_b) > yk__bstr_len(yy__strings_a))
     {
-        yk__sdsfree(yy__strings_b);
-        yk__sdsfree(yy__strings_a);
         return false;
     }
-    int32_t yy__strings_pos = (yk__sdslen(yy__strings_a) - yk__sdslen(yy__strings_b));
-    yk__sds t__1 = yy__strings_cut_from(yk__bstr_h(yy__strings_a), yy__strings_pos);
+    int32_t yy__strings_pos = (yk__bstr_len(yy__strings_a) - yk__bstr_len(yy__strings_b));
+    yk__sds t__1 = yy__strings_cut_from(yy__strings_a, yy__strings_pos);
     yk__sds yy__strings_cut_a = yk__sdsdup(t__1);
-    bool yy__strings_result = (yk__sdscmp(yy__strings_cut_a , yy__strings_b) == 0);
+    bool yy__strings_result = (yk__cmp_sds_bstr(yy__strings_cut_a, yy__strings_b) == 0);
     bool t__2 = yy__strings_result;
     yk__sdsfree(yy__strings_cut_a);
     yk__sdsfree(t__1);
-    yk__sdsfree(yy__strings_b);
-    yk__sdsfree(yy__strings_a);
     return t__2;
 }
 yk__sds yy__os_exe_path() 

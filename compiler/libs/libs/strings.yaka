@@ -148,7 +148,7 @@ def mid(a: sr, position: int, number: int) -> str:
     yk__sds s = yk__sdsnewlen(yk__bstr_get_reference(nn__a) + nn__position, nn__number);
     return s"""
 
-def endswith(a: str, b: str) -> bool:
+def endswith(a: sr, b: sr) -> bool:
     # Does string a ends with string b
     if len(b) > len(a):
         return False
@@ -169,7 +169,7 @@ def spaces(count: int) -> str:
     }
     return s"""
 
-def rpad(a: str, count: int) -> str:
+def rpad(a: sr, count: int) -> str:
     # Pad string to right to ensure string length is large or equal to count
     if len(a) > count:
         return a
@@ -177,7 +177,7 @@ def rpad(a: str, count: int) -> str:
     result: str = a + spaces(remainder)
     return result
 
-def lpad(a: str, count: int) -> str:
+def lpad(a: sr, count: int) -> str:
     # Pad string to left to ensure string length is large or equal to count
     if len(a) > count:
         return a
