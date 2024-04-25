@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:noble-20240407.1
 ENV DEBIAN_FRONTEND=noninteractive
 ARG ZIG_VERSION=0.9.1
 RUN apt-get update && apt-get -y -q install clang-12 clang-tools git wget build-essential python3 libssl-dev lcov gcovr dos2unix cmake ninja-build
