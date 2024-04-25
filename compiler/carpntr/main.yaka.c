@@ -155,12 +155,12 @@ yk__sds yy__path_remove_extension(yk__sds);
 yk__sds yy__array_join(yk__sds*, yk__sds);
 yk__sds* yy__array_extend(yk__sds*, yk__sds*);
 int32_t yy__strings_get_cstr(yy__c_CStr, int32_t);
-int32_t yy__strings_get(yk__sds, int32_t);
-bool yy__strings_contains(yk__sds, yk__sds);
-int32_t yy__strings_ord(yk__sds);
-bool yy__strings_startswith(yk__sds, yk__sds);
-yk__sds* yy__strings_split(yk__sds, yk__sds);
-int32_t yy__strings_find_char(yk__sds, int32_t);
+int32_t yy__strings_get(struct yk__bstr, int32_t);
+bool yy__strings_contains(struct yk__bstr, struct yk__bstr);
+int32_t yy__strings_ord(struct yk__bstr);
+bool yy__strings_startswith(struct yk__bstr, struct yk__bstr);
+yk__sds* yy__strings_split(struct yk__bstr, struct yk__bstr);
+int32_t yy__strings_find_char(struct yk__bstr, int32_t);
 yk__sds yy__strings_from_cstr(yy__c_CStr);
 yk__sds yy__strings_from_cstrlen(yy__c_CStr, int32_t);
 yk__sds yy__strings_from_cstrlen_after(yy__c_CStr, int32_t, int32_t);
@@ -168,8 +168,8 @@ yy__c_CStr yy__strings_null_cstr();
 yy__c_CStr yy__strings_to_cstr(yk__sds);
 void yy__strings_del_cstr(yy__c_CStr);
 void yy__strings_del_str(yy__c_CStr);
-yk__sds yy__strings_cut_from(yk__sds, int32_t);
-yk__sds yy__strings_mid(yk__sds, int32_t, int32_t);
+yk__sds yy__strings_cut_from(struct yk__bstr, int32_t);
+yk__sds yy__strings_mid(struct yk__bstr, int32_t, int32_t);
 bool yy__strings_endswith(yk__sds, yk__sds);
 yk__sds yy__os_exe_path();
 yk__sds yy__os_cwd();
@@ -1056,7 +1056,7 @@ bool yy__building_is_target_macos(yk__sds yy__building_target_to_check)
         yk__sdsfree(yy__building_target_to_check);
         return t__12;
     }
-    bool t__13 = yy__strings_contains(yk__sdsdup(yy__building_target_to_check), yk__sdsnewlen("macos", 5));
+    bool t__13 = yy__strings_contains(yk__bstr_h(yy__building_target_to_check), yk__bstr_s("macos", 5));
     yk__sdsfree(yy__building_target_to_check);
     return t__13;
 }
@@ -1069,7 +1069,7 @@ bool yy__building_is_target_windows(yk__sds yy__building_target_to_check)
         yk__sdsfree(yy__building_target_to_check);
         return t__14;
     }
-    bool t__15 = yy__strings_contains(yk__sdsdup(yy__building_target_to_check), yk__sdsnewlen("windows", 7));
+    bool t__15 = yy__strings_contains(yk__bstr_h(yy__building_target_to_check), yk__bstr_s("windows", 7));
     yk__sdsfree(yy__building_target_to_check);
     return t__15;
 }
@@ -2456,7 +2456,7 @@ struct yy__configuration_CCode* yy__configuration_inject_c_code_defaults(struct 
 struct yy__configuration_Config* yy__configuration_load_runtime_features(struct yy__configuration_Config* yy__configuration_c, yk__sds yy__configuration_code, bool yy__configuration_silent) 
 {
     yk__sds yy__configuration_header = yk__sdsnewlen("// YK:" , 6);
-    bool yy__configuration_has_requirements = yy__strings_startswith(yk__sdsdup(yy__configuration_code), yk__sdsdup(yy__configuration_header));
+    bool yy__configuration_has_requirements = yy__strings_startswith(yk__bstr_h(yy__configuration_code), yk__bstr_h(yy__configuration_header));
     if (!yy__configuration_has_requirements)
     {
         if (!yy__configuration_silent)
@@ -2471,7 +2471,7 @@ struct yy__configuration_Config* yy__configuration_load_runtime_features(struct 
         yk__sdsfree(yy__configuration_code);
         return t__62;
     }
-    int32_t yy__configuration_until = yy__strings_find_char(yk__sdsdup(yy__configuration_code), yy__strings_ord(yk__sdsnewlen("#", 1)));
+    int32_t yy__configuration_until = yy__strings_find_char(yk__bstr_h(yy__configuration_code), yy__strings_ord(yk__bstr_s("#", 1)));
     if (yy__configuration_until == INT32_C(-1))
     {
         yk__arrput(yy__configuration_c->yy__configuration_errors, yk__sdsnewlen("Failed to extract runtime features. Cannot find # in compiled code first line.", 78));
@@ -2480,7 +2480,7 @@ struct yy__configuration_Config* yy__configuration_load_runtime_features(struct 
         yk__sdsfree(yy__configuration_code);
         return t__63;
     }
-    yk__sds t__64 = yy__strings_mid(yk__sdsdup(yy__configuration_code), yk__sdslen(yy__configuration_header), (yy__configuration_until - yk__sdslen(yy__configuration_header)));
+    yk__sds t__64 = yy__strings_mid(yk__bstr_h(yy__configuration_code), yk__sdslen(yy__configuration_header), (yy__configuration_until - yk__sdslen(yy__configuration_header)));
     yk__sds yy__configuration_temp_features = yk__sdsdup(t__64);
     if (!yy__configuration_silent)
     {
@@ -2489,7 +2489,7 @@ struct yy__configuration_Config* yy__configuration_load_runtime_features(struct 
         yy__console_green(yk__bstr_h(yy__configuration_temp_features));
         yk__printstr("\n");
     }
-    yk__sds* yy__configuration_features = yy__strings_split(yk__sdsdup(yy__configuration_temp_features), yk__sdsnewlen(",", 1));
+    yk__sds* yy__configuration_features = yy__strings_split(yk__bstr_h(yy__configuration_temp_features), yk__bstr_s(",", 1));
     int32_t yy__configuration_x = INT32_C(0);
     int32_t yy__configuration_length = yk__arrlen(yy__configuration_features);
     while (true)
@@ -3300,39 +3300,31 @@ int32_t yy__strings_get_cstr(yy__c_CStr nn__s, int32_t nn__pos)
 {
     return (int32_t)nn__s[nn__pos];
 }
-int32_t yy__strings_get(yk__sds nn__s, int32_t nn__pos) 
+int32_t yy__strings_get(struct yk__bstr nn__s, int32_t nn__pos) 
 {
-    int32_t x = (int32_t)nn__s[nn__pos];
-    yk__sdsfree(nn__s);
+    int32_t x = (int32_t)(yk__bstr_get_reference(nn__s))[nn__pos];
     return x;
 }
-bool yy__strings_contains(yk__sds nn__haystack, yk__sds nn__needle) 
+bool yy__strings_contains(struct yk__bstr nn__haystack, struct yk__bstr nn__needle) 
 {
-    bool val = strstr(nn__haystack, nn__needle) != NULL;
-    yk__sdsfree(nn__haystack);
-    yk__sdsfree(nn__needle);
+    bool val = strstr(yk__bstr_get_reference(nn__haystack), yk__bstr_get_reference(nn__needle)) != NULL;
     return val;
 }
-int32_t yy__strings_ord(yk__sds yy__strings_s) 
+int32_t yy__strings_ord(struct yk__bstr yy__strings_s) 
 {
-    int32_t t__0 = yy__strings_get(yk__sdsdup(yy__strings_s), INT32_C(0));
-    yk__sdsfree(yy__strings_s);
+    int32_t t__0 = yy__strings_get(yy__strings_s, INT32_C(0));
     return t__0;
 }
-bool yy__strings_startswith(yk__sds nn__a, yk__sds nn__b) 
+bool yy__strings_startswith(struct yk__bstr nn__a, struct yk__bstr nn__b) 
 {
-    bool x = (strstr(nn__a, nn__b) != NULL);
-    yk__sdsfree(nn__a);
-    yk__sdsfree(nn__b);
+    bool x = (strstr(yk__bstr_get_reference(nn__a), yk__bstr_get_reference(nn__b)) != NULL);
     return x;
 }
-yk__sds* yy__strings_split(yk__sds nn__value, yk__sds nn__sep) 
+yk__sds* yy__strings_split(struct yk__bstr nn__value, struct yk__bstr nn__sep) 
 {
     int count;
-    yk__sds* result = yk__sdssplitlen(nn__value, yk__sdslen(nn__value),
-            nn__sep, yk__sdslen(nn__sep), &count);
-    yk__sdsfree(nn__value);
-    yk__sdsfree(nn__sep);
+    yk__sds* result = yk__sdssplitlen(yk__bstr_get_reference(nn__value), yk__bstr_len(nn__value),
+            yk__bstr_get_reference(nn__sep), yk__bstr_len(nn__sep), &count);
     if (NULL == result) {
         return NULL;
     }
@@ -3343,17 +3335,17 @@ yk__sds* yy__strings_split(yk__sds nn__value, yk__sds nn__sep)
     free(result); // free array itself.
     return newarr;
 }
-int32_t yy__strings_find_char(yk__sds nn__value, int32_t nn__ch) 
+int32_t yy__strings_find_char(struct yk__bstr nn__value, int32_t nn__ch) 
 {
     int position = -1;
-    int length = (int)yk__sdslen(nn__value);
+    int length = (int)yk__bstr_len(nn__value);
+    const char* reference = yk__bstr_get_reference(nn__value);
     for (int i = 0; i < length; i++) {
-        if (nn__value[i] == nn__ch) {
+        if (reference[i] == nn__ch) {
             position = i;
             break;
         }
     }
-    yk__sdsfree(nn__value);
     return position;
 }
 yk__sds yy__strings_from_cstr(yy__c_CStr nn__a) 
@@ -3385,24 +3377,20 @@ void yy__strings_del_str(yy__c_CStr nn__a)
     if (NULL == nn__a) return;
     yk__sdsfree(nn__a);
 }
-yk__sds yy__strings_cut_from(yk__sds nn__a, int32_t nn__position) 
+yk__sds yy__strings_cut_from(struct yk__bstr nn__a, int32_t nn__position) 
 {
-    if (nn__a == NULL || yk__sdslen(nn__a) < nn__position) {
-        yk__sdsfree(nn__a);
+    if (yk__bstr_len(nn__a) < nn__position) {
         return yk__sdsempty();
     }
-    yk__sds s = yk__sdsnewlen(nn__a + nn__position, yk__sdslen(nn__a) - nn__position);
-    yk__sdsfree(nn__a);
+    yk__sds s = yk__sdsnewlen(yk__bstr_get_reference(nn__a) + nn__position, yk__bstr_len(nn__a) - nn__position);
     return s;
 }
-yk__sds yy__strings_mid(yk__sds nn__a, int32_t nn__position, int32_t nn__number) 
+yk__sds yy__strings_mid(struct yk__bstr nn__a, int32_t nn__position, int32_t nn__number) 
 {
-    if (nn__a == NULL || nn__number < 1 || yk__sdslen(nn__a) < (nn__position + nn__number)) {
-        yk__sdsfree(nn__a);
+    if (nn__number < 1 || yk__bstr_len(nn__a) < (nn__position + nn__number)) {
         return yk__sdsempty();
     }
-    yk__sds s = yk__sdsnewlen(nn__a + nn__position, nn__number);
-    yk__sdsfree(nn__a);
+    yk__sds s = yk__sdsnewlen(yk__bstr_get_reference(nn__a) + nn__position, nn__number);
     return s;
 }
 bool yy__strings_endswith(yk__sds yy__strings_a, yk__sds yy__strings_b) 
@@ -3414,7 +3402,7 @@ bool yy__strings_endswith(yk__sds yy__strings_a, yk__sds yy__strings_b)
         return false;
     }
     int32_t yy__strings_pos = (yk__sdslen(yy__strings_a) - yk__sdslen(yy__strings_b));
-    yk__sds t__1 = yy__strings_cut_from(yk__sdsdup(yy__strings_a), yy__strings_pos);
+    yk__sds t__1 = yy__strings_cut_from(yk__bstr_h(yy__strings_a), yy__strings_pos);
     yk__sds yy__strings_cut_a = yk__sdsdup(t__1);
     bool yy__strings_result = (yk__sdscmp(yy__strings_cut_a , yy__strings_b) == 0);
     bool t__2 = yy__strings_result;
@@ -3488,7 +3476,7 @@ yk__sds yy__os_which(yk__sds yy__os_binary)
         yk__sdsfree(t__2);
         yk__sdsfree(t__1);
     }
-    yk__sds* yy__os_paths = yy__strings_split(yk__sdsdup(yy__os_env), yk__sdsdup(yy__os_sep));
+    yk__sds* yy__os_paths = yy__strings_split(yk__bstr_h(yy__os_env), yk__bstr_h(yy__os_sep));
     int32_t yy__os_length = yk__arrlen(yy__os_paths);
     while (true)
     {
@@ -3814,7 +3802,7 @@ int32_t yy__build_from_config(struct yy__configuration_Config* yy__config, bool 
     }
     else
     {
-        if (yy__strings_startswith(yk__sdsdup(yy__result->output), yk__sdsnewlen("// YK", 5)))
+        if (yy__strings_startswith(yk__bstr_h(yy__result->output), yk__bstr_s("// YK", 5)))
         {
             if (yy__simple)
             {

@@ -8,29 +8,26 @@ def get_cstr(s: c.CStr, pos: int) -> int:
     # Warning: Does not do a length check
     ccode """return (int32_t)nn__s[nn__pos]"""
 
-@native 
+@native
 def set_cstr(s: c.CStr, pos: int, v: int) -> None:
     # Set a byte to given CStr position
     # Warning: Does not do a length check
     ccode """nn__s[nn__pos] = nn__v;"""
 
 @native
-def get(s: str, pos: int) -> int:
+def get(s: sr, pos: int) -> int:
     # Get a single byte from given string and position
     # Warning: Does not do a length check
     # Warning: This copies the string to just get a single byte
-    ccode """int32_t x = (int32_t)nn__s[nn__pos];
-    yk__sdsfree(nn__s);
+    ccode """int32_t x = (int32_t)(yk__bstr_get_reference(nn__s))[nn__pos];
     return x"""
 
 ######## Utils
 
 @native
-def contains(haystack: str, needle: str) -> bool:
+def contains(haystack: sr, needle: sr) -> bool:
     # Does the string needle contain in string haystack?
-    ccode """bool val = strstr(nn__haystack, nn__needle) != NULL;
-    yk__sdsfree(nn__haystack);
-    yk__sdsfree(nn__needle);
+    ccode """bool val = strstr(yk__bstr_get_reference(nn__haystack), yk__bstr_get_reference(nn__needle)) != NULL;
     return val"""
 
 @nativemacro
@@ -38,12 +35,9 @@ def valid_cstr(s: c.CStr) -> bool:
     # Is a valid CStr
     ccode """(NULL != nn__s)"""
 
-@native
-def isempty(s: str) -> bool:
-    # Is this string empty?
-    ccode """bool x = yk__sdslen(nn__s) == 0;
-    yk__sdsfree(nn__s);
-    return x"""
+def isempty(s: sr) -> bool:
+    # Is an empty string?
+    return len(s) == 0
 
 @native
 def isempty_cstr(s: c.CStr) -> bool:
@@ -56,26 +50,22 @@ def ord_cstr(s: c.CStr) -> int:
     # Get first byte of CStr
     ccode """return (int32_t)nn__s[0]"""
 
-def ord(s: str) -> int:
+def ord(s: sr) -> int:
     # Get first byte of string
     return get(s, 0)
 
 @native
-def startswith(a: str, b: str) -> bool:
+def startswith(a: sr, b: sr) -> bool:
     # Does the given string a starts with b
-    ccode """bool x = (strstr(nn__a, nn__b) != NULL);
-    yk__sdsfree(nn__a);
-    yk__sdsfree(nn__b);
+    ccode """bool x = (strstr(yk__bstr_get_reference(nn__a), yk__bstr_get_reference(nn__b)) != NULL);
     return x"""
 
 @native
-def split(value: str, sep: str) -> Array[str]:
+def split(value: sr, sep: sr) -> Array[str]:
     # Split a string to a string array
     ccode """int count;
-    yk__sds* result = yk__sdssplitlen(nn__value, yk__sdslen(nn__value),
-            nn__sep, yk__sdslen(nn__sep), &count);
-    yk__sdsfree(nn__value);
-    yk__sdsfree(nn__sep);
+    yk__sds* result = yk__sdssplitlen(yk__bstr_get_reference(nn__value), yk__bstr_len(nn__value),
+            yk__bstr_get_reference(nn__sep), yk__bstr_len(nn__sep), &count);
     if (NULL == result) {
         return NULL;
     }
@@ -87,17 +77,17 @@ def split(value: str, sep: str) -> Array[str]:
     return newarr"""
 
 @native
-def find_char(value: str, ch: int) -> int:
+def find_char(value: sr, ch: int) -> int:
     # Find first occurance of given character
     ccode """int position = -1;
-    int length = (int)yk__sdslen(nn__value);
+    int length = (int)yk__bstr_len(nn__value);
+    const char* reference = yk__bstr_get_reference(nn__value);
     for (int i = 0; i < length; i++) {
-        if (nn__value[i] == nn__ch) {
+        if (reference[i] == nn__ch) {
             position = i;
             break;
         }
     }
-    yk__sdsfree(nn__value);
     return position"""
 
 ############ Conversions and deletions
@@ -119,6 +109,7 @@ def from_cstrlen_after(a: c.CStr, length: int, after: int) -> str:
 
 @native
 def null_cstr() -> c.CStr:
+    # Return a NULL c-string
     ccode """return (char*)NULL"""
 
 @native
@@ -139,26 +130,22 @@ def del_str(a: c.CStr) -> None:
     yk__sdsfree(nn__a)"""
 
 @native
-def cut_from(a: str, position: int) -> str:
+def cut_from(a: sr, position: int) -> str:
     # Cut a string from given position
-    ccode """if (nn__a == NULL || yk__sdslen(nn__a) < nn__position) {
-        yk__sdsfree(nn__a);
+    ccode """if (yk__bstr_len(nn__a) < nn__position) {
         return yk__sdsempty();
     }
-    yk__sds s = yk__sdsnewlen(nn__a + nn__position, yk__sdslen(nn__a) - nn__position);
-    yk__sdsfree(nn__a);
+    yk__sds s = yk__sdsnewlen(yk__bstr_get_reference(nn__a) + nn__position, yk__bstr_len(nn__a) - nn__position);
     return s"""
 
 @native
-def mid(a: str, position: int, number: int) -> str:
+def mid(a: sr, position: int, number: int) -> str:
     # Cut a string from given position for number characters
     # Returns empty() if input is invalid
-    ccode """if (nn__a == NULL || nn__number < 1 || yk__sdslen(nn__a) < (nn__position + nn__number)) {
-        yk__sdsfree(nn__a);
+    ccode """if (nn__number < 1 || yk__bstr_len(nn__a) < (nn__position + nn__number)) {
         return yk__sdsempty();
     }
-    yk__sds s = yk__sdsnewlen(nn__a + nn__position, nn__number);
-    yk__sdsfree(nn__a);
+    yk__sds s = yk__sdsnewlen(yk__bstr_get_reference(nn__a) + nn__position, nn__number);
     return s"""
 
 def endswith(a: str, b: str) -> bool:
