@@ -3,14 +3,26 @@ runtimefeature "raylib"
 import libs.c
 import raylib as rl
 
+@onstack
 @nativedefine("float3")
 class float3:
     # NOTE: Helper types to be used instead of array return types for *ToFloat functions
-    pass
+    v: FixedArr[f32,3]
 
+@nativemacro
+def float3(v: FixedArr[f32,3]) -> float3:
+    # Factory function for: float3
+    ccode """(float3){nn__v}"""
+
+@onstack
 @nativedefine("float16")
 class float16:
-    pass
+    v: FixedArr[f32,16]
+
+@nativemacro
+def float16(v: FixedArr[f32,16]) -> float16:
+    # Factory function for: float16
+    ccode """(float16){nn__v}"""
 
 @nativemacro
 def clamp(value: float, min: float, max: float) -> float:
@@ -253,8 +265,8 @@ def vector3_max(v1: rl.Vector3, v2: rl.Vector3) -> rl.Vector3:
     ccode """Vector3Max(nn__v1, nn__v2)"""
 
 @nativemacro
-def vector3_barycenter(p: rl.Vector3, a: rl.Vector3, b: rl.Vector3, c_arg: rl.Vector3) -> rl.Vector3:
-    ccode """Vector3Barycenter(nn__p, nn__a, nn__b, nn__c_arg)"""
+def vector3_barycenter(p: rl.Vector3, a: rl.Vector3, b: rl.Vector3, c: rl.Vector3) -> rl.Vector3:
+    ccode """Vector3Barycenter(nn__p, nn__a, nn__b, nn__c)"""
 
 @nativemacro
 def vector3_unproject(source: rl.Vector3, projection: rl.Matrix, view: rl.Matrix) -> rl.Vector3:
@@ -441,7 +453,7 @@ def quaternion_from_axis_angle(axis: rl.Vector3, angle: float) -> rl.Quaternion:
     ccode """QuaternionFromAxisAngle(nn__axis, nn__angle)"""
 
 @nativemacro
-def quaternion_to_axis_angle(q: rl.Quaternion, out_axis: Ptr[rl.Vector3], out_angle: Ptr[c.CFloat]) -> None:
+def quaternion_to_axis_angle(q: rl.Quaternion, out_axis: Ptr[rl.Vector3], out_angle: Ptr[float]) -> None:
     ccode """QuaternionToAxisAngle(nn__q, nn__out_axis, nn__out_angle)"""
 
 @nativemacro

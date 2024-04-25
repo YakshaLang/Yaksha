@@ -290,6 +290,11 @@ def rl_scalef(x: float, y: float, z: float) -> None:
     ccode """rlScalef(nn__x, nn__y, nn__z)"""
 
 @nativemacro
+def rl_mult_matrixf(matf: Ptr[Const[float]]) -> None:
+    # Multiply the current matrix by another matrix
+    ccode """rlMultMatrixf(nn__matf)"""
+
+@nativemacro
 def rl_frustum(left: f64, right: f64, bottom: f64, top: f64, znear: f64, zfar: f64) -> None:
     ccode """rlFrustum(nn__left, nn__right, nn__bottom, nn__top, nn__znear, nn__zfar)"""
 
@@ -774,11 +779,10 @@ def rl_get_gl_texture_formats(format: int, gl_internal_format: Ptr[c.CUInt], gl_
     # Get OpenGL internal formats
     ccode """rlGetGlTextureFormats((int)nn__format, nn__gl_internal_format, nn__gl_format, nn__gl_type)"""
 
-@native
-def rl_get_pixel_format_name(format: u32) -> Ptr[Const[c.CChar]]:
+@nativemacro
+def rl_get_pixel_format_name(format: u32) -> c.CStr:
     # Get name string for pixel format
-    ccode """const char * temp_rl = rlGetPixelFormatName((unsigned int)nn__format);
-    return temp_rl"""
+    ccode """rlGetPixelFormatName((unsigned int)nn__format)"""
 
 @nativemacro
 def rl_unload_texture(id: u32) -> None:
@@ -820,20 +824,15 @@ def rl_unload_framebuffer(id: u32) -> None:
     # Delete framebuffer from GPU
     ccode """rlUnloadFramebuffer((unsigned int)nn__id)"""
 
-@native
-def rl_load_shader_code(vs_code: str, fs_code: str) -> u32:
+@nativemacro
+def rl_load_shader_code(vs_code: c.CStr, fs_code: c.CStr) -> u32:
     # Load shader from code strings
-    ccode """unsigned int temp_rl = rlLoadShaderCode(nn__vs_code, nn__fs_code);
-    yk__sdsfree(nn__vs_code);
-    yk__sdsfree(nn__fs_code);
-    return temp_rl"""
+    ccode """rlLoadShaderCode(nn__vs_code, nn__fs_code)"""
 
-@native
-def rl_compile_shader(shader_code: str, type: int) -> u32:
+@nativemacro
+def rl_compile_shader(shader_code: c.CStr, type: int) -> u32:
     # Compile custom shader and return shader id (type: RL_VERTEX_SHADER, RL_FRAGMENT_SHADER, RL_COMPUTE_SHADER)
-    ccode """unsigned int temp_rl = rlCompileShader(nn__shader_code, (int)nn__type);
-    yk__sdsfree(nn__shader_code);
-    return temp_rl"""
+    ccode """rlCompileShader(nn__shader_code, (int)nn__type)"""
 
 @nativemacro
 def rl_load_shader_program(v_shader_id: u32, f_shader_id: u32) -> u32:
@@ -845,19 +844,15 @@ def rl_unload_shader_program(id: u32) -> None:
     # Unload shader program
     ccode """rlUnloadShaderProgram((unsigned int)nn__id)"""
 
-@native
-def rl_get_location_uniform(shader_id: u32, uniform_name: str) -> int:
+@nativemacro
+def rl_get_location_uniform(shader_id: u32, uniform_name: c.CStr) -> int:
     # Get shader location uniform
-    ccode """int temp_rl = rlGetLocationUniform((unsigned int)nn__shader_id, nn__uniform_name);
-    yk__sdsfree(nn__uniform_name);
-    return temp_rl"""
+    ccode """rlGetLocationUniform((unsigned int)nn__shader_id, nn__uniform_name)"""
 
-@native
-def rl_get_location_attrib(shader_id: u32, attrib_name: str) -> int:
+@nativemacro
+def rl_get_location_attrib(shader_id: u32, attrib_name: c.CStr) -> int:
     # Get shader location attribute
-    ccode """int temp_rl = rlGetLocationAttrib((unsigned int)nn__shader_id, nn__attrib_name);
-    yk__sdsfree(nn__attrib_name);
-    return temp_rl"""
+    ccode """rlGetLocationAttrib((unsigned int)nn__shader_id, nn__attrib_name)"""
 
 @nativemacro
 def rl_set_uniform(loc_index: int, value: AnyPtrToConst, uniform_type: int, count: int) -> None:

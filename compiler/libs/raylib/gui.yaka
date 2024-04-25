@@ -434,240 +434,170 @@ def gui_get_style(control: int, property: int) -> int:
     # Get one style property
     ccode """GuiGetStyle((int)nn__control, (int)nn__property)"""
 
-@native
-def gui_window_box(bounds: rl.Rectangle, title: str) -> bool:
+@nativemacro
+def gui_window_box(bounds: rl.Rectangle, title: c.CStr) -> bool:
     # Window Box control, shows a window that can be closed
-    ccode """bool temp_rl = GuiWindowBox(nn__bounds, nn__title);
-    yk__sdsfree(nn__title);
-    return temp_rl"""
+    ccode """GuiWindowBox(nn__bounds, nn__title)"""
 
-@native
-def gui_group_box(bounds: rl.Rectangle, text: str) -> None:
+@nativemacro
+def gui_group_box(bounds: rl.Rectangle, text: c.CStr) -> None:
     # Group Box control with text name
-    ccode """GuiGroupBox(nn__bounds, nn__text);
-    yk__sdsfree(nn__text);
-    """
+    ccode """GuiGroupBox(nn__bounds, nn__text)"""
 
-@native
-def gui_line(bounds: rl.Rectangle, text: str) -> None:
+@nativemacro
+def gui_line(bounds: rl.Rectangle, text: c.CStr) -> None:
     # Line separator control, could contain text
-    ccode """GuiLine(nn__bounds, nn__text);
-    yk__sdsfree(nn__text);
-    """
+    ccode """GuiLine(nn__bounds, nn__text)"""
 
-@native
-def gui_panel(bounds: rl.Rectangle, text: str) -> None:
+@nativemacro
+def gui_panel(bounds: rl.Rectangle, text: c.CStr) -> None:
     # Panel control, useful to group controls
-    ccode """GuiPanel(nn__bounds, nn__text);
-    yk__sdsfree(nn__text);
-    """
+    ccode """GuiPanel(nn__bounds, nn__text)"""
 
 @nativemacro
 def gui_tab_bar(bounds: rl.Rectangle, text: Ptr[Ptr[Const[c.CChar]]], count: int, active: Ptr[c.CInt]) -> int:
     # Tab Bar control, returns TAB to be closed or -1
     ccode """GuiTabBar(nn__bounds, nn__text, (int)nn__count, nn__active)"""
 
-@native
-def gui_scroll_panel(bounds: rl.Rectangle, text: str, content: rl.Rectangle, scroll: Ptr[rl.Vector2]) -> rl.Rectangle:
+@nativemacro
+def gui_scroll_panel(bounds: rl.Rectangle, text: c.CStr, content: rl.Rectangle, scroll: Ptr[rl.Vector2]) -> rl.Rectangle:
     # Scroll Panel control
-    ccode """Rectangle temp_rl = GuiScrollPanel(nn__bounds, nn__text, nn__content, nn__scroll);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiScrollPanel(nn__bounds, nn__text, nn__content, nn__scroll)"""
 
-@native
-def gui_label(bounds: rl.Rectangle, text: str) -> None:
+@nativemacro
+def gui_label(bounds: rl.Rectangle, text: c.CStr) -> None:
     # Label control, shows text
-    ccode """GuiLabel(nn__bounds, nn__text);
-    yk__sdsfree(nn__text);
-    """
+    ccode """GuiLabel(nn__bounds, nn__text)"""
 
-@native
-def gui_button(bounds: rl.Rectangle, text: str) -> bool:
+@nativemacro
+def gui_button(bounds: rl.Rectangle, text: c.CStr) -> bool:
     # Button control, returns true when clicked
-    ccode """bool temp_rl = GuiButton(nn__bounds, nn__text);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiButton(nn__bounds, nn__text)"""
 
-@native
-def gui_label_button(bounds: rl.Rectangle, text: str) -> bool:
+@nativemacro
+def gui_label_button(bounds: rl.Rectangle, text: c.CStr) -> bool:
     # Label button control, show true when clicked
-    ccode """bool temp_rl = GuiLabelButton(nn__bounds, nn__text);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiLabelButton(nn__bounds, nn__text)"""
 
-@native
-def gui_toggle(bounds: rl.Rectangle, text: str, active: bool) -> bool:
+@nativemacro
+def gui_toggle(bounds: rl.Rectangle, text: c.CStr, active: bool) -> bool:
     # Toggle Button control, returns true when active
-    ccode """bool temp_rl = GuiToggle(nn__bounds, nn__text, nn__active);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiToggle(nn__bounds, nn__text, nn__active)"""
 
-@native
-def gui_toggle_group(bounds: rl.Rectangle, text: str, active: int) -> int:
+@nativemacro
+def gui_toggle_group(bounds: rl.Rectangle, text: c.CStr, active: int) -> int:
     # Toggle Group control, returns active toggle index
-    ccode """int temp_rl = GuiToggleGroup(nn__bounds, nn__text, (int)nn__active);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiToggleGroup(nn__bounds, nn__text, (int)nn__active)"""
 
-@native
-def gui_check_box(bounds: rl.Rectangle, text: str, checked: bool) -> bool:
+@nativemacro
+def gui_check_box(bounds: rl.Rectangle, text: c.CStr, checked: bool) -> bool:
     # Check Box control, returns true when active
-    ccode """bool temp_rl = GuiCheckBox(nn__bounds, nn__text, nn__checked);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiCheckBox(nn__bounds, nn__text, nn__checked)"""
 
-@native
-def gui_combo_box(bounds: rl.Rectangle, text: str, active: int) -> int:
+@nativemacro
+def gui_combo_box(bounds: rl.Rectangle, text: c.CStr, active: int) -> int:
     # Combo Box control, returns selected item index
-    ccode """int temp_rl = GuiComboBox(nn__bounds, nn__text, (int)nn__active);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiComboBox(nn__bounds, nn__text, (int)nn__active)"""
 
-@native
-def gui_dropdown_box(bounds: rl.Rectangle, text: str, active: Ptr[c.CInt], edit_mode: bool) -> bool:
+@nativemacro
+def gui_dropdown_box(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt], edit_mode: bool) -> bool:
     # Dropdown Box control, returns selected item
-    ccode """bool temp_rl = GuiDropdownBox(nn__bounds, nn__text, nn__active, nn__edit_mode);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiDropdownBox(nn__bounds, nn__text, nn__active, nn__edit_mode)"""
 
-@native
-def gui_spinner(bounds: rl.Rectangle, text: str, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> bool:
+@nativemacro
+def gui_spinner(bounds: rl.Rectangle, text: c.CStr, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> bool:
     # Spinner control, returns selected value
-    ccode """bool temp_rl = GuiSpinner(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiSpinner(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode)"""
 
-@native
-def gui_value_box(bounds: rl.Rectangle, text: str, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> bool:
+@nativemacro
+def gui_value_box(bounds: rl.Rectangle, text: c.CStr, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> bool:
     # Value Box control, updates input text with numbers
-    ccode """bool temp_rl = GuiValueBox(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiValueBox(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode)"""
 
-@native
-def gui_text_box(bounds: rl.Rectangle, text: str, text_size: int, edit_mode: bool) -> bool:
+@nativemacro
+def gui_text_box(bounds: rl.Rectangle, text: c.CStr, text_size: int, edit_mode: bool) -> bool:
     # Text Box control, updates input text
-    ccode """bool temp_rl = GuiTextBox(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiTextBox(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode)"""
 
-@native
-def gui_text_box_multi(bounds: rl.Rectangle, text: str, text_size: int, edit_mode: bool) -> bool:
+@nativemacro
+def gui_text_box_multi(bounds: rl.Rectangle, text: c.CStr, text_size: int, edit_mode: bool) -> bool:
     # Text Box control with multiple lines
-    ccode """bool temp_rl = GuiTextBoxMulti(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiTextBoxMulti(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode)"""
 
-@native
-def gui_slider(bounds: rl.Rectangle, text_left: str, text_right: str, value: float, min_value: float, max_value: float) -> float:
+@nativemacro
+def gui_slider(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: float, min_value: float, max_value: float) -> float:
     # Slider control, returns selected value
-    ccode """float temp_rl = GuiSlider(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value);
-    yk__sdsfree(nn__text_left);
-    yk__sdsfree(nn__text_right);
-    return temp_rl"""
+    ccode """GuiSlider(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
 
-@native
-def gui_slider_bar(bounds: rl.Rectangle, text_left: str, text_right: str, value: float, min_value: float, max_value: float) -> float:
+@nativemacro
+def gui_slider_bar(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: float, min_value: float, max_value: float) -> float:
     # Slider Bar control, returns selected value
-    ccode """float temp_rl = GuiSliderBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value);
-    yk__sdsfree(nn__text_left);
-    yk__sdsfree(nn__text_right);
-    return temp_rl"""
+    ccode """GuiSliderBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
 
-@native
-def gui_progress_bar(bounds: rl.Rectangle, text_left: str, text_right: str, value: float, min_value: float, max_value: float) -> float:
+@nativemacro
+def gui_progress_bar(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: float, min_value: float, max_value: float) -> float:
     # Progress Bar control, shows current progress value
-    ccode """float temp_rl = GuiProgressBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value);
-    yk__sdsfree(nn__text_left);
-    yk__sdsfree(nn__text_right);
-    return temp_rl"""
+    ccode """GuiProgressBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
 
-@native
-def gui_status_bar(bounds: rl.Rectangle, text: str) -> None:
+@nativemacro
+def gui_status_bar(bounds: rl.Rectangle, text: c.CStr) -> None:
     # Status Bar control, shows info text
-    ccode """GuiStatusBar(nn__bounds, nn__text);
-    yk__sdsfree(nn__text);
-    """
+    ccode """GuiStatusBar(nn__bounds, nn__text)"""
 
-@native
-def gui_dummy_rec(bounds: rl.Rectangle, text: str) -> None:
+@nativemacro
+def gui_dummy_rec(bounds: rl.Rectangle, text: c.CStr) -> None:
     # Dummy control for placeholders
-    ccode """GuiDummyRec(nn__bounds, nn__text);
-    yk__sdsfree(nn__text);
-    """
+    ccode """GuiDummyRec(nn__bounds, nn__text)"""
 
-@native
-def gui_grid(bounds: rl.Rectangle, text: str, spacing: float, subdivs: int) -> rl.Vector2:
+@nativemacro
+def gui_grid(bounds: rl.Rectangle, text: c.CStr, spacing: float, subdivs: int) -> rl.Vector2:
     # Grid control, returns mouse cell position
-    ccode """Vector2 temp_rl = GuiGrid(nn__bounds, nn__text, nn__spacing, (int)nn__subdivs);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiGrid(nn__bounds, nn__text, nn__spacing, (int)nn__subdivs)"""
 
-@native
-def gui_list_view(bounds: rl.Rectangle, text: str, scroll_index: Ptr[c.CInt], active: int) -> int:
+@nativemacro
+def gui_list_view(bounds: rl.Rectangle, text: c.CStr, scroll_index: Ptr[c.CInt], active: int) -> int:
     # List View control, returns selected list item index
-    ccode """int temp_rl = GuiListView(nn__bounds, nn__text, nn__scroll_index, (int)nn__active);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiListView(nn__bounds, nn__text, nn__scroll_index, (int)nn__active)"""
 
 @nativemacro
 def gui_list_view_ex(bounds: rl.Rectangle, text: Ptr[Ptr[Const[c.CChar]]], count: int, focus: Ptr[c.CInt], scroll_index: Ptr[c.CInt], active: int) -> int:
     # List View with extended parameters
     ccode """GuiListViewEx(nn__bounds, nn__text, (int)nn__count, nn__focus, nn__scroll_index, (int)nn__active)"""
 
-@native
-def gui_message_box(bounds: rl.Rectangle, title: str, message: str, buttons: str) -> int:
+@nativemacro
+def gui_message_box(bounds: rl.Rectangle, title: c.CStr, message: c.CStr, buttons: c.CStr) -> int:
     # Message Box control, displays a message
-    ccode """int temp_rl = GuiMessageBox(nn__bounds, nn__title, nn__message, nn__buttons);
-    yk__sdsfree(nn__title);
-    yk__sdsfree(nn__message);
-    yk__sdsfree(nn__buttons);
-    return temp_rl"""
+    ccode """GuiMessageBox(nn__bounds, nn__title, nn__message, nn__buttons)"""
 
-@native
-def gui_text_input_box(bounds: rl.Rectangle, title: str, message: str, buttons: str, text: str, text_max_size: int, secret_view_active: Ptr[c.CInt]) -> int:
+@nativemacro
+def gui_text_input_box(bounds: rl.Rectangle, title: c.CStr, message: c.CStr, buttons: c.CStr, text: c.CStr, text_max_size: int, secret_view_active: Ptr[c.CInt]) -> int:
     # Text Input Box control, ask for text, supports secret
-    ccode """int temp_rl = GuiTextInputBox(nn__bounds, nn__title, nn__message, nn__buttons, nn__text, (int)nn__text_max_size, nn__secret_view_active);
-    yk__sdsfree(nn__title);
-    yk__sdsfree(nn__message);
-    yk__sdsfree(nn__buttons);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiTextInputBox(nn__bounds, nn__title, nn__message, nn__buttons, nn__text, (int)nn__text_max_size, nn__secret_view_active)"""
 
-@native
-def gui_color_picker(bounds: rl.Rectangle, text: str, p_color: rl.Color) -> rl.Color:
+@nativemacro
+def gui_color_picker(bounds: rl.Rectangle, text: c.CStr, p_color: rl.Color) -> rl.Color:
     # Color Picker control (multiple color controls)
-    ccode """Color temp_rl = GuiColorPicker(nn__bounds, nn__text, nn__p_color);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiColorPicker(nn__bounds, nn__text, nn__p_color)"""
 
-@native
-def gui_color_panel(bounds: rl.Rectangle, text: str, p_color: rl.Color) -> rl.Color:
+@nativemacro
+def gui_color_panel(bounds: rl.Rectangle, text: c.CStr, p_color: rl.Color) -> rl.Color:
     # Color Panel control
-    ccode """Color temp_rl = GuiColorPanel(nn__bounds, nn__text, nn__p_color);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiColorPanel(nn__bounds, nn__text, nn__p_color)"""
 
-@native
-def gui_color_bar_alpha(bounds: rl.Rectangle, text: str, alpha: float) -> float:
+@nativemacro
+def gui_color_bar_alpha(bounds: rl.Rectangle, text: c.CStr, alpha: float) -> float:
     # Color Bar Alpha control
-    ccode """float temp_rl = GuiColorBarAlpha(nn__bounds, nn__text, nn__alpha);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiColorBarAlpha(nn__bounds, nn__text, nn__alpha)"""
 
-@native
-def gui_color_bar_hue(bounds: rl.Rectangle, text: str, value: float) -> float:
+@nativemacro
+def gui_color_bar_hue(bounds: rl.Rectangle, text: c.CStr, value: float) -> float:
     # Color Bar Hue control
-    ccode """float temp_rl = GuiColorBarHue(nn__bounds, nn__text, nn__value);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiColorBarHue(nn__bounds, nn__text, nn__value)"""
 
-@native
-def gui_load_style(file_name: str) -> None:
+@nativemacro
+def gui_load_style(file_name: c.CStr) -> None:
     # Load style file over global style variable (.rgs)
-    ccode """GuiLoadStyle(nn__file_name);
-    yk__sdsfree(nn__file_name);
-    """
+    ccode """GuiLoadStyle(nn__file_name)"""
 
 @nativemacro
 def gui_load_style_default() -> None:
@@ -684,31 +614,25 @@ def gui_disable_tooltip() -> None:
     # Disable gui tooltips (global state)
     ccode """GuiDisableTooltip()"""
 
-@native
-def gui_set_tooltip(tooltip: str) -> None:
+@nativemacro
+def gui_set_tooltip(tooltip: c.CStr) -> None:
     # Set tooltip string
-    ccode """GuiSetTooltip(nn__tooltip);
-    yk__sdsfree(nn__tooltip);
-    """
+    ccode """GuiSetTooltip(nn__tooltip)"""
 
-@native
-def gui_icon_text(icon_id: int, text: str) -> Ptr[Const[c.CChar]]:
+@nativemacro
+def gui_icon_text(icon_id: int, text: c.CStr) -> c.CStr:
     # Get text with icon id prepended (if supported)
-    ccode """const char * temp_rl = GuiIconText((int)nn__icon_id, nn__text);
-    yk__sdsfree(nn__text);
-    return temp_rl"""
+    ccode """GuiIconText((int)nn__icon_id, nn__text)"""
 
 @nativemacro
 def gui_get_icons() -> Ptr[c.CUInt]:
     # Get raygui icons data pointer
     ccode """GuiGetIcons()"""
 
-@native
-def gui_load_icons(file_name: str, load_icons_name: bool) -> Ptr[Ptr[c.CChar]]:
+@nativemacro
+def gui_load_icons(file_name: c.CStr, load_icons_name: bool) -> Ptr[Ptr[c.CChar]]:
     # Load raygui icons file (.rgi) into internal icons data
-    ccode """char ** temp_rl = GuiLoadIcons(nn__file_name, nn__load_icons_name);
-    yk__sdsfree(nn__file_name);
-    return temp_rl"""
+    ccode """GuiLoadIcons(nn__file_name, nn__load_icons_name)"""
 
 @nativemacro
 def gui_draw_icon(icon_id: int, pos_x: int, pos_y: int, pixel_size: int, p_color: rl.Color) -> None:

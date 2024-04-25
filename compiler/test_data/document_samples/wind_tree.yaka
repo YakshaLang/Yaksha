@@ -3,7 +3,7 @@ import raylib.utils
 import libs.numbers as num
 import libs.perlin
 import libs.random
-
+import libs.c
 
 class State:
     width: float
@@ -48,7 +48,7 @@ def main() -> int:
     s.blue = rl.color(0, 255, 214, 255)
     s.green = rl.color(0, 255, 0, 255)
     s.color3 = rl.color(255, 45, 156, 255)
-    rl.init_window(num.f2i(s.width), num.f2i(s.height), "Fractal Tree in the Wind")
+    rl.init_window(num.f2i(s.width), num.f2i(s.height), c.cstr!{"Fractal Tree in the Wind"})
     rl.set_target_fps(120)
     seed: u64 = random.init_random()
     while not rl.window_should_close():

@@ -5,36 +5,36 @@
 # Note: libs - MIT license, runtime/3rd - various
 # ==============================================================================================
 # GPLv3:
-# 
+#
 # Yaksha - Programming Language.
 # Copyright (C) 2020 - 2024 Bhathiya Perera
-# 
+#
 # This program is free software: you can redistribute it and/or modify it under the terms
 # of the GNU General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see https://www.gnu.org/licenses/.
-# 
+#
 # ==============================================================================================
 # Additional Terms:
-# 
+#
 # Please note that any commercial use of the programming language's compiler source code
 # (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
 # with author of the language (Bhathiya Perera).
-# 
+#
 # If you are using it for an open source project, please give credits.
 # Your own project must use GPLv3 license with these additional terms.
-# 
+#
 # You may use programs written in Yaksha/YakshaLisp for any legal purpose
 # (commercial, open-source, closed-source, etc) as long as it agrees
 # to the licenses of linked runtime libraries (see compiler/runtime/README.md).
-# 
+#
 # ==============================================================================================
 import json
 import os
@@ -73,22 +73,6 @@ runtimefeature "raylib"
 import libs.c
 
 $REPLACE_ME$
-
-@nativedefine("char[32]")
-class CChar32:
-    pass
-
-@nativedefine("float[2]")
-class CFloat2:
-    pass
-
-@nativedefine("float[4]")
-class CFloat4:
-    pass
-
-@nativedefine("Matrix[2]")
-class DTMatrix2:
-    pass
 
 @nativedefine("rAudioBuffer *")
 class RAudioBufferPtr:
@@ -165,8 +149,9 @@ def eprint(*args, **kwargs):
 
 
 F_DT = {
-    "const char *": {"t": "str", "del": "yk__sdsfree($)", "conv": None},
-    "char *": {"t": "str", "del": "yk__sdsfree($)", "conv": None},
+    "const char *": {"t": "c.CStr", "del": None, "conv": None},
+    "char *": {"t": "c.CStr", "del": None, "conv": None},
+    "unsigned char *": {"t": "Ptr[c.CUChar]", "del": None, "conv": None},
     "char": {"t": "int", "del": None, "conv": "(?)$"},
     "int": {"t": "int", "del": None, "conv": "(?)$"},
     "unsigned int": {"t": "u32", "del": None, "conv": "(?)$"},
@@ -175,11 +160,31 @@ F_DT = {
     "unsigned long": {"t": "u64", "del": None, "conv": "(?)$"},
     "short": {"t": "int", "del": None, "conv": "(?)$"},
     "unsigned short": {"t": "int", "del": None, "conv": "(?)$"},
+    "unsigned short *": {"t": "Ptr[c.CUShort]", "del": None, "conv": None},
+    "unsigned int *": {"t": "Ptr[c.CUInt]", "del": None, "conv": None},
     "float": {"t": "float", "del": None, "conv": None},
+    "float *": {"t": "Ptr[float]", "del": None, "conv": None},
+    "const float *": {"t": "Ptr[Const[float]]", "del": None, "conv": None},
+    "int *": {"t": "Ptr[c.CInt]", "del": None, "conv": None},
+    "float[4]": {"t": "FixedArr[f32,4]", "del": None, "conv": None},
+    "float[2]": {"t": "FixedArr[f32,2]", "del": None, "conv": None},
+    "float[3]": {"t": "FixedArr[f32,3]", "del": None, "conv": None},
+    "float[16]": {"t": "FixedArr[f32,16]", "del": None, "conv": None},
+    "char[32]": {"t": "FixedArr[c.CChar,32]", "del": None, "conv": None},
+    "rAudioBuffer *": {"t": "RAudioBufferPtr", "del": None, "conv": None},
+    "rAudioProcessor *": {"t": "RAudioProcessorPtr", "del": None, "conv": None},
+    "Transform **": {"t": "Ptr[Ptr[Transform]]", "del": None, "conv": None},
+    "Matrix[2]": {"t": "FixedArr[f32,2]", "del": None, "conv": None},
+    "char **": {"t": "Ptr[Ptr[c.CChar]]", "del": None, "conv": None},
     "double": {"t": "f64", "del": None, "conv": None},
     "void *": {"t": "AnyPtr", "del": None, "conv": None},
     "bool": {"t": "bool", "del": None, "conv": None},
     "void": {"t": "None", "del": None, "conv": None},
+    "LoadFileTextCallback": {"t": "Function[In[c.CStr],Out[c.CStr]]", "del": None, "conv": None},
+    "LoadFileDataCallback": {"t": "Function[In[c.CStr,Ptr[c.CUInt]],Out[c.CStr]]", "del": None, "conv": None},
+    "SaveFileTextCallback": {"t": "Function[In[c.CStr,c.CStr],Out[bool]]", "del": None, "conv": None},
+    "SaveFileDataCallback": {"t": "Function[In[c.CStr,AnyPtr,c.CUInt],Out[bool]]", "del": None, "conv": None},
+    "AudioCallback": {"t": "Function[In[AnyPtr,c.CUint],Out]", "del": None, "conv": None},
 }
 R_DT = {
     "const char *": "Ptr[Const[c.CChar]]",
@@ -200,7 +205,8 @@ S_DT = {
     "const char **": "Ptr[Ptr[Const[c.CChar]]]",
     "bool": "bool",
     "float": "float",
-    "float *": "Ptr[c.CFloat]",
+    "float *": "Ptr[float]",
+    "const float *": "Ptr[Const[float]]",
     "int *": "Ptr[c.CInt]",
     "const int *": "Ptr[Const[c.CInt]]",
     "const void *": "AnyPtrToConst",
@@ -208,15 +214,17 @@ S_DT = {
     "const unsigned char *": "Ptr[Const[c.CUChar]]",
     "unsigned short *": "Ptr[c.CUShort]",
     "unsigned int *": "Ptr[c.CUInt]",
-    "float[4]": "CFloat4",
-    "float[2]": "CFloat2",
-    "char[32]": "CChar32",
-    "Matrix[2]": "DTMatrix2",
+    "float[4]": "FixedArr[f32,4]",
+    "float[3]": "FixedArr[f32,3]",
+    "float[16]": "FixedArr[f32,16]",
+    "float[2]": "FixedArr[f32,2]",
+    "char[32]": "FixedArr[c.CChar,32]",
+    "Matrix[2]": "FixedArr[f32,2]",
     "rAudioBuffer *": "RAudioBufferPtr",
     "rAudioProcessor *": "RAudioProcessorPtr",
     "double": "f64",
 }
-S_DT_MUST_PREFIX = {"CFloat4", "CFloat2", "CChar32", "DTMatrix2", "RAudioBufferPtr", "RAudioProcessorPtr"}
+S_DT_MUST_PREFIX = {"RAudioBufferPtr", "RAudioProcessorPtr"}
 
 NAMESPACE = set()
 KNOWN_STRUCTURES = set()
@@ -346,7 +354,7 @@ def create_factory(s: dict) -> Optional[Code]:
     name: str = s["name"]
     name = underscore(name)
     if name in NAMESPACE:
-        print(Colors.fail(f"{name} is redefined"))
+        # print(Colors.fail(f"{name} is redefined"))
         return None
     has_strings = False
     for field in s["fields"]:
@@ -364,7 +372,7 @@ def convert_barebones_structure(s: dict) -> bool:
     c = Code()
     name = s["name"]
     if name in NAMESPACE:
-        print(Colors.fail(f"{name} is redefined"))
+        # print(Colors.fail(f"{name} is redefined"))
         return False
     comment = s["description"]
     c.append("@nativedefine(\"").append(name).append("\")").newline()
@@ -382,7 +390,7 @@ def convert_structure(s: dict) -> bool:
     c = Code()
     name = s["name"]
     if name in NAMESPACE:
-        print(Colors.fail(f"{name} is redefined"))
+        # print(Colors.fail(f"{name} is redefined"))
         return False
     comment = s["description"]
     c.append("@onstack").newline()
@@ -564,7 +572,7 @@ def create_function(s: dict) -> bool:
     name: str = s["name"]
     name = underscore(name)
     if name in NAMESPACE:
-        print(Colors.fail(f"{name} is redefined"))
+        # print(Colors.fail(f"{name} is redefined"))
         return None
     has_strings = False
     for field in s.get("params", []):
@@ -589,7 +597,7 @@ def convert_enum(ev: dict) -> bool:
     val = ev["value"]
     comment = ev["description"]
     if name in NAMESPACE:
-        print(Colors.fail(f"{name} is redefined"))
+        # print(Colors.fail(f"{name} is redefined"))
         return False
     c = Code()
     c.append(name).append(": Const[int] = ").append(val).newline()

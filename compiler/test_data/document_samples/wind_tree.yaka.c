@@ -7,11 +7,13 @@
 #define yy__numbers_uu2f(nn__a) ((float)nn__a)
 #define yy__utils_sin_deg(nn__x) sin(nn__x * DEG2RAD)
 #define yy__utils_cos_deg(nn__x) cos(nn__x * DEG2RAD)
+#define yy__c_CStr char*
 #define yy__c_CUChar unsigned char
 #define yy__raylib_Vector2 Vector2
 #define yy__raylib_vector2(nn__x, nn__y) (Vector2){nn__x, nn__y}
 #define yy__raylib_Color Color
 #define yy__raylib_color(nn__r, nn__g, nn__b, nn__a) (Color){(unsigned char)nn__r, (unsigned char)nn__g, (unsigned char)nn__b, (unsigned char)nn__a}
+#define yy__raylib_init_window(nn__width, nn__height, nn__title) InitWindow((int)nn__width, (int)nn__height, nn__title)
 #define yy__raylib_window_should_close() WindowShouldClose()
 #define yy__raylib_close_window() CloseWindow()
 #define yy__raylib_clear_background(nn__p_color) ClearBackground(nn__p_color)
@@ -27,7 +29,6 @@ float yy__random_randomf();
 float yy__random_random_betweenf(float, float);
 float yy__utils_remap(float, float, float, float, float);
 yy__raylib_Color yy__utils_lerp_color(yy__raylib_Color, yy__raylib_Color, float);
-void yy__raylib_init_window(int32_t, int32_t, yk__sds);
 void yy__branch(float, float, float, float, struct yy__State*);
 void yy__update_draw_frame(struct yy__State*);
 int32_t yy__main();
@@ -93,12 +94,6 @@ yy__raylib_Color yy__utils_lerp_color(yy__raylib_Color nn__a, yy__raylib_Color n
     return (Color){(unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a}
     ;
 }
-void yy__raylib_init_window(int32_t nn__width, int32_t nn__height, yk__sds nn__title) 
-{
-    InitWindow((int)nn__width, (int)nn__height, nn__title);
-    yk__sdsfree(nn__title);
-    ;
-}
 void yy__branch(float yy__x, float yy__y, float yy__length, float yy__angle, struct yy__State* yy__s) 
 {
     if (yy__length < 4.0f)
@@ -137,7 +132,7 @@ int32_t yy__main()
     yy__s->yy__blue = yy__raylib_color(INT32_C(0), INT32_C(255), INT32_C(214), INT32_C(255));
     yy__s->yy__green = yy__raylib_color(INT32_C(0), INT32_C(255), INT32_C(0), INT32_C(255));
     yy__s->yy__color3 = yy__raylib_color(INT32_C(255), INT32_C(45), INT32_C(156), INT32_C(255));
-    yy__raylib_init_window(yy__numbers_f2i(yy__s->yy__width), yy__numbers_f2i(yy__s->yy__height), yk__sdsnewlen("Fractal Tree in the Wind", 24));
+    yy__raylib_init_window(yy__numbers_f2i(yy__s->yy__width), yy__numbers_f2i(yy__s->yy__height), "Fractal Tree in the Wind");
     yy__raylib_set_target_fps(INT32_C(120));
     uint64_t yy__seed = yy__random_init_random();
     while (true)
