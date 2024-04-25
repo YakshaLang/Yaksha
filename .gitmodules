@@ -14,9 +14,3 @@
 [submodule "compiler/3rd/reproc"]
 	path = compiler/3rd/reproc
 	url = https://github.com/DaanDeMeyer/reproc.git
-[submodule "compiler/runtime/net/mbedtls"]
-	path = compiler/runtime/net/mbedtls
-	url = https://github.com/Mbed-TLS/mbedtls.git
-[submodule "compiler/runtime/net/civetweb"]
-	path = compiler/runtime/net/civetweb
-	url = https://github.com/civetweb/civetweb.git
