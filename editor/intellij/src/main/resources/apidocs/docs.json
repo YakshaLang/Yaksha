@@ -760,17 +760,6 @@
         "comment": " size_t in C code",
         "members": [],
         "name": "Size"
-      },
-      {
-        "annotations": [
-          {
-            "argument": "void*",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": " Any pointer type\n void* in C",
-        "members": [],
-        "name": "VoidPtr"
       }
     ],
     "functions": [
@@ -888,7 +877,7 @@
           }
         ],
         "return_type": {
-          "type": "VoidPtr"
+          "type": "AnyPtr"
         }
       },
       {
@@ -1056,7 +1045,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "ptr"
           }
@@ -1181,7 +1170,7 @@
           }
         ],
         "return_type": {
-          "type": "VoidPtr"
+          "type": "AnyPtr"
         }
       },
       {
@@ -1196,13 +1185,13 @@
         "parameters": [
           {
             "datatype": {
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "str1"
           },
           {
             "datatype": {
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "str2"
           },
@@ -1229,13 +1218,13 @@
         "parameters": [
           {
             "datatype": {
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "dest"
           },
           {
             "datatype": {
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "src"
           },
@@ -1247,7 +1236,7 @@
           }
         ],
         "return_type": {
-          "type": "VoidPtr"
+          "type": "AnyPtr"
         }
       },
       {
@@ -1262,13 +1251,13 @@
         "parameters": [
           {
             "datatype": {
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "dest"
           },
           {
             "datatype": {
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "src"
           },
@@ -1280,7 +1269,7 @@
           }
         ],
         "return_type": {
-          "type": "VoidPtr"
+          "type": "AnyPtr"
         }
       },
       {
@@ -1295,7 +1284,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "dest"
           },
@@ -1313,7 +1302,7 @@
           }
         ],
         "return_type": {
-          "type": "VoidPtr"
+          "type": "AnyPtr"
         }
       },
       {
@@ -1355,7 +1344,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "VoidPtr"
+              "type": "AnyPtr"
             },
             "name": "ptr"
           },
@@ -1367,7 +1356,7 @@
           }
         ],
         "return_type": {
-          "type": "VoidPtr"
+          "type": "AnyPtr"
         }
       },
       {
@@ -1534,6 +1523,22 @@
         }
       },
       {
+        "annotations": [],
+        "comment": "",
+        "name": "blueln",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "sr"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
         "annotations": [
           {
             "argument": "yk__clear",
@@ -1571,8 +1576,46 @@
       },
       {
         "annotations": [],
+        "comment": " Print in given color and then rewind",
+        "name": "color_println",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "color"
+          },
+          {
+            "datatype": {
+              "type": "sr"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [],
         "comment": " Print text in console, in cyan color",
         "name": "cyan",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "sr"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "cyanln",
         "parameters": [
           {
             "datatype": {
@@ -1617,6 +1660,22 @@
       },
       {
         "annotations": [],
+        "comment": "",
+        "name": "greenln",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "sr"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [],
         "comment": " Print text in console, in purple color",
         "name": "purple",
         "parameters": [
@@ -1633,8 +1692,40 @@
       },
       {
         "annotations": [],
+        "comment": "",
+        "name": "purpleln",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "sr"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [],
         "comment": " Print text in console, in red color",
         "name": "red",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "sr"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "redln",
         "parameters": [
           {
             "datatype": {
@@ -1686,8 +1777,40 @@
       },
       {
         "annotations": [],
+        "comment": "",
+        "name": "whiteln",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "sr"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [],
         "comment": " Print text in console, in yellow color",
         "name": "yellow",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "sr"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "yellowln",
         "parameters": [
           {
             "datatype": {
@@ -5236,13 +5359,13 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "haystack"
           },
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "needle"
           }
@@ -5263,7 +5386,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "a"
           },
@@ -5329,13 +5452,13 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "a"
           },
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "b"
           }
@@ -5356,7 +5479,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "value"
           },
@@ -5467,7 +5590,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "s"
           },
@@ -5511,18 +5634,13 @@
         }
       },
       {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@native"
-          }
-        ],
-        "comment": " Is this string empty?",
+        "annotations": [],
+        "comment": " Is an empty string?",
         "name": "isempty",
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "s"
           }
@@ -5560,7 +5678,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "a"
           },
@@ -5587,7 +5705,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "a"
           },
@@ -5615,7 +5733,7 @@
             "name": "@native"
           }
         ],
-        "comment": "",
+        "comment": " Return a NULL c-string",
         "name": "null_cstr",
         "parameters": [],
         "return_type": {
@@ -5630,7 +5748,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "s"
           }
@@ -5668,7 +5786,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "a"
           },
@@ -5750,13 +5868,13 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "value"
           },
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "sep"
           }
@@ -5782,13 +5900,13 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "a"
           },
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "b"
           }
@@ -8321,10 +8439,47 @@
           {
             "argument": "AudioStream",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " AudioStream, custom audio stream",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "type": "RAudioBufferPtr"
+            },
+            "name": "buffer"
+          },
+          {
+            "datatype": {
+              "type": "RAudioProcessorPtr"
+            },
+            "name": "processor"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "sampleRate"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "sampleSize"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "channels"
+          }
+        ],
         "name": "AudioStream"
       },
       {
@@ -8332,10 +8487,36 @@
           {
             "argument": "BoneInfo",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " Bone, skeletal animation bone",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                },
+                {
+                  "type": "32"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "name"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "parent"
+          }
+        ],
         "name": "BoneInfo"
       },
       {
@@ -8364,39 +8545,6 @@
           }
         ],
         "name": "BoundingBox"
-      },
-      {
-        "annotations": [
-          {
-            "argument": "char[32]",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "",
-        "members": [],
-        "name": "CChar32"
-      },
-      {
-        "annotations": [
-          {
-            "argument": "float[2]",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "",
-        "members": [],
-        "name": "CFloat2"
-      },
-      {
-        "annotations": [
-          {
-            "argument": "float[4]",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "",
-        "members": [],
-        "name": "CFloat4"
       },
       {
         "annotations": [
@@ -8575,23 +8723,47 @@
       {
         "annotations": [
           {
-            "argument": "Matrix[2]",
-            "name": "@nativedefine"
-          }
-        ],
-        "comment": "",
-        "members": [],
-        "name": "DTMatrix2"
-      },
-      {
-        "annotations": [
-          {
             "argument": "FilePathList",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " File path list",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "capacity"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "count"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "module": "libs.c",
+                      "type": "CChar"
+                    }
+                  ],
+                  "type": "Ptr"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "paths"
+          }
+        ],
         "name": "FilePathList"
       },
       {
@@ -8761,10 +8933,45 @@
           {
             "argument": "Material",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " Material, includes shader and maps",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "type": "Shader"
+            },
+            "name": "shader"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "MaterialMap"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "maps"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "4"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "params"
+          }
+        ],
         "name": "Material"
       },
       {
@@ -8916,10 +9123,171 @@
           {
             "argument": "Mesh",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " Mesh, vertex data and vao/vbo",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "vertexCount"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "triangleCount"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "vertices"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "texcoords"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "texcoords2"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "normals"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "tangents"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CUChar"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "colors"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CUShort"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "indices"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "animVertices"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "animNormals"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CUChar"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "boneIds"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "boneWeights"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "vaoId"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CUInt"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "vboId"
+          }
+        ],
         "name": "Mesh"
       },
       {
@@ -8927,10 +9295,97 @@
           {
             "argument": "Model",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " Model, meshes, materials and animation data",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "type": "Matrix"
+            },
+            "name": "transform"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "meshCount"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "materialCount"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mesh"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "meshes"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Material"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "materials"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "meshMaterial"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "boneCount"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "BoneInfo"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "bones"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Transform"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "bindPose"
+          }
+        ],
         "name": "Model"
       },
       {
@@ -8938,10 +9393,55 @@
           {
             "argument": "ModelAnimation",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " ModelAnimation",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "boneCount"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "frameCount"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "BoneInfo"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "bones"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "Transform"
+                    }
+                  ],
+                  "type": "Ptr"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "framePoses"
+          }
+        ],
         "name": "ModelAnimation"
       },
       {
@@ -9286,10 +9786,33 @@
           {
             "argument": "Shader",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " Shader",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "id"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "locs"
+          }
+        ],
         "name": "Shader"
       },
       {
@@ -9607,10 +10130,92 @@
           {
             "argument": "VrDeviceInfo",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " VrDeviceInfo, Head-Mounted-Display device parameters",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "hResolution"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "vResolution"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "hScreenSize"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "vScreenSize"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "vScreenCenter"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "eyeToScreenDistance"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "lensSeparationDistance"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "interpupillaryDistance"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "4"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "lensDistortionValues"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "4"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "chromaAbCorrection"
+          }
+        ],
         "name": "VrDeviceInfo"
       },
       {
@@ -9618,10 +10223,126 @@
           {
             "argument": "VrStereoConfig",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " VrStereoConfig, VR stereo rendering configuration for simulator",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "projection"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "viewOffset"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "leftLensCenter"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "rightLensCenter"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "leftScreenCenter"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "rightScreenCenter"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "scale"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "scaleIn"
+          }
+        ],
         "name": "VrStereoConfig"
       },
       {
@@ -9675,6 +10396,133 @@
       }
     ],
     "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Attach audio stream processor to the entire audio pipeline",
+        "name": "attach_audio_mixed_processor",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "AnyPtr"
+                    },
+                    {
+                      "module": "libs.c",
+                      "type": "CUint"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "processor"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Attach audio stream processor to stream",
+        "name": "attach_audio_stream_processor",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "AudioStream"
+            },
+            "name": "stream"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "AnyPtr"
+                    },
+                    {
+                      "module": "libs.c",
+                      "type": "CUint"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "processor"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: AudioStream",
+        "name": "audio_stream",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "RAudioBufferPtr"
+            },
+            "name": "buffer"
+          },
+          {
+            "datatype": {
+              "type": "RAudioProcessorPtr"
+            },
+            "name": "processor"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "sample_rate"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "sample_size"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "channels"
+          }
+        ],
+        "return_type": {
+          "type": "AudioStream"
+        }
+      },
       {
         "annotations": [
           {
@@ -9805,7 +10653,7 @@
             "datatype": {
               "type": "Shader"
             },
-            "name": "shader"
+            "name": "p_shader"
           }
         ],
         "return_type": {
@@ -9852,6 +10700,42 @@
         ],
         "return_type": {
           "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: BoneInfo",
+        "name": "bone_info",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                },
+                {
+                  "type": "32"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "name"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "parent"
+          }
+        ],
+        "return_type": {
+          "type": "BoneInfo"
         }
       },
       {
@@ -10014,7 +10898,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Change working directory, return true on success",
@@ -10022,7 +10906,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "dir"
           }
@@ -10529,7 +11414,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Encode one codepoint into UTF-8 byte array (array length returned as parameter)",
@@ -10555,18 +11440,8 @@
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -11032,7 +11907,89 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Detach audio stream processor from the entire audio pipeline",
+        "name": "detach_audio_mixed_processor",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "AnyPtr"
+                    },
+                    {
+                      "module": "libs.c",
+                      "type": "CUint"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "processor"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Detach audio stream processor from stream",
+        "name": "detach_audio_stream_processor",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "AudioStream"
+            },
+            "name": "stream"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "AnyPtr"
+                    },
+                    {
+                      "module": "libs.c",
+                      "type": "CUint"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "processor"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
           }
         ],
         "comment": " Check if a directory path exists",
@@ -11040,7 +11997,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "dir_path"
           }
@@ -12515,13 +13473,13 @@
             "datatype": {
               "type": "Mesh"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           },
           {
             "datatype": {
               "type": "Material"
             },
-            "name": "material"
+            "name": "p_material"
           },
           {
             "datatype": {
@@ -12548,13 +13506,13 @@
             "datatype": {
               "type": "Mesh"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           },
           {
             "datatype": {
               "type": "Material"
             },
-            "name": "material"
+            "name": "p_material"
           },
           {
             "datatype": {
@@ -12597,7 +13555,7 @@
             "datatype": {
               "type": "Model"
             },
-            "name": "model"
+            "name": "p_model"
           },
           {
             "datatype": {
@@ -12636,7 +13594,7 @@
             "datatype": {
               "type": "Model"
             },
-            "name": "model"
+            "name": "p_model"
           },
           {
             "datatype": {
@@ -12687,7 +13645,7 @@
             "datatype": {
               "type": "Model"
             },
-            "name": "model"
+            "name": "p_model"
           },
           {
             "datatype": {
@@ -12726,7 +13684,7 @@
             "datatype": {
               "type": "Model"
             },
-            "name": "model"
+            "name": "p_model"
           },
           {
             "datatype": {
@@ -13745,7 +14703,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Draw text (using default font)",
@@ -13753,7 +14711,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -13903,7 +14862,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Draw text using font and additional parameters",
@@ -13917,7 +14876,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -13954,7 +14914,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Draw text using Font and pro parameters (rotation)",
@@ -13968,7 +14928,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -14534,7 +15495,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Encode data to Base64 string, memory must be MemFree()",
@@ -14697,7 +15658,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Export data to code (.h), returns true on success",
@@ -14728,7 +15689,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -14741,7 +15703,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Export font as code file, returns true on success",
@@ -14755,7 +15717,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -14768,7 +15731,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Export image data to file, returns true on success",
@@ -14782,7 +15745,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -14795,7 +15759,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Export image as code file defining an array of bytes, returns true on success",
@@ -14809,7 +15773,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -14822,7 +15787,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Export mesh data to file, returns true on success",
@@ -14832,11 +15797,12 @@
             "datatype": {
               "type": "Mesh"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -14849,7 +15815,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Export wave data to file, returns true on success",
@@ -14863,7 +15829,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -14876,7 +15843,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Export wave sample data to code (.h), returns true on success",
@@ -14890,7 +15857,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -14930,7 +15898,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Check if file exists",
@@ -14938,13 +15906,58 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
         ],
         "return_type": {
           "type": "bool"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: FilePathList",
+        "name": "file_path_list",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "capacity"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "count"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "module": "libs.c",
+                      "type": "CChar"
+                    }
+                  ],
+                  "type": "Ptr"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "paths"
+          }
+        ],
+        "return_type": {
+          "type": "FilePathList"
         }
       },
       {
@@ -15368,7 +16381,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Generate image: grayscale image from text data",
@@ -15388,7 +16401,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -15773,7 +16787,7 @@
               ],
               "type": "Ptr"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           }
         ],
         "return_type": {
@@ -15849,25 +16863,15 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get the directory if the running application (uses static string)",
         "name": "get_application_directory",
         "parameters": [],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -15930,32 +16934,22 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get clipboard text content",
         "name": "get_clipboard_text",
         "parameters": [],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure",
@@ -15963,7 +16957,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -15988,7 +16983,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get total number of codepoints in a UTF-8 encoded string",
@@ -15996,7 +16991,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -16009,7 +17005,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure",
@@ -16017,7 +17013,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -16042,7 +17039,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get previous codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure",
@@ -16050,7 +17047,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -16137,7 +17135,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get full path for a given fileName with path (uses static string)",
@@ -16145,31 +17143,22 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_path"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get pointer to extension for a filename string (includes dot: '.png')",
@@ -16177,31 +17166,22 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)",
@@ -16209,7 +17189,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -16222,7 +17203,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get file modification time (last write time)",
@@ -16230,7 +17211,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -16243,7 +17225,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get pointer to filename for a path string",
@@ -16251,31 +17233,22 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_path"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get filename string without extension (uses static string)",
@@ -16283,24 +17256,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_path"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -16411,7 +17375,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get gamepad internal name id",
@@ -16425,18 +17389,8 @@
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -16692,7 +17646,7 @@
             "datatype": {
               "type": "Mesh"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           }
         ],
         "return_type": {
@@ -16713,7 +17667,7 @@
             "datatype": {
               "type": "Model"
             },
-            "name": "model"
+            "name": "p_model"
           }
         ],
         "return_type": {
@@ -16759,7 +17713,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get the human-readable, UTF-8 encoded name of the primary monitor",
@@ -16773,18 +17727,8 @@
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -17109,7 +18053,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get previous directory path for a given path (uses static string)",
@@ -17117,24 +18061,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "dir_path"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -17211,7 +18146,7 @@
             "datatype": {
               "type": "Mesh"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           },
           {
             "datatype": {
@@ -17428,7 +18363,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get shader uniform location",
@@ -17438,11 +18373,12 @@
             "datatype": {
               "type": "Shader"
             },
-            "name": "shader"
+            "name": "p_shader"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "uniform_name"
           }
@@ -17455,7 +18391,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get shader attribute location",
@@ -17465,11 +18401,12 @@
             "datatype": {
               "type": "Shader"
             },
-            "name": "shader"
+            "name": "p_shader"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "attrib_name"
           }
@@ -17622,25 +18559,15 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get current working directory (uses static string)",
         "name": "get_working_directory",
         "parameters": [],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -18927,7 +19854,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Draw text (using default font) within an image (destination)",
@@ -18946,7 +19873,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -18983,7 +19911,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Draw text (custom sprite font) within an image (destination)",
@@ -19008,7 +19936,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -19366,7 +20295,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Create an image from text (default font)",
@@ -19374,7 +20303,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -19399,7 +20329,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Create an image from text (custom sprite font)",
@@ -19413,7 +20343,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -19490,7 +20421,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Initialize window and OpenGL context",
@@ -19510,7 +20441,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "title"
           }
@@ -19642,7 +20574,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Check file extension (including point: .png, .wav)",
@@ -19650,13 +20582,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "ext"
           }
@@ -19955,7 +20889,7 @@
             "datatype": {
               "type": "Material"
             },
-            "name": "material"
+            "name": "p_material"
           }
         ],
         "return_type": {
@@ -19976,7 +20910,7 @@
             "datatype": {
               "type": "Model"
             },
-            "name": "model"
+            "name": "p_model"
           },
           {
             "datatype": {
@@ -20003,7 +20937,7 @@
             "datatype": {
               "type": "Model"
             },
-            "name": "model"
+            "name": "p_model"
           }
         ],
         "return_type": {
@@ -20140,7 +21074,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Check if a given path is a file or a directory",
@@ -20148,7 +21082,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "path"
           }
@@ -20192,7 +21127,7 @@
             "datatype": {
               "type": "Shader"
             },
-            "name": "shader"
+            "name": "p_shader"
           }
         ],
         "return_type": {
@@ -20439,7 +21374,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load all codepoints from a UTF-8 text string, codepoints count returned by parameter",
@@ -20447,7 +21382,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -20478,7 +21414,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load directory filepaths",
@@ -20486,7 +21422,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "dir_path"
           }
@@ -20499,7 +21436,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load directory filepaths with extension filtering and recursive directory scan",
@@ -20507,13 +21444,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "base_path"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "filter"
           },
@@ -20546,7 +21485,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load file data as byte array (read)",
@@ -20554,7 +21493,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
@@ -20585,7 +21525,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load text data from file (read), returns a '\\0' terminated string",
@@ -20593,7 +21533,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -20607,7 +21548,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load font from file into GPU memory (VRAM)",
@@ -20615,7 +21556,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -20701,7 +21643,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load font from file with extended parameters, use NULL for fontChars and 0 for glyphCount to load the default character set",
@@ -20709,7 +21651,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
@@ -20779,7 +21722,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load font from memory buffer, fileType refers to extension: i.e. '.ttf'",
@@ -20787,7 +21730,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_type"
           },
@@ -20847,7 +21791,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load image from file into CPU memory (RAM)",
@@ -20855,7 +21799,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -20868,7 +21813,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load image sequence from file (frames appended to image.data)",
@@ -20876,7 +21821,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
@@ -20927,7 +21873,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load image from memory buffer, fileType refers to extension: i.e. '.png'",
@@ -20935,7 +21881,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_type"
           },
@@ -21050,7 +21997,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load image from RAW file data",
@@ -21058,7 +22005,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
@@ -21109,7 +22057,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load materials from model file",
@@ -21117,7 +22065,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
@@ -21147,7 +22096,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load model from files (meshes and materials)",
@@ -21155,7 +22104,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -21168,7 +22118,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load model animations from file",
@@ -21176,7 +22126,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
@@ -21216,7 +22167,7 @@
             "datatype": {
               "type": "Mesh"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           }
         ],
         "return_type": {
@@ -21227,7 +22178,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load music stream from file",
@@ -21235,7 +22186,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -21248,7 +22200,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load music stream from data",
@@ -21256,7 +22208,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_type"
           },
@@ -21319,7 +22272,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load shader from files and bind default locations",
@@ -21327,13 +22280,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "vs_file_name"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "fs_file_name"
           }
@@ -21346,7 +22301,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load shader from code strings and bind default locations",
@@ -21354,13 +22309,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "vs_code"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "fs_code"
           }
@@ -21373,7 +22330,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load sound from file",
@@ -21381,7 +22338,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -21415,7 +22373,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load texture from file into GPU memory (VRAM)",
@@ -21423,7 +22381,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -21484,7 +22443,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load UTF-8 text encoded from codepoints array",
@@ -21544,7 +22503,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load wave data from file",
@@ -21552,7 +22511,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -21565,7 +22525,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load wave from memory buffer, fileType refers to extension: i.e. '.wav'",
@@ -21573,7 +22533,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_type"
           },
@@ -21625,11 +22586,56 @@
         "return_type": {
           "arguments": [
             {
-              "module": "libs.c",
-              "type": "CFloat"
+              "type": "float"
             }
           ],
           "type": "Ptr"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: Material",
+        "name": "material",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Shader"
+            },
+            "name": "p_shader"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "MaterialMap"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "maps"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "4"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "params"
+          }
+        ],
+        "return_type": {
+          "type": "Material"
         }
       },
       {
@@ -21794,7 +22800,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Measure string width for default font",
@@ -21802,7 +22808,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -21821,7 +22828,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Measure string size for Font",
@@ -21835,7 +22842,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -21932,11 +22940,329 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Factory function for: Mesh",
+        "name": "mesh",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "vertex_count"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "triangle_count"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "vertices"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "texcoords"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "texcoords2"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "normals"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "tangents"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CUChar"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "colors"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CUShort"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "indices"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "anim_vertices"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "anim_normals"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CUChar"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "bone_ids"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "bone_weights"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "vao_id"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CUInt"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "vbo_id"
+          }
+        ],
+        "return_type": {
+          "type": "Mesh"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Set window state: minimized, if resizable (only PLATFORM_DESKTOP)",
         "name": "minimize_window",
         "parameters": [],
         "return_type": {
           "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: Model",
+        "name": "model",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Matrix"
+            },
+            "name": "p_transform"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "mesh_count"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "material_count"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Mesh"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "meshes"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Material"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "materials"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mesh_material"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "bone_count"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "BoneInfo"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "bones"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Transform"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "bind_pose"
+          }
+        ],
+        "return_type": {
+          "type": "Model"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: ModelAnimation",
+        "name": "model_animation",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "bone_count"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "frame_count"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "BoneInfo"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "bones"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "Transform"
+                    }
+                  ],
+                  "type": "Ptr"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "frame_poses"
+          }
+        ],
+        "return_type": {
+          "type": "ModelAnimation"
         }
       },
       {
@@ -22039,7 +23365,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Open URL with default system browser (if available)",
@@ -22047,7 +23373,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "url"
           }
@@ -22487,7 +23814,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Save data to file from byte array (write), returns true on success",
@@ -22495,7 +23822,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
@@ -22520,7 +23848,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Save text data to file (write), string must be '\\0' terminated, returns true on success",
@@ -22528,13 +23856,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -22585,6 +23915,50 @@
               "type": "int"
             },
             "name": "size"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Audio thread callback to request new data",
+        "name": "set_audio_stream_callback",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "AudioStream"
+            },
+            "name": "stream"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "AnyPtr"
+                    },
+                    {
+                      "module": "libs.c",
+                      "type": "CUint"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "callback"
           }
         ],
         "return_type": {
@@ -22676,7 +24050,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Set clipboard text content",
@@ -22684,7 +24058,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -22739,7 +24114,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Set internal gamepad mappings (SDL_GameControllerDB)",
@@ -22747,7 +24122,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "mappings"
           }
@@ -22771,6 +24147,97 @@
               "type": "u32"
             },
             "name": "flags"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Set custom file binary data loader",
+        "name": "set_load_file_data_callback",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "module": "libs.c",
+                      "type": "CStr"
+                    },
+                    {
+                      "arguments": [
+                        {
+                          "module": "libs.c",
+                          "type": "CUInt"
+                        }
+                      ],
+                      "type": "Ptr"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "arguments": [
+                    {
+                      "module": "libs.c",
+                      "type": "CStr"
+                    }
+                  ],
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "callback"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Set custom file text data loader",
+        "name": "set_load_file_text_callback",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "module": "libs.c",
+                      "type": "CStr"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "arguments": [
+                    {
+                      "module": "libs.c",
+                      "type": "CStr"
+                    }
+                  ],
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "callback"
           }
         ],
         "return_type": {
@@ -22817,7 +24284,7 @@
               ],
               "type": "Ptr"
             },
-            "name": "material"
+            "name": "p_material"
           },
           {
             "datatype": {
@@ -22855,7 +24322,7 @@
               ],
               "type": "Ptr"
             },
-            "name": "model"
+            "name": "p_model"
           },
           {
             "datatype": {
@@ -23118,6 +24585,97 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Set custom file binary data saver",
+        "name": "set_save_file_data_callback",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "module": "libs.c",
+                      "type": "CStr"
+                    },
+                    {
+                      "type": "AnyPtr"
+                    },
+                    {
+                      "module": "libs.c",
+                      "type": "CUInt"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "arguments": [
+                    {
+                      "type": "bool"
+                    }
+                  ],
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "callback"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Set custom file text data saver",
+        "name": "set_save_file_text_callback",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "module": "libs.c",
+                      "type": "CStr"
+                    },
+                    {
+                      "module": "libs.c",
+                      "type": "CStr"
+                    }
+                  ],
+                  "type": "In"
+                },
+                {
+                  "arguments": [
+                    {
+                      "type": "bool"
+                    }
+                  ],
+                  "type": "Out"
+                }
+              ],
+              "type": "Function"
+            },
+            "name": "callback"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Set shader uniform value",
         "name": "set_shader_value",
         "parameters": [
@@ -23125,7 +24683,7 @@
             "datatype": {
               "type": "Shader"
             },
-            "name": "shader"
+            "name": "p_shader"
           },
           {
             "datatype": {
@@ -23164,7 +24722,7 @@
             "datatype": {
               "type": "Shader"
             },
-            "name": "shader"
+            "name": "p_shader"
           },
           {
             "datatype": {
@@ -23197,7 +24755,7 @@
             "datatype": {
               "type": "Shader"
             },
-            "name": "shader"
+            "name": "p_shader"
           },
           {
             "datatype": {
@@ -23230,7 +24788,7 @@
             "datatype": {
               "type": "Shader"
             },
-            "name": "shader"
+            "name": "p_shader"
           },
           {
             "datatype": {
@@ -23666,7 +25224,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Set title for window (only PLATFORM_DESKTOP)",
@@ -23674,13 +25232,47 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "title"
           }
         ],
         "return_type": {
           "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: Shader",
+        "name": "shader",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "id"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "locs"
+          }
+        ],
+        "return_type": {
+          "type": "Shader"
         }
       },
       {
@@ -23805,7 +25397,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Takes a screenshot of current screen (filename extension defines format)",
@@ -23813,7 +25405,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -23826,7 +25419,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Append text at specific position and move cursor!",
@@ -23834,13 +25427,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "append"
           },
@@ -23865,7 +25460,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Copy one string to another, returns bytes copied",
@@ -23873,13 +25468,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "dst"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "src"
           }
@@ -23892,7 +25489,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Find first text occurrence within a string",
@@ -23900,13 +25497,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "find"
           }
@@ -23919,7 +25518,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Insert text in a position (WARNING: memory must be freed!)",
@@ -23927,13 +25526,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "insert"
           },
@@ -23953,7 +25554,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Check if two text string are equal",
@@ -23961,13 +25562,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text1"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text2"
           }
@@ -23980,7 +25583,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Join text strings with delimiter",
@@ -24016,31 +25619,22 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "delimiter"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get text length, checks for '\\0' ending",
@@ -24048,7 +25642,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -24061,7 +25656,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Replace text string (WARNING: memory must be freed!)",
@@ -24069,19 +25664,22 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "replace"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "by"
           }
@@ -24095,7 +25693,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Split text into multiple strings",
@@ -24103,7 +25701,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -24150,7 +25749,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get a piece of a text string",
@@ -24158,7 +25757,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -24176,25 +25776,15 @@
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get integer value from text (negative values not supported)",
@@ -24202,7 +25792,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -24215,7 +25806,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get lower case version of provided string",
@@ -24223,31 +25814,22 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get Pascal case notation version of provided string",
@@ -24255,31 +25837,22 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get upper case version of provided string",
@@ -24287,24 +25860,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -24610,7 +26174,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Unload file text data allocated by LoadFileText()",
@@ -24618,7 +26182,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -24767,7 +26332,7 @@
             "datatype": {
               "type": "Material"
             },
-            "name": "material"
+            "name": "p_material"
           }
         ],
         "return_type": {
@@ -24788,7 +26353,7 @@
             "datatype": {
               "type": "Mesh"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           }
         ],
         "return_type": {
@@ -24809,7 +26374,7 @@
             "datatype": {
               "type": "Model"
             },
-            "name": "model"
+            "name": "p_model"
           }
         ],
         "return_type": {
@@ -24925,7 +26490,7 @@
             "datatype": {
               "type": "Shader"
             },
-            "name": "shader"
+            "name": "p_shader"
           }
         ],
         "return_type": {
@@ -24978,7 +26543,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Unload UTF-8 text encoded from codepoints array",
@@ -24986,7 +26551,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -25051,8 +26617,7 @@
             "datatype": {
               "arguments": [
                 {
-                  "module": "libs.c",
-                  "type": "CFloat"
+                  "type": "float"
                 }
               ],
               "type": "Ptr"
@@ -25187,7 +26752,7 @@
             "datatype": {
               "type": "Mesh"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           },
           {
             "datatype": {
@@ -25232,7 +26797,7 @@
             "datatype": {
               "type": "Model"
             },
-            "name": "model"
+            "name": "p_model"
           },
           {
             "datatype": {
@@ -25384,7 +26949,7 @@
               ],
               "type": "Ptr"
             },
-            "name": "mesh"
+            "name": "p_mesh"
           },
           {
             "datatype": {
@@ -25494,6 +27059,224 @@
         ],
         "return_type": {
           "type": "Vector4"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: VrDeviceInfo",
+        "name": "vr_device_info",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "h_resolution"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "v_resolution"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "h_screen_size"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "v_screen_size"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "v_screen_center"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "eye_to_screen_distance"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "lens_separation_distance"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "interpupillary_distance"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "4"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "lens_distortion_values"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "4"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "chroma_ab_correction"
+          }
+        ],
+        "return_type": {
+          "type": "VrDeviceInfo"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: VrStereoConfig",
+        "name": "vr_stereo_config",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "projection"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "view_offset"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "left_lens_center"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "right_lens_center"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "left_screen_center"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "right_screen_center"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "scale"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "2"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "scale_in"
+          }
+        ],
+        "return_type": {
+          "type": "VrStereoConfig"
         }
       },
       {
@@ -29688,7 +31471,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Compile custom shader and return shader id (type: RL_VERTEX_SHADER, RL_FRAGMENT_SHADER, RL_COMPUTE_SHADER)",
@@ -29696,7 +31479,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "shader_code"
           },
@@ -30878,7 +32662,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get shader location attribute",
@@ -30892,7 +32676,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "attrib_name"
           }
@@ -30905,7 +32690,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get shader location uniform",
@@ -30919,7 +32704,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "uniform_name"
           }
@@ -31021,7 +32807,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get name string for pixel format",
@@ -31035,18 +32821,8 @@
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -31322,7 +33098,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load shader from code strings",
@@ -31330,13 +33106,15 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "vs_code"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "fs_code"
           }
@@ -31578,6 +33356,37 @@
               "type": "int"
             },
             "name": "mode"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Multiply the current matrix by another matrix",
+        "name": "rl_mult_matrixf",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "type": "float"
+                    }
+                  ],
+                  "type": "Const"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "matf"
           }
         ],
         "return_type": {
@@ -34494,7 +36303,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Button control, returns true when clicked",
@@ -34509,7 +36318,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -34522,7 +36332,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Check Box control, returns true when active",
@@ -34537,7 +36347,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -34556,7 +36367,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Color Bar Alpha control",
@@ -34571,7 +36382,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -34590,7 +36402,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Color Bar Hue control",
@@ -34605,7 +36417,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -34624,7 +36437,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Color Panel control",
@@ -34639,7 +36452,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -34660,7 +36474,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Color Picker control (multiple color controls)",
@@ -34675,7 +36489,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -34696,7 +36511,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Combo Box control, returns selected item index",
@@ -34711,7 +36526,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -34804,7 +36620,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Dropdown Box control, returns selected item",
@@ -34819,7 +36635,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -34850,7 +36667,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Dummy control for placeholders",
@@ -34865,7 +36682,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -35003,7 +36821,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Grid control, returns mouse cell position",
@@ -35018,7 +36836,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -35044,7 +36863,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Group Box control with text name",
@@ -35059,7 +36878,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -35072,7 +36892,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Get text with icon id prepended (if supported)",
@@ -35086,24 +36906,15 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
         ],
         "return_type": {
-          "arguments": [
-            {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CChar"
-                }
-              ],
-              "type": "Const"
-            }
-          ],
-          "type": "Ptr"
+          "module": "libs.c",
+          "type": "CStr"
         }
       },
       {
@@ -35124,7 +36935,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Label control, shows text",
@@ -35139,7 +36950,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -35152,7 +36964,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Label button control, show true when clicked",
@@ -35167,7 +36979,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -35180,7 +36993,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Line separator control, could contain text",
@@ -35195,7 +37008,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -35208,7 +37022,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " List View control, returns selected list item index",
@@ -35223,7 +37037,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -35334,7 +37149,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load raygui icons file (.rgi) into internal icons data",
@@ -35342,7 +37157,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           },
@@ -35372,7 +37188,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Load style file over global style variable (.rgs)",
@@ -35380,7 +37196,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "file_name"
           }
@@ -35421,7 +37238,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Message Box control, displays a message",
@@ -35436,19 +37253,22 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "title"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "message"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "buttons"
           }
@@ -35461,7 +37281,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Panel control, useful to group controls",
@@ -35476,7 +37296,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -35489,7 +37310,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Progress Bar control, shows current progress value",
@@ -35504,13 +37325,15 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text_left"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text_right"
           },
@@ -35541,7 +37364,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Scroll Panel control",
@@ -35556,7 +37379,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -35686,7 +37510,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Set tooltip string",
@@ -35694,7 +37518,8 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "tooltip"
           }
@@ -35707,7 +37532,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Slider control, returns selected value",
@@ -35722,13 +37547,15 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text_left"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text_right"
           },
@@ -35759,7 +37586,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Slider Bar control, returns selected value",
@@ -35774,13 +37601,15 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text_left"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text_right"
           },
@@ -35811,7 +37640,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Spinner control, returns selected value",
@@ -35826,7 +37655,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -35869,7 +37699,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Status Bar control, shows info text",
@@ -35884,7 +37714,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           }
@@ -35992,7 +37823,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Text Box control, updates input text",
@@ -36007,7 +37838,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -36032,7 +37864,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Text Box control with multiple lines",
@@ -36047,7 +37879,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -36072,7 +37905,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Text Input Box control, ask for text, supports secret",
@@ -36087,25 +37920,29 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "title"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "message"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "buttons"
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -36136,7 +37973,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Toggle Button control, returns true when active",
@@ -36151,7 +37988,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -36170,7 +38008,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Toggle Group control, returns active toggle index",
@@ -36185,7 +38023,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -36218,7 +38057,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Value Box control, updates input text with numbers",
@@ -36233,7 +38072,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "text"
           },
@@ -36276,7 +38116,7 @@
         "annotations": [
           {
             "argument": "",
-            "name": "@native"
+            "name": "@nativemacro"
           }
         ],
         "comment": " Window Box control, shows a window that can be closed",
@@ -36291,7 +38131,8 @@
           },
           {
             "datatype": {
-              "type": "str"
+              "module": "libs.c",
+              "type": "CStr"
             },
             "name": "title"
           }
@@ -40251,10 +42092,28 @@
           {
             "argument": "float16",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": "",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "16"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "v"
+          }
+        ],
         "name": "float16"
       },
       {
@@ -40262,10 +42121,28 @@
           {
             "argument": "float3",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " NOTE: Helper types to be used instead of array return types for *ToFloat functions",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "3"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "v"
+          }
+        ],
         "name": "float3"
       }
     ],
@@ -40301,6 +42178,64 @@
         ],
         "return_type": {
           "type": "float"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: float16",
+        "name": "create_float16",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "16"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "v"
+          }
+        ],
+        "return_type": {
+          "type": "float16"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: float3",
+        "name": "create_float3",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "f32"
+                },
+                {
+                  "type": "3"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "v"
+          }
+        ],
+        "return_type": {
+          "type": "float3"
         }
       },
       {
@@ -40888,7 +42823,6 @@
           }
         ],
         "return_type": {
-          "module": "raylib",
           "type": "float16"
         }
       },
@@ -41580,8 +43514,7 @@
             "datatype": {
               "arguments": [
                 {
-                  "module": "libs.c",
-                  "type": "CFloat"
+                  "type": "float"
                 }
               ],
               "type": "Ptr"
@@ -42595,7 +44528,7 @@
               "module": "raylib",
               "type": "Vector3"
             },
-            "name": "c_arg"
+            "name": "c"
           }
         ],
         "return_type": {
@@ -43416,7 +45349,6 @@
           }
         ],
         "return_type": {
-          "module": "raylib",
           "type": "float3"
         }
       },
