@@ -3,24 +3,22 @@ runtimefeature "raylib"
 import libs.c
 import raylib as rl
 
-@onstack
 @nativedefine("float3")
-class float3:
+struct float3:
     # NOTE: Helper types to be used instead of array return types for *ToFloat functions
     v: FixedArr[f32,3]
 
 @nativemacro
-def float3(v: FixedArr[f32,3]) -> float3:
+def create_float3(v: FixedArr[f32,3]) -> float3:
     # Factory function for: float3
     ccode """(float3){nn__v}"""
 
-@onstack
 @nativedefine("float16")
-class float16:
+struct float16:
     v: FixedArr[f32,16]
 
 @nativemacro
-def float16(v: FixedArr[f32,16]) -> float16:
+def create_float16(v: FixedArr[f32,16]) -> float16:
     # Factory function for: float16
     ccode """(float16){nn__v}"""
 
@@ -273,7 +271,7 @@ def vector3_unproject(source: rl.Vector3, projection: rl.Matrix, view: rl.Matrix
     ccode """Vector3Unproject(nn__source, nn__projection, nn__view)"""
 
 @nativemacro
-def vector3_to_float_v(v: rl.Vector3) -> rl.float3:
+def vector3_to_float_v(v: rl.Vector3) -> float3:
     ccode """Vector3ToFloatV(nn__v)"""
 
 @nativemacro
@@ -377,7 +375,7 @@ def matrix_look_at(eye: rl.Vector3, target: rl.Vector3, up: rl.Vector3) -> rl.Ma
     ccode """MatrixLookAt(nn__eye, nn__target, nn__up)"""
 
 @nativemacro
-def matrix_to_float_v(mat: rl.Matrix) -> rl.float16:
+def matrix_to_float_v(mat: rl.Matrix) -> float16:
     ccode """MatrixToFloatV(nn__mat)"""
 
 @nativemacro

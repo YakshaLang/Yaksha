@@ -361,9 +361,8 @@ ICON_252: Const[int] = 252
 ICON_253: Const[int] = 253
 ICON_254: Const[int] = 254
 ICON_255: Const[int] = 255
-@onstack
 @nativedefine("GuiStyleProp")
-class GuiStyleProp:
+struct GuiStyleProp:
     # Style property
     controlId: c.CUShort
     propertyId: c.CUShort

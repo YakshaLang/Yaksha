@@ -306,8 +306,11 @@ def macro_field(f: dict) -> str:
 
 def create_macro_factory(s: dict) -> Optional[Code]:
     c = Code()
+    original_name = s["name"]
     name: str = s["name"]
     name = underscore(name)
+    if name == original_name:
+        name = "create_" + name
     c.append("@nativemacro").newline()
     c.append("def ").append(name).append("(")
     for i, field in enumerate(s["fields"]):
@@ -393,9 +396,8 @@ def convert_structure(s: dict) -> bool:
         # print(Colors.fail(f"{name} is redefined"))
         return False
     comment = s["description"]
-    c.append("@onstack").newline()
     c.append("@nativedefine(\"").append(name).append("\")").newline()
-    c.append("class ").append(name).append(":").newline().indent()
+    c.append("struct ").append(name).append(":").newline().indent()
     if comment:
         c.comment(comment).newline()
     for field in s["fields"]:
@@ -461,6 +463,12 @@ def get_func_data_type(typ) -> Optional[str]:
         return "Const[" + PREFIX + typ[6:] + "]"
     return None
 
+def fix_return_type(typ: str) -> str:
+    if typ == "rl.float3":
+        return "float3"
+    if typ == "rl.float16":
+        return "float16"
+    return typ
 
 def create_macro_function(s: dict) -> Optional[Code]:
     c = Code()
@@ -472,6 +480,7 @@ def create_macro_function(s: dict) -> Optional[Code]:
     if not rtype:
         CANNOT_CONVERT.add(s["returnType"])
         return None
+    rtype = fix_return_type(rtype)
     for i, field in enumerate(s.get("params", [])):
         typ = field["type"]
         fname = underscore(field["name"])
@@ -514,6 +523,7 @@ def create_native_function(s: dict) -> Optional[Code]:
     if not rtype:
         CANNOT_CONVERT.add(s["returnType"])
         return None
+    rtype = fix_return_type(rtype)
     actual_return_type = rtype
     if rtype == "str":
         actual_return_type = R_DT[s["returnType"]]

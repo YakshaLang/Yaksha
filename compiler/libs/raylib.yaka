@@ -603,9 +603,8 @@ class RAudioBufferPtr:
 class RAudioProcessorPtr:
     pass
 
-@onstack
 @nativedefine("Vector2")
-class Vector2:
+struct Vector2:
     # Vector2, 2 components
     x: float
     y: float
@@ -615,9 +614,8 @@ def vector2(x: float, y: float) -> Vector2:
     # Factory function for: Vector2
     ccode """(Vector2){nn__x, nn__y}"""
 
-@onstack
 @nativedefine("Vector3")
-class Vector3:
+struct Vector3:
     # Vector3, 3 components
     x: float
     y: float
@@ -628,9 +626,8 @@ def vector3(x: float, y: float, z: float) -> Vector3:
     # Factory function for: Vector3
     ccode """(Vector3){nn__x, nn__y, nn__z}"""
 
-@onstack
 @nativedefine("Vector4")
-class Vector4:
+struct Vector4:
     # Vector4, 4 components
     x: float
     y: float
@@ -642,9 +639,8 @@ def vector4(x: float, y: float, z: float, w: float) -> Vector4:
     # Factory function for: Vector4
     ccode """(Vector4){nn__x, nn__y, nn__z, nn__w}"""
 
-@onstack
 @nativedefine("Matrix")
-class Matrix:
+struct Matrix:
     # Matrix, 4x4 components, column major, OpenGL style, right-handed
     m0: float
     m4: float
@@ -668,9 +664,8 @@ def matrix(m0: float, m4: float, m8: float, m12: float, m1: float, m5: float, m9
     # Factory function for: Matrix
     ccode """(Matrix){nn__m0, nn__m4, nn__m8, nn__m12, nn__m1, nn__m5, nn__m9, nn__m13, nn__m2, nn__m6, nn__m10, nn__m14, nn__m3, nn__m7, nn__m11, nn__m15}"""
 
-@onstack
 @nativedefine("Color")
-class Color:
+struct Color:
     # Color, 4 components, R8G8B8A8 (32bit)
     r: c.CUChar
     g: c.CUChar
@@ -682,9 +677,8 @@ def color(r: int, g: int, b: int, a: int) -> Color:
     # Factory function for: Color
     ccode """(Color){(unsigned char)nn__r, (unsigned char)nn__g, (unsigned char)nn__b, (unsigned char)nn__a}"""
 
-@onstack
 @nativedefine("Rectangle")
-class Rectangle:
+struct Rectangle:
     # Rectangle, 4 components
     x: float
     y: float
@@ -696,9 +690,8 @@ def rectangle(x: float, y: float, width: float, height: float) -> Rectangle:
     # Factory function for: Rectangle
     ccode """(Rectangle){nn__x, nn__y, nn__width, nn__height}"""
 
-@onstack
 @nativedefine("Image")
-class Image:
+struct Image:
     # Image, pixel data stored in CPU memory (RAM)
     data: AnyPtr
     width: c.CInt
@@ -711,9 +704,8 @@ def image(data: AnyPtr, width: int, height: int, mipmaps: int, format: int) -> I
     # Factory function for: Image
     ccode """(Image){nn__data, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
 
-@onstack
 @nativedefine("Texture")
-class Texture:
+struct Texture:
     # Texture, tex data stored in GPU memory (VRAM)
     id: c.CUInt
     width: c.CInt
@@ -726,9 +718,8 @@ def texture(id: u32, width: int, height: int, mipmaps: int, format: int) -> Text
     # Factory function for: Texture
     ccode """(Texture){(unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
 
-@onstack
 @nativedefine("RenderTexture")
-class RenderTexture:
+struct RenderTexture:
     # RenderTexture, fbo for texture rendering
     id: c.CUInt
     texture: Texture
@@ -739,9 +730,8 @@ def render_texture(id: u32, p_texture: Texture, depth: Texture) -> RenderTexture
     # Factory function for: RenderTexture
     ccode """(RenderTexture){(unsigned int)nn__id, nn__p_texture, nn__depth}"""
 
-@onstack
 @nativedefine("NPatchInfo")
-class NPatchInfo:
+struct NPatchInfo:
     # NPatchInfo, n-patch layout info
     source: Rectangle
     left: c.CInt
@@ -755,9 +745,8 @@ def n_patch_info(source: Rectangle, left: int, top: int, right: int, bottom: int
     # Factory function for: NPatchInfo
     ccode """(NPatchInfo){nn__source, (int)nn__left, (int)nn__top, (int)nn__right, (int)nn__bottom, (int)nn__layout}"""
 
-@onstack
 @nativedefine("GlyphInfo")
-class GlyphInfo:
+struct GlyphInfo:
     # GlyphInfo, font characters glyphs info
     value: c.CInt
     offsetX: c.CInt
@@ -770,9 +759,8 @@ def glyph_info(value: int, offset_x: int, offset_y: int, advance_x: int, p_image
     # Factory function for: GlyphInfo
     ccode """(GlyphInfo){(int)nn__value, (int)nn__offset_x, (int)nn__offset_y, (int)nn__advance_x, nn__p_image}"""
 
-@onstack
 @nativedefine("Font")
-class Font:
+struct Font:
     # Font, font texture and GlyphInfo array data
     baseSize: c.CInt
     glyphCount: c.CInt
@@ -786,9 +774,8 @@ def font(base_size: int, glyph_count: int, glyph_padding: int, p_texture: Textur
     # Factory function for: Font
     ccode """(Font){(int)nn__base_size, (int)nn__glyph_count, (int)nn__glyph_padding, nn__p_texture, nn__recs, nn__glyphs}"""
 
-@onstack
 @nativedefine("Camera3D")
-class Camera3D:
+struct Camera3D:
     # Camera, defines position/orientation in 3d space
     position: Vector3
     target: Vector3
@@ -801,9 +788,8 @@ def camera_3d(position: Vector3, target: Vector3, up: Vector3, fovy: float, proj
     # Factory function for: Camera3D
     ccode """(Camera3D){nn__position, nn__target, nn__up, nn__fovy, (int)nn__projection}"""
 
-@onstack
 @nativedefine("Camera2D")
-class Camera2D:
+struct Camera2D:
     # Camera2D, defines position/orientation in 2d space
     offset: Vector2
     target: Vector2
@@ -815,9 +801,8 @@ def camera_2d(offset: Vector2, target: Vector2, rotation: float, zoom: float) ->
     # Factory function for: Camera2D
     ccode """(Camera2D){nn__offset, nn__target, nn__rotation, nn__zoom}"""
 
-@onstack
 @nativedefine("Mesh")
-class Mesh:
+struct Mesh:
     # Mesh, vertex data and vao/vbo
     vertexCount: c.CInt
     triangleCount: c.CInt
@@ -840,9 +825,8 @@ def mesh(vertex_count: int, triangle_count: int, vertices: Ptr[float], texcoords
     # Factory function for: Mesh
     ccode """(Mesh){(int)nn__vertex_count, (int)nn__triangle_count, nn__vertices, nn__texcoords, nn__texcoords2, nn__normals, nn__tangents, nn__colors, nn__indices, nn__anim_vertices, nn__anim_normals, nn__bone_ids, nn__bone_weights, (unsigned int)nn__vao_id, nn__vbo_id}"""
 
-@onstack
 @nativedefine("Shader")
-class Shader:
+struct Shader:
     # Shader
     id: c.CUInt
     locs: Ptr[c.CInt]
@@ -852,9 +836,8 @@ def shader(id: u32, locs: Ptr[c.CInt]) -> Shader:
     # Factory function for: Shader
     ccode """(Shader){(unsigned int)nn__id, nn__locs}"""
 
-@onstack
 @nativedefine("MaterialMap")
-class MaterialMap:
+struct MaterialMap:
     # MaterialMap
     texture: Texture2D
     color: Color
@@ -865,9 +848,8 @@ def material_map(p_texture: Texture2D, p_color: Color, value: float) -> Material
     # Factory function for: MaterialMap
     ccode """(MaterialMap){nn__p_texture, nn__p_color, nn__value}"""
 
-@onstack
 @nativedefine("Material")
-class Material:
+struct Material:
     # Material, includes shader and maps
     shader: Shader
     maps: Ptr[MaterialMap]
@@ -878,9 +860,8 @@ def material(p_shader: Shader, maps: Ptr[MaterialMap], params: FixedArr[f32,4]) 
     # Factory function for: Material
     ccode """(Material){nn__p_shader, nn__maps, nn__params}"""
 
-@onstack
 @nativedefine("Transform")
-class Transform:
+struct Transform:
     # Transform, vertex transformation data
     translation: Vector3
     rotation: Quaternion
@@ -891,9 +872,8 @@ def transform(translation: Vector3, rotation: Quaternion, scale: Vector3) -> Tra
     # Factory function for: Transform
     ccode """(Transform){nn__translation, nn__rotation, nn__scale}"""
 
-@onstack
 @nativedefine("BoneInfo")
-class BoneInfo:
+struct BoneInfo:
     # Bone, skeletal animation bone
     name: FixedArr[c.CChar,32]
     parent: c.CInt
@@ -903,9 +883,8 @@ def bone_info(name: FixedArr[c.CChar,32], parent: int) -> BoneInfo:
     # Factory function for: BoneInfo
     ccode """(BoneInfo){nn__name, (int)nn__parent}"""
 
-@onstack
 @nativedefine("Model")
-class Model:
+struct Model:
     # Model, meshes, materials and animation data
     transform: Matrix
     meshCount: c.CInt
@@ -922,9 +901,8 @@ def model(p_transform: Matrix, mesh_count: int, material_count: int, meshes: Ptr
     # Factory function for: Model
     ccode """(Model){nn__p_transform, (int)nn__mesh_count, (int)nn__material_count, nn__meshes, nn__materials, nn__mesh_material, (int)nn__bone_count, nn__bones, nn__bind_pose}"""
 
-@onstack
 @nativedefine("ModelAnimation")
-class ModelAnimation:
+struct ModelAnimation:
     # ModelAnimation
     boneCount: c.CInt
     frameCount: c.CInt
@@ -936,9 +914,8 @@ def model_animation(bone_count: int, frame_count: int, bones: Ptr[BoneInfo], fra
     # Factory function for: ModelAnimation
     ccode """(ModelAnimation){(int)nn__bone_count, (int)nn__frame_count, nn__bones, nn__frame_poses}"""
 
-@onstack
 @nativedefine("Ray")
-class Ray:
+struct Ray:
     # Ray, ray for raycasting
     position: Vector3
     direction: Vector3
@@ -948,9 +925,8 @@ def ray(position: Vector3, direction: Vector3) -> Ray:
     # Factory function for: Ray
     ccode """(Ray){nn__position, nn__direction}"""
 
-@onstack
 @nativedefine("RayCollision")
-class RayCollision:
+struct RayCollision:
     # RayCollision, ray hit information
     hit: bool
     distance: float
@@ -962,9 +938,8 @@ def ray_collision(hit: bool, distance: float, point: Vector3, normal: Vector3) -
     # Factory function for: RayCollision
     ccode """(RayCollision){nn__hit, nn__distance, nn__point, nn__normal}"""
 
-@onstack
 @nativedefine("BoundingBox")
-class BoundingBox:
+struct BoundingBox:
     # BoundingBox
     min: Vector3
     max: Vector3
@@ -974,9 +949,8 @@ def bounding_box(min: Vector3, max: Vector3) -> BoundingBox:
     # Factory function for: BoundingBox
     ccode """(BoundingBox){nn__min, nn__max}"""
 
-@onstack
 @nativedefine("Wave")
-class Wave:
+struct Wave:
     # Wave, audio wave data
     frameCount: c.CUInt
     sampleRate: c.CUInt
@@ -989,9 +963,8 @@ def wave(frame_count: u32, sample_rate: u32, sample_size: u32, channels: u32, da
     # Factory function for: Wave
     ccode """(Wave){(unsigned int)nn__frame_count, (unsigned int)nn__sample_rate, (unsigned int)nn__sample_size, (unsigned int)nn__channels, nn__data}"""
 
-@onstack
 @nativedefine("AudioStream")
-class AudioStream:
+struct AudioStream:
     # AudioStream, custom audio stream
     buffer: RAudioBufferPtr
     processor: RAudioProcessorPtr
@@ -1004,9 +977,8 @@ def audio_stream(buffer: RAudioBufferPtr, processor: RAudioProcessorPtr, sample_
     # Factory function for: AudioStream
     ccode """(AudioStream){nn__buffer, nn__processor, (unsigned int)nn__sample_rate, (unsigned int)nn__sample_size, (unsigned int)nn__channels}"""
 
-@onstack
 @nativedefine("Sound")
-class Sound:
+struct Sound:
     # Sound
     stream: AudioStream
     frameCount: c.CUInt
@@ -1016,9 +988,8 @@ def sound(stream: AudioStream, frame_count: u32) -> Sound:
     # Factory function for: Sound
     ccode """(Sound){nn__stream, (unsigned int)nn__frame_count}"""
 
-@onstack
 @nativedefine("Music")
-class Music:
+struct Music:
     # Music, audio stream, anything longer than ~10 seconds should be streamed
     stream: AudioStream
     frameCount: c.CUInt
@@ -1031,9 +1002,8 @@ def music(stream: AudioStream, frame_count: u32, looping: bool, ctx_type: int, c
     # Factory function for: Music
     ccode """(Music){nn__stream, (unsigned int)nn__frame_count, nn__looping, (int)nn__ctx_type, nn__ctx_data}"""
 
-@onstack
 @nativedefine("VrDeviceInfo")
-class VrDeviceInfo:
+struct VrDeviceInfo:
     # VrDeviceInfo, Head-Mounted-Display device parameters
     hResolution: c.CInt
     vResolution: c.CInt
@@ -1051,9 +1021,8 @@ def vr_device_info(h_resolution: int, v_resolution: int, h_screen_size: float, v
     # Factory function for: VrDeviceInfo
     ccode """(VrDeviceInfo){(int)nn__h_resolution, (int)nn__v_resolution, nn__h_screen_size, nn__v_screen_size, nn__v_screen_center, nn__eye_to_screen_distance, nn__lens_separation_distance, nn__interpupillary_distance, nn__lens_distortion_values, nn__chroma_ab_correction}"""
 
-@onstack
 @nativedefine("VrStereoConfig")
-class VrStereoConfig:
+struct VrStereoConfig:
     # VrStereoConfig, VR stereo rendering configuration for simulator
     projection: FixedArr[f32,2]
     viewOffset: FixedArr[f32,2]
@@ -1069,9 +1038,8 @@ def vr_stereo_config(projection: FixedArr[f32,2], view_offset: FixedArr[f32,2], 
     # Factory function for: VrStereoConfig
     ccode """(VrStereoConfig){nn__projection, nn__view_offset, nn__left_lens_center, nn__right_lens_center, nn__left_screen_center, nn__right_screen_center, nn__scale, nn__scale_in}"""
 
-@onstack
 @nativedefine("FilePathList")
-class FilePathList:
+struct FilePathList:
     # File path list
     capacity: c.CUInt
     count: c.CUInt
@@ -1082,9 +1050,8 @@ def file_path_list(capacity: u32, count: u32, paths: Ptr[Ptr[c.CChar]]) -> FileP
     # Factory function for: FilePathList
     ccode """(FilePathList){(unsigned int)nn__capacity, (unsigned int)nn__count, nn__paths}"""
 
-@onstack
 @nativedefine("Quaternion")
-class Quaternion:
+struct Quaternion:
     # Quaternion, 4 components (Vector4 alias)
     x: float
     y: float
@@ -1096,9 +1063,8 @@ def quaternion(x: float, y: float, z: float, w: float) -> Quaternion:
     # Factory function for: Quaternion
     ccode """(Quaternion){nn__x, nn__y, nn__z, nn__w}"""
 
-@onstack
 @nativedefine("Texture2D")
-class Texture2D:
+struct Texture2D:
     # Texture2D, same as Texture
     id: c.CUInt
     width: c.CInt
@@ -1111,9 +1077,8 @@ def texture_2d(id: u32, width: int, height: int, mipmaps: int, format: int) -> T
     # Factory function for: Texture2D
     ccode """(Texture2D){(unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
 
-@onstack
 @nativedefine("TextureCubemap")
-class TextureCubemap:
+struct TextureCubemap:
     # TextureCubemap, same as Texture
     id: c.CUInt
     width: c.CInt
@@ -1126,9 +1091,8 @@ def texture_cubemap(id: u32, width: int, height: int, mipmaps: int, format: int)
     # Factory function for: TextureCubemap
     ccode """(TextureCubemap){(unsigned int)nn__id, (int)nn__width, (int)nn__height, (int)nn__mipmaps, (int)nn__format}"""
 
-@onstack
 @nativedefine("RenderTexture2D")
-class RenderTexture2D:
+struct RenderTexture2D:
     # RenderTexture2D, same as RenderTexture
     id: c.CUInt
     p_texture: Texture
@@ -1139,9 +1103,8 @@ def render_texture_2d(id: u32, p_texture: Texture, depth: Texture) -> RenderText
     # Factory function for: RenderTexture2D
     ccode """(RenderTexture2D){(unsigned int)nn__id, nn__p_texture, nn__depth}"""
 
-@onstack
 @nativedefine("Camera")
-class Camera:
+struct Camera:
     # Camera type fallback, defaults to Camera3D
     position: Vector3
     target: Vector3

@@ -220,9 +220,8 @@ class rlVertexBuffer:
     # Dynamic vertex buffers (position + texcoords + colors + indices arrays)
     pass
 
-@onstack
 @nativedefine("rlDrawCall")
-class rlDrawCall:
+struct rlDrawCall:
     # of those state-change happens (this is done in core module)
     mode: c.CInt
     vertexCount: c.CInt
@@ -234,9 +233,8 @@ def rl_draw_call(mode: int, vertex_count: int, vertex_alignment: int, texture_id
     # Factory function for: rlDrawCall
     ccode """(rlDrawCall){(int)nn__mode, (int)nn__vertex_count, (int)nn__vertex_alignment, (unsigned int)nn__texture_id}"""
 
-@onstack
 @nativedefine("rlRenderBatch")
-class rlRenderBatch:
+struct rlRenderBatch:
     # rlRenderBatch type
     bufferCount: c.CInt
     currentBuffer: c.CInt
