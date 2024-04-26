@@ -450,7 +450,7 @@ def get_func_data_type(typ) -> Optional[str]:
     elif typ in F_DT:
         return F_DT[typ]["t"]
     elif typ in S_DT_MUST_PREFIX:
-        PREFIX + S_DT[typ]
+        return PREFIX + S_DT[typ]
     elif typ in S_DT:
         return S_DT[typ]
     elif typ.endswith(" *") and typ[:-2] in KNOWN_STRUCTURES:
