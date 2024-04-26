@@ -28,12 +28,6 @@ macros! {
     # c.char!{"a"} --> create a char --> inlinec("Const[Char]", "'a'")
 }
 
-@nativedefine("void*")
-class VoidPtr:
-    # Any pointer type
-    # void* in C
-    pass
-
 @nativedefine("size_t")
 class Size:
     # size_t in C code
@@ -101,19 +95,19 @@ class CFloat:
     pass
 
 @nativedefine("free")
-def free(ptr: VoidPtr) -> None:
+def free(ptr: AnyPtr) -> None:
     pass
 
 @nativedefine("calloc")
-def calloc(n: Size, size: Size) -> VoidPtr:
+def calloc(n: Size, size: Size) -> AnyPtr:
     pass
 
 @nativedefine("realloc")
-def realloc(ptr: VoidPtr, size: Size) -> VoidPtr:
+def realloc(ptr: AnyPtr, size: Size) -> AnyPtr:
     pass
 
 @nativedefine("malloc")
-def malloc(size: Size) -> VoidPtr:
+def malloc(size: Size) -> AnyPtr:
     pass
 
 @nativemacro("((size_t)nn__i)")
@@ -208,19 +202,19 @@ def fmod(x: CDouble, y: CDouble) -> CDouble:
     pass
 
 @nativedefine("memcpy")
-def memcpy(dest: VoidPtr, src: VoidPtr, size: Size) -> VoidPtr:
+def memcpy(dest: AnyPtr, src: AnyPtr, size: Size) -> AnyPtr:
     pass
 
 @nativedefine("memmove")
-def memmove(dest: VoidPtr, src: VoidPtr, size: Size) -> VoidPtr:
+def memmove(dest: AnyPtr, src: AnyPtr, size: Size) -> AnyPtr:
     pass
 
 @nativedefine("memset")
-def memset(dest: VoidPtr, character: CInt, size: Size) -> VoidPtr:
+def memset(dest: AnyPtr, character: CInt, size: Size) -> AnyPtr:
     pass
 
 @nativedefine("memcmp")
-def memcmp(str1: VoidPtr, str2: VoidPtr, size: Size) -> CInt:
+def memcmp(str1: AnyPtr, str2: AnyPtr, size: Size) -> CInt:
     pass
 
 @nativedefine("strlen")

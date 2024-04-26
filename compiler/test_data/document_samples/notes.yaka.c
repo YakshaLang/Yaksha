@@ -95,7 +95,6 @@ UINT8_C(0x63), UINT8_C(0x64), UINT8_C(0x65), UINT8_C(0x66),
 UINT8_C(0x67), UINT8_C(0x61), UINT8_C(0x62), UINT8_C(0x52),
 UINT8_C(0x23), UINT8_C(0x30)
 };
-#define yy__c_VoidPtr void*
 #define yy__c_Size size_t
 #define yy__c_calloc calloc
 #define yy__w4_set_draw_colors(nn__value) *((uint16_t*)0x14) = nn__value
