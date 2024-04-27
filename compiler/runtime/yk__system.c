@@ -397,15 +397,14 @@ char *yk__windows_read_file(const char *path, size_t *length, int *error) {
   return buffer;
 }
 #endif
-yk__sds yk__io_readfile(yk__sds name) {
+yk__sds yk__io_readfile(struct yk__bstr name) {
   size_t ln;
   int err;
 #if defined(_WIN32) || defined(_WIN64)
-  char *out = yk__windows_read_file(name, &ln, &err);
+  char *out = yk__windows_read_file(yk__bstr_get_reference(name), &ln, &err);
 #else
-  char *out = yk__bhalib_read_file(name, &ln, &err);
+  char *out = yk__bhalib_read_file(yk__bstr_get_reference(name), &ln, &err);
 #endif
-  yk__sdsfree(name);// clean up filename as it will be copied
   if (err == 0) {
     yk__sds tmp = yk__sdsnewlen(out, ln);
     yk__bhalib_free(out);
@@ -413,12 +412,10 @@ yk__sds yk__io_readfile(yk__sds name) {
   }
   return yk__sdsempty();
 }
-bool yk__io_writefile(yk__sds fpath, yk__sds data) {
+bool yk__io_writefile(struct yk__bstr fpath, struct yk__bstr data) {
 #if defined(_WIN32) || defined(_WIN64)
-  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(fpath);
+  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(yk__bstr_get_reference(fpath));
   if (wpath == NULL) {
-    yk__sdsfree(fpath);
-    yk__sdsfree(data);
     return false;
   }
 #if defined(_MSC_VER)// MSVC
@@ -427,34 +424,26 @@ bool yk__io_writefile(yk__sds fpath, yk__sds data) {
   if (0 != openerr) {
     if (NULL != file) { fclose(file); }
     free(wpath);
-    yk__sdsfree(fpath);
-    yk__sdsfree(data);
     return false;
   }
 #else // GCC, MingW, etc
   FILE *file = _wfopen(wpath, L"wb+");
   if (file == NULL) {
     free(wpath);
-    yk__sdsfree(fpath);
-    yk__sdsfree(data);
     return false;
   }
 #endif// msvc check
 #else // not windows
-  FILE *file = fopen(fpath, "wb+");
+  FILE *file = fopen(yk__bstr_get_reference(fpath), "wb+");
   if (file == NULL) {
-    yk__sdsfree(fpath);
-    yk__sdsfree(data);
     return false;
   }
 #endif// unix / windows check
-  size_t written = fwrite(data, sizeof(char), yk__sdslen(data), file);
-  bool fully_written = (written == yk__sdslen(data));
+  size_t written = fwrite(yk__bstr_get_reference(data), sizeof(char), yk__bstr_len(data), file);
+  bool fully_written = (written == yk__bstr_len(data));
 #if defined(_WIN32) || defined(_WIN64)
   free(wpath);
 #endif
-  yk__sdsfree(fpath);
-  yk__sdsfree(data);
   fclose(file);
   return fully_written;
 }

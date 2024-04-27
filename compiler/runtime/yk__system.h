@@ -28,8 +28,8 @@ bool yk__writable(yk__sds path);
 bool yk__executable(yk__sds path);
 bool yk__mkdir(yk__sds path);
 yk__sds yk__getenv(yk__sds name);
-yk__sds yk__io_readfile(yk__sds name);
-bool yk__io_writefile(yk__sds name, yk__sds data);
+yk__sds yk__io_readfile(struct yk__bstr name);
+bool yk__io_writefile(struct yk__bstr name, struct yk__bstr data);
 #if defined(_WIN32) || defined(_WIN64)
 wchar_t *yk__utf8_to_utf16_null_terminated(const char *str);
 char *yk__utf16_to_utf8_null_terminated(const wchar_t *str);

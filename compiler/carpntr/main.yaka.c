@@ -135,8 +135,8 @@ void yy__console_red(struct yk__bstr);
 void yy__console_green(struct yk__bstr);
 void yy__console_yellow(struct yk__bstr);
 void yy__console_cyan(struct yk__bstr);
-yk__sds yy__io_readfile(yk__sds);
-bool yy__io_writefile(yk__sds, yk__sds);
+yk__sds yy__io_readfile(struct yk__bstr);
+bool yy__io_writefile(struct yk__bstr, struct yk__bstr);
 yy__toml_Table yy__toml_from_str(struct yk__bstr);
 yy__toml_Table yy__toml_get_table(yy__toml_Table, struct yk__bstr);
 yy__toml_TomlArray yy__toml_get_array(yy__toml_Table, struct yk__bstr);
@@ -1815,7 +1815,7 @@ int32_t yy__building_build(struct yy__configuration_Config* yy__building_c, yk__
     yk__sds t__83 = yy__path_join(yk__bstr_h(yy__building_build_path), yk__bstr_s("program_code.c", 14));
     yk__sds yy__building_code_path = yk__sdsdup(t__83);
     yk__sds t__84 = yy__building_prepare_code(yy__building_c, yk__sdsdup(yy__building_code));
-    if (!(yy__io_writefile(yk__sdsdup(yy__building_code_path), yk__sdsdup(t__84))))
+    if (!(yy__io_writefile(yk__bstr_h(yy__building_code_path), yk__bstr_h(t__84))))
     {
         yy__console_red(yk__bstr_s("Failed to write file:", 21));
         yk__printlnstr(yy__building_code_path);
@@ -1914,7 +1914,7 @@ int32_t yy__building_build_simple(struct yy__configuration_Config* yy__building_
         yy__building_target = yk__sdsnewlen("web", 3);
     }
     yk__sds t__96 = yy__building_prepare_code(yy__building_c, yk__sdsdup(yy__building_code));
-    if (!(yy__io_writefile(yk__sdsdup(yy__building_code_path), yk__sdsdup(t__96))))
+    if (!(yy__io_writefile(yk__bstr_h(yy__building_code_path), yk__bstr_h(t__96))))
     {
         yy__console_red(yk__bstr_s("Failed to write file:", 21));
         yk__printlnstr(yy__building_code_path);
@@ -2669,7 +2669,7 @@ struct yy__configuration_Config* yy__configuration_load_config()
     yk__sds t__80 = yy__os_cwd();
     yk__sds t__81 = yy__path_join(yk__bstr_h(t__80), yk__bstr_s("yaksha.toml", 11));
     yk__sds yy__configuration_configf = yk__sdsdup(t__81);
-    yk__sds t__82 = yy__io_readfile(yk__sdsdup(yy__configuration_configf));
+    yk__sds t__82 = yy__io_readfile(yk__bstr_h(yy__configuration_configf));
     yk__sds yy__configuration_config_text = yk__sdsdup(t__82);
     yy__toml_Table yy__configuration_conf = yy__toml_from_str(yk__bstr_h(yy__configuration_config_text));
     if (!(yy__toml_valid_table(yy__configuration_conf)))
@@ -3016,8 +3016,8 @@ void yy__console_cyan(struct yk__bstr yy__console_x)
     yy__console_color_print(INT32_C(7), yy__console_x);
     return;
 }
-yk__sds yy__io_readfile(yk__sds nn__fname) { return yk__io_readfile(nn__fname); }
-bool yy__io_writefile(yk__sds nn__fname, yk__sds nn__data) { return yk__io_writefile(nn__fname, nn__data); }
+yk__sds yy__io_readfile(struct yk__bstr nn__fname) { return yk__io_readfile(nn__fname); }
+bool yy__io_writefile(struct yk__bstr nn__fname, struct yk__bstr nn__data) { return yk__io_writefile(nn__fname, nn__data); }
 yy__toml_Table yy__toml_from_str(struct yk__bstr nn__x) 
 {
     char errbuf[200];

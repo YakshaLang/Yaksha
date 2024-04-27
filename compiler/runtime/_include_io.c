@@ -9,17 +9,15 @@
 #define YK_IO_MSVC 1
 #endif
 
-FILE *yk__io_fopen(yk__sds fpath, yk__sds mode) {
+FILE *yk__io_fopen(struct yk__bstr fpath, struct yk__bstr mode) {
   FILE *file;
 #if defined(YK_IO_WIN)
   // ---------- BEGIN WINDOWS -----------------
-  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(fpath);
-  wchar_t *wmode = yk__utf8_to_utf16_null_terminated(mode);
+  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(yk__bstr_get_reference(fpath));
+  wchar_t *wmode = yk__utf8_to_utf16_null_terminated(yk__bstr_get_reference(mode));
   if (wpath == NULL || wmode == NULL) {
     if (wpath != NULL) { free(wpath); }
     if (wmode != NULL) { free(wmode); }
-    yk__sdsfree(fpath);
-    yk__sdsfree(mode);
     return NULL;
   }
 #if defined(YK_IO_MSVC)// WINDOWS + MSVC
@@ -28,8 +26,6 @@ FILE *yk__io_fopen(yk__sds fpath, yk__sds mode) {
     if (NULL != file) { fclose(file); }
     free(wpath);
     free(wmode);
-    yk__sdsfree(fpath);
-    yk__sdsfree(mode);
     return NULL;
   }
 #else// WINDOWS + GCC/MingW
@@ -37,18 +33,14 @@ FILE *yk__io_fopen(yk__sds fpath, yk__sds mode) {
   if (file == NULL) {
     free(wpath);
     free(wmode);
-    yk__sdsfree(fpath);
-    yk__sdsfree(mode);
     return NULL;
   }
 #endif
   // ---------- END WINDOWS -----------------
 #else
   // ---------- BEGIN UNIX -----------------
-  file = fopen(fpath, mode);
+  file = fopen(yk__bstr_get_reference(fpath), yk__bstr_get_reference(mode));
   if (file == NULL) {
-    yk__sdsfree(fpath);
-    yk__sdsfree(mode);
     return NULL;
   }
   // ---------- END UNIX -----------------
@@ -58,8 +50,6 @@ FILE *yk__io_fopen(yk__sds fpath, yk__sds mode) {
   free(wpath);
   free(wmode);
 #endif
-  yk__sdsfree(fpath);
-  yk__sdsfree(mode);
   return file;
 }
 bool yk__io_fclose(FILE *stream) {
@@ -105,13 +95,12 @@ void yk__io_rewind(FILE *stream) {
   if (stream == NULL) { return; }
   rewind(stream);
 }
-int yk__io_open(yk__sds fpath, int mode) {
+int yk__io_open(struct yk__bstr fpath, int mode) {
   int fd = -1;
 #if defined(YK_IO_WIN)
   // ---------- BEGIN WINDOWS -----------------
-  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(fpath);
+  wchar_t *wpath = yk__utf8_to_utf16_null_terminated(yk__bstr_get_reference(fpath));
   if (wpath == NULL) {
-    yk__sdsfree(fpath);
     return fd;
   }
 #if defined(YK_IO_MSVC)// WINDOWS + MSVC
@@ -120,7 +109,6 @@ int yk__io_open(yk__sds fpath, int mode) {
   if (0 != openerr) {
     if (-1 != fd) { _close(fd); }
     free(wpath);
-    yk__sdsfree(fpath);
     fd = -1;
     return fd;
   }
@@ -130,14 +118,13 @@ int yk__io_open(yk__sds fpath, int mode) {
   // ---------- END WINDOWS -----------------
 #else
   // ---------- BEGIN UNIX -----------------
-  fd = open(fpath, mode);
+  fd = open(yk__bstr_get_reference(fpath), mode);
   // ---------- END UNIX -----------------
 #endif
 // ----- RETURNING FILE* ------
 #if defined(YK_IO_WIN)
   free(wpath);
 #endif
-  yk__sdsfree(fpath);
   return fd;
 }
 bool yk__io_close(int fd) {

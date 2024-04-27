@@ -56,7 +56,7 @@ def valid(stream: Ptr[File]) -> bool:
     pass
 
 @nativedefine("yk__io_fopen")
-def fopen(fname: str, mode: str) -> Ptr[File]:
+def fopen(fname: sr, mode: sr) -> Ptr[File]:
     # Open a file
     pass
 
@@ -144,17 +144,17 @@ def munlock(address: AnyPtr, length: c.Size) -> int:
     pass
 
 @native("yk__io_readfile")
-def readfile(fname: str) -> str:
+def readfile(fname: sr) -> str:
     # Read a file to as string, on error returns empty
     pass
 
 @native("yk__io_writefile")
-def writefile(fname: str, data: str) -> bool:
+def writefile(fname: sr, data: sr) -> bool:
     # Write a file
     pass
 
 @nativedefine("yk__io_open")
-def open(path: str, mode: int) -> c.CInt:
+def open(path: sr, mode: int) -> c.CInt:
     pass
 
 @nativedefine("yk__io_close")

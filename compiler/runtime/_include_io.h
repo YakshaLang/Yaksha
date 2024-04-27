@@ -1,4 +1,4 @@
-FILE *yk__io_fopen(yk__sds path, yk__sds mode);
+FILE *yk__io_fopen(struct yk__bstr path, struct yk__bstr mode);
 bool yk__io_fclose(FILE *stream);
 bool yk__io_fflush(FILE *stream);
 size_t yk__io_fread(void *buffer, size_t size, size_t count, FILE *stream);
@@ -11,7 +11,7 @@ bool yk__io_feof(FILE *stream);
 bool yk__io_ferror(FILE *stream);
 void yk__io_clearerr(FILE *stream);
 void yk__io_rewind(FILE *stream);
-int yk__io_open(yk__sds path, int mode);
+int yk__io_open(struct yk__bstr path, int mode);
 bool yk__io_close(int fd);
 #if defined(_WIN32) || defined(_WIN64)
 #define YK__IO_O_RDONLY _O_RDONLY
