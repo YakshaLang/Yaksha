@@ -138,10 +138,9 @@ def rect(x: int, y: int, width: u32, height: u32) -> None:
     pass
 
 @native
-def text(text_data: str, x: int, y: int) -> None:
+def text(text_data: sr, x: int, y: int) -> None:
     # Draws text using the built-in system font
-    ccode """text(nn__text_data, nn__x, nn__y);
-    yk__sdsfree(nn__text_data)"""
+    ccode """text(yk__bstr_get_reference(nn__text_data), nn__x, nn__y)"""
 
 @native
 def text_u8(text_data: Ptr[Const[u8]], x: int, y: int) -> None:
@@ -175,10 +174,9 @@ def diskw(src: AnyPtrToConst, size: u32) -> u32:
     pass
 
 @native
-def trace(text_data: str) -> None:
+def trace(text_data: sr) -> None:
     # Prints a message to the debug console
-    ccode """trace(nn__text_data);
-    yk__sdsfree(nn__text_data)"""
+    ccode """trace(yk__bstr_get_reference(nn__text_data))"""
 
 @native
 def trace_u8(text_data: Ptr[Const[u8]]) -> None:
