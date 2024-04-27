@@ -1,0 +1,8 @@
+import libs.c
+
+def myfunc(d: c.CStr) -> None:
+    pass
+
+def main() -> int:
+    myfunc(cast("c.CStr", "hello\nworld\n"))
+    return 0

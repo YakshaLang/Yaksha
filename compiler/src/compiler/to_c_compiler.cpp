@@ -674,7 +674,8 @@ void to_c_compiler::visit_literal_expr(literal_expr *obj) {
   if (data_type_tok == token_type::STRING ||
       data_type_tok == token_type::THREE_QUOTE_STRING) {
     ykobject str_lit_object = ykobject(obj->literal_token_->token_, dt_pool_);
-    push("<><>", str_lit_object);
+    std::string string_literal = "\"" + string_utils::escape(string_utils::unescape(obj->literal_token_->token_)) + "\"";
+    push(string_literal, str_lit_object);
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_TRUE) {
     push("true", ykobject(dt_pool_->create("bool")));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_FALSE) {

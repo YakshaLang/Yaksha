@@ -1,0 +1,21 @@
+// YK
+#include "yk__lib.h"
+// --forward declarations-- 
+#define yy__c_CStr char*
+void yy__myfunc(yy__c_CStr);
+int32_t yy__main();
+// --structs-- 
+// --functions-- 
+void yy__myfunc(yy__c_CStr yy__d) 
+{
+    // pass;
+    return;
+}
+int32_t yy__main() 
+{
+    yy__myfunc(((yy__c_CStr)"hello\nworld\n"));
+    return INT32_C(0);
+}
+#if defined(YK__MINIMAL_MAIN)
+int main(void) { return yy__main(); }
+#endif

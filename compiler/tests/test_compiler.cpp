@@ -379,6 +379,9 @@ TEST_CASE("compiler: fixed arrays - structure data types") {
 TEST_CASE("compiler: bug-fix - access struct str member") {
   test_compile_yaka_file("../test_data/bug_fixes/struct_str_return.yaka");
 }
+TEST_CASE("compiler: bug-fix - cast string literal should work as expected") {
+  test_compile_yaka_file("../test_data/bug_fixes/easy_cstr.yaka");
+}
 TEST_CASE("compiler: directive - ccode") {
   test_compile_yaka_file("../test_data/compiler_tests/directives/directive_ccode.yaka");
 }
