@@ -5,4 +5,6 @@ def myfunc(d: c.CStr) -> None:
 
 def main() -> int:
     myfunc(cast("c.CStr", "hello\nworld\n"))
+    a: sr = "bug\nfix\nis good"
+    myfunc(cast("c.CStr", a))
     return 0

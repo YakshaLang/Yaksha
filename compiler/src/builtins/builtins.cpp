@@ -722,6 +722,10 @@ struct builtin_cast : builtin {
       code << dt_compiler->wrap_in_paren(args[1].first);
     } else if (args[1].second.datatype_->is_none()) {
       code << "NULL";
+    } else if (args[1].second.datatype_->const_unwrap()->is_sr()) {
+      code << "(("
+           << dt_compiler->convert_dt(out_dt, datatype_location::CAST, "", "")
+           << ")yk__bstr_get_reference(" << args[1].first << "))";
     } else {
       code << "(("
            << dt_compiler->convert_dt(out_dt, datatype_location::CAST, "", "")
