@@ -48,6 +48,7 @@
 #include <cerrno>
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <sstream>
 #include <streambuf>
 #include <string>
@@ -213,5 +214,23 @@ namespace yaksha {
   }
   template<typename T>
   static inline void intentionally_ignored(const T &) {}
+  // Reference: https://codereview.stackexchange.com/a/238646/47826
+  static inline std::size_t levenshtein_distance(const std::string &string_a,
+                                   const std::string &string_b) {
+    const auto size_a = string_a.size();
+    const auto size_b = string_b.size();
+    std::vector<std::size_t> distances(size_b + 1);
+    std::iota(distances.begin(), distances.end(), std::size_t{0});
+    for (std::size_t i = 0; i < size_a; ++i) {
+      std::size_t previous_distance = 0;
+      for (std::size_t j = 0; j < size_b; ++j) {
+        distances[j + 1] =
+            std::min({std::exchange(previous_distance, distances[j + 1]) +
+                          (string_a[i] == string_b[j] ? 0 : 1),
+                      distances[j] + 1, distances[j + 1] + 1});
+      }
+    }
+    return distances[size_b];
+  }
 }// namespace yaksha
 #endif

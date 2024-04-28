@@ -107,6 +107,7 @@ namespace yaksha {
     void visit_enum_stmt(enum_stmt *obj) override;
     void visit_union_stmt(union_stmt *obj) override;
     void visit_directive_stmt(directive_stmt *obj) override;
+    std::vector<std::string> get_all_names();
     std::vector<std::string> function_names_{};
     std::vector<std::string> class_names_{};
     std::vector<std::string> global_const_names_{};

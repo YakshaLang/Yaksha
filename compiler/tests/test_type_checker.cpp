@@ -67,7 +67,8 @@ static void test_typechecker_snippet(const std::string &S,
   xa += (S);
   xa += "\n"
         "    return 0";
-  auto result = mc.compile(xa, true, "dummy.yaka", "../libs", &cg);
+  std::filesystem::path code_file_path = std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
+  auto result = mc.compile(xa, true, code_file_path.string(), "../libs", &cg);
   REQUIRE(result.failed_ == true);
   REQUIRE(mc.error_printer_.has_any_error());
   REQUIRE(mc.error_printer_.has_error(E));
@@ -80,7 +81,8 @@ static void test_typechecker_snippet_ok(const std::string &S) {
   xa += (S);
   xa += "\n"
         "    return 0";
-  auto result = mc.compile(xa, true, "dummy.yaka", "../libs", &cg);
+  std::filesystem::path code_file_path = std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
+  auto result = mc.compile(xa, true, code_file_path.string(), "../libs", &cg);
   REQUIRE(result.failed_ == false);
   REQUIRE(mc.error_printer_.has_no_errors());
 }
@@ -89,7 +91,8 @@ static void test_typechecker_snippet_full(const std::string &S,
   multifile_compiler mc{};
   codegen_c cg{};
   const std::string &xa = S;
-  auto result = mc.compile(xa, true, "dummy.yaka", "../libs", &cg);
+  std::filesystem::path code_file_path = std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
+  auto result = mc.compile(xa, true, code_file_path.string(), "../libs", &cg);
   REQUIRE(result.failed_ == true);
   REQUIRE(mc.error_printer_.has_any_error());
   REQUIRE(mc.error_printer_.has_error(E));
@@ -98,7 +101,8 @@ static void test_typechecker_snippet_full_ok(const std::string &S) {
   multifile_compiler mc{};
   codegen_c cg{};
   const std::string &xa = S;
-  auto result = mc.compile(xa, true, "dummy.yaka", "../libs", &cg);
+  std::filesystem::path code_file_path = std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
+  auto result = mc.compile(xa, true, code_file_path.string(), "../libs", &cg);
   REQUIRE(result.failed_ == false);
   REQUIRE(mc.error_printer_.has_no_errors());
 }
@@ -617,9 +621,9 @@ TEST_CASE("type checker: dot operator from class") {
 TEST_CASE("type checker: member not found from imported module") {
   test_typechecker_snippet_full("import libs.c\n"
                                 "def main() -> int:\n"
-                                "    println(c.A)\n"
+                                "    println(c.Cos)\n"
                                 "    return 0",
-                                "Member not found");
+                                "Member not found. Perhaps 'cos' is what you meant?");
 }
 TEST_CASE("type checker: non existent type access") {
   test_typechecker_snippet_full("def main() -> int:\n"
@@ -635,7 +639,7 @@ TEST_CASE("type checker: non existent element access") {
                                 "    c: A\n"
                                 "    println(c.B)\n"
                                 "    return 0",
-                                "Cannot find data type of LHS");
+                                "Member not found. Perhaps 'b' is what you meant?");
 }
 TEST_CASE("type checker: ccode statement used outside non native function") {
   test_typechecker_snippet_full(
@@ -679,7 +683,7 @@ TEST_CASE("type checker: Invalid fields in struct") {
                                 "def main() -> int:\n"
                                 "    a = P{k: 0}\n"
                                 "    return 0\n",
-                                "member not found in class/struct");
+                                "member not found in class/struct. Perhaps 'x' is what you meant?");
 }
 TEST_CASE("type checker: Duplicate fields in {} init (struct)") {
   test_typechecker_snippet_full("struct P:\n"

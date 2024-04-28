@@ -378,3 +378,14 @@ bool def_class_visitor::has_zero_arg_directive(directive_stmt *obj) {
   }
   return zero_arg_directive;
 }
+std::vector<std::string> def_class_visitor::get_all_names() {
+  std::vector<std::string> all_names{};
+  all_names.insert(all_names.end(), function_names_.begin(),
+                   function_names_.end());
+  all_names.insert(all_names.end(), class_names_.begin(), class_names_.end());
+  all_names.insert(all_names.end(), global_const_names_.begin(),
+                   global_const_names_.end());
+  all_names.insert(all_names.end(), global_native_const_names_.begin(),
+                   global_native_const_names_.end());
+  return all_names;
+}

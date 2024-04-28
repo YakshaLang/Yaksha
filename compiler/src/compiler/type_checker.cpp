@@ -752,6 +752,19 @@ void type_checker::visit_del_stmt(del_stmt *obj) {
 void type_checker::visit_get_expr(get_expr *obj) {
   handle_dot_operator(obj->lhs_, obj->dot_, obj->item_);
 }
+std::string find_closest(const std::string &member,
+                         const std::vector<std::string> &members) {
+  std::string closest;
+  std::size_t closest_distance = 9999999;
+  for (const auto &member_name : members) {
+    std::size_t distance = ::levenshtein_distance(member, member_name);
+    if (distance < closest_distance) {
+      closest = member_name;
+      closest_distance = distance;
+    }
+  }
+  return closest;
+}
 void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
                                        token *member_item) {
   lhs_expr->accept(this);
@@ -791,7 +804,11 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
       obj.module_file_ = lhs.string_val_;
       obj.module_name_ = lhs.module_name_;
     } else {
-      error(dot, "Member not found");
+      auto closest = find_closest(member_item->token_,
+                                  imported->data_->dsv_->get_all_names());
+      error(dot, "Member not found. Perhaps '" + closest +
+                     "' is what you "
+                     "meant?");
     }
     push(obj);
     return;
@@ -803,10 +820,13 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     return;
   }
   auto item = member_item->token_;
+  bool datatype_of_lhs_found = false;
+  std::string closest = "";
   if (!lhs.datatype_->module_.empty()) {
     auto mod_file_info = cf_->get_or_null(lhs.datatype_->module_);
     if (mod_file_info != nullptr &&
         mod_file_info->data_->dsv_->has_class(lhs.datatype_->type_)) {
+      datatype_of_lhs_found = true;
       auto class_ = mod_file_info->data_->dsv_->get_class(lhs.datatype_->type_);
       for (const auto &member : class_->members_) {
         if (item == member.name_->token_) {
@@ -817,9 +837,24 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
           return;
         }
       }
+      std::vector<std::string> members{};
+      for (const auto &member : class_->members_) {
+        members.push_back(member.name_->token_);
+      }
+      closest = find_closest(item, members);
     }
   }
-  error(dot, "Cannot find data type of LHS");
+  if (!datatype_of_lhs_found) {
+    error(dot, "Cannot find data type of LHS");
+  } else {
+    if (closest.empty()) {
+      error(dot, "Member not found");
+    } else {
+      error(dot, "Member not found. Perhaps '" + closest +
+                     "' is what you "
+                     "meant?");
+    }
+  }
   push(ykobject(dt_pool_));
 }
 void type_checker::visit_set_expr(set_expr *obj) {
@@ -1144,13 +1179,17 @@ class_stmt *type_checker::find_class(token *tok, ykdatatype *data_type) {
 }
 void type_checker::validate_member(name_val &member, class_stmt *class_st) {
   ykdatatype *class_member_dt = nullptr;
+  std::vector<std::string> members{};
   for (auto const &para : class_st->members_) {
     if (para.name_->token_ == member.name_->token_) {
       class_member_dt = para.data_type_;
     }
+    members.push_back(para.name_->token_);
   }
   if (class_member_dt == nullptr) {
-    error(member.name_, "member not found in class/struct");
+    std::string closest = find_closest(member.name_->token_, members);
+    error(member.name_, "member not found in class/struct. Perhaps '" +
+                            closest + "' is what you meant?");
     return;
   }
   member.value_->accept(this);
