@@ -2744,13 +2744,13 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "fname"
           },
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "mode"
           }
@@ -3249,7 +3249,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "path"
           },
@@ -3277,7 +3277,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "fname"
           }
@@ -3407,13 +3407,13 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "fname"
           },
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "data"
           }
@@ -46430,7 +46430,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "text_data"
           },
@@ -46545,7 +46545,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "str"
+              "type": "sr"
             },
             "name": "text_data"
           }
