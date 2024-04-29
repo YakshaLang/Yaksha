@@ -132,7 +132,7 @@ bool ykdatatype::is_none() const {
   return primitive_type_ == ykprimitive::NONE;
 }
 void ykdatatype::write_to_str(std::stringstream &s, bool write_mod) const {
-  if (!module_.empty() && write_mod) { s << module_ << ":::"; }
+  if (!module_.empty() && write_mod && !is_dimension()) { s << module_ << ":::"; }
   s << token_->token_;
   if (!args_.empty()) {
     s << "[";
@@ -153,7 +153,7 @@ std::string ykdatatype::as_string() const {
   this->write_to_str(s);
   return s.str();
 }
-std::string ykdatatype::as_simple_string() const {
+std::string ykdatatype::as_string_simplified() const {
   std::stringstream s{};
   this->write_to_str(s, false);
   return s.str();

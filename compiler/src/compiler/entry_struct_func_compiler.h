@@ -79,6 +79,7 @@ namespace yaksha {
 
 private:
     std::string improve_name(const std::string &yaksha_datatype_string,
+                             const std::string &simple_name,
                              const std::string &numbered_name);
     std::unordered_map<std::string, std::string> name_improvements_;
     std::unordered_map<std::string, std::string> reverse_name_improvements_;

@@ -293,7 +293,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
             if (!slot_match(arg, param.data_type_)) {
               std::stringstream message{};
               message << "Variable argument: " << (j + 1) << " mismatches. ";
-              message << "Expected: " << param.data_type_->as_simple_string();
+              message << "Expected: " << param.data_type_->as_string_simplified();
               error(obj->paren_token_, message.str());
             }
           }
@@ -302,7 +302,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
           if (!slot_match(arg, param.data_type_)) {
             std::stringstream message{};
             message << "Parameter & argument " << (i + 1) << " mismatches. ";
-            message << "Expected: " << param.data_type_->as_simple_string();
+            message << "Expected: " << param.data_type_->as_string_simplified();
             error(obj->paren_token_, message.str());
           }
         }
@@ -355,8 +355,8 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
         std::stringstream message{};
         message << "Function[] call parameter & argument " << (i + 1)
                 << " mismatches. ";
-        message << "Expected: " << param->as_simple_string()
-                << ", Provided: " << arg.datatype_->as_simple_string();
+        message << "Expected: " << param->as_string_simplified()
+                << ", Provided: " << arg.datatype_->as_string_simplified();
         error(obj->paren_token_, message.str());
       }
     }
@@ -377,7 +377,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   } else {
     message << " is not allowed.";
   }
-  message << " datatype: " << name.datatype_->as_simple_string();
+  message << " datatype: " << name.datatype_->as_string_simplified();
   error(obj->paren_token_, message.str());
   push(ykobject(dt_pool_));// Push None here
 }
@@ -453,8 +453,8 @@ void type_checker::visit_logical_expr(logical_expr *obj) {
     std::stringstream message{};
     message << "Both LHS and RHS of logical"
                " operator need to be boolean. ";
-    message << "LHS: " << lhs.datatype_->as_simple_string()
-            << ", RHS: " << rhs.datatype_->as_simple_string();
+    message << "LHS: " << lhs.datatype_->as_string_simplified()
+            << ", RHS: " << rhs.datatype_->as_string_simplified();
     error(obj->opr_, message.str());
   }
   push(rhs);
@@ -470,17 +470,17 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
     if (obj->opr_->type_ == token_type::KEYWORD_NOT &&
         !rhs.datatype_->const_unwrap()->is_bool()) {
       message << "Invalid unary operation. Not operator must follow a boolean.";
-      message << " Provided: " << rhs.datatype_->as_simple_string();
+      message << " Provided: " << rhs.datatype_->as_string_simplified();
       error(obj->opr_, message.str());
     } else if (obj->opr_->type_ == token_type::TILDE &&
                !rhs.datatype_->is_an_integer()) {
       message << "Bitwise not (~) is only supported for integers.";
-      message << " Provided: " << rhs.datatype_->as_simple_string();
+      message << " Provided: " << rhs.datatype_->as_string_simplified();
       error(obj->opr_, message.str());
     }
   } else {
     message << "Unary operator is not supported for data type: ";
-    message << rhs.datatype_->as_simple_string();
+    message << rhs.datatype_->as_string_simplified();
     error(obj->opr_, message.str());
   }
   push(rhs);
@@ -621,7 +621,7 @@ void type_checker::visit_if_stmt(if_stmt *obj) {
   if (!bool_expression.is_primitive_or_obj() ||
       !bool_expression.datatype_->const_unwrap()->is_bool()) {
     message << "If statement expression must be a boolean. ";
-    message << "Provided: " << bool_expression.datatype_->as_simple_string();
+    message << "Provided: " << bool_expression.datatype_->as_string_simplified();
     error(obj->if_keyword_, message.str());
   }
   scope_.push();
@@ -672,9 +672,9 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
     auto func = this->defs_classes_->get_function(function_name);
     if (!slot_match(return_data_type, func->return_type_)) {
       message << "Invalid return data type. ";
-      message << "Expected: " << func->return_type_->as_simple_string();
+      message << "Expected: " << func->return_type_->as_string_simplified();
       message << ", Provided: "
-              << return_data_type.datatype_->as_simple_string();
+              << return_data_type.datatype_->as_string_simplified();
       error(obj->return_keyword_, message.str());
     }
     obj->result_type_ = func->return_type_;
@@ -1164,7 +1164,7 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   if (!exp.datatype_->const_unwrap()->is_array() &&
       !exp.datatype_->const_unwrap()->is_fixed_size_array()) {
     message << "foreach statement expression must be an array. ";
-    message << "Provided: " << exp.datatype_->as_simple_string();
+    message << "Provided: " << exp.datatype_->as_string_simplified();
     error(obj->for_keyword_, message.str());
   }
   if ((exp.datatype_->const_unwrap()->is_array() &&
@@ -1187,8 +1187,8 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   auto rhs = obj->data_type_;
   if ((*lhs != *rhs)) {
     message << "foreach statement expression and element data type does not match.";
-    message << " LHS: " << lhs->as_simple_string();
-    message << ", RHS: " << rhs->as_simple_string();
+    message << " LHS: " << lhs->as_string_simplified();
+    message << ", RHS: " << rhs->as_string_simplified();
     error(obj->for_keyword_, message.str());
   }
   push_scope_type(ast_type::STMT_WHILE);

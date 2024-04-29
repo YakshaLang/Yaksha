@@ -99,7 +99,7 @@ namespace yaksha {
     [[nodiscard]] ykdatatype *auto_cast(ykdatatype *rhs, ykdt_pool *pool,
                                         bool lhs_mutates, bool assignment);
     [[nodiscard]] std::string as_string() const;
-    [[nodiscard]] std::string as_simple_string() const;
+    [[nodiscard]] std::string as_string_simplified() const;
 
     // meta type
     [[nodiscard]] bool is_primitive() const;

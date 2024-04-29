@@ -4,28 +4,28 @@
 struct yy__A;
 struct yy__B;
 typedef int32_t (*yt_fn_in_int_out_int)(int32_t);
-typedef int32_t ykfxa0[3];
-typedef int32_t ykfxa1[2];
-typedef ykfxa1 ykfxa2[2];
-typedef int32_t* ykfxa3[2];
-typedef int32_t** ykfxa4[2];
-typedef yt_fn_in_int_out_int ykfxa5[2];
-typedef int32_t* const  ykfxa6[2];
+typedef int32_t yt_arr_int_3[3];
+typedef int32_t yt_arr_int_2[2];
+typedef yt_arr_int_2 yt_arr_arr_int_2_2[2];
+typedef int32_t* yt_arr_ptr_int_2[2];
+typedef int32_t** yt_arr_ptr_ptr_int_2[2];
+typedef yt_fn_in_int_out_int yt_arr_fn_in_int_out_int_2[2];
+typedef int32_t* const  yt_arr_const_ptr_int_2[2];
 int32_t yy__main();
 // --structs-- 
 struct yy__A {
     int32_t yy__a;
-    ykfxa0 yy__b;
-    ykfxa0 yy__c;
+    yt_arr_int_3 yy__b;
+    yt_arr_int_3 yy__c;
 };
 struct yy__B {
-    ykfxa2 yy__nested;
-    ykfxa1* yy__ptr_nested;
-    ykfxa3 yy__nested_ptr;
-    ykfxa3* yy__ptr_nested_ptr;
-    ykfxa4 yy__nested_ptr_ptr;
-    ykfxa5 yy__nested_func;
-    ykfxa6 yy__nested_const_ptr;
+    yt_arr_arr_int_2_2 yy__nested;
+    yt_arr_int_2* yy__ptr_nested;
+    yt_arr_ptr_int_2 yy__nested_ptr;
+    yt_arr_ptr_int_2* yy__ptr_nested_ptr;
+    yt_arr_ptr_ptr_int_2 yy__nested_ptr_ptr;
+    yt_arr_fn_in_int_out_int_2 yy__nested_func;
+    yt_arr_const_ptr_int_2 yy__nested_const_ptr;
 };
 // --functions-- 
 int32_t yy__main() 
