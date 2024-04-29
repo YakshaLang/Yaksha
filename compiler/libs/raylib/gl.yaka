@@ -13,6 +13,8 @@ RL_OPENGL_43: Const[int] = 4
 # OpenGL 4.3 (using GLSL 330)
 RL_OPENGL_ES_20: Const[int] = 5
 # OpenGL ES 2.0 (GLSL 100)
+RL_OPENGL_ES_30: Const[int] = 6
+# OpenGL ES 3.0 (GLSL 300 es)
 RL_LOG_ALL: Const[int] = 0
 # Display all logs
 RL_LOG_TRACE: Const[int] = 1
@@ -49,27 +51,33 @@ RL_PIXELFORMAT_UNCOMPRESSED_R32G32B32: Const[int] = 9
 # 32*3 bpp (3 channels - float)
 RL_PIXELFORMAT_UNCOMPRESSED_R32G32B32A32: Const[int] = 10
 # 32*4 bpp (4 channels - float)
-RL_PIXELFORMAT_COMPRESSED_DXT1_RGB: Const[int] = 11
+RL_PIXELFORMAT_UNCOMPRESSED_R16: Const[int] = 11
+# 16 bpp (1 channel - half float)
+RL_PIXELFORMAT_UNCOMPRESSED_R16G16B16: Const[int] = 12
+# 16*3 bpp (3 channels - half float)
+RL_PIXELFORMAT_UNCOMPRESSED_R16G16B16A16: Const[int] = 13
+# 16*4 bpp (4 channels - half float)
+RL_PIXELFORMAT_COMPRESSED_DXT1_RGB: Const[int] = 14
 # 4 bpp (no alpha)
-RL_PIXELFORMAT_COMPRESSED_DXT1_RGBA: Const[int] = 12
+RL_PIXELFORMAT_COMPRESSED_DXT1_RGBA: Const[int] = 15
 # 4 bpp (1 bit alpha)
-RL_PIXELFORMAT_COMPRESSED_DXT3_RGBA: Const[int] = 13
+RL_PIXELFORMAT_COMPRESSED_DXT3_RGBA: Const[int] = 16
 # 8 bpp
-RL_PIXELFORMAT_COMPRESSED_DXT5_RGBA: Const[int] = 14
+RL_PIXELFORMAT_COMPRESSED_DXT5_RGBA: Const[int] = 17
 # 8 bpp
-RL_PIXELFORMAT_COMPRESSED_ETC1_RGB: Const[int] = 15
+RL_PIXELFORMAT_COMPRESSED_ETC1_RGB: Const[int] = 18
 # 4 bpp
-RL_PIXELFORMAT_COMPRESSED_ETC2_RGB: Const[int] = 16
+RL_PIXELFORMAT_COMPRESSED_ETC2_RGB: Const[int] = 19
 # 4 bpp
-RL_PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA: Const[int] = 17
+RL_PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA: Const[int] = 20
 # 8 bpp
-RL_PIXELFORMAT_COMPRESSED_PVRT_RGB: Const[int] = 18
+RL_PIXELFORMAT_COMPRESSED_PVRT_RGB: Const[int] = 21
 # 4 bpp
-RL_PIXELFORMAT_COMPRESSED_PVRT_RGBA: Const[int] = 19
+RL_PIXELFORMAT_COMPRESSED_PVRT_RGBA: Const[int] = 22
 # 4 bpp
-RL_PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA: Const[int] = 20
+RL_PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA: Const[int] = 23
 # 8 bpp
-RL_PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA: Const[int] = 21
+RL_PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA: Const[int] = 24
 # 2 bpp
 RL_TEXTURE_FILTER_POINT: Const[int] = 0
 # No filter, just pixel approximation
@@ -466,6 +474,11 @@ def rl_active_draw_buffers(count: int) -> None:
     ccode """rlActiveDrawBuffers((int)nn__count)"""
 
 @nativemacro
+def rl_blit_framebuffer(src_x: int, src_y: int, src_width: int, src_height: int, dst_x: int, dst_y: int, dst_width: int, dst_height: int, buffer_mask: int) -> None:
+    # Blit active framebuffer to main framebuffer
+    ccode """rlBlitFramebuffer((int)nn__src_x, (int)nn__src_y, (int)nn__src_width, (int)nn__src_height, (int)nn__dst_x, (int)nn__dst_y, (int)nn__dst_width, (int)nn__dst_height, (int)nn__buffer_mask)"""
+
+@nativemacro
 def rl_enable_color_blend() -> None:
     # Enable color blending
     ccode """rlEnableColorBlend()"""
@@ -531,8 +544,13 @@ def rl_enable_wire_mode() -> None:
     ccode """rlEnableWireMode()"""
 
 @nativemacro
+def rl_enable_point_mode() -> None:
+    # Enable point mode
+    ccode """rlEnablePointMode()"""
+
+@nativemacro
 def rl_disable_wire_mode() -> None:
-    # Disable wire mode
+    # Disable wire mode ( and point ) maybe rename
     ccode """rlDisableWireMode()"""
 
 @nativemacro

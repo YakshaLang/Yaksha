@@ -10,6 +10,12 @@ STATE_DISABLED: Const[int] = 3
 TEXT_ALIGN_LEFT: Const[int] = 0
 TEXT_ALIGN_CENTER: Const[int] = 1
 TEXT_ALIGN_RIGHT: Const[int] = 2
+TEXT_ALIGN_TOP: Const[int] = 0
+TEXT_ALIGN_MIDDLE: Const[int] = 1
+TEXT_ALIGN_BOTTOM: Const[int] = 2
+TEXT_WRAP_NONE: Const[int] = 0
+TEXT_WRAP_CHAR: Const[int] = 1
+TEXT_WRAP_WORD: Const[int] = 2
 DEFAULT: Const[int] = 0
 LABEL: Const[int] = 1
 # Used also for: LABELBUTTON
@@ -17,7 +23,7 @@ BUTTON: Const[int] = 2
 TOGGLE: Const[int] = 3
 # Used also for: TOGGLEGROUP
 SLIDER: Const[int] = 4
-# Used also for: SLIDERBAR
+# Used also for: SLIDERBAR, TOGGLESLIDER
 PROGRESSBAR: Const[int] = 5
 CHECKBOX: Const[int] = 6
 COMBOBOX: Const[int] = 7
@@ -32,21 +38,35 @@ COLORPICKER: Const[int] = 13
 SCROLLBAR: Const[int] = 14
 STATUSBAR: Const[int] = 15
 BORDER_COLOR_NORMAL: Const[int] = 0
+# Control border color in STATE_NORMAL
 BASE_COLOR_NORMAL: Const[int] = 1
+# Control base color in STATE_NORMAL
 TEXT_COLOR_NORMAL: Const[int] = 2
+# Control text color in STATE_NORMAL
 BORDER_COLOR_FOCUSED: Const[int] = 3
+# Control border color in STATE_FOCUSED
 BASE_COLOR_FOCUSED: Const[int] = 4
+# Control base color in STATE_FOCUSED
 TEXT_COLOR_FOCUSED: Const[int] = 5
+# Control text color in STATE_FOCUSED
 BORDER_COLOR_PRESSED: Const[int] = 6
+# Control border color in STATE_PRESSED
 BASE_COLOR_PRESSED: Const[int] = 7
+# Control base color in STATE_PRESSED
 TEXT_COLOR_PRESSED: Const[int] = 8
+# Control text color in STATE_PRESSED
 BORDER_COLOR_DISABLED: Const[int] = 9
+# Control border color in STATE_DISABLED
 BASE_COLOR_DISABLED: Const[int] = 10
+# Control base color in STATE_DISABLED
 TEXT_COLOR_DISABLED: Const[int] = 11
+# Control text color in STATE_DISABLED
 BORDER_WIDTH: Const[int] = 12
+# Control border size, 0 for no border
 TEXT_PADDING: Const[int] = 13
+# Control text padding, not considering border
 TEXT_ALIGNMENT: Const[int] = 14
-RESERVED: Const[int] = 15
+# Control text horizontal alignment inside control text bound (after border and padding)
 TEXT_SIZE: Const[int] = 16
 # Text size (glyphs max height)
 TEXT_SPACING: Const[int] = 17
@@ -55,6 +75,12 @@ LINE_COLOR: Const[int] = 18
 # Line control color
 BACKGROUND_COLOR: Const[int] = 19
 # Background color
+TEXT_LINE_SPACING: Const[int] = 20
+# Text spacing between lines
+TEXT_ALIGNMENT_VERTICAL: Const[int] = 21
+# Text vertical alignment inside text bounds (after border and padding)
+TEXT_WRAP_MODE: Const[int] = 22
+# Text wrap-mode inside text bounds
 GROUP_PADDING: Const[int] = 16
 # ToggleGroup separation between toggles
 SLIDER_WIDTH: Const[int] = 16
@@ -64,12 +90,17 @@ SLIDER_PADDING: Const[int] = 17
 PROGRESS_PADDING: Const[int] = 16
 # ProgressBar internal padding
 ARROWS_SIZE: Const[int] = 16
+# ScrollBar arrows size
 ARROWS_VISIBLE: Const[int] = 17
+# ScrollBar arrows visible
 SCROLL_SLIDER_PADDING: Const[int] = 18
-# (SLIDERBAR, SLIDER_PADDING)
+# ScrollBar slider internal padding
 SCROLL_SLIDER_SIZE: Const[int] = 19
+# ScrollBar slider size
 SCROLL_PADDING: Const[int] = 20
+# ScrollBar scroll padding from arrows
 SCROLL_SPEED: Const[int] = 21
+# ScrollBar scrolling speed
 CHECK_PADDING: Const[int] = 16
 # CheckBox internal check padding
 COMBO_BUTTON_WIDTH: Const[int] = 16
@@ -80,10 +111,8 @@ ARROW_PADDING: Const[int] = 16
 # DropdownBox arrow separation from border and items
 DROPDOWN_ITEMS_SPACING: Const[int] = 17
 # DropdownBox items separation
-TEXT_INNER_PADDING: Const[int] = 16
-# TextBox/TextBoxMulti/ValueBox/Spinner inner text padding
-TEXT_LINES_SPACING: Const[int] = 17
-# TextBoxMulti lines separation
+TEXT_READONLY: Const[int] = 16
+# TextBox in read-only mode: 0-text editable, 1-text no-editable
 SPIN_BUTTON_WIDTH: Const[int] = 16
 # Spinner left/right buttons width
 SPIN_BUTTON_SPACING: Const[int] = 17
@@ -95,7 +124,7 @@ LIST_ITEMS_SPACING: Const[int] = 17
 SCROLLBAR_WIDTH: Const[int] = 18
 # ListView scrollbar size (usually width)
 SCROLLBAR_SIDE: Const[int] = 19
-# ListView scrollbar side (0-left, 1-right)
+# ListView scrollbar side (0-SCROLLBAR_LEFT_SIDE, 1-SCROLLBAR_RIGHT_SIDE)
 COLOR_SELECTOR_SIZE: Const[int] = 16
 HUEBAR_WIDTH: Const[int] = 17
 # ColorPicker right hue bar width
@@ -324,7 +353,7 @@ ICON_CASE_SENSITIVE: Const[int] = 215
 ICON_REG_EXP: Const[int] = 216
 ICON_FOLDER: Const[int] = 217
 ICON_FILE: Const[int] = 218
-ICON_219: Const[int] = 219
+ICON_SAND_TIMER: Const[int] = 219
 ICON_220: Const[int] = 220
 ICON_221: Const[int] = 221
 ICON_222: Const[int] = 222
@@ -363,15 +392,30 @@ ICON_254: Const[int] = 254
 ICON_255: Const[int] = 255
 @nativedefine("GuiStyleProp")
 struct GuiStyleProp:
-    # Style property
+    # NOTE: Used when exporting style as code for convenience
     controlId: c.CUShort
     propertyId: c.CUShort
-    propertyValue: c.CUInt
+    propertyValue: c.CInt
 
 @nativemacro
-def gui_style_prop(control_id: int, property_id: int, property_value: u32) -> GuiStyleProp:
+def gui_style_prop(control_id: int, property_id: int, property_value: int) -> GuiStyleProp:
     # Factory function for: GuiStyleProp
-    ccode """(GuiStyleProp){(unsigned short)nn__control_id, (unsigned short)nn__property_id, (unsigned int)nn__property_value}"""
+    ccode """(GuiStyleProp){(unsigned short)nn__control_id, (unsigned short)nn__property_id, (int)nn__property_value}"""
+
+@nativedefine("GuiTextStyle")
+struct GuiTextStyle:
+    # NOTE: Text style is defined by control
+    size: c.CUInt
+    charSpacing: c.CInt
+    lineSpacing: c.CInt
+    alignmentH: c.CInt
+    alignmentV: c.CInt
+    padding: c.CInt
+
+@nativemacro
+def gui_text_style(size: u32, char_spacing: int, line_spacing: int, alignment_h: int, alignment_v: int, padding: int) -> GuiTextStyle:
+    # Factory function for: GuiTextStyle
+    ccode """(GuiTextStyle){(unsigned int)nn__size, (int)nn__char_spacing, (int)nn__line_spacing, (int)nn__alignment_h, (int)nn__alignment_v, (int)nn__padding}"""
 
 @nativemacro
 def gui_enable() -> None:
@@ -399,9 +443,9 @@ def gui_is_locked() -> bool:
     ccode """GuiIsLocked()"""
 
 @nativemacro
-def gui_fade(alpha: float) -> None:
+def gui_set_alpha(alpha: float) -> None:
     # Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f
-    ccode """GuiFade(nn__alpha)"""
+    ccode """GuiSetAlpha(nn__alpha)"""
 
 @nativemacro
 def gui_set_state(state: int) -> None:
@@ -434,166 +478,6 @@ def gui_get_style(control: int, property: int) -> int:
     ccode """GuiGetStyle((int)nn__control, (int)nn__property)"""
 
 @nativemacro
-def gui_window_box(bounds: rl.Rectangle, title: c.CStr) -> bool:
-    # Window Box control, shows a window that can be closed
-    ccode """GuiWindowBox(nn__bounds, nn__title)"""
-
-@nativemacro
-def gui_group_box(bounds: rl.Rectangle, text: c.CStr) -> None:
-    # Group Box control with text name
-    ccode """GuiGroupBox(nn__bounds, nn__text)"""
-
-@nativemacro
-def gui_line(bounds: rl.Rectangle, text: c.CStr) -> None:
-    # Line separator control, could contain text
-    ccode """GuiLine(nn__bounds, nn__text)"""
-
-@nativemacro
-def gui_panel(bounds: rl.Rectangle, text: c.CStr) -> None:
-    # Panel control, useful to group controls
-    ccode """GuiPanel(nn__bounds, nn__text)"""
-
-@nativemacro
-def gui_tab_bar(bounds: rl.Rectangle, text: Ptr[Ptr[Const[c.CChar]]], count: int, active: Ptr[c.CInt]) -> int:
-    # Tab Bar control, returns TAB to be closed or -1
-    ccode """GuiTabBar(nn__bounds, nn__text, (int)nn__count, nn__active)"""
-
-@nativemacro
-def gui_scroll_panel(bounds: rl.Rectangle, text: c.CStr, content: rl.Rectangle, scroll: Ptr[rl.Vector2]) -> rl.Rectangle:
-    # Scroll Panel control
-    ccode """GuiScrollPanel(nn__bounds, nn__text, nn__content, nn__scroll)"""
-
-@nativemacro
-def gui_label(bounds: rl.Rectangle, text: c.CStr) -> None:
-    # Label control, shows text
-    ccode """GuiLabel(nn__bounds, nn__text)"""
-
-@nativemacro
-def gui_button(bounds: rl.Rectangle, text: c.CStr) -> bool:
-    # Button control, returns true when clicked
-    ccode """GuiButton(nn__bounds, nn__text)"""
-
-@nativemacro
-def gui_label_button(bounds: rl.Rectangle, text: c.CStr) -> bool:
-    # Label button control, show true when clicked
-    ccode """GuiLabelButton(nn__bounds, nn__text)"""
-
-@nativemacro
-def gui_toggle(bounds: rl.Rectangle, text: c.CStr, active: bool) -> bool:
-    # Toggle Button control, returns true when active
-    ccode """GuiToggle(nn__bounds, nn__text, nn__active)"""
-
-@nativemacro
-def gui_toggle_group(bounds: rl.Rectangle, text: c.CStr, active: int) -> int:
-    # Toggle Group control, returns active toggle index
-    ccode """GuiToggleGroup(nn__bounds, nn__text, (int)nn__active)"""
-
-@nativemacro
-def gui_check_box(bounds: rl.Rectangle, text: c.CStr, checked: bool) -> bool:
-    # Check Box control, returns true when active
-    ccode """GuiCheckBox(nn__bounds, nn__text, nn__checked)"""
-
-@nativemacro
-def gui_combo_box(bounds: rl.Rectangle, text: c.CStr, active: int) -> int:
-    # Combo Box control, returns selected item index
-    ccode """GuiComboBox(nn__bounds, nn__text, (int)nn__active)"""
-
-@nativemacro
-def gui_dropdown_box(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt], edit_mode: bool) -> bool:
-    # Dropdown Box control, returns selected item
-    ccode """GuiDropdownBox(nn__bounds, nn__text, nn__active, nn__edit_mode)"""
-
-@nativemacro
-def gui_spinner(bounds: rl.Rectangle, text: c.CStr, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> bool:
-    # Spinner control, returns selected value
-    ccode """GuiSpinner(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode)"""
-
-@nativemacro
-def gui_value_box(bounds: rl.Rectangle, text: c.CStr, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> bool:
-    # Value Box control, updates input text with numbers
-    ccode """GuiValueBox(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode)"""
-
-@nativemacro
-def gui_text_box(bounds: rl.Rectangle, text: c.CStr, text_size: int, edit_mode: bool) -> bool:
-    # Text Box control, updates input text
-    ccode """GuiTextBox(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode)"""
-
-@nativemacro
-def gui_text_box_multi(bounds: rl.Rectangle, text: c.CStr, text_size: int, edit_mode: bool) -> bool:
-    # Text Box control with multiple lines
-    ccode """GuiTextBoxMulti(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode)"""
-
-@nativemacro
-def gui_slider(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: float, min_value: float, max_value: float) -> float:
-    # Slider control, returns selected value
-    ccode """GuiSlider(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
-
-@nativemacro
-def gui_slider_bar(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: float, min_value: float, max_value: float) -> float:
-    # Slider Bar control, returns selected value
-    ccode """GuiSliderBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
-
-@nativemacro
-def gui_progress_bar(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: float, min_value: float, max_value: float) -> float:
-    # Progress Bar control, shows current progress value
-    ccode """GuiProgressBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
-
-@nativemacro
-def gui_status_bar(bounds: rl.Rectangle, text: c.CStr) -> None:
-    # Status Bar control, shows info text
-    ccode """GuiStatusBar(nn__bounds, nn__text)"""
-
-@nativemacro
-def gui_dummy_rec(bounds: rl.Rectangle, text: c.CStr) -> None:
-    # Dummy control for placeholders
-    ccode """GuiDummyRec(nn__bounds, nn__text)"""
-
-@nativemacro
-def gui_grid(bounds: rl.Rectangle, text: c.CStr, spacing: float, subdivs: int) -> rl.Vector2:
-    # Grid control, returns mouse cell position
-    ccode """GuiGrid(nn__bounds, nn__text, nn__spacing, (int)nn__subdivs)"""
-
-@nativemacro
-def gui_list_view(bounds: rl.Rectangle, text: c.CStr, scroll_index: Ptr[c.CInt], active: int) -> int:
-    # List View control, returns selected list item index
-    ccode """GuiListView(nn__bounds, nn__text, nn__scroll_index, (int)nn__active)"""
-
-@nativemacro
-def gui_list_view_ex(bounds: rl.Rectangle, text: Ptr[Ptr[Const[c.CChar]]], count: int, focus: Ptr[c.CInt], scroll_index: Ptr[c.CInt], active: int) -> int:
-    # List View with extended parameters
-    ccode """GuiListViewEx(nn__bounds, nn__text, (int)nn__count, nn__focus, nn__scroll_index, (int)nn__active)"""
-
-@nativemacro
-def gui_message_box(bounds: rl.Rectangle, title: c.CStr, message: c.CStr, buttons: c.CStr) -> int:
-    # Message Box control, displays a message
-    ccode """GuiMessageBox(nn__bounds, nn__title, nn__message, nn__buttons)"""
-
-@nativemacro
-def gui_text_input_box(bounds: rl.Rectangle, title: c.CStr, message: c.CStr, buttons: c.CStr, text: c.CStr, text_max_size: int, secret_view_active: Ptr[c.CInt]) -> int:
-    # Text Input Box control, ask for text, supports secret
-    ccode """GuiTextInputBox(nn__bounds, nn__title, nn__message, nn__buttons, nn__text, (int)nn__text_max_size, nn__secret_view_active)"""
-
-@nativemacro
-def gui_color_picker(bounds: rl.Rectangle, text: c.CStr, p_color: rl.Color) -> rl.Color:
-    # Color Picker control (multiple color controls)
-    ccode """GuiColorPicker(nn__bounds, nn__text, nn__p_color)"""
-
-@nativemacro
-def gui_color_panel(bounds: rl.Rectangle, text: c.CStr, p_color: rl.Color) -> rl.Color:
-    # Color Panel control
-    ccode """GuiColorPanel(nn__bounds, nn__text, nn__p_color)"""
-
-@nativemacro
-def gui_color_bar_alpha(bounds: rl.Rectangle, text: c.CStr, alpha: float) -> float:
-    # Color Bar Alpha control
-    ccode """GuiColorBarAlpha(nn__bounds, nn__text, nn__alpha)"""
-
-@nativemacro
-def gui_color_bar_hue(bounds: rl.Rectangle, text: c.CStr, value: float) -> float:
-    # Color Bar Hue control
-    ccode """GuiColorBarHue(nn__bounds, nn__text, nn__value)"""
-
-@nativemacro
 def gui_load_style(file_name: c.CStr) -> None:
     # Load style file over global style variable (.rgs)
     ccode """GuiLoadStyle(nn__file_name)"""
@@ -624,6 +508,11 @@ def gui_icon_text(icon_id: int, text: c.CStr) -> c.CStr:
     ccode """GuiIconText((int)nn__icon_id, nn__text)"""
 
 @nativemacro
+def gui_set_icon_scale(scale: int) -> None:
+    # Set default icon drawing size
+    ccode """GuiSetIconScale((int)nn__scale)"""
+
+@nativemacro
 def gui_get_icons() -> Ptr[c.CUInt]:
     # Get raygui icons data pointer
     ccode """GuiGetIcons()"""
@@ -635,10 +524,161 @@ def gui_load_icons(file_name: c.CStr, load_icons_name: bool) -> Ptr[Ptr[c.CChar]
 
 @nativemacro
 def gui_draw_icon(icon_id: int, pos_x: int, pos_y: int, pixel_size: int, p_color: rl.Color) -> None:
+    # Draw icon using pixel size at specified position
     ccode """GuiDrawIcon((int)nn__icon_id, (int)nn__pos_x, (int)nn__pos_y, (int)nn__pixel_size, nn__p_color)"""
 
 @nativemacro
-def gui_set_icon_scale(scale: int) -> None:
-    # Set icon drawing size
-    ccode """GuiSetIconScale((int)nn__scale)"""
+def gui_window_box(bounds: rl.Rectangle, title: c.CStr) -> int:
+    # Window Box control, shows a window that can be closed
+    ccode """GuiWindowBox(nn__bounds, nn__title)"""
+
+@nativemacro
+def gui_group_box(bounds: rl.Rectangle, text: c.CStr) -> int:
+    # Group Box control with text name
+    ccode """GuiGroupBox(nn__bounds, nn__text)"""
+
+@nativemacro
+def gui_line(bounds: rl.Rectangle, text: c.CStr) -> int:
+    # Line separator control, could contain text
+    ccode """GuiLine(nn__bounds, nn__text)"""
+
+@nativemacro
+def gui_panel(bounds: rl.Rectangle, text: c.CStr) -> int:
+    # Panel control, useful to group controls
+    ccode """GuiPanel(nn__bounds, nn__text)"""
+
+@nativemacro
+def gui_tab_bar(bounds: rl.Rectangle, text: Ptr[Ptr[Const[c.CChar]]], count: int, active: Ptr[c.CInt]) -> int:
+    # Tab Bar control, returns TAB to be closed or -1
+    ccode """GuiTabBar(nn__bounds, nn__text, (int)nn__count, nn__active)"""
+
+@nativemacro
+def gui_scroll_panel(bounds: rl.Rectangle, text: c.CStr, content: rl.Rectangle, scroll: Ptr[rl.Vector2], view: Ptr[rl.Rectangle]) -> int:
+    # Scroll Panel control
+    ccode """GuiScrollPanel(nn__bounds, nn__text, nn__content, nn__scroll, nn__view)"""
+
+@nativemacro
+def gui_label(bounds: rl.Rectangle, text: c.CStr) -> int:
+    # Label control, shows text
+    ccode """GuiLabel(nn__bounds, nn__text)"""
+
+@nativemacro
+def gui_button(bounds: rl.Rectangle, text: c.CStr) -> int:
+    # Button control, returns true when clicked
+    ccode """GuiButton(nn__bounds, nn__text)"""
+
+@nativemacro
+def gui_label_button(bounds: rl.Rectangle, text: c.CStr) -> int:
+    # Label button control, show true when clicked
+    ccode """GuiLabelButton(nn__bounds, nn__text)"""
+
+@nativemacro
+def gui_toggle_group(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) -> int:
+    # Toggle Group control, returns active toggle index
+    ccode """GuiToggleGroup(nn__bounds, nn__text, nn__active)"""
+
+@nativemacro
+def gui_toggle_slider(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) -> int:
+    # Toggle Slider control, returns true when clicked
+    ccode """GuiToggleSlider(nn__bounds, nn__text, nn__active)"""
+
+@nativemacro
+def gui_combo_box(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) -> int:
+    # Combo Box control, returns selected item index
+    ccode """GuiComboBox(nn__bounds, nn__text, nn__active)"""
+
+@nativemacro
+def gui_dropdown_box(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt], edit_mode: bool) -> int:
+    # Dropdown Box control, returns selected item
+    ccode """GuiDropdownBox(nn__bounds, nn__text, nn__active, nn__edit_mode)"""
+
+@nativemacro
+def gui_spinner(bounds: rl.Rectangle, text: c.CStr, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> int:
+    # Spinner control, returns selected value
+    ccode """GuiSpinner(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode)"""
+
+@nativemacro
+def gui_value_box(bounds: rl.Rectangle, text: c.CStr, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> int:
+    # Value Box control, updates input text with numbers
+    ccode """GuiValueBox(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode)"""
+
+@nativemacro
+def gui_text_box(bounds: rl.Rectangle, text: c.CStr, text_size: int, edit_mode: bool) -> int:
+    # Text Box control, updates input text
+    ccode """GuiTextBox(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode)"""
+
+@nativemacro
+def gui_slider(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: Ptr[float], min_value: float, max_value: float) -> int:
+    # Slider control, returns selected value
+    ccode """GuiSlider(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
+
+@nativemacro
+def gui_slider_bar(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: Ptr[float], min_value: float, max_value: float) -> int:
+    # Slider Bar control, returns selected value
+    ccode """GuiSliderBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
+
+@nativemacro
+def gui_progress_bar(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: Ptr[float], min_value: float, max_value: float) -> int:
+    # Progress Bar control, shows current progress value
+    ccode """GuiProgressBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
+
+@nativemacro
+def gui_status_bar(bounds: rl.Rectangle, text: c.CStr) -> int:
+    # Status Bar control, shows info text
+    ccode """GuiStatusBar(nn__bounds, nn__text)"""
+
+@nativemacro
+def gui_dummy_rec(bounds: rl.Rectangle, text: c.CStr) -> int:
+    # Dummy control for placeholders
+    ccode """GuiDummyRec(nn__bounds, nn__text)"""
+
+@nativemacro
+def gui_grid(bounds: rl.Rectangle, text: c.CStr, spacing: float, subdivs: int, mouse_cell: Ptr[rl.Vector2]) -> int:
+    # Grid control, returns mouse cell position
+    ccode """GuiGrid(nn__bounds, nn__text, nn__spacing, (int)nn__subdivs, nn__mouse_cell)"""
+
+@nativemacro
+def gui_list_view(bounds: rl.Rectangle, text: c.CStr, scroll_index: Ptr[c.CInt], active: Ptr[c.CInt]) -> int:
+    # List View control, returns selected list item index
+    ccode """GuiListView(nn__bounds, nn__text, nn__scroll_index, nn__active)"""
+
+@nativemacro
+def gui_list_view_ex(bounds: rl.Rectangle, text: Ptr[Ptr[Const[c.CChar]]], count: int, scroll_index: Ptr[c.CInt], active: Ptr[c.CInt], focus: Ptr[c.CInt]) -> int:
+    # List View with extended parameters
+    ccode """GuiListViewEx(nn__bounds, nn__text, (int)nn__count, nn__scroll_index, nn__active, nn__focus)"""
+
+@nativemacro
+def gui_message_box(bounds: rl.Rectangle, title: c.CStr, message: c.CStr, buttons: c.CStr) -> int:
+    # Message Box control, displays a message
+    ccode """GuiMessageBox(nn__bounds, nn__title, nn__message, nn__buttons)"""
+
+@nativemacro
+def gui_color_picker(bounds: rl.Rectangle, text: c.CStr, p_color: Ptr[rl.Color]) -> int:
+    # Color Picker control (multiple color controls)
+    ccode """GuiColorPicker(nn__bounds, nn__text, nn__p_color)"""
+
+@nativemacro
+def gui_color_panel(bounds: rl.Rectangle, text: c.CStr, p_color: Ptr[rl.Color]) -> int:
+    # Color Panel control
+    ccode """GuiColorPanel(nn__bounds, nn__text, nn__p_color)"""
+
+@nativemacro
+def gui_color_bar_alpha(bounds: rl.Rectangle, text: c.CStr, alpha: Ptr[float]) -> int:
+    # Color Bar Alpha control
+    ccode """GuiColorBarAlpha(nn__bounds, nn__text, nn__alpha)"""
+
+@nativemacro
+def gui_color_bar_hue(bounds: rl.Rectangle, text: c.CStr, value: Ptr[float]) -> int:
+    # Color Bar Hue control
+    ccode """GuiColorBarHue(nn__bounds, nn__text, nn__value)"""
+
+@nativemacro
+def gui_color_picker_hsv(bounds: rl.Rectangle, text: c.CStr, color_hsv: Ptr[rl.Vector3]) -> int:
+    # Color Picker control that avoids conversion to RGB on each call (multiple color controls)
+    ccode """GuiColorPickerHSV(nn__bounds, nn__text, nn__color_hsv)"""
+
+@nativemacro
+def gui_color_panel_hsv(bounds: rl.Rectangle, text: c.CStr, color_hsv: Ptr[rl.Vector3]) -> int:
+    # Color Panel control that returns HSV color value, used by GuiColorPickerHSV()
+    ccode """GuiColorPanelHSV(nn__bounds, nn__text, nn__color_hsv)"""
 

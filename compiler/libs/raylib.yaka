@@ -31,6 +31,8 @@ FLAG_WINDOW_HIGHDPI: Const[int] = 8192
 # Set to support HighDPI
 FLAG_WINDOW_MOUSE_PASSTHROUGH: Const[int] = 16384
 # Set to support mouse passthrough, only supported when FLAG_WINDOW_UNDECORATED
+FLAG_BORDERLESS_WINDOWED_MODE: Const[int] = 32768
+# Set to run program in borderless windowed mode
 FLAG_MSAA_4X_HINT: Const[int] = 32
 # Set to try enabling MSAA 4X
 FLAG_INTERLACED_HINT: Const[int] = 65536
@@ -475,27 +477,33 @@ PIXELFORMAT_UNCOMPRESSED_R32G32B32: Const[int] = 9
 # 32*3 bpp (3 channels - float)
 PIXELFORMAT_UNCOMPRESSED_R32G32B32A32: Const[int] = 10
 # 32*4 bpp (4 channels - float)
-PIXELFORMAT_COMPRESSED_DXT1_RGB: Const[int] = 11
+PIXELFORMAT_UNCOMPRESSED_R16: Const[int] = 11
+# 16 bpp (1 channel - half float)
+PIXELFORMAT_UNCOMPRESSED_R16G16B16: Const[int] = 12
+# 16*3 bpp (3 channels - half float)
+PIXELFORMAT_UNCOMPRESSED_R16G16B16A16: Const[int] = 13
+# 16*4 bpp (4 channels - half float)
+PIXELFORMAT_COMPRESSED_DXT1_RGB: Const[int] = 14
 # 4 bpp (no alpha)
-PIXELFORMAT_COMPRESSED_DXT1_RGBA: Const[int] = 12
+PIXELFORMAT_COMPRESSED_DXT1_RGBA: Const[int] = 15
 # 4 bpp (1 bit alpha)
-PIXELFORMAT_COMPRESSED_DXT3_RGBA: Const[int] = 13
+PIXELFORMAT_COMPRESSED_DXT3_RGBA: Const[int] = 16
 # 8 bpp
-PIXELFORMAT_COMPRESSED_DXT5_RGBA: Const[int] = 14
+PIXELFORMAT_COMPRESSED_DXT5_RGBA: Const[int] = 17
 # 8 bpp
-PIXELFORMAT_COMPRESSED_ETC1_RGB: Const[int] = 15
+PIXELFORMAT_COMPRESSED_ETC1_RGB: Const[int] = 18
 # 4 bpp
-PIXELFORMAT_COMPRESSED_ETC2_RGB: Const[int] = 16
+PIXELFORMAT_COMPRESSED_ETC2_RGB: Const[int] = 19
 # 4 bpp
-PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA: Const[int] = 17
+PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA: Const[int] = 20
 # 8 bpp
-PIXELFORMAT_COMPRESSED_PVRT_RGB: Const[int] = 18
+PIXELFORMAT_COMPRESSED_PVRT_RGB: Const[int] = 21
 # 4 bpp
-PIXELFORMAT_COMPRESSED_PVRT_RGBA: Const[int] = 19
+PIXELFORMAT_COMPRESSED_PVRT_RGBA: Const[int] = 22
 # 4 bpp
-PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA: Const[int] = 20
+PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA: Const[int] = 23
 # 8 bpp
-PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA: Const[int] = 21
+PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA: Const[int] = 24
 # 2 bpp
 TEXTURE_FILTER_POINT: Const[int] = 0
 # No filter, just pixel approximation
@@ -908,11 +916,12 @@ struct ModelAnimation:
     frameCount: c.CInt
     bones: Ptr[BoneInfo]
     framePoses: Ptr[Ptr[Transform ]]
+    name: FixedArr[c.CChar,32]
 
 @nativemacro
-def model_animation(bone_count: int, frame_count: int, bones: Ptr[BoneInfo], frame_poses: Ptr[Ptr[Transform]]) -> ModelAnimation:
+def model_animation(bone_count: int, frame_count: int, bones: Ptr[BoneInfo], frame_poses: Ptr[Ptr[Transform]], name: FixedArr[c.CChar,32]) -> ModelAnimation:
     # Factory function for: ModelAnimation
-    ccode """(ModelAnimation){(int)nn__bone_count, (int)nn__frame_count, nn__bones, nn__frame_poses}"""
+    ccode """(ModelAnimation){(int)nn__bone_count, (int)nn__frame_count, nn__bones, nn__frame_poses, nn__name}"""
 
 @nativedefine("Ray")
 struct Ray:
@@ -1050,6 +1059,23 @@ def file_path_list(capacity: u32, count: u32, paths: Ptr[Ptr[c.CChar]]) -> FileP
     # Factory function for: FilePathList
     ccode """(FilePathList){(unsigned int)nn__capacity, (unsigned int)nn__count, nn__paths}"""
 
+@nativedefine("AutomationEvent")
+class AutomationEvent:
+    # Automation event
+    pass
+
+@nativedefine("AutomationEventList")
+struct AutomationEventList:
+    # Automation event list
+    capacity: c.CUInt
+    count: c.CUInt
+    events: Ptr[AutomationEvent]
+
+@nativemacro
+def automation_event_list(capacity: u32, count: u32, events: Ptr[AutomationEvent]) -> AutomationEventList:
+    # Factory function for: AutomationEventList
+    ccode """(AutomationEventList){(unsigned int)nn__capacity, (unsigned int)nn__count, nn__events}"""
+
 @nativedefine("Quaternion")
 struct Quaternion:
     # Quaternion, 4 components (Vector4 alias)
@@ -1123,14 +1149,14 @@ def init_window(width: int, height: int, title: c.CStr) -> None:
     ccode """InitWindow((int)nn__width, (int)nn__height, nn__title)"""
 
 @nativemacro
-def window_should_close() -> bool:
-    # Check if KEY_ESCAPE pressed or Close icon pressed
-    ccode """WindowShouldClose()"""
-
-@nativemacro
 def close_window() -> None:
     # Close window and unload OpenGL context
     ccode """CloseWindow()"""
+
+@nativemacro
+def window_should_close() -> bool:
+    # Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)
+    ccode """WindowShouldClose()"""
 
 @nativemacro
 def is_window_ready() -> bool:
@@ -1188,6 +1214,11 @@ def toggle_fullscreen() -> None:
     ccode """ToggleFullscreen()"""
 
 @nativemacro
+def toggle_borderless_windowed() -> None:
+    # Toggle window state: borderless windowed (only PLATFORM_DESKTOP)
+    ccode """ToggleBorderlessWindowed()"""
+
+@nativemacro
 def maximize_window() -> None:
     # Set window state: maximized, if resizable (only PLATFORM_DESKTOP)
     ccode """MaximizeWindow()"""
@@ -1214,7 +1245,7 @@ def set_window_icons(images: Ptr[Image], count: int) -> None:
 
 @nativemacro
 def set_window_title(title: c.CStr) -> None:
-    # Set title for window (only PLATFORM_DESKTOP)
+    # Set title for window (only PLATFORM_DESKTOP and PLATFORM_WEB)
     ccode """SetWindowTitle(nn__title)"""
 
 @nativemacro
@@ -1224,13 +1255,18 @@ def set_window_position(x: int, y: int) -> None:
 
 @nativemacro
 def set_window_monitor(monitor: int) -> None:
-    # Set monitor for the current window (fullscreen mode)
+    # Set monitor for the current window
     ccode """SetWindowMonitor((int)nn__monitor)"""
 
 @nativemacro
 def set_window_min_size(width: int, height: int) -> None:
     # Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
     ccode """SetWindowMinSize((int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def set_window_max_size(width: int, height: int) -> None:
+    # Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE)
+    ccode """SetWindowMaxSize((int)nn__width, (int)nn__height)"""
 
 @nativemacro
 def set_window_size(width: int, height: int) -> None:
@@ -1241,6 +1277,11 @@ def set_window_size(width: int, height: int) -> None:
 def set_window_opacity(opacity: float) -> None:
     # Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)
     ccode """SetWindowOpacity(nn__opacity)"""
+
+@nativemacro
+def set_window_focused() -> None:
+    # Set window focused (only PLATFORM_DESKTOP)
+    ccode """SetWindowFocused()"""
 
 @nativemacro
 def get_window_handle() -> AnyPtr:
@@ -1319,7 +1360,7 @@ def get_window_scale_dpi() -> Vector2:
 
 @nativemacro
 def get_monitor_name(monitor: int) -> c.CStr:
-    # Get the human-readable, UTF-8 encoded name of the primary monitor
+    # Get the human-readable, UTF-8 encoded name of the specified monitor
     ccode """GetMonitorName((int)nn__monitor)"""
 
 @nativemacro
@@ -1341,21 +1382,6 @@ def enable_event_waiting() -> None:
 def disable_event_waiting() -> None:
     # Disable waiting for events on EndDrawing(), automatic events polling
     ccode """DisableEventWaiting()"""
-
-@nativemacro
-def swap_screen_buffer() -> None:
-    # Swap back buffer with front buffer (screen drawing)
-    ccode """SwapScreenBuffer()"""
-
-@nativemacro
-def poll_input_events() -> None:
-    # Register all input events
-    ccode """PollInputEvents()"""
-
-@nativemacro
-def wait_time(seconds: f64) -> None:
-    # Wait for some time (halt program execution)
-    ccode """WaitTime(nn__seconds)"""
 
 @nativemacro
 def show_cursor() -> None:
@@ -1573,11 +1599,6 @@ def set_target_fps(fps: int) -> None:
     ccode """SetTargetFPS((int)nn__fps)"""
 
 @nativemacro
-def get_fps() -> int:
-    # Get current FPS
-    ccode """GetFPS()"""
-
-@nativemacro
 def get_frame_time() -> float:
     # Get time in seconds for last frame drawn (delta time)
     ccode """GetFrameTime()"""
@@ -1588,14 +1609,44 @@ def get_time() -> f64:
     ccode """GetTime()"""
 
 @nativemacro
-def get_random_value(min: int, max: int) -> int:
-    # Get a random value between min and max (both included)
-    ccode """GetRandomValue((int)nn__min, (int)nn__max)"""
+def get_fps() -> int:
+    # Get current FPS
+    ccode """GetFPS()"""
+
+@nativemacro
+def swap_screen_buffer() -> None:
+    # Swap back buffer with front buffer (screen drawing)
+    ccode """SwapScreenBuffer()"""
+
+@nativemacro
+def poll_input_events() -> None:
+    # Register all input events
+    ccode """PollInputEvents()"""
+
+@nativemacro
+def wait_time(seconds: f64) -> None:
+    # Wait for some time (halt program execution)
+    ccode """WaitTime(nn__seconds)"""
 
 @nativemacro
 def set_random_seed(seed: u32) -> None:
     # Set the seed for the random number generator
     ccode """SetRandomSeed((unsigned int)nn__seed)"""
+
+@nativemacro
+def get_random_value(min: int, max: int) -> int:
+    # Get a random value between min and max (both included)
+    ccode """GetRandomValue((int)nn__min, (int)nn__max)"""
+
+@nativemacro
+def load_random_sequence(count: u32, min: int, max: int) -> Ptr[c.CInt]:
+    # Load random values sequence, no values repeated
+    ccode """LoadRandomSequence((unsigned int)nn__count, (int)nn__min, (int)nn__max)"""
+
+@nativemacro
+def unload_random_sequence(sequence: Ptr[c.CInt]) -> None:
+    # Unload random values sequence
+    ccode """UnloadRandomSequence(nn__sequence)"""
 
 @nativemacro
 def take_screenshot(file_name: c.CStr) -> None:
@@ -1606,6 +1657,11 @@ def take_screenshot(file_name: c.CStr) -> None:
 def set_config_flags(flags: u32) -> None:
     # Setup init configuration flags (view FLAGS)
     ccode """SetConfigFlags((unsigned int)nn__flags)"""
+
+@nativemacro
+def open_url(url: c.CStr) -> None:
+    # Open URL with default system browser (if available)
+    ccode """OpenURL(nn__url)"""
 
 @nativemacro
 def set_trace_log_level(log_level: int) -> None:
@@ -1628,11 +1684,6 @@ def mem_free(ptr: AnyPtr) -> None:
     ccode """MemFree(nn__ptr)"""
 
 @nativemacro
-def open_url(url: c.CStr) -> None:
-    # Open URL with default system browser (if available)
-    ccode """OpenURL(nn__url)"""
-
-@nativemacro
 def set_load_file_data_callback(callback: Function[In[c.CStr,Ptr[c.CUInt]],Out[c.CStr]]) -> None:
     # Set custom file binary data loader
     ccode """SetLoadFileDataCallback(nn__callback)"""
@@ -1653,9 +1704,9 @@ def set_save_file_text_callback(callback: Function[In[c.CStr,c.CStr],Out[bool]])
     ccode """SetSaveFileTextCallback(nn__callback)"""
 
 @nativemacro
-def load_file_data(file_name: c.CStr, bytes_read: Ptr[c.CUInt]) -> Ptr[c.CUChar]:
+def load_file_data(file_name: c.CStr, data_size: Ptr[c.CInt]) -> Ptr[c.CUChar]:
     # Load file data as byte array (read)
-    ccode """LoadFileData(nn__file_name, nn__bytes_read)"""
+    ccode """LoadFileData(nn__file_name, nn__data_size)"""
 
 @nativemacro
 def unload_file_data(data: Ptr[c.CUChar]) -> None:
@@ -1663,14 +1714,14 @@ def unload_file_data(data: Ptr[c.CUChar]) -> None:
     ccode """UnloadFileData(nn__data)"""
 
 @nativemacro
-def save_file_data(file_name: c.CStr, data: AnyPtr, bytes_to_write: u32) -> bool:
+def save_file_data(file_name: c.CStr, data: AnyPtr, data_size: int) -> bool:
     # Save data to file from byte array (write), returns true on success
-    ccode """SaveFileData(nn__file_name, nn__data, (unsigned int)nn__bytes_to_write)"""
+    ccode """SaveFileData(nn__file_name, nn__data, (int)nn__data_size)"""
 
 @nativemacro
-def export_data_as_code(data: Ptr[Const[c.CUChar]], size: u32, file_name: c.CStr) -> bool:
+def export_data_as_code(data: Ptr[Const[c.CUChar]], data_size: int, file_name: c.CStr) -> bool:
     # Export data to code (.h), returns true on success
-    ccode """ExportDataAsCode(nn__data, (unsigned int)nn__size, nn__file_name)"""
+    ccode """ExportDataAsCode(nn__data, (int)nn__data_size, nn__file_name)"""
 
 @nativemacro
 def load_file_text(file_name: c.CStr) -> c.CStr:
@@ -1739,7 +1790,7 @@ def get_working_directory() -> c.CStr:
 
 @nativemacro
 def get_application_directory() -> c.CStr:
-    # Get the directory if the running application (uses static string)
+    # Get the directory of the running application (uses static string)
     ccode """GetApplicationDirectory()"""
 
 @nativemacro
@@ -1808,9 +1859,54 @@ def decode_data_base64(data: Ptr[Const[c.CUChar]], output_size: Ptr[c.CInt]) -> 
     ccode """DecodeDataBase64(nn__data, nn__output_size)"""
 
 @nativemacro
+def load_automation_event_list(file_name: c.CStr) -> AutomationEventList:
+    # Load automation events list from file, NULL for empty list, capacity = MAX_AUTOMATION_EVENTS
+    ccode """LoadAutomationEventList(nn__file_name)"""
+
+@nativemacro
+def unload_automation_event_list(list: Ptr[AutomationEventList]) -> None:
+    # Unload automation events list from file
+    ccode """UnloadAutomationEventList(nn__list)"""
+
+@nativemacro
+def export_automation_event_list(list: AutomationEventList, file_name: c.CStr) -> bool:
+    # Export automation events list as text file
+    ccode """ExportAutomationEventList(nn__list, nn__file_name)"""
+
+@nativemacro
+def set_automation_event_list(list: Ptr[AutomationEventList]) -> None:
+    # Set automation event list to record to
+    ccode """SetAutomationEventList(nn__list)"""
+
+@nativemacro
+def set_automation_event_base_frame(frame: int) -> None:
+    # Set automation event internal base frame to start recording
+    ccode """SetAutomationEventBaseFrame((int)nn__frame)"""
+
+@nativemacro
+def start_automation_event_recording() -> None:
+    # Start recording automation events (AutomationEventList must be set)
+    ccode """StartAutomationEventRecording()"""
+
+@nativemacro
+def stop_automation_event_recording() -> None:
+    # Stop recording automation events
+    ccode """StopAutomationEventRecording()"""
+
+@nativemacro
+def play_automation_event(event: AutomationEvent) -> None:
+    # Play a recorded automation event
+    ccode """PlayAutomationEvent(nn__event)"""
+
+@nativemacro
 def is_key_pressed(key: int) -> bool:
     # Check if a key has been pressed once
     ccode """IsKeyPressed((int)nn__key)"""
+
+@nativemacro
+def is_key_pressed_repeat(key: int) -> bool:
+    # Check if a key has been pressed again (Only PLATFORM_DESKTOP)
+    ccode """IsKeyPressedRepeat((int)nn__key)"""
 
 @nativemacro
 def is_key_down(key: int) -> bool:
@@ -1828,11 +1924,6 @@ def is_key_up(key: int) -> bool:
     ccode """IsKeyUp((int)nn__key)"""
 
 @nativemacro
-def set_exit_key(key: int) -> None:
-    # Set a custom key to exit program (default is ESC)
-    ccode """SetExitKey((int)nn__key)"""
-
-@nativemacro
 def get_key_pressed() -> int:
     # Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty
     ccode """GetKeyPressed()"""
@@ -1841,6 +1932,11 @@ def get_key_pressed() -> int:
 def get_char_pressed() -> int:
     # Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty
     ccode """GetCharPressed()"""
+
+@nativemacro
+def set_exit_key(key: int) -> None:
+    # Set a custom key to exit program (default is ESC)
+    ccode """SetExitKey((int)nn__key)"""
 
 @nativemacro
 def is_gamepad_available(gamepad: int) -> bool:
@@ -1993,9 +2089,9 @@ def set_gestures_enabled(flags: u32) -> None:
     ccode """SetGesturesEnabled((unsigned int)nn__flags)"""
 
 @nativemacro
-def is_gesture_detected(gesture: int) -> bool:
+def is_gesture_detected(gesture: u32) -> bool:
     # Check if a gesture have been detected
-    ccode """IsGestureDetected((int)nn__gesture)"""
+    ccode """IsGestureDetected((unsigned int)nn__gesture)"""
 
 @nativemacro
 def get_gesture_detected() -> int:
@@ -2059,33 +2155,23 @@ def draw_line(start_pos_x: int, start_pos_y: int, end_pos_x: int, end_pos_y: int
 
 @nativemacro
 def draw_line_v(start_pos: Vector2, end_pos: Vector2, p_color: Color) -> None:
-    # Draw a line (Vector version)
+    # Draw a line (using gl lines)
     ccode """DrawLineV(nn__start_pos, nn__end_pos, nn__p_color)"""
 
 @nativemacro
 def draw_line_ex(start_pos: Vector2, end_pos: Vector2, thick: float, p_color: Color) -> None:
-    # Draw a line defining thickness
+    # Draw a line (using triangles/quads)
     ccode """DrawLineEx(nn__start_pos, nn__end_pos, nn__thick, nn__p_color)"""
 
 @nativemacro
-def draw_line_bezier(start_pos: Vector2, end_pos: Vector2, thick: float, p_color: Color) -> None:
-    # Draw a line using cubic-bezier curves in-out
-    ccode """DrawLineBezier(nn__start_pos, nn__end_pos, nn__thick, nn__p_color)"""
-
-@nativemacro
-def draw_line_bezier_quad(start_pos: Vector2, end_pos: Vector2, control_pos: Vector2, thick: float, p_color: Color) -> None:
-    # Draw line using quadratic bezier curves with a control point
-    ccode """DrawLineBezierQuad(nn__start_pos, nn__end_pos, nn__control_pos, nn__thick, nn__p_color)"""
-
-@nativemacro
-def draw_line_bezier_cubic(start_pos: Vector2, end_pos: Vector2, start_control_pos: Vector2, end_control_pos: Vector2, thick: float, p_color: Color) -> None:
-    # Draw line using cubic bezier curves with 2 control points
-    ccode """DrawLineBezierCubic(nn__start_pos, nn__end_pos, nn__start_control_pos, nn__end_control_pos, nn__thick, nn__p_color)"""
-
-@nativemacro
 def draw_line_strip(points: Ptr[Vector2], point_count: int, p_color: Color) -> None:
-    # Draw lines sequence
+    # Draw lines sequence (using gl lines)
     ccode """DrawLineStrip(nn__points, (int)nn__point_count, nn__p_color)"""
+
+@nativemacro
+def draw_line_bezier(start_pos: Vector2, end_pos: Vector2, thick: float, p_color: Color) -> None:
+    # Draw line segment cubic-bezier in-out interpolation
+    ccode """DrawLineBezier(nn__start_pos, nn__end_pos, nn__thick, nn__p_color)"""
 
 @nativemacro
 def draw_circle(center_x: int, center_y: int, radius: float, p_color: Color) -> None:
@@ -2116,6 +2202,11 @@ def draw_circle_v(center: Vector2, radius: float, p_color: Color) -> None:
 def draw_circle_lines(center_x: int, center_y: int, radius: float, p_color: Color) -> None:
     # Draw circle outline
     ccode """DrawCircleLines((int)nn__center_x, (int)nn__center_y, nn__radius, nn__p_color)"""
+
+@nativemacro
+def draw_circle_lines_v(center: Vector2, radius: float, p_color: Color) -> None:
+    # Draw circle outline (Vector version)
+    ccode """DrawCircleLinesV(nn__center, nn__radius, nn__p_color)"""
 
 @nativemacro
 def draw_ellipse(center_x: int, center_y: int, radius_h: float, radius_v: float, p_color: Color) -> None:
@@ -2228,6 +2319,81 @@ def draw_poly_lines_ex(center: Vector2, sides: int, radius: float, rotation: flo
     ccode """DrawPolyLinesEx(nn__center, (int)nn__sides, nn__radius, nn__rotation, nn__line_thick, nn__p_color)"""
 
 @nativemacro
+def draw_spline_linear(points: Ptr[Vector2], point_count: int, thick: float, p_color: Color) -> None:
+    # Draw spline: Linear, minimum 2 points
+    ccode """DrawSplineLinear(nn__points, (int)nn__point_count, nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_spline_basis(points: Ptr[Vector2], point_count: int, thick: float, p_color: Color) -> None:
+    # Draw spline: B-Spline, minimum 4 points
+    ccode """DrawSplineBasis(nn__points, (int)nn__point_count, nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_spline_catmull_rom(points: Ptr[Vector2], point_count: int, thick: float, p_color: Color) -> None:
+    # Draw spline: Catmull-Rom, minimum 4 points
+    ccode """DrawSplineCatmullRom(nn__points, (int)nn__point_count, nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_spline_bezier_quadratic(points: Ptr[Vector2], point_count: int, thick: float, p_color: Color) -> None:
+    # Draw spline: Quadratic Bezier, minimum 3 points (1 control point): [p1, c2, p3, c4...]
+    ccode """DrawSplineBezierQuadratic(nn__points, (int)nn__point_count, nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_spline_bezier_cubic(points: Ptr[Vector2], point_count: int, thick: float, p_color: Color) -> None:
+    # Draw spline: Cubic Bezier, minimum 4 points (2 control points): [p1, c2, c3, p4, c5, c6...]
+    ccode """DrawSplineBezierCubic(nn__points, (int)nn__point_count, nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_spline_segment_linear(p1: Vector2, p2: Vector2, thick: float, p_color: Color) -> None:
+    # Draw spline segment: Linear, 2 points
+    ccode """DrawSplineSegmentLinear(nn__p1, nn__p2, nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_spline_segment_basis(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, thick: float, p_color: Color) -> None:
+    # Draw spline segment: B-Spline, 4 points
+    ccode """DrawSplineSegmentBasis(nn__p1, nn__p2, nn__p3, nn__p4, nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_spline_segment_catmull_rom(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, thick: float, p_color: Color) -> None:
+    # Draw spline segment: Catmull-Rom, 4 points
+    ccode """DrawSplineSegmentCatmullRom(nn__p1, nn__p2, nn__p3, nn__p4, nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_spline_segment_bezier_quadratic(p1: Vector2, c2: Vector2, p3: Vector2, thick: float, p_color: Color) -> None:
+    # Draw spline segment: Quadratic Bezier, 2 points, 1 control point
+    ccode """DrawSplineSegmentBezierQuadratic(nn__p1, nn__c2, nn__p3, nn__thick, nn__p_color)"""
+
+@nativemacro
+def draw_spline_segment_bezier_cubic(p1: Vector2, c2: Vector2, c3: Vector2, p4: Vector2, thick: float, p_color: Color) -> None:
+    # Draw spline segment: Cubic Bezier, 2 points, 2 control points
+    ccode """DrawSplineSegmentBezierCubic(nn__p1, nn__c2, nn__c3, nn__p4, nn__thick, nn__p_color)"""
+
+@nativemacro
+def get_spline_point_linear(start_pos: Vector2, end_pos: Vector2, t: float) -> Vector2:
+    # Get (evaluate) spline point: Linear
+    ccode """GetSplinePointLinear(nn__start_pos, nn__end_pos, nn__t)"""
+
+@nativemacro
+def get_spline_point_basis(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, t: float) -> Vector2:
+    # Get (evaluate) spline point: B-Spline
+    ccode """GetSplinePointBasis(nn__p1, nn__p2, nn__p3, nn__p4, nn__t)"""
+
+@nativemacro
+def get_spline_point_catmull_rom(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, t: float) -> Vector2:
+    # Get (evaluate) spline point: Catmull-Rom
+    ccode """GetSplinePointCatmullRom(nn__p1, nn__p2, nn__p3, nn__p4, nn__t)"""
+
+@nativemacro
+def get_spline_point_bezier_quad(p1: Vector2, c2: Vector2, p3: Vector2, t: float) -> Vector2:
+    # Get (evaluate) spline point: Quadratic Bezier
+    ccode """GetSplinePointBezierQuad(nn__p1, nn__c2, nn__p3, nn__t)"""
+
+@nativemacro
+def get_spline_point_bezier_cubic(p1: Vector2, c2: Vector2, c3: Vector2, p4: Vector2, t: float) -> Vector2:
+    # Get (evaluate) spline point: Cubic Bezier
+    ccode """GetSplinePointBezierCubic(nn__p1, nn__c2, nn__c3, nn__p4, nn__t)"""
+
+@nativemacro
 def check_collision_recs(rec1: Rectangle, rec2: Rectangle) -> bool:
     # Check collision between two rectangles
     ccode """CheckCollisionRecs(nn__rec1, nn__rec2)"""
@@ -2288,6 +2454,11 @@ def load_image_raw(file_name: c.CStr, width: int, height: int, format: int, head
     ccode """LoadImageRaw(nn__file_name, (int)nn__width, (int)nn__height, (int)nn__format, (int)nn__header_size)"""
 
 @nativemacro
+def load_image_svg(file_name_or_string: c.CStr, width: int, height: int) -> Image:
+    # Load image from SVG file data or string with specified size
+    ccode """LoadImageSvg(nn__file_name_or_string, (int)nn__width, (int)nn__height)"""
+
+@nativemacro
 def load_image_anim(file_name: c.CStr, frames: Ptr[c.CInt]) -> Image:
     # Load image sequence from file (frames appended to image.data)
     ccode """LoadImageAnim(nn__file_name, nn__frames)"""
@@ -2323,6 +2494,11 @@ def export_image(p_image: Image, file_name: c.CStr) -> bool:
     ccode """ExportImage(nn__p_image, nn__file_name)"""
 
 @nativemacro
+def export_image_to_memory(p_image: Image, file_type: c.CStr, file_size: Ptr[c.CInt]) -> Ptr[c.CUChar]:
+    # Export image to memory buffer
+    ccode """ExportImageToMemory(nn__p_image, nn__file_type, nn__file_size)"""
+
+@nativemacro
 def export_image_as_code(p_image: Image, file_name: c.CStr) -> bool:
     # Export image as code file defining an array of bytes, returns true on success
     ccode """ExportImageAsCode(nn__p_image, nn__file_name)"""
@@ -2333,19 +2509,19 @@ def gen_image_color(width: int, height: int, p_color: Color) -> Image:
     ccode """GenImageColor((int)nn__width, (int)nn__height, nn__p_color)"""
 
 @nativemacro
-def gen_image_gradient_v(width: int, height: int, top: Color, bottom: Color) -> Image:
-    # Generate image: vertical gradient
-    ccode """GenImageGradientV((int)nn__width, (int)nn__height, nn__top, nn__bottom)"""
-
-@nativemacro
-def gen_image_gradient_h(width: int, height: int, left: Color, right: Color) -> Image:
-    # Generate image: horizontal gradient
-    ccode """GenImageGradientH((int)nn__width, (int)nn__height, nn__left, nn__right)"""
+def gen_image_gradient_linear(width: int, height: int, direction: int, start: Color, end: Color) -> Image:
+    # Generate image: linear gradient, direction in degrees [0..360], 0=Vertical gradient
+    ccode """GenImageGradientLinear((int)nn__width, (int)nn__height, (int)nn__direction, nn__start, nn__end)"""
 
 @nativemacro
 def gen_image_gradient_radial(width: int, height: int, density: float, inner: Color, outer: Color) -> Image:
     # Generate image: radial gradient
     ccode """GenImageGradientRadial((int)nn__width, (int)nn__height, nn__density, nn__inner, nn__outer)"""
+
+@nativemacro
+def gen_image_gradient_square(width: int, height: int, density: float, inner: Color, outer: Color) -> Image:
+    # Generate image: square gradient
+    ccode """GenImageGradientSquare((int)nn__width, (int)nn__height, nn__density, nn__inner, nn__outer)"""
 
 @nativemacro
 def gen_image_checked(width: int, height: int, checks_x: int, checks_y: int, col1: Color, col2: Color) -> Image:
@@ -2466,6 +2642,11 @@ def image_flip_vertical(p_image: Ptr[Image]) -> None:
 def image_flip_horizontal(p_image: Ptr[Image]) -> None:
     # Flip image horizontally
     ccode """ImageFlipHorizontal(nn__p_image)"""
+
+@nativemacro
+def image_rotate(p_image: Ptr[Image], degrees: int) -> None:
+    # Rotate image by input angle in degrees (-359 to 359)
+    ccode """ImageRotate(nn__p_image, (int)nn__degrees)"""
 
 @nativemacro
 def image_rotate_cw(p_image: Ptr[Image]) -> None:
@@ -2798,9 +2979,9 @@ def load_font(file_name: c.CStr) -> Font:
     ccode """LoadFont(nn__file_name)"""
 
 @nativemacro
-def load_font_ex(file_name: c.CStr, font_size: int, font_chars: Ptr[c.CInt], glyph_count: int) -> Font:
-    # Load font from file with extended parameters, use NULL for fontChars and 0 for glyphCount to load the default character set
-    ccode """LoadFontEx(nn__file_name, (int)nn__font_size, nn__font_chars, (int)nn__glyph_count)"""
+def load_font_ex(file_name: c.CStr, font_size: int, codepoints: Ptr[c.CInt], codepoint_count: int) -> Font:
+    # Load font from file with extended parameters, use NULL for codepoints and 0 for codepointCount to load the default character setFont
+    ccode """LoadFontEx(nn__file_name, (int)nn__font_size, nn__codepoints, (int)nn__codepoint_count)"""
 
 @nativemacro
 def load_font_from_image(p_image: Image, key: Color, first_char: int) -> Font:
@@ -2808,9 +2989,9 @@ def load_font_from_image(p_image: Image, key: Color, first_char: int) -> Font:
     ccode """LoadFontFromImage(nn__p_image, nn__key, (int)nn__first_char)"""
 
 @nativemacro
-def load_font_from_memory(file_type: c.CStr, file_data: Ptr[Const[c.CUChar]], data_size: int, font_size: int, font_chars: Ptr[c.CInt], glyph_count: int) -> Font:
+def load_font_from_memory(file_type: c.CStr, file_data: Ptr[Const[c.CUChar]], data_size: int, font_size: int, codepoints: Ptr[c.CInt], codepoint_count: int) -> Font:
     # Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
-    ccode """LoadFontFromMemory(nn__file_type, nn__file_data, (int)nn__data_size, (int)nn__font_size, nn__font_chars, (int)nn__glyph_count)"""
+    ccode """LoadFontFromMemory(nn__file_type, nn__file_data, (int)nn__data_size, (int)nn__font_size, nn__codepoints, (int)nn__codepoint_count)"""
 
 @nativemacro
 def is_font_ready(p_font: Font) -> bool:
@@ -2818,19 +2999,19 @@ def is_font_ready(p_font: Font) -> bool:
     ccode """IsFontReady(nn__p_font)"""
 
 @nativemacro
-def load_font_data(file_data: Ptr[Const[c.CUChar]], data_size: int, font_size: int, font_chars: Ptr[c.CInt], glyph_count: int, type: int) -> Ptr[GlyphInfo]:
+def load_font_data(file_data: Ptr[Const[c.CUChar]], data_size: int, font_size: int, codepoints: Ptr[c.CInt], codepoint_count: int, type: int) -> Ptr[GlyphInfo]:
     # Load font data for further use
-    ccode """LoadFontData(nn__file_data, (int)nn__data_size, (int)nn__font_size, nn__font_chars, (int)nn__glyph_count, (int)nn__type)"""
+    ccode """LoadFontData(nn__file_data, (int)nn__data_size, (int)nn__font_size, nn__codepoints, (int)nn__codepoint_count, (int)nn__type)"""
 
 @nativemacro
-def gen_image_font_atlas(chars: Ptr[Const[GlyphInfo]], recs: Ptr[Ptr[Rectangle ]], glyph_count: int, font_size: int, padding: int, pack_method: int) -> Image:
+def gen_image_font_atlas(glyphs: Ptr[Const[GlyphInfo]], glyph_recs: Ptr[Ptr[Rectangle ]], glyph_count: int, font_size: int, padding: int, pack_method: int) -> Image:
     # Generate image font atlas using chars info
-    ccode """GenImageFontAtlas(nn__chars, nn__recs, (int)nn__glyph_count, (int)nn__font_size, (int)nn__padding, (int)nn__pack_method)"""
+    ccode """GenImageFontAtlas(nn__glyphs, nn__glyph_recs, (int)nn__glyph_count, (int)nn__font_size, (int)nn__padding, (int)nn__pack_method)"""
 
 @nativemacro
-def unload_font_data(chars: Ptr[GlyphInfo], glyph_count: int) -> None:
+def unload_font_data(glyphs: Ptr[GlyphInfo], glyph_count: int) -> None:
     # Unload font chars info data (RAM)
-    ccode """UnloadFontData(nn__chars, (int)nn__glyph_count)"""
+    ccode """UnloadFontData(nn__glyphs, (int)nn__glyph_count)"""
 
 @nativemacro
 def unload_font(p_font: Font) -> None:
@@ -2868,9 +3049,14 @@ def draw_text_codepoint(p_font: Font, codepoint: int, position: Vector2, font_si
     ccode """DrawTextCodepoint(nn__p_font, (int)nn__codepoint, nn__position, nn__font_size, nn__tint)"""
 
 @nativemacro
-def draw_text_codepoints(p_font: Font, codepoints: Ptr[Const[c.CInt]], count: int, position: Vector2, font_size: float, spacing: float, tint: Color) -> None:
+def draw_text_codepoints(p_font: Font, codepoints: Ptr[Const[c.CInt]], codepoint_count: int, position: Vector2, font_size: float, spacing: float, tint: Color) -> None:
     # Draw multiple character (codepoint)
-    ccode """DrawTextCodepoints(nn__p_font, nn__codepoints, (int)nn__count, nn__position, nn__font_size, nn__spacing, nn__tint)"""
+    ccode """DrawTextCodepoints(nn__p_font, nn__codepoints, (int)nn__codepoint_count, nn__position, nn__font_size, nn__spacing, nn__tint)"""
+
+@nativemacro
+def set_text_line_spacing(spacing: int) -> None:
+    # Set vertical line spacing when drawing with line-breaks
+    ccode """SetTextLineSpacing((int)nn__spacing)"""
 
 @nativemacro
 def measure_text(text: c.CStr, font_size: int) -> int:
@@ -3308,7 +3494,7 @@ def set_model_mesh_material(p_model: Ptr[Model], mesh_id: int, material_id: int)
     ccode """SetModelMeshMaterial(nn__p_model, (int)nn__mesh_id, (int)nn__material_id)"""
 
 @nativemacro
-def load_model_animations(file_name: c.CStr, anim_count: Ptr[c.CUInt]) -> Ptr[ModelAnimation]:
+def load_model_animations(file_name: c.CStr, anim_count: Ptr[c.CInt]) -> Ptr[ModelAnimation]:
     # Load model animations from file
     ccode """LoadModelAnimations(nn__file_name, nn__anim_count)"""
 
@@ -3323,9 +3509,9 @@ def unload_model_animation(anim: ModelAnimation) -> None:
     ccode """UnloadModelAnimation(nn__anim)"""
 
 @nativemacro
-def unload_model_animations(animations: Ptr[ModelAnimation], count: u32) -> None:
+def unload_model_animations(animations: Ptr[ModelAnimation], anim_count: int) -> None:
     # Unload animation array data
-    ccode """UnloadModelAnimations(nn__animations, (unsigned int)nn__count)"""
+    ccode """UnloadModelAnimations(nn__animations, (int)nn__anim_count)"""
 
 @nativemacro
 def is_model_animation_valid(p_model: Model, anim: ModelAnimation) -> bool:
@@ -3393,6 +3579,11 @@ def set_master_volume(volume: float) -> None:
     ccode """SetMasterVolume(nn__volume)"""
 
 @nativemacro
+def get_master_volume() -> float:
+    # Get master volume (listener)
+    ccode """GetMasterVolume()"""
+
+@nativemacro
 def load_wave(file_name: c.CStr) -> Wave:
     # Load wave data from file
     ccode """LoadWave(nn__file_name)"""
@@ -3418,6 +3609,11 @@ def load_sound_from_wave(p_wave: Wave) -> Sound:
     ccode """LoadSoundFromWave(nn__p_wave)"""
 
 @nativemacro
+def load_sound_alias(source: Sound) -> Sound:
+    # Create a new sound that shares the same sample data as the source sound, does not own the sound data
+    ccode """LoadSoundAlias(nn__source)"""
+
+@nativemacro
 def is_sound_ready(p_sound: Sound) -> bool:
     # Checks if a sound is ready
     ccode """IsSoundReady(nn__p_sound)"""
@@ -3436,6 +3632,11 @@ def unload_wave(p_wave: Wave) -> None:
 def unload_sound(p_sound: Sound) -> None:
     # Unload sound
     ccode """UnloadSound(nn__p_sound)"""
+
+@nativemacro
+def unload_sound_alias(alias: Sound) -> None:
+    # Unload a sound alias (does not deallocate sample data)
+    ccode """UnloadSoundAlias(nn__alias)"""
 
 @nativemacro
 def export_wave(p_wave: Wave, file_name: c.CStr) -> bool:
@@ -3669,7 +3870,7 @@ def set_audio_stream_callback(stream: AudioStream, callback: Function[In[AnyPtr,
 
 @nativemacro
 def attach_audio_stream_processor(stream: AudioStream, processor: Function[In[AnyPtr,c.CUint],Out]) -> None:
-    # Attach audio stream processor to stream
+    # Attach audio stream processor to stream, receives the samples as <float>s
     ccode """AttachAudioStreamProcessor(nn__stream, nn__processor)"""
 
 @nativemacro
@@ -3679,7 +3880,7 @@ def detach_audio_stream_processor(stream: AudioStream, processor: Function[In[An
 
 @nativemacro
 def attach_audio_mixed_processor(processor: Function[In[AnyPtr,c.CUint],Out]) -> None:
-    # Attach audio stream processor to the entire audio pipeline
+    # Attach audio stream processor to the entire audio pipeline, receives the samples as <float>s
     ccode """AttachAudioMixedProcessor(nn__processor)"""
 
 @nativemacro

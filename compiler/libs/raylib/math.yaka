@@ -231,6 +231,14 @@ def vector3_normalize(v: rl.Vector3) -> rl.Vector3:
     ccode """Vector3Normalize(nn__v)"""
 
 @nativemacro
+def vector3_project(v1: rl.Vector3, v2: rl.Vector3) -> rl.Vector3:
+    ccode """Vector3Project(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector3_reject(v1: rl.Vector3, v2: rl.Vector3) -> rl.Vector3:
+    ccode """Vector3Reject(nn__v1, nn__v2)"""
+
+@nativemacro
 def vector3_ortho_normalize(v1: Ptr[rl.Vector3], v2: Ptr[rl.Vector3]) -> None:
     ccode """Vector3OrthoNormalize(nn__v1, nn__v2)"""
 
@@ -363,12 +371,12 @@ def matrix_frustum(left: f64, right: f64, bottom: f64, top: f64, near: f64, far:
     ccode """MatrixFrustum(nn__left, nn__right, nn__bottom, nn__top, nn__near, nn__far)"""
 
 @nativemacro
-def matrix_perspective(fovy: f64, aspect: f64, near: f64, far: f64) -> rl.Matrix:
-    ccode """MatrixPerspective(nn__fovy, nn__aspect, nn__near, nn__far)"""
+def matrix_perspective(fov_y: f64, aspect: f64, near_plane: f64, far_plane: f64) -> rl.Matrix:
+    ccode """MatrixPerspective(nn__fov_y, nn__aspect, nn__near_plane, nn__far_plane)"""
 
 @nativemacro
-def matrix_ortho(left: f64, right: f64, bottom: f64, top: f64, near: f64, far: f64) -> rl.Matrix:
-    ccode """MatrixOrtho(nn__left, nn__right, nn__bottom, nn__top, nn__near, nn__far)"""
+def matrix_ortho(left: f64, right: f64, bottom: f64, top: f64, near_plane: f64, far_plane: f64) -> rl.Matrix:
+    ccode """MatrixOrtho(nn__left, nn__right, nn__bottom, nn__top, nn__near_plane, nn__far_plane)"""
 
 @nativemacro
 def matrix_look_at(eye: rl.Vector3, target: rl.Vector3, up: rl.Vector3) -> rl.Matrix:
