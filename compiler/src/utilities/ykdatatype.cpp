@@ -131,8 +131,8 @@ bool ykdatatype::is_bool() const {
 bool ykdatatype::is_none() const {
   return primitive_type_ == ykprimitive::NONE;
 }
-void ykdatatype::write_to_str(std::stringstream &s) const {
-  if (!module_.empty()) { s << module_ << ":::"; }
+void ykdatatype::write_to_str(std::stringstream &s, bool write_mod) const {
+  if (!module_.empty() && write_mod) { s << module_ << ":::"; }
   s << token_->token_;
   if (!args_.empty()) {
     s << "[";
@@ -143,7 +143,7 @@ void ykdatatype::write_to_str(std::stringstream &s) const {
       } else {
         s << ", ";
       }
-      arg->write_to_str(s);
+      arg->write_to_str(s, write_mod);
     }
     s << "]";
   }
@@ -151,6 +151,11 @@ void ykdatatype::write_to_str(std::stringstream &s) const {
 std::string ykdatatype::as_string() const {
   std::stringstream s{};
   this->write_to_str(s);
+  return s.str();
+}
+std::string ykdatatype::as_simple_string() const {
+  std::stringstream s{};
+  this->write_to_str(s, false);
   return s.str();
 }
 bool ykdatatype::is_primitive() const {

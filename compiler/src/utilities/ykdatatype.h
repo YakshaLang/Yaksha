@@ -99,6 +99,8 @@ namespace yaksha {
     [[nodiscard]] ykdatatype *auto_cast(ykdatatype *rhs, ykdt_pool *pool,
                                         bool lhs_mutates, bool assignment);
     [[nodiscard]] std::string as_string() const;
+    [[nodiscard]] std::string as_simple_string() const;
+
     // meta type
     [[nodiscard]] bool is_primitive() const;
     [[nodiscard]] bool is_builtin_or_primitive() const;
@@ -158,7 +160,7 @@ namespace yaksha {
     bool inlinable_literal_{false};
 
 private:
-    void write_to_str(std::stringstream &s) const;
+    void write_to_str(std::stringstream &s, bool write_mod = true) const;
     void find_builtin_or_primitive();
   };
   inline bool datatypes_equal(const ykdatatype &lhs, const ykdatatype &rhs) {

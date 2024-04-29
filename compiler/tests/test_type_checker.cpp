@@ -358,13 +358,13 @@ TEST_CASE("type checker: func call parameter and argument mismatches") {
                                 "def main() -> int:\n"
                                 "    fnc(1i32, False)\n"
                                 "    return 0",
-                                "Parameter & argument 1 mismatches");
+                                "Parameter & argument 1 mismatches. Expected: i8");
   test_typechecker_snippet_full("def fnc(a: int, b: i8) -> None:\n"
                                 "    pass\n"
                                 "def main() -> int:\n"
                                 "    fnc(1i32, 10)\n"
                                 "    return 0",
-                                "Parameter & argument 2 mismatches");
+                                "Parameter & argument 2 mismatches. Expected: i8");
 }
 TEST_CASE("type checker: func call parameter and argument mismatches first "
           "argument") {
@@ -378,7 +378,7 @@ TEST_CASE("type checker: func call parameter and argument mismatches first "
                                 "def main() -> int:\n"
                                 "    fnc(1340, 3)\n"
                                 "    return 0",
-                                "Parameter & argument 1 mismatches");
+                                "Parameter & argument 1 mismatches. Expected: i8");
 }
 TEST_CASE(
     "type checker: func call parameter and argument mismatches for varargs") {
@@ -396,7 +396,7 @@ TEST_CASE(
                                 "def main() -> int:\n"
                                 "    fnc(1, 3, 2, 3, 12i64)\n"
                                 "    return 0",
-                                "Variable argument: 5 mismatches");
+                                "Variable argument: 5 mismatches. Expected: int");
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
   test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
@@ -429,7 +429,7 @@ TEST_CASE("type checker: func ptr call parameter and argument mismatches first "
       "    f1: Function[In[i8,int],Out] = fnc\n"
       "    f1(1000, 1)\n"
       "    return 0",
-      "Function[] call parameter & argument 1 mismatches");
+      "Function[] call parameter & argument 1 mismatches. Expected: i8, Provided: int");
 }
 TEST_CASE("type checker: func ptr call too much arguments") {
   test_typechecker_snippet_full(
@@ -439,7 +439,7 @@ TEST_CASE("type checker: func ptr call too much arguments") {
       "    f1: Function[In[int,int],Out] = fnc\n"
       "    f1(1, 1, 1, 2)\n"
       "    return 0",
-      "Too few or too much arguments for function call");
+      "Too few or too much arguments for function call. Expected: 2, Provided: 4");
 }
 TEST_CASE("type checker: func ptr call too few arguments") {
   test_typechecker_snippet_full(
@@ -449,7 +449,7 @@ TEST_CASE("type checker: func ptr call too few arguments") {
       "    f1: Function[In[int,int],Out] = fnc\n"
       "    f1(1)\n"
       "    return 0",
-      "Too few or too much arguments for function call");
+      "Too few or too much arguments for function call. Expected: 2, Provided: 1");
 }
 TEST_CASE("type checker: func ptr call output type mismatches") {
   test_typechecker_snippet_full(
@@ -467,40 +467,46 @@ TEST_CASE("type checker: calling a non callable") {
       "    a: bool = False\n"
       "    b: bool = a(1, 2)\n"
       "    return 0",
-      "Calling a non callable or a non existing function");
+      "Calling a non callable or a non existing function with name: 'a' is not allowed. datatype: bool");
 }
 TEST_CASE("type checker: logical or needs two booleans") {
   test_typechecker_snippet(
       "a: bool = False or 1\n",
-      "Both LHS and RHS of logical operator need to be boolean");
+      "Both LHS and RHS of logical operator need to be boolean. LHS: bool, RHS: int");
+}
+TEST_CASE("type checker: logical or needs two booleans swapped") {
+  test_typechecker_snippet(
+      "a: bool = 1 or False\n",
+      "Both LHS and RHS of logical operator need to be boolean. LHS: int, RHS: bool");
 }
 TEST_CASE("type checker: logical and needs two booleans") {
   test_typechecker_snippet(
       "a: bool = True and 1\n",
-      "Both LHS and RHS of logical operator need to be boolean");
+      "Both LHS and RHS of logical operator need to be boolean. LHS: bool, RHS: int");
 }
 TEST_CASE("type checker: not must follow a boolean") {
   test_typechecker_snippet(
       "a: bool = not 1\n",
-      "Invalid unary operation. Not operator must follow a boolean.");
+      "Invalid unary operation. Not operator must follow a boolean. Provided: int");
 }
 TEST_CASE("type checker: not must follow a boolean (str used)") {
   test_typechecker_snippet("a: bool = not \"False\"\n",
-                           "Invalid unary operation");
+                           "Unary operator is not supported for data type: :s:");
 }
 TEST_CASE("type checker: ~ must follow an integer") {
   test_typechecker_snippet("a: int = ~False\n",
-                           "Bitwise not (~) is only supported for integers");
+                           "Bitwise not (~) is only supported for integers. Provided: bool");
 }
 TEST_CASE("type checker: ~ must follow an integer (f64 used)") {
   test_typechecker_snippet("a: int = ~1.0\n",
-                           "Bitwise not (~) is only supported for integers");
+                           "Bitwise not (~) is only supported for integers. Provided: f64");
 }
 TEST_CASE("type checker: ~ must follow an integer (str used)") {
-  test_typechecker_snippet("a: int = ~\"Hello\"\n", "Invalid unary operation");
+  // String literal has a special datatype ':s:'
+  test_typechecker_snippet("a: int = ~\"Hello\"\n", "Unary operator is not supported for data type: :s:");
 }
 TEST_CASE("type checker: access non defined variable") {
-  test_typechecker_snippet("a: int = ~1 + b\n", "Undefined name");
+  test_typechecker_snippet("a: int = ~1 + b\n", "Undefined name: 'b'");
 }
 TEST_CASE("type checker: delete an integer") {
   test_typechecker_snippet("del 1u8",
@@ -659,12 +665,12 @@ TEST_CASE("type checker: only 1 argument is allowed for binarydata()") {
 TEST_CASE(
     "type checker: Redefining variables in a function different data types") {
   test_typechecker_yaka_file("../test_data/bug_fixes/redefining_vars.yaka",
-                             "Redefining a variable is not allowed");
+                             "Redefining a variable is not allowed: 'b'");
 }
 TEST_CASE("type checker: Redefining variables in a function - params") {
   test_typechecker_yaka_file(
       "../test_data/bug_fixes/redefining_vars_params.yaka",
-      "Redefining a variable is not allowed");
+      "Redefining a variable is not allowed: 'b'");
 }
 TEST_CASE("type checker: Const assignment should work as expected") {
   test_typechecker_ok_yaka_file("../test_data/bug_fixes/assign_const.yaka");

@@ -14,8 +14,8 @@
 #define yy__raylib_Color Color
 #define yy__raylib_color(nn__r, nn__g, nn__b, nn__a) (Color){(unsigned char)nn__r, (unsigned char)nn__g, (unsigned char)nn__b, (unsigned char)nn__a}
 #define yy__raylib_init_window(nn__width, nn__height, nn__title) InitWindow((int)nn__width, (int)nn__height, nn__title)
-#define yy__raylib_window_should_close() WindowShouldClose()
 #define yy__raylib_close_window() CloseWindow()
+#define yy__raylib_window_should_close() WindowShouldClose()
 #define yy__raylib_clear_background(nn__p_color) ClearBackground(nn__p_color)
 #define yy__raylib_begin_drawing() BeginDrawing()
 #define yy__raylib_end_drawing() EndDrawing()

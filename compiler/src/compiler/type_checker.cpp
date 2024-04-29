@@ -292,7 +292,8 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
             auto arg = arguments[j];
             if (!slot_match(arg, param.data_type_)) {
               std::stringstream message{};
-              message << "Variable argument: " << (j + 1) << " mismatches";
+              message << "Variable argument: " << (j + 1) << " mismatches. ";
+              message << "Expected: " << param.data_type_->as_simple_string();
               error(obj->paren_token_, message.str());
             }
           }
@@ -300,7 +301,8 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
           auto arg = arguments[i];
           if (!slot_match(arg, param.data_type_)) {
             std::stringstream message{};
-            message << "Parameter & argument " << (i + 1) << " mismatches";
+            message << "Parameter & argument " << (i + 1) << " mismatches. ";
+            message << "Expected: " << param.data_type_->as_simple_string();
             error(obj->paren_token_, message.str());
           }
         }
@@ -337,8 +339,12 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     /*Function[In[..*/
     auto &params = name.datatype_->args_[0]->args_;
     if (params.size() != arguments.size()) {
-      error(obj->paren_token_, "Too few or too "
-                               "much arguments for function call");
+      std::stringstream message{};
+      message << "Too few or too "
+                 "much arguments for function call. ";
+      message << "Expected: " << params.size()
+              << ", Provided: " << arguments.size();
+      error(obj->paren_token_, message.str());
       push(ykobject(dt_pool_));// Push None here
       return;
     }
@@ -348,7 +354,9 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       if (!slot_match(arg, param)) {
         std::stringstream message{};
         message << "Function[] call parameter & argument " << (i + 1)
-                << " mismatches";
+                << " mismatches. ";
+        message << "Expected: " << param->as_simple_string()
+                << ", Provided: " << arg.datatype_->as_simple_string();
         error(obj->paren_token_, message.str());
       }
     }
@@ -360,8 +368,17 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     }
     return;
   }
-  error(obj->paren_token_, "Calling a non callable "
-                           "or a non existing function");
+  std::stringstream message{};
+  message << "Calling a non callable "
+             "or a non existing function";
+  auto located_name = obj->name_->locate();
+  if (located_name != nullptr) {
+    message << " with name: '" << located_name->token_  << "' is not allowed.";
+  } else {
+    message << " is not allowed.";
+  }
+  message << " datatype: " << name.datatype_->as_simple_string();
+  error(obj->paren_token_, message.str());
   push(ykobject(dt_pool_));// Push None here
 }
 void type_checker::visit_grouping_expr(grouping_expr *obj) {
@@ -433,13 +450,18 @@ void type_checker::visit_logical_expr(logical_expr *obj) {
   if (!(lhs.is_primitive_or_obj() && lhs.datatype_->const_unwrap()->is_bool() &&
         rhs.is_primitive_or_obj() &&
         rhs.datatype_->const_unwrap()->is_bool())) {
-    error(obj->opr_, "Both LHS and RHS of logical"
-                     " operator need to be boolean");
+    std::stringstream message{};
+    message << "Both LHS and RHS of logical"
+               " operator need to be boolean. ";
+    message << "LHS: " << lhs.datatype_->as_simple_string()
+            << ", RHS: " << rhs.datatype_->as_simple_string();
+    error(obj->opr_, message.str());
   }
   push(rhs);
 }
 void type_checker::visit_unary_expr(unary_expr *obj) {
   // -5 - correct, -"some string" is not
+  std::stringstream message{};
   obj->right_->accept(this);
   auto rhs = pop();
   if (rhs.is_primitive_or_obj() &&
@@ -447,14 +469,19 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
        rhs.datatype_->const_unwrap()->is_bool())) {
     if (obj->opr_->type_ == token_type::KEYWORD_NOT &&
         !rhs.datatype_->const_unwrap()->is_bool()) {
-      error(obj->opr_,
-            "Invalid unary operation. Not operator must follow a boolean.");
+      message << "Invalid unary operation. Not operator must follow a boolean.";
+      message << " Provided: " << rhs.datatype_->as_simple_string();
+      error(obj->opr_, message.str());
     } else if (obj->opr_->type_ == token_type::TILDE &&
                !rhs.datatype_->is_an_integer()) {
-      error(obj->opr_, "Bitwise not (~) is only supported for integers");
+      message << "Bitwise not (~) is only supported for integers.";
+      message << " Provided: " << rhs.datatype_->as_simple_string();
+      error(obj->opr_, message.str());
     }
   } else {
-    error(obj->opr_, "Invalid unary operation");
+    message << "Unary operator is not supported for data type: ";
+    message << rhs.datatype_->as_simple_string();
+    error(obj->opr_, message.str());
   }
   push(rhs);
 }
@@ -468,7 +495,9 @@ void type_checker::visit_variable_expr(variable_expr *obj) {
     return;
   }
   if (!scope_.is_defined(name)) {
-    error(obj->name_, "Undefined name");
+    std::stringstream message{};
+    message << "Undefined name: '" << name << "'";
+    error(obj->name_, message.str());
     push(ykobject(dt_pool_));
     return;
   }
@@ -496,6 +525,7 @@ void type_checker::visit_continue_stmt(continue_stmt *obj) {
   }
 }
 void type_checker::visit_def_stmt(def_stmt *obj) {
+  std::stringstream message{};
   // WHY? This is so I can know I am in a function when I'm in a block statement
   push_scope_type(ast_type::STMT_DEF);
   push_function(obj->name_->token_);
@@ -503,7 +533,8 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
   for (auto param : obj->params_) {
     auto name = param.name_->token_;
     if (scope_.is_defined(name)) {
-      error(param.name_, "Parameter shadows outer scope name.");
+      message << "Parameter shadows outer scope name: " << name;
+      error(param.name_, message.str());
     } else {
       auto data = ykobject(param.data_type_);
       scope_.define(name, data);
@@ -582,13 +613,16 @@ void type_checker::visit_expression_stmt(expression_stmt *obj) {
   obj->expression_->accept(this);
 }
 void type_checker::visit_if_stmt(if_stmt *obj) {
+  std::stringstream message{};
   // Note the parser rewrites if statement to not include elif,
   //    by structuring them in a nested structure
   obj->expression_->accept(this);
   auto bool_expression = pop();
   if (!bool_expression.is_primitive_or_obj() ||
       !bool_expression.datatype_->const_unwrap()->is_bool()) {
-    error(obj->if_keyword_, "Invalid boolean expression used");
+    message << "If statement expression must be a boolean. ";
+    message << "Provided: " << bool_expression.datatype_->as_simple_string();
+    error(obj->if_keyword_, message.str());
   }
   scope_.push();
   obj->if_branch_->accept(this);
@@ -600,9 +634,11 @@ void type_checker::visit_if_stmt(if_stmt *obj) {
   }
 }
 void type_checker::visit_let_stmt(let_stmt *obj) {
+  std::stringstream message{};
   auto name = obj->name_->token_;
   if (scope_.is_defined(name)) {
-    error(obj->name_, "Redefining a variable is not allowed");
+    message << "Redefining a variable is not allowed: '" << name << "'";
+    error(obj->name_, message.str());
   }
   if (obj->data_type_->is_none()) {
     error(obj->name_, "Cannot use None as a data type here");
@@ -619,6 +655,7 @@ void type_checker::visit_pass_stmt(pass_stmt *obj) {
   // Nothing to do
 }
 void type_checker::visit_return_stmt(return_stmt *obj) {
+  std::stringstream message{};
   auto function_name = peek_function();
   ykobject return_data_type = ykobject(dt_pool_);
   if (obj->expression_ != nullptr) {
@@ -627,12 +664,18 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
   }
   if (function_name.empty() ||
       !this->defs_classes_->has_function(function_name)) {
-    error(obj->return_keyword_, "Invalid use of return statement");
+    message << "Invalid use of return statement. ";
+    message << "Return statement can only be used inside a function.";
+    error(obj->return_keyword_, message.str());
   } else {
     // func cannot be null here.
     auto func = this->defs_classes_->get_function(function_name);
     if (!slot_match(return_data_type, func->return_type_)) {
-      error(obj->return_keyword_, "Invalid return data type");
+      message << "Invalid return data type. ";
+      message << "Expected: " << func->return_type_->as_simple_string();
+      message << ", Provided: "
+              << return_data_type.datatype_->as_simple_string();
+      error(obj->return_keyword_, message.str());
     }
     obj->result_type_ = func->return_type_;
   }
@@ -821,7 +864,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
   }
   auto item = member_item->token_;
   bool datatype_of_lhs_found = false;
-  std::string closest = "";
+  std::string closest{};
   if (!lhs.datatype_->module_.empty()) {
     auto mod_file_info = cf_->get_or_null(lhs.datatype_->module_);
     if (mod_file_info != nullptr &&
@@ -838,6 +881,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
         }
       }
       std::vector<std::string> members{};
+      members.reserve(class_->members_.size());
       for (const auto &member : class_->members_) {
         members.push_back(member.name_->token_);
       }
@@ -1110,6 +1154,7 @@ void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {
   }
 }
 void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
+  std::stringstream message{};
   obj->expression_->accept(this);
   auto exp = pop();
   // Derive data type of foreach-s expression and fill it to AST
@@ -1118,14 +1163,16 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   //   if, while, del, defer, return?
   if (!exp.datatype_->const_unwrap()->is_array() &&
       !exp.datatype_->const_unwrap()->is_fixed_size_array()) {
-    error(obj->for_keyword_, "foreach iteration must use an array");
+    message << "foreach statement expression must be an array. ";
+    message << "Provided: " << exp.datatype_->as_simple_string();
+    error(obj->for_keyword_, message.str());
   }
   if ((exp.datatype_->const_unwrap()->is_array() &&
        !exp.datatype_->const_unwrap()->args_.empty() &&
        (exp.datatype_->const_unwrap()->args_[0]->is_sm_entry() ||
         exp.datatype_->const_unwrap()->args_[0]->is_m_entry()))) {
-    error(obj->for_keyword_,
-          "Cannot use foreach iteration for SMEntry and MEntry.");
+    message << "Cannot use foreach iteration for SMEntry and MEntry.";
+    error(obj->for_keyword_, message.str());
   }
   if (exp.datatype_->const_unwrap()->args_.empty()) {
     // We do not have any information to continue
@@ -1139,8 +1186,10 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   auto lhs = exp.datatype_->const_unwrap()->args_[0];
   auto rhs = obj->data_type_;
   if ((*lhs != *rhs)) {
-    error(obj->for_keyword_,
-          "foreach statement expression and element data type does not match.");
+    message << "foreach statement expression and element data type does not match.";
+    message << " LHS: " << lhs->as_simple_string();
+    message << ", RHS: " << rhs->as_simple_string();
+    error(obj->for_keyword_, message.str());
   }
   push_scope_type(ast_type::STMT_WHILE);
   scope_.push();
