@@ -132,20 +132,39 @@ bool ykdatatype::is_none() const {
   return primitive_type_ == ykprimitive::NONE;
 }
 void ykdatatype::write_to_str(std::stringstream &s, bool write_mod) const {
-  if (!module_.empty() && write_mod && !is_dimension()) { s << module_ << ":::"; }
-  s << token_->token_;
-  if (!args_.empty()) {
-    s << "[";
-    bool first = true;
-    for (auto arg : args_) {
-      if (first) {
-        first = false;
-      } else {
-        s << ", ";
-      }
-      arg->write_to_str(s, write_mod);
+  std::vector<std::pair<const ykdatatype *, std::string>> stack{};
+  stack.emplace_back(this, "");
+  while (!stack.empty()) {
+    auto item = stack.back();
+    const ykdatatype *dt = item.first;
+    auto text = item.second;
+    stack.pop_back();
+    // text node, write it
+    if (dt == nullptr) {
+      s << text;
+      continue;
     }
-    s << "]";
+    // actual datatype or datatype arg (also a datatype)
+    if (!dt->module_.empty() && write_mod && !dt->is_dimension()) {
+      s << dt->module_ << ":::";
+    }
+    s << dt->token_->token_;
+    // arguments
+    if (!dt->args_.empty()) {
+      stack.emplace_back(
+          std::make_pair<const ykdatatype *, std::string>(nullptr, "]"));
+      int length = (int) dt->args_.size();
+      for (int i = length; i > 0; --i) {
+        const ykdatatype *arg = dt->args_[i - 1];
+        stack.emplace_back(arg, "");
+        if (i > 1) {
+          stack.emplace_back(
+              std::make_pair<const ykdatatype *, std::string>(nullptr, ", "));
+        }
+      }
+      stack.emplace_back(
+          std::make_pair<const ykdatatype *, std::string>(nullptr, "["));
+    }
   }
 }
 std::string ykdatatype::as_string() const {
