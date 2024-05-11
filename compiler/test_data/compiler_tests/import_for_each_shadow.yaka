@@ -1,0 +1,18 @@
+import libs.c
+
+class Cookie:
+    x: int
+    y: int
+    animation: int
+
+
+def main() -> int:
+    a: Array[Cookie] = array("Cookie", Cookie{x: 0, y: 0, animation: 0}, Cookie{x: 1, y: 2, animation: 0})
+    # Note the array and individual cookies needs to be deleted,
+    #   however, in here I have not done so.
+    # ---------------------------------------
+    # Note: c in foreach below is shadowing the c from the import
+    #  this must not be allowed
+    for c in a:
+        println(c.x)
+    0

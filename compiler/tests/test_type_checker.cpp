@@ -67,7 +67,8 @@ static void test_typechecker_snippet(const std::string &S,
   xa += (S);
   xa += "\n"
         "    return 0";
-  std::filesystem::path code_file_path = std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
+  std::filesystem::path code_file_path =
+      std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
   auto result = mc.compile(xa, true, code_file_path.string(), "../libs", &cg);
   REQUIRE(result.failed_ == true);
   REQUIRE(mc.error_printer_.has_any_error());
@@ -81,7 +82,8 @@ static void test_typechecker_snippet_ok(const std::string &S) {
   xa += (S);
   xa += "\n"
         "    return 0";
-  std::filesystem::path code_file_path = std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
+  std::filesystem::path code_file_path =
+      std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
   auto result = mc.compile(xa, true, code_file_path.string(), "../libs", &cg);
   REQUIRE(result.failed_ == false);
   REQUIRE(mc.error_printer_.has_no_errors());
@@ -91,7 +93,8 @@ static void test_typechecker_snippet_full(const std::string &S,
   multifile_compiler mc{};
   codegen_c cg{};
   const std::string &xa = S;
-  std::filesystem::path code_file_path = std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
+  std::filesystem::path code_file_path =
+      std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
   auto result = mc.compile(xa, true, code_file_path.string(), "../libs", &cg);
   REQUIRE(result.failed_ == true);
   REQUIRE(mc.error_printer_.has_any_error());
@@ -101,7 +104,8 @@ static void test_typechecker_snippet_full_ok(const std::string &S) {
   multifile_compiler mc{};
   codegen_c cg{};
   const std::string &xa = S;
-  std::filesystem::path code_file_path = std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
+  std::filesystem::path code_file_path =
+      std::filesystem::absolute(std::filesystem::path{"dummy.yaka"});
   auto result = mc.compile(xa, true, code_file_path.string(), "../libs", &cg);
   REQUIRE(result.failed_ == false);
   REQUIRE(mc.error_printer_.has_no_errors());
@@ -353,18 +357,20 @@ TEST_CASE("type checker: func call parameter and argument mismatches") {
                                    "def main() -> int:\n"
                                    "    fnc(1, False)\n"
                                    "    return 0");
-  test_typechecker_snippet_full("def fnc(a: i8, b: int) -> None:\n"
-                                "    pass\n"
-                                "def main() -> int:\n"
-                                "    fnc(1i32, False)\n"
-                                "    return 0",
-                                "Parameter & argument 1 mismatches. Expected: i8");
-  test_typechecker_snippet_full("def fnc(a: int, b: i8) -> None:\n"
-                                "    pass\n"
-                                "def main() -> int:\n"
-                                "    fnc(1i32, 10)\n"
-                                "    return 0",
-                                "Parameter & argument 2 mismatches. Expected: i8");
+  test_typechecker_snippet_full(
+      "def fnc(a: i8, b: int) -> None:\n"
+      "    pass\n"
+      "def main() -> int:\n"
+      "    fnc(1i32, False)\n"
+      "    return 0",
+      "Parameter & argument 1 mismatches. Expected: i8");
+  test_typechecker_snippet_full(
+      "def fnc(a: int, b: i8) -> None:\n"
+      "    pass\n"
+      "def main() -> int:\n"
+      "    fnc(1i32, 10)\n"
+      "    return 0",
+      "Parameter & argument 2 mismatches. Expected: i8");
 }
 TEST_CASE("type checker: func call parameter and argument mismatches first "
           "argument") {
@@ -373,12 +379,13 @@ TEST_CASE("type checker: func call parameter and argument mismatches first "
                                    "def main() -> int:\n"
                                    "    fnc(False, 3)\n"
                                    "    return 0");
-  test_typechecker_snippet_full("def fnc(a: i8, b: int) -> None:\n"
-                                "    pass\n"
-                                "def main() -> int:\n"
-                                "    fnc(1340, 3)\n"
-                                "    return 0",
-                                "Parameter & argument 1 mismatches. Expected: i8");
+  test_typechecker_snippet_full(
+      "def fnc(a: i8, b: int) -> None:\n"
+      "    pass\n"
+      "def main() -> int:\n"
+      "    fnc(1340, 3)\n"
+      "    return 0",
+      "Parameter & argument 1 mismatches. Expected: i8");
 }
 TEST_CASE(
     "type checker: func call parameter and argument mismatches for varargs") {
@@ -389,14 +396,15 @@ TEST_CASE(
                                    "def main() -> int:\n"
                                    "    fnc(1, 3, 2, 3, False)\n"
                                    "    return 0");
-  test_typechecker_snippet_full("@nativedefine(\"test\")\n"
-                                "@varargs\n"
-                                "def fnc(a: int, b: int) -> None:\n"
-                                "    pass\n"
-                                "def main() -> int:\n"
-                                "    fnc(1, 3, 2, 3, 12i64)\n"
-                                "    return 0",
-                                "Variable argument: 5 mismatches. Expected: int");
+  test_typechecker_snippet_full(
+      "@nativedefine(\"test\")\n"
+      "@varargs\n"
+      "def fnc(a: int, b: int) -> None:\n"
+      "    pass\n"
+      "def main() -> int:\n"
+      "    fnc(1, 3, 2, 3, 12i64)\n"
+      "    return 0",
+      "Variable argument: 5 mismatches. Expected: int");
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
   test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
@@ -422,34 +430,34 @@ TEST_CASE("type checker: func ptr call parameter and argument mismatches first "
                                    "    f1: Function[In[int,int],Out] = fnc\n"
                                    "    f1(False, 1)\n"
                                    "    return 0");
-  test_typechecker_snippet_full(
-      "def fnc(a: i8, b: int) -> None:\n"
-      "    pass\n"
-      "def main() -> int:\n"
-      "    f1: Function[In[i8,int],Out] = fnc\n"
-      "    f1(1000, 1)\n"
-      "    return 0",
-      "Function[] call parameter & argument 1 mismatches. Expected: i8, Provided: int");
+  test_typechecker_snippet_full("def fnc(a: i8, b: int) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    f1: Function[In[i8,int],Out] = fnc\n"
+                                "    f1(1000, 1)\n"
+                                "    return 0",
+                                "Function[] call parameter & argument 1 "
+                                "mismatches. Expected: i8, Provided: int");
 }
 TEST_CASE("type checker: func ptr call too much arguments") {
-  test_typechecker_snippet_full(
-      "def fnc(a: int, b: int) -> None:\n"
-      "    pass\n"
-      "def main() -> int:\n"
-      "    f1: Function[In[int,int],Out] = fnc\n"
-      "    f1(1, 1, 1, 2)\n"
-      "    return 0",
-      "Too few or too much arguments for function call. Expected: 2, Provided: 4");
+  test_typechecker_snippet_full("def fnc(a: int, b: int) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    f1: Function[In[int,int],Out] = fnc\n"
+                                "    f1(1, 1, 1, 2)\n"
+                                "    return 0",
+                                "Too few or too much arguments for function "
+                                "call. Expected: 2, Provided: 4");
 }
 TEST_CASE("type checker: func ptr call too few arguments") {
-  test_typechecker_snippet_full(
-      "def fnc(a: int, b: int) -> None:\n"
-      "    pass\n"
-      "def main() -> int:\n"
-      "    f1: Function[In[int,int],Out] = fnc\n"
-      "    f1(1)\n"
-      "    return 0",
-      "Too few or too much arguments for function call. Expected: 2, Provided: 1");
+  test_typechecker_snippet_full("def fnc(a: int, b: int) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    f1: Function[In[int,int],Out] = fnc\n"
+                                "    f1(1)\n"
+                                "    return 0",
+                                "Too few or too much arguments for function "
+                                "call. Expected: 2, Provided: 1");
 }
 TEST_CASE("type checker: func ptr call output type mismatches") {
   test_typechecker_snippet_full(
@@ -467,43 +475,49 @@ TEST_CASE("type checker: calling a non callable") {
       "    a: bool = False\n"
       "    b: bool = a(1, 2)\n"
       "    return 0",
-      "Calling a non callable or a non existing function with name: 'a' is not allowed. datatype: bool");
+      "Calling a non callable or a non existing function with name: 'a' is not "
+      "allowed. datatype: bool");
 }
 TEST_CASE("type checker: logical or needs two booleans") {
-  test_typechecker_snippet(
-      "a: bool = False or 1\n",
-      "Both LHS and RHS of logical operator need to be boolean. LHS: bool, RHS: int");
+  test_typechecker_snippet("a: bool = False or 1\n",
+                           "Both LHS and RHS of logical operator need to be "
+                           "boolean. LHS: bool, RHS: int");
 }
 TEST_CASE("type checker: logical or needs two booleans swapped") {
-  test_typechecker_snippet(
-      "a: bool = 1 or False\n",
-      "Both LHS and RHS of logical operator need to be boolean. LHS: int, RHS: bool");
+  test_typechecker_snippet("a: bool = 1 or False\n",
+                           "Both LHS and RHS of logical operator need to be "
+                           "boolean. LHS: int, RHS: bool");
 }
 TEST_CASE("type checker: logical and needs two booleans") {
-  test_typechecker_snippet(
-      "a: bool = True and 1\n",
-      "Both LHS and RHS of logical operator need to be boolean. LHS: bool, RHS: int");
+  test_typechecker_snippet("a: bool = True and 1\n",
+                           "Both LHS and RHS of logical operator need to be "
+                           "boolean. LHS: bool, RHS: int");
 }
 TEST_CASE("type checker: not must follow a boolean") {
-  test_typechecker_snippet(
-      "a: bool = not 1\n",
-      "Invalid unary operation. Not operator must follow a boolean. Provided: int");
+  test_typechecker_snippet("a: bool = not 1\n",
+                           "Invalid unary operation. Not operator must follow "
+                           "a boolean. Provided: int");
 }
 TEST_CASE("type checker: not must follow a boolean (str used)") {
-  test_typechecker_snippet("a: bool = not \"False\"\n",
-                           "Unary operator is not supported for data type: :s:");
+  test_typechecker_snippet(
+      "a: bool = not \"False\"\n",
+      "Unary operator is not supported for data type: :s:");
 }
 TEST_CASE("type checker: ~ must follow an integer") {
-  test_typechecker_snippet("a: int = ~False\n",
-                           "Bitwise not (~) is only supported for integers. Provided: bool");
+  test_typechecker_snippet(
+      "a: int = ~False\n",
+      "Bitwise not (~) is only supported for integers. Provided: bool");
 }
 TEST_CASE("type checker: ~ must follow an integer (f64 used)") {
-  test_typechecker_snippet("a: int = ~1.0\n",
-                           "Bitwise not (~) is only supported for integers. Provided: f64");
+  test_typechecker_snippet(
+      "a: int = ~1.0\n",
+      "Bitwise not (~) is only supported for integers. Provided: f64");
 }
 TEST_CASE("type checker: ~ must follow an integer (str used)") {
   // String literal has a special datatype ':s:'
-  test_typechecker_snippet("a: int = ~\"Hello\"\n", "Unary operator is not supported for data type: :s:");
+  test_typechecker_snippet(
+      "a: int = ~\"Hello\"\n",
+      "Unary operator is not supported for data type: :s:");
 }
 TEST_CASE("type checker: access non defined variable") {
   test_typechecker_snippet("a: int = ~1 + b\n", "Undefined name: 'b'");
@@ -625,11 +639,12 @@ TEST_CASE("type checker: dot operator from class") {
       "Invalid dot operator, LHS need to be an object");
 }
 TEST_CASE("type checker: member not found from imported module") {
-  test_typechecker_snippet_full("import libs.c\n"
-                                "def main() -> int:\n"
-                                "    println(c.Cos)\n"
-                                "    return 0",
-                                "Member not found. Perhaps 'cos' is what you meant?");
+  test_typechecker_snippet_full(
+      "import libs.c\n"
+      "def main() -> int:\n"
+      "    println(c.Cos)\n"
+      "    return 0",
+      "Member not found. Perhaps 'cos' is what you meant?");
 }
 TEST_CASE("type checker: non existent type access") {
   test_typechecker_snippet_full("def main() -> int:\n"
@@ -639,13 +654,14 @@ TEST_CASE("type checker: non existent type access") {
                                 "Cannot find data type of LHS");
 }
 TEST_CASE("type checker: non existent element access") {
-  test_typechecker_snippet_full("class A:\n"
-                                "    b: int\n"
-                                "def main() -> int:\n"
-                                "    c: A\n"
-                                "    println(c.B)\n"
-                                "    return 0",
-                                "Member not found. Perhaps 'b' is what you meant?");
+  test_typechecker_snippet_full(
+      "class A:\n"
+      "    b: int\n"
+      "def main() -> int:\n"
+      "    c: A\n"
+      "    println(c.B)\n"
+      "    return 0",
+      "Member not found. Perhaps 'b' is what you meant?");
 }
 TEST_CASE("type checker: ccode statement used outside non native function") {
   test_typechecker_snippet_full(
@@ -679,17 +695,23 @@ TEST_CASE("type checker: Test multiple assignment failure") {
   test_typechecker_yaka_file("../test_data/compiler_tests/multi_assign.yaka",
                              "Cannot assign between 2 different data types.");
 }
+TEST_CASE("type checker: import shadows a foreach variable") {
+  test_typechecker_yaka_file(
+      "../test_data/compiler_tests/import_for_each_shadow.yaka",
+      "foreach: shadows outer scope name: 'c'");
+}
 TEST_CASE("type checker: Create a primitive using {} init") {
   test_typechecker_snippet("a = int{x: 0}",
                            "invalid data type for {} initialization");
 }
 TEST_CASE("type checker: Invalid fields in struct") {
-  test_typechecker_snippet_full("struct P:\n"
-                                "    x: int\n\n"
-                                "def main() -> int:\n"
-                                "    a = P{k: 0}\n"
-                                "    return 0\n",
-                                "member not found in class/struct. Perhaps 'x' is what you meant?");
+  test_typechecker_snippet_full(
+      "struct P:\n"
+      "    x: int\n\n"
+      "def main() -> int:\n"
+      "    a = P{k: 0}\n"
+      "    return 0\n",
+      "member not found in class/struct. Perhaps 'x' is what you meant?");
 }
 TEST_CASE("type checker: Duplicate fields in {} init (struct)") {
   test_typechecker_snippet_full("struct P:\n"

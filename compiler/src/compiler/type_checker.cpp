@@ -293,7 +293,8 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
             if (!slot_match(arg, param.data_type_)) {
               std::stringstream message{};
               message << "Variable argument: " << (j + 1) << " mismatches. ";
-              message << "Expected: " << param.data_type_->as_string_simplified();
+              message << "Expected: "
+                      << param.data_type_->as_string_simplified();
               error(obj->paren_token_, message.str());
             }
           }
@@ -373,7 +374,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
              "or a non existing function";
   auto located_name = obj->name_->locate();
   if (located_name != nullptr) {
-    message << " with name: '" << located_name->token_  << "' is not allowed.";
+    message << " with name: '" << located_name->token_ << "' is not allowed.";
   } else {
     message << " is not allowed.";
   }
@@ -621,7 +622,8 @@ void type_checker::visit_if_stmt(if_stmt *obj) {
   if (!bool_expression.is_primitive_or_obj() ||
       !bool_expression.datatype_->const_unwrap()->is_bool()) {
     message << "If statement expression must be a boolean. ";
-    message << "Provided: " << bool_expression.datatype_->as_string_simplified();
+    message << "Provided: "
+            << bool_expression.datatype_->as_string_simplified();
     error(obj->if_keyword_, message.str());
   }
   scope_.push();
@@ -1174,6 +1176,11 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
     message << "Cannot use foreach iteration for SMEntry and MEntry.";
     error(obj->for_keyword_, message.str());
   }
+  if (scope_.is_defined(obj->name_->token_)) {
+    message << "foreach: shadows outer scope name: '" << obj->name_->token_
+            << "'";
+    error(obj->name_, message.str());
+  }
   if (exp.datatype_->const_unwrap()->args_.empty()) {
     // We do not have any information to continue
     // continuing here will cause a segfault
@@ -1186,7 +1193,8 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   auto lhs = exp.datatype_->const_unwrap()->args_[0];
   auto rhs = obj->data_type_;
   if ((*lhs != *rhs)) {
-    message << "foreach statement expression and element data type does not match.";
+    message
+        << "foreach statement expression and element data type does not match.";
     message << " LHS: " << lhs->as_string_simplified();
     message << ", RHS: " << rhs->as_string_simplified();
     error(obj->for_keyword_, message.str());
