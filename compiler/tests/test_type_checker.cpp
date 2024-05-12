@@ -148,7 +148,7 @@ TEST_CASE("type checker: Second argument must be int for arrnew()") {
 }
 TEST_CASE("type checker: Must assign to proper data structure for arrnew()") {
   test_typechecker_snippet("a: Array[str] = arrnew(\"int\", 10)",
-                           "Cannot assign between 2 different data types.");
+                           "Cannot assign between 2 different data types. lhs: Array[str], rhs: Array[int]");
 }
 TEST_CASE("type checker: Builtin array() invalid arg count") {
   test_typechecker_snippet("a: Array[int] = array()",
@@ -175,7 +175,7 @@ TEST_CASE("type checker: Second argument must be int for array()") {
 }
 TEST_CASE("type checker: Must assign to proper data structure for array()") {
   test_typechecker_snippet("a: Array[str] = array(\"int\", 10)",
-                           "Cannot assign between 2 different data types.");
+                           "Cannot assign between 2 different data types. lhs: Array[str], rhs: Array[int]");
 }
 TEST_CASE("type checker: Different type assignment using iif") {
   test_typechecker_snippet(
@@ -240,13 +240,13 @@ TEST_CASE("type checker: sr constants are supported") {
 TEST_CASE("type checker: different type of numbers used in operators bitwise") {
   test_typechecker_snippet("a: int = 1\n"
                            "    b: i8 = a & 1i8\n",
-                           "Cannot assign between 2 different data types.");
+                           "Cannot assign between 2 different data types. lhs: i8, rhs: int");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators mul/div/rem") {
   test_typechecker_snippet("a: int = 1\n"
                            "    b: i8 = a * 1i8\n",
-                           "Cannot assign between 2 different data types.");
+                           "Cannot assign between 2 different data types. lhs: i8, rhs: int");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators comparison") {
@@ -420,7 +420,7 @@ TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
       "    f1: Function[In[int,int],Out] = fnc\n"
       "    f1(1, 2)\n"
       "    return 0",
-      "You can only assign a (matching) function to a Function[In[?],Out[?]]");
+      "You can only assign a matching function. lhs: Function[In[int, int], Out], rhs: Function[In[int, i8], Out]");
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches first "
           "argument") {
@@ -467,7 +467,7 @@ TEST_CASE("type checker: func ptr call output type mismatches") {
       "    f1: Function[In[int,int],Out[int]] = fnc\n"
       "    a: bool = f1(1, 2)\n"
       "    return 0",
-      "Cannot assign between 2 different data types.");
+      "Cannot assign between 2 different data types. lhs: bool, rhs: int");
 }
 TEST_CASE("type checker: calling a non callable") {
   test_typechecker_snippet_full(
@@ -693,7 +693,7 @@ TEST_CASE("type checker: Const assignment should work as expected") {
 }
 TEST_CASE("type checker: Test multiple assignment failure") {
   test_typechecker_yaka_file("../test_data/compiler_tests/multi_assign.yaka",
-                             "Cannot assign between 2 different data types.");
+                             "Cannot assign between 2 different data types. lhs: sr, rhs: int");
 }
 TEST_CASE("type checker: import shadows a foreach variable") {
   test_typechecker_yaka_file(

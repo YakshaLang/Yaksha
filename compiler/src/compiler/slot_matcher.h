@@ -42,6 +42,7 @@
 #include "compiler/function_datatype_extractor.h"
 #include "utilities/ykobject.h"
 namespace yaksha {
+
   /**
    * Match a given object argument with a data type
    */
@@ -49,11 +50,11 @@ namespace yaksha {
     ~slot_matcher() override = default;
     /**
      * Can we pass this argument to a slot of given data type?
-     * @param arg
+     * @param provided_arg data to be passed to a function slot
      * @param datatype
-     * @return
+     * @return true if match, false otherwise
      */
-    virtual bool slot_match(const ykobject &arg, ykdatatype *datatype) = 0;
+    virtual bool slot_match(const ykobject &provided_arg, ykdatatype *datatype) = 0;
   };
 }// namespace yaksha
 #endif

@@ -114,7 +114,6 @@ namespace yaksha {
 
 private:
     ykobject pop();
-    // TODO why is this method not used?
     class_stmt *find_class(token *tok, ykdatatype *data_type);
     void push(const ykobject &data_type);
     void error(token *tok, const std::string &message);
@@ -140,7 +139,11 @@ private:
     builtins builtins_;
     // Copy of internal stmt_alias to handle dt parsing in builtins
     std::unordered_map<std::string, import_stmt *> import_stmts_alias_{};
-    // TODO why is this method not used?
+    /**
+     * Validate that given name is present in the class and expression matches type
+     * @param member name + value
+     * @param class_st class statement object
+     */
     void validate_member(name_val &member, class_stmt *class_st);
     return_checker return_checker_{};
     ast_pool *ast_pool_;

@@ -76,7 +76,9 @@ namespace yaksha {
     NOT_A_BUILTIN,
     CONSTANT,
     POINTER,
+    // TODO Rename to PTR_ANY
     ANY_PTR,
+    // TODO Rename to PTR_CONST_ANY
     ANY_PTR_TO_CONST,
     TUPLE,
     // Function[In[str],Out]
@@ -156,13 +158,13 @@ namespace yaksha {
     bool widen_lhs{false};
     size_t hits_{0};
     // for distinguishing between fixedarr(...) and variable_to_fixedarr
-    // TODO see if we can get rid of :sr: datatype
     bool inlinable_literal_{false};
 
 private:
     void write_to_str(std::stringstream &s, bool write_mod = true) const;
     void find_builtin_or_primitive();
   };
+  // TODO get rid of below functions and always use slot_matcher for type checking
   inline bool datatypes_equal(const ykdatatype &lhs, const ykdatatype &rhs) {
     if (lhs.is_primitive() && rhs.is_primitive()) {
       return lhs.primitive_type_ == rhs.primitive_type_;

@@ -983,28 +983,39 @@ void type_checker::visit_assign_arr_expr(assign_arr_expr *obj) {
 }
 void type_checker::handle_assigns(token *oper, const ykobject &lhs,
                                   const ykobject &rhs) {
-  // TODO: add support for assign to fixed array without overflowing.
-  //  Basically assign as much elements as possible to LHS from RHS (FixedArr, Array, or sr/str/lit),
-  //  keep any leftover as is. (We assume whoever assigns knows what they are doing) :)
-  //  however, we cannot assign if the args_[0] is a const in a FixedArray, so check for this.
-  // ---
-  // TODO verify What if lhs is a tuple? We can't assign to a tuple,
-  //  but we can assign to a tuple element, so we might be able to assign between 2 tuples of exact same type?
-  //  if any element in a tuple is a const, then we cannot assign to it.?
-  //  we can either skip the const element, or error out. (TBD)
-  //
+  std::stringstream message{};
   if (lhs.datatype_->const_unwrap()->is_fixed_size_array()) {
-    error(oper, "Cannot assign to a FixedArr[..]. FixedArr variables are not "
-                "assignable.");
+    // TODO: add support for assign to fixed array without overflowing.
+    //  Basically assign as much elements as possible to LHS from RHS (FixedArr, Array, or sr/str/lit),
+    //  keep any leftover as is. (We assume whoever assigns knows what they are doing) :)
+    //  however, we cannot assign if the args_[0] is a const in a FixedArray, so check for this.
+    message << "Cannot assign to a FixedArr[..]. FixedArr variables are not "
+               "assignable. lhs: " << lhs.datatype_->as_string_simplified();
+    message << ", rhs: " << rhs.datatype_->as_string_simplified();
+    error(oper, message.str());
   }
   if (lhs.datatype_->const_unwrap()->is_tuple()) {
-    error(oper,
-          "Cannot assign to a Tuple[..]. Tuple variables are not assignable.");
+    // TODO verify What if lhs is a tuple? We can't assign to a tuple,
+    //  but we can assign to a tuple element, so we might be able to assign between 2 tuples of exact same type?
+    //  if any element in a tuple is a const, then we cannot assign to it.?
+    //  we can either skip the const element, or error out. (TBD)
+    message << "Cannot assign to a Tuple[..]. Tuple variables are not "
+               "assignable. lhs: " << lhs.datatype_->as_string_simplified();
+    message << ", rhs: " << rhs.datatype_->as_string_simplified();
+    error(oper, message.str());
   }
   if (lhs.datatype_->is_const()) { error(oper, "Cannot assign to a constant"); }
   if (rhs.is_a_function() && !slot_match(rhs, lhs.datatype_)) {
-    error(oper, "You can only assign a (matching) function to a "
-                "Function[In[?],Out[?]]");
+    message << "You can only assign a matching function. lhs: ";
+    message << lhs.datatype_->as_string_simplified();
+    ykdatatype *arg_datatype = function_to_datatype_or_null(rhs);
+    message << ", rhs: ";
+    if (arg_datatype != nullptr) {
+      message << arg_datatype->as_string_simplified();
+    } else {
+      message << rhs.datatype_->as_string_simplified();
+    }
+    error(oper, message.str());
   }
   if ((lhs.is_primitive_or_obj() && rhs.is_primitive_or_obj())) {
     auto rhs_dt = rhs.datatype_->const_unwrap();
@@ -1012,7 +1023,10 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
       auto castable =
           lhs.datatype_->auto_cast(rhs.datatype_, dt_pool_, true, true);
       if (castable == nullptr) {
-        error(oper, "Cannot assign between 2 different data types.");
+        message << "Cannot assign between 2 different data types. lhs: ";
+        message << lhs.datatype_->as_string_simplified();
+        message << ", rhs: " << rhs.datatype_->as_string_simplified();
+        error(oper, message.str());
       }
     }
   }
@@ -1024,7 +1038,10 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
     case token_type::SHL_EQ:
     case token_type::SHR_EQ:
       if (!lhs.datatype_->is_an_integer()) {
-        error(oper, "Cannot augment assign for non integer values");
+        message << "Cannot augment assign for non integer values.";
+        message << " lhs: " << lhs.datatype_->as_string_simplified();
+        message << ", rhs: " << rhs.datatype_->as_string_simplified();
+        error(oper, message.str());
       }
       break;
     case token_type::DIV_EQ:
@@ -1032,13 +1049,19 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
     case token_type::MUL_EQ:
     case token_type::SUB_EQ:
       if (!lhs.datatype_->is_a_number()) {
-        error(oper, "Cannot augment assign for non number values");
+        message << "Cannot augment assign for non number values.";
+        message << " lhs: " << lhs.datatype_->as_string_simplified();
+        message << ", rhs: " << rhs.datatype_->as_string_simplified();
+        error(oper, message.str());
       }
       break;
     case token_type::PLUS_EQ:
       // += will not be supported for string references or literals as that makes no sense
       if (!lhs.datatype_->is_a_number() && !lhs.datatype_->is_str()) {
-        error(oper, "Cannot use += for data type");
+        message << "Cannot use += for data type. lhs: ";
+        message << lhs.datatype_->as_string_simplified();
+        message << ", rhs: " << rhs.datatype_->as_string_simplified();
+        error(oper, message.str());
       }
       break;
     default:

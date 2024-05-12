@@ -61,6 +61,7 @@ struct builtin_arrput : builtin {
       o.string_val_ = "Two arguments must be provided for arrput() builtin";
     } else if (!args[0].datatype_->is_array()) {
       o.string_val_ = "First argument to arrput() must be an Array[?]";
+      // TODO below does not take into account how to handle relevant auto casting requirements
     } else if (*(args[0].datatype_->args_[0]) !=
                *args[1].datatype_->const_unwrap()) {
       if (args[0].datatype_->args_[0]->const_unwrap()->is_a_string() &&
@@ -637,6 +638,7 @@ struct builtin_shput : builtin {
           "First argument to shput() must match with Array[SMEntry[?]]";
     } else if (!args[1].datatype_->const_unwrap()->is_a_string()) {
       o.string_val_ = "Second argument to shput() must be a string";
+      // TODO below does not take into account about auto casting requirements
     } else if (!(*(args[2].datatype_->const_unwrap()) ==
                  *(args[0].datatype_->args_[0]->args_[0]->const_unwrap()))) {
       o.string_val_ = "Third argument to shput() must match provided map";
@@ -793,6 +795,7 @@ struct builtin_hmget : builtin {
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ =
           "First argument to hmget() must match with Array[MEntry[K,V]]";
+      // TODO below does not take into account about auto casting requirements
     } else if (*(args[0].datatype_->args_[0]->args_[0]) !=
                *(args[1].datatype_)) {
       o.string_val_ = "Second argument to hmget() must be a valid key matching "
@@ -839,6 +842,7 @@ struct builtin_hmgeti : builtin {
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ =
           "First argument to hmgeti() must match with Array[MEntry[K,V]]";
+      // TODO below does not take into account about auto casting requirements
     } else if (*(args[0].datatype_->args_[0]->args_[0]) !=
                *(args[1].datatype_)) {
       o.string_val_ = "Second argument to hmget() must be a valid key matching "
@@ -885,6 +889,7 @@ struct builtin_hmput : builtin {
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ =
           "First argument to hmput() must match with Array[MEntry[K,V]]";
+      // TODO below does not take into account about auto casting requirements
     } else if (*(args[0].datatype_->args_[0]->args_[0]) !=
                *(args[1].datatype_)) {
       o.string_val_ = "Second argument to hmput() must be a valid key matching "
@@ -1251,6 +1256,7 @@ struct builtin_iif : builtin {
       o.string_val_ = "iif() builtin expects 3 arguments";
     } else if (!(args[0].datatype_->const_unwrap()->is_bool())) {
       o.string_val_ = "First argument to iif() must be a bool";
+      // TODO below does not take into account about auto casting requirements
     } else if (*args[1].datatype_->const_unwrap() !=
                *args[2].datatype_->const_unwrap()) {
       o.string_val_ = "Second and third argument to iif() must be of same type";
