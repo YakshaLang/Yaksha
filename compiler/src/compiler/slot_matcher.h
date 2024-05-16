@@ -42,19 +42,29 @@
 #include "compiler/function_datatype_extractor.h"
 #include "utilities/ykobject.h"
 namespace yaksha {
-
+  struct type_match_result {
+    std::string error_{};
+    bool matched_{false};
+    bool auto_casted_{false};
+  };
   /**
-   * Match a given object argument with a data type
+   * Facade for typechecking and auto-casting needs
    */
   struct slot_matcher : function_datatype_extractor {
     ~slot_matcher() override = default;
+
+    virtual type_match_result slot_match_with_result(ykdatatype *datatype, const ykobject &provided_arg) = 0;
+    virtual type_match_result rvalue_match(const ykobject& left_side, const ykobject& right_side) = 0;
     /**
-     * Can we pass this argument to a slot of given data type?
-     * @param provided_arg data to be passed to a function slot
-     * @param datatype
-     * @return true if match, false otherwise
+     * Match given two data types, taking auto-casting into account
+     * @param required_datatype datatype that we require (LHS)
+     * @param provided_datatype datatype provided by the user (RHS)
+     * @param primitive_or_obj true if provided data is a primitive/object, false otherwise
+     * @return type_match_result struct
      */
-    virtual bool slot_match(const ykobject &provided_arg, ykdatatype *datatype) = 0;
+    virtual type_match_result type_match(ykdatatype* required_datatype, ykdatatype* provided_datatype, bool primitive_or_obj) = 0;
+    virtual bool is_identical_type(ykdatatype* required_datatype, ykdatatype* provided_datatype) = 0;
+    virtual bool is_not_identical_type(ykdatatype* required_datatype, ykdatatype* provided_datatype) = 0;
   };
 }// namespace yaksha
 #endif

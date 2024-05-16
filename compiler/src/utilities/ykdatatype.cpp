@@ -182,6 +182,10 @@ bool ykdatatype::is_primitive() const {
          is_f64() || is_i8() || is_i16() || is_i32() || is_i64() || is_u8() ||
          is_u16() || is_u32() || is_u64() || is_none();
 }
+bool ykdatatype::is_c_primitive() const {
+  return is_bool() || is_f32() || is_f64() || is_i8() || is_i16() || is_i32() ||
+         is_i64() || is_u8() || is_u16() || is_u32() || is_u64();
+}
 ykdatatype::ykdatatype(std::string primitive) : type_(std::move(primitive)) {
   token_ = new token();
   token_->token_ = type_;
@@ -267,7 +271,8 @@ ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, ykdt_pool *pool,
   if ((lhs_mutates || assignment) && is_const()) { return nullptr; }
   ykdatatype *lhsu = const_unwrap();
   ykdatatype *rhsu = rhs->const_unwrap();
-  if (*lhsu == *rhsu) { return nullptr; }
+  // Identical type cannot be cast as they are already same
+  if (internal_is_identical_type(lhsu, rhsu)) { return nullptr; }
   auto li = +lhsu->primitive_type_;
   auto ri = +rhsu->primitive_type_;
   if (lhsu->is_a_string() && rhsu->is_a_string()) {
@@ -299,4 +304,16 @@ bool ykdatatype::is_fixed_size_array() const {
 }
 bool ykdatatype::is_dimension() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::DIMENSION;
+}
+bool yaksha::internal_is_identical_type(ykdatatype *required_datatype,
+                                ykdatatype *provided_datatype) {
+  if (required_datatype != nullptr && provided_datatype != nullptr) {
+    if (required_datatype->is_primitive() &&
+        provided_datatype->is_primitive()) {
+      return required_datatype->primitive_type_ ==
+             provided_datatype->primitive_type_;
+    }
+    return required_datatype->as_string() == provided_datatype->as_string();
+  }
+  return false;
 }

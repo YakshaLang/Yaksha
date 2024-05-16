@@ -104,7 +104,7 @@ struct yt_tuple_u8_u8_u8_u8;
 void yy__w4_set_palette(uint32_t, uint32_t, uint32_t, uint32_t);
 void yy__w4_hline(int32_t, int32_t, uint32_t);
 void yy__w4_vline(int32_t, int32_t, uint32_t);
-void yy__w4_text_u8(uint8_t const *, int32_t, int32_t);
+void yy__w4_text_u8(uint8_t const * const , int32_t, int32_t);
 void yy__w4_tone(uint32_t, uint32_t, uint32_t, uint32_t);
 void yy__w4_set_game_state(void*);
 void yy__clear_buf(uint8_t*);
@@ -155,7 +155,7 @@ void yy__w4_set_palette(uint32_t nn__c1, uint32_t nn__c2, uint32_t nn__c3, uint3
 }
 void yy__w4_hline(int32_t nn__x, int32_t nn__y, uint32_t nn__length) { hline(nn__x, nn__y, nn__length); }
 void yy__w4_vline(int32_t nn__x, int32_t nn__y, uint32_t nn__length) { vline(nn__x, nn__y, nn__length); }
-void yy__w4_text_u8(uint8_t const * nn__text_data, int32_t nn__x, int32_t nn__y) 
+void yy__w4_text_u8(uint8_t const * const  nn__text_data, int32_t nn__x, int32_t nn__y) 
 {
     text((const char *)nn__text_data, nn__x, nn__y);
 }
@@ -509,7 +509,7 @@ void yy__draw_board(struct yy__State* yy__s)
     yy__w4_set_draw_colors(UINT16_C(20));
     yy__w4_text_u8(ykbindata1, INT32_C(2), INT32_C(2));
     yy__i2s(yy__s->yy__note_count, yy__s->yy__text_buf);
-    yy__w4_text_u8(((uint8_t const *)yy__s->yy__text_buf), INT32_C(120), INT32_C(2));
+    yy__w4_text_u8(((uint8_t const * const )yy__s->yy__text_buf), INT32_C(120), INT32_C(2));
     yy__w4_vline(INT32_C(118), INT32_C(0), UINT32_C(10));
     yy__w4_vline(INT32_C(79), INT32_C(0), UINT32_C(10));
     yy__w4_set_draw_colors(UINT16_C(18));
@@ -521,7 +521,7 @@ void yy__draw_board(struct yy__State* yy__s)
     {
         yy__i2s((yy__s->yy__cursor + INT32_C(1)), yy__s->yy__text_buf);
     }
-    yy__w4_text_u8(((uint8_t const *)yy__s->yy__text_buf), INT32_C(80), INT32_C(2));
+    yy__w4_text_u8(((uint8_t const * const )yy__s->yy__text_buf), INT32_C(80), INT32_C(2));
     yy__w4_hline(INT32_C(0), INT32_C(10), UINT32_C(160));
     yy__w4_hline(INT32_C(0), (yy__s->yy__height - INT32_C(10)), UINT32_C(160));
     if (yy__s->yy__playing)
@@ -600,7 +600,7 @@ void yy__draw_note(struct yy__State* yy__s, int32_t yy__grid_pos, int32_t yy__no
     {
         yy__w4_set_draw_colors(UINT16_C(18));
     }
-    yy__w4_text_u8(((uint8_t const *)yy__s->yy__text_buf), (yy__x + yy__x_delta), yy__y);
+    yy__w4_text_u8(((uint8_t const * const )yy__s->yy__text_buf), (yy__x + yy__x_delta), yy__y);
     yy__x_delta += yy__FONT_WIDTH;
     uint8_t yy__note = yy__s->yy__note_buf[yy__note_pos].e2;
     if ((yy__note == yy__NOTE_C) || (yy__note == yy__NOTE_C_S))
@@ -650,7 +650,7 @@ void yy__draw_note(struct yy__State* yy__s, int32_t yy__grid_pos, int32_t yy__no
     {
         yy__w4_set_draw_colors(UINT16_C(19));
     }
-    yy__w4_text_u8(((uint8_t const *)yy__s->yy__text_buf), (yy__x + yy__x_delta), yy__y);
+    yy__w4_text_u8(((uint8_t const * const )yy__s->yy__text_buf), (yy__x + yy__x_delta), yy__y);
     yy__x_delta += yy__FONT_WIDTH;
     if (yy__s->yy__text_buf[INT32_C(1)] != UINT8_C(0))
     {
@@ -668,7 +668,7 @@ void yy__draw_note(struct yy__State* yy__s, int32_t yy__grid_pos, int32_t yy__no
         {
             yy__w4_set_draw_colors(UINT16_C(20));
         }
-        yy__w4_text_u8(((uint8_t const *)yy__s->yy__text_buf), (yy__x + yy__x_delta), yy__y);
+        yy__w4_text_u8(((uint8_t const * const )yy__s->yy__text_buf), (yy__x + yy__x_delta), yy__y);
     }
     return;
 }

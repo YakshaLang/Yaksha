@@ -143,7 +143,7 @@ def text(text_data: sr, x: int, y: int) -> None:
     ccode """text(yk__bstr_get_reference(nn__text_data), nn__x, nn__y)"""
 
 @native
-def text_u8(text_data: Ptr[Const[u8]], x: int, y: int) -> None:
+def text_u8(text_data: Const[Ptr[Const[u8]]], x: int, y: int) -> None:
     # Draws text from given binarydata("text") (or manually created u8 Ptr) (no string allocation)
     ccode """text((const char *)nn__text_data, nn__x, nn__y)"""
 

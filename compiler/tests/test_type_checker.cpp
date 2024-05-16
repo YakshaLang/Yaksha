@@ -111,6 +111,8 @@ static void test_typechecker_snippet_full_ok(const std::string &S) {
   REQUIRE(mc.error_printer_.has_no_errors());
 }
 TEST_CASE("type checker: Bad function for qsort") {
+  // TODO Note that the error here does not really make sense
+  //  as I renamed SortArg --> AnyPtrToConst
   test_typechecker_yaka_file(
       "../test_data/bad_inputs/bad_input_sort_with_wrong_args.yaka",
       "Comparison must match with "
@@ -143,6 +145,7 @@ TEST_CASE("type checker: First argument must be a string literal for arrnew(). "
       "First argument to arrnew() must be a string literal");
 }
 TEST_CASE("type checker: Second argument must be int for arrnew()") {
+  // Note: see here that the second arg is a string literal "10"
   test_typechecker_snippet(R"(a: Array[int] = arrnew("int", "10"))",
                            "Second argument to arrnew() must be an int");
 }
@@ -168,6 +171,7 @@ TEST_CASE("type checker: First argument must be a string literal for array(). "
       "First argument to array() must be a string literal");
 }
 TEST_CASE("type checker: Second argument must be int for array()") {
+  // Note: we are looking at integer type values, but we get a "10" string literal
   test_typechecker_snippet(
       "a: Array[int] = array(\"int\", \"10\")",
       "All arguments must match with data type passed to first "
@@ -180,7 +184,10 @@ TEST_CASE("type checker: Must assign to proper data structure for array()") {
 TEST_CASE("type checker: Different type assignment using iif") {
   test_typechecker_snippet(
       "a: bool = iif(True, False, 1)",
-      "Second and third argument to iif() must be of same type");
+      "Second and third arguments to iif() data type mismatch. Expected: bool, Provided: int");
+}
+TEST_CASE("type checker: Different type assignment using iif bigger type on lhs") {
+  test_typechecker_snippet_ok("a: int = iif(True, 1, 1i8)");
 }
 TEST_CASE("type checker: Different type func assignment using iif") {
   test_typechecker_snippet_full(
@@ -191,7 +198,7 @@ TEST_CASE("type checker: Different type func assignment using iif") {
       "def main() -> int:\n"
       "    a: Function[In[int],Out] = iif(True, f1, f2)\n"
       "    return 0",
-      "You must use functions of same type for iif() builtin");
+      "Second and third arguments to iif() data type mismatch. Expected: Function[In[int], Out], Provided: Function[In[int, int], Out]");
 }
 TEST_CASE("type checker: iif using 4 args") {
   test_typechecker_snippet("a: bool = iif(True, False, True, 2)",
@@ -363,14 +370,14 @@ TEST_CASE("type checker: func call parameter and argument mismatches") {
       "def main() -> int:\n"
       "    fnc(1i32, False)\n"
       "    return 0",
-      "Parameter & argument 1 mismatches. Expected: i8");
+      "Parameter & argument 1 mismatches. Expected: i8 Provided: int");
   test_typechecker_snippet_full(
       "def fnc(a: int, b: i8) -> None:\n"
       "    pass\n"
       "def main() -> int:\n"
       "    fnc(1i32, 10)\n"
       "    return 0",
-      "Parameter & argument 2 mismatches. Expected: i8");
+      "Parameter & argument 2 mismatches. Expected: i8 Provided: int");
 }
 TEST_CASE("type checker: func call parameter and argument mismatches first "
           "argument") {
@@ -385,7 +392,7 @@ TEST_CASE("type checker: func call parameter and argument mismatches first "
       "def main() -> int:\n"
       "    fnc(1340, 3)\n"
       "    return 0",
-      "Parameter & argument 1 mismatches. Expected: i8");
+      "Parameter & argument 1 mismatches. Expected: i8 Provided: int");
 }
 TEST_CASE(
     "type checker: func call parameter and argument mismatches for varargs") {
@@ -404,7 +411,7 @@ TEST_CASE(
       "def main() -> int:\n"
       "    fnc(1, 3, 2, 3, 12i64)\n"
       "    return 0",
-      "Variable argument: 5 mismatches. Expected: int");
+      "Variable argument: 5 mismatches. Expected: int Provided: i64");
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
   test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
@@ -695,14 +702,14 @@ TEST_CASE("type checker: Test multiple assignment failure") {
   test_typechecker_yaka_file("../test_data/compiler_tests/multi_assign.yaka",
                              "Cannot assign between 2 different data types. lhs: sr, rhs: int");
 }
-TEST_CASE("type checker: import shadows a foreach variable") {
+TEST_CASE("type checker: Import shadows a foreach variable") {
   test_typechecker_yaka_file(
       "../test_data/compiler_tests/import_for_each_shadow.yaka",
-      "foreach: shadows outer scope name: 'c'");
+      "Foreach: shadows outer scope name: 'c'");
 }
 TEST_CASE("type checker: Create a primitive using {} init") {
   test_typechecker_snippet("a = int{x: 0}",
-                           "invalid data type for {} initialization");
+                           "Invalid data type for {} initialization");
 }
 TEST_CASE("type checker: Invalid fields in struct") {
   test_typechecker_snippet_full(
@@ -711,7 +718,7 @@ TEST_CASE("type checker: Invalid fields in struct") {
       "def main() -> int:\n"
       "    a = P{k: 0}\n"
       "    return 0\n",
-      "member not found in class/struct. Perhaps 'x' is what you meant?");
+      "Member 'k' not found in class/struct 'P'. Perhaps 'x' is what you meant?");
 }
 TEST_CASE("type checker: Duplicate fields in {} init (struct)") {
   test_typechecker_snippet_full("struct P:\n"
@@ -719,7 +726,7 @@ TEST_CASE("type checker: Duplicate fields in {} init (struct)") {
                                 "def main() -> int:\n"
                                 "    a = P{x: 0, x: 1}\n"
                                 "    return 0\n",
-                                "duplicate field in struct literal.");
+                                "Duplicate field 'x' in class/struct literal.");
 }
 TEST_CASE("type checker: Duplicate fields in {} init (class)") {
   test_typechecker_snippet_full("class P:\n"
@@ -728,9 +735,9 @@ TEST_CASE("type checker: Duplicate fields in {} init (class)") {
                                 "    a = P{x: 0, x: 1}\n"
                                 "    defer del a\n"
                                 "    return 0\n",
-                                "duplicate field in struct literal.");
+                                "Duplicate field 'x' in class/struct literal.");
 }
-TEST_CASE("type checker: Certain comparisions are not allowed") {
+TEST_CASE("type checker: Certain comparisons are not allowed") {
   test_typechecker_snippet_full("def main() -> int:\n"
                                 "    b: str = \"\"\n"
                                 "    c: str = \"xxx\"\n"

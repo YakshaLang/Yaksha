@@ -6,7 +6,7 @@
 #    / // / // /// // /// // /// / / / /
 #   /___ //////////////////////////_/ /
 #   \____\________________________\_\/
-# 
+#
 #  **notes**: Application by -- Bhathiya Perera --
 #        For WASM4 Fantasy Console
 #
@@ -303,7 +303,7 @@ def draw_board(s: State) -> None:
     w4.set_draw_colors(0x0014u16)
     w4.text_u8(binarydata("mode:\0"), 2, 2)
     i2s(s.note_count, s.text_buf)
-    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), 120, 2)
+    w4.text_u8(cast("Const[Ptr[Const[u8]]]", s.text_buf), 120, 2)
     w4.vline(118, 0, 10u32)
     w4.vline(79, 0, 10u32)
     w4.set_draw_colors(0x0012u16)
@@ -311,7 +311,7 @@ def draw_board(s: State) -> None:
         i2s(0, s.text_buf)
     else:
         i2s(s.cursor + 1, s.text_buf)
-    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), 80, 2)
+    w4.text_u8(cast("Const[Ptr[Const[u8]]]", s.text_buf), 80, 2)
     w4.hline(0, 10, 160u32)
     w4.hline(0, s.height - 10, 160u32)
     if s.playing:
@@ -356,7 +356,7 @@ def draw_note(s: State, grid_pos: int, note_pos: int, cursor: bool) -> None:
         w4.set_draw_colors(0x0042u16)
     else:
         w4.set_draw_colors(0x0012u16)
-    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), x + x_delta, y)
+    w4.text_u8(cast("Const[Ptr[Const[u8]]]", s.text_buf), x + x_delta, y)
     x_delta += FONT_WIDTH
     # Put note indicator
     note: u8 = s.note_buf[note_pos][1]
@@ -382,7 +382,7 @@ def draw_note(s: State, grid_pos: int, note_pos: int, cursor: bool) -> None:
         w4.set_draw_colors(0x0043u16)
     else:
         w4.set_draw_colors(0x0013u16)
-    w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), x + x_delta, y)
+    w4.text_u8(cast("Const[Ptr[Const[u8]]]", s.text_buf), x + x_delta, y)
     x_delta += FONT_WIDTH
     if s.text_buf[1] != 0u8:
         # handle '#' sign
@@ -395,7 +395,7 @@ def draw_note(s: State, grid_pos: int, note_pos: int, cursor: bool) -> None:
             w4.set_draw_colors(0x0041u16)
         else:
             w4.set_draw_colors(0x0014u16)
-        w4.text_u8(cast("Ptr[Const[u8]]", s.text_buf), x + x_delta, y)
+        w4.text_u8(cast("Const[Ptr[Const[u8]]]", s.text_buf), x + x_delta, y)
 
 def draw_notes(s: State) -> None:
     # Nothing to draw

@@ -102,7 +102,7 @@ template<typename Verifier>
 bool dt_match_ignore_const(ykdatatype *lhs, ykdatatype *rhs, Verifier v) {
   ykdatatype *my_lhs = lhs->const_unwrap();
   ykdatatype *my_rhs = rhs->const_unwrap();
-  return (*my_lhs == *my_rhs) && v(my_lhs) && v(my_rhs);
+  return (internal_is_identical_type(my_lhs, my_rhs)) && v(my_lhs) && v(my_rhs);
 }
 #define DT_MATCH(lhs, rhs, fnc)                                                \
   dt_match_ignore_const(lhs.datatype_, rhs.datatype_,                          \
@@ -112,8 +112,9 @@ bool dt_verify_ignore_const(ykdatatype *castable, ykdatatype *lhs,
                             ykdatatype *rhs, Verifier v) {
   ykdatatype *my_lhs = lhs->const_unwrap();
   ykdatatype *my_rhs = rhs->const_unwrap();
-  return ((castable == nullptr && *my_lhs == *my_rhs) || castable != nullptr) &&
-         v(my_lhs) && v(my_rhs);
+  return ((castable == nullptr && internal_is_identical_type(my_lhs, my_rhs) ||
+           castable != nullptr) &&
+          v(my_lhs) && v(my_rhs));
 }
 #define DT_VERIFY(castable, lhs, rhs, fnc)                                     \
   dt_verify_ignore_const(castable, lhs.datatype_, rhs.datatype_,               \
@@ -290,20 +291,22 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
         if (i == last_param_index && funct->annotations_.varargs_) {
           for (auto j = i; j < arguments.size(); j++) {
             auto arg = arguments[j];
-            if (!slot_match(arg, param.data_type_)) {
+            if (!slot_match_with_result(param.data_type_, arg).matched_) {
               std::stringstream message{};
               message << "Variable argument: " << (j + 1) << " mismatches. ";
               message << "Expected: "
                       << param.data_type_->as_string_simplified();
+              message << " Provided: " << arg.datatype_->as_string_simplified();
               error(obj->paren_token_, message.str());
             }
           }
         } else {
           auto arg = arguments[i];
-          if (!slot_match(arg, param.data_type_)) {
+          if (!slot_match_with_result(param.data_type_, arg).matched_) {
             std::stringstream message{};
             message << "Parameter & argument " << (i + 1) << " mismatches. ";
             message << "Expected: " << param.data_type_->as_string_simplified();
+            message << " Provided: " << arg.datatype_->as_string_simplified();
             error(obj->paren_token_, message.str());
           }
         }
@@ -352,7 +355,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     for (auto i = 0; i < params.size(); i++) {
       auto param = params[i];
       auto arg = arguments[i];
-      if (!slot_match(arg, param)) {
+      if (!slot_match_with_result(param, arg).matched_) {
         std::stringstream message{};
         message << "Function[] call parameter & argument " << (i + 1)
                 << " mismatches. ";
@@ -672,7 +675,8 @@ void type_checker::visit_return_stmt(return_stmt *obj) {
   } else {
     // func cannot be null here.
     auto func = this->defs_classes_->get_function(function_name);
-    if (!slot_match(return_data_type, func->return_type_)) {
+    if (!slot_match_with_result(func->return_type_, return_data_type)
+             .matched_) {
       message << "Invalid return data type. ";
       message << "Expected: " << func->return_type_->as_string_simplified();
       message << ", Provided: "
@@ -990,7 +994,8 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
     //  keep any leftover as is. (We assume whoever assigns knows what they are doing) :)
     //  however, we cannot assign if the args_[0] is a const in a FixedArray, so check for this.
     message << "Cannot assign to a FixedArr[..]. FixedArr variables are not "
-               "assignable. lhs: " << lhs.datatype_->as_string_simplified();
+               "assignable. lhs: "
+            << lhs.datatype_->as_string_simplified();
     message << ", rhs: " << rhs.datatype_->as_string_simplified();
     error(oper, message.str());
   }
@@ -1000,12 +1005,14 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
     //  if any element in a tuple is a const, then we cannot assign to it.?
     //  we can either skip the const element, or error out. (TBD)
     message << "Cannot assign to a Tuple[..]. Tuple variables are not "
-               "assignable. lhs: " << lhs.datatype_->as_string_simplified();
+               "assignable. lhs: "
+            << lhs.datatype_->as_string_simplified();
     message << ", rhs: " << rhs.datatype_->as_string_simplified();
     error(oper, message.str());
   }
   if (lhs.datatype_->is_const()) { error(oper, "Cannot assign to a constant"); }
-  if (rhs.is_a_function() && !slot_match(rhs, lhs.datatype_)) {
+  if (rhs.is_a_function() &&
+      !slot_match_with_result(lhs.datatype_, rhs).matched_) {
     message << "You can only assign a matching function. lhs: ";
     message << lhs.datatype_->as_string_simplified();
     ykdatatype *arg_datatype = function_to_datatype_or_null(rhs);
@@ -1019,7 +1026,7 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
   }
   if ((lhs.is_primitive_or_obj() && rhs.is_primitive_or_obj())) {
     auto rhs_dt = rhs.datatype_->const_unwrap();
-    if (*lhs.datatype_ != *rhs_dt) {
+    if (is_not_identical_type(lhs.datatype_, rhs_dt)) {
       auto castable =
           lhs.datatype_->auto_cast(rhs.datatype_, dt_pool_, true, true);
       if (castable == nullptr) {
@@ -1101,40 +1108,118 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
         !expression_dt->is_string_literal() && scope_.is_global_level()) {
       error(obj->name_, "Const[sr] must use a string literal at the RHS.");
     }
-    if (*(obj->data_type_->args_[0]) != *expression_dt) {
-      auto castable = obj->data_type_->args_[0]->auto_cast(
-          expression_dt, dt_pool_, false, true);
-      if (castable == nullptr) {
-        error(obj->name_, "Data type mismatch in expression and declaration.");
-      }
+    auto match = type_match(obj->data_type_->args_[0], expression_dt, true);
+    if (match.matched_) {
+      placeholder = expression_data;
+    } else {
+      std::stringstream message{};
+      message << "Constant '" << name << "' data type mismatch. ";
+      message << match.error_;
+      error(obj->name_, message.str());
     }
   }
   // If this is not a global constant define it
   if (!scope_.is_global_level()) { scope_.define(name, placeholder); }
 }
-bool type_checker::slot_match(const ykobject &arg, ykdatatype *datatype) {
-  if (arg.is_a_function() && datatype->is_function()) {
-    ykdatatype *arg_datatype = function_to_datatype_or_null(arg);
-    return arg_datatype != nullptr && *arg_datatype == *datatype;
+bool type_checker::is_identical_type(ykdatatype *required_datatype,
+                                     ykdatatype *provided_datatype) {
+  return internal_is_identical_type(required_datatype, provided_datatype);
+}
+bool type_checker::is_not_identical_type(ykdatatype *required_datatype,
+                                         ykdatatype *provided_datatype) {
+  return !is_identical_type(required_datatype, provided_datatype);
+}
+type_match_result type_checker::type_match(ykdatatype *required_datatype,
+                                           ykdatatype *provided_datatype,
+                                           bool primitive_or_obj) {
+  // Identical types match
+  if (primitive_or_obj &&
+      is_identical_type(required_datatype, provided_datatype)) {
+    return type_match_result{"", true, false};
   }
-  if (arg.is_primitive_or_obj() &&
-      *(arg.datatype_->const_unwrap()) == *(datatype->const_unwrap())) {
-    return true;
+  // Can autocast strings
+  if (primitive_or_obj && required_datatype->const_unwrap()->is_a_string() &&
+      provided_datatype->const_unwrap()->is_a_string()) {
+    return type_match_result{
+        "", true, is_not_identical_type(required_datatype, provided_datatype)};
   }
-  // Due to auto casting any string can be passed to any string (at user level we only got sr and str)
-  if (arg.is_primitive_or_obj() &&
-      arg.datatype_->const_unwrap()->is_a_string() &&
-      datatype->const_unwrap()->is_a_string()) {
-    return true;
+  // Can autocast numbers and booleans
+  if (primitive_or_obj && (provided_datatype->const_unwrap()->is_a_number() ||
+                           provided_datatype->const_unwrap()->is_bool())) {
+    auto castable =
+        required_datatype->auto_cast(provided_datatype, dt_pool_, false, true);
+    if (castable != nullptr) { return type_match_result{"", true, true}; }
   }
-  // Number auto casting
-  if (arg.is_primitive_or_obj() &&
-      (arg.datatype_->const_unwrap()->is_a_number() ||
-       arg.datatype_->const_unwrap()->is_bool())) {
-    auto castable = datatype->auto_cast(arg.datatype_, dt_pool_, false, true);
-    if (castable != nullptr) { return true; }
+  std::stringstream message{};
+  message << "data type mismatch. Expected: ";
+  message << required_datatype->as_string_simplified();
+  message << ", Provided: ";
+  message << provided_datatype->as_string_simplified();
+  return type_match_result{message.str(), false, false};
+}
+type_match_result
+type_checker::slot_match_with_result(ykdatatype *datatype,
+                                     const ykobject &provided_arg) {
+  std::stringstream message{};
+  // If we passed in a builtin function to an argument then we cannot use that
+  //  error out as this is not allowed
+  if (provided_arg.object_type_ == object_type::BUILTIN_FUNCTION &&
+      datatype->is_function()) {
+    message
+        << "Cannot use builtin functions as a function pointers. Expected: ";
+    message << datatype->as_string_simplified();
+    return type_match_result{message.str(), false, false};
   }
-  return false;
+  // Type check for function passed as is
+  if (provided_arg.is_a_function() && datatype->is_function()) {
+    ykdatatype *arg_datatype = function_to_datatype_or_null(provided_arg);
+    if (arg_datatype != nullptr) {
+      return type_match(datatype, arg_datatype, true);
+    } else {
+      message << "Invalid function pointer provided. Expected: ";
+      message << datatype->as_string_simplified();
+      return type_match_result{message.str(), false, false};
+    }
+  }
+  // Type check for primitive or object
+  auto lhs = datatype;
+  auto lhsu = lhs->const_unwrap();
+  auto rhs = provided_arg.datatype_;
+  auto rhsu = rhs->const_unwrap();
+  // Both are native primitives
+  if (lhsu->is_c_primitive() && rhsu->is_c_primitive()) {
+    return type_match(lhsu, rhsu, true);
+  }
+  return type_match(datatype, provided_arg.datatype_,
+                    provided_arg.is_primitive_or_obj());
+}
+type_match_result type_checker::rvalue_match(const ykobject &left_side,
+                                             const ykobject &right_side) {
+  std::stringstream message{};
+  if (left_side.is_a_function() && right_side.is_a_function()) {
+    ykdatatype *lhs = function_to_datatype_or_null(left_side);
+    ykdatatype *rhs = function_to_datatype_or_null(right_side);
+    if (lhs != nullptr && rhs != nullptr) { return type_match(lhs, rhs, true); }
+  } else if (left_side.is_a_function()) {
+    ykdatatype *lhs = function_to_datatype_or_null(left_side);
+    if (lhs == nullptr) {
+      message << "Invalid function pointer provided. Expected: ";
+      message << left_side.datatype_->as_string_simplified();
+      return type_match_result{message.str(), false, false};
+    }
+    return slot_match_with_result(lhs, right_side);
+  } else if (right_side.is_a_function()) {
+    ykdatatype *rhs = function_to_datatype_or_null(right_side);
+    if (rhs == nullptr) {
+      message << "Invalid function pointer provided. Expected: ";
+      message << left_side.datatype_->as_string_simplified();
+      return type_match_result{message.str(), false, false};
+    }
+    return type_match(left_side.datatype_, rhs, true);
+  }
+  return type_match(left_side.datatype_->const_unwrap(),
+                    right_side.datatype_->const_unwrap(),
+                    right_side.is_primitive_or_obj());
 }
 ykdatatype *type_checker::function_to_datatype_or_null(const ykobject &arg) {
   def_stmt *funct;
@@ -1188,7 +1273,7 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   //   if, while, del, defer, return?
   if (!exp.datatype_->const_unwrap()->is_array() &&
       !exp.datatype_->const_unwrap()->is_fixed_size_array()) {
-    message << "foreach statement expression must be an array. ";
+    message << "Foreach statement expression must be an array. ";
     message << "Provided: " << exp.datatype_->as_string_simplified();
     error(obj->for_keyword_, message.str());
   }
@@ -1200,7 +1285,7 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
     error(obj->for_keyword_, message.str());
   }
   if (scope_.is_defined(obj->name_->token_)) {
-    message << "foreach: shadows outer scope name: '" << obj->name_->token_
+    message << "Foreach: shadows outer scope name: '" << obj->name_->token_
             << "'";
     error(obj->name_, message.str());
   }
@@ -1215,11 +1300,9 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   }
   auto lhs = exp.datatype_->const_unwrap()->args_[0];
   auto rhs = obj->data_type_;
-  if ((*lhs != *rhs)) {
-    message
-        << "foreach statement expression and element data type does not match.";
-    message << " LHS: " << lhs->as_string_simplified();
-    message << ", RHS: " << rhs->as_string_simplified();
+  auto match = type_match(lhs, rhs, true);
+  if (!match.matched_) {
+    message << "Foreach statement " << match.error_;
     error(obj->for_keyword_, message.str());
   }
   push_scope_type(ast_type::STMT_WHILE);
@@ -1240,24 +1323,26 @@ void type_checker::visit_compins_stmt(compins_stmt *obj) {
   // Does not occur in AST
   // Does not need to be type checked at the moment
 }
-class_stmt *type_checker::find_class(token *tok, ykdatatype *data_type) {
+class_stmt *type_checker::find_class_or_null(token *tok,
+                                             ykdatatype *data_type) {
   // If this is a primitive / builtin it is not a user defined class
   if (data_type->const_unwrap()->is_builtin_or_primitive()) {
-    error(tok, "primitives/builtins cannot be created as a struct literal");
+    error(tok, "Primitives/builtins cannot be created as a struct literal");
     return nullptr;
   }
   auto mod = cf_->get_or_null(data_type->module_);
   if (mod == nullptr) {
-    error(tok, "module not found");
+    error(tok, "Module not found");
     return nullptr;
   }
   if (mod->data_->dsv_->has_class(data_type->type_)) {
     return mod->data_->dsv_->get_class(data_type->type_);
   }
-  error(tok, "class/struct not found");
+  error(tok, "Class/struct not found");
   return nullptr;
 }
 void type_checker::validate_member(name_val &member, class_stmt *class_st) {
+  std::stringstream message{};
   ykdatatype *class_member_dt = nullptr;
   std::vector<std::string> members{};
   for (auto const &para : class_st->members_) {
@@ -1268,18 +1353,26 @@ void type_checker::validate_member(name_val &member, class_stmt *class_st) {
   }
   if (class_member_dt == nullptr) {
     std::string closest = find_closest(member.name_->token_, members);
-    error(member.name_, "member not found in class/struct. Perhaps '" +
-                            closest + "' is what you meant?");
+    message << "Member '" << member.name_->token_
+            << "' not found in class/struct '";
+    message << class_st->name_->token_ << "'. Perhaps '" << closest;
+    message << "' is what you meant?";
+    error(member.name_, message.str());
     return;
   }
   member.value_->accept(this);
   auto set_value = pop();
   ykdatatype *member_dt = set_value.datatype_->const_unwrap();
-  if (*class_member_dt != *member_dt) {
-    error(member.name_, "data types mismatch");
+  auto match = type_match(class_member_dt, member_dt, true);
+  if (!match.matched_) {
+    message << "Member '" << member.name_->token_
+            << "' data type mismatch for class/struct '";
+    message << class_st->name_->token_ << "'." << match.error_;
+    error(member.name_, message.str());
   }
 }
 void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
+  std::stringstream message{};
   obj->dt_expr_->accept(this);
   auto dt_class = pop();
   if (dt_class.object_type_ == object_type::CLASS_ITSELF ||
@@ -1297,13 +1390,15 @@ void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
     std::unordered_set<std::string> names{};
     for (auto nv : obj->values_) {
       if (names.find(nv.name_->token_) != names.end()) {
-        error(nv.name_, "duplicate field in struct literal.");
+        message << "Duplicate field '" << nv.name_->token_
+                << "' in class/struct literal.";
+        error(nv.name_, message.str());
         break;
       }
       names.insert(nv.name_->token_);
     }
     // Match data type of each element with member data type
-    auto class_stmt = find_class(obj->curly_open_, data.datatype_);
+    auto class_stmt = find_class_or_null(obj->curly_open_, data.datatype_);
     if (class_stmt == nullptr) {
       // Note error is created in find_class, so no need to do it again here
       push(ykobject(dt_pool_));
@@ -1313,10 +1408,12 @@ void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
     /* ----------------------------------------- */
     push(data);
   } else {
-    error(obj->curly_open_, "invalid data type for {} initialization");
+    error(obj->curly_open_, "Invalid data type for {} initialization");
   }
 }
-void type_checker::visit_macro_call_expr(macro_call_expr *obj) {}
+void type_checker::visit_macro_call_expr(macro_call_expr *obj) {
+  // Not required to be type checked
+}
 void type_checker::visit_cfor_stmt(cfor_stmt *obj) {
   push_scope_type(ast_type::STMT_WHILE);
   scope_.push();

@@ -37,6 +37,8 @@
 //
 // ==============================================================================================
 // builtins.cpp
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "readability-convert-member-functions-to-static"
 #include "builtins.h"
 #include "ast/parser.h"
 #include "tokenizer/tokenizer.h"
@@ -61,19 +63,16 @@ struct builtin_arrput : builtin {
       o.string_val_ = "Two arguments must be provided for arrput() builtin";
     } else if (!args[0].datatype_->is_array()) {
       o.string_val_ = "First argument to arrput() must be an Array[?]";
-      // TODO below does not take into account how to handle relevant auto casting requirements
-    } else if (*(args[0].datatype_->args_[0]) !=
-               *args[1].datatype_->const_unwrap()) {
-      if (args[0].datatype_->args_[0]->const_unwrap()->is_a_string() &&
-          args[1].datatype_->const_unwrap()->is_a_string()) {
-        return o;
-      }
-      o.string_val_ = "Second argument to arrput() must match with Array[?]";
     } else if (args[0].datatype_->args_[0]->is_m_entry() ||
                args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ = "arrput() does not work with maps";
     } else {
-      return o;
+      auto matched = dt_slot_matcher->type_match(
+          args[0].datatype_->args_[0], args[1].datatype_->const_unwrap(),
+          args[1].is_primitive_or_obj());
+      if (matched.matched_) { return o; }
+      o.string_val_ = "Argument to arrput() does not match the array type " +
+                      matched.error_;
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
@@ -253,9 +252,8 @@ struct builtin_print : builtin {
                   string_utils::unescape(rhs.second.string_val_))
            << "\")";
     } else if (dt->is_sr()) {
-      code << "yk__" << func_name_ << "str("
-           << "yk__bstr_get_reference(" << rhs.first << ")"
-           << ")";
+      code << "yk__" << func_name_ << "str(" << "yk__bstr_get_reference("
+           << rhs.first << ")" << ")";
     } else if (dt->is_a_float()) {
       code << "yk__" << func_name_ << "dbl(" << rhs.first << ")";
     } else if (dt->is_none()) {
@@ -638,12 +636,14 @@ struct builtin_shput : builtin {
           "First argument to shput() must match with Array[SMEntry[?]]";
     } else if (!args[1].datatype_->const_unwrap()->is_a_string()) {
       o.string_val_ = "Second argument to shput() must be a string";
-      // TODO below does not take into account about auto casting requirements
-    } else if (!(*(args[2].datatype_->const_unwrap()) ==
-                 *(args[0].datatype_->args_[0]->args_[0]->const_unwrap()))) {
-      o.string_val_ = "Third argument to shput() must match provided map";
     } else {
-      return o;
+      auto lhs = args[0].datatype_->args_[0]->args_[0]->const_unwrap();
+      auto rhs = args[2].datatype_->const_unwrap();
+      auto matched =
+          dt_slot_matcher->type_match(lhs, rhs, args[2].is_primitive_or_obj());
+      if (matched.matched_) { return o; }
+      o.string_val_ =
+          "Third argument to shput() must match provided map " + matched.error_;
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
@@ -795,13 +795,16 @@ struct builtin_hmget : builtin {
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ =
           "First argument to hmget() must match with Array[MEntry[K,V]]";
-      // TODO below does not take into account about auto casting requirements
-    } else if (*(args[0].datatype_->args_[0]->args_[0]) !=
-               *(args[1].datatype_)) {
-      o.string_val_ = "Second argument to hmget() must be a valid key matching "
-                      "with Array[MEntry[K,V]]";
     } else {
-      return ykobject(args[0].datatype_->args_[0]->args_[1]);
+      auto lhs_raw = args[0].datatype_->args_[0]->args_[1];
+      auto lhs = lhs_raw->const_unwrap();
+      auto rhs = args[1].datatype_->const_unwrap();
+      auto matched =
+          dt_slot_matcher->type_match(lhs, rhs, args[1].is_primitive_or_obj());
+      if (matched.matched_) { return ykobject(lhs_raw); }
+      o.string_val_ =
+          "Second argument to hmget() must match with Array[MEntry[K,V]] " +
+          matched.error_;
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
@@ -842,13 +845,14 @@ struct builtin_hmgeti : builtin {
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ =
           "First argument to hmgeti() must match with Array[MEntry[K,V]]";
-      // TODO below does not take into account about auto casting requirements
-    } else if (*(args[0].datatype_->args_[0]->args_[0]) !=
-               *(args[1].datatype_)) {
-      o.string_val_ = "Second argument to hmget() must be a valid key matching "
-                      "with Array[MEntry[K,V]]";
     } else {
-      return ykobject(dt_pool->create("int"));
+      auto matched = dt_slot_matcher->type_match(
+          args[0].datatype_->args_[0]->args_[0]->const_unwrap(),
+          args[1].datatype_->const_unwrap(), args[1].is_primitive_or_obj());
+      if (matched.matched_) { return ykobject(dt_pool->create("int")); }
+      o.string_val_ =
+          "Second argument to hmgeti() must match with Array[MEntry[K,V]] " +
+          matched.error_;
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
@@ -889,17 +893,27 @@ struct builtin_hmput : builtin {
                !args[0].datatype_->args_[0]->is_m_entry()) {
       o.string_val_ =
           "First argument to hmput() must match with Array[MEntry[K,V]]";
-      // TODO below does not take into account about auto casting requirements
-    } else if (*(args[0].datatype_->args_[0]->args_[0]) !=
-               *(args[1].datatype_)) {
-      o.string_val_ = "Second argument to hmput() must be a valid key matching "
-                      "with Array[MEntry[K,V]]";
-    } else if (*(args[0].datatype_->args_[0]->args_[1]) !=
-               *(args[2].datatype_)) {
-      o.string_val_ = "Third argument to hmput() must be a valid value "
-                      "matching with Array[MEntry[K,V]]";
     } else {
-      return o;
+      auto key_matched = dt_slot_matcher->type_match(
+          args[0].datatype_->args_[0]->args_[0]->const_unwrap(),
+          args[1].datatype_->const_unwrap(), args[1].is_primitive_or_obj());
+      auto value_matched = dt_slot_matcher->type_match(
+          args[0].datatype_->args_[0]->args_[1]->const_unwrap(),
+          args[2].datatype_->const_unwrap(), args[2].is_primitive_or_obj());
+      if (key_matched.matched_ && value_matched.matched_) { return o; }
+      std::stringstream message{};
+      message << "Key/Value arguments to hmput() must match with "
+                 "Array[MEntry[K,V]] ";
+      bool comma = false;
+      if (!key_matched.matched_) {
+        message << "key " << key_matched.error_;
+        comma = true;
+      }
+      if (!value_matched.matched_) {
+        if (comma) { message << ", "; }
+        message << "value " << value_matched.error_;
+      }
+      o.string_val_ = message.str();
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
@@ -960,7 +974,7 @@ struct builtin_qsort : builtin {
       func_in->args_.emplace_back(const_arg1);
       func_in->args_.emplace_back(const_arg2);
       // func -> Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]
-      if (dt_slot_matcher->slot_match(args[1], func)) {
+      if (dt_slot_matcher->slot_match_with_result(func, args[1]).matched_) {
         return ykobject(dt_pool->create("bool"));
       } else {
         o.string_val_ =
@@ -986,8 +1000,7 @@ struct builtin_qsort : builtin {
     code << "(yk__quicksort(" << args[0].first << ",sizeof("
          << dt_compiler->convert_dt(args[0].second.datatype_->args_[0],
                                     datatype_location::SIZEOF_, "", "")
-         << ")"
-         << ",yk__arrlenu(" << args[0].first << ")," << args[1].first
+         << ")" << ",yk__arrlenu(" << args[0].first << ")," << args[1].first
          << ") == 0)";
     return {code.str(), o};
   }
@@ -1089,7 +1102,8 @@ struct builtin_fixed_arr : builtin {
       } else {
         size_t length = args.size();
         for (size_t i = 1; i < length; i++) {
-          if (!dt_slot_matcher->slot_match(args[i], parsed_dt)) {
+          if (!dt_slot_matcher->slot_match_with_result(parsed_dt, args[i])
+                   .matched_) {
             o.string_val_ = "All arguments must match with data type passed "
                             "to first argument for fixedarr() builtin";
             o.object_type_ = object_type::ERROR_DETECTED;
@@ -1177,7 +1191,8 @@ struct builtin_array : builtin {
       } else {
         size_t length = args.size();
         for (size_t i = 1; i < length; i++) {
-          if (!dt_slot_matcher->slot_match(args[i], parsed_dt)) {
+          if (!dt_slot_matcher->slot_match_with_result(parsed_dt, args[i])
+                   .matched_) {
             o.string_val_ = "All arguments must match with data type passed "
                             "to first argument for array() builtin";
             o.object_type_ = object_type::ERROR_DETECTED;
@@ -1251,31 +1266,36 @@ struct builtin_iif : builtin {
          ykdt_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    std::stringstream message{};
     auto o = ykobject(dt_pool);
+
     if (args.size() != 3) {
       o.string_val_ = "iif() builtin expects 3 arguments";
     } else if (!(args[0].datatype_->const_unwrap()->is_bool())) {
       o.string_val_ = "First argument to iif() must be a bool";
-      // TODO below does not take into account about auto casting requirements
-    } else if (*args[1].datatype_->const_unwrap() !=
-               *args[2].datatype_->const_unwrap()) {
-      o.string_val_ = "Second and third argument to iif() must be of same type";
-    } else if (args[1].is_a_function()) {
-      ykdatatype *arg1_dt =
-          dt_slot_matcher->function_to_datatype_or_null(args[1]);
-      ykdatatype *arg2_dt =
-          dt_slot_matcher->function_to_datatype_or_null(args[2]);
-      if (arg1_dt != nullptr && arg2_dt != nullptr &&
-          *(arg1_dt->const_unwrap()) == *(arg2_dt->const_unwrap())) {
-        o = ykobject(arg1_dt);
-        return o;
-      } else {
-        o.string_val_ = "You must use functions of same type for iif() builtin";
-      }
     } else {
+      auto matched = dt_slot_matcher->rvalue_match(args[1], args[2]);
+      if (!matched.matched_) {
+        message << "Second and third arguments to iif() ";
+        message << matched.error_;
+        o.string_val_ = message.str();
+        o.object_type_ = object_type::ERROR_DETECTED;
+        return o;
+      }
       o = ykobject(args[1].datatype_);
       if (args[1].datatype_->const_unwrap()->is_string_literal()) {
         o.datatype_ = dt_pool->create("sr");
+      }
+      if (args[1].is_a_function()) {
+        auto datatype_for_function = dt_slot_matcher->function_to_datatype_or_null(args[1]);
+        if (datatype_for_function != nullptr) {
+          o.datatype_ = datatype_for_function;
+        } else {
+          // Note: this cannot actually happen as this should error out from rvalue_match
+          o.string_val_ = "Second argument to iif() must be a function";
+          o.object_type_ = object_type::ERROR_DETECTED;
+          return o;
+        }
       }
       return o;
     }
@@ -1298,8 +1318,8 @@ struct builtin_iif : builtin {
       auto u_lhs = string_utils::unescape(args[1].second.string_val_);
       auto u_rhs = string_utils::unescape(args[2].second.string_val_);
       code << "(" << args[0].first << " ? yk__bstr_s(\""
-           << string_utils::escape(u_lhs) << "\", " << u_lhs.size() << ") : "
-           << "yk__bstr_s(\"" << string_utils::escape(u_rhs) << "\", "
+           << string_utils::escape(u_lhs) << "\", " << u_lhs.size()
+           << ") : " << "yk__bstr_s(\"" << string_utils::escape(u_rhs) << "\", "
            << u_rhs.size() << "))";
     } else {
       code << "(" << args[0].first << " ? " << args[1].first << " : "
@@ -1454,13 +1474,12 @@ struct builtin_functional : builtin {
           // Create a new copy
           code << elm_temp << " = yk__sdsdup(" << arr_temp << "[" << i
                << "]); ";
-          code << "if (" << fn_out_temp << ") {"
-               << "yk__arrput(" << return_temp << ", " << elm_temp
-               << "); } else {"
-               << " yk__sdsfree(" << elm_temp << "); }";
+          code << "if (" << fn_out_temp << ") {" << "yk__arrput(" << return_temp
+               << ", " << elm_temp << "); } else {" << " yk__sdsfree("
+               << elm_temp << "); }";
         } else {
-          code << "if (" << fn_out_temp << ") {"
-               << "yk__arrput(" << return_temp << ", " << elm_temp << "); }";
+          code << "if (" << fn_out_temp << ") {" << "yk__arrput(" << return_temp
+               << ", " << elm_temp << "); }";
         }
         break;
       default:// fnc::MAP
@@ -1514,10 +1533,12 @@ struct builtin_functional : builtin {
     } else if (dt->args_[0]->args_.size() != 2) {
       o.string_val_ =
           "Function argument for builtin " + name_ + " () must take 2 values";
-    } else if (*template_dt != *dt->args_[0]->args_[0]) {
+    } else if (dt_slot_matcher->is_not_identical_type(template_dt,
+                                                      dt->args_[0]->args_[0])) {
       o.string_val_ = "Function argument for builtin " + name_ +
                       " () must match with provided array";
-    } else if (*dt->args_[0]->args_[1] != *context_dt) {
+    } else if (dt_slot_matcher->is_not_identical_type(dt->args_[0]->args_[1],
+                                                      context_dt)) {
       o.string_val_ = "Function argument for builtin " + name_ +
                       " () must match with context argument";
     } else if (fnc_type_ != fnc::MAP && !dt->args_[1]->args_[0]->is_bool()) {
@@ -1824,3 +1845,4 @@ ykdatatype *builtins::parse(
   p.rescan_datatypes();
   return dt;
 }
+#pragma clang diagnostic pop

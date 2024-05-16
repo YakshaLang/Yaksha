@@ -96,7 +96,6 @@ namespace yaksha {
     explicit ykdatatype(std::string primitive_dt);
     explicit ykdatatype(std::string primitive_dt, std::string module);
     ~ykdatatype();
-    // Quick Checks for Primitive Data Types
     [[nodiscard]] ykdatatype *const_unwrap();
     [[nodiscard]] ykdatatype *auto_cast(ykdatatype *rhs, ykdt_pool *pool,
                                         bool lhs_mutates, bool assignment);
@@ -104,6 +103,7 @@ namespace yaksha {
     [[nodiscard]] std::string as_string_simplified() const;
 
     // meta type
+    [[nodiscard]] bool is_c_primitive() const;
     [[nodiscard]] bool is_primitive() const;
     [[nodiscard]] bool is_builtin_or_primitive() const;
     // const type modifier
@@ -164,19 +164,7 @@ private:
     void write_to_str(std::stringstream &s, bool write_mod = true) const;
     void find_builtin_or_primitive();
   };
-  // TODO get rid of below functions and always use slot_matcher for type checking
-  inline bool datatypes_equal(const ykdatatype &lhs, const ykdatatype &rhs) {
-    if (lhs.is_primitive() && rhs.is_primitive()) {
-      return lhs.primitive_type_ == rhs.primitive_type_;
-    }
-    return lhs.as_string() == rhs.as_string();
-  }
-  inline bool operator==(const yaksha::ykdatatype &lhs,
-                         const yaksha::ykdatatype &rhs) {
-    return datatypes_equal(lhs, rhs);
-  }
-  inline bool operator!=(const ykdatatype &lhs, const ykdatatype &rhs) {
-    return !(lhs == rhs);
-  }
+  bool internal_is_identical_type(ykdatatype *required_datatype,
+                                  ykdatatype *provided_datatype);
 }// namespace yaksha
 #endif

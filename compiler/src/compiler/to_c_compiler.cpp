@@ -121,9 +121,8 @@ void to_c_compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
             << rhs.first << ")";
     } else if (rhs.second.datatype_->const_unwrap()->is_string_literal()) {
       auto u = string_utils::unescape(rhs.second.string_val_);
-      body_ << lhs.first << " = "
-            << "yk__append_sds_lit(" << lhs.first << ", \""
-            << string_utils::escape(u) << "\" , " << u.size() << ")";
+      body_ << lhs.first << " = " << "yk__append_sds_lit(" << lhs.first
+            << ", \"" << string_utils::escape(u) << "\" , " << u.size() << ")";
     } else {
       error("Cannot compile += for str");
     }
@@ -133,14 +132,14 @@ void to_c_compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
              operator_token->type_ == token_type::MOD_EQ &&
              rhs.second.datatype_->const_unwrap()->is_f32()) {
     // f32 %=
-    body_ << lhs.first << " = "
-          << "remainderf(" << lhs.first + ", " + rhs.first + ")";
+    body_ << lhs.first << " = " << "remainderf("
+          << lhs.first + ", " + rhs.first + ")";
   } else if (rhs.second.is_primitive_or_obj() &&
              operator_token->type_ == token_type::MOD_EQ &&
              rhs.second.datatype_->const_unwrap()->is_f64()) {
     // f64 %=
-    body_ << lhs.first << " = "
-          << "remainder(" << lhs.first + ", " + rhs.first + ")";
+    body_ << lhs.first << " = " << "remainder("
+          << lhs.first + ", " + rhs.first + ")";
   } else {// usual case
     body_ << lhs.first << " " << operator_token->token_ << " " << rhs.first;
   }
@@ -161,8 +160,9 @@ void to_c_compiler::visit_binary_expr(binary_expr *obj) {
   //  auto data_type = lhs.second;
   bool both_sr = lhs.second.datatype_->const_unwrap()->is_sr() &&
                  rhs.second.datatype_->const_unwrap()->is_sr();
-  bool different_types = (*(lhs.second.datatype_->const_unwrap()) !=
-                          *(rhs.second.datatype_->const_unwrap()));
+  bool different_types =
+      !internal_is_identical_type(lhs.second.datatype_->const_unwrap(),
+                                  rhs.second.datatype_->const_unwrap());
   if (lhs.second.datatype_->is_none() || rhs.second.datatype_->is_none()) {
     // both null
     if (lhs.second.datatype_->is_none() && rhs.second.datatype_->is_none()) {
@@ -238,9 +238,9 @@ void to_c_compiler::visit_binary_expr(binary_expr *obj) {
         // call sdscatsds
         // assign to the temp
         write_indent(body_);
-        body_ << "yk__sds " << temporary_string << " = "
-              << "yk__concat_" << lhsdn << "_" << rhsdn << "(" << lhs_code
-              << ", " << rhs_code << ")";
+        body_ << "yk__sds " << temporary_string << " = " << "yk__concat_"
+              << lhsdn << "_" << rhsdn << "(" << lhs_code << ", " << rhs_code
+              << ")";
         write_end_statement(body_);
         push(temporary_string, ykobject(dt_pool_->create("str")));
       } else {
@@ -674,7 +674,10 @@ void to_c_compiler::visit_literal_expr(literal_expr *obj) {
   if (data_type_tok == token_type::STRING ||
       data_type_tok == token_type::THREE_QUOTE_STRING) {
     ykobject str_lit_object = ykobject(obj->literal_token_->token_, dt_pool_);
-    std::string string_literal = "\"" + string_utils::escape(string_utils::unescape(obj->literal_token_->token_)) + "\"";
+    std::string string_literal = "\"" +
+                                 string_utils::escape(string_utils::unescape(
+                                     obj->literal_token_->token_)) +
+                                 "\"";
     push(string_literal, str_lit_object);
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_TRUE) {
     push("true", ykobject(dt_pool_->create("bool")));
@@ -1047,25 +1050,22 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
       write_indent(body_);
       if (exp.second.datatype_->const_unwrap()->is_str()) {
         body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
-              << " " << name << " = "
-              << "yk__sdsdup(" << exp.first << ")";
+              << " " << name << " = " << "yk__sdsdup(" << exp.first << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_sr()) {
         body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
-              << " " << name << " = "
-              << "yk__bstr_copy_to_sds(" << exp.first << ")";
+              << " " << name << " = " << "yk__bstr_copy_to_sds(" << exp.first
+              << ")";
       } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
         auto u = string_utils::unescape(exp.second.string_val_);
         body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
-              << " " << name << " = "
-              << "yk__sdsnewlen(\"" << string_utils::escape(u) << "\" , "
-              << u.size() << ")";
+              << " " << name << " = " << "yk__sdsnewlen(\""
+              << string_utils::escape(u) << "\" , " << u.size() << ")";
       } else {
         error("Failed to compile assign to string.");
       }
     } else {
       body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
-            << " " << name << " = "
-            << "yk__sdsempty()";
+            << " " << name << " = " << "yk__sdsempty()";
     }
     // If there is an expression, go to that, pop(), duplicate and assign.
     // If there is not an expression, assign yk__sdsempty()
@@ -1093,9 +1093,8 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
       } else if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
         auto u = string_utils::unescape(exp.second.string_val_);
         body_ << convert_dt(object.datatype_, datatype_location::STRUCT, "", "")
-              << " " << name << " = "
-              << "yk__bstr_s(\"" << string_utils::escape(u) << "\" , "
-              << u.size() << ")";
+              << " " << name << " = " << "yk__bstr_s(\""
+              << string_utils::escape(u) << "\" , " << u.size() << ")";
       } else {
         error("Failed to compile assign to sr.");
       }
@@ -1194,7 +1193,7 @@ void to_c_compiler::visit_return_stmt(return_stmt *obj) {
       result_type = obj->result_type_->const_unwrap();
     }
     if (result_type != nullptr &&
-        *result_type != *rhs.second.datatype_->const_unwrap()) {
+        !internal_is_identical_type(rhs.second.datatype_->const_unwrap(), result_type)) {
       // different data types are here
       if (result_type->is_a_string()) {
         std::stringstream code_ss{};
@@ -1684,8 +1683,8 @@ void to_c_compiler::visit_const_stmt(const_stmt *obj) {
         if (exp.second.datatype_->const_unwrap()->is_string_literal()) {
           auto u = string_utils::unescape(exp.second.string_val_);
           global_constants_ << "struct yk__bstr const " << name << " = "
-                            << "((struct yk__bstr){.data.s = "
-                            << "\"" << string_utils::escape(u) << "\""
+                            << "((struct yk__bstr){.data.s = " << "\""
+                            << string_utils::escape(u) << "\""
                             << ", .l = " << u.size()
                             << ", .t = yk__bstr_static})";
           write_end_statement(global_constants_);
