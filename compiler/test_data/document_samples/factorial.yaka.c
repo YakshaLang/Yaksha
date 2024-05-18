@@ -1,14 +1,11 @@
 // YK:console#
 #include "yk__lib.h"
-// --forward declarations-- 
 void yy__console_set_color(int32_t);
 void yy__console_color_print(int32_t, struct yk__bstr);
 void yy__console_red(struct yk__bstr);
 void yy__console_cyan(struct yk__bstr);
 int32_t yy__factorial(int32_t);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 void yy__console_set_color(int32_t nn__c) 
 {
     if (nn__c == 0) { // rewind

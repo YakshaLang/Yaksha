@@ -1,11 +1,8 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 yk__sds yy__readfile(yk__sds);
 bool yy__is_empty_str(yk__sds);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 yk__sds yy__readfile(yk__sds nn__fname) 
 {
     size_t ln;

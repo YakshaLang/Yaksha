@@ -1,14 +1,11 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 struct yy__Spaceship;
-int32_t yy__main();
-// --structs-- 
 struct yy__Spaceship {
     yk__sds yy__name;
     yk__sds yy__class_;
 };
-// --functions-- 
+int32_t yy__main();
 int32_t yy__main() 
 {
     struct yy__Spaceship* yy__myship = calloc(1, sizeof(struct yy__Spaceship));

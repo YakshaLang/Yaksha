@@ -1,6 +1,5 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 void yy__print_a(int32_t);
 int32_t yy__augment_equal_a();
 void yy__print_b(float);
@@ -9,8 +8,6 @@ void yy__print_c(double);
 int32_t yy__augment_equal_c();
 int32_t yy__additional_operators();
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 void yy__print_a(int32_t yy__a) 
 {
     yk__printstr("a is now ");

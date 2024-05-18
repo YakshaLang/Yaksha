@@ -1,12 +1,9 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 int32_t yy__to_lengths(yk__sds, int32_t);
 int32_t yy__to_pow2(int32_t, int32_t);
 bool yy__print_int(int32_t, int32_t);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 int32_t yy__to_lengths(yk__sds yy__a, int32_t yy__ignored) 
 {
     int32_t t__0 = yk__sdslen(yy__a);

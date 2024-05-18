@@ -1,6 +1,9 @@
 // YK:graphicutils,wasm4#
 #include "yk__lib.h"
-// --forward declarations-- 
+#define yy__c_Size size_t
+#define yy__c_calloc calloc
+#define yy__w4_set_draw_colors(nn__value) *((uint16_t*)0x14) = nn__value
+#define yy__w4_gamepad1() (*((const uint8_t*)0x16))
 uint8_t const  yy__w4_BUTTON_1 = UINT8_C(1);
 uint8_t const  yy__w4_BUTTON_2 = UINT8_C(2);
 uint8_t const  yy__w4_BUTTON_LEFT = UINT8_C(16);
@@ -95,12 +98,26 @@ UINT8_C(0x63), UINT8_C(0x64), UINT8_C(0x65), UINT8_C(0x66),
 UINT8_C(0x67), UINT8_C(0x61), UINT8_C(0x62), UINT8_C(0x52),
 UINT8_C(0x23), UINT8_C(0x30)
 };
-#define yy__c_Size size_t
-#define yy__c_calloc calloc
-#define yy__w4_set_draw_colors(nn__value) *((uint16_t*)0x14) = nn__value
-#define yy__w4_gamepad1() (*((const uint8_t*)0x16))
 struct yy__State;
-struct yt_tuple_u8_u8_u8_u8;
+struct yt_tuple_u8_u8_u8_u8 { uint8_t e1; uint8_t e2; uint8_t e3; uint8_t e4; };
+struct yy__State {
+    int32_t yy__width;
+    int32_t yy__height;
+    uint64_t yy__frame_count;
+    uint8_t yy__gamepad_prev;
+    uint8_t* yy__text_buf;
+    struct yt_tuple_u8_u8_u8_u8* yy__note_buf;
+    int32_t* yy__note_freq;
+    int32_t* yy__note_time;
+    int32_t yy__cursor;
+    int32_t yy__prev_cursor;
+    int32_t yy__v_start;
+    int32_t yy__v_end;
+    int32_t yy__note_count;
+    uint8_t yy__mode;
+    bool yy__playing;
+    uint64_t yy__play_on;
+};
 void yy__w4_set_palette(uint32_t, uint32_t, uint32_t, uint32_t);
 void yy__w4_hline(int32_t, int32_t, uint32_t);
 void yy__w4_vline(int32_t, int32_t, uint32_t);
@@ -123,27 +140,6 @@ void yy__game_step(void*);
 struct yy__State* yy__init_state();
 void yy__del_state(void*);
 int32_t yy__main();
-// --structs-- 
-struct yy__State {
-    int32_t yy__width;
-    int32_t yy__height;
-    uint64_t yy__frame_count;
-    uint8_t yy__gamepad_prev;
-    uint8_t* yy__text_buf;
-    struct yt_tuple_u8_u8_u8_u8* yy__note_buf;
-    int32_t* yy__note_freq;
-    int32_t* yy__note_time;
-    int32_t yy__cursor;
-    int32_t yy__prev_cursor;
-    int32_t yy__v_start;
-    int32_t yy__v_end;
-    int32_t yy__note_count;
-    uint8_t yy__mode;
-    bool yy__playing;
-    uint64_t yy__play_on;
-};
-struct yt_tuple_u8_u8_u8_u8 { uint8_t e1; uint8_t e2; uint8_t e3; uint8_t e4; };
-// --functions-- 
 void yy__w4_set_palette(uint32_t nn__c1, uint32_t nn__c2, uint32_t nn__c3, uint32_t nn__c4) 
 {
     

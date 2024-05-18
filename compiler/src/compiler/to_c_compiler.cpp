@@ -840,9 +840,8 @@ void to_c_compiler::visit_def_stmt(def_stmt *obj) {
     if (cf_->directives_.apply_native_define_) {
       return;// no need to write native_defines
     }
-    struct_forward_declarations_ << "#define " << name << " "
-                                 << obj->annotations_.native_define_arg_
-                                 << "\n";
+    header_ << "#define " << name << " " << obj->annotations_.native_define_arg_
+            << "\n";
     return;
   }
   bool first = false;
@@ -850,29 +849,28 @@ void to_c_compiler::visit_def_stmt(def_stmt *obj) {
   // Compile @nativemacro if present
   // ::================================::
   if (obj->annotations_.native_macro_) {
-    struct_forward_declarations_ << "#define " << name << "(";
+    header_ << "#define " << name << "(";
     first = true;
     for (auto para : obj->params_) {
       if (!first) {
-        struct_forward_declarations_ << ", ";
+        header_ << ", ";
       } else {
         first = false;
       }
-      struct_forward_declarations_ << prefix(para.name_->token_, "nn__");
+      header_ << prefix(para.name_->token_, "nn__");
     }
-    struct_forward_declarations_ << ") ";
+    header_ << ") ";
     if (obj->annotations_.native_macro_arg_.empty()) {
       // #define yy__name ccode..
       auto b = dynamic_cast<block_stmt *>(obj->function_body_);
       auto st = b->statements_[0];
       auto stn = dynamic_cast<ccode_stmt *>(st);
-      struct_forward_declarations_
-          << ::string_utils::unescape(stn->code_str_->token_);
+      header_ << ::string_utils::unescape(stn->code_str_->token_);
     } else {
       // #define yy__name arg
-      struct_forward_declarations_ << obj->annotations_.native_macro_arg_;
+      header_ << obj->annotations_.native_macro_arg_;
     }
-    struct_forward_declarations_ << "\n";
+    header_ << "\n";
     return;
   }
   // ::================================::
@@ -1193,7 +1191,8 @@ void to_c_compiler::visit_return_stmt(return_stmt *obj) {
       result_type = obj->result_type_->const_unwrap();
     }
     if (result_type != nullptr &&
-        !internal_is_identical_type(rhs.second.datatype_->const_unwrap(), result_type)) {
+        !internal_is_identical_type(rhs.second.datatype_->const_unwrap(),
+                                    result_type)) {
       // different data types are here
       if (result_type->is_a_string()) {
         std::stringstream code_ss{};
@@ -1386,29 +1385,13 @@ compiler_output to_c_compiler::compile(codefiles *cf, file_info *fi) {
   // ---------- Create a copy of import information -------------
   import_stmts_alias_ = fi->data_->parser_->import_stmts_alias_;
   filepath_ = fi->filepath_.string();
-  //
-  // ----- Compile structure forward declarations ------
-  for (const auto &name : this->defs_classes_.class_names_) {
-    auto cls = defs_classes_.get_class(name);
-#ifdef YAKSHA_DEADCODE_ELIMINATION
-    if (cls->hits_ == 0) { continue; }
-#endif
-    if (!cls->annotations_.native_define_) {
-      struct_forward_declarations_ << "struct " << prefix(name, prefix_val_)
-                                   << ";\n";
-    }
-  }
   // -------- Desugar statements -------------------
   auto desugared = desugar_->desugar(fi->data_->parser_->stmts_, this);
   // ------- Compile statements ---------------------
   for (auto st : desugared) { st->accept(this); }
   // ---------- Produce result object -------------
-  return {struct_forward_declarations_.str(),
-          function_forward_declarations_.str(),
-          classes_.str(),
-          body_.str(),
-          global_constants_.str(),
-          errors_};
+  return {function_forward_declarations_.str(), header_.str(), body_.str(),
+          global_constants_.str(), errors_};
 }
 void to_c_compiler::push(const std::string &expr, const ykobject &data_type) {
   expr_stack_.push_back(expr);
@@ -1443,34 +1426,18 @@ void to_c_compiler::visit_class_stmt(class_stmt *obj) {
 #ifdef YAKSHA_DEADCODE_ELIMINATION
   if (obj->hits_ == 0) { return; }
 #endif
-  /**
-   *    struct foo {
-   *       int abc;
-   *    };
-   */
   auto name = prefix(obj->name_->token_, prefix_val_);
   if (obj->annotations_.native_define_) {
-    struct_forward_declarations_ << "#define " << name << " "
-                                 << obj->annotations_.native_define_arg_
-                                 << "\n";
+    header_ << "#define " << name << " " << obj->annotations_.native_define_arg_
+            << "\n";
     return;
   }
-  write_indent(classes_);
-  classes_ << "struct " << name << " {\n";
-  indent();
-  //
-  for (auto member : obj->members_) {
-    write_indent(classes_);
-    auto member_name = prefix(member.name_->token_, prefix_val_);
-    auto dt = convert_dt(member.data_type_, datatype_location::STRUCT, "", "");
-    classes_ << dt << " " << member_name;
-    write_end_statement(classes_);
-  }
-  //
-  dedent();
-  write_indent(classes_);
-  classes_ << "}";
-  write_end_statement(classes_);
+  // class/struct
+  ykdatatype *class_dt = dt_pool_->create(obj->name_->token_, filepath_);
+  class_dt->token_->file_ = obj->name_->file_;
+  class_dt->token_->line_ = obj->name_->line_;
+  class_dt->token_->pos_ = obj->name_->pos_;
+  esc_->register_structure(name, class_dt, obj, this, prefix_val_);
 }
 void to_c_compiler::visit_del_stmt(del_stmt *obj) {
   obj->expression_->accept(this);

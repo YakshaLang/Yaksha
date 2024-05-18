@@ -1,6 +1,5 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 #define yy__numbers_cstr2i atoi
 #define yy__c_CStr char*
 #define yy__mpc_Ast mpc_ast_t*
@@ -20,8 +19,6 @@ yk__sds yy__io_readline(yk__sds);
 int32_t yy__eval_op(int32_t, yk__sds, int32_t);
 int32_t yy__eval(yy__mpc_Ast);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 bool yy__strings_startswith(yk__sds nn__a, yk__sds nn__b) 
 {
     bool x = (strstr(nn__a, nn__b) != NULL);

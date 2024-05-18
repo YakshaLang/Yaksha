@@ -1,11 +1,7 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
-struct yt_pair_int_int;
-int32_t yy__main();
-// --structs-- 
 struct yt_pair_int_int { int32_t key; int32_t value; };
-// --functions-- 
+int32_t yy__main();
 int32_t yy__main() 
 {
     struct yt_pair_int_int* yy__m = NULL;

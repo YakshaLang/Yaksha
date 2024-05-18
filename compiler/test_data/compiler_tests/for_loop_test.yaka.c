@@ -1,10 +1,7 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 int32_t yy__add(int32_t, int32_t);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 int32_t yy__add(int32_t yy__a, int32_t yy__b) 
 {
     int32_t t__0 = (yy__a + yy__b);

@@ -10,37 +10,11 @@
 #include "whereami.h"
 // YK:argparse,arrayutils,console,cpu,process,tinycthread,toml,whereami#
 #include "yk__lib.h"
-// --forward declarations-- 
-int32_t const  yy__mutex_PLAIN = INT32_C(0);
-int32_t const  yy__thread_SUCCESS = INT32_C(1);
-int32_t const  yy__pool_IMMEDIATE_SHUTDOWN = INT32_C(1);
-int32_t const  yy__pool_GRACEFUL_SHUTDOWN = INT32_C(2);
-int32_t const  yy__pool_NO_SHUTDOWN = INT32_C(0);
-uint8_t const  yy__pool_MAX_THREAD_SIZE = UINT8_C(64);
-uint32_t const  yy__pool_MAX_QUEUE_SIZE = UINT32_C(65536);
-int32_t const  yy__pool_ERROR_INVALID = INT32_C(10);
-int32_t const  yy__pool_ERROR_LOCK_FAILURE = INT32_C(20);
-int32_t const  yy__pool_ERROR_QUEUE_FULL = INT32_C(30);
-int32_t const  yy__pool_ERROR_SHUTDOWN = INT32_C(40);
-int32_t const  yy__pool_ERROR_THREAD_FAILURE = INT32_C(50);
-int32_t const  yy__pool_SUCCESS = INT32_C(0);
-int32_t const  yy__configuration_CLANG = INT32_C(44);
-int32_t const  yy__configuration_GCC = INT32_C(33);
-int32_t const  yy__configuration_NOT_FOUND = INT32_C(0);
-int32_t const  yy__argparse_ARGPARSE_DEFAULT = INT32_C(0);
-struct yy__raylib_support_CObject;
-struct yy__raylib_support_BuildData;
 #define yy__cpu_Cpu struct yk__cpu_info
 #define yy__mutex_Mutex mtx_t
 #define yy__condition_Condition cnd_t
 #define yy__thread_Thread thrd_t
-struct yy__pool_ThreadPool;
 #define yy__buffer_StringBuffer yk__sds*
-struct yy__building_BObject;
-struct yy__configuration_CCode;
-struct yy__configuration_Project;
-struct yy__configuration_Compilation;
-struct yy__configuration_Config;
 #define yy__argparse_ArgParseRemainder struct yk__arg_remainder*
 #define yy__argparse_ArgParse struct argparse*
 #define yy__argparse_ArgParseWrapper struct yk__argparse_wrapper*
@@ -61,9 +35,113 @@ struct yy__configuration_Config;
 #define yy__os_Arguments struct yk__arguments*
 #define yy__os_get_args yk__get_args
 #define yy__os_ProcessResult struct yk__process_result*
-struct yt_tuple_fn_in_any_ptr_out_any_ptr;
-typedef int32_t (*yt_fn_in_any_ptr_out_int)(void*);
+int32_t const  yy__mutex_PLAIN = INT32_C(0);
+int32_t const  yy__thread_SUCCESS = INT32_C(1);
+int32_t const  yy__pool_IMMEDIATE_SHUTDOWN = INT32_C(1);
+int32_t const  yy__pool_GRACEFUL_SHUTDOWN = INT32_C(2);
+int32_t const  yy__pool_NO_SHUTDOWN = INT32_C(0);
+uint8_t const  yy__pool_MAX_THREAD_SIZE = UINT8_C(64);
+uint32_t const  yy__pool_MAX_QUEUE_SIZE = UINT32_C(65536);
+int32_t const  yy__pool_ERROR_INVALID = INT32_C(10);
+int32_t const  yy__pool_ERROR_LOCK_FAILURE = INT32_C(20);
+int32_t const  yy__pool_ERROR_QUEUE_FULL = INT32_C(30);
+int32_t const  yy__pool_ERROR_SHUTDOWN = INT32_C(40);
+int32_t const  yy__pool_ERROR_THREAD_FAILURE = INT32_C(50);
+int32_t const  yy__pool_SUCCESS = INT32_C(0);
+int32_t const  yy__configuration_CLANG = INT32_C(44);
+int32_t const  yy__configuration_GCC = INT32_C(33);
+int32_t const  yy__configuration_NOT_FOUND = INT32_C(0);
+int32_t const  yy__argparse_ARGPARSE_DEFAULT = INT32_C(0);
+struct yy__building_BObject;
+struct yy__configuration_CCode;
+struct yy__configuration_Compilation;
+struct yy__configuration_Config;
+struct yy__configuration_Project;
+struct yy__pool_ThreadPool;
+struct yy__raylib_support_BuildData;
+struct yy__raylib_support_CObject;
 typedef void (*yt_fn_in_any_ptr_out)(void*);
+typedef int32_t (*yt_fn_in_any_ptr_out_int)(void*);
+struct yt_tuple_fn_in_any_ptr_out_any_ptr { yt_fn_in_any_ptr_out e1; void* e2; };
+struct yy__building_BObject {
+    yk__sds* yy__building_args;
+    yk__sds yy__building_c_file;
+    yk__sds yy__building_object_file_path;
+    bool yy__building_always_build;
+    bool yy__building_print_info;
+};
+struct yy__configuration_CCode {
+    yk__sds* yy__configuration_include_paths;
+    yk__sds* yy__configuration_defines;
+    yk__sds* yy__configuration_compiler_defines;
+    yk__sds* yy__configuration_includes;
+    yk__sds* yy__configuration_system_includes;
+    yk__sds* yy__configuration_c_code;
+    yk__sds* yy__configuration_cpp_code;
+    yk__sds* yy__configuration_runtime_feature_defines;
+    yk__sds* yy__configuration_runtime_feature_includes;
+    yk__sds* yy__configuration_runtime_feature_c_code;
+    yk__sds* yy__configuration_runtime_feature_compiler_defines;
+};
+struct yy__configuration_Compilation {
+    bool yy__configuration_override_alloc;
+    bool yy__configuration_only_ccode;
+    yk__sds yy__configuration_libc;
+    yk__sds yy__configuration_compiler;
+    yk__sds* yy__configuration_targets;
+    bool yy__configuration_raylib;
+    bool yy__configuration_raylib_hot_reloading_dll;
+    bool yy__configuration_web;
+    yk__sds yy__configuration_web_shell;
+    yk__sds yy__configuration_web_assets;
+    bool yy__configuration_wasm4;
+    bool yy__configuration_disable_parallel_build;
+};
+struct yy__configuration_Config {
+    yk__sds yy__configuration_runtime_path;
+    yk__sds yy__configuration_compiler_path;
+    yk__sds yy__configuration_libs_path;
+    yk__sds yy__configuration_zig_compiler_path;
+    yk__sds yy__configuration_emcc_compiler_path;
+    yk__sds yy__configuration_gcc_compiler_path;
+    yk__sds yy__configuration_clang_compiler_path;
+    int32_t yy__configuration_alt_compiler;
+    bool yy__configuration_use_alt_compiler;
+    yk__sds yy__configuration_emrun_path;
+    yk__sds yy__configuration_w4_path;
+    struct yy__configuration_CCode* yy__configuration_c_code;
+    struct yy__configuration_Project* yy__configuration_project;
+    struct yy__configuration_Compilation* yy__configuration_compilation;
+    yk__sds* yy__configuration_errors;
+};
+struct yy__configuration_Project {
+    yk__sds yy__configuration_main;
+    yk__sds yy__configuration_name;
+    yk__sds yy__configuration_author;
+};
+struct yy__pool_ThreadPool {
+    yy__mutex_Mutex yy__pool_lock;
+    yy__condition_Condition yy__pool_notify;
+    yy__thread_Thread* yy__pool_threads;
+    struct yt_tuple_fn_in_any_ptr_out_any_ptr* yy__pool_queue;
+    int32_t yy__pool_thread_count;
+    int32_t yy__pool_queue_size;
+    int32_t yy__pool_head;
+    int32_t yy__pool_tail;
+    int32_t yy__pool_count;
+    int32_t yy__pool_shutdown;
+    int32_t yy__pool_started;
+};
+struct yy__raylib_support_BuildData {
+    struct yy__raylib_support_CObject* yy__raylib_support_object_data;
+    struct yy__configuration_Config* yy__raylib_support_config;
+};
+struct yy__raylib_support_CObject {
+    yk__sds yy__raylib_support_c_file;
+    yk__sds yy__raylib_support_o_file;
+    yk__sds yy__raylib_support_base_name;
+    yk__sds* yy__raylib_support_args;
+};
 struct yy__raylib_support_CObject* yy__raylib_support_fill_arguments(yk__sds, struct yy__raylib_support_CObject*, bool);
 struct yy__raylib_support_CObject* yy__raylib_support_fill_web_arguments(yk__sds, struct yy__raylib_support_CObject*);
 struct yy__raylib_support_CObject* yy__raylib_support_co(yk__sds, yk__sds, yk__sds, bool, bool);
@@ -199,88 +277,6 @@ int32_t yy__perform_build();
 int32_t yy__perform_mini_build(yk__sds, bool, bool, bool, yk__sds, yk__sds, bool, bool, bool, bool);
 int32_t yy__handle_args(yy__os_Arguments);
 int32_t yy__main();
-// --structs-- 
-struct yy__raylib_support_CObject {
-    yk__sds yy__raylib_support_c_file;
-    yk__sds yy__raylib_support_o_file;
-    yk__sds yy__raylib_support_base_name;
-    yk__sds* yy__raylib_support_args;
-};
-struct yy__raylib_support_BuildData {
-    struct yy__raylib_support_CObject* yy__raylib_support_object_data;
-    struct yy__configuration_Config* yy__raylib_support_config;
-};
-struct yy__pool_ThreadPool {
-    yy__mutex_Mutex yy__pool_lock;
-    yy__condition_Condition yy__pool_notify;
-    yy__thread_Thread* yy__pool_threads;
-    struct yt_tuple_fn_in_any_ptr_out_any_ptr* yy__pool_queue;
-    int32_t yy__pool_thread_count;
-    int32_t yy__pool_queue_size;
-    int32_t yy__pool_head;
-    int32_t yy__pool_tail;
-    int32_t yy__pool_count;
-    int32_t yy__pool_shutdown;
-    int32_t yy__pool_started;
-};
-struct yy__building_BObject {
-    yk__sds* yy__building_args;
-    yk__sds yy__building_c_file;
-    yk__sds yy__building_object_file_path;
-    bool yy__building_always_build;
-    bool yy__building_print_info;
-};
-struct yy__configuration_CCode {
-    yk__sds* yy__configuration_include_paths;
-    yk__sds* yy__configuration_defines;
-    yk__sds* yy__configuration_compiler_defines;
-    yk__sds* yy__configuration_includes;
-    yk__sds* yy__configuration_system_includes;
-    yk__sds* yy__configuration_c_code;
-    yk__sds* yy__configuration_cpp_code;
-    yk__sds* yy__configuration_runtime_feature_defines;
-    yk__sds* yy__configuration_runtime_feature_includes;
-    yk__sds* yy__configuration_runtime_feature_c_code;
-    yk__sds* yy__configuration_runtime_feature_compiler_defines;
-};
-struct yy__configuration_Project {
-    yk__sds yy__configuration_main;
-    yk__sds yy__configuration_name;
-    yk__sds yy__configuration_author;
-};
-struct yy__configuration_Compilation {
-    bool yy__configuration_override_alloc;
-    bool yy__configuration_only_ccode;
-    yk__sds yy__configuration_libc;
-    yk__sds yy__configuration_compiler;
-    yk__sds* yy__configuration_targets;
-    bool yy__configuration_raylib;
-    bool yy__configuration_raylib_hot_reloading_dll;
-    bool yy__configuration_web;
-    yk__sds yy__configuration_web_shell;
-    yk__sds yy__configuration_web_assets;
-    bool yy__configuration_wasm4;
-    bool yy__configuration_disable_parallel_build;
-};
-struct yy__configuration_Config {
-    yk__sds yy__configuration_runtime_path;
-    yk__sds yy__configuration_compiler_path;
-    yk__sds yy__configuration_libs_path;
-    yk__sds yy__configuration_zig_compiler_path;
-    yk__sds yy__configuration_emcc_compiler_path;
-    yk__sds yy__configuration_gcc_compiler_path;
-    yk__sds yy__configuration_clang_compiler_path;
-    int32_t yy__configuration_alt_compiler;
-    bool yy__configuration_use_alt_compiler;
-    yk__sds yy__configuration_emrun_path;
-    yk__sds yy__configuration_w4_path;
-    struct yy__configuration_CCode* yy__configuration_c_code;
-    struct yy__configuration_Project* yy__configuration_project;
-    struct yy__configuration_Compilation* yy__configuration_compilation;
-    yk__sds* yy__configuration_errors;
-};
-struct yt_tuple_fn_in_any_ptr_out_any_ptr { yt_fn_in_any_ptr_out e1; void* e2; };
-// --functions-- 
 struct yy__raylib_support_CObject* yy__raylib_support_fill_arguments(yk__sds yy__raylib_support_src_path, struct yy__raylib_support_CObject* yy__raylib_support_c, bool yy__raylib_support_dll) 
 {
     yk__sds* yy__raylib_support_args = NULL;

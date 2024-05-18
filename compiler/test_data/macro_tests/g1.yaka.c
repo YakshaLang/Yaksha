@@ -1,11 +1,8 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 void yy__g3_g3();
 void yy__g2_g2();
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 void yy__g3_g3() 
 {
     int32_t yy__g3_a = INT32_C(1);

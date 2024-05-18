@@ -1,12 +1,9 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 typedef yk__sds (*yt_fn_in_str_out_str)(yk__sds);
 yk__sds yy__normal(yk__sds);
 yk__sds yy__sqb(yk__sds);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 yk__sds yy__normal(yk__sds yy__s) 
 {
     yk__sds t__0 = yy__s;

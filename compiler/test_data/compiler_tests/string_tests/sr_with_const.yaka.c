@@ -1,10 +1,7 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 struct yk__bstr const yy__BANANA = ((struct yk__bstr){.data.s = "Banana", .l = 6, .t = yk__bstr_static});
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 int32_t yy__main() 
 {
     yk__sds yy__a = yk__sdsnewlen("Banana" , 6);

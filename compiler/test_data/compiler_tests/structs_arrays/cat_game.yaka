@@ -1,0 +1,90 @@
+# ==============================================================================
+#                        Structure Dependencies Test
+# ==============================================================================
+
+# State of the game
+#  -> depending on structures: Animation, Cat, Cookie
+class State:
+    width: int
+    height: int
+    frame_count: u64
+    screen: int
+    animations: FixedArr[Animation, 12]
+    cookies: FixedArr[Cookie, 30]
+    player: Cat
+
+# Player/cat
+#   -> depending on structures: Sprite
+#      -> This is for 8 directions and 4 animations
+struct Cat:
+    x: int
+    y: int
+    speed: int
+    direction: int
+    animations: FixedArr[FixedArr[Sprite, 4], 8]
+    score: int
+    lives: int
+    speed_reset: u64
+    frame_delay: int
+    current_frame: int
+    frame_timer: int
+
+# Animation (basic animations for cookies)
+#   -> depending on structures: Sprite
+struct Animation:
+    # All animatiosn will have 4 frames
+    sprites: FixedArr[Sprite, 4]
+    frame_count: int
+    frame_delay: int
+
+# Sprite
+#   -> does not directly depend on a structure
+struct Sprite:
+    width: int
+    height: int
+    center_x: int
+    center_y: int
+    # Texture is a 16x16 array of u8
+    texture: FixedArr[FixedArr[u8, 16], 16]
+
+# Cookie information
+#   -> does not directly depend on a structure
+struct Cookie:
+    x: int
+    y: int
+    speed: float
+    animation_reference: int
+    cookie_type: int
+    current_frame: int
+    frame_timer: int
+
+def main() -> int:
+    state = State()
+    defer del state
+    state.width = 800
+    state.height = 600
+    state.frame_count = 0u8
+    state.screen = 0
+    state.animations[0].sprites[0].width = 64
+    state.animations[0].sprites[0].height = 64
+    state.animations[0].sprites[0].center_x = 32
+    state.animations[0].sprites[0].center_y = 32
+    state.animations[0].frame_count = 4
+    state.animations[0].frame_delay = 10
+    state.cookies[0].x = 0
+    state.cookies[0].y = 0
+    state.cookies[0].speed = 0.0f
+    state.cookies[0].animation_reference = 0
+    state.cookies[0].cookie_type = 0
+    state.cookies[0].current_frame = 0
+    state.cookies[0].frame_timer = 0
+    state.player.x = 0
+    state.player.y = 0
+    state.player.speed = 0
+    state.player.direction = 0
+    state.player.score = 0
+    state.player.lives = 0
+    state.player.speed_reset = 0u8
+    state.player.current_frame = 0
+
+    return 0

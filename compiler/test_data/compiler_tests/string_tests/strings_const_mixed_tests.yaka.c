@@ -1,6 +1,5 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 struct yk__bstr const yy__BANANA = ((struct yk__bstr){.data.s = "Banana", .l = 6, .t = yk__bstr_static});
 yk__sds const  yy__f1(yk__sds const );
 struct yk__bstr yy__f2(yk__sds const );
@@ -9,8 +8,6 @@ struct yk__bstr const  yy__f4(struct yk__bstr);
 struct yk__bstr const  yy__f5(yk__sds);
 yk__sds yy__f6(yk__sds const );
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 yk__sds const  yy__f1(yk__sds const  yy__v) 
 {
     yk__sds const  t__0 = yy__v;

@@ -1,13 +1,8 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
-struct yt_pair_str_int;
-struct yt_pair_str_float;
-int32_t yy__main();
-// --structs-- 
-struct yt_pair_str_int { yk__sds key; int32_t value; };
 struct yt_pair_str_float { yk__sds key; float value; };
-// --functions-- 
+struct yt_pair_str_int { yk__sds key; int32_t value; };
+int32_t yy__main();
 int32_t yy__main() 
 {
     struct yt_pair_str_int* yy__m = NULL;

@@ -1,14 +1,11 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
-typedef bool (*yt_fn_in_str_int_out_bool)(yk__sds, int32_t);
 typedef bool (*yt_fn_in_int_int_out_bool)(int32_t, int32_t);
+typedef bool (*yt_fn_in_str_int_out_bool)(yk__sds, int32_t);
 bool yy__print_str(yk__sds, int32_t);
 bool yy__print_add_n(int32_t, int32_t);
 bool yy__print_upto_n(int32_t, int32_t);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 bool yy__print_str(yk__sds yy__a, int32_t yy__b) 
 {
     yk__printint((intmax_t)yy__b);

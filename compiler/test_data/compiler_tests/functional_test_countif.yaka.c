@@ -1,12 +1,9 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 typedef bool (*yt_fn_in_str_int_out_bool)(yk__sds, int32_t);
 bool yy__keep_len_n(yk__sds, int32_t);
 bool yy__keep_upto_n(int32_t, int32_t);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 bool yy__keep_len_n(yk__sds yy__a, int32_t yy__n) 
 {
     if (yk__sdslen(yy__a) == yy__n)

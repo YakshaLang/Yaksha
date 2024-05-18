@@ -1,12 +1,9 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 typedef int32_t yt_arr_int_3[3];
-typedef struct yk__bstr yt_arr_sr_3[3];
 typedef int32_t yt_arr_int_4[4];
+typedef struct yk__bstr yt_arr_sr_3[3];
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 int32_t yy__main() 
 {
     yk__printlnstr("Fixed Array looping");

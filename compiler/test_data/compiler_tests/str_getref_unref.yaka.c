@@ -1,12 +1,9 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 void yy__world1(yk__sds*);
 void yy__world2(yk__sds*);
 void yy__world3(void*);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 void yy__world1(yk__sds* yy__a) 
 {
     yk__printstr((*(yy__a)));

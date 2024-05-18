@@ -1,10 +1,7 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 int32_t yy__takes_str(yk__sds);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 int32_t yy__takes_str(yk__sds yy__s) 
 {
     yk__printstr("Printing str: ");

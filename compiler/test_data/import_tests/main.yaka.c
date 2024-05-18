@@ -1,14 +1,15 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
+struct yy__MainClass;
+struct yy__house_ColomboHouse;
 struct yy__jungle_banana;
 struct yy__jungle_monkey;
-struct yy__house_ColomboHouse;
-struct yy__MainClass;
-void yy__jungle_print_monkey(struct yy__jungle_monkey*);
-void yy__jungle_print_banana(struct yy__jungle_banana*);
-int32_t yy__main();
-// --structs-- 
+struct yy__MainClass {
+    int32_t yy__id;
+};
+struct yy__house_ColomboHouse {
+    int32_t yy__house_id;
+};
 struct yy__jungle_banana {
     int32_t yy__jungle_id;
 };
@@ -16,13 +17,9 @@ struct yy__jungle_monkey {
     int32_t yy__jungle_id;
     struct yy__jungle_banana* yy__jungle_food;
 };
-struct yy__house_ColomboHouse {
-    int32_t yy__house_id;
-};
-struct yy__MainClass {
-    int32_t yy__id;
-};
-// --functions-- 
+void yy__jungle_print_monkey(struct yy__jungle_monkey*);
+void yy__jungle_print_banana(struct yy__jungle_banana*);
+int32_t yy__main();
 void yy__jungle_print_monkey(struct yy__jungle_monkey* yy__jungle_m) 
 {
     yk__printstr("Monkey ");

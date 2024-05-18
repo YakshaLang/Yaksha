@@ -38,6 +38,7 @@
 // ==============================================================================================
 // entry_struct_func_compiler.cpp
 #include "entry_struct_func_compiler.h"
+#include "compiler/compiler_utils.h"
 #include <iomanip>
 #include <iostream>
 const std::vector<std::pair<std::string, std::string>> REPLACEMENTS = {
@@ -47,67 +48,147 @@ const std::vector<std::pair<std::string, std::string>> REPLACEMENTS = {
     {"fixed_arr", "arr"}};
 using namespace yaksha;
 entry_struct_func_compiler::entry_struct_func_compiler(ykdt_pool *pool)
-    : pool_(pool), counter_(0), autogen_structs_list_(), autogen_structs_(),
-      autogen_func_typedefs_(), autogen_func_typedef_list_(),
-      counter_functions_(0), code_(), code_fnc_(), counter_tuples_(0),
-      autogen_tuple_list_(), autogen_tuples_(), code_tuples_(),
-      counter_bin_data_(0), autogen_bin_data_(), bin_data_(), counter_fxa_(0),
-      forward_decls_(), name_improvements_() {}
+    : pool_(pool), counter_(0), counter_bin_data_(0), autogen_bin_data_(),
+      bin_data_(), name_improvements_(), errors_(),
+      structure_pool_(), structures_(),
+      reverse_name_improvements_() {}
 std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
                                                 datatype_compiler *dtc) {
   std::string repr = entry_dt->as_string();
   std::string simple_repr = entry_dt->as_string_simplified();
-  if (autogen_structs_.find(repr) != autogen_structs_.end()) {
-    return "struct " +
-           improve_name(repr, simple_repr,
-                        "ykentry" + std::to_string(autogen_structs_[repr]));
+  if (structures_.find(repr) != structures_.end()) {
+    return structures_[repr]->prefixed_full_name_;
   }
-  entry_data d{};
-  d.incremented_id_ = counter_++;
-  if (entry_dt->is_sm_entry()) {
-    d.key_dt_ = pool_->create("str");
-    d.val_dt_ = entry_dt->args_[0];
-  } else if (entry_dt->is_m_entry()) {
-    d.key_dt_ = entry_dt->args_[0];
-    d.val_dt_ = entry_dt->args_[1];
+  auto d = new structure_definition{};
+  d->id_ = counter_++;
+  d->dt_ = entry_dt;
+  if (entry_dt->is_m_entry()) {
+    d->a_ = entry_dt->args_[0];
+    d->b_ = entry_dt->args_[1];
+  } else if (entry_dt->is_sm_entry()) {
+    d->a_ = pool_->create("str");
+    d->b_ = entry_dt->args_[0];
   } else {
-    // Must not happen
+    errors_.emplace_back("Invalid entry datatype: " + entry_dt->as_string_simplified(), nullptr);
     return "<><>";
   }
   std::stringstream code{};
-  std::string name = improve_name(
-      repr, simple_repr, "ykentry" + std::to_string(d.incremented_id_));
+  std::string name =
+      improve_name(repr, simple_repr, "ykentry" + std::to_string(d->id_));
   code << "struct " << name << " { "
-       << dtc->convert_dt(d.key_dt_, datatype_location::STRUCT, "", "")
-       << " key; "
-       << dtc->convert_dt(d.val_dt_, datatype_location::STRUCT, "", "")
+       << dtc->convert_dt(d->a_, datatype_location::STRUCT, "", "") << " key; "
+       << dtc->convert_dt(d->b_, datatype_location::STRUCT, "", "")
        << " value; };\n";
-  code_ << code.str();
-  autogen_structs_list_.emplace_back(d);
-  autogen_structs_[repr] = d.incremented_id_;
-  forward_decls_ << "struct " << name << ";\n";
-  return "struct " + improve_name(repr, simple_repr, name);
-}
-void entry_struct_func_compiler::compile_forward_declarations(
-    std::stringstream &target) {
-  target << forward_decls_.str();
+  d->prefixed_name_ = name;
+  d->prefixed_full_name_ = "struct " + name;
+  d->code_ = code.str();
+  d->meta_type_ = structure_type::PAIR;
+  structures_[repr] = d;
+  structure_pool_.push_back(d);
+  return d->prefixed_full_name_;
 }
 void entry_struct_func_compiler::compile_structures(std::stringstream &target) {
-  target << code_.str();
-  target << code_tuples_.str();
+  // Alphabetically sort structures first
+  std::vector<structure_definition *> alpha_sorted_types{};
+  std::vector<structure_definition *> alpha_sorted_classes{};
+  std::vector<structure_definition *> sorted{};
+  for (auto &it : structures_) {
+    if (it.second->meta_type_ == structure_type::CLASS) {
+      alpha_sorted_classes.push_back(it.second);
+      it.second->permanent_mark_ = true; /* Consider sorted */
+    } else {
+      alpha_sorted_types.push_back(it.second);
+    }
+    if (it.second->meta_type_ == structure_type::CLASS ||
+        it.second->meta_type_ == structure_type::STRUCT) {
+      sorted.push_back(it.second);
+    }
+  }
+  std::sort(alpha_sorted_types.begin(), alpha_sorted_types.end(),
+            [](structure_definition *a, structure_definition *b) {
+              return a->prefixed_name_ < b->prefixed_name_;
+            });
+  std::sort(alpha_sorted_classes.begin(), alpha_sorted_classes.end(),
+            [](structure_definition *a, structure_definition *b) {
+              return a->prefixed_name_ < b->prefixed_name_;
+            });
+  std::sort(sorted.begin(), sorted.end(),
+            [](structure_definition *a, structure_definition *b) {
+              return a->prefixed_name_ < b->prefixed_name_;
+            });
+  // Topological sort
+  std::vector<structure_definition *> topo_sorted_types{};
+  for (structure_definition *it : alpha_sorted_types) {
+    if (!it->permanent_mark_) {
+      bool cycle = this->visit(it, topo_sorted_types);
+      if (cycle) {
+        errors_.emplace_back("Cycle detected in structure: " + it->dt_->as_string_simplified(), nullptr);
+        return;
+      }
+    }
+  }
+  // Forward declarations of classes
+  for (auto *it : sorted) {
+    target << it->prefixed_full_name_ << ";\n";
+  }
+  // Topologically sorted structures
+  for (auto *it : topo_sorted_types) { target << it->code_; }
+  // Classes
+  for (auto *it : alpha_sorted_classes) { target << it->code_; }
 }
-bool entry_struct_func_compiler::has_structures() {
-  return !autogen_structs_list_.empty() || !autogen_tuple_list_.empty();
+#define CONSIDER_CYCLE(x)                                                      \
+  if (x) { return true; }
+bool entry_struct_func_compiler::visit(
+    ykdatatype *data, std::vector<structure_definition *> &sorted) {
+  if (data == nullptr) { return false; }
+  // These are builtins, no need to visit these
+  if (data->is_primitive() || data->is_any_ptr() ||
+      data->is_any_ptr_to_const()) {
+    return false;
+  }
+  if (!data->args_.empty()) {
+    for (auto dt : data->args_) { CONSIDER_CYCLE(visit(dt, sorted)); }
+  }
+  auto repr = data->as_string();
+  // Cannot find structure, must be a builtin!
+  if (structures_.find(repr) == structures_.end()) { return false; }
+  // Found structure, visit it
+  auto definition = structures_[repr];
+  return visit(definition, sorted);
+}
+bool entry_struct_func_compiler::visit(
+    structure_definition *n, std::vector<structure_definition *> &sorted) {
+  if (n == nullptr) { return false; }
+  if (n->permanent_mark_) { return false; }
+  if (n->temporary_mark_) { return true; }
+  n->temporary_mark_ = true;
+  if (n->meta_type_ == structure_type::PAIR ||
+      n->meta_type_ == structure_type::FUNCTION_TYPEDEF) {
+    CONSIDER_CYCLE(visit(n->a_, sorted));
+    CONSIDER_CYCLE(visit(n->b_, sorted));
+  } else if (n->meta_type_ == structure_type::TUPLE) {
+    for (auto dt : n->dt_->args_) { CONSIDER_CYCLE(visit(dt, sorted)); }
+  } else if (n->meta_type_ == structure_type::FIXED_ARRAY) {
+    CONSIDER_CYCLE(visit(n->a_, sorted));
+  } else if (n->meta_type_ == structure_type::STRUCT) {
+    for (auto &member : n->class_stmt_or_null_->members_) {
+      CONSIDER_CYCLE(visit(member.data_type_, sorted));
+    }
+  } else {
+    return false;
+  }
+  n->temporary_mark_ = false;
+  n->permanent_mark_ = true;
+  sorted.push_back(n);
+  return false;
 }
 std::string
 entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
                                                 datatype_compiler *dtc) {
-  std::string fdt_str = function_dt->as_string();
-  std::string simple_fdt_str = function_dt->as_string_simplified();
-  if (autogen_func_typedefs_.find(fdt_str) != autogen_func_typedefs_.end()) {
-    return improve_name(fdt_str, simple_fdt_str,
-                        "ykfncptr" +
-                            std::to_string(autogen_func_typedefs_[fdt_str]));
+  std::string repr = function_dt->as_string();
+  std::string simple_repr = function_dt->as_string_simplified();
+  if (structures_.find(repr) != structures_.end()) {
+    return structures_[repr]->prefixed_full_name_;
   }
   // Check assumption that must not happen
   if (!function_dt->is_function() || function_dt->args_.size() != 2 ||
@@ -118,28 +199,30 @@ entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
   }
   // -- convert
   // typedef F_OUT *(ykfncptr##num)(F_IN...)
+  auto d = new structure_definition{};
+  d->id_ = counter_++;
+  d->dt_ = function_dt;
   std::stringstream code{};
-  ykdatatype *input = function_dt->args_[0];
-  ykdatatype *output = function_dt->args_[1];
+  d->a_ = function_dt->args_[0];
+  d->b_ = function_dt->args_[1];
   code << "typedef ";
-  if (output->args_.empty()) {
+  if (d->b_->args_.empty()) {
     code << "void ";
-  } else if (output->args_.size() == 1) {
-    code << dtc->convert_dt(output->args_[0], datatype_location::STRUCT, "", "")
+  } else if (d->b_->args_.size() == 1) {
+    code << dtc->convert_dt(d->b_->args_[0], datatype_location::STRUCT, "", "")
          << " ";
   } else {
-    // Must not happen
+    errors_.emplace_back("Invalid function output datatype: " + d->b_->as_string_simplified(), nullptr);
     code << "<><>";
   }
-  unsigned int current_num = counter_functions_++;
-  std::string name = improve_name(fdt_str, simple_fdt_str,
-                                  "ykfncptr" + std::to_string(current_num));
+  std::string name =
+      improve_name(repr, simple_repr, "ykfncptr" + std::to_string(d->id_));
   code << "(*" << name << ")(";
-  if (input->args_.empty()) {
+  if (d->a_->args_.empty()) {
     code << "void";
   } else {
     bool first = true;
-    for (auto dt : input->args_) {
+    for (auto dt : d->a_->args_) {
       if (first) {
         first = false;
       } else {
@@ -149,48 +232,44 @@ entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
     }
   }
   code << ");\n";
-  // write the finalized code here
-  code_fnc_ << code.str();
-  func_data d{input, output, current_num};
-  autogen_func_typedef_list_.emplace_back(d);
-  autogen_func_typedefs_[fdt_str] = current_num;
+  d->code_ = code.str();
+  d->meta_type_ = structure_type::FUNCTION_TYPEDEF;
+  d->prefixed_name_ = name;
+  d->prefixed_full_name_ = name;
+  structures_[repr] = d;
+  structure_pool_.push_back(d);
   return name;
-}
-void entry_struct_func_compiler::compile_function_defs(
-    std::stringstream &target) {
-  target << code_fnc_.str();
-}
-bool entry_struct_func_compiler::has_functions() {
-  return !autogen_func_typedef_list_.empty();
 }
 std::string entry_struct_func_compiler::compile_tuple(ykdatatype *tuple_dt,
                                                       datatype_compiler *dtc) {
   std::string repr = tuple_dt->as_string();
   std::string simple_repr = tuple_dt->as_string_simplified();
-  if (autogen_tuples_.find(repr) != autogen_tuples_.end()) {
-    std::string name = improve_name(
-        repr, simple_repr, "yktuple" + std::to_string(autogen_tuples_[repr]));
-    return "struct " + name;
+  if (structures_.find(repr) != structures_.end()) {
+    return structures_[repr]->prefixed_full_name_;
   }
-  tuple_data d{};
-  d.incremented_id_ = counter_tuples_++;
-  d.tuple_dt_ = tuple_dt;
+  auto d = new structure_definition{};
+  d->id_ = counter_++;
+  d->dt_ = tuple_dt;
+  d->a_ = nullptr;
+  d->b_ = nullptr;
   std::stringstream code{};
-  std::string name = improve_name(
-      repr, simple_repr, "yktuple" + std::to_string(d.incremented_id_));
+  std::string name =
+      improve_name(repr, simple_repr, "yktuple" + std::to_string(d->id_));
   code << "struct " << name << " {";
   size_t i = 1;
-  for (ykdatatype *dt_arg : d.tuple_dt_->args_) {
+  for (ykdatatype *dt_arg : d->dt_->args_) {
     code << " " << dtc->convert_dt(dt_arg, datatype_location::STRUCT, "", "")
          << " e" << i << ";";
     i++;
   }
   code << " };\n";
-  code_ << code.str();
-  autogen_tuple_list_.emplace_back(d);
-  autogen_tuples_[repr] = d.incremented_id_;
-  forward_decls_ << "struct " << name << ";\n";
-  return "struct " + name;
+  d->prefixed_name_ = name;
+  d->prefixed_full_name_ = "struct " + name;
+  d->code_ = code.str();
+  d->meta_type_ = structure_type::TUPLE;
+  structures_[repr] = d;
+  structure_pool_.push_back(d);
+  return d->prefixed_full_name_;
 }
 bool entry_struct_func_compiler::has_bin_data() {
   return !autogen_bin_data_.empty();
@@ -231,47 +310,42 @@ void entry_struct_func_compiler::compile_binary_data_to(
 std::string
 entry_struct_func_compiler::compile_fixed_array(ykdatatype *fixed_array_dt,
                                                 datatype_compiler *dtc) {
-  std::string fxa_str = fixed_array_dt->as_string();
-  std::string fxa_str_simple = fixed_array_dt->as_string_simplified();
-  if (autogen_fxa_.find(fxa_str) != autogen_fxa_.end()) {
-    return improve_name(fxa_str, fxa_str_simple,
-                        "ykfxa" + std::to_string(autogen_fxa_[fxa_str]));
+  std::string repr = fixed_array_dt->as_string();
+  std::string simple_repr = fixed_array_dt->as_string_simplified();
+  if (structures_.find(repr) != structures_.end()) {
+    return structures_[repr]->prefixed_full_name_;
   }
   // Check assumption that must not happen
   if (!fixed_array_dt->is_fixed_size_array() ||
       fixed_array_dt->args_.size() != 2 ||
       fixed_array_dt->args_[0]->is_sm_entry() ||
       fixed_array_dt->args_[1]->is_m_entry()) {
-    // Must not happen
+    errors_.emplace_back("Invalid fixed array datatype: " + fixed_array_dt->as_string_simplified(), nullptr);
     return "<><>";
   }
   // -- convert
   // typedef ARG0 ykfxa##num[ARG1];
+  auto d = new structure_definition{};
+  d->id_ = counter_++;
+  d->dt_ = fixed_array_dt;
   std::stringstream code{};
-  ykdatatype *target_datatype = fixed_array_dt->args_[0];
-  ykdatatype *size_specifier = fixed_array_dt->args_[1];
+  d->a_ = fixed_array_dt->args_[0]; /* target */
+  d->b_ = fixed_array_dt->args_[1]; /* size */
   code << "typedef ";
-  code << dtc->convert_dt(target_datatype, datatype_location::STRUCT, "", "")
-       << " ";
-  unsigned int current_num = counter_fxa_++;
-  std::string name = improve_name(fxa_str, fxa_str_simple,
-                                  "ykfxa" + std::to_string(current_num));
+  code << dtc->convert_dt(d->a_, datatype_location::STRUCT, "", "") << " ";
+  std::string name =
+      improve_name(repr, simple_repr, "ykfxa" + std::to_string(d->id_));
   code << name << "[";
-  code << size_specifier->token_->token_;
+  code << d->b_->token_->token_; /* size */
   code << "];\n";
   // write the finalized code here
-  code_fxa_ << code.str();
-  tuple_data d{fixed_array_dt, current_num};
-  autogen_fxa_list_.emplace_back(d);
-  autogen_fxa_[fxa_str] = current_num;
+  d->code_ = code.str();
+  d->meta_type_ = structure_type::FIXED_ARRAY;
+  d->prefixed_name_ = name;
+  d->prefixed_full_name_ = name;
+  structures_[repr] = d;
+  structure_pool_.push_back(d);
   return name;
-}
-void entry_struct_func_compiler::compiled_fixed_array_to(
-    std::stringstream &target) {
-  target << code_fxa_.str();
-}
-bool entry_struct_func_compiler::has_fixed_arrays() {
-  return !autogen_fxa_.empty();
 }
 std::string sanitize_name(const std::string &input) {
   auto is_valid_char = [](char c) { return std::isalnum(c) || c == '_'; };
@@ -332,4 +406,40 @@ std::string entry_struct_func_compiler::improve_name(
   reverse_name_improvements_[improved] = yaksha_datatype_string;
   return improved;
 }
-entry_struct_func_compiler::~entry_struct_func_compiler() = default;
+void entry_struct_func_compiler::register_structure(
+    const std::string &prefixed_name, ykdatatype *class_dt,
+    class_stmt *class_statement, datatype_compiler *dtc,
+    const std::string &member_prefix) {
+  std::string repr = class_dt->as_string();
+  if (structures_.find(repr) != structures_.end()) { return; }
+  auto d = new structure_definition{};
+  d->id_ = counter_++;
+  d->dt_ = class_dt;
+  d->a_ = nullptr;
+  d->b_ = nullptr;
+  std::stringstream code{};
+  code << "struct " << prefixed_name << " {\n";
+  for (auto &member : class_statement->members_) {
+    code << "    ";
+    code << dtc->convert_dt(member.data_type_, datatype_location::STRUCT, "",
+                            "");
+    code << " " << ::prefix(member.name_->token_, member_prefix) << ";\n";
+  }
+  code << "};\n";
+  d->prefixed_name_ = prefixed_name;
+  d->prefixed_full_name_ = "struct " + prefixed_name;
+  d->code_ = code.str();
+  d->class_stmt_or_null_ = class_statement;
+  // struct or class based on the @onstack annotation or struct keyword usage
+  if (class_statement->annotations_.on_stack_) {
+    d->meta_type_ = structure_type::STRUCT;
+  } else {
+    d->meta_type_ = structure_type::CLASS;
+  }
+  structures_[repr] = d;
+  structure_pool_.push_back(d);
+}
+entry_struct_func_compiler::~entry_struct_func_compiler() {
+  for (auto *it : structure_pool_) { delete it; }
+  structure_pool_.clear();
+}

@@ -1,13 +1,10 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 int32_t yy__bin_numbers();
 int32_t yy__oct_numbers();
 int32_t yy__dec_numbers();
 int32_t yy__hex_numbers();
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 int32_t yy__bin_numbers() 
 {
     int8_t yy__a = INT8_C(15);

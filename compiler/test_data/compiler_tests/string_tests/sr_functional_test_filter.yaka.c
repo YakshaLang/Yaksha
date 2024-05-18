@@ -1,8 +1,7 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
-typedef bool (*yt_fn_in_sr_int_out_bool)(struct yk__bstr, int32_t);
 typedef bool (*yt_fn_in_int_int_out_bool)(int32_t, int32_t);
+typedef bool (*yt_fn_in_sr_int_out_bool)(struct yk__bstr, int32_t);
 bool yy__keep_len_n(struct yk__bstr, int32_t);
 bool yy__keep_all(struct yk__bstr, int32_t);
 bool yy__keep_upto(int32_t, int32_t);
@@ -10,8 +9,6 @@ bool yy__keep_div(int32_t, int32_t);
 bool yy__print_sr(struct yk__bstr, int32_t);
 bool yy__print_int(int32_t, int32_t);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 bool yy__keep_len_n(struct yk__bstr yy__a, int32_t yy__n) 
 {
     bool t__0 = (yk__bstr_len(yy__a) == yy__n);

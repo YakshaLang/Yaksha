@@ -1,12 +1,9 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 int32_t const  yy__A = ((int32_t)(INT8_C(10)));
 int8_t const  yy__B = INT8_C(10);
 int8_t const  yy__C = ((int8_t)(((false) ? 1 : 0)));
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 int32_t yy__main() 
 {
     int32_t const  yy__a = ((int32_t)(INT8_C(1)));

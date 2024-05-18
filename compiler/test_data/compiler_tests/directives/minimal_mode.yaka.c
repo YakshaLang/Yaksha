@@ -1,8 +1,5 @@
 // YK
-// --forward declarations-- 
 int32_t yy__add(int32_t, int32_t);
-// --structs-- 
-// --functions-- 
 
 #ifndef max
 #define max(a, b) ((a) > (b) ? (a) : (b))

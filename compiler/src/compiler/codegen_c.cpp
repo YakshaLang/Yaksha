@@ -49,11 +49,10 @@ comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool,
                             errors::error_printer *ep) {
   // Compile all files.
   bool has_errors = false;
-  std::stringstream struct_forward_decls{};
   std::stringstream function_forward_decls{};
-  std::stringstream struct_body{};
   std::stringstream function_body{};
   std::stringstream global_consts{};
+  std::stringstream header{};
   std::unordered_set<std::string> runtime_features{};
   std::vector<parsing_error> compiler_errors_{};
   int file_count = static_cast<int>(cf->files_.size());
@@ -61,17 +60,25 @@ comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool,
     auto f = cf->files_[i];
     to_c_compiler c{*f->data_->dsv_, &cf->pool_, cf->esc_, token_pool};
     auto result = c.compile(cf, f);
-    struct_forward_decls << result.struct_forward_declarations_;
     function_forward_decls << result.function_forward_declarations_;
-    struct_body << result.classes_;
     function_body << result.body_;
     global_consts << result.global_constants_;
+    header << result.header_;
     for (const std::string &feature : f->data_->dsv_->runtime_features_) {
       runtime_features.insert(feature);
     }
-    for (const auto &err : result.errors_) {
-      compiler_errors_.emplace_back(err);
+    if (!result.errors_.empty()) {
       has_errors = true;
+      for (const auto &err : result.errors_) {
+        compiler_errors_.emplace_back(err);
+      }
+    }
+  }
+  // Check if there are any errors in entry_struct_fn_compiler
+  if (!cf->esc_->errors_.empty()) {
+    has_errors = true;
+    for (const auto &err : cf->esc_->errors_) {
+      compiler_errors_.emplace_back(err);
     }
   }
   // We found errors during compile time
@@ -90,6 +97,9 @@ comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool,
   // Format: // YK --> no requirements
   // Format: // YK:a,b,c# --> 'a', 'b', 'c' are requirements
   // Format: // YK:a# --> 'a' is the only requirement
+  // ---
+  // carpntr (or yaksha build) will check these requirements
+  //   and link with correct runtime dependency files.
   c_code << "// YK";
   if (!rf.empty()) {
     c_code << ":";
@@ -106,29 +116,34 @@ comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool,
   }
   c_code << "\n";
   if (!cf->directives_.no_stdlib_) {
-    LOG_COMP("no_stdlib mode");
+    LOG_COMP("stdlib is used");
     c_code << "#include \"yk__lib.h\"\n";
   }
-  c_code << "// --forward declarations-- \n";
+  // ----------------------------------------------------------------
+  //   ╔═╗┌─┐┌┐┌┌─┐┌┬┐┌─┐┌┐┌┌┬┐┌─┐
+  //   ║  │ ││││└─┐ │ ├─┤│││ │ └─┐
+  //   ╚═╝└─┘┘└┘└─┘ ┴ ┴ ┴┘└┘ ┴ └─┘
+  // ----------------------------------------------------------------
+  c_code << header.str();
   c_code << global_consts.str();
   if (cf->esc_->has_bin_data()) { cf->esc_->compile_binary_data_to(c_code); }
-  c_code << struct_forward_decls.str();
-  if (cf->esc_->has_structures()) {
-    cf->esc_->compile_forward_declarations(c_code);
-  }
-  if (cf->esc_->has_functions()) { cf->esc_->compile_function_defs(c_code); }
-  if (cf->esc_->has_fixed_arrays()) {
-    cf->esc_->compiled_fixed_array_to(c_code);
-  }
+  // ----------------------------------------------------------------
+  //   ╔═╗┌┬┐┬─┐┬ ┬┌─┐┌┬┐┬ ┬┬─┐┌─┐┌─┐   ╔╦╗┬ ┬┌─┐┌─┐┌┬┐┌─┐┌─┐┌─┐
+  //   ╚═╗ │ ├┬┘│ ││   │ │ │├┬┘├┤ └─┐    ║ └┬┘├─┘├┤  ││├┤ ├┤ └─┐
+  //   ╚═╝ ┴ ┴└─└─┘└─┘ ┴ └─┘┴└─└─┘└─┘┘   ╩  ┴ ┴  └─┘─┴┘└─┘└  └─┘
+  // ----------------------------------------------------------------
+  cf->esc_->compile_structures(c_code);
+  // ----------------------------------------------------------------
+  //  ╔═╗┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
+  //  ╠╣ │ │││││   │ ││ ││││└─┐
+  //  ╚  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘
+  // ----------------------------------------------------------------
   c_code << function_forward_decls.str();
-  c_code << "// --structs-- \n";
-  c_code << struct_body.str();
-  if (cf->esc_->has_structures()) { cf->esc_->compile_structures(c_code); }
-  c_code << "// --functions-- \n";
   c_code << function_body.str();
+  // ----------------------------------------------------------------
+  // Generate main() if required
   if (!cf->directives_.no_main_) {
-    LOG_COMP("no_main directive is set, no need add the minimal main to the "
-             "generated code.");
+    LOG_COMP("main() function is required");
     c_code << "#if defined(YK__MINIMAL_MAIN)\n";
     c_code << "int main(void) { return yy__main(); }\n";
     c_code << "#endif";
@@ -136,3 +151,4 @@ comp_result codegen_c::emit(codefiles *cf, gc_pool<token> *token_pool,
   LOG_COMP("c code generated");
   return {false, c_code.str()};
 }
+// Text ART -> https://patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Functions

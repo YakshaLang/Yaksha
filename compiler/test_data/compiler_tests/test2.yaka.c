@@ -1,11 +1,8 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 int32_t yy__factorial(int32_t);
 int32_t yy__on_end(int32_t);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 int32_t yy__factorial(int32_t yy__x) 
 {
     if (yy__x <= INT32_C(0))

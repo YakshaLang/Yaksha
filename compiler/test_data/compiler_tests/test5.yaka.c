@@ -1,14 +1,7 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 struct yy__Captain;
 struct yy__Spaceship;
-int32_t yy__print_str_item(yk__sds, yk__sds);
-int32_t yy__print_int_item(yk__sds, int32_t);
-int32_t yy__print_captain(struct yy__Captain*);
-int32_t yy__print_ship(struct yy__Spaceship*);
-int32_t yy__main();
-// --structs-- 
 struct yy__Captain {
     yk__sds yy__name;
     int32_t yy__age;
@@ -18,7 +11,11 @@ struct yy__Spaceship {
     yk__sds yy__class_;
     struct yy__Captain* yy__captain;
 };
-// --functions-- 
+int32_t yy__print_str_item(yk__sds, yk__sds);
+int32_t yy__print_int_item(yk__sds, int32_t);
+int32_t yy__print_captain(struct yy__Captain*);
+int32_t yy__print_ship(struct yy__Spaceship*);
+int32_t yy__main();
 int32_t yy__print_str_item(yk__sds yy__item, yk__sds yy__value) 
 {
     yk__printstr(yy__item);

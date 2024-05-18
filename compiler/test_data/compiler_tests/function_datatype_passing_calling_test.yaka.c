@@ -1,12 +1,9 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 typedef yk__sds (*yt_fn_in_str_out_str)(yk__sds);
 yk__sds yy__world_formatter(yk__sds);
 void yy__formatted_print(yt_fn_in_str_out_str, yk__sds);
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 yk__sds yy__world_formatter(yk__sds yy__item) 
 {
     yk__sds t__0 = yk__concat_sds_lit(yy__item, " World", 6);

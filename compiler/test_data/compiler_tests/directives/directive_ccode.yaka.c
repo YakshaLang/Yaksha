@@ -1,16 +1,13 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
-struct yy__MyState;
 #define yy__get_global_state get_global_state
 #define yy__set_global_state set_global_state
-int32_t yy__main();
-// --structs-- 
+struct yy__MyState;
 struct yy__MyState {
     int32_t yy__x;
     int32_t yy__y;
 };
-// --functions-- 
+int32_t yy__main();
 
 void* GLOBAL_STATE = NULL;
 

@@ -1,6 +1,8 @@
 // YK:graphicutils,wasm4#
 #include "yk__lib.h"
-// --forward declarations-- 
+#define yy__random_random_u64 yk__random_u64
+#define yy__w4_set_draw_colors(nn__value) *((uint16_t*)0x14) = nn__value
+#define yy__w4_gamepad1() (*((const uint8_t*)0x16))
 uint8_t const  yy__w4_BUTTON_LEFT = UINT8_C(16);
 uint8_t const  yy__w4_BUTTON_RIGHT = UINT8_C(32);
 uint8_t const  yy__w4_BUTTON_UP = UINT8_C(64);
@@ -12,12 +14,24 @@ UINT8_C(0x0e), UINT8_C(0xf0), UINT8_C(0x36), UINT8_C(0x5c),
 UINT8_C(0xd6), UINT8_C(0x57), UINT8_C(0xd5), UINT8_C(0x57),
 UINT8_C(0x35), UINT8_C(0x5c), UINT8_C(0x0f), UINT8_C(0xf0)
 };
-#define yy__random_random_u64 yk__random_u64
-#define yy__w4_set_draw_colors(nn__value) *((uint16_t*)0x14) = nn__value
-#define yy__w4_gamepad1() (*((const uint8_t*)0x16))
 struct yy__Point;
 struct yy__Snake;
 struct yy__State;
+struct yy__Point {
+    int16_t yy__x;
+    int16_t yy__y;
+};
+struct yy__Snake {
+    struct yy__Point** yy__body;
+    struct yy__Point* yy__direction;
+};
+struct yy__State {
+    struct yy__Snake* yy__snake;
+    uint8_t const * yy__fruit_sprite;
+    struct yy__Point* yy__fruit;
+    uint32_t yy__frame_count;
+    uint8_t yy__gamepad_prev;
+};
 void yy__random_set_seed(uint64_t);
 void yy__w4_set_palette(uint32_t, uint32_t, uint32_t, uint32_t);
 void yy__w4_blit(uint8_t const *, int32_t, int32_t, uint32_t, uint32_t, uint32_t);
@@ -38,23 +52,6 @@ void yy__snake_reset(struct yy__Snake*);
 void yy__handle_input(struct yy__State*);
 void yy__game_step(void*);
 int32_t yy__main();
-// --structs-- 
-struct yy__Point {
-    int16_t yy__x;
-    int16_t yy__y;
-};
-struct yy__Snake {
-    struct yy__Point** yy__body;
-    struct yy__Point* yy__direction;
-};
-struct yy__State {
-    struct yy__Snake* yy__snake;
-    uint8_t const * yy__fruit_sprite;
-    struct yy__Point* yy__fruit;
-    uint32_t yy__frame_count;
-    uint8_t yy__gamepad_prev;
-};
-// --functions-- 
 void yy__random_set_seed(uint64_t nn__seed) 
 {
     srand((unsigned) nn__seed);

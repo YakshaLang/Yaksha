@@ -1,17 +1,10 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
-struct yy__class_stuff_C;
+struct yy__AnotherFriend;
 struct yy__Enemy;
 struct yy__Friend;
-struct yy__AnotherFriend;
+struct yy__class_stuff_C;
 typedef int32_t (*yt_fn_in_out_int)(void);
-int32_t yy__a();
-int32_t yy__main();
-// --structs-- 
-struct yy__class_stuff_C {
-    int32_t yy__class_stuff_c;
-};
 struct yy__Enemy {
     int32_t yy__x;
     int32_t yy__y;
@@ -20,10 +13,14 @@ struct yy__Enemy {
 struct yy__Friend {
     int32_t yy__x;
 };
+struct yy__class_stuff_C {
+    int32_t yy__class_stuff_c;
+};
 struct yy__AnotherFriend {
     int32_t yy__x;
 };
-// --functions-- 
+int32_t yy__a();
+int32_t yy__main();
 int32_t yy__a() 
 {
     return INT32_C(0);

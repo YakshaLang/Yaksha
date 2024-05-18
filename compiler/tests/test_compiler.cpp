@@ -388,3 +388,6 @@ TEST_CASE("compiler: directive - ccode") {
 TEST_CASE("compiler: directive - no_main/no_stdlib") {
   test_compile_yaka_file("../test_data/compiler_tests/directives/minimal_mode.yaka");
 }
+TEST_CASE("compiler: structures - depends on other structures") {
+  test_compile_yaka_file("../test_data/compiler_tests/structs_arrays/cat_game.yaka");
+}

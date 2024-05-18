@@ -1,10 +1,7 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 typedef int32_t yt_arr_int_3[3];
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 int32_t yy__main() 
 {
     yk__printlnstr("Creating a fixed array");

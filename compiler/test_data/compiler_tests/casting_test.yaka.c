@@ -1,15 +1,12 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
-struct yy__B;
 #define yy__A void*
-yy__A yy__toA(struct yy__B*);
-int32_t yy__main();
-// --structs-- 
+struct yy__B;
 struct yy__B {
     int32_t yy__a;
 };
-// --functions-- 
+yy__A yy__toA(struct yy__B*);
+int32_t yy__main();
 yy__A yy__toA(struct yy__B* yy__b) 
 {
     yy__A t__0 = ((yy__A)yy__b);

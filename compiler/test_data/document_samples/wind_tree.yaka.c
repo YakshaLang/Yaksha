@@ -1,6 +1,5 @@
 // YK:graphicutils,raylib#
 #include "yk__lib.h"
-// --forward declarations-- 
 #define yy__random_init_random yk__init_random
 #define yy__perlin_noise1df(nn__x) ((float)yk__perlin1d((double) nn__x))
 #define yy__numbers_f2i(nn__a) ((int32_t)(nn__a))
@@ -24,15 +23,6 @@
 #define yy__raylib_draw_ellipse(nn__center_x, nn__center_y, nn__radius_h, nn__radius_v, nn__p_color) DrawEllipse((int)nn__center_x, (int)nn__center_y, nn__radius_h, nn__radius_v, nn__p_color)
 #define yy__raylib_draw_fps(nn__pos_x, nn__pos_y) DrawFPS((int)nn__pos_x, (int)nn__pos_y)
 struct yy__State;
-void yy__random_set_seed(uint64_t);
-float yy__random_randomf();
-float yy__random_random_betweenf(float, float);
-float yy__utils_remap(float, float, float, float, float);
-yy__raylib_Color yy__utils_lerp_color(yy__raylib_Color, yy__raylib_Color, float);
-void yy__branch(float, float, float, float, struct yy__State*);
-void yy__update_draw_frame(struct yy__State*);
-int32_t yy__main();
-// --structs-- 
 struct yy__State {
     float yy__width;
     float yy__height;
@@ -42,7 +32,14 @@ struct yy__State {
     yy__raylib_Color yy__green;
     yy__raylib_Color yy__color3;
 };
-// --functions-- 
+void yy__random_set_seed(uint64_t);
+float yy__random_randomf();
+float yy__random_random_betweenf(float, float);
+float yy__utils_remap(float, float, float, float, float);
+yy__raylib_Color yy__utils_lerp_color(yy__raylib_Color, yy__raylib_Color, float);
+void yy__branch(float, float, float, float, struct yy__State*);
+void yy__update_draw_frame(struct yy__State*);
+int32_t yy__main();
 void yy__random_set_seed(uint64_t nn__seed) 
 {
     srand((unsigned) nn__seed);

@@ -1,12 +1,9 @@
 // YK
 #include "yk__lib.h"
-// --forward declarations-- 
 struct yk__bstr yy__a();
 yk__sds yy__b();
 struct yk__bstr yy__c();
 int32_t yy__main();
-// --structs-- 
-// --functions-- 
 struct yk__bstr yy__a() 
 {
     return yk__bstr_s("Hello", 5);

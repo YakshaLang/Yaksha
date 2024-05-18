@@ -133,7 +133,7 @@ namespace yaksha {
                                const std::pair<std::string, ykobject> &rhs,
                                const ykdatatype *rhs_datatype,
                                const ykdatatype *lhs_datatype) override;
-    std::string wrap_in_paren(const std::string &code) const override;
+    [[nodiscard]] std::string wrap_in_paren(const std::string &code) const override;
     void visit_cfor_stmt(cfor_stmt *obj) override;
     void visit_enum_stmt(enum_stmt *obj) override;
     void visit_union_stmt(union_stmt *obj) override;
@@ -166,9 +166,8 @@ private:
     /**
      * Function declarations, etc
      */
-    std::stringstream struct_forward_declarations_{};
     std::stringstream function_forward_declarations_{};
-    std::stringstream classes_{};
+    std::stringstream header_{};
     std::stringstream body_{};
     std::stringstream global_constants_{};
     // Scope

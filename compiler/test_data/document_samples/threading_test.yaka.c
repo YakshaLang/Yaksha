@@ -1,6 +1,8 @@
 // YK:cpu,tinycthread#
 #include "yk__lib.h"
-// --forward declarations-- 
+#define yy__mutex_Mutex mtx_t
+#define yy__condition_Condition cnd_t
+#define yy__thread_Thread thrd_t
 int32_t const  yy__mutex_PLAIN = INT32_C(0);
 int32_t const  yy__pool_IMMEDIATE_SHUTDOWN = INT32_C(1);
 int32_t const  yy__pool_GRACEFUL_SHUTDOWN = INT32_C(2);
@@ -14,13 +16,23 @@ int32_t const  yy__pool_ERROR_SHUTDOWN = INT32_C(40);
 int32_t const  yy__pool_ERROR_THREAD_FAILURE = INT32_C(50);
 int32_t const  yy__pool_SUCCESS = INT32_C(0);
 int32_t const  yy__thread_SUCCESS = INT32_C(1);
-#define yy__mutex_Mutex mtx_t
-#define yy__condition_Condition cnd_t
 struct yy__pool_ThreadPool;
-#define yy__thread_Thread thrd_t
-struct yt_tuple_fn_in_any_ptr_out_any_ptr;
 typedef void (*yt_fn_in_any_ptr_out)(void*);
 typedef int32_t (*yt_fn_in_any_ptr_out_int)(void*);
+struct yt_tuple_fn_in_any_ptr_out_any_ptr { yt_fn_in_any_ptr_out e1; void* e2; };
+struct yy__pool_ThreadPool {
+    yy__mutex_Mutex yy__pool_lock;
+    yy__condition_Condition yy__pool_notify;
+    yy__thread_Thread* yy__pool_threads;
+    struct yt_tuple_fn_in_any_ptr_out_any_ptr* yy__pool_queue;
+    int32_t yy__pool_thread_count;
+    int32_t yy__pool_queue_size;
+    int32_t yy__pool_head;
+    int32_t yy__pool_tail;
+    int32_t yy__pool_count;
+    int32_t yy__pool_shutdown;
+    int32_t yy__pool_started;
+};
 int32_t yy__mutex_init(yy__mutex_Mutex*, int32_t);
 void yy__mutex_destroy(yy__mutex_Mutex*);
 int32_t yy__mutex_lock(yy__mutex_Mutex*);
@@ -43,22 +55,6 @@ int32_t yy__thread_sleep(int32_t);
 int32_t yy__my_thread(void*);
 void yy__print_num(void*);
 int32_t yy__main();
-// --structs-- 
-struct yy__pool_ThreadPool {
-    yy__mutex_Mutex yy__pool_lock;
-    yy__condition_Condition yy__pool_notify;
-    yy__thread_Thread* yy__pool_threads;
-    struct yt_tuple_fn_in_any_ptr_out_any_ptr* yy__pool_queue;
-    int32_t yy__pool_thread_count;
-    int32_t yy__pool_queue_size;
-    int32_t yy__pool_head;
-    int32_t yy__pool_tail;
-    int32_t yy__pool_count;
-    int32_t yy__pool_shutdown;
-    int32_t yy__pool_started;
-};
-struct yt_tuple_fn_in_any_ptr_out_any_ptr { yt_fn_in_any_ptr_out e1; void* e2; };
-// --functions-- 
 int32_t yy__mutex_init(yy__mutex_Mutex* nn__mtx, int32_t nn__type) { return mtx_init(nn__mtx, nn__type); }
 void yy__mutex_destroy(yy__mutex_Mutex* nn__mtx) { mtx_destroy(nn__mtx); }
 int32_t yy__mutex_lock(yy__mutex_Mutex* nn__mtx) { return mtx_lock(nn__mtx); }
