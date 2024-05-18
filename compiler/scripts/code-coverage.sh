@@ -9,8 +9,8 @@ find . -type f -exec dos2unix {} \;
 set -e
 cd build || exit 1
 # Build project
-cmake -G Ninja -S .. -B . -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -fPIC -O0 -fsanitize=address -static-libasan -g"
-cmake --build . -- -j 24
+YAKSHA_COV_OR_FUZZ=1 cmake -G Ninja -S .. -B . -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -fPIC -O0 -fsanitize=address -static-libasan -g"
+YAKSHA_COV_OR_FUZZ=1 cmake --build . -- -j 24
 # Run test cases
 echo "██    ██ ███    ██ ██ ████████     ████████ ███████ ███████ ████████"
 echo "██    ██ ████   ██ ██    ██           ██    ██      ██         ██"

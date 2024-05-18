@@ -19,8 +19,8 @@ echo "---------------FUZZER--------------"
 mkdir fuzz-build
 cd fuzz-build
 export YAKSHA_FUZZ=1
-CC=clang-12 CXX=clang++-12 cmake -S .. -B .
-cmake --build . --target YakshaFuzz
+YAKSHA_COV_OR_FUZZ=1 CC=clang-15 CXX=clang++-15 cmake -S .. -B .
+YAKSHA_COV_OR_FUZZ=1 cmake --build . --target YakshaFuzz
 cd ../bin
 ./YakshaFuzz -fork=2 ../test_data
 cp crash-* /fuzz

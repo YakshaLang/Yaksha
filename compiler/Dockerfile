@@ -1,12 +1,10 @@
 FROM ubuntu:noble-20240407.1
 ENV DEBIAN_FRONTEND=noninteractive
 ARG ZIG_VERSION=0.9.1
-RUN apt-get update && apt-get -y -q install clang-12 clang-tools git wget build-essential python3 libssl-dev lcov gcovr dos2unix cmake ninja-build
+RUN apt-get update && apt-get -y -q install clang-15 clang-tools git wget build-essential python3 libssl-dev lcov gcovr dos2unix cmake ninja-build python3-pip python3-tqdm
 
-RUN   ln -s /usr/bin/clang-12 /usr/bin/clang \
-      && ln -s /usr/bin/clang++-12 /usr/bin/clang++
-
-RUN apt-get -y -q install python3-pip && pip3 install tqdm
+RUN   ln -s /usr/bin/clang-15 /usr/bin/clang \
+      && ln -s /usr/bin/clang++-15 /usr/bin/clang++
 
 RUN wget https://ziglang.org/download/0.9.1/zig-linux-x86_64-${ZIG_VERSION}.tar.xz \
     && tar -xf zig-linux-x86_64-${ZIG_VERSION}.tar.xz \
