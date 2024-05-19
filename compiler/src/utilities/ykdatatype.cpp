@@ -306,7 +306,7 @@ bool ykdatatype::is_dimension() const {
   return !is_primitive() && builtin_type_ == ykbuiltin::DIMENSION;
 }
 bool yaksha::internal_is_identical_type(ykdatatype *required_datatype,
-                                ykdatatype *provided_datatype) {
+                                        ykdatatype *provided_datatype) {
   if (required_datatype != nullptr && provided_datatype != nullptr) {
     if (required_datatype->is_primitive() &&
         provided_datatype->is_primitive()) {

@@ -48,7 +48,6 @@
 #include "return_checker.h"
 #include "utilities/ykobject.h"
 namespace yaksha {
-
   struct type_checker : expr_visitor, stmt_visitor, slot_matcher {
     explicit type_checker(std::string filepath, codefiles *cf,
                           def_class_visitor *dcv, ykdt_pool *pool,
@@ -61,8 +60,11 @@ namespace yaksha {
     type_match_result type_match(ykdatatype *required_datatype,
                                  ykdatatype *provided_datatype,
                                  bool primitive_or_obj) override;
-    type_match_result slot_match_with_result(ykdatatype *datatype, const ykobject &provided_arg) override;
-    type_match_result rvalue_match(const ykobject& left_side, const ykobject& right_side) override;
+    type_match_result
+    slot_match_with_result(ykdatatype *datatype,
+                           const ykobject &provided_arg) override;
+    type_match_result rvalue_match(const ykobject &left_side,
+                                   const ykobject &right_side) override;
     ykdatatype *function_to_datatype_or_null(const ykobject &arg) override;
     void check(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;

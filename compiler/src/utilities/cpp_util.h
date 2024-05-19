@@ -216,7 +216,7 @@ namespace yaksha {
   static inline void intentionally_ignored(const T &) {}
   // Reference: https://codereview.stackexchange.com/a/238646/47826
   static inline std::size_t levenshtein_distance(const std::string &string_a,
-                                   const std::string &string_b) {
+                                                 const std::string &string_b) {
     const auto size_a = string_a.size();
     const auto size_b = string_b.size();
     std::vector<std::size_t> distances(size_b + 1);

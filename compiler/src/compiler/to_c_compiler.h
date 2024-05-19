@@ -133,7 +133,8 @@ namespace yaksha {
                                const std::pair<std::string, ykobject> &rhs,
                                const ykdatatype *rhs_datatype,
                                const ykdatatype *lhs_datatype) override;
-    [[nodiscard]] std::string wrap_in_paren(const std::string &code) const override;
+    [[nodiscard]] std::string
+    wrap_in_paren(const std::string &code) const override;
     void visit_cfor_stmt(cfor_stmt *obj) override;
     void visit_enum_stmt(enum_stmt *obj) override;
     void visit_union_stmt(union_stmt *obj) override;

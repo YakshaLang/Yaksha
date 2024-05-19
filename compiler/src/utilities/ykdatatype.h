@@ -101,7 +101,6 @@ namespace yaksha {
                                         bool lhs_mutates, bool assignment);
     [[nodiscard]] std::string as_string() const;
     [[nodiscard]] std::string as_string_simplified() const;
-
     // meta type
     [[nodiscard]] bool is_c_primitive() const;
     [[nodiscard]] bool is_primitive() const;

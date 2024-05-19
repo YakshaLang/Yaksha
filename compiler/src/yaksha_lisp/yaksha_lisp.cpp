@@ -454,12 +454,11 @@ yaksha_lisp_value *yaksha_envmap::get(const std::string &symbol) {
 #ifdef YAKSHA_LISP_EVAL_DEBUG_IS_PRINTED
   auto v = get_internal(symbol);
   if (v == nullptr) {
-    std::cout << indent_ << ">>> "
-              << "env(" << this << ")." << symbol << " -> "
+    std::cout << indent_ << ">>> " << "env(" << this << ")." << symbol << " -> "
               << "NULL" << std::endl;
   } else {
-    std::cout << indent_ << ">>> "
-              << "env(" << this << ")." << symbol << " -> " << v << std::endl;
+    std::cout << indent_ << ">>> " << "env(" << this << ")." << symbol << " -> "
+              << v << std::endl;
   }
   return v;
 #else
@@ -476,8 +475,8 @@ void yaksha_envmap::set(const std::string &symbol, yaksha_lisp_value *value,
   }
   LOG_COMP("not locked can try setting to this env");
 #ifdef YAKSHA_LISP_EVAL_DEBUG_IS_PRINTED
-  std::cout << indent_ << ">>> "
-            << "env(" << this << ")." << symbol << " = " << value << std::endl;
+  std::cout << indent_ << ">>> " << "env(" << this << ")." << symbol << " = "
+            << value << std::endl;
 #endif
   // Define if not defined
   // Do not define in closure, only in current env

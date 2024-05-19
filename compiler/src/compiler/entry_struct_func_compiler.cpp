@@ -49,9 +49,8 @@ const std::vector<std::pair<std::string, std::string>> REPLACEMENTS = {
 using namespace yaksha;
 entry_struct_func_compiler::entry_struct_func_compiler(ykdt_pool *pool)
     : pool_(pool), counter_(0), counter_bin_data_(0), autogen_bin_data_(),
-      bin_data_(), name_improvements_(), errors_(),
-      structure_pool_(), structures_(),
-      reverse_name_improvements_() {}
+      bin_data_(), name_improvements_(), errors_(), structure_pool_(),
+      structures_(), reverse_name_improvements_() {}
 std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
                                                 datatype_compiler *dtc) {
   std::string repr = entry_dt->as_string();
@@ -69,7 +68,8 @@ std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
     d->a_ = pool_->create("str");
     d->b_ = entry_dt->args_[0];
   } else {
-    errors_.emplace_back("Invalid entry datatype: " + entry_dt->as_string_simplified(), nullptr);
+    errors_.emplace_back(
+        "Invalid entry datatype: " + entry_dt->as_string_simplified(), nullptr);
     return "<><>";
   }
   std::stringstream code{};
@@ -122,15 +122,15 @@ void entry_struct_func_compiler::compile_structures(std::stringstream &target) {
     if (!it->permanent_mark_) {
       bool cycle = this->visit(it, topo_sorted_types);
       if (cycle) {
-        errors_.emplace_back("Cycle detected in structure: " + it->dt_->as_string_simplified(), nullptr);
+        errors_.emplace_back("Cycle detected in structure: " +
+                                 it->dt_->as_string_simplified(),
+                             nullptr);
         return;
       }
     }
   }
   // Forward declarations of classes
-  for (auto *it : sorted) {
-    target << it->prefixed_full_name_ << ";\n";
-  }
+  for (auto *it : sorted) { target << it->prefixed_full_name_ << ";\n"; }
   // Topologically sorted structures
   for (auto *it : topo_sorted_types) { target << it->code_; }
   // Classes
@@ -212,7 +212,9 @@ entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
     code << dtc->convert_dt(d->b_->args_[0], datatype_location::STRUCT, "", "")
          << " ";
   } else {
-    errors_.emplace_back("Invalid function output datatype: " + d->b_->as_string_simplified(), nullptr);
+    errors_.emplace_back("Invalid function output datatype: " +
+                             d->b_->as_string_simplified(),
+                         nullptr);
     code << "<><>";
   }
   std::string name =
@@ -320,7 +322,9 @@ entry_struct_func_compiler::compile_fixed_array(ykdatatype *fixed_array_dt,
       fixed_array_dt->args_.size() != 2 ||
       fixed_array_dt->args_[0]->is_sm_entry() ||
       fixed_array_dt->args_[1]->is_m_entry()) {
-    errors_.emplace_back("Invalid fixed array datatype: " + fixed_array_dt->as_string_simplified(), nullptr);
+    errors_.emplace_back("Invalid fixed array datatype: " +
+                             fixed_array_dt->as_string_simplified(),
+                         nullptr);
     return "<><>";
   }
   // -- convert

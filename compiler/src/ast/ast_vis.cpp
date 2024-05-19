@@ -315,8 +315,7 @@ void ast_vis::visit_ccode_stmt(ccode_stmt *obj) {
   text_ << "<pre class=\"cyan-code\">"
         << ::string_utils::html_escape(
                string_utils::unescape(obj->code_str_->token_))
-        << "</pre>"
-        << "<br />";
+        << "</pre>" << "<br />";
   end_block();
 }
 void ast_vis::visit_import_stmt(import_stmt *obj) {
@@ -348,8 +347,7 @@ void ast_vis::visit_nativeconst_stmt(nativeconst_stmt *obj) {
     text_ << "<pre class=\"cyan-code\">"
           << ::string_utils::html_escape(
                  string_utils::unescape(obj->code_str_->token_))
-          << "</pre>"
-          << "<br />";
+          << "</pre>" << "<br />";
     end_block();
   }
   end_block();
@@ -359,8 +357,7 @@ void ast_vis::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
   text_ << "<pre class=\"cyan-code\">"
         << ::string_utils::html_escape(
                string_utils::unescape(obj->feature_->token_))
-        << "</pre>"
-        << "<br />";
+        << "</pre>" << "<br />";
   end_block();
 }
 void ast_vis::visit_foreach_stmt(foreach_stmt *obj) {

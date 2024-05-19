@@ -1268,7 +1268,6 @@ struct builtin_iif : builtin {
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     std::stringstream message{};
     auto o = ykobject(dt_pool);
-
     if (args.size() != 3) {
       o.string_val_ = "iif() builtin expects 3 arguments";
     } else if (!(args[0].datatype_->const_unwrap()->is_bool())) {
@@ -1287,7 +1286,8 @@ struct builtin_iif : builtin {
         o.datatype_ = dt_pool->create("sr");
       }
       if (args[1].is_a_function()) {
-        auto datatype_for_function = dt_slot_matcher->function_to_datatype_or_null(args[1]);
+        auto datatype_for_function =
+            dt_slot_matcher->function_to_datatype_or_null(args[1]);
         if (datatype_for_function != nullptr) {
           o.datatype_ = datatype_for_function;
         } else {

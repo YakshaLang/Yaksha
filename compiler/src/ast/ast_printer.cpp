@@ -101,8 +101,7 @@ void ast_printer::visit_let_stmt(let_stmt *obj) {
   text_ << ")";
 }
 void ast_printer::visit_assign_expr(assign_expr *obj) {
-  text_ << "("
-        << "assign " << obj->name_->token_ << " ";
+  text_ << "(" << "assign " << obj->name_->token_ << " ";
   obj->right_->accept(this);
   text_ << ")";
 }
