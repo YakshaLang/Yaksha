@@ -14,6 +14,7 @@ public class YakshaAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull final PsiElement element, @NotNull AnnotationHolder holder) {
+
         if (element instanceof YakshaDataTypeBit) {
             holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                     .range(element.getTextRange())
@@ -35,7 +36,7 @@ public class YakshaAnnotator implements Annotator {
                         .range(fncall.getFirstChild().getTextRange())
                         .textAttributes(YakshaSyntaxHighlighter.KEYWORD)
                         .create();
-                if ((fullName.equals("cast") || fullName.equals("arrnew") || fullName.equals("array")) && fncall.getArgumentsList() != null
+                if ((fullName.equals("cast") || fullName.equals("arrnew") || fullName.equals("array") || fullName.equals("fixedarr")) && fncall.getArgumentsList() != null
                         && !fncall.getArgumentsList().isEmpty() && fncall.getArgumentsList().get(0).getExpList() != null
                         && fncall.getArgumentsList().get(0).getExpList().size() > 0) {
                     YakshaExp dt = fncall.getArgumentsList().get(0).getExpList().get(0);

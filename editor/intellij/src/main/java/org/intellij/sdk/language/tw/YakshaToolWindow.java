@@ -1,5 +1,6 @@
 package org.intellij.sdk.language.tw;
 
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import org.intellij.sdk.language.YakshaIcons;
 import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
@@ -11,13 +12,16 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
+import java.io.File;
+import java.util.Locale;
 import java.util.concurrent.*;
 
 public class YakshaToolWindow {
-
+    public static String YAKSHA_EXE_PATH = "";
     private JPanel myToolWindowContent;
     private JTree documentationTree;
     private JTextField filterText;
+    private JButton setYakshaCompilerPathButton;
 
     private final Debouncer debouncer = new Debouncer();
 
@@ -47,7 +51,14 @@ public class YakshaToolWindow {
         }
     }
 
-    public YakshaToolWindow(ToolWindow toolWindow) {
+    public YakshaToolWindow(ToolWindow toolWindow, ExecutableFileStateService service) {
+        final var state = service.getState();
+        if (state != null) {
+            final var path = state.getExecutableFilePath();
+            if (path != null && !path.isBlank()) {
+                YAKSHA_EXE_PATH = path; // Set current path when the tool window is opened
+            }
+        }
         final DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -86,7 +97,37 @@ public class YakshaToolWindow {
                 renderTree(filterText.getText().strip());
             }
         });
+
+        setYakshaCompilerPathButton.addActionListener(e -> onSelectFileButtonClicked(service));
     }
+
+    private void onSelectFileButtonClicked(ExecutableFileStateService service) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select Executable File");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || (f.isFile() && f.canExecute() && f.getName().toLowerCase(Locale.ROOT).startsWith("yaksha"));
+            }
+
+            @Override
+            public String getDescription() {
+                return "Yaksha executable";
+            }
+        });
+
+        int returnValue = fileChooser.showOpenDialog(myToolWindowContent);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String filePath = selectedFile.getAbsolutePath();
+            assert service.getState() != null;
+            service.getState().setExecutableFilePath(filePath);
+            YAKSHA_EXE_PATH = filePath;
+            Messages.showMessageDialog("Set compiler path: " + filePath, "Information", Messages.getInformationIcon());
+        }
+    }
+
 
     private void renderTree(String filter) {
         debouncer.debounce(Void.class, () -> SwingUtilities.invokeLater(() -> {
