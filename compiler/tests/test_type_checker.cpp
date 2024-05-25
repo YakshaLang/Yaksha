@@ -151,7 +151,8 @@ TEST_CASE("type checker: Second argument must be int for arrnew()") {
 }
 TEST_CASE("type checker: Must assign to proper data structure for arrnew()") {
   test_typechecker_snippet("a: Array[str] = arrnew(\"int\", 10)",
-                           "Cannot assign between 2 different data types. lhs: Array[str], rhs: Array[int]");
+                           "Cannot assign between 2 different data types. lhs: "
+                           "Array[str], rhs: Array[int]");
 }
 TEST_CASE("type checker: Builtin array() invalid arg count") {
   test_typechecker_snippet("a: Array[int] = array()",
@@ -179,14 +180,16 @@ TEST_CASE("type checker: Second argument must be int for array()") {
 }
 TEST_CASE("type checker: Must assign to proper data structure for array()") {
   test_typechecker_snippet("a: Array[str] = array(\"int\", 10)",
-                           "Cannot assign between 2 different data types. lhs: Array[str], rhs: Array[int]");
+                           "Cannot assign between 2 different data types. lhs: "
+                           "Array[str], rhs: Array[int]");
 }
 TEST_CASE("type checker: Different type assignment using iif") {
-  test_typechecker_snippet(
-      "a: bool = iif(True, False, 1)",
-      "Second and third arguments to iif() data type mismatch. Expected: bool, Provided: int");
+  test_typechecker_snippet("a: bool = iif(True, False, 1)",
+                           "Second and third arguments to iif() data type "
+                           "mismatch. Expected: bool, Provided: int");
 }
-TEST_CASE("type checker: Different type assignment using iif bigger type on lhs") {
+TEST_CASE(
+    "type checker: Different type assignment using iif bigger type on lhs") {
   test_typechecker_snippet_ok("a: int = iif(True, 1, 1i8)");
 }
 TEST_CASE("type checker: Different type func assignment using iif") {
@@ -198,7 +201,8 @@ TEST_CASE("type checker: Different type func assignment using iif") {
       "def main() -> int:\n"
       "    a: Function[In[int],Out] = iif(True, f1, f2)\n"
       "    return 0",
-      "Second and third arguments to iif() data type mismatch. Expected: Function[In[int], Out], Provided: Function[In[int, int], Out]");
+      "Second and third arguments to iif() data type mismatch. Expected: "
+      "Function[In[int], Out], Provided: Function[In[int, int], Out]");
 }
 TEST_CASE("type checker: iif using 4 args") {
   test_typechecker_snippet("a: bool = iif(True, False, True, 2)",
@@ -245,15 +249,17 @@ TEST_CASE("type checker: sr constants are supported") {
                                    "    return 0");
 }
 TEST_CASE("type checker: different type of numbers used in operators bitwise") {
-  test_typechecker_snippet("a: int = 1\n"
-                           "    b: i8 = a & 1i8\n",
-                           "Cannot assign between 2 different data types. lhs: i8, rhs: int");
+  test_typechecker_snippet(
+      "a: int = 1\n"
+      "    b: i8 = a & 1i8\n",
+      "Cannot assign between 2 different data types. lhs: i8, rhs: int");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators mul/div/rem") {
-  test_typechecker_snippet("a: int = 1\n"
-                           "    b: i8 = a * 1i8\n",
-                           "Cannot assign between 2 different data types. lhs: i8, rhs: int");
+  test_typechecker_snippet(
+      "a: int = 1\n"
+      "    b: i8 = a * 1i8\n",
+      "Cannot assign between 2 different data types. lhs: i8, rhs: int");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators comparison") {
@@ -414,15 +420,14 @@ TEST_CASE(
       "Variable argument: 5 mismatches. Expected: int Provided: i64");
 }
 TEST_CASE("type checker: pass in a non constant structure to a const") {
-  test_typechecker_snippet_full_ok(
-      "class A:\n"
-      "    a: int\n"
-      "def afunc(a: Const[A]) -> None:\n"
-      "    pass\n"
-      "def main() -> int:\n"
-      "    myobj = A{a: 1}\n"
-      "    afunc(myobj)\n"
-      "    return 0");
+  test_typechecker_snippet_full_ok("class A:\n"
+                                   "    a: int\n"
+                                   "def afunc(a: Const[A]) -> None:\n"
+                                   "    pass\n"
+                                   "def main() -> int:\n"
+                                   "    myobj = A{a: 1}\n"
+                                   "    afunc(myobj)\n"
+                                   "    return 0");
 }
 TEST_CASE("type checker: pass in a constant structure object to a non const") {
   test_typechecker_snippet_full(
@@ -433,7 +438,8 @@ TEST_CASE("type checker: pass in a constant structure object to a non const") {
       "def main() -> int:\n"
       "    myobj: Const[A] = A{a: 1}\n"
       "    afunc(myobj)\n"
-      "    return 0", "Parameter & argument 1 mismatches. Expected: A Provided: Const[A]");
+      "    return 0",
+      "Parameter & argument 1 mismatches. Expected: A Provided: Const[A]");
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
   test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
@@ -449,7 +455,37 @@ TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
       "    f1: Function[In[int,int],Out] = fnc\n"
       "    f1(1, 2)\n"
       "    return 0",
-      "You can only assign a matching function. lhs: Function[In[int, int], Out], rhs: Function[In[int, i8], Out]");
+      "You can only assign a matching function. lhs: Function[In[int, int], "
+      "Out], rhs: Function[In[int, i8], Out]");
+}
+TEST_CASE("type checker: do not allow to return a constant as a non constant") {
+  test_typechecker_snippet_full(
+      "class A:\n"
+      "    a: int\n"
+      "def fnc(r: Const[A]) -> A:\n"
+      "    r\n"
+      "def main() -> int:\n"
+      "    a0: Const[A] = A{a: 1}\n"
+      "    a: A = fnc(a0)\n"
+      "    0",
+      "Invalid return data type. Expected: A, Provided: Const[A]");
+}
+TEST_CASE("type checker: for primitives it is allowed to remove const-ness") {
+  // It does not matter that this is done, as integer is copied and is a primitive
+  test_typechecker_snippet_full_ok("def fnc(r: Const[int]) -> int:\n"
+                                   "    r\n"
+                                   "def main() -> int:\n"
+                                   "    a0: Const[int] = 90\n"
+                                   "    a: int = fnc(a0)\n"
+                                   "    0");
+}
+TEST_CASE("type checker: remove const-ness and also autocast") {
+  test_typechecker_snippet_full_ok("def fnc(r: Const[i8]) -> int:\n"
+                                   "    r\n"
+                                   "def main() -> int:\n"
+                                   "    a0: Const[i8] = 5i8\n"
+                                   "    a: int = fnc(a0)\n"
+                                   "    0");
 }
 TEST_CASE("type checker: func ptr call parameter and argument mismatches first "
           "argument") {
@@ -721,8 +757,9 @@ TEST_CASE("type checker: Const assignment should work as expected") {
   test_typechecker_ok_yaka_file("../test_data/bug_fixes/assign_const.yaka");
 }
 TEST_CASE("type checker: Test multiple assignment failure") {
-  test_typechecker_yaka_file("../test_data/compiler_tests/multi_assign.yaka",
-                             "Cannot assign between 2 different data types. lhs: sr, rhs: int");
+  test_typechecker_yaka_file(
+      "../test_data/compiler_tests/multi_assign.yaka",
+      "Cannot assign between 2 different data types. lhs: sr, rhs: int");
 }
 TEST_CASE("type checker: Import shadows a foreach variable") {
   test_typechecker_yaka_file(
@@ -734,13 +771,13 @@ TEST_CASE("type checker: Create a primitive using {} init") {
                            "Invalid data type for {} initialization");
 }
 TEST_CASE("type checker: Invalid fields in struct") {
-  test_typechecker_snippet_full(
-      "struct P:\n"
-      "    x: int\n\n"
-      "def main() -> int:\n"
-      "    a = P{k: 0}\n"
-      "    return 0\n",
-      "Member 'k' not found in class/struct 'P'. Perhaps 'x' is what you meant?");
+  test_typechecker_snippet_full("struct P:\n"
+                                "    x: int\n\n"
+                                "def main() -> int:\n"
+                                "    a = P{k: 0}\n"
+                                "    return 0\n",
+                                "Member 'k' not found in class/struct 'P'. "
+                                "Perhaps 'x' is what you meant?");
 }
 TEST_CASE("type checker: Duplicate fields in {} init (struct)") {
   test_typechecker_snippet_full("struct P:\n"
