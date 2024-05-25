@@ -1111,6 +1111,7 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
     auto match = type_match(obj->data_type_->args_[0], expression_dt, true);
     if (match.matched_) {
       placeholder = expression_data;
+      placeholder.datatype_ = obj->data_type_; // Set the correct data type
     } else {
       std::stringstream message{};
       message << "Constant '" << name << "' data type mismatch. ";
@@ -1149,6 +1150,10 @@ type_match_result type_checker::type_match(ykdatatype *required_datatype,
     auto castable =
         required_datatype->auto_cast(provided_datatype, dt_pool_, false, true);
     if (castable != nullptr) { return type_match_result{"", true, true}; }
+  }
+  // Pass a Type to a Const[Type] is allowed (becomes more restrictive)
+  if (primitive_or_obj && is_identical_type(required_datatype->const_unwrap(), provided_datatype)) {
+    return type_match_result{"", true, false};
   }
   std::stringstream message{};
   message << "data type mismatch. Expected: ";

@@ -413,6 +413,28 @@ TEST_CASE(
       "    return 0",
       "Variable argument: 5 mismatches. Expected: int Provided: i64");
 }
+TEST_CASE("type checker: pass in a non constant structure to a const") {
+  test_typechecker_snippet_full_ok(
+      "class A:\n"
+      "    a: int\n"
+      "def afunc(a: Const[A]) -> None:\n"
+      "    pass\n"
+      "def main() -> int:\n"
+      "    myobj = A{a: 1}\n"
+      "    afunc(myobj)\n"
+      "    return 0");
+}
+TEST_CASE("type checker: pass in a constant structure object to a non const") {
+  test_typechecker_snippet_full(
+      "class A:\n"
+      "    a: int\n"
+      "def afunc(a: A) -> None:\n"
+      "    pass\n"
+      "def main() -> int:\n"
+      "    myobj: Const[A] = A{a: 1}\n"
+      "    afunc(myobj)\n"
+      "    return 0", "Parameter & argument 1 mismatches. Expected: A Provided: Const[A]");
+}
 TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
   test_typechecker_snippet_full_ok("def fnc(a: int, b: int) -> None:\n"
                                    "    pass\n"
