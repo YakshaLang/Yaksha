@@ -65,6 +65,7 @@ namespace yaksha {
     bool main_required_ = true;
     bool check_types_ = true;
     bool usage_analysis_ = true;
+    bool use_scratch_files_ = false;
     errors::error_printer error_printer_{};
 
 private:

@@ -53,7 +53,11 @@ int main(int argc, char *argv[]) {
   auto no_codegen = argparser::OP_BOOL(
       'd', "--disable-codegen",
       "Do not output generated code, instead just print errors as JSON.");
-  args.optional_ = {&help, &no_main, &no_codegen};
+  auto use_scratch_files =
+      argparser::OP_BOOL('e', "--use-scratch-files",
+                         "Use scratch files such as '_.main.yaka' if present "
+                         "in the same directory instead of 'main.yaka'.");
+  args.optional_ = {&help, &no_main, &no_codegen, &use_scratch_files};
   auto code = argparser::PO("mainfile.yaka", "Yaksha code file.");
   auto lib = argparser::PO_OPT("[LIBS_PARENT_PATH]",
                                "Path to the parent directory of the libraries");
@@ -72,6 +76,7 @@ int main(int argc, char *argv[]) {
   multifile_compiler mc{};
   try {
     mc.main_required_ = !no_main.is_set_;
+    mc.use_scratch_files_ = use_scratch_files.is_set_;
     if (no_codegen.is_set_) { mc.error_printer_.json_output_ = true; }
     codegen_c cg{};
     do_nothing_codegen dn_cg{};

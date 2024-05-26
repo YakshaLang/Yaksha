@@ -81,6 +81,7 @@ namespace yaksha {
     entry_struct_func_compiler *esc_;
     directives directives_{};
     std::filesystem::path libs_path_{};
+    bool use_scratch_files_{false};
 
 private:
     file_data *parse_or_null(std::filesystem::path &file_name);
@@ -98,6 +99,7 @@ private:
     std::unordered_map<std::intptr_t, std::filesystem::path>
         import_to_path_cache_{};
     errors::error_printer *ep_{nullptr};
+    std::filesystem::path scratch_file_path(const std::string &filename) const;
   };
 }// namespace yaksha
 #endif

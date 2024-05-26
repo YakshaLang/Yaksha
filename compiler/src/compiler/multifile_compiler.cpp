@@ -40,7 +40,6 @@
 #include "multifile_compiler.h"
 #include "ast/codefiles.h"
 #include "ast/parser.h"
-//#include "compiler/compiler.h"
 #include "compiler/type_checker.h"
 #include "tokenizer/block_analyzer.h"
 #include "usage_analyser.h"
@@ -69,6 +68,7 @@ comp_result multifile_compiler::compile(const std::string &code, bool use_code,
   LOG_COMP("compile:" << main_file);
   std::filesystem::path library_parent{libs_path};
   cf_ = new codefiles{library_parent, &error_printer_};
+  cf_->use_scratch_files_ = use_scratch_files_;
   // Step 0) First of all, we initialize parsing
   // In this step, we initialize all files we know of at this point
   file_info *main_file_info;
