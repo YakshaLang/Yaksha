@@ -107,7 +107,6 @@ namespace yaksha {
     void visit_macro_call_expr(macro_call_expr *obj) override;
     void visit_cfor_stmt(cfor_stmt *obj) override;
     void visit_enum_stmt(enum_stmt *obj) override;
-    void visit_union_stmt(union_stmt *obj) override;
     void visit_directive_stmt(directive_stmt *obj) override;
     /**
      * Errors vector, type checker will try and identify as much errors as possible

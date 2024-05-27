@@ -341,7 +341,6 @@ void const_fold::visit_return_stmt(return_stmt *obj) {
 void const_fold::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
   store_statement(obj);
 }
-void const_fold::visit_union_stmt(union_stmt *obj) { store_statement(obj); }
 void const_fold::visit_while_stmt(while_stmt *obj) {
   statement_stack_.back()->emplace_back(wrap(obj));
 }

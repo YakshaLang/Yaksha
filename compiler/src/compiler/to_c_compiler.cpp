@@ -1910,7 +1910,6 @@ void to_c_compiler::visit_cfor_stmt(cfor_stmt *obj) {
   deletions_.pop_delete_stack();
 }
 void to_c_compiler::visit_enum_stmt(enum_stmt *obj) {}
-void to_c_compiler::visit_union_stmt(union_stmt *obj) {}
 void to_c_compiler::visit_directive_stmt(directive_stmt *obj) {
   // TODO add support for parameters
   if (obj->directive_type_->token_ == "ccode") {

@@ -93,7 +93,6 @@ private:
     void visit_pass_stmt(pass_stmt *obj) override;
     void visit_return_stmt(return_stmt *obj) override;
     void visit_runtimefeature_stmt(runtimefeature_stmt *obj) override;
-    void visit_union_stmt(union_stmt *obj) override;
     void visit_while_stmt(while_stmt *obj) override;
     void visit_directive_stmt(directive_stmt *obj) override;
     ~to_json_compiler() override = default;

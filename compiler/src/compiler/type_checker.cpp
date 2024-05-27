@@ -1111,7 +1111,7 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
     auto match = type_match(obj->data_type_->args_[0], expression_dt, true);
     if (match.matched_) {
       placeholder = expression_data;
-      placeholder.datatype_ = obj->data_type_; // Set the correct data type
+      placeholder.datatype_ = obj->data_type_;// Set the correct data type
     } else {
       std::stringstream message{};
       message << "Constant '" << name << "' data type mismatch. ";
@@ -1152,7 +1152,8 @@ type_match_result type_checker::type_match(ykdatatype *required_datatype,
     if (castable != nullptr) { return type_match_result{"", true, true}; }
   }
   // Pass a Type to a Const[Type] is allowed (becomes more restrictive)
-  if (primitive_or_obj && is_identical_type(required_datatype->const_unwrap(), provided_datatype)) {
+  if (primitive_or_obj &&
+      is_identical_type(required_datatype->const_unwrap(), provided_datatype)) {
     return type_match_result{"", true, false};
   }
   std::stringstream message{};
@@ -1436,5 +1437,4 @@ void type_checker::visit_cfor_stmt(cfor_stmt *obj) {
   pop_scope_type();
 }
 void type_checker::visit_enum_stmt(enum_stmt *obj) {}
-void type_checker::visit_union_stmt(union_stmt *obj) {}
 void type_checker::visit_directive_stmt(directive_stmt *obj) {}

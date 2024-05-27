@@ -569,9 +569,6 @@ void to_json_compiler::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
   json_ << "\"feature\": \"" << obj->feature_->token_ << "\"\n";
   json_ << "}\n";
 }
-void to_json_compiler::visit_union_stmt(union_stmt *obj) {
-  // Placeholder statement - this is not parsed
-}
 void to_json_compiler::visit_while_stmt(while_stmt *obj) {
   json_ << "{\n";
   write_location(obj);

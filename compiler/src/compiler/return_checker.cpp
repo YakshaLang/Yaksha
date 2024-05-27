@@ -93,7 +93,6 @@ void return_checker::visit_return_stmt(return_stmt *obj) {
   found_returns_.push_back(true);
 }
 void return_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
-void return_checker::visit_union_stmt(union_stmt *obj) {}
 void return_checker::visit_while_stmt(while_stmt *obj) {}
 bool return_checker::found_return() {
   if (found_returns_.empty()) { return false; }

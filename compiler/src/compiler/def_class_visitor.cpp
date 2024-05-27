@@ -283,7 +283,6 @@ void def_class_visitor::visit_curly_call_expr(curly_call_expr *obj) {}
 void def_class_visitor::visit_macro_call_expr(macro_call_expr *obj) {}
 void def_class_visitor::visit_cfor_stmt(cfor_stmt *obj) {}
 void def_class_visitor::visit_enum_stmt(enum_stmt *obj) {}
-void def_class_visitor::visit_union_stmt(union_stmt *obj) {}
 void def_class_visitor::visit_directive_stmt(directive_stmt *obj) {
   obj->hits_ = 1;// Always consider this to be used!
   auto directive_type = obj->directive_type_->token_;

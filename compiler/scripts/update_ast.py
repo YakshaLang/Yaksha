@@ -135,7 +135,6 @@ STMT_LOCATIONS = {
     "def": "name_",
     "class": "name_",
     "enum": "name_",
-    "union": "name_",
     "import": "import_token_",
     "runtimefeature": "runtimefeature_token_",
     "compins": "name_",
@@ -223,7 +222,6 @@ STMTS = sorted([
              ("stmt*", "function_body"), ("ykdatatype*", "return_type"), ("annotations", "annotations"))),
     ("class", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
     ("enum", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
-    ("union", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
     # import io [as io]
     ("import", (("token*", "import_token"), ("std::vector<token*>", "import_names"),
                 ("token*", "name"), ("file_info*", "data"))),

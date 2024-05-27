@@ -60,6 +60,7 @@
     (defun ykt_keyword_directive () (yk_create_token YK_TOKEN_KEYWORD_DIRECTIVE "directive"))
     (defun ykt_keyword_elif () (yk_create_token YK_TOKEN_KEYWORD_ELIF "elif"))
     (defun ykt_keyword_else () (yk_create_token YK_TOKEN_KEYWORD_ELSE "else"))
+    (defun ykt_keyword_enum () (yk_create_token YK_TOKEN_KEYWORD_ENUM "enum"))
     (defun ykt_keyword_for () (yk_create_token YK_TOKEN_KEYWORD_FOR "for"))
     (defun ykt_keyword_from () (yk_create_token YK_TOKEN_KEYWORD_FROM "from"))
     (defun ykt_keyword_if () (yk_create_token YK_TOKEN_KEYWORD_IF "if"))
