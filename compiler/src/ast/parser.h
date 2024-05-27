@@ -123,6 +123,7 @@ private:
     stmt *attempt_parse_def_or_class();
     stmt *def_statement(annotations ants);
     stmt *class_statement(annotations ants);
+    stmt *enum_statement(annotations ants);
     stmt *import_statement();
     stmt *runtimefeature_statement();
     std::vector<parameter> parse_class_members(token *name);
@@ -165,6 +166,7 @@ private:
     stmt *directive_statement();
     token *consume_any_of(std::initializer_list<token_type> types,
                           const std::string &message);
+    std::vector<parameter> parse_enum_members(token *name_token);
   };
 }// namespace yaksha
 #endif

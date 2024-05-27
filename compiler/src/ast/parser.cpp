@@ -569,6 +569,7 @@ stmt *parser::declaration_statement() {
     if (match({token_type::KEYWORD_CLASS, token_type::KEYWORD_STRUCT})) {
       return class_statement({});
     }
+    if (match({token_type::KEYWORD_ENUM})) { return enum_statement({}); }
     if (match({token_type::AT})) { return attempt_parse_def_or_class(); }
     if (!match({token_type::NAME})) { return statement(); }
     return parse_named_let_statement();
@@ -947,6 +948,8 @@ stmt *parser::attempt_parse_def_or_class() {
       return def_statement(ants);
     } else if (match({token_type::KEYWORD_CLASS, token_type::KEYWORD_STRUCT})) {
       return class_statement(ants);
+    } else if (match({token_type::KEYWORD_ENUM})) {
+      return enum_statement(ants);
     } else {
       break;
     }
@@ -1361,5 +1364,33 @@ void parser::parse_dsl_soup(std::vector<stmt *> &stmts,
   } else {
     tokens_buffer.emplace_back(advance());
   }
+}
+stmt *parser::enum_statement(annotations ants) {
+  auto enum_keyword = previous();
+  auto name = consume(token_type::NAME, "Enum name must be present");
+  consume(token_type::COLON, "Colon must be present after enum name");
+  consume(token_type::NEW_LINE, "Enum block must start with a new line");
+  consume(token_type::BA_INDENT,
+          "Enum block must start with an indentation increase");
+  std::vector<parameter> members = parse_enum_members(name);
+  return pool_.c_enum_stmt(name, members, std::move(ants));
+}
+std::vector<parameter> parser::parse_enum_members(token *name_token) {
+  std::vector<parameter> values{};
+  while (!is_at_end()) {
+    auto param_name =
+        consume(token_type::NAME, "Enum value name must be present");
+    if (param_name->token_ == "pass") {
+      throw error(param_name, "Enum value cannot be named 'pass'");
+    }
+    values.emplace_back(parameter{param_name, nullptr});
+    consume(token_type::NEW_LINE, "New line should separate enum values");
+    if (peek()->type_ == token_type::BA_DEDENT) { break; }
+  }
+  if (values.empty()) {
+    throw error(name_token, "Enum statement cannot have an empty block");
+  }
+  consume(token_type::BA_DEDENT, "Expected dedent");
+  return values;
 }
 #pragma clang diagnostic pop

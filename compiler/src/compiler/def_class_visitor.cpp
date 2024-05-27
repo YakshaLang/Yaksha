@@ -46,33 +46,12 @@ using namespace yaksha;
 def_class_visitor::def_class_visitor(builtins *builtins, codefiles *cf)
     : builtins_(builtins), cf_(cf){};
 def_class_visitor::~def_class_visitor() = default;
-void def_class_visitor::visit_assign_expr(assign_expr *obj) {}
-void def_class_visitor::visit_binary_expr(binary_expr *obj) {}
-void def_class_visitor::visit_fncall_expr(fncall_expr *obj) {}
-void def_class_visitor::visit_grouping_expr(grouping_expr *obj) {}
-void def_class_visitor::visit_literal_expr(literal_expr *obj) {}
-void def_class_visitor::visit_logical_expr(logical_expr *obj) {}
-void def_class_visitor::visit_unary_expr(unary_expr *obj) {}
-void def_class_visitor::visit_variable_expr(variable_expr *obj) {}
 void def_class_visitor::visit_block_stmt(block_stmt *obj) {}
 void def_class_visitor::visit_break_stmt(break_stmt *obj) {}
 void def_class_visitor::visit_continue_stmt(continue_stmt *obj) {}
 void def_class_visitor::visit_def_stmt(def_stmt *obj) {
   auto name = obj->name_->token_;
-  if (builtins_->has_builtin(name)) {
-    error(obj->name_, "Critical!! Redefinition of builtin function");
-    return;
-  }
-  if (has_function(name)) {
-    error(obj->name_, "Critical!! Redefinition of function");
-    return;
-  }
-  if (has_class(name)) {
-    error(obj->name_, "Critical!! Redefinition of class as a function");
-    return;
-  }
-  if (has_const(name) || has_native_const(name)) {
-    error(obj->name_, "Critical!! Redefinition of global constant");
+  if (is_redefined(name, obj->name_)) {
     return;
   }
   if (obj->annotations_.varargs_ && !obj->annotations_.native_define_) {
@@ -107,7 +86,8 @@ void def_class_visitor::extract(const std::vector<stmt *> &statements) {
         statement_type == ast_type::STMT_IMPORT ||
         statement_type == ast_type::STMT_RUNTIMEFEATURE ||
         statement_type == ast_type::STMT_NATIVECONST ||
-        statement_type == ast_type::STMT_DIRECTIVE) {
+        statement_type == ast_type::STMT_DIRECTIVE ||
+        statement_type == ast_type::STMT_ENUM) {
       st->accept(this);
     } else {
       error(st->locate(),
@@ -119,20 +99,7 @@ void def_class_visitor::extract(const std::vector<stmt *> &statements) {
 }
 void def_class_visitor::visit_const_stmt(const_stmt *obj) {
   auto name = obj->name_->token_;
-  if (builtins_->has_builtin(name)) {
-    error(obj->name_, "Critical!! Redefinition of builtin function");
-    return;
-  }
-  if (has_function(name)) {
-    error(obj->name_, "Critical!! Redefinition of function");
-    return;
-  }
-  if (has_class(name)) {
-    error(obj->name_, "Critical!! Redefinition of class");
-    return;
-  }
-  if (has_const(name) || has_native_const(name)) {
-    error(obj->name_, "Critical!! Redefinition of global constant");
+  if (is_redefined(name, obj->name_)) {
     return;
   }
   if (obj->data_type_->args_.size() != 1) {
@@ -156,20 +123,7 @@ void def_class_visitor::visit_const_stmt(const_stmt *obj) {
 }
 void def_class_visitor::visit_nativeconst_stmt(nativeconst_stmt *obj) {
   auto name = obj->name_->token_;
-  if (builtins_->has_builtin(name)) {
-    error(obj->name_, "Critical!! Redefinition of builtin function");
-    return;
-  }
-  if (has_function(name)) {
-    error(obj->name_, "Critical!! Redefinition of function");
-    return;
-  }
-  if (has_class(name)) {
-    error(obj->name_, "Critical!! Redefinition of class");
-    return;
-  }
-  if (has_const(name) || has_native_const(name)) {
-    error(obj->name_, "Critical!! Redefinition of global constant");
+  if (is_redefined(name, obj->name_)) {
     return;
   }
   if (obj->data_type_->args_.size() != 1) {
@@ -212,20 +166,7 @@ void def_class_visitor::visit_class_stmt(class_stmt *obj) {
     error(obj->name_, "@nativedefine must have a valid argument");
     return;
   }
-  if (builtins_->has_builtin(name)) {
-    error(obj->name_, "Critical!! Redefinition of builtin function");
-    return;
-  }
-  if (has_class(name)) {
-    error(obj->name_, "Critical!! Redefinition of class");
-    return;
-  }
-  if (has_function(name)) {
-    error(obj->name_, "Critical!! Redefinition of function as a class");
-    return;
-  }
-  if (has_const(name)) {
-    error(obj->name_, "Critical!! Redefinition of global constant");
+  if (is_redefined(name, obj->name_)) {
     return;
   }
   class_names_.push_back(name);
@@ -239,14 +180,6 @@ bool def_class_visitor::has_class(const std::string &prefixed_name) {
   return classes_.find(prefixed_name) != classes_.end();
 }
 void def_class_visitor::visit_del_stmt(del_stmt *obj) {}
-void def_class_visitor::visit_get_expr(get_expr *obj) {}
-void def_class_visitor::visit_set_expr(set_expr *obj) {}
-void def_class_visitor::visit_assign_member_expr(assign_member_expr *obj) {}
-void def_class_visitor::visit_square_bracket_access_expr(
-    square_bracket_access_expr *obj) {}
-void def_class_visitor::visit_assign_arr_expr(assign_arr_expr *obj) {}
-void def_class_visitor::visit_square_bracket_set_expr(
-    square_bracket_set_expr *obj) {}
 void def_class_visitor::visit_ccode_stmt(ccode_stmt *obj) {}
 void def_class_visitor::visit_import_stmt(import_stmt *obj) {}
 const_stmt *def_class_visitor::get_const(const std::string &prefixed_name) {
@@ -276,13 +209,55 @@ def_class_visitor::get_native_const(const std::string &prefixed_name) {
   }
   return nullptr;
 }
+bool def_class_visitor::has_enum(const std::string &prefixed_name) {
+  return enums_.find(prefixed_name) != enums_.end();
+}
+enum_stmt *def_class_visitor::get_enum(const std::string &prefixed_name) {
+  if (has_enum(prefixed_name)) { return enums_[prefixed_name]; }
+  return nullptr;
+}
 void def_class_visitor::visit_foreach_stmt(foreach_stmt *obj) {}
 void def_class_visitor::visit_forendless_stmt(forendless_stmt *obj) {}
 void def_class_visitor::visit_compins_stmt(compins_stmt *obj) {}
-void def_class_visitor::visit_curly_call_expr(curly_call_expr *obj) {}
-void def_class_visitor::visit_macro_call_expr(macro_call_expr *obj) {}
 void def_class_visitor::visit_cfor_stmt(cfor_stmt *obj) {}
-void def_class_visitor::visit_enum_stmt(enum_stmt *obj) {}
+void def_class_visitor::visit_enum_stmt(enum_stmt *obj) {
+  if (obj->annotations_.native_ || obj->annotations_.native_define_ ||
+      obj->annotations_.native_macro_ || obj->annotations_.on_stack_ ||
+      obj->annotations_.template_) {
+    error(obj->name_, "Annotations are not allowed for enums");
+    return;
+  }
+  auto name = obj->name_->token_;
+  if (is_redefined(name, obj->name_)) {
+    return;
+  }
+  enum_names_.push_back(name);
+  enums_.insert({name, obj});
+}
+bool def_class_visitor::is_redefined(const std::string &name, token *tok) {
+  bool redefined = false;
+  if (builtins_->has_builtin(name)) {
+    error(tok, "Critical!! Redefinition of builtin function");
+    redefined = true;
+  }
+  if (has_function(name)) {
+    error(tok, "Critical!! Redefinition of function");
+    redefined = true;
+  }
+  if (has_class(name)) {
+    error(tok, "Critical!! Redefinition of class");
+    redefined = true;
+  }
+  if (has_const(name) || has_native_const(name)) {
+    error(tok, "Critical!! Redefinition of global constant");
+    redefined = true;
+  }
+  if (has_enum(name)) {
+    error(tok, "Critical!! Redefinition of enum");
+    redefined = true;
+  }
+  return redefined;
+}
 void def_class_visitor::visit_directive_stmt(directive_stmt *obj) {
   obj->hits_ = 1;// Always consider this to be used!
   auto directive_type = obj->directive_type_->token_;
@@ -386,5 +361,6 @@ std::vector<std::string> def_class_visitor::get_all_names() {
                    global_const_names_.end());
   all_names.insert(all_names.end(), global_native_const_names_.begin(),
                    global_native_const_names_.end());
+  all_names.insert(all_names.end(), enum_names_.begin(), enum_names_.end());
   return all_names;
 }
