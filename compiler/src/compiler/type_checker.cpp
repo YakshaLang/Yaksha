@@ -261,6 +261,13 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     // Creating a custom object from user defined type / class;
     return;
   }
+  // Enums are not allowed to be created
+  if (name.object_type_ == object_type::ENUM ||
+      name.object_type_ == object_type::MODULE_ENUM) {
+    error(obj->paren_token_, "Enum object creation is not supported");
+    push(yk_object(dt_pool_));
+    return;
+  }
   // Functions
   if (name.object_type_ == object_type::FUNCTION ||
       name.object_type_ == object_type::MODULE_FUNCTION) {
@@ -508,7 +515,8 @@ void type_checker::visit_variable_expr(variable_expr *obj) {
   auto value = scope_.get(name);
   // Preserve function name so we can access it
   if (value.object_type_ == object_type::FUNCTION ||
-      value.object_type_ == object_type::CLASS) {
+      value.object_type_ == object_type::CLASS ||
+      value.object_type_ == object_type::ENUM) {
     value.string_val_ = name;
   }
   push(value);
@@ -534,11 +542,20 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
   push_scope_type(ast_type::STMT_DEF);
   push_function(obj->name_->token_);
   scope_.push();
+  std::unordered_set<std::string> param_names{};
   for (auto param : obj->params_) {
     auto name = param.name_->token_;
+    if (param_names.find(name) != param_names.end()) {
+      message << "Parameter redefinition is not allowed: '" << name << "'";
+      error(param.name_, message.str());
+      message.str("");
+    } else {
+      param_names.insert(name);
+    }
     if (scope_.is_defined(name)) {
       message << "Parameter shadows outer scope name: " << name;
       error(param.name_, message.str());
+      message.str("");
     } else {
       auto data = yk_object(param.data_type_);
       scope_.define(name, data);
@@ -716,6 +733,12 @@ void type_checker::check(const std::vector<stmt *> &statements) {
     class_placeholder_object.object_type_ = object_type::CLASS;
     scope_.define_global(class_name, class_placeholder_object);
   }
+  // Define enums
+  for (const auto &enum_name : defs_classes_->enum_names_) {
+    auto enum_placeholder_object = yk_object(dt_pool_);
+    enum_placeholder_object.object_type_ = object_type::ENUM;
+    scope_.define_global(enum_name, enum_placeholder_object);
+  }
   // Define global constants
   for (const auto &constant_name : defs_classes_->global_const_names_) {
     auto constant_definition = defs_classes_->get_const(constant_name);
@@ -781,7 +804,18 @@ void type_checker::visit_defer_stmt(defer_stmt *obj) {
   }
 }
 void type_checker::visit_class_stmt(class_stmt *obj) {
-  // TODO check validity of types
+  // Check for duplicate fields
+  std::unordered_set<std::string> members{};
+  for (const auto &member : obj->members_) {
+    if (members.find(member.name_->token_) != members.end()) {
+      std::stringstream message{};
+      message << "Duplicate member name: '" << member.name_->token_ << "' ";
+      message << "in class/struct: '" << obj->name_->token_ << "'";
+      error(member.name_, message.str());
+    } else {
+      members.insert(member.name_->token_);
+    }
+  }
 }
 void type_checker::visit_del_stmt(del_stmt *obj) {
   obj->expression_->accept(this);
@@ -825,6 +859,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     bool has_const = imported->data_->dsv_->has_const(member_item->token_);
     bool has_native_const =
         imported->data_->dsv_->has_native_const(member_item->token_);
+    bool has_enum = imported->data_->dsv_->has_enum(member_item->token_);
     auto obj = yk_object(dt_pool_);
     if (has_class) {
       obj.object_type_ = object_type::MODULE_CLASS;
@@ -835,6 +870,11 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     } else if (has_func) {
       obj.object_type_ = object_type::MODULE_FUNCTION;
       obj.string_val_ = member_item->token_;
+      obj.module_file_ = lhs.string_val_;
+      obj.module_name_ = lhs.module_name_;
+    } else if (has_enum) {
+      obj.object_type_ = object_type::MODULE_ENUM;
+      obj.string_val_ = member_item->token_;// enum name
       obj.module_file_ = lhs.string_val_;
       obj.module_name_ = lhs.module_name_;
     } else if (has_const || has_native_const) {
@@ -860,6 +900,44 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
                      "meant?");
     }
     push(obj);
+    return;
+  }
+  // --- access enum values ---
+  if (lhs.object_type_ == object_type::ENUM ||
+      lhs.object_type_ == object_type::MODULE_ENUM) {
+    enum_stmt *enum_statement;
+    std::string module_file;
+    if (lhs.object_type_ == object_type::ENUM) {
+      enum_statement = defs_classes_->get_enum(lhs.string_val_);
+      module_file = filepath_;
+    } else {
+      auto imp = cf_->get_or_null(lhs.module_file_);
+      enum_statement = imp->data_->dsv_->get_enum(lhs.string_val_);
+      module_file = lhs.module_file_;
+    }
+    for (const auto &member : enum_statement->members_) {
+      if (member.name_->token_ == member_item->token_) {
+        auto placeholder =
+            yk_object(dt_pool_->create(lhs.string_val_, module_file));
+        push(placeholder);
+        return;
+      }
+    }
+    // -- bad enum value --
+    std::vector<std::string> members{};
+    members.reserve(enum_statement->members_.size());
+    for (const auto &member : enum_statement->members_) {
+      members.push_back(member.name_->token_);
+    }
+    auto closest = find_closest(member_item->token_, members);
+    if (closest.empty()) {
+      error(dot, "Enum value not found");
+    } else {
+      error(dot, "Enum value not found. Perhaps '" + closest +
+                     "' is what you "
+                     "meant?");
+    }
+    push(yk_object(dt_pool_));
     return;
   }
   if (!lhs.is_primitive_or_obj() ||
@@ -1414,7 +1492,7 @@ void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
     /* ----------------------------------------- */
     push(data);
   } else {
-    error(obj->curly_open_, "Invalid data type for {} initialization");
+    error(obj->curly_open_, "Invalid datatype for {} initialization");
   }
 }
 void type_checker::visit_macro_call_expr(macro_call_expr *obj) {
@@ -1436,5 +1514,17 @@ void type_checker::visit_cfor_stmt(cfor_stmt *obj) {
   scope_.pop();
   pop_scope_type();
 }
-void type_checker::visit_enum_stmt(enum_stmt *obj) {}
+void type_checker::visit_enum_stmt(enum_stmt *obj) {
+  std::unordered_set<std::string> names{};
+  for (auto nv : obj->members_) {
+    if (names.find(nv.name_->token_) != names.end()) {
+      std::stringstream message{};
+      message << "Duplicate enum value '" << nv.name_->token_ << "' ";
+      message << "in enum '" << obj->name_->token_ << "'";
+      error(nv.name_, message.str());
+      break;
+    }
+    names.insert(nv.name_->token_);
+  }
+}
 void type_checker::visit_directive_stmt(directive_stmt *obj) {}

@@ -79,7 +79,6 @@ namespace yaksha {
     PTR_TO_ANY,      // void *
     PTR_TO_CONST_ANY,// void const *
     TUPLE,
-    ENUM_CONTAINER,// Enum[EnumClass,Value]
     // Function[In[str],Out]
     FUNCTION,
     F_IN, // ----- special metadata
@@ -139,7 +138,6 @@ namespace yaksha {
     [[nodiscard]] bool is_tuple() const;
     [[nodiscard]] bool is_fixed_size_array() const;
     [[nodiscard]] bool is_dimension() const;
-    [[nodiscard]] bool is_enum_container() const;
     // match a combination of primitives
     [[nodiscard]] bool is_a_number() const;
     [[nodiscard]] bool is_an_integer() const;

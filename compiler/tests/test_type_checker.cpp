@@ -111,8 +111,6 @@ static void test_typechecker_snippet_full_ok(const std::string &S) {
   REQUIRE(mc.error_printer_.has_no_errors());
 }
 TEST_CASE("type checker: Bad function for qsort") {
-  // TODO Note that the error here does not really make sense
-  //  as I renamed SortArg --> AnyPtrToConst
   test_typechecker_yaka_file(
       "../test_data/bad_inputs/bad_input_sort_with_wrong_args.yaka",
       "Comparison must match with "
@@ -242,6 +240,124 @@ TEST_CASE("type checker: str constants are not supported") {
                                 "    b: bool = a == A\n"
                                 "    return 0",
                                 "Only number/bool/sr constants are supported.");
+}
+TEST_CASE("type checker: two different enums cannot be compared") {
+  test_typechecker_snippet_full("enum A:\n"
+                                "    a\n"
+                                "enum B:\n"
+                                "    b\n"
+                                "def main() -> int:\n"
+                                "    c: bool = A.a == B.b\n"
+                                "    0\n",
+                                "Cannot compare between two data types");
+}
+TEST_CASE("type checker: enum cannot be compared with integer") {
+  test_typechecker_snippet_full("enum A:\n"
+                                "    a\n"
+                                "def main() -> int:\n"
+                                "    c: bool = A.a == 0\n"
+                                "    0\n",
+                                "Cannot compare between two data types");
+}
+TEST_CASE("type checker: different enums cannot be assigned") {
+  test_typechecker_snippet_full(
+      "enum A:\n"
+      "    a\n"
+      "enum B:\n"
+      "    b\n"
+      "def main() -> int:\n"
+      "    a: A = A.a\n"
+      "    a = B.b\n"
+      "    0\n",
+      "Cannot assign between 2 different data types. lhs: A, rhs: B");
+}
+TEST_CASE(
+    "type checker: different enums cannot be assigned ('a' basic inference)") {
+  test_typechecker_snippet_full(
+      "enum A:\n"
+      "    a\n"
+      "enum B:\n"
+      "    b\n"
+      "def main() -> int:\n"
+      "    a = A.a\n"
+      "    a = B.b\n"
+      "    0\n",
+      "Cannot assign between 2 different data types. lhs: A, rhs: B");
+}
+TEST_CASE("type checker: compare inferred enums") {
+  test_typechecker_snippet_full("enum A:\n"
+                                "    a\n"
+                                "enum B:\n"
+                                "    b\n"
+                                "def main() -> int:\n"
+                                "    a = A.a\n"
+                                "    b = B.b\n"
+                                "    iif(a == b, 0, 1)\n",
+                                "Cannot compare between two data types");
+}
+TEST_CASE("type checker: duplicated enum values") {
+  test_typechecker_snippet_full("enum A:\n"
+                                "    a\n"
+                                "    a\n"
+                                "def main() -> int:\n"
+                                "    a = A.a\n"
+                                "    iif(a == A.a, 0, 1)\n",
+                                "Duplicate enum value 'a' in enum 'A'");
+}
+TEST_CASE("type checker: duplicate class fields") {
+  test_typechecker_snippet_full(
+      "class A:\n"
+      "    a: int\n"
+      "    a: int\n"
+      "def main() -> int:\n"
+      "    a = A{a: 1}\n"
+      "    iif(a.a == 1, 0, 1)\n",
+      "Duplicate member name: 'a' in class/struct: 'A'");
+}
+TEST_CASE("type checker: duplicate function parameters") {
+  // Both errors should be raised
+  test_typechecker_snippet_full("def fnc(a: int, a: int) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    fnc(1, 2)\n"
+                                "    0\n",
+                                "Parameter redefinition is not allowed: 'a'");
+  test_typechecker_snippet_full("def fnc(b: int, b: int) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    fnc(1, 2)\n"
+                                "    0\n",
+                                "Parameter shadows outer scope name: b");
+}
+TEST_CASE("type checker: duplicate name and value for an enum") {
+  test_typechecker_snippet_full_ok("enum A:\n"
+                                   "    A\n"
+                                   "def main() -> int:\n"
+                                   "    iif(A.A == A.A, 0, 1)\n");
+}
+TEST_CASE("type checker: duplicate name and value for class field") {
+  test_typechecker_snippet_full_ok("class A:\n"
+                                   "    A: int\n"
+                                   "def main() -> int:\n"
+                                   "    a = A{A: 1}\n"
+                                   "    iif(a.A == 1, 0, 1)\n");
+}
+TEST_CASE("type checker: duplicate name and parameter name for function") {
+  test_typechecker_snippet_full("def fnc(fnc: int) -> None:\n"
+                                "    pass\n"
+                                "def main() -> int:\n"
+                                "    fnc(1)\n"
+                                "    0\n",
+                                "Parameter shadows outer scope name: fnc");
+}
+TEST_CASE("type checker: function name is same as class member") {
+  test_typechecker_snippet_full_ok("class A:\n"
+                                   "    a: int\n"
+                                   "def a(b: int) -> None:\n"
+                                   "    pass\n"
+                                   "def main() -> int:\n"
+                                   "    a0 = A{a: 1}\n"
+                                   "    0\n");
 }
 TEST_CASE("type checker: sr constants are supported") {
   test_typechecker_snippet_full_ok("A:Const[sr] = \"hello\"\n"
@@ -768,7 +884,7 @@ TEST_CASE("type checker: Import shadows a foreach variable") {
 }
 TEST_CASE("type checker: Create a primitive using {} init") {
   test_typechecker_snippet("a = int{x: 0}",
-                           "Invalid data type for {} initialization");
+                           "Invalid datatype for {} initialization");
 }
 TEST_CASE("type checker: Invalid fields in struct") {
   test_typechecker_snippet_full("struct P:\n"

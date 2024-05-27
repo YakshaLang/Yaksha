@@ -110,8 +110,6 @@ void yk_datatype::find_builtin_or_primitive() {
     builtin_type_ = yk_builtin::TUPLE;
   } else if (token_->token_ == "FixedArr") {
     builtin_type_ = yk_builtin::FIXED_ARRAY;
-  } else if (token_->token_ == ":enum:") {
-    builtin_type_ = yk_builtin::ENUM_CONTAINER;
   }
 }
 yk_datatype::~yk_datatype() { delete (token_); }
@@ -326,9 +324,6 @@ bool yk_datatype::is_fixed_size_array() const {
 }
 bool yk_datatype::is_dimension() const {
   return !is_primitive() && builtin_type_ == yk_builtin::DIMENSION;
-}
-bool yk_datatype::is_enum_container() const {
-  return !is_primitive() && builtin_type_ == yk_builtin::ENUM_CONTAINER;
 }
 bool yaksha::internal_is_identical_type(yk_datatype *required_datatype,
                                         yk_datatype *provided_datatype) {

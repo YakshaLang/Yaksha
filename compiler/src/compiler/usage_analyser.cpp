@@ -147,6 +147,16 @@ void usage_analyser::visit_get_expr(get_expr *obj) {
       o.module_file_ = import_st->data_->filepath_.string();
       o.string_val_ = obj->item_->token_;
       push_object(o);
+    } else if (import_st->data_->data_->dsv_->has_enum(obj->item_->token_)) {
+      auto e = import_st->data_->data_->dsv_->get_enum(obj->item_->token_);
+      push_import(import_st);
+      e->accept(this);
+      pop_import();
+      auto o = yk_object();
+      o.object_type_ = object_type::MODULE_ENUM;
+      o.module_file_ = import_st->data_->filepath_.string();
+      o.string_val_ = obj->item_->token_;
+      push_object(o);
     } else if (import_st->data_->data_->dsv_->has_const(obj->item_->token_)) {
       auto c = import_st->data_->data_->dsv_->get_const(obj->item_->token_);
       push_import(import_st);
@@ -269,6 +279,11 @@ void usage_analyser::visit_variable_expr(variable_expr *obj) {
     auto imp = peek_file_info()->data_->parser_->import_stmts_alias_[name];
     o.module_file_ = imp->data_->filepath_.string();
     imp->accept(this);
+  } else if (peek_file_info()->data_->dsv_->has_enum(name)) {
+    o.string_val_ = name;
+    o.object_type_ = object_type::ENUM;
+    peek_file_info()->data_->dsv_->get_enum(name)->accept(this);
+    o.module_file_ = "!enum";
   } else {
     o.string_val_ = name;
     o.object_type_ = object_type::PRIMITIVE_OR_OBJ;
@@ -405,13 +420,17 @@ void usage_analyser::visit_data_type(yk_datatype *dt, token *token_for_err) {
       dsv = import_st->data_->data_->dsv_;
     }
   }
-  if (!dsv->has_class(dt->type_)) {
+  if (!dsv->has_class(dt->type_) && !dsv->has_enum(dt->type_)) {
     error(token_for_err,
           "cannot find class " + dt->type_ + " in " + dt->module_);
     if (pop_import_stack) { pop_import(); }
     return;
   }
-  dsv->get_class(dt->type_)->accept(this);
+  if (dsv->has_enum(dt->type_)) {
+    dsv->get_enum(dt->type_)->accept(this);
+  } else {
+    dsv->get_class(dt->type_)->accept(this);
+  }
   if (pop_import_stack) { pop_import(); }
 }
 void usage_analyser::push_import(const import_stmt *import_st) {

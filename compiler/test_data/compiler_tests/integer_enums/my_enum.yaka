@@ -1,0 +1,4 @@
+enum SampleType:
+    A
+    B
+    C

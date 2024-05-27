@@ -153,9 +153,7 @@ void no_crash_test(std::string text) {
     auto env = yaksha_envmap{&yaksha_lisp_m};
     env.setup_builtins();
     env.eval(parser.exprs_);
-  } catch (const parsing_error &ex) {
-    intentionally_ignored(ex);
-  }
+  } catch (const parsing_error &ex) { intentionally_ignored(ex); }
 }
 TEST_CASE("yaksha_lisp: expected ')'") {
   test_snippet_execute_unhappy("(+ 1 2", "Expected a terminal");

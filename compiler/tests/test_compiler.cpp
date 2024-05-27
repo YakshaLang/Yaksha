@@ -44,7 +44,8 @@
 using namespace yaksha;
 static void test_compile_yaka_file(const std::string &yaka_code_file) {
   std::string exe_path = get_my_exe_path();
-  auto libs_path = std::filesystem::path(exe_path).parent_path().parent_path() / "libs";
+  auto libs_path =
+      std::filesystem::path(exe_path).parent_path().parent_path() / "libs";
   multifile_compiler mc{};
   codegen_c cg{};
   auto result = mc.compile(yaka_code_file, libs_path.string(), &cg);
@@ -383,11 +384,18 @@ TEST_CASE("compiler: bug-fix - cast string literal should work as expected") {
   test_compile_yaka_file("../test_data/bug_fixes/easy_cstr.yaka");
 }
 TEST_CASE("compiler: directive - ccode") {
-  test_compile_yaka_file("../test_data/compiler_tests/directives/directive_ccode.yaka");
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/directives/directive_ccode.yaka");
 }
 TEST_CASE("compiler: directive - no_main/no_stdlib") {
-  test_compile_yaka_file("../test_data/compiler_tests/directives/minimal_mode.yaka");
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/directives/minimal_mode.yaka");
 }
 TEST_CASE("compiler: structures - depends on other structures") {
-  test_compile_yaka_file("../test_data/compiler_tests/structs_arrays/cat_game.yaka");
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/structs_arrays/cat_game.yaka");
+}
+TEST_CASE("compiler: enums - import and use enum") {
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/integer_enums/sample.yaka");
 }

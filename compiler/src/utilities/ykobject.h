@@ -94,13 +94,15 @@ namespace yaksha {
     token *token_{nullptr};
   };
   enum class object_type {
-    PRIMITIVE_OR_OBJ,
-    FUNCTION,
+    PRIMITIVE_OR_OBJ,// int, float, bool, string, custom object
+    BUILTIN_FUNCTION,// reference to a builtin function
+    FUNCTION,        // reference to a function
     CLASS,
-    BUILTIN_FUNCTION,
+    ENUM,
     MODULE,
     MODULE_CLASS,
     MODULE_FUNCTION,
+    MODULE_ENUM,
     // --------------------
     // Only used for constant folding
     CONST_FOLD_VALUE,

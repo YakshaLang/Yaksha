@@ -1,0 +1,39 @@
+import my_enum as me
+
+enum Banana:
+    X
+    Y
+    Z
+
+class My:
+    a: int
+    b: int
+    c: Banana
+    d: me.SampleType
+
+def main() -> int:
+    g = My{a: 0, b: 0, c: Banana.X, d: me.SampleType.A}
+    a: me.SampleType = me.SampleType.A
+    b = me.SampleType.B
+    c = me.SampleType.C
+    a0 = me.SampleType.A
+    bx = Banana.X
+    by = Banana.Y
+    d = 0
+    if a == a0:
+        d += 2
+    if a != b:
+        d += 3
+    else:
+        d += 100
+    if c == c:
+        d += 1
+    if c != c:
+        d += 1000
+    if bx == Banana.X and bx == g.c:
+        d += 5
+    if bx != by:
+        d += 7
+    else:
+        d += 10000
+    d

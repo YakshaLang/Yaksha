@@ -794,6 +794,11 @@ void to_c_compiler::visit_variable_expr(variable_expr *obj) {
     b.object_type_ = object_type::CLASS;
     push(obj->name_->token_, b);
     return;
+  } else if (defs_classes_.has_enum(obj->name_->token_)) {
+    auto b = yk_object(dt_pool_);
+    b.object_type_ = object_type::ENUM;
+    push(obj->name_->token_, b);
+    return;
   }
   auto object = scope_.get(name);
   if (object.desugar_rewrite_needed_) {
@@ -1351,11 +1356,14 @@ std::string to_c_compiler::convert_dt(yk_datatype *basic_dt,
     auto module = cf_->get_or_null(basic_dt->module_);
     auto imported_module_prefix = module->prefix_;
     auto class_info = module->data_->dsv_->get_class(dt);
+    auto enum_info = module->data_->dsv_->get_enum(dt);
     if (class_info != nullptr) {
       auto class_name = prefix(dt, imported_module_prefix);
       if (class_info->annotations_.native_define_) { return class_name; }
       if (class_info->annotations_.on_stack_) { return "struct " + class_name; }
       return "struct " + class_name + "*";
+    } else if (enum_info != nullptr) {
+      return "int32_t";// Just an integer
     }
   }
   error("Failed to compile data type:" + basic_dt->as_string());
@@ -1495,6 +1503,11 @@ void to_c_compiler::visit_get_expr(get_expr *obj) {
       mod_obj.string_val_ = member_item->token_;
       mod_obj.module_file_ = lhs.second.string_val_;
       mod_obj.module_name_ = lhs.second.module_name_;
+    } else if (has_enum) {
+      mod_obj.object_type_ = object_type::MODULE_ENUM;
+      mod_obj.string_val_ = member_item->token_;
+      mod_obj.module_file_ = lhs.second.string_val_;
+      mod_obj.module_name_ = lhs.second.module_name_;
     } else if (has_const) {
       auto glob = imported->data_->dsv_->get_const(member_item->token_);
       mod_obj.object_type_ = object_type::PRIMITIVE_OR_OBJ;
@@ -1522,6 +1535,34 @@ void to_c_compiler::visit_get_expr(get_expr *obj) {
     }
     push("<><>", mod_obj);
     return;
+  }
+  if (lhs.second.object_type_ == object_type::ENUM ||
+      lhs.second.object_type_ == object_type::MODULE_ENUM) {
+    auto enum_item = obj->item_;
+    enum_stmt *enum_statement = nullptr;
+    std::string module;
+    if (lhs.second.object_type_ == object_type::ENUM) {
+      enum_statement = this->defs_classes_.get_enum(lhs.first);
+      module = filepath_;
+    } else {
+      auto imported = cf_->get_or_null(lhs.second.module_file_);
+      enum_statement = imported->data_->dsv_->get_enum(lhs.second.string_val_);
+      module = lhs.second.module_file_;
+    }
+    int index = 0;
+    for (const auto &item : enum_statement->members_) {
+      if (item.name_->token_ == enum_item->token_) {
+        auto enum_object = yk_object(dt_pool_);
+        enum_object.object_type_ = object_type::PRIMITIVE_OR_OBJ;
+        enum_object.string_val_ = item.name_->token_;
+        enum_object.datatype_ =
+            dt_pool_->create(enum_statement->name_->token_, module);
+        push(std::to_string(index),
+             enum_object);// index is the value of enum (only used at C level)
+        return;
+      }
+      index++;
+    }
   }
   auto item = obj->item_->token_;
   auto user_defined_type = lhs.second.datatype_->type_;
