@@ -4,14 +4,14 @@
 using namespace yaksha;
 // ------- expressions -----
 assign_expr::assign_expr(token *name, token *opr, expr *right, bool promoted,
-                         ykdatatype *promoted_data_type)
+                         yk_datatype *promoted_data_type)
     : name_(name), opr_(opr), right_(right), promoted_(promoted),
       promoted_data_type_(promoted_data_type) {}
 void assign_expr::accept(expr_visitor *v) { v->visit_assign_expr(this); }
 ast_type assign_expr::get_type() { return ast_type::EXPR_ASSIGN; }
 token *assign_expr::locate() { return name_; }
 expr *ast_pool::c_assign_expr(token *name, token *opr, expr *right,
-                              bool promoted, ykdatatype *promoted_data_type) {
+                              bool promoted, yk_datatype *promoted_data_type) {
   auto o = new assign_expr(name, opr, right, promoted, promoted_data_type);
   cleanup_expr_.push_back(o);
   return o;
@@ -261,27 +261,27 @@ stmt *ast_pool::c_class_stmt(token *name, std::vector<parameter> members,
   cleanup_stmt_.push_back(o);
   return o;
 }
-compins_stmt::compins_stmt(token *name, ykdatatype *data_type, token *meta1,
-                           ykdatatype *meta2, void *meta3)
+compins_stmt::compins_stmt(token *name, yk_datatype *data_type, token *meta1,
+                           yk_datatype *meta2, void *meta3)
     : name_(name), data_type_(data_type), meta1_(meta1), meta2_(meta2),
       meta3_(meta3) {}
 void compins_stmt::accept(stmt_visitor *v) { v->visit_compins_stmt(this); }
 ast_type compins_stmt::get_type() { return ast_type::STMT_COMPINS; }
 token *compins_stmt::locate() { return name_; }
-stmt *ast_pool::c_compins_stmt(token *name, ykdatatype *data_type, token *meta1,
-                               ykdatatype *meta2, void *meta3) {
+stmt *ast_pool::c_compins_stmt(token *name, yk_datatype *data_type,
+                               token *meta1, yk_datatype *meta2, void *meta3) {
   auto o = new compins_stmt(name, data_type, meta1, meta2, meta3);
   cleanup_stmt_.push_back(o);
   return o;
 }
-const_stmt::const_stmt(token *name, ykdatatype *data_type, expr *expression,
+const_stmt::const_stmt(token *name, yk_datatype *data_type, expr *expression,
                        bool is_global)
     : name_(name), data_type_(data_type), expression_(expression),
       is_global_(is_global) {}
 void const_stmt::accept(stmt_visitor *v) { v->visit_const_stmt(this); }
 ast_type const_stmt::get_type() { return ast_type::STMT_CONST; }
 token *const_stmt::locate() { return name_; }
-stmt *ast_pool::c_const_stmt(token *name, ykdatatype *data_type,
+stmt *ast_pool::c_const_stmt(token *name, yk_datatype *data_type,
                              expr *expression, bool is_global) {
   auto o = new const_stmt(name, data_type, expression, is_global);
   cleanup_stmt_.push_back(o);
@@ -298,7 +298,7 @@ stmt *ast_pool::c_continue_stmt(token *continue_token) {
   return o;
 }
 def_stmt::def_stmt(token *name, std::vector<parameter> params,
-                   stmt *function_body, ykdatatype *return_type,
+                   stmt *function_body, yk_datatype *return_type,
                    annotations annotations)
     : name_(name), params_(std::move(params)), function_body_(function_body),
       return_type_(return_type), annotations_(annotations) {}
@@ -306,7 +306,7 @@ void def_stmt::accept(stmt_visitor *v) { v->visit_def_stmt(this); }
 ast_type def_stmt::get_type() { return ast_type::STMT_DEF; }
 token *def_stmt::locate() { return name_; }
 stmt *ast_pool::c_def_stmt(token *name, std::vector<parameter> params,
-                           stmt *function_body, ykdatatype *return_type,
+                           stmt *function_body, yk_datatype *return_type,
                            annotations annotations) {
   auto o = new def_stmt(name, std::move(params), function_body, return_type,
                         annotations);
@@ -376,9 +376,9 @@ stmt *ast_pool::c_expression_stmt(expr *expression) {
   return o;
 }
 foreach_stmt::foreach_stmt(token *for_keyword, token *name,
-                           ykdatatype *data_type, token *in_keyword,
+                           yk_datatype *data_type, token *in_keyword,
                            expr *expression, stmt *for_body,
-                           ykdatatype *expr_datatype)
+                           yk_datatype *expr_datatype)
     : for_keyword_(for_keyword), name_(name), data_type_(data_type),
       in_keyword_(in_keyword), expression_(expression), for_body_(for_body),
       expr_datatype_(expr_datatype) {}
@@ -386,9 +386,9 @@ void foreach_stmt::accept(stmt_visitor *v) { v->visit_foreach_stmt(this); }
 ast_type foreach_stmt::get_type() { return ast_type::STMT_FOREACH; }
 token *foreach_stmt::locate() { return for_keyword_; }
 stmt *ast_pool::c_foreach_stmt(token *for_keyword, token *name,
-                               ykdatatype *data_type, token *in_keyword,
+                               yk_datatype *data_type, token *in_keyword,
                                expr *expression, stmt *for_body,
-                               ykdatatype *expr_datatype) {
+                               yk_datatype *expr_datatype) {
   auto o = new foreach_stmt(for_keyword, name, data_type, in_keyword,
                             expression, for_body, expr_datatype);
   cleanup_stmt_.push_back(o);
@@ -434,18 +434,18 @@ stmt *ast_pool::c_import_stmt(token *import_token,
   cleanup_stmt_.push_back(o);
   return o;
 }
-let_stmt::let_stmt(token *name, ykdatatype *data_type, expr *expression)
+let_stmt::let_stmt(token *name, yk_datatype *data_type, expr *expression)
     : name_(name), data_type_(data_type), expression_(expression) {}
 void let_stmt::accept(stmt_visitor *v) { v->visit_let_stmt(this); }
 ast_type let_stmt::get_type() { return ast_type::STMT_LET; }
 token *let_stmt::locate() { return name_; }
-stmt *ast_pool::c_let_stmt(token *name, ykdatatype *data_type,
+stmt *ast_pool::c_let_stmt(token *name, yk_datatype *data_type,
                            expr *expression) {
   auto o = new let_stmt(name, data_type, expression);
   cleanup_stmt_.push_back(o);
   return o;
 }
-nativeconst_stmt::nativeconst_stmt(token *name, ykdatatype *data_type,
+nativeconst_stmt::nativeconst_stmt(token *name, yk_datatype *data_type,
                                    token *ccode_keyword, token *code_str,
                                    bool is_global)
     : name_(name), data_type_(data_type), ccode_keyword_(ccode_keyword),
@@ -455,7 +455,7 @@ void nativeconst_stmt::accept(stmt_visitor *v) {
 }
 ast_type nativeconst_stmt::get_type() { return ast_type::STMT_NATIVECONST; }
 token *nativeconst_stmt::locate() { return name_; }
-stmt *ast_pool::c_nativeconst_stmt(token *name, ykdatatype *data_type,
+stmt *ast_pool::c_nativeconst_stmt(token *name, yk_datatype *data_type,
                                    token *ccode_keyword, token *code_str,
                                    bool is_global) {
   auto o =
@@ -473,14 +473,14 @@ stmt *ast_pool::c_pass_stmt(token *pass_token) {
   return o;
 }
 return_stmt::return_stmt(token *return_keyword, expr *expression,
-                         ykdatatype *result_type)
+                         yk_datatype *result_type)
     : return_keyword_(return_keyword), expression_(expression),
       result_type_(result_type) {}
 void return_stmt::accept(stmt_visitor *v) { v->visit_return_stmt(this); }
 ast_type return_stmt::get_type() { return ast_type::STMT_RETURN; }
 token *return_stmt::locate() { return return_keyword_; }
 stmt *ast_pool::c_return_stmt(token *return_keyword, expr *expression,
-                              ykdatatype *result_type) {
+                              yk_datatype *result_type) {
   auto o = new return_stmt(return_keyword, expression, result_type);
   cleanup_stmt_.push_back(o);
   return o;

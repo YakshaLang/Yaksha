@@ -57,7 +57,7 @@ namespace yaksha {
    */
   struct desugaring_compiler : private stmt_visitor {
     explicit desugaring_compiler(ast_pool *ast_pool_obj,
-                                 ykdt_pool *dt_pool_obj);
+                                 yk_datatype_pool *dt_pool_obj);
     std::vector<stmt *> desugar(const std::vector<stmt *> &statements,
                                 to_c_compiler *compiler_obj);
     ~desugaring_compiler() override;
@@ -68,7 +68,7 @@ private:
     std::vector<stmt *> pre_continue_stack_;
     std::vector<token *> internal_token_pool_;
     ast_pool *ast_pool_;
-    ykdt_pool *dt_pool_;
+    yk_datatype_pool *dt_pool_;
     token *true_token_;
     token *while_token_;
     token *break_token_;

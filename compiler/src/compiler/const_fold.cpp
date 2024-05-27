@@ -42,7 +42,7 @@
 #include "utilities/ykdt_pool.h"
 #include <utility>
 using namespace yaksha;
-const_fold::const_fold(ast_pool *ast_pool, ykdt_pool *dt_pool)
+const_fold::const_fold(ast_pool *ast_pool, yk_datatype_pool *dt_pool)
     : statement_stack_(), global_statements_(), ast_pool_(ast_pool),
       dt_pool_(dt_pool), context_pool_(), internal_token_pool_(), errors_(),
       env_stack_(dt_pool) {

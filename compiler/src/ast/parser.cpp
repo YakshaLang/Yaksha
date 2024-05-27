@@ -52,7 +52,7 @@ using namespace yaksha;
 #define PRINT_PREPROCESSOR_OUTPUT
 #endif
 parser::parser(std::string filepath, std::vector<token *> &tokens,
-               ykdt_pool *pool)
+               yk_datatype_pool *pool)
     : pool_{}, original_tokens_{tokens}, current_{0}, control_flow_{0},
       magic_return_token_(new token{}), sugar_else_(new token{}),
       dt_pool_(pool), import_stmts_(), filepath_(std::move(filepath)),
@@ -680,7 +680,7 @@ stmt *parser::for_statement() {
   } else if (check(token_type::NAME)) {
     // foreach_stmt -> FOR name: datatype in array: block_stmt
     auto name = consume(token_type::NAME, "Name must be present");
-    ykdatatype *dt = nullptr;
+    yk_datatype *dt = nullptr;
     if (check(token_type::COLON)) {
       consume(token_type::COLON, "Colon must be present");
       dt = parse_datatype();
@@ -774,12 +774,12 @@ stmt *parser::def_statement(annotations ants) {
   }
   return pool_.c_def_stmt(name, params, body, return_dt, std::move(ants));
 }
-ykdatatype *parser::parse_datatype() {
+yk_datatype *parser::parse_datatype() {
   if (!match({token_type::NAME, token_type::KEYWORD_NONE,
               token_type::INTEGER_DECIMAL})) {
     throw error(peek(), "Must have a data type.");
   }
-  ykdatatype *dt;
+  yk_datatype *dt;
   auto tk = previous();
   if (match({token_type::DOT})) {
     // None.XXX or 4.XXX are invalid it needs to be mod.Name

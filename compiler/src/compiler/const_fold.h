@@ -85,7 +85,7 @@ private:
    *  this is basically a mini interpreter that runs on AST evaluating to AST
    */
   struct const_fold : stmt_visitor, expr_visitor {
-    const_fold(ast_pool *ast_pool, ykdt_pool *dt_pool);
+    const_fold(ast_pool *ast_pool, yk_datatype_pool *dt_pool);
     ~const_fold() override;
     // ---------------------------------------------------------------------------------------------
     void visit_assign_expr(assign_expr *obj) override;
@@ -143,7 +143,7 @@ private:
     std::vector<token *> internal_token_pool_;      // to delete
     ast_pool
         *ast_pool_;// this is a passed in pointer and will not need to delete
-    ykdt_pool
+    yk_datatype_pool
         *dt_pool_;// this is a passed in pointer and will not need to delete
     const_fold_context *wrap(stmt *statement);
     const_fold_context *wrap(expr *expression);

@@ -208,7 +208,7 @@ comp_result multifile_compiler::compile_all(codegen *code_generator) {
                            &(cf_->pool_), &token_pool_);
       // TODO create a function in the type checker to do this
       for (auto impo : f->data_->parser_->import_stmts_) {
-        auto obj = ykobject(&(cf_->pool_));
+        auto obj = yk_object(&(cf_->pool_));
         obj.object_type_ = object_type::MODULE;
         obj.string_val_ = impo->data_->filepath_.string();
         obj.module_file_ = impo->data_->filepath_.string();

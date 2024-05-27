@@ -261,7 +261,7 @@ void ast_vis::visit_class_stmt(class_stmt *obj) {
   end_block();
 }
 void ast_vis::field(const std::string &name, const std::string &literal_obj,
-                    ykdatatype *dt) {
+                    yk_datatype *dt) {
   text_ << R"(<div class="field"><div class="field_title">)"
         << ::string_utils::html_escape(name) << "</div>";
   text_ << ::string_utils::html_escape(literal_obj) << ": <code>";

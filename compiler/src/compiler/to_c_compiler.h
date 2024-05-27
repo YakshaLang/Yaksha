@@ -62,11 +62,11 @@ namespace yaksha {
                          datatype_compiler,
                          statement_writer,
                          function_datatype_extractor {
-    to_c_compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
+    to_c_compiler(def_class_visitor &defs_classes, yk_datatype_pool *pool,
                   entry_struct_func_compiler *esc, gc_pool<token> *token_pool);
     ~to_c_compiler() override;
     compiler_output compile(codefiles *cf, file_info *fi);
-    ykdatatype *function_to_datatype_or_null(const ykobject &arg) override;
+    yk_datatype *function_to_datatype_or_null(const yk_object &arg) override;
     void visit_assign_expr(assign_expr *obj) override;
     void visit_binary_expr(binary_expr *obj) override;
     void visit_fncall_expr(fncall_expr *obj) override;
@@ -110,7 +110,7 @@ namespace yaksha {
      * @param basic_dt data type as a token.
      * @return converted data type.
      */
-    std::string convert_dt(ykdatatype *basic_dt, datatype_location dt_location,
+    std::string convert_dt(yk_datatype *basic_dt, datatype_location dt_location,
                            std::string extra_data_1,
                            std::string extra_data_2) override;
     /**
@@ -130,9 +130,9 @@ namespace yaksha {
     void dedent() override;
     void visit_macro_call_expr(macro_call_expr *obj) override;
     void compile_string_assign(token *t, std::stringstream &code,
-                               const std::pair<std::string, ykobject> &rhs,
-                               const ykdatatype *rhs_datatype,
-                               const ykdatatype *lhs_datatype) override;
+                               const std::pair<std::string, yk_object> &rhs,
+                               const yk_datatype *rhs_datatype,
+                               const yk_datatype *lhs_datatype) override;
     [[nodiscard]] std::string
     wrap_in_paren(const std::string &code) const override;
     void visit_cfor_stmt(cfor_stmt *obj) override;
@@ -146,15 +146,15 @@ private:
     void write_indent(std::stringstream &where) const;
     void write_prev_indent(std::stringstream &where) const;
     void write_end_statement(std::stringstream &where);
-    void push(const std::string &expr, const ykobject &data_type);
+    void push(const std::string &expr, const yk_object &data_type);
     void error(token *tok, const std::string &message);
     void error(const std::string &message);
     std::string conv_integer_literal(token_type token_type_val,
                                      token *literal_token);
     std::string prefix_val_{};
     codefiles *cf_{nullptr};
-    std::pair<std::string, ykobject> pop();
-    std::pair<std::string, ykobject> compile_expression(expr *ex);
+    std::pair<std::string, yk_object> pop();
+    std::pair<std::string, yk_object> compile_expression(expr *ex);
     // Indentation to generate
     int indent_{0};
     // Counter for temp variables.
@@ -178,7 +178,7 @@ private:
     // Note this does not check for types.
     // This is just to place current type.
     // type_checker round should do the type checking, before compiler.
-    std::vector<ykobject> type_stack_{};
+    std::vector<yk_object> type_stack_{};
     // Delete stack for strings
     delete_stack_stack deletions_{};
     // Access functions and classes by name
@@ -188,7 +188,7 @@ private:
     // Defer stack
     defer_stack_stack defers_{};
     // Data type pool
-    ykdt_pool *dt_pool_;
+    yk_datatype_pool *dt_pool_;
     // AST pool
     ast_pool *ast_pool_;
     // Desugaring compiler
@@ -201,29 +201,30 @@ private:
     std::string filepath_{};
     std::vector<parsing_error> errors_;
     void compile_function_call(fncall_expr *obj, const std::string &name,
-                               std::stringstream &code, ykdatatype *return_type,
-                               const std::vector<ykdatatype *> &parameters,
+                               std::stringstream &code,
+                               yk_datatype *return_type,
+                               const std::vector<yk_datatype *> &parameters,
                                bool varargs_fnc);
     void compile_obj_creation(const std::string &name, std::stringstream &code,
-                              ykdatatype *return_type);
+                              yk_datatype *return_type);
     std::string
-    prefix_function_arg(const std::pair<std::string, ykobject> &arg_val);
-    void perform_assign(std::pair<std::string, ykobject> &lhs,
-                        std::pair<std::string, ykobject> &rhs,
+    prefix_function_arg(const std::pair<std::string, yk_object> &arg_val);
+    void perform_assign(std::pair<std::string, yk_object> &lhs,
+                        std::pair<std::string, yk_object> &rhs,
                         token *operator_token, bool assign_variable,
                         bool lhs_mutates);
     static void obj_calloc(const std::string &name, std::stringstream &code);
     static bool should_wrap_in_paren(const std::string &code);
     void compile_simple_bin_op(const binary_expr *obj,
                                const token_type &operator_type,
-                               const std::pair<std::string, ykobject> &lhs,
-                               const std::pair<std::string, ykobject> &rhs);
-    void cast_numbers(const ykdatatype *castable,
-                      std::pair<std::string, ykobject> &lhs,
-                      std::pair<std::string, ykobject> &rhs);
+                               const std::pair<std::string, yk_object> &lhs,
+                               const std::pair<std::string, yk_object> &rhs);
+    void cast_numbers(const yk_datatype *castable,
+                      std::pair<std::string, yk_object> &lhs,
+                      std::pair<std::string, yk_object> &rhs);
     void write_casted_rhs(std::stringstream &stream,
-                          std::pair<std::string, ykobject> &rhs,
-                          ykdatatype *lhsu);
+                          std::pair<std::string, yk_object> &rhs,
+                          yk_datatype *lhsu);
   };
 }// namespace yaksha
 #endif

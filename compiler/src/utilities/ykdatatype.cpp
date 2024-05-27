@@ -43,7 +43,7 @@
 #include "ykdt_pool.h"
 #include <utility>
 using namespace yaksha;
-ykdatatype::ykdatatype(token *primitive_dt) {
+yk_datatype::yk_datatype(token *primitive_dt) {
   token_ = new token();
   type_ = primitive_dt->token_;
   token_->token_ = primitive_dt->token_;
@@ -53,7 +53,7 @@ ykdatatype::ykdatatype(token *primitive_dt) {
   token_->file_ = primitive_dt->file_;
   find_builtin_or_primitive();
 }
-void ykdatatype::find_builtin_or_primitive() {
+void yk_datatype::find_builtin_or_primitive() {
   if (token_->type_ == token_type::INTEGER_DECIMAL) {
     builtin_type_ = yk_builtin::DIMENSION;
   } else if (token_->token_ == "i8") {
@@ -114,31 +114,49 @@ void ykdatatype::find_builtin_or_primitive() {
     builtin_type_ = yk_builtin::ENUM_CONTAINER;
   }
 }
-ykdatatype::~ykdatatype() { delete (token_); }
-bool ykdatatype::is_i8() const { return primitive_type_ == yk_primitive::I8; }
-bool ykdatatype::is_i16() const { return primitive_type_ == yk_primitive::I16; }
-bool ykdatatype::is_i32() const { return primitive_type_ == yk_primitive::I32; }
-bool ykdatatype::is_i64() const { return primitive_type_ == yk_primitive::I64; }
-bool ykdatatype::is_u8() const { return primitive_type_ == yk_primitive::U8; }
-bool ykdatatype::is_u16() const { return primitive_type_ == yk_primitive::U16; }
-bool ykdatatype::is_u32() const { return primitive_type_ == yk_primitive::U32; }
-bool ykdatatype::is_u64() const { return primitive_type_ == yk_primitive::U64; }
-bool ykdatatype::is_str() const { return primitive_type_ == yk_primitive::STR; }
-bool ykdatatype::is_sr() const { return primitive_type_ == yk_primitive::SR; }
-bool ykdatatype::is_f32() const { return primitive_type_ == yk_primitive::F32; }
-bool ykdatatype::is_f64() const { return primitive_type_ == yk_primitive::F64; }
-bool ykdatatype::is_bool() const {
+yk_datatype::~yk_datatype() { delete (token_); }
+bool yk_datatype::is_i8() const { return primitive_type_ == yk_primitive::I8; }
+bool yk_datatype::is_i16() const {
+  return primitive_type_ == yk_primitive::I16;
+}
+bool yk_datatype::is_i32() const {
+  return primitive_type_ == yk_primitive::I32;
+}
+bool yk_datatype::is_i64() const {
+  return primitive_type_ == yk_primitive::I64;
+}
+bool yk_datatype::is_u8() const { return primitive_type_ == yk_primitive::U8; }
+bool yk_datatype::is_u16() const {
+  return primitive_type_ == yk_primitive::U16;
+}
+bool yk_datatype::is_u32() const {
+  return primitive_type_ == yk_primitive::U32;
+}
+bool yk_datatype::is_u64() const {
+  return primitive_type_ == yk_primitive::U64;
+}
+bool yk_datatype::is_str() const {
+  return primitive_type_ == yk_primitive::STR;
+}
+bool yk_datatype::is_sr() const { return primitive_type_ == yk_primitive::SR; }
+bool yk_datatype::is_f32() const {
+  return primitive_type_ == yk_primitive::F32;
+}
+bool yk_datatype::is_f64() const {
+  return primitive_type_ == yk_primitive::F64;
+}
+bool yk_datatype::is_bool() const {
   return primitive_type_ == yk_primitive::BOOL;
 }
-bool ykdatatype::is_none() const {
+bool yk_datatype::is_none() const {
   return primitive_type_ == yk_primitive::NONE;
 }
-void ykdatatype::write_to_str(std::stringstream &s, bool write_mod) const {
-  std::vector<std::pair<const ykdatatype *, std::string>> stack{};
+void yk_datatype::write_to_str(std::stringstream &s, bool write_mod) const {
+  std::vector<std::pair<const yk_datatype *, std::string>> stack{};
   stack.emplace_back(this, "");
   while (!stack.empty()) {
     auto item = stack.back();
-    const ykdatatype *dt = item.first;
+    const yk_datatype *dt = item.first;
     auto text = item.second;
     stack.pop_back();
     // text node, write it
@@ -154,41 +172,41 @@ void ykdatatype::write_to_str(std::stringstream &s, bool write_mod) const {
     // arguments
     if (!dt->args_.empty()) {
       stack.emplace_back(
-          std::make_pair<const ykdatatype *, std::string>(nullptr, "]"));
+          std::make_pair<const yk_datatype *, std::string>(nullptr, "]"));
       int length = (int) dt->args_.size();
       for (int i = length; i > 0; --i) {
-        const ykdatatype *arg = dt->args_[i - 1];
+        const yk_datatype *arg = dt->args_[i - 1];
         stack.emplace_back(arg, "");
         if (i > 1) {
           stack.emplace_back(
-              std::make_pair<const ykdatatype *, std::string>(nullptr, ", "));
+              std::make_pair<const yk_datatype *, std::string>(nullptr, ", "));
         }
       }
       stack.emplace_back(
-          std::make_pair<const ykdatatype *, std::string>(nullptr, "["));
+          std::make_pair<const yk_datatype *, std::string>(nullptr, "["));
     }
   }
 }
-std::string ykdatatype::as_string() const {
+std::string yk_datatype::as_string() const {
   std::stringstream s{};
   this->write_to_str(s);
   return s.str();
 }
-std::string ykdatatype::as_string_simplified() const {
+std::string yk_datatype::as_string_simplified() const {
   std::stringstream s{};
   this->write_to_str(s, false);
   return s.str();
 }
-bool ykdatatype::is_primitive() const {
+bool yk_datatype::is_primitive() const {
   return is_str() || is_sr() || is_string_literal() || is_bool() || is_f32() ||
          is_f64() || is_i8() || is_i16() || is_i32() || is_i64() || is_u8() ||
          is_u16() || is_u32() || is_u64() || is_none();
 }
-bool ykdatatype::is_c_primitive() const {
+bool yk_datatype::is_c_primitive() const {
   return is_bool() || is_f32() || is_f64() || is_i8() || is_i16() || is_i32() ||
          is_i64() || is_u8() || is_u16() || is_u32() || is_u64();
 }
-ykdatatype::ykdatatype(std::string primitive) : type_(std::move(primitive)) {
+yk_datatype::yk_datatype(std::string primitive) : type_(std::move(primitive)) {
   token_ = new token();
   token_->token_ = type_;
   token_->type_ = token_type::NAME;
@@ -197,7 +215,7 @@ ykdatatype::ykdatatype(std::string primitive) : type_(std::move(primitive)) {
   token_->file_ = "";
   find_builtin_or_primitive();
 }
-ykdatatype::ykdatatype(std::string primitive_dt, std::string module)
+yk_datatype::yk_datatype(std::string primitive_dt, std::string module)
     : type_(std::move(primitive_dt)), module_(std::move(module)) {
   token_ = new token();
   token_->token_ = type_;
@@ -210,69 +228,71 @@ ykdatatype::ykdatatype(std::string primitive_dt, std::string module)
     module_ = "";// Do not store module if it's a primitive
   }
 }
-bool ykdatatype::is_a_number() const { return is_an_integer() || is_a_float(); }
-bool ykdatatype::is_an_integer() const {
+bool yk_datatype::is_a_number() const {
+  return is_an_integer() || is_a_float();
+}
+bool yk_datatype::is_an_integer() const {
   return is_i8() || is_i16() || is_i32() || is_i64() || is_u8() || is_u16() ||
          is_u32() || is_u64();
 }
-bool ykdatatype::is_array() const {
+bool yk_datatype::is_array() const {
   return !is_primitive() && builtin_type_ == yk_builtin::ARRAY;
 }
-bool ykdatatype::is_const() const {
+bool yk_datatype::is_const() const {
   return !is_primitive() && builtin_type_ == yk_builtin::CONSTANT;
 }
-bool ykdatatype::is_a_signed_integer() const {
+bool yk_datatype::is_a_signed_integer() const {
   return is_i8() || is_i16() || is_i32() || is_i64();
 }
-bool ykdatatype::is_an_unsigned_integer() const {
+bool yk_datatype::is_an_unsigned_integer() const {
   return is_u8() || is_u16() || is_u32() || is_u64();
 }
-bool ykdatatype::is_a_float() const { return is_f32() || is_f64(); }
-bool ykdatatype::is_builtin_or_primitive() const {
+bool yk_datatype::is_a_float() const { return is_f32() || is_f64(); }
+bool yk_datatype::is_builtin_or_primitive() const {
   return this->primitive_type_ != yk_primitive::NOT_A_PRIMITIVE ||
          this->builtin_type_ != yk_builtin::NOT_A_BUILTIN;
 }
-bool ykdatatype::is_ptr() const {
+bool yk_datatype::is_ptr() const {
   return !is_primitive() && builtin_type_ == yk_builtin::POINTER;
 }
-bool ykdatatype::is_m_entry() const {
+bool yk_datatype::is_m_entry() const {
   return !is_primitive() && builtin_type_ == yk_builtin::M_ENTRY;
 }
-bool ykdatatype::is_sm_entry() const {
+bool yk_datatype::is_sm_entry() const {
   return !is_primitive() && builtin_type_ == yk_builtin::SM_ENTRY;
 }
-bool ykdatatype::is_function() const {
+bool yk_datatype::is_function() const {
   return !is_primitive() && builtin_type_ == yk_builtin::FUNCTION;
 }
-bool ykdatatype::is_function_input() const {
+bool yk_datatype::is_function_input() const {
   return !is_primitive() && builtin_type_ == yk_builtin::F_IN;
 }
-bool ykdatatype::is_function_output() const {
+bool yk_datatype::is_function_output() const {
   return !is_primitive() && builtin_type_ == yk_builtin::F_OUT;
 }
-bool ykdatatype::is_any_ptr() const {
+bool yk_datatype::is_any_ptr() const {
   return !is_primitive() && builtin_type_ == yk_builtin::PTR_TO_ANY;
 }
-bool ykdatatype::is_any_ptr_to_const() const {
+bool yk_datatype::is_any_ptr_to_const() const {
   return !is_primitive() && builtin_type_ == yk_builtin::PTR_TO_CONST_ANY;
 }
-bool ykdatatype::is_tuple() const {
+bool yk_datatype::is_tuple() const {
   return !is_primitive() && builtin_type_ == yk_builtin::TUPLE;
 }
-ykdatatype *ykdatatype::const_unwrap() {
+yk_datatype *yk_datatype::const_unwrap() {
   if (is_const()) { return args_[0]; }
   return this;
 }
-bool ykdatatype::is_string_literal() const {
+bool yk_datatype::is_string_literal() const {
   return primitive_type_ == yk_primitive::HIDDEN_STRING_LIT;
 }
-bool ykdatatype::is_a_string() const { return +primitive_type_ >= 1000; }
-ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, ykdt_pool *pool,
-                                  bool lhs_mutates, bool assignment) {
-  ykdatatype *castable = nullptr;
+bool yk_datatype::is_a_string() const { return +primitive_type_ >= 1000; }
+yk_datatype *yk_datatype::auto_cast(yk_datatype *rhs, yk_datatype_pool *pool,
+                                    bool lhs_mutates, bool assignment) {
+  yk_datatype *castable = nullptr;
   if ((lhs_mutates || assignment) && is_const()) { return nullptr; }
-  ykdatatype *lhsu = const_unwrap();
-  ykdatatype *rhsu = rhs->const_unwrap();
+  yk_datatype *lhsu = const_unwrap();
+  yk_datatype *rhsu = rhs->const_unwrap();
   // Identical type cannot be cast as they are already same
   if (internal_is_identical_type(lhsu, rhsu)) { return nullptr; }
   auto li = +lhsu->primitive_type_;
@@ -301,17 +321,17 @@ ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, ykdt_pool *pool,
   }
   return castable;
 }
-bool ykdatatype::is_fixed_size_array() const {
+bool yk_datatype::is_fixed_size_array() const {
   return !is_primitive() && builtin_type_ == yk_builtin::FIXED_ARRAY;
 }
-bool ykdatatype::is_dimension() const {
+bool yk_datatype::is_dimension() const {
   return !is_primitive() && builtin_type_ == yk_builtin::DIMENSION;
 }
-bool ykdatatype::is_enum_container() const {
+bool yk_datatype::is_enum_container() const {
   return !is_primitive() && builtin_type_ == yk_builtin::ENUM_CONTAINER;
 }
-bool yaksha::internal_is_identical_type(ykdatatype *required_datatype,
-                                        ykdatatype *provided_datatype) {
+bool yaksha::internal_is_identical_type(yk_datatype *required_datatype,
+                                        yk_datatype *provided_datatype) {
   if (required_datatype != nullptr && provided_datatype != nullptr) {
     if (required_datatype->is_primitive() &&
         provided_datatype->is_primitive()) {

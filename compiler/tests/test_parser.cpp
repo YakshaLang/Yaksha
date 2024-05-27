@@ -62,7 +62,7 @@ static void test_parser_yaka_file(const std::string &yaka_code_file_input) {
       REQUIRE(t.errors_.empty());
       block_analyzer b{t.tokens_, &token_pool};
       b.analyze();
-      ykdt_pool dt_pool{};
+      yk_datatype_pool dt_pool{};
       parser p{yaka_code_file_input, b.tokens_, &dt_pool};
       auto tree = p.parse();
       REQUIRE(!tree.empty());

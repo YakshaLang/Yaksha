@@ -77,8 +77,8 @@ std::string extract_comments(int definition_line, tokenizer &token_extractor) {
   }
   return comments.str();
 }
-void display_datatype(ykdatatype *dt);
-void display_dt_args(std::vector<ykdatatype *> &args) {
+void display_datatype(yk_datatype *dt);
+void display_dt_args(std::vector<yk_datatype *> &args) {
   bool first = true;
   for (auto &arg : args) {
     if (first) {
@@ -89,7 +89,7 @@ void display_dt_args(std::vector<ykdatatype *> &args) {
     display_datatype(arg);
   }
 }
-void display_datatype(ykdatatype *dt) {
+void display_datatype(yk_datatype *dt) {
   std::cout << "{ \"type\": \"" << string_utils::escape_json(dt->token_->token_)
             << "\"";
   if (!dt->module_.empty()) {

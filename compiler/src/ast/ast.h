@@ -172,7 +172,7 @@ namespace yaksha {
   // ------- expressions ------
   struct assign_expr : expr {
     assign_expr(token *name, token *opr, expr *right, bool promoted,
-                ykdatatype *promoted_data_type);
+                yk_datatype *promoted_data_type);
     void accept(expr_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
@@ -180,7 +180,7 @@ namespace yaksha {
     token *opr_;
     expr *right_;
     bool promoted_;
-    ykdatatype *promoted_data_type_;
+    yk_datatype *promoted_data_type_;
   };
   struct assign_arr_expr : expr {
     assign_arr_expr(expr *assign_oper, token *opr, expr *right);
@@ -368,25 +368,25 @@ namespace yaksha {
     annotations annotations_;
   };
   struct compins_stmt : stmt {
-    compins_stmt(token *name, ykdatatype *data_type, token *meta1,
-                 ykdatatype *meta2, void *meta3);
+    compins_stmt(token *name, yk_datatype *data_type, token *meta1,
+                 yk_datatype *meta2, void *meta3);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
     token *name_;
-    ykdatatype *data_type_;
+    yk_datatype *data_type_;
     token *meta1_;
-    ykdatatype *meta2_;
+    yk_datatype *meta2_;
     void *meta3_;
   };
   struct const_stmt : stmt {
-    const_stmt(token *name, ykdatatype *data_type, expr *expression,
+    const_stmt(token *name, yk_datatype *data_type, expr *expression,
                bool is_global);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
     token *name_;
-    ykdatatype *data_type_;
+    yk_datatype *data_type_;
     expr *expression_;
     bool is_global_;
   };
@@ -399,14 +399,14 @@ namespace yaksha {
   };
   struct def_stmt : stmt {
     def_stmt(token *name, std::vector<parameter> params, stmt *function_body,
-             ykdatatype *return_type, annotations annotations);
+             yk_datatype *return_type, annotations annotations);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
     token *name_;
     std::vector<parameter> params_;
     stmt *function_body_;
-    ykdatatype *return_type_;
+    yk_datatype *return_type_;
     annotations annotations_;
   };
   struct defer_stmt : stmt {
@@ -478,19 +478,19 @@ namespace yaksha {
     expr *expression_;
   };
   struct foreach_stmt : stmt {
-    foreach_stmt(token *for_keyword, token *name, ykdatatype *data_type,
+    foreach_stmt(token *for_keyword, token *name, yk_datatype *data_type,
                  token *in_keyword, expr *expression, stmt *for_body,
-                 ykdatatype *expr_datatype);
+                 yk_datatype *expr_datatype);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
     token *for_keyword_;
     token *name_;
-    ykdatatype *data_type_;
+    yk_datatype *data_type_;
     token *in_keyword_;
     expr *expression_;
     stmt *for_body_;
-    ykdatatype *expr_datatype_;
+    yk_datatype *expr_datatype_;
   };
   struct forendless_stmt : stmt {
     forendless_stmt(token *for_keyword, stmt *for_body);
@@ -524,12 +524,12 @@ namespace yaksha {
     file_info *data_;
   };
   struct let_stmt : stmt {
-    let_stmt(token *name, ykdatatype *data_type, expr *expression);
+    let_stmt(token *name, yk_datatype *data_type, expr *expression);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
     token *name_;
-    ykdatatype *data_type_;
+    yk_datatype *data_type_;
     expr *expression_;
   };
   struct macros_stmt : stmt {
@@ -545,13 +545,13 @@ namespace yaksha {
     token *curly_close_;
   };
   struct nativeconst_stmt : stmt {
-    nativeconst_stmt(token *name, ykdatatype *data_type, token *ccode_keyword,
+    nativeconst_stmt(token *name, yk_datatype *data_type, token *ccode_keyword,
                      token *code_str, bool is_global);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
     token *name_;
-    ykdatatype *data_type_;
+    yk_datatype *data_type_;
     token *ccode_keyword_;
     token *code_str_;
     bool is_global_;
@@ -565,13 +565,13 @@ namespace yaksha {
   };
   struct return_stmt : stmt {
     return_stmt(token *return_keyword, expr *expression,
-                ykdatatype *result_type);
+                yk_datatype *result_type);
     void accept(stmt_visitor *v) override;
     ast_type get_type() override;
     token *locate() override;
     token *return_keyword_;
     expr *expression_;
-    ykdatatype *result_type_;
+    yk_datatype *result_type_;
   };
   struct runtimefeature_stmt : stmt {
     runtimefeature_stmt(token *runtimefeature_token, token *feature);
@@ -602,7 +602,7 @@ namespace yaksha {
     ast_pool();
     ~ast_pool();
     expr *c_assign_expr(token *name, token *opr, expr *right, bool promoted,
-                        ykdatatype *promoted_data_type);
+                        yk_datatype *promoted_data_type);
     expr *c_assign_arr_expr(expr *assign_oper, token *opr, expr *right);
     expr *c_assign_member_expr(expr *set_oper, token *opr, expr *right);
     expr *c_binary_expr(expr *left, token *opr, expr *right);
@@ -632,13 +632,13 @@ namespace yaksha {
                       expr *operation, token *close_paren, stmt *for_body);
     stmt *c_class_stmt(token *name, std::vector<parameter> members,
                        annotations annotations);
-    stmt *c_compins_stmt(token *name, ykdatatype *data_type, token *meta1,
-                         ykdatatype *meta2, void *meta3);
-    stmt *c_const_stmt(token *name, ykdatatype *data_type, expr *expression,
+    stmt *c_compins_stmt(token *name, yk_datatype *data_type, token *meta1,
+                         yk_datatype *meta2, void *meta3);
+    stmt *c_const_stmt(token *name, yk_datatype *data_type, expr *expression,
                        bool is_global);
     stmt *c_continue_stmt(token *continue_token);
     stmt *c_def_stmt(token *name, std::vector<parameter> params,
-                     stmt *function_body, ykdatatype *return_type,
+                     stmt *function_body, yk_datatype *return_type,
                      annotations annotations);
     stmt *c_defer_stmt(token *defer_keyword, expr *expression,
                        stmt *del_statement);
@@ -654,24 +654,25 @@ namespace yaksha {
     stmt *c_enum_stmt(token *name, std::vector<parameter> members,
                       annotations annotations);
     stmt *c_expression_stmt(expr *expression);
-    stmt *c_foreach_stmt(token *for_keyword, token *name, ykdatatype *data_type,
-                         token *in_keyword, expr *expression, stmt *for_body,
-                         ykdatatype *expr_datatype);
+    stmt *c_foreach_stmt(token *for_keyword, token *name,
+                         yk_datatype *data_type, token *in_keyword,
+                         expr *expression, stmt *for_body,
+                         yk_datatype *expr_datatype);
     stmt *c_forendless_stmt(token *for_keyword, stmt *for_body);
     stmt *c_if_stmt(token *if_keyword, expr *expression, stmt *if_branch,
                     token *else_keyword, stmt *else_branch);
     stmt *c_import_stmt(token *import_token, std::vector<token *> import_names,
                         token *name, file_info *data);
-    stmt *c_let_stmt(token *name, ykdatatype *data_type, expr *expression);
+    stmt *c_let_stmt(token *name, yk_datatype *data_type, expr *expression);
     stmt *c_macros_stmt(token *macros_token, token *not_symbol_tok,
                         token *curly_open, std::vector<token *> lisp_code,
                         token *curly_close);
-    stmt *c_nativeconst_stmt(token *name, ykdatatype *data_type,
+    stmt *c_nativeconst_stmt(token *name, yk_datatype *data_type,
                              token *ccode_keyword, token *code_str,
                              bool is_global);
     stmt *c_pass_stmt(token *pass_token);
     stmt *c_return_stmt(token *return_keyword, expr *expression,
-                        ykdatatype *result_type);
+                        yk_datatype *result_type);
     stmt *c_runtimefeature_stmt(token *runtimefeature_token, token *feature);
     stmt *c_token_soup_stmt(std::vector<token *> soup);
     stmt *c_while_stmt(token *while_keyword, expr *expression,
@@ -686,7 +687,7 @@ private:
 */
   struct parameter {
     token *name_;
-    ykdatatype *data_type_;
+    yk_datatype *data_type_;
     token *enum_val_override_;
   };
   /**

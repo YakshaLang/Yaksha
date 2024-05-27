@@ -89,7 +89,7 @@ void test_snippet_execute(std::string code) {
 void yaksha_macro_preprocess_happy_path(std::string code) {
   yaksha_macros yaksha_lisp_m{};
   try {
-    ykdt_pool datatypes{};
+    yk_datatype_pool datatypes{};
     tokenizer t{"test", code, yaksha_lisp_m.get_yk_token_pool()};
     t.tokenize();
     block_analyzer ba{t.tokens_, yaksha_lisp_m.get_yk_token_pool()};

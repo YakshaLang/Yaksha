@@ -53,10 +53,10 @@ namespace yaksha {
   struct slot_matcher : function_datatype_extractor {
     ~slot_matcher() override = default;
     virtual type_match_result
-    slot_match_with_result(ykdatatype *datatype,
-                           const ykobject &provided_arg) = 0;
-    virtual type_match_result rvalue_match(const ykobject &left_side,
-                                           const ykobject &right_side) = 0;
+    slot_match_with_result(yk_datatype *datatype,
+                           const yk_object &provided_arg) = 0;
+    virtual type_match_result rvalue_match(const yk_object &left_side,
+                                           const yk_object &right_side) = 0;
     /**
      * Match given two data types, taking auto-casting into account
      * @param required_datatype datatype that we require (LHS)
@@ -64,13 +64,13 @@ namespace yaksha {
      * @param primitive_or_obj true if provided data is a primitive/object, false otherwise
      * @return type_match_result struct
      */
-    virtual type_match_result type_match(ykdatatype *required_datatype,
-                                         ykdatatype *provided_datatype,
+    virtual type_match_result type_match(yk_datatype *required_datatype,
+                                         yk_datatype *provided_datatype,
                                          bool primitive_or_obj) = 0;
-    virtual bool is_identical_type(ykdatatype *required_datatype,
-                                   ykdatatype *provided_datatype) = 0;
-    virtual bool is_not_identical_type(ykdatatype *required_datatype,
-                                       ykdatatype *provided_datatype) = 0;
+    virtual bool is_identical_type(yk_datatype *required_datatype,
+                                   yk_datatype *provided_datatype) = 0;
+    virtual bool is_not_identical_type(yk_datatype *required_datatype,
+                                       yk_datatype *provided_datatype) = 0;
   };
 }// namespace yaksha
 #endif

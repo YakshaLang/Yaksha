@@ -90,7 +90,7 @@ void usage_analyser::visit_binary_expr(binary_expr *obj) {
   auto lhs = pop_object();
   obj->right_->accept(this);
   auto rhs = pop_object();
-  auto o = ykobject();
+  auto o = yk_object();
   o.object_type_ = object_type::PRIMITIVE_OR_OBJ;
   object_stack_.emplace_back(o);
 }
@@ -115,7 +115,7 @@ void usage_analyser::visit_get_expr(get_expr *obj) {
                            peek_file_info()->data_->parser_->import_stmts_);
     if (imp.first == nullptr && !imp.second) {
       error(obj->dot_, "cannot find imported file: " + lhs.module_file_);
-      auto o = ykobject();
+      auto o = yk_object();
       o.object_type_ = object_type::PRIMITIVE_OR_OBJ;
       push_object(o);
       return;
@@ -132,7 +132,7 @@ void usage_analyser::visit_get_expr(get_expr *obj) {
       push_import(import_st);
       fnc->accept(this);
       pop_import();
-      auto o = ykobject();
+      auto o = yk_object();
       o.object_type_ = object_type::MODULE_FUNCTION;
       o.module_file_ = import_st->data_->filepath_.string();
       o.string_val_ = obj->item_->token_;
@@ -142,7 +142,7 @@ void usage_analyser::visit_get_expr(get_expr *obj) {
       push_import(import_st);
       cls->accept(this);
       pop_import();
-      auto o = ykobject();
+      auto o = yk_object();
       o.object_type_ = object_type::MODULE_CLASS;
       o.module_file_ = import_st->data_->filepath_.string();
       o.string_val_ = obj->item_->token_;
@@ -152,7 +152,7 @@ void usage_analyser::visit_get_expr(get_expr *obj) {
       push_import(import_st);
       c->accept(this);
       pop_import();
-      auto o = ykobject();
+      auto o = yk_object();
       o.object_type_ = object_type::PRIMITIVE_OR_OBJ;
       o.module_file_ = import_st->data_->filepath_.string();
       o.string_val_ = obj->item_->token_;
@@ -164,19 +164,19 @@ void usage_analyser::visit_get_expr(get_expr *obj) {
       push_import(import_st);
       c->accept(this);
       pop_import();
-      auto o = ykobject();
+      auto o = yk_object();
       o.object_type_ = object_type::PRIMITIVE_OR_OBJ;
       o.module_file_ = import_st->data_->filepath_.string();
       o.string_val_ = obj->item_->token_;
       push_object(o);
     } else {
-      auto o = ykobject();
+      auto o = yk_object();
       o.object_type_ = object_type::PRIMITIVE_OR_OBJ;
       push_object(o);
     }
     return;
   }
-  auto o = ykobject();
+  auto o = yk_object();
   o.object_type_ = object_type::PRIMITIVE_OR_OBJ;
   push_object(o);
 }
@@ -186,7 +186,7 @@ void usage_analyser::visit_grouping_expr(grouping_expr *obj) {
 }
 void usage_analyser::visit_literal_expr(literal_expr *obj) {
   obj->hits_++;
-  auto o = ykobject();
+  auto o = yk_object();
   o.object_type_ = object_type::PRIMITIVE_OR_OBJ;
   push_object(o);
 }
@@ -196,7 +196,7 @@ void usage_analyser::visit_logical_expr(logical_expr *obj) {
   auto lhs = pop_object();
   obj->right_->accept(this);
   auto rhs = pop_object();
-  auto o = ykobject();
+  auto o = yk_object();
   o.object_type_ = object_type::PRIMITIVE_OR_OBJ;
   push_object(o);
 }
@@ -212,17 +212,17 @@ void usage_analyser::visit_square_bracket_access_expr(
     square_bracket_access_expr *obj) {
   obj->hits_++;
   obj->name_->accept(this);
-  ykobject lhs = pop_object();
+  yk_object lhs = pop_object();
   if (lhs.is_primitive_or_obj()) {
     push_object(lhs);
   } else {
     // Class[X] -- not required for now as this is when we add template support
   }
 }
-void usage_analyser::push_object(const ykobject &lhs) {
+void usage_analyser::push_object(const yk_object &lhs) {
   object_stack_.push_back(lhs);
 }
-ykobject usage_analyser::pop_object() {
+yk_object usage_analyser::pop_object() {
   if (object_stack_.empty()) { return {}; }
   auto lhs = object_stack_.back();
   object_stack_.pop_back();
@@ -241,7 +241,7 @@ void usage_analyser::visit_unary_expr(unary_expr *obj) {
 void usage_analyser::visit_variable_expr(variable_expr *obj) {
   obj->hits_++;
   auto name = obj->name_->token_;
-  auto o = ykobject();
+  auto o = yk_object();
   if (peek_file_info()->data_->dsv_->has_class(name)) {
     o.string_val_ = name;
     o.object_type_ = object_type::CLASS;
@@ -361,7 +361,7 @@ void usage_analyser::visit_while_stmt(while_stmt *obj) {
   pop_object();
   obj->while_body_->accept(this);
 }
-void usage_analyser::visit_data_type(ykdatatype *dt, token *token_for_err) {
+void usage_analyser::visit_data_type(yk_datatype *dt, token *token_for_err) {
   if (dt == nullptr) { return; }
   if (dt->hits_ > 0) { return; }
   dt->hits_++;

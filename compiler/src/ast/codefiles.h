@@ -76,7 +76,7 @@ namespace yaksha {
     file_info *scan_or_null(import_stmt *st);
     std::vector<file_info *> files_;
     file_info *main_file_info_{nullptr};
-    ykdt_pool pool_;
+    yk_datatype_pool pool_;
     yaksha_macros yaksha_macros_{};
     entry_struct_func_compiler *esc_;
     directives directives_{};

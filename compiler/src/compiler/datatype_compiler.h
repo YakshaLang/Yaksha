@@ -45,15 +45,15 @@
 namespace yaksha {
   enum class datatype_location { STRUCT, VARIABLE, PARAMETER, CAST, SIZEOF_ };
   struct datatype_compiler {
-    virtual std::string convert_dt(ykdatatype *entry_dt,
+    virtual std::string convert_dt(yk_datatype *entry_dt,
                                    datatype_location dt_location,
                                    std::string extra_data_1,
                                    std::string extra_data_2) = 0;
     virtual void
     compile_string_assign(token *t, std::stringstream &code,
-                          const std::pair<std::string, ykobject> &rhs,
-                          const ykdatatype *rhs_datatype,
-                          const ykdatatype *lhs_datatype) = 0;
+                          const std::pair<std::string, yk_object> &rhs,
+                          const yk_datatype *rhs_datatype,
+                          const yk_datatype *lhs_datatype) = 0;
     [[nodiscard]] virtual std::string
     wrap_in_paren(const std::string &code) const = 0;
     virtual ~datatype_compiler() = default;

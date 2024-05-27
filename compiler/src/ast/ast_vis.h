@@ -58,7 +58,7 @@ namespace yaksha {
     void field(const std::string &name, stmt *stmt);
     void field(const std::string &name, const std::string &literal_obj);
     void field(const std::string &name, const std::string &literal_obj,
-               ykdatatype *dt);
+               yk_datatype *dt);
     void begin_block(const std::string &name);
     void end_block();
     void visit_expression_stmt(expression_stmt *obj) override;

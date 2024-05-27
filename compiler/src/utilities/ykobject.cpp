@@ -41,42 +41,42 @@
 #include <sstream>
 #include <utility>
 using namespace yaksha;
-ykobject::ykobject(ykdt_pool *pool)
+yk_object::yk_object(yk_datatype_pool *pool)
     : object_type_(object_type::PRIMITIVE_OR_OBJ) {
   datatype_ = pool->create("None");
 }
-ykobject::ykobject(int i, ykdt_pool *pool)
+yk_object::yk_object(int i, yk_datatype_pool *pool)
     : object_type_(object_type::PRIMITIVE_OR_OBJ) {
   datatype_ = pool->create("i32");
 }
-ykobject::ykobject(std::string str, ykdt_pool *pool)
+yk_object::yk_object(std::string str, yk_datatype_pool *pool)
     : string_val_{std::move(str)}, object_type_(object_type::PRIMITIVE_OR_OBJ) {
   datatype_ = pool->create(":s:");
 }
-ykobject::ykobject(double dbl, ykdt_pool *pool)
+yk_object::yk_object(double dbl, yk_datatype_pool *pool)
     : object_type_{object_type::PRIMITIVE_OR_OBJ} {
   datatype_ = pool->create("f64");
 }
-ykobject::ykobject(float float_val, ykdt_pool *pool)
+yk_object::yk_object(float float_val, yk_datatype_pool *pool)
     : object_type_{object_type::PRIMITIVE_OR_OBJ} {
   datatype_ = pool->create("f32");
 }
-ykobject::ykobject(bool i, ykdt_pool *pool)
+yk_object::yk_object(bool i, yk_datatype_pool *pool)
     : object_type_(object_type::PRIMITIVE_OR_OBJ) {
   datatype_ = pool->create("bool");
 }
-bool ykobject::is_primitive_or_obj() const {
+bool yk_object::is_primitive_or_obj() const {
   return object_type_ == object_type::PRIMITIVE_OR_OBJ;
 }
-bool ykobject::is_a_function() const {
+bool yk_object::is_a_function() const {
   return object_type_ == object_type::FUNCTION ||
          object_type_ == object_type::MODULE_FUNCTION;
 }
-ykobject::ykobject(ykdatatype *dt) {
+yk_object::yk_object(yk_datatype *dt) {
   datatype_ = dt;
   object_type_ = object_type::PRIMITIVE_OR_OBJ;
 }
-ykobject::ykobject() : object_type_(object_type::UNKNOWN_OBJECT) {}
-ykobject::ykobject(const_fold_context *fold_context)
+yk_object::yk_object() : object_type_(object_type::UNKNOWN_OBJECT) {}
+yk_object::yk_object(const_fold_context *fold_context)
     : fold_context_(fold_context), object_type_(object_type::CONST_FOLD_VALUE) {
 }

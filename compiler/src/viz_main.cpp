@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   }
   block_analyzer b{t.tokens_, &token_pool};
   b.analyze();
-  ykdt_pool dt_pool{};
+  yk_datatype_pool dt_pool{};
   try {
     parser p{file_name, b.tokens_, &dt_pool};
     auto tree = p.parse();

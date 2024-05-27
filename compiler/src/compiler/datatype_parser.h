@@ -45,7 +45,7 @@
 namespace yaksha {
   struct datatype_parser {
     virtual ~datatype_parser() = default;
-    virtual ykdatatype *
+    virtual yk_datatype *
     parse(std::string data_type_str,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath) = 0;

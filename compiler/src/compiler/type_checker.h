@@ -50,22 +50,22 @@
 namespace yaksha {
   struct type_checker : expr_visitor, stmt_visitor, slot_matcher {
     explicit type_checker(std::string filepath, codefiles *cf,
-                          def_class_visitor *dcv, ykdt_pool *pool,
+                          def_class_visitor *dcv, yk_datatype_pool *pool,
                           gc_pool<token> *token_pool);
     ~type_checker() override;
-    bool is_identical_type(ykdatatype *required_datatype,
-                           ykdatatype *provided_datatype) override;
-    bool is_not_identical_type(ykdatatype *required_datatype,
-                               ykdatatype *provided_datatype) override;
-    type_match_result type_match(ykdatatype *required_datatype,
-                                 ykdatatype *provided_datatype,
+    bool is_identical_type(yk_datatype *required_datatype,
+                           yk_datatype *provided_datatype) override;
+    bool is_not_identical_type(yk_datatype *required_datatype,
+                               yk_datatype *provided_datatype) override;
+    type_match_result type_match(yk_datatype *required_datatype,
+                                 yk_datatype *provided_datatype,
                                  bool primitive_or_obj) override;
     type_match_result
-    slot_match_with_result(ykdatatype *datatype,
-                           const ykobject &provided_arg) override;
-    type_match_result rvalue_match(const ykobject &left_side,
-                                   const ykobject &right_side) override;
-    ykdatatype *function_to_datatype_or_null(const ykobject &arg) override;
+    slot_match_with_result(yk_datatype *datatype,
+                           const yk_object &provided_arg) override;
+    type_match_result rvalue_match(const yk_object &left_side,
+                                   const yk_object &right_side) override;
+    yk_datatype *function_to_datatype_or_null(const yk_object &arg) override;
     void check(const std::vector<stmt *> &statements);
     void visit_assign_expr(assign_expr *obj) override;
     void visit_binary_expr(binary_expr *obj) override;
@@ -123,9 +123,9 @@ namespace yaksha {
     std::string filepath_;
 
 private:
-    ykobject pop();
-    class_stmt *find_class_or_null(token *tok, ykdatatype *data_type);
-    void push(const ykobject &data_type);
+    yk_object pop();
+    class_stmt *find_class_or_null(token *tok, yk_datatype *data_type);
+    void push(const yk_object &data_type);
     void error(token *tok, const std::string &message);
     void error(const std::string &message);
     void push_scope_type(ast_type scope_type);
@@ -137,10 +137,11 @@ private:
     void handle_dot_operator(expr *lhs_expr, token *dot, token *member_item);
     void handle_square_access(expr *index_expr, token *sqb_token,
                               expr *name_expr, bool mutate);
-    void handle_assigns(token *oper, const ykobject &lhs, const ykobject &rhs);
+    void handle_assigns(token *oper, const yk_object &lhs,
+                        const yk_object &rhs);
     // Data type pool
-    ykdt_pool *dt_pool_;
-    std::vector<ykobject> object_stack_{};
+    yk_datatype_pool *dt_pool_;
+    std::vector<yk_object> object_stack_{};
     // Different types of scopes stack, -> are we in function body, if or while
     std::vector<ast_type> scope_type_stack_{};
     // Function stack

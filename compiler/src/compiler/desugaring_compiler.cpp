@@ -41,7 +41,7 @@
 #include "compiler/to_c_compiler.h"
 using namespace yaksha;
 desugaring_compiler::desugaring_compiler(ast_pool *ast_pool_obj,
-                                         ykdt_pool *dt_pool_obj)
+                                         yk_datatype_pool *dt_pool_obj)
     : statement_stack_(), global_statements_(), pre_continue_stack_(),
       ast_pool_(ast_pool_obj), dt_pool_(dt_pool_obj), true_token_(new token{}),
       while_token_(new token{}), break_token_(new token{}),
@@ -248,7 +248,7 @@ void desugaring_compiler::desugar_arr_foreach(foreach_stmt *obj) {
   auto prefixed_name = compiler_obj_->prefix_token(obj->name_);
   // -----------------------------------------
   // New statement -> array_holder: Array[T] = expression
-  ykdatatype *arr = dt_pool_->create("Array");
+  yk_datatype *arr = dt_pool_->create("Array");
   arr->args_.push_back(obj->data_type_);
   statement_stack_.back()->emplace_back(
       ast_pool_->c_let_stmt(array_holder_tok, arr, obj->expression_));
@@ -310,7 +310,7 @@ void desugaring_compiler::desugar_fixed_arr_foreach(foreach_stmt *obj) {
   //    array_holder: FixedArr[T] = expression
   // if the expression cannot be inlined
   //    array_holder: Ptr[FixedArr[T]] = expression
-  ykdatatype *arr;
+  yk_datatype *arr;
   if (expression_dt->inlinable_literal_) {
     arr = dt_pool_->create("FixedArr");
     arr->args_.push_back(obj->data_type_);
@@ -320,7 +320,7 @@ void desugaring_compiler::desugar_fixed_arr_foreach(foreach_stmt *obj) {
         ast_pool_->c_let_stmt(array_holder_tok, arr, obj->expression_));
   } else {
     arr = dt_pool_->create("Ptr");
-    ykdatatype *fixed_arr = dt_pool_->create("FixedArr");
+    yk_datatype *fixed_arr = dt_pool_->create("FixedArr");
     fixed_arr->args_.push_back(obj->data_type_);
     fixed_arr->args_.push_back(
         dt_pool_->create_dimension(expression_dt->args_[1]->dimension_));

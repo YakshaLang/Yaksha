@@ -58,24 +58,24 @@ namespace yaksha {
      * @param name name of the variable
      * @param data object
      */
-    virtual void define(const std::string &name, ykobject data);
+    virtual void define(const std::string &name, yk_object data);
     /**
      * Assign a value to a variable (only if it's declared)
      * @param name name of the variable
      * @param data object
      */
-    virtual void assign(const std::string &name, ykobject data);
+    virtual void assign(const std::string &name, yk_object data);
     /**
      * Get mutable data for a variable
      * @param name name of the variable
      * @return mutable object
      */
-    virtual ykobject get(const std::string &name);
+    virtual yk_object get(const std::string &name);
     environment();
     virtual ~environment();
 
 private:
-    std::unordered_map<std::string, ykobject> variables_;
+    std::unordered_map<std::string, yk_object> variables_;
   };
 }// namespace yaksha
 #endif

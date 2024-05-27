@@ -43,7 +43,7 @@
 #include <utility>
 using namespace yaksha;
 type_checker::type_checker(std::string filepath, codefiles *cf,
-                           def_class_visitor *dcv, ykdt_pool *pool,
+                           def_class_visitor *dcv, yk_datatype_pool *pool,
                            gc_pool<token> *token_pool)
     : cf_(cf), dt_pool_(pool), scope_(pool), builtins_(pool, token_pool),
       defs_classes_(dcv), filepath_(std::move(filepath)),
@@ -66,7 +66,7 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
   obj->right_->accept(this);
   auto rhs = pop();
   auto name = obj->name_->token_;
-  ykobject object;
+  yk_object object;
   if (scope_.is_defined(name)) {
     object = scope_.get(name);
   } else {
@@ -83,9 +83,9 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
     }
     if (rhs.datatype_->is_string_literal()) {
       // When `a = string_lit`, then `a` should be promoted to `sr`
-      object = ykobject(dt_pool_->create("sr"));
+      object = yk_object(dt_pool_->create("sr"));
     } else {
-      object = ykobject(rhs.datatype_);
+      object = yk_object(rhs.datatype_);
     }
     obj->promoted_ = true;
   }
@@ -99,33 +99,33 @@ void type_checker::visit_assign_expr(assign_expr *obj) {
   }
 }
 template<typename Verifier>
-bool dt_match_ignore_const(ykdatatype *lhs, ykdatatype *rhs, Verifier v) {
-  ykdatatype *my_lhs = lhs->const_unwrap();
-  ykdatatype *my_rhs = rhs->const_unwrap();
+bool dt_match_ignore_const(yk_datatype *lhs, yk_datatype *rhs, Verifier v) {
+  yk_datatype *my_lhs = lhs->const_unwrap();
+  yk_datatype *my_rhs = rhs->const_unwrap();
   return (internal_is_identical_type(my_lhs, my_rhs)) && v(my_lhs) && v(my_rhs);
 }
 #define DT_MATCH(lhs, rhs, fnc)                                                \
   dt_match_ignore_const(lhs.datatype_, rhs.datatype_,                          \
-                        [](ykdatatype *a) { return fnc; })
+                        [](yk_datatype *a) { return fnc; })
 template<typename Verifier>
-bool dt_verify_ignore_const(ykdatatype *castable, ykdatatype *lhs,
-                            ykdatatype *rhs, Verifier v) {
-  ykdatatype *my_lhs = lhs->const_unwrap();
-  ykdatatype *my_rhs = rhs->const_unwrap();
+bool dt_verify_ignore_const(yk_datatype *castable, yk_datatype *lhs,
+                            yk_datatype *rhs, Verifier v) {
+  yk_datatype *my_lhs = lhs->const_unwrap();
+  yk_datatype *my_rhs = rhs->const_unwrap();
   return ((castable == nullptr && internal_is_identical_type(my_lhs, my_rhs) ||
            castable != nullptr) &&
           v(my_lhs) && v(my_rhs));
 }
 #define DT_VERIFY(castable, lhs, rhs, fnc)                                     \
   dt_verify_ignore_const(castable, lhs.datatype_, rhs.datatype_,               \
-                         [](ykdatatype *a) { return fnc; })
+                         [](yk_datatype *a) { return fnc; })
 template<typename Matcher>
-bool dt_either_match(ykdatatype *lhs, ykdatatype *rhs, Matcher m) {
+bool dt_either_match(yk_datatype *lhs, yk_datatype *rhs, Matcher m) {
   return m(lhs) || m(rhs);
 }
 #define EITHER_MATCH(lhs, rhs, fnc)                                            \
   dt_either_match(lhs.datatype_, rhs.datatype_,                                \
-                  [](ykdatatype *a) { return fnc; })
+                  [](yk_datatype *a) { return fnc; })
 void type_checker::visit_binary_expr(binary_expr *obj) {
   auto oper = obj->opr_->type_;
   obj->left_->accept(this);
@@ -172,7 +172,7 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
       if (castable != nullptr &&
           (DT_VERIFY(castable, lhs, rhs, (a->is_a_number() || a->is_bool())) ||
            DT_VERIFY(castable, lhs, rhs, (a->is_a_string())))) {
-        push(ykobject(castable));
+        push(yk_object(castable));
         return;
       }
       if (!(DT_MATCH(lhs, rhs, (a->is_a_number() || a->is_a_string())))) {
@@ -182,7 +182,7 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
               "is not a valid case of auto widening)");
       }
       if (lhs.datatype_->const_unwrap()->is_sr()) {// sr + sr -> str
-        push(ykobject(dt_pool_->create("str")));
+        push(yk_object(dt_pool_->create("str")));
         return;
       }
       break;
@@ -194,7 +194,7 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
       if (!(DT_VERIFY(castable, lhs, rhs, a->is_a_number()))) {
         error(obj->opr_, "< > <= >= operators work only for numbers");
       }
-      push(ykobject(dt_pool_->create("bool")));
+      push(yk_object(dt_pool_->create("bool")));
       return;
     case token_type::NOT_EQ:
     case token_type::EQ_EQ:
@@ -208,12 +208,12 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
       // Any 2 string data types can be compared due to auto type casting
       if (lhs.datatype_->const_unwrap()->is_a_string() &&
           rhs.datatype_->const_unwrap()->is_a_string()) {
-        push(ykobject(dt_pool_->create("bool")));
+        push(yk_object(dt_pool_->create("bool")));
         return;
       }
       if (lhs.datatype_->is_none() || rhs.datatype_->is_none()) {
         // can compare with array/anyptr/pointer/none/not primitive
-        ykdatatype *to_comp;
+        yk_datatype *to_comp;
         if (lhs.datatype_->is_none()) {
           to_comp = rhs.datatype_->const_unwrap();
         } else {
@@ -226,13 +226,13 @@ void type_checker::visit_binary_expr(binary_expr *obj) {
           error(obj->opr_, "Datatype cannot be compared with None");
           break;
         }
-        push(ykobject(dt_pool_->create("bool")));
+        push(yk_object(dt_pool_->create("bool")));
         return;
       }
       if (!(DT_MATCH(lhs, rhs, true))) {
         error(obj->opr_, "Cannot compare between two data types");
       }
-      push(ykobject(dt_pool_->create("bool")));
+      push(yk_object(dt_pool_->create("bool")));
       return;
     default:
       error(obj->opr_, "Unhandled boolean operator");
@@ -251,11 +251,11 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
             "Arguments for object creation is not supported");
     }
     auto class_name = name.string_val_;
-    ykobject data;
+    yk_object data;
     if (name.object_type_ == object_type::CLASS) {
-      data = ykobject(dt_pool_->create(class_name, filepath_));
+      data = yk_object(dt_pool_->create(class_name, filepath_));
     } else {
-      data = ykobject(dt_pool_->create(name.string_val_, name.module_file_));
+      data = yk_object(dt_pool_->create(name.string_val_, name.module_file_));
     }
     push(data);
     // Creating a custom object from user defined type / class;
@@ -264,7 +264,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   // Functions
   if (name.object_type_ == object_type::FUNCTION ||
       name.object_type_ == object_type::MODULE_FUNCTION) {
-    std::vector<ykobject> arguments{};
+    std::vector<yk_object> arguments{};
     for (auto arg : obj->args_) {
       arg->accept(this);
       arguments.push_back(pop());
@@ -281,7 +281,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
         !funct->annotations_.varargs_) {
       error(obj->paren_token_, "Too few or too "
                                "much arguments for function call");
-      push(ykobject(dt_pool_));// Push None here
+      push(yk_object(dt_pool_));// Push None here
       return;
     }
     if (!funct->params_.empty()) {
@@ -312,11 +312,11 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
         }
       }
     }
-    push(ykobject(funct->return_type_));
+    push(yk_object(funct->return_type_));
     return;
   }
   if (name.object_type_ == object_type::BUILTIN_FUNCTION) {
-    std::vector<ykobject> arguments{};
+    std::vector<yk_object> arguments{};
     for (auto arg : obj->args_) {
       arg->accept(this);
       arguments.push_back(pop());
@@ -327,7 +327,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     // Error when calling builtin, if so return None as data type
     if (result.object_type_ == object_type::ERROR_DETECTED) {
       error(obj->paren_token_, result.string_val_);
-      push(ykobject(dt_pool_));// Push None here
+      push(yk_object(dt_pool_));// Push None here
       return;
     }
     push(result);
@@ -335,7 +335,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   }
   // Callable function reference can be called
   if (name.datatype_->is_function()) {
-    std::vector<ykobject> arguments{};
+    std::vector<yk_object> arguments{};
     for (auto arg : obj->args_) {
       arg->accept(this);
       arguments.push_back(pop());
@@ -349,7 +349,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
       message << "Expected: " << params.size()
               << ", Provided: " << arguments.size();
       error(obj->paren_token_, message.str());
-      push(ykobject(dt_pool_));// Push None here
+      push(yk_object(dt_pool_));// Push None here
       return;
     }
     for (auto i = 0; i < params.size(); i++) {
@@ -366,9 +366,9 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     }
     auto ret_type = name.datatype_->args_[1];
     if (ret_type->args_.empty()) {
-      push(ykobject(dt_pool_));
+      push(yk_object(dt_pool_));
     } else {
-      push(ykobject(ret_type->args_[0]));
+      push(yk_object(ret_type->args_[0]));
     }
     return;
   }
@@ -383,7 +383,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   }
   message << " datatype: " << name.datatype_->as_string_simplified();
   error(obj->paren_token_, message.str());
-  push(ykobject(dt_pool_));// Push None here
+  push(yk_object(dt_pool_));// Push None here
 }
 void type_checker::visit_grouping_expr(grouping_expr *obj) {
   obj->expression_->accept(this);
@@ -391,58 +391,58 @@ void type_checker::visit_grouping_expr(grouping_expr *obj) {
   push(inside);
 }
 void type_checker::visit_literal_expr(literal_expr *obj) {
-  auto data = ykobject(dt_pool_);
+  auto data = yk_object(dt_pool_);
   auto literal_type = obj->literal_token_->type_;
   if (literal_type == token_type::STRING ||
       literal_type == token_type::THREE_QUOTE_STRING) {
-    data = ykobject(obj->literal_token_->token_, dt_pool_);
+    data = yk_object(obj->literal_token_->token_, dt_pool_);
   } else if (literal_type == token_type::KEYWORD_TRUE ||
              literal_type == token_type::KEYWORD_FALSE) {
-    data = ykobject(true, dt_pool_);
+    data = yk_object(true, dt_pool_);
   } else if (literal_type == token_type::INTEGER_BIN ||
              literal_type == token_type::INTEGER_OCT ||
              literal_type == token_type::INTEGER_DECIMAL ||
              literal_type == token_type::INTEGER_HEX) {
-    data = ykobject(dt_pool_->create("int"));
+    data = yk_object(dt_pool_->create("int"));
   } else if (literal_type == token_type::INTEGER_BIN_8 ||
              literal_type == token_type::INTEGER_OCT_8 ||
              literal_type == token_type::INTEGER_DECIMAL_8 ||
              literal_type == token_type::INTEGER_HEX_8) {
-    data = ykobject(dt_pool_->create("i8"));
+    data = yk_object(dt_pool_->create("i8"));
   } else if (literal_type == token_type::INTEGER_BIN_16 ||
              literal_type == token_type::INTEGER_OCT_16 ||
              literal_type == token_type::INTEGER_DECIMAL_16 ||
              literal_type == token_type::INTEGER_HEX_16) {
-    data = ykobject(dt_pool_->create("i16"));
+    data = yk_object(dt_pool_->create("i16"));
   } else if (literal_type == token_type::INTEGER_BIN_64 ||
              literal_type == token_type::INTEGER_OCT_64 ||
              literal_type == token_type::INTEGER_DECIMAL_64 ||
              literal_type == token_type::INTEGER_HEX_64) {
-    data = ykobject(dt_pool_->create("i64"));
+    data = yk_object(dt_pool_->create("i64"));
   } else if (literal_type == token_type::UINTEGER_BIN ||
              literal_type == token_type::UINTEGER_OCT ||
              literal_type == token_type::UINTEGER_DECIMAL ||
              literal_type == token_type::UINTEGER_HEX) {
-    data = ykobject(dt_pool_->create("u32"));
+    data = yk_object(dt_pool_->create("u32"));
   } else if (literal_type == token_type::UINTEGER_BIN_8 ||
              literal_type == token_type::UINTEGER_OCT_8 ||
              literal_type == token_type::UINTEGER_DECIMAL_8 ||
              literal_type == token_type::UINTEGER_HEX_8) {
-    data = ykobject(dt_pool_->create("u8"));
+    data = yk_object(dt_pool_->create("u8"));
   } else if (literal_type == token_type::UINTEGER_BIN_16 ||
              literal_type == token_type::UINTEGER_OCT_16 ||
              literal_type == token_type::UINTEGER_DECIMAL_16 ||
              literal_type == token_type::UINTEGER_HEX_16) {
-    data = ykobject(dt_pool_->create("u16"));
+    data = yk_object(dt_pool_->create("u16"));
   } else if (literal_type == token_type::UINTEGER_BIN_64 ||
              literal_type == token_type::UINTEGER_OCT_64 ||
              literal_type == token_type::UINTEGER_DECIMAL_64 ||
              literal_type == token_type::UINTEGER_HEX_64) {
-    data = ykobject(dt_pool_->create("u64"));
+    data = yk_object(dt_pool_->create("u64"));
   } else if (literal_type == token_type::DOUBLE_NUMBER) {
-    data = ykobject(1.2, dt_pool_);
+    data = yk_object(1.2, dt_pool_);
   } else if (literal_type == token_type::FLOAT_NUMBER) {
-    data = ykobject((float) 1.2f, dt_pool_);
+    data = yk_object((float) 1.2f, dt_pool_);
   }// else - none data type by default
   push(data);
 }
@@ -492,7 +492,7 @@ void type_checker::visit_unary_expr(unary_expr *obj) {
 void type_checker::visit_variable_expr(variable_expr *obj) {
   auto name = obj->name_->token_;
   if (builtins_.has_builtin(name)) {
-    auto b = ykobject(dt_pool_);
+    auto b = yk_object(dt_pool_);
     b.object_type_ = object_type::BUILTIN_FUNCTION;
     b.string_val_ = name;
     push(b);
@@ -502,7 +502,7 @@ void type_checker::visit_variable_expr(variable_expr *obj) {
     std::stringstream message{};
     message << "Undefined name: '" << name << "'";
     error(obj->name_, message.str());
-    push(ykobject(dt_pool_));
+    push(yk_object(dt_pool_));
     return;
   }
   auto value = scope_.get(name);
@@ -540,7 +540,7 @@ void type_checker::visit_def_stmt(def_stmt *obj) {
       message << "Parameter shadows outer scope name: " << name;
       error(param.name_, message.str());
     } else {
-      auto data = ykobject(param.data_type_);
+      auto data = yk_object(param.data_type_);
       scope_.define(name, data);
     }
   }
@@ -648,7 +648,7 @@ void type_checker::visit_let_stmt(let_stmt *obj) {
   if (obj->data_type_->is_none()) {
     error(obj->name_, "Cannot use None as a data type here");
   }
-  auto placeholder = ykobject(obj->data_type_);
+  auto placeholder = yk_object(obj->data_type_);
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto expression_data = pop();
@@ -662,7 +662,7 @@ void type_checker::visit_pass_stmt(pass_stmt *obj) {
 void type_checker::visit_return_stmt(return_stmt *obj) {
   std::stringstream message{};
   auto function_name = peek_function();
-  ykobject return_data_type = ykobject(dt_pool_);
+  yk_object return_data_type = yk_object(dt_pool_);
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     return_data_type = pop();
@@ -706,25 +706,25 @@ void type_checker::check(const std::vector<stmt *> &statements) {
       error(function_definition->name_,
             "Number of parameters cannot be larger than 100.");
     }
-    auto function_placeholder_object = ykobject(dt_pool_);
+    auto function_placeholder_object = yk_object(dt_pool_);
     function_placeholder_object.object_type_ = object_type::FUNCTION;
     scope_.define_global(name, function_placeholder_object);
   }
   // Define classes
   for (const auto &class_name : defs_classes_->class_names_) {
-    auto class_placeholder_object = ykobject(dt_pool_);
+    auto class_placeholder_object = yk_object(dt_pool_);
     class_placeholder_object.object_type_ = object_type::CLASS;
     scope_.define_global(class_name, class_placeholder_object);
   }
   // Define global constants
   for (const auto &constant_name : defs_classes_->global_const_names_) {
     auto constant_definition = defs_classes_->get_const(constant_name);
-    auto placeholder_object = ykobject(constant_definition->data_type_);
+    auto placeholder_object = yk_object(constant_definition->data_type_);
     scope_.define_global(constant_name, placeholder_object);
   }
   for (const auto &constant_name : defs_classes_->global_native_const_names_) {
     auto constant_definition = defs_classes_->get_native_const(constant_name);
-    auto placeholder_object = ykobject(constant_definition->data_type_);
+    auto placeholder_object = yk_object(constant_definition->data_type_);
     scope_.define_global(constant_name, placeholder_object);
   }
   // Visit all statements
@@ -739,11 +739,11 @@ void type_checker::error(const std::string &message) {
   err.token_set_ = false;
   errors_.emplace_back(err);
 }
-void type_checker::push(const ykobject &data_type) {
+void type_checker::push(const yk_object &data_type) {
   this->object_stack_.push_back(data_type);
 }
-ykobject type_checker::pop() {
-  if (this->object_stack_.empty()) { return ykobject(dt_pool_); }
+yk_object type_checker::pop() {
+  if (this->object_stack_.empty()) { return yk_object(dt_pool_); }
   auto back = object_stack_.back();
   object_stack_.pop_back();
   return back;
@@ -786,7 +786,7 @@ void type_checker::visit_class_stmt(class_stmt *obj) {
 void type_checker::visit_del_stmt(del_stmt *obj) {
   obj->expression_->accept(this);
   auto deletable_expression = pop();
-  ykdatatype *dt = deletable_expression.datatype_->const_unwrap();
+  yk_datatype *dt = deletable_expression.datatype_->const_unwrap();
   // Cannot delete int, bool. But we can delete sr and str
   if (deletable_expression.is_primitive_or_obj() && dt->is_primitive() &&
       !dt->is_str() && !dt->is_sr()) {
@@ -825,7 +825,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
     bool has_const = imported->data_->dsv_->has_const(member_item->token_);
     bool has_native_const =
         imported->data_->dsv_->has_native_const(member_item->token_);
-    auto obj = ykobject(dt_pool_);
+    auto obj = yk_object(dt_pool_);
     if (has_class) {
       obj.object_type_ = object_type::MODULE_CLASS;
       /* for io.open */
@@ -838,7 +838,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
       obj.module_file_ = lhs.string_val_;
       obj.module_name_ = lhs.module_name_;
     } else if (has_const || has_native_const) {
-      ykdatatype *dt;
+      yk_datatype *dt;
       if (has_const) {
         auto glob = imported->data_->dsv_->get_const(member_item->token_);
         dt = glob->data_type_;
@@ -865,7 +865,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
   if (!lhs.is_primitive_or_obj() ||
       lhs.datatype_->const_unwrap()->is_primitive()) {
     error(dot, "Invalid dot operator, LHS need to be an object");
-    push(ykobject(dt_pool_));
+    push(yk_object(dt_pool_));
     return;
   }
   auto item = member_item->token_;
@@ -880,7 +880,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
       for (const auto &member : class_->members_) {
         if (item == member.name_->token_) {
           // Found the member
-          auto placeholder = ykobject(dt_pool_);
+          auto placeholder = yk_object(dt_pool_);
           placeholder.datatype_ = member.data_type_;
           push(placeholder);
           return;
@@ -905,7 +905,7 @@ void type_checker::handle_dot_operator(expr *lhs_expr, token *dot,
                      "meant?");
     }
   }
-  push(ykobject(dt_pool_));
+  push(yk_object(dt_pool_));
 }
 void type_checker::visit_set_expr(set_expr *obj) {
   handle_dot_operator(obj->lhs_, obj->dot_, obj->item_);
@@ -926,15 +926,15 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
   index_expr->accept(this);
   auto index_exp = pop();
   if (!index_exp.datatype_->is_an_integer()) {
-    push(ykobject(dt_pool_));
+    push(yk_object(dt_pool_));
     error(sqb_token, "Invalid index expression, must be of a valid integer");
   }
   name_expr->accept(this);
   auto arr_var = pop();
-  ykdatatype *arr_data_type = arr_var.datatype_->const_unwrap();
+  yk_datatype *arr_data_type = arr_var.datatype_->const_unwrap();
   if (arr_data_type->is_array() || arr_data_type->is_ptr() ||
       arr_data_type->is_fixed_size_array()) {
-    auto placeholder = ykobject(dt_pool_);
+    auto placeholder = yk_object(dt_pool_);
     placeholder.datatype_ = arr_data_type->args_[0];
     // --- OK ---
     push(placeholder);
@@ -945,7 +945,7 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
   }
   if (arr_data_type->is_tuple()) {
     if (index_expr->get_type() != ast_type::EXPR_LITERAL) {
-      push(ykobject(dt_pool_));
+      push(yk_object(dt_pool_));
       error(sqb_token, "Must use a literal for accessing tuple elements");
       return;
     }
@@ -954,7 +954,7 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
     //   We should be able to also use a const time expression for tuple access as well.
     //   current behaviour is annoying, but it's fine for now.
     if (lexp->literal_token_->type_ != token_type::INTEGER_DECIMAL) {
-      push(ykobject(dt_pool_));
+      push(yk_object(dt_pool_));
       error(sqb_token,
             "Must use a integer decimal literal for accessing tuple elements");
       return;
@@ -962,11 +962,11 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
     auto item = lexp->literal_token_->token_;
     auto index = std::stoi(item);
     if (index < 0 || index >= arr_data_type->args_.size()) {
-      push(ykobject(dt_pool_));
+      push(yk_object(dt_pool_));
       error(sqb_token, "Tuple index out of bounds");
       return;
     }
-    auto placeholder = ykobject(dt_pool_);
+    auto placeholder = yk_object(dt_pool_);
     placeholder.datatype_ = arr_data_type->args_[index];
     // --- OK ---
     push(placeholder);
@@ -975,7 +975,7 @@ void type_checker::handle_square_access(expr *index_expr, token *sqb_token,
     }
     return;
   }
-  push(ykobject(dt_pool_));
+  push(yk_object(dt_pool_));
   error(sqb_token, "Not an array");
 }
 void type_checker::visit_assign_arr_expr(assign_arr_expr *obj) {
@@ -985,8 +985,8 @@ void type_checker::visit_assign_arr_expr(assign_arr_expr *obj) {
   auto rhs = pop();
   handle_assigns(obj->opr_, lhs, rhs);
 }
-void type_checker::handle_assigns(token *oper, const ykobject &lhs,
-                                  const ykobject &rhs) {
+void type_checker::handle_assigns(token *oper, const yk_object &lhs,
+                                  const yk_object &rhs) {
   std::stringstream message{};
   if (lhs.datatype_->const_unwrap()->is_fixed_size_array()) {
     // TODO: add support for assign to fixed array without overflowing.
@@ -1015,7 +1015,7 @@ void type_checker::handle_assigns(token *oper, const ykobject &lhs,
       !slot_match_with_result(lhs.datatype_, rhs).matched_) {
     message << "You can only assign a matching function. lhs: ";
     message << lhs.datatype_->as_string_simplified();
-    ykdatatype *arg_datatype = function_to_datatype_or_null(rhs);
+    yk_datatype *arg_datatype = function_to_datatype_or_null(rhs);
     message << ", rhs: ";
     if (arg_datatype != nullptr) {
       message << arg_datatype->as_string_simplified();
@@ -1099,11 +1099,11 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
     error(obj->name_, "Need a value for the constant");
   }
   auto name = obj->name_->token_;
-  auto placeholder = ykobject(obj->data_type_);
+  auto placeholder = yk_object(obj->data_type_);
   if (obj->expression_ != nullptr) {
     obj->expression_->accept(this);
     auto expression_data = pop();
-    ykdatatype *expression_dt = expression_data.datatype_->const_unwrap();
+    yk_datatype *expression_dt = expression_data.datatype_->const_unwrap();
     if (obj->data_type_->args_[0]->is_sr() &&
         !expression_dt->is_string_literal() && scope_.is_global_level()) {
       error(obj->name_, "Const[sr] must use a string literal at the RHS.");
@@ -1122,16 +1122,16 @@ void type_checker::visit_const_stmt(const_stmt *obj) {
   // If this is not a global constant define it
   if (!scope_.is_global_level()) { scope_.define(name, placeholder); }
 }
-bool type_checker::is_identical_type(ykdatatype *required_datatype,
-                                     ykdatatype *provided_datatype) {
+bool type_checker::is_identical_type(yk_datatype *required_datatype,
+                                     yk_datatype *provided_datatype) {
   return internal_is_identical_type(required_datatype, provided_datatype);
 }
-bool type_checker::is_not_identical_type(ykdatatype *required_datatype,
-                                         ykdatatype *provided_datatype) {
+bool type_checker::is_not_identical_type(yk_datatype *required_datatype,
+                                         yk_datatype *provided_datatype) {
   return !is_identical_type(required_datatype, provided_datatype);
 }
-type_match_result type_checker::type_match(ykdatatype *required_datatype,
-                                           ykdatatype *provided_datatype,
+type_match_result type_checker::type_match(yk_datatype *required_datatype,
+                                           yk_datatype *provided_datatype,
                                            bool primitive_or_obj) {
   // Identical types match
   if (primitive_or_obj &&
@@ -1164,8 +1164,8 @@ type_match_result type_checker::type_match(ykdatatype *required_datatype,
   return type_match_result{message.str(), false, false};
 }
 type_match_result
-type_checker::slot_match_with_result(ykdatatype *datatype,
-                                     const ykobject &provided_arg) {
+type_checker::slot_match_with_result(yk_datatype *datatype,
+                                     const yk_object &provided_arg) {
   std::stringstream message{};
   // If we passed in a builtin function to an argument then we cannot use that
   //  error out as this is not allowed
@@ -1178,7 +1178,7 @@ type_checker::slot_match_with_result(ykdatatype *datatype,
   }
   // Type check for function passed as is
   if (provided_arg.is_a_function() && datatype->is_function()) {
-    ykdatatype *arg_datatype = function_to_datatype_or_null(provided_arg);
+    yk_datatype *arg_datatype = function_to_datatype_or_null(provided_arg);
     if (arg_datatype != nullptr) {
       return type_match(datatype, arg_datatype, true);
     } else {
@@ -1199,15 +1199,15 @@ type_checker::slot_match_with_result(ykdatatype *datatype,
   return type_match(datatype, provided_arg.datatype_,
                     provided_arg.is_primitive_or_obj());
 }
-type_match_result type_checker::rvalue_match(const ykobject &left_side,
-                                             const ykobject &right_side) {
+type_match_result type_checker::rvalue_match(const yk_object &left_side,
+                                             const yk_object &right_side) {
   std::stringstream message{};
   if (left_side.is_a_function() && right_side.is_a_function()) {
-    ykdatatype *lhs = function_to_datatype_or_null(left_side);
-    ykdatatype *rhs = function_to_datatype_or_null(right_side);
+    yk_datatype *lhs = function_to_datatype_or_null(left_side);
+    yk_datatype *rhs = function_to_datatype_or_null(right_side);
     if (lhs != nullptr && rhs != nullptr) { return type_match(lhs, rhs, true); }
   } else if (left_side.is_a_function()) {
-    ykdatatype *lhs = function_to_datatype_or_null(left_side);
+    yk_datatype *lhs = function_to_datatype_or_null(left_side);
     if (lhs == nullptr) {
       message << "Invalid function pointer provided. Expected: ";
       message << left_side.datatype_->as_string_simplified();
@@ -1215,7 +1215,7 @@ type_match_result type_checker::rvalue_match(const ykobject &left_side,
     }
     return slot_match_with_result(lhs, right_side);
   } else if (right_side.is_a_function()) {
-    ykdatatype *rhs = function_to_datatype_or_null(right_side);
+    yk_datatype *rhs = function_to_datatype_or_null(right_side);
     if (rhs == nullptr) {
       message << "Invalid function pointer provided. Expected: ";
       message << left_side.datatype_->as_string_simplified();
@@ -1227,7 +1227,7 @@ type_match_result type_checker::rvalue_match(const ykobject &left_side,
                     right_side.datatype_->const_unwrap(),
                     right_side.is_primitive_or_obj());
 }
-ykdatatype *type_checker::function_to_datatype_or_null(const ykobject &arg) {
+yk_datatype *type_checker::function_to_datatype_or_null(const yk_object &arg) {
   def_stmt *funct;
   if (arg.object_type_ == object_type::FUNCTION) {
     funct = defs_classes_->get_function(arg.string_val_);
@@ -1247,9 +1247,9 @@ ykdatatype *type_checker::function_to_datatype_or_null(const ykobject &arg) {
     return nullptr;
   }
   // Create datatype out of function
-  ykdatatype *fnc = dt_pool_->create("Function");
-  ykdatatype *fin = dt_pool_->create("In");
-  ykdatatype *fout = dt_pool_->create("Out");
+  yk_datatype *fnc = dt_pool_->create("Function");
+  yk_datatype *fin = dt_pool_->create("In");
+  yk_datatype *fout = dt_pool_->create("Out");
   fnc->args_.emplace_back(fin);
   fnc->args_.emplace_back(fout);
   for (auto current_param : funct->params_) {
@@ -1266,7 +1266,7 @@ void type_checker::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {
 }
 void type_checker::visit_nativeconst_stmt(nativeconst_stmt *obj) {
   if (!scope_.is_global_level()) {
-    scope_.define(obj->name_->token_, ykobject(obj->data_type_));
+    scope_.define(obj->name_->token_, yk_object(obj->data_type_));
   }
 }
 void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
@@ -1313,7 +1313,7 @@ void type_checker::visit_foreach_stmt(foreach_stmt *obj) {
   }
   push_scope_type(ast_type::STMT_WHILE);
   scope_.push();
-  scope_.define(obj->name_->token_, ykobject(obj->data_type_));
+  scope_.define(obj->name_->token_, yk_object(obj->data_type_));
   obj->for_body_->accept(this);
   scope_.pop();
   pop_scope_type();
@@ -1330,7 +1330,7 @@ void type_checker::visit_compins_stmt(compins_stmt *obj) {
   // Does not need to be type checked at the moment
 }
 class_stmt *type_checker::find_class_or_null(token *tok,
-                                             ykdatatype *data_type) {
+                                             yk_datatype *data_type) {
   // If this is a primitive / builtin it is not a user defined class
   if (data_type->const_unwrap()->is_builtin_or_primitive()) {
     error(tok, "Primitives/builtins cannot be created as a struct literal");
@@ -1349,7 +1349,7 @@ class_stmt *type_checker::find_class_or_null(token *tok,
 }
 void type_checker::validate_member(name_val &member, class_stmt *class_st) {
   std::stringstream message{};
-  ykdatatype *class_member_dt = nullptr;
+  yk_datatype *class_member_dt = nullptr;
   std::vector<std::string> members{};
   for (auto const &para : class_st->members_) {
     if (para.name_->token_ == member.name_->token_) {
@@ -1368,7 +1368,7 @@ void type_checker::validate_member(name_val &member, class_stmt *class_st) {
   }
   member.value_->accept(this);
   auto set_value = pop();
-  ykdatatype *member_dt = set_value.datatype_->const_unwrap();
+  yk_datatype *member_dt = set_value.datatype_->const_unwrap();
   auto match = type_match(class_member_dt, member_dt, true);
   if (!match.matched_) {
     message << "Member '" << member.name_->token_
@@ -1384,11 +1384,11 @@ void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
   if (dt_class.object_type_ == object_type::CLASS ||
       dt_class.object_type_ == object_type::MODULE_CLASS) {
     auto class_name = dt_class.string_val_;
-    ykobject data;
+    yk_object data;
     if (dt_class.object_type_ == object_type::CLASS) {
-      data = ykobject(dt_pool_->create(class_name, filepath_));
+      data = yk_object(dt_pool_->create(class_name, filepath_));
     } else {
-      data = ykobject(
+      data = yk_object(
           dt_pool_->create(dt_class.string_val_, dt_class.module_file_));
     }
     /* ----------------------------------------- */
@@ -1407,7 +1407,7 @@ void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
     auto class_stmt = find_class_or_null(obj->curly_open_, data.datatype_);
     if (class_stmt == nullptr) {
       // Note error is created in find_class, so no need to do it again here
-      push(ykobject(dt_pool_));
+      push(yk_object(dt_pool_));
       return;
     }
     for (auto &member : obj->values_) { validate_member(member, class_stmt); }

@@ -94,15 +94,15 @@ namespace yaksha {
 private:
     file_info *main_;
     std::vector<file_info *> import_stack_{};
-    std::vector<ykobject> object_stack_{};
-    void visit_data_type(ykdatatype *dt, token *token_for_err);
+    std::vector<yk_object> object_stack_{};
+    void visit_data_type(yk_datatype *dt, token *token_for_err);
     void error(token *t, std::string message);
     std::pair<import_stmt *, bool>
     find_import(std::string &filepath,
                 std::vector<import_stmt *> &import_statements);
     file_info *peek_file_info();
-    ykobject pop_object();
-    void push_object(const ykobject &lhs);
+    yk_object pop_object();
+    void push_object(const yk_object &lhs);
     void push_import(const import_stmt *import_st);
     void pop_import();
   };

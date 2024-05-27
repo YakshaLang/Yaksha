@@ -108,16 +108,16 @@ namespace yaksha {
     ERROR_DETECTED,
     UNKNOWN_OBJECT
   };
-  struct ykobject {
-    ykobject();
-    explicit ykobject(const_fold_context *cfc);
-    explicit ykobject(ykdatatype *dt);
-    explicit ykobject(int i, ykdt_pool *pool);
-    explicit ykobject(bool b, ykdt_pool *pool);
-    explicit ykobject(std::string str, ykdt_pool *pool);
-    explicit ykobject(double dbl, ykdt_pool *pool);
-    explicit ykobject(float dbl, ykdt_pool *pool);
-    explicit ykobject(ykdt_pool *pool);
+  struct yk_object {
+    yk_object();
+    explicit yk_object(const_fold_context *cfc);
+    explicit yk_object(yk_datatype *dt);
+    explicit yk_object(int i, yk_datatype_pool *pool);
+    explicit yk_object(bool b, yk_datatype_pool *pool);
+    explicit yk_object(std::string str, yk_datatype_pool *pool);
+    explicit yk_object(double dbl, yk_datatype_pool *pool);
+    explicit yk_object(float dbl, yk_datatype_pool *pool);
+    explicit yk_object(yk_datatype_pool *pool);
     [[nodiscard]] bool is_primitive_or_obj() const;
     [[nodiscard]] bool is_a_function() const;
     std::string string_val_{};
@@ -126,7 +126,7 @@ namespace yaksha {
     bool desugar_rewrite_needed_{false};
     std::string desugar_rewrite_{};
     object_type object_type_{object_type::PRIMITIVE_OR_OBJ};
-    ykdatatype *datatype_{nullptr};
+    yk_datatype *datatype_{nullptr};
     const_fold_context *fold_context_{nullptr};
   };
 }// namespace yaksha

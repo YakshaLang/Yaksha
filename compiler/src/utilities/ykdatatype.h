@@ -89,15 +89,16 @@ namespace yaksha {
     FIXED_ARRAY,
     DIMENSION,// ----- special metadata
   };
-  struct ykdt_pool;
-  struct ykdatatype {
-    explicit ykdatatype(token *primitive_dt);
-    explicit ykdatatype(std::string primitive_dt);
-    explicit ykdatatype(std::string primitive_dt, std::string module);
-    ~ykdatatype();
-    [[nodiscard]] ykdatatype *const_unwrap();
-    [[nodiscard]] ykdatatype *auto_cast(ykdatatype *rhs, ykdt_pool *pool,
-                                        bool lhs_mutates, bool assignment);
+  struct yk_datatype_pool;
+  struct yk_datatype {
+    explicit yk_datatype(token *primitive_dt);
+    explicit yk_datatype(std::string primitive_dt);
+    explicit yk_datatype(std::string primitive_dt, std::string module);
+    ~yk_datatype();
+    [[nodiscard]] yk_datatype *const_unwrap();
+    [[nodiscard]] yk_datatype *auto_cast(yk_datatype *rhs,
+                                         yk_datatype_pool *pool,
+                                         bool lhs_mutates, bool assignment);
     [[nodiscard]] std::string as_string() const;
     [[nodiscard]] std::string as_string_simplified() const;
     // meta type
@@ -149,7 +150,7 @@ namespace yaksha {
     token *token_{};
     std::string type_{};
     std::string module_{};
-    std::vector<ykdatatype *> args_;
+    std::vector<yk_datatype *> args_;
     int dimension_{-1};
     yk_primitive primitive_type_{yk_primitive::NOT_A_PRIMITIVE};
     yk_builtin builtin_type_{yk_builtin::NOT_A_BUILTIN};
@@ -163,7 +164,7 @@ private:
     void write_to_str(std::stringstream &s, bool write_mod = true) const;
     void find_builtin_or_primitive();
   };
-  bool internal_is_identical_type(ykdatatype *required_datatype,
-                                  ykdatatype *provided_datatype);
+  bool internal_is_identical_type(yk_datatype *required_datatype,
+                                  yk_datatype *provided_datatype);
 }// namespace yaksha
 #endif

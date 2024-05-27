@@ -53,9 +53,9 @@ namespace yaksha {
   };
   struct structure_definition {
     /** The datatype of the structure */
-    [[maybe_unused]] ykdatatype *dt_{nullptr};
-    [[maybe_unused]] ykdatatype *a_{nullptr};
-    [[maybe_unused]] ykdatatype *b_{nullptr};
+    [[maybe_unused]] yk_datatype *dt_{nullptr};
+    [[maybe_unused]] yk_datatype *a_{nullptr};
+    [[maybe_unused]] yk_datatype *b_{nullptr};
     /** If this is a structure (struct/class), this will be set */
     [[maybe_unused]] class_stmt *class_stmt_or_null_{nullptr};
     /** Prefixed name or nice name for the structure: yt_arr_1*/
@@ -77,16 +77,16 @@ namespace yaksha {
     [[maybe_unused]] bool permanent_mark_{false};
   };
   struct entry_struct_func_compiler {
-    explicit entry_struct_func_compiler(ykdt_pool *pool);
-    std::string compile(ykdatatype *entry_dt, datatype_compiler *dtc);
-    std::string compile_tuple(ykdatatype *tuple_dt, datatype_compiler *dtc);
-    std::string compile_function_dt(ykdatatype *function_dt,
+    explicit entry_struct_func_compiler(yk_datatype_pool *pool);
+    std::string compile(yk_datatype *entry_dt, datatype_compiler *dtc);
+    std::string compile_tuple(yk_datatype *tuple_dt, datatype_compiler *dtc);
+    std::string compile_function_dt(yk_datatype *function_dt,
                                     datatype_compiler *dtc);
     std::string compile_binary_data(const std::string &data);
-    std::string compile_fixed_array(ykdatatype *fixed_array_dt,
+    std::string compile_fixed_array(yk_datatype *fixed_array_dt,
                                     datatype_compiler *dtc);
     void register_structure(const std::string &prefixed_name,
-                            ykdatatype *class_dt, class_stmt *class_statement,
+                            yk_datatype *class_dt, class_stmt *class_statement,
                             datatype_compiler *dtc,
                             const std::string &member_prefix);
     void compile_binary_data_to(std::stringstream &target);
@@ -105,7 +105,7 @@ private:
         name_improvements_;
     std::unordered_map<std::string, std::string> reverse_name_improvements_;
     // ------------------------------------------------
-    ykdt_pool *pool_;
+    yk_datatype_pool *pool_;
     int counter_;
     std::unordered_map<std::string /* fully qualified data type */,
                        structure_definition *>
@@ -117,7 +117,7 @@ private:
     std::stringstream bin_data_;
     bool visit(structure_definition *n,
                std::vector<structure_definition *> &sorted);
-    bool visit(ykdatatype *data, std::vector<structure_definition *> &sorted);
+    bool visit(yk_datatype *data, std::vector<structure_definition *> &sorted);
   };
 }// namespace yaksha
 #endif

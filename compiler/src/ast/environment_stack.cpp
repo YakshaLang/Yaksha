@@ -40,7 +40,7 @@
 #include "environment_stack.h"
 #include <utility>
 using namespace yaksha;
-environment_stack::environment_stack(ykdt_pool *pool) : pool_(pool) {
+environment_stack::environment_stack(yk_datatype_pool *pool) : pool_(pool) {
   // Create global environment
   scope_stack_.emplace_back(environment());
 };
@@ -55,13 +55,13 @@ bool environment_stack::is_defined(const std::string &name) {
   }
   return false;
 }
-void environment_stack::define(const std::string &name, ykobject data) {
+void environment_stack::define(const std::string &name, yk_object data) {
   peek().define(name, data);
 }
-void environment_stack::define_global(const std::string &name, ykobject data) {
+void environment_stack::define_global(const std::string &name, yk_object data) {
   scope_stack_.front().define(name, std::move(data));
 }
-void environment_stack::assign(const std::string &name, ykobject data) {
+void environment_stack::assign(const std::string &name, yk_object data) {
   if (peek().is_defined(name)) {
     peek().assign(name, data);
     return;
@@ -73,7 +73,7 @@ void environment_stack::assign(const std::string &name, ykobject data) {
     }
   }
 }
-ykobject environment_stack::get(const std::string &name) {
+yk_object environment_stack::get(const std::string &name) {
   if (scope_stack_.front().is_defined(name)) {
     return scope_stack_.front().get(name);
   }
@@ -81,7 +81,7 @@ ykobject environment_stack::get(const std::string &name) {
   for (auto stack : scope_stack_) {
     if (stack.is_defined(name)) { return stack.get(name); }
   }
-  return ykobject(pool_);
+  return yk_object(pool_);
 }
 void environment_stack::push() { scope_stack_.emplace_back(environment()); }
 void environment_stack::pop() {

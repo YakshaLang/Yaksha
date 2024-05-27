@@ -47,11 +47,11 @@ const std::vector<std::pair<std::string, std::string>> REPLACEMENTS = {
     {"_s_pair_", "_pair_str_"},
     {"fixed_arr", "arr"}};
 using namespace yaksha;
-entry_struct_func_compiler::entry_struct_func_compiler(ykdt_pool *pool)
+entry_struct_func_compiler::entry_struct_func_compiler(yk_datatype_pool *pool)
     : pool_(pool), counter_(0), counter_bin_data_(0), autogen_bin_data_(),
       bin_data_(), name_improvements_(), errors_(), structure_pool_(),
       structures_(), reverse_name_improvements_() {}
-std::string entry_struct_func_compiler::compile(ykdatatype *entry_dt,
+std::string entry_struct_func_compiler::compile(yk_datatype *entry_dt,
                                                 datatype_compiler *dtc) {
   std::string repr = entry_dt->as_string();
   std::string simple_repr = entry_dt->as_string_simplified();
@@ -139,7 +139,7 @@ void entry_struct_func_compiler::compile_structures(std::stringstream &target) {
 #define CONSIDER_CYCLE(x)                                                      \
   if (x) { return true; }
 bool entry_struct_func_compiler::visit(
-    ykdatatype *data, std::vector<structure_definition *> &sorted) {
+    yk_datatype *data, std::vector<structure_definition *> &sorted) {
   if (data == nullptr) { return false; }
   // These are builtins, no need to visit these
   if (data->is_primitive() || data->is_any_ptr() ||
@@ -183,7 +183,7 @@ bool entry_struct_func_compiler::visit(
   return false;
 }
 std::string
-entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
+entry_struct_func_compiler::compile_function_dt(yk_datatype *function_dt,
                                                 datatype_compiler *dtc) {
   std::string repr = function_dt->as_string();
   std::string simple_repr = function_dt->as_string_simplified();
@@ -242,7 +242,7 @@ entry_struct_func_compiler::compile_function_dt(ykdatatype *function_dt,
   structure_pool_.push_back(d);
   return name;
 }
-std::string entry_struct_func_compiler::compile_tuple(ykdatatype *tuple_dt,
+std::string entry_struct_func_compiler::compile_tuple(yk_datatype *tuple_dt,
                                                       datatype_compiler *dtc) {
   std::string repr = tuple_dt->as_string();
   std::string simple_repr = tuple_dt->as_string_simplified();
@@ -259,7 +259,7 @@ std::string entry_struct_func_compiler::compile_tuple(ykdatatype *tuple_dt,
       improve_name(repr, simple_repr, "yktuple" + std::to_string(d->id_));
   code << "struct " << name << " {";
   size_t i = 1;
-  for (ykdatatype *dt_arg : d->dt_->args_) {
+  for (yk_datatype *dt_arg : d->dt_->args_) {
     code << " " << dtc->convert_dt(dt_arg, datatype_location::STRUCT, "", "")
          << " e" << i << ";";
     i++;
@@ -310,7 +310,7 @@ void entry_struct_func_compiler::compile_binary_data_to(
   target << bin_data_.str();
 }
 std::string
-entry_struct_func_compiler::compile_fixed_array(ykdatatype *fixed_array_dt,
+entry_struct_func_compiler::compile_fixed_array(yk_datatype *fixed_array_dt,
                                                 datatype_compiler *dtc) {
   std::string repr = fixed_array_dt->as_string();
   std::string simple_repr = fixed_array_dt->as_string_simplified();
@@ -411,7 +411,7 @@ std::string entry_struct_func_compiler::improve_name(
   return improved;
 }
 void entry_struct_func_compiler::register_structure(
-    const std::string &prefixed_name, ykdatatype *class_dt,
+    const std::string &prefixed_name, yk_datatype *class_dt,
     class_stmt *class_statement, datatype_compiler *dtc,
     const std::string &member_prefix) {
   std::string repr = class_dt->as_string();

@@ -56,7 +56,7 @@ namespace yaksha {
    * Handle verifying and checking built in types
    */
   struct builtins : datatype_parser {
-    explicit builtins(ykdt_pool *dt_pool, gc_pool<token> *token_pool);
+    explicit builtins(yk_datatype_pool *dt_pool, gc_pool<token> *token_pool);
     ~builtins() override;
     /**
      * Is this name a valid builtin
@@ -72,8 +72,8 @@ namespace yaksha {
      * @param import_aliases import aliases in current file
      * @return return type, if this is a runtime error something is wrong
      */
-    ykobject
-    verify(const std::string &name, const std::vector<ykobject> &args,
+    yk_object
+    verify(const std::string &name, const std::vector<yk_object> &args,
            const std::vector<expr *> &arg_expressions,
            const std::unordered_map<std::string, import_stmt *> &import_aliases,
            const std::string &filepath, slot_matcher *dt_slot_matcher,
@@ -88,9 +88,9 @@ namespace yaksha {
      * @param import_aliases import aliases in current file
      * @return compiled code + return type
      */
-    std::pair<std::string, ykobject> compile(
+    std::pair<std::string, yk_object> compile(
         const std::string &name,
-        const std::vector<std::pair<std::string, ykobject>> &args,
+        const std::vector<std::pair<std::string, yk_object>> &args,
         const std::vector<expr *> &arg_expressions,
         datatype_compiler *dt_compiler,
         const std::unordered_map<std::string, import_stmt *> &import_aliases,
@@ -104,13 +104,13 @@ namespace yaksha {
      * @param filepath filepath to current file this builtin call located in
      * @return nullptr if failed, else ykdatatype*
      */
-    ykdatatype *
+    yk_datatype *
     parse(std::string data_type_str,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath) override;
 
 private:
-    ykdt_pool *dt_pool_;
+    yk_datatype_pool *dt_pool_;
     std::unordered_map<std::string, builtin *> builtins_;
     gc_pool<token> *token_pool_;
   };

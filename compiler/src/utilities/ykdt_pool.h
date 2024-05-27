@@ -42,16 +42,16 @@
 #include "utilities/ykdatatype.h"
 #include <vector>
 namespace yaksha {
-  struct ykdt_pool {
-    ykdt_pool();
-    ~ykdt_pool();
-    ykdatatype *create(std::string tok);
-    ykdatatype *create(std::string tok, std::string module);
-    ykdatatype *create_dimension(token *tok, std::string fpath);
-    ykdatatype *create_dimension(int x);
+  struct yk_datatype_pool {
+    yk_datatype_pool();
+    ~yk_datatype_pool();
+    yk_datatype *create(std::string tok);
+    yk_datatype *create(std::string tok, std::string module);
+    yk_datatype *create_dimension(token *tok, std::string fpath);
+    yk_datatype *create_dimension(int x);
 
 private:
-    std::vector<ykdatatype *> pool_;
+    std::vector<yk_datatype *> pool_;
   };
 }// namespace yaksha
 #endif

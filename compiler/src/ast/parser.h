@@ -51,7 +51,7 @@
 namespace yaksha {
   struct parser {
     explicit parser(std::string filepath_, std::vector<token *> &tokens,
-                    ykdt_pool *pool);
+                    yk_datatype_pool *pool);
     ~parser();
     // stepwise preprocess dsl macros
     void step_1_parse_token_soup();
@@ -76,7 +76,7 @@ namespace yaksha {
     std::vector<stmt *> stmts_{};
     std::string filepath_{};
     // parsing data types
-    ykdatatype *parse_datatype();
+    yk_datatype *parse_datatype();
     void rescan_datatypes();
 
 private:
@@ -151,10 +151,10 @@ private:
     // state
     std::size_t current_;
     ast_pool pool_;
-    ykdt_pool *dt_pool_;
+    yk_datatype_pool *dt_pool_;
     std::vector<token *> &original_tokens_;
     std::vector<token *> tokens_{};
-    std::vector<ykdatatype *> datatypes_from_modules_{};
+    std::vector<yk_datatype *> datatypes_from_modules_{};
     std::vector<stmt *> soup_statements_{};
     // Increase when we allow control, flow.
     // Decrease after parsing.

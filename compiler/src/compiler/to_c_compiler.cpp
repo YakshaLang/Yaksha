@@ -42,7 +42,8 @@
 #include "literal_utils.h"
 #include <cinttypes>
 using namespace yaksha;
-to_c_compiler::to_c_compiler(def_class_visitor &defs_classes, ykdt_pool *pool,
+to_c_compiler::to_c_compiler(def_class_visitor &defs_classes,
+                             yk_datatype_pool *pool,
                              entry_struct_func_compiler *esc,
                              gc_pool<token> *token_pool)
     : defs_classes_(defs_classes), scope_(pool), dt_pool_(pool),
@@ -68,8 +69,8 @@ void to_c_compiler::visit_assign_expr(assign_expr *obj) {
   auto o = std::make_pair(name, object);
   perform_assign(o, rhs, obj->opr_, true, true);
 }
-void to_c_compiler::perform_assign(std::pair<std::string, ykobject> &lhs,
-                                   std::pair<std::string, ykobject> &rhs,
+void to_c_compiler::perform_assign(std::pair<std::string, yk_object> &lhs,
+                                   std::pair<std::string, yk_object> &rhs,
                                    token *operator_token, bool assign_variable,
                                    bool lhs_mutates) {
   auto castable = lhs.second.datatype_->auto_cast(rhs.second.datatype_,
@@ -169,32 +170,32 @@ void to_c_compiler::visit_binary_expr(binary_expr *obj) {
       // None == None -> True
       // None !- None -> False
       push(operator_type == token_type::EQ_EQ ? "true" : "false",
-           ykobject(dt_pool_->create("bool")));
+           yk_object(dt_pool_->create("bool")));
     } else if (lhs.second.datatype_->is_none()) {
       // rhs is not None
       if (rhs.second.datatype_->const_unwrap()->is_sr()) {
         push("(NULL " + obj->opr_->token_ + " yk__bstr_get_reference(" +
                  rhs.first + "))",
-             ykobject(dt_pool_->create("bool")));
+             yk_object(dt_pool_->create("bool")));
       } else if (rhs.second.datatype_->const_unwrap()->is_string_literal()) {
         push(operator_type != token_type::EQ_EQ ? "true" : "false",
-             ykobject(dt_pool_->create("bool")));
+             yk_object(dt_pool_->create("bool")));
       } else {
         push("(NULL " + obj->opr_->token_ + " " + rhs.first + ")",
-             ykobject(dt_pool_->create("bool")));
+             yk_object(dt_pool_->create("bool")));
       }
     } else {
       // lhs is not None
       if (lhs.second.datatype_->const_unwrap()->is_sr()) {
         push("(yk__bstr_get_reference(" + lhs.first + ") " + obj->opr_->token_ +
                  " NULL)",
-             ykobject(dt_pool_->create("bool")));
+             yk_object(dt_pool_->create("bool")));
       } else if (lhs.second.datatype_->const_unwrap()->is_string_literal()) {
         push(operator_type != token_type::EQ_EQ ? "true" : "false",
-             ykobject(dt_pool_->create("bool")));
+             yk_object(dt_pool_->create("bool")));
       } else {
         push("(" + lhs.first + " " + obj->opr_->token_ + " NULL)",
-             ykobject(dt_pool_->create("bool")));
+             yk_object(dt_pool_->create("bool")));
       }
     }
   } else if (lhs.second.is_primitive_or_obj() &&
@@ -227,7 +228,7 @@ void to_c_compiler::visit_binary_expr(binary_expr *obj) {
         } else {
           code += " != 0)";
         }
-        push(code, ykobject(dt_pool_->create("bool")));
+        push(code, yk_object(dt_pool_->create("bool")));
       } else if (operator_type ==
                  token_type::PLUS) {// :s:|str|lit + :s:|str|lit --> str
         auto temporary_string = temp();
@@ -242,7 +243,7 @@ void to_c_compiler::visit_binary_expr(binary_expr *obj) {
               << lhsdn << "_" << rhsdn << "(" << lhs_code << ", " << rhs_code
               << ")";
         write_end_statement(body_);
-        push(temporary_string, ykobject(dt_pool_->create("str")));
+        push(temporary_string, yk_object(dt_pool_->create("str")));
       } else {
         error(obj->opr_, "Failed to compile string binary operation");
         push("<><>", rhs.second);
@@ -273,10 +274,10 @@ void to_c_compiler::visit_binary_expr(binary_expr *obj) {
              lhs.second.datatype_->is_str()) {// str +|==|!= str
     if (obj->opr_->type_ == token_type::EQ_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") == 0)",
-           ykobject(dt_pool_->create("bool")));
+           yk_object(dt_pool_->create("bool")));
     } else if (obj->opr_->type_ == token_type::NOT_EQ) {
       push("(yk__sdscmp(" + lhs.first + " , " + rhs.first + ") != 0)",
-           ykobject(dt_pool_->create("bool")));
+           yk_object(dt_pool_->create("bool")));
     } else {// String concat using + operator
       // new temp needs to be created
       auto temporary_string = temp();
@@ -305,10 +306,10 @@ void to_c_compiler::visit_binary_expr(binary_expr *obj) {
       push(rhs.first, rhs.second);
     } else if (operator_type == token_type::EQ_EQ) {
       bool eq = lhsu == rhsu;
-      push(eq ? "true" : "false", ykobject(dt_pool_->create("bool")));
+      push(eq ? "true" : "false", yk_object(dt_pool_->create("bool")));
     } else if (operator_type == token_type::NOT_EQ) {
       bool neq = lhsu != rhsu;
-      push(neq ? "true" : "false", ykobject(dt_pool_->create("bool")));
+      push(neq ? "true" : "false", yk_object(dt_pool_->create("bool")));
     } else {
       error("Failed to compile literal string binary operation");
       push("<><>", rhs.second);
@@ -319,11 +320,11 @@ void to_c_compiler::visit_binary_expr(binary_expr *obj) {
   // Note: type checker prevents compiler coming here with non integer data types
 }
 void to_c_compiler::cast_numbers(
-    const ykdatatype *castable, std::pair<std::string, ykobject> &lhs,
-    std::pair<std::string, ykobject> &rhs) {// --- number casting ---
-  std::pair<std::string, ykobject> &wider_dt =
+    const yk_datatype *castable, std::pair<std::string, yk_object> &lhs,
+    std::pair<std::string, yk_object> &rhs) {// --- number casting ---
+  std::pair<std::string, yk_object> &wider_dt =
       (castable->widen_rhs) ? lhs : rhs;
-  std::pair<std::string, ykobject> &to_widen =
+  std::pair<std::string, yk_object> &to_widen =
       (castable->widen_rhs) ? rhs : lhs;
   auto code = to_widen.first;
   LOG_COMP("cast to widen: " << to_widen.first);
@@ -346,8 +347,8 @@ void to_c_compiler::cast_numbers(
 }
 void to_c_compiler::compile_simple_bin_op(
     const binary_expr *obj, const token_type &operator_type,
-    const std::pair<std::string, ykobject> &lhs,
-    const std::pair<std::string, ykobject> &rhs) {
+    const std::pair<std::string, yk_object> &lhs,
+    const std::pair<std::string, yk_object> &rhs) {
   if (lhs.second.is_primitive_or_obj() &&
       lhs.second.datatype_->const_unwrap()->is_f32() &&
       obj->opr_->type_ == token_type::MOD) {// Float %
@@ -363,7 +364,7 @@ void to_c_compiler::compile_simple_bin_op(
              operator_type == token_type::NOT_EQ ||
              operator_type == token_type::EQ_EQ) {
     push("(" + lhs.first + " " + obj->opr_->token_ + " " + rhs.first + ")",
-         ykobject(dt_pool_->create("bool")));
+         yk_object(dt_pool_->create("bool")));
   } else {// Other number stuff
     push("(" + lhs.first + " " + obj->opr_->token_ + " " + rhs.first + ")",
          lhs.second);
@@ -378,7 +379,7 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
   // Depending on the fact that this is a function or class, we will call or create object
   if (name_pair.second.object_type_ == object_type::BUILTIN_FUNCTION) {
     LOG_COMP("builtin: " << name);
-    std::vector<std::pair<std::string, ykobject>> args{};
+    std::vector<std::pair<std::string, yk_object>> args{};
     int i = 0;
     for (auto arg : obj->args_) {
       arg->accept(this);
@@ -422,7 +423,7 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
       prefixed_fn_name = fndef->annotations_.native_define_arg_;
     }
     auto fn_return = fndef->return_type_;
-    std::vector<ykdatatype *> params{};
+    std::vector<yk_datatype *> params{};
     params.reserve(fndef->params_.size());
     for (auto &p : fndef->params_) { params.emplace_back(p.data_type_); }
     compile_function_call(obj, prefixed_fn_name, code, fn_return, params,
@@ -436,7 +437,7 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
       prefixed_name = fn_def->annotations_.native_define_arg_;
     }
     auto return_type = fn_def->return_type_;
-    std::vector<ykdatatype *> params{};
+    std::vector<yk_datatype *> params{};
     params.reserve(fn_def->params_.size());
     for (auto &p : fn_def->params_) { params.emplace_back(p.data_type_); }
     compile_function_call(obj, prefixed_name, code, return_type, params,
@@ -452,7 +453,7 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
   } else if (name_pair.second.datatype_->is_function()) {
     LOG_COMP("function_pointer: " << name);
     auto ret_type = name_pair.second.datatype_->args_[1];
-    ykdatatype *return_type;
+    yk_datatype *return_type;
     if (ret_type->args_.empty()) {
       return_type = dt_pool_->create("None");
     } else {
@@ -466,9 +467,9 @@ void to_c_compiler::visit_fncall_expr(fncall_expr *obj) {
 }
 void to_c_compiler::compile_obj_creation(const std::string &name,
                                          std::stringstream &code,
-                                         ykdatatype *return_type) {
+                                         yk_datatype *return_type) {
   obj_calloc(name, code);
-  auto data = ykobject(return_type);
+  auto data = yk_object(return_type);
   push(code.str(), data);
 }
 void to_c_compiler::obj_calloc(const std::string &name,
@@ -477,7 +478,7 @@ void to_c_compiler::obj_calloc(const std::string &name,
 }
 void to_c_compiler::compile_function_call(
     fncall_expr *obj, const std::string &name, std::stringstream &code,
-    ykdatatype *return_type, const std::vector<ykdatatype *> &parameters,
+    yk_datatype *return_type, const std::vector<yk_datatype *> &parameters,
     bool varargs_fnc) {
   // Note: no need to check here as type_checker & def_class_visitor ensure this is present.
   code << name << "(";
@@ -487,7 +488,7 @@ void to_c_compiler::compile_function_call(
   // ---
   for (size_t i = 0; i < arg_size; i++) {
     auto arg = obj->args_[i];
-    ykdatatype *param;
+    yk_datatype *param;
     if (i >= param_size) {
       param = parameters[param_size - 1];
     } else {
@@ -518,15 +519,16 @@ void to_c_compiler::compile_function_call(
     body_ << "yk__sds " << temp_name << " = " << code.str();
     write_end_statement(body_);
     deletions_.push(temp_name, "yk__sdsfree(" + temp_name + ")");
-    push(wrap_in_paren(temp_name), ykobject(return_type));
+    push(wrap_in_paren(temp_name), yk_object(return_type));
   } else {
-    push(code.str(), ykobject(return_type));
+    push(code.str(), yk_object(return_type));
   }
 }
 void to_c_compiler::compile_string_assign(
     token *t, std::stringstream &code,
-    const std::pair<std::string, ykobject> &rhs, const ykdatatype *rhs_datatype,
-    const ykdatatype *lhs_datatype) {// param - sr, arg - sr
+    const std::pair<std::string, yk_object> &rhs,
+    const yk_datatype *rhs_datatype,
+    const yk_datatype *lhs_datatype) {// param - sr, arg - sr
   if (lhs_datatype->is_sr() && rhs_datatype->is_sr()) {
     code << rhs.first;
   }
@@ -563,7 +565,7 @@ void to_c_compiler::compile_string_assign(
   }
 }
 std::string to_c_compiler::prefix_function_arg(
-    const std::pair<std::string, ykobject> &arg_val) {
+    const std::pair<std::string, yk_object> &arg_val) {
   if (arg_val.second.object_type_ == object_type::MODULE_FUNCTION) {
     auto module_file = arg_val.second.module_file_;
     auto module_fn = arg_val.second.string_val_;
@@ -673,81 +675,81 @@ void to_c_compiler::visit_literal_expr(literal_expr *obj) {
   auto data_type_tok = obj->literal_token_->type_;
   if (data_type_tok == token_type::STRING ||
       data_type_tok == token_type::THREE_QUOTE_STRING) {
-    ykobject str_lit_object = ykobject(obj->literal_token_->token_, dt_pool_);
+    yk_object str_lit_object = yk_object(obj->literal_token_->token_, dt_pool_);
     std::string string_literal = "\"" +
                                  string_utils::escape(string_utils::unescape(
                                      obj->literal_token_->token_)) +
                                  "\"";
     push(string_literal, str_lit_object);
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_TRUE) {
-    push("true", ykobject(dt_pool_->create("bool")));
+    push("true", yk_object(dt_pool_->create("bool")));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_FALSE) {
-    push("false", ykobject(dt_pool_->create("bool")));
+    push("false", yk_object(dt_pool_->create("bool")));
   } else if (obj->literal_token_->type_ == token_type::KEYWORD_NONE) {
-    push("NULL", ykobject(dt_pool_));
+    push("NULL", yk_object(dt_pool_));
   } else if (data_type_tok == token_type::INTEGER_BIN ||
              data_type_tok == token_type::INTEGER_DECIMAL ||
              data_type_tok == token_type::INTEGER_OCT ||
              data_type_tok == token_type::INTEGER_HEX) {
     push("INT32_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool_->create("int")));
+         yk_object(dt_pool_->create("int")));
   } else if (data_type_tok == token_type::INTEGER_BIN_8 ||
              data_type_tok == token_type::INTEGER_DECIMAL_8 ||
              data_type_tok == token_type::INTEGER_OCT_8 ||
              data_type_tok == token_type::INTEGER_HEX_8) {
     push("INT8_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool_->create("i8")));
+         yk_object(dt_pool_->create("i8")));
   } else if (data_type_tok == token_type::INTEGER_BIN_16 ||
              data_type_tok == token_type::INTEGER_DECIMAL_16 ||
              data_type_tok == token_type::INTEGER_OCT_16 ||
              data_type_tok == token_type::INTEGER_HEX_16) {
     push("INT16_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool_->create("i16")));
+         yk_object(dt_pool_->create("i16")));
   } else if (data_type_tok == token_type::INTEGER_BIN_64 ||
              data_type_tok == token_type::INTEGER_DECIMAL_64 ||
              data_type_tok == token_type::INTEGER_OCT_64 ||
              data_type_tok == token_type::INTEGER_HEX_64) {
     push("INT64_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool_->create("i64")));
+         yk_object(dt_pool_->create("i64")));
   } else if (data_type_tok == token_type::UINTEGER_BIN ||
              data_type_tok == token_type::UINTEGER_DECIMAL ||
              data_type_tok == token_type::UINTEGER_OCT ||
              data_type_tok == token_type::UINTEGER_HEX) {
     push("UINT32_C(" +
              conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
-         ykobject(dt_pool_->create("u32")));
+         yk_object(dt_pool_->create("u32")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_8 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_8 ||
              data_type_tok == token_type::UINTEGER_OCT_8 ||
              data_type_tok == token_type::UINTEGER_HEX_8) {
     push("UINT8_C(" + conv_integer_literal(data_type_tok, obj->literal_token_) +
              ")",
-         ykobject(dt_pool_->create("u8")));
+         yk_object(dt_pool_->create("u8")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_16 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_16 ||
              data_type_tok == token_type::UINTEGER_OCT_16 ||
              data_type_tok == token_type::UINTEGER_HEX_16) {
     push("UINT16_C(" +
              conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
-         ykobject(dt_pool_->create("u16")));
+         yk_object(dt_pool_->create("u16")));
   } else if (data_type_tok == token_type::UINTEGER_BIN_64 ||
              data_type_tok == token_type::UINTEGER_DECIMAL_64 ||
              data_type_tok == token_type::UINTEGER_OCT_64 ||
              data_type_tok == token_type::UINTEGER_HEX_64) {
     push("UINT64_C(" +
              conv_integer_literal(data_type_tok, obj->literal_token_) + ")",
-         ykobject(dt_pool_->create("u64")));
+         yk_object(dt_pool_->create("u64")));
   } else if (data_type_tok == token_type::FLOAT_NUMBER) {
-    push(obj->literal_token_->token_, ykobject(dt_pool_->create("float")));
+    push(obj->literal_token_->token_, yk_object(dt_pool_->create("float")));
   } else if (data_type_tok == token_type::DOUBLE_NUMBER) {
-    push(obj->literal_token_->token_, ykobject(dt_pool_->create("f64")));
+    push(obj->literal_token_->token_, yk_object(dt_pool_->create("f64")));
   } else {
     error(obj->literal_token_, "Failed to compile literal");
-    push("<><>", ykobject(dt_pool_));
+    push("<><>", yk_object(dt_pool_));
   }
 }
 void to_c_compiler::visit_logical_expr(logical_expr *obj) {
@@ -762,7 +764,7 @@ void to_c_compiler::visit_logical_expr(logical_expr *obj) {
     operator_token = " || ";
   }
   push("(" + lhs.first + operator_token + rhs.first + ")",
-       ykobject(true, dt_pool_));
+       yk_object(true, dt_pool_));
 }
 void to_c_compiler::visit_unary_expr(unary_expr *obj) {
   // Note: this is not supported by strings only numbers/floats
@@ -777,18 +779,18 @@ void to_c_compiler::visit_variable_expr(variable_expr *obj) {
   // Compiler is visiting a variable, can get data type from scope_
   auto name = prefix(obj->name_->token_, prefix_val_);
   if (builtins_.has_builtin(obj->name_->token_)) {
-    auto b = ykobject(dt_pool_);
+    auto b = yk_object(dt_pool_);
     b.object_type_ = object_type::BUILTIN_FUNCTION;
     push(obj->name_->token_, b);
     return;
   } else if (defs_classes_.has_function(obj->name_->token_)) {
-    auto b = ykobject(dt_pool_);
+    auto b = yk_object(dt_pool_);
     b.object_type_ = object_type::FUNCTION;
     b.string_val_ = obj->name_->token_;
     push(obj->name_->token_, b);
     return;
   } else if (defs_classes_.has_class(obj->name_->token_)) {
-    auto b = ykobject(dt_pool_);
+    auto b = yk_object(dt_pool_);
     b.object_type_ = object_type::CLASS;
     push(obj->name_->token_, b);
     return;
@@ -932,13 +934,13 @@ void to_c_compiler::visit_def_stmt(def_stmt *obj) {
   // Create code body
   // ::================================::
   // Define parameters in nested scope for function
-  ykobject func_placeholder{dt_pool_};
+  yk_object func_placeholder{dt_pool_};
   func_placeholder.object_type_ = object_type::FUNCTION;
   scope_.define_global(name, func_placeholder);
   scope_.push();
   auto function_def = obj;
   for (auto param : function_def->params_) {
-    auto placeholder = ykobject(param.data_type_);
+    auto placeholder = yk_object(param.data_type_);
     scope_.define(prefix(param.name_->token_, prefix_val_), placeholder);
   }
   indent();
@@ -1014,8 +1016,8 @@ void to_c_compiler::visit_if_stmt(if_stmt *obj) {
 }
 void to_c_compiler::visit_let_stmt(let_stmt *obj) {
   auto name = prefix(obj->name_->token_, prefix_val_);
-  auto object = ykobject(dt_pool_);
-  std::pair<std::string, ykobject> resulting_pair;
+  auto object = yk_object(dt_pool_);
+  std::pair<std::string, yk_object> resulting_pair;
   bool visited_expr = false;
   LOG_COMP("let lhs: " << name);
   // infer data type based on RHS if we do not have a data type here
@@ -1041,7 +1043,7 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
           "Failed to compile let statement. (Use of non compilable data type)");
   }
   if (obj->data_type_->const_unwrap()->is_str()) {
-    object = ykobject(obj->data_type_);
+    object = yk_object(obj->data_type_);
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
@@ -1074,9 +1076,9 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
     if (obj->data_type_->is_const()) {
       auto const_wrapper = dt_pool_->create("Const");
       const_wrapper->args_.emplace_back(dt_pool_->create("sr"));
-      object = ykobject(const_wrapper);
+      object = yk_object(const_wrapper);
     } else {
-      object = ykobject(dt_pool_->create("sr"));
+      object = yk_object(dt_pool_->create("sr"));
     }
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
@@ -1103,7 +1105,7 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
                " .l = 0, .t = yk__bstr_static})";
     }
   } else if (obj->data_type_->const_unwrap()->is_array()) {
-    object = ykobject(obj->data_type_);
+    object = yk_object(obj->data_type_);
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
@@ -1118,7 +1120,7 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
       body_ << " = NULL";
     }
   } else if (obj->data_type_->const_unwrap()->is_fixed_size_array()) {
-    object = ykobject(obj->data_type_);
+    object = yk_object(obj->data_type_);
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
@@ -1137,7 +1139,7 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
       body_ << " = {}";
     }
   } else {
-    object = ykobject(obj->data_type_);
+    object = yk_object(obj->data_type_);
     if (obj->expression_ != nullptr) {
       auto exp = (visited_expr) ? resulting_pair
                                 : compile_expression(obj->expression_);
@@ -1164,8 +1166,8 @@ void to_c_compiler::visit_let_stmt(let_stmt *obj) {
   scope_.define(name, object);
 }
 void to_c_compiler::write_casted_rhs(
-    std::stringstream &stream, std::pair<std::string, ykobject> &rhs,
-    ykdatatype *lhsu) {// We need to cast RHS to appropriate DT
+    std::stringstream &stream, std::pair<std::string, yk_object> &rhs,
+    yk_datatype *lhsu) {// We need to cast RHS to appropriate DT
   stream << " = ";
   stream << "((";
   stream << convert_dt(lhsu, datatype_location::STRUCT, "", "") << ")(";
@@ -1186,7 +1188,7 @@ void to_c_compiler::visit_return_stmt(return_stmt *obj) {
     obj->expression_->accept(this);
     auto rhs = pop();
     std::string return_val = rhs.first;
-    ykdatatype *result_type = nullptr;
+    yk_datatype *result_type = nullptr;
     if (obj->result_type_ != nullptr) {
       result_type = obj->result_type_->const_unwrap();
     }
@@ -1277,7 +1279,7 @@ std::string to_c_compiler::temp(const std::string &custom_prefix) {
   temp_++;
   return name;
 }
-std::string to_c_compiler::convert_dt(ykdatatype *basic_dt,
+std::string to_c_compiler::convert_dt(yk_datatype *basic_dt,
                                       datatype_location dt_location,
                                       std::string extra_data_1,
                                       std::string extra_data_2) {
@@ -1366,16 +1368,16 @@ compiler_output to_c_compiler::compile(codefiles *cf, file_info *fi) {
   // -------- Define forward declarations ---------------
   for (const auto &name : this->defs_classes_.global_const_names_) {
     auto cls = defs_classes_.get_const(name);
-    auto obj = ykobject(cls->data_type_);
+    auto obj = yk_object(cls->data_type_);
     scope_.define_global(prefix(cls->name_->token_, prefix_val_), obj);
   }
   for (const auto &name : this->defs_classes_.global_native_const_names_) {
     auto cls = defs_classes_.get_native_const(name);
-    auto obj = ykobject(cls->data_type_);
+    auto obj = yk_object(cls->data_type_);
     scope_.define_global(prefix(cls->name_->token_, prefix_val_), obj);
   }
   for (auto imp_st : fi->data_->parser_->import_stmts_) {
-    auto obj = ykobject(dt_pool_);
+    auto obj = yk_object(dt_pool_);
     obj.object_type_ = yaksha::object_type::MODULE;
     obj.string_val_ = imp_st->data_->filepath_.string();
     obj.module_file_ = imp_st->data_->filepath_.string();
@@ -1393,11 +1395,11 @@ compiler_output to_c_compiler::compile(codefiles *cf, file_info *fi) {
   return {function_forward_declarations_.str(), header_.str(), body_.str(),
           global_constants_.str(), errors_};
 }
-void to_c_compiler::push(const std::string &expr, const ykobject &data_type) {
+void to_c_compiler::push(const std::string &expr, const yk_object &data_type) {
   expr_stack_.push_back(expr);
   type_stack_.push_back(data_type);
 }
-std::pair<std::string, ykobject> to_c_compiler::pop() {
+std::pair<std::string, yk_object> to_c_compiler::pop() {
   auto p = std::make_pair(expr_stack_.back(), type_stack_.back());
   expr_stack_.pop_back();
   type_stack_.pop_back();
@@ -1433,7 +1435,7 @@ void to_c_compiler::visit_class_stmt(class_stmt *obj) {
     return;
   }
   // class/struct
-  ykdatatype *class_dt = dt_pool_->create(obj->name_->token_, filepath_);
+  yk_datatype *class_dt = dt_pool_->create(obj->name_->token_, filepath_);
   class_dt->token_->file_ = obj->name_->file_;
   class_dt->token_->line_ = obj->name_->line_;
   class_dt->token_->pos_ = obj->name_->pos_;
@@ -1481,7 +1483,7 @@ void to_c_compiler::visit_get_expr(get_expr *obj) {
     bool has_native_const =
         imported->data_->dsv_->has_native_const(member_item->token_);
     bool has_enum = imported->data_->dsv_->has_enum(member_item->token_);
-    auto mod_obj = ykobject(dt_pool_);
+    auto mod_obj = yk_object(dt_pool_);
     if (has_class) {
       mod_obj.object_type_ = object_type::MODULE_CLASS;
       /* for jungle.Banana */
@@ -1534,7 +1536,7 @@ void to_c_compiler::visit_get_expr(get_expr *obj) {
   if (class_->annotations_.on_stack_) { access_ = "."; }
   for (const auto &member : class_->members_) {
     if (item == member.name_->token_) {
-      auto placeholder = ykobject(dt_pool_);
+      auto placeholder = yk_object(dt_pool_);
       placeholder.datatype_ = member.data_type_;
       push(lhs.first + access_ + prefix(item, item_prefix), placeholder);
       return;
@@ -1558,7 +1560,7 @@ void to_c_compiler::visit_set_expr(set_expr *obj) {
   if (class_->annotations_.on_stack_) { access_ = "."; }
   for (const auto &member : class_->members_) {
     if (item == member.name_->token_) {
-      auto placeholder = ykobject(dt_pool_);
+      auto placeholder = yk_object(dt_pool_);
       placeholder.datatype_ = member.data_type_;
       push(lhs.first + access_ + prefix(item, item_prefix), placeholder);
       return;
@@ -1581,17 +1583,17 @@ void to_c_compiler::visit_square_bracket_access_expr(
   // TODO verify if we can access Const[FixedArr[int, 10]]
   if (lhs.second.datatype_->is_array() ||
       lhs.second.datatype_->is_fixed_size_array()) {
-    auto b = ykobject(lhs.second.datatype_->args_[0]);
+    auto b = yk_object(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {
     auto int_expr = dynamic_cast<literal_expr *>(obj->index_expr_);
     auto index = std::stoi(int_expr->literal_token_->token_);
-    auto b = ykobject(lhs.second.datatype_->args_[index]);
+    auto b = yk_object(lhs.second.datatype_->args_[index]);
     index++;
     push(lhs.first + ".e" + std::to_string(index), b);
   } else {
     error(obj->sqb_token_, "Failed to compile [] access");
-    push("<><>", ykobject(dt_pool_));
+    push("<><>", yk_object(dt_pool_));
   }
 }
 void to_c_compiler::visit_square_bracket_set_expr(
@@ -1602,17 +1604,17 @@ void to_c_compiler::visit_square_bracket_set_expr(
   auto lhs = pop();
   if (lhs.second.datatype_->is_array() ||
       lhs.second.datatype_->is_fixed_size_array()) {
-    auto b = ykobject(lhs.second.datatype_->args_[0]);
+    auto b = yk_object(lhs.second.datatype_->args_[0]);
     push(lhs.first + "[" + rhs.first + "]", b);
   } else if (lhs.second.datatype_->is_tuple()) {
     auto int_expr = dynamic_cast<literal_expr *>(obj->index_expr_);
     auto index = std::stoi(int_expr->literal_token_->token_);
-    auto b = ykobject(lhs.second.datatype_->args_[index]);
+    auto b = yk_object(lhs.second.datatype_->args_[index]);
     index++;
     push(lhs.first + ".e" + std::to_string(index), b);
   } else {
     error(obj->sqb_token_, "Failed to compile [] set");
-    push("<><>", ykobject(dt_pool_));
+    push("<><>", yk_object(dt_pool_));
   }
 }
 void to_c_compiler::visit_assign_arr_expr(assign_arr_expr *obj) {
@@ -1689,7 +1691,7 @@ void to_c_compiler::write_statement_no_end(std::string code_line) {
   body_ << code_line << "\n";
 }
 void to_c_compiler::visit_runtimefeature_stmt(runtimefeature_stmt *obj) {}
-ykdatatype *to_c_compiler::function_to_datatype_or_null(const ykobject &arg) {
+yk_datatype *to_c_compiler::function_to_datatype_or_null(const yk_object &arg) {
   def_stmt *funct;
   if (arg.object_type_ == object_type::FUNCTION) {
     funct = defs_classes_.get_function(arg.string_val_);
@@ -1701,9 +1703,9 @@ ykdatatype *to_c_compiler::function_to_datatype_or_null(const ykobject &arg) {
       funct->annotations_.native_define_) {
     return nullptr;
   }
-  ykdatatype *fnc = dt_pool_->create("Function");
-  ykdatatype *fin = dt_pool_->create("In");
-  ykdatatype *fout = dt_pool_->create("Out");
+  yk_datatype *fnc = dt_pool_->create("Function");
+  yk_datatype *fin = dt_pool_->create("In");
+  yk_datatype *fout = dt_pool_->create("Out");
   fnc->args_.emplace_back(fin);
   fnc->args_.emplace_back(fout);
   for (auto current_param : funct->params_) {
@@ -1724,7 +1726,7 @@ void to_c_compiler::visit_nativeconst_stmt(nativeconst_stmt *obj) {
     global_constants_ << ::string_utils::unescape(obj->code_str_->token_);
     global_constants_ << ")\n";
   } else {
-    auto object = ykobject(obj->data_type_);
+    auto object = yk_object(obj->data_type_);
     write_indent(body_);
     // something like
     // a: Const[int] = ccode """1 + 1"""
@@ -1757,14 +1759,14 @@ std::string to_c_compiler::prefix_token(token *p_token) {
 void to_c_compiler::visit_compins_stmt(compins_stmt *obj) {
   // Add given item to scope
   auto name = prefix(obj->name_->token_, prefix_val_);
-  auto object = ykobject(obj->data_type_);
+  auto object = yk_object(obj->data_type_);
   if (obj->meta1_ != nullptr) {
     object.desugar_rewrite_ = obj->meta1_->token_;
     object.desugar_rewrite_needed_ = true;
   }
   scope_.define(name, object);
 }
-std::pair<std::string, ykobject> to_c_compiler::compile_expression(expr *ex) {
+std::pair<std::string, yk_object> to_c_compiler::compile_expression(expr *ex) {
   ex->accept(this);
   auto p = std::make_pair(expr_stack_.back(), type_stack_.back());
   expr_stack_.pop_back();
@@ -1777,7 +1779,7 @@ void to_c_compiler::visit_curly_call_expr(curly_call_expr *obj) {
   auto name = name_pair.first;
   std::stringstream code{};
   class_stmt *class_info;
-  ykdatatype *dt;
+  yk_datatype *dt;
   std::string c_mod_prefix;
   std::string prefixed_class_name;
   if (name_pair.second.object_type_ == object_type::MODULE_CLASS) {
@@ -1796,13 +1798,13 @@ void to_c_compiler::visit_curly_call_expr(curly_call_expr *obj) {
     prefixed_class_name = prefix(name, c_mod_prefix);
   } else {
     error(obj->curly_open_, "Invalid {} initialization");
-    push("<><>", ykobject(dt_pool_));
+    push("<><>", yk_object(dt_pool_));
     return;
   }
   if (class_info != nullptr) {
     if (class_info->annotations_.native_define_) {
       error(obj->curly_open_, "Cannot create a native structure");
-      push("<><>", ykobject(dt_pool_));
+      push("<><>", yk_object(dt_pool_));
       return;
     }
     if (class_info->annotations_.on_stack_) {
@@ -1822,7 +1824,7 @@ void to_c_compiler::visit_curly_call_expr(curly_call_expr *obj) {
              << ")";
       }
       code << "})";
-      push(code.str(), ykobject(dt));
+      push(code.str(), yk_object(dt));
       return;
     } else {
       // ---------- On heap --------
@@ -1840,12 +1842,12 @@ void to_c_compiler::visit_curly_call_expr(curly_call_expr *obj) {
               << " = (" << val.first << ")";
         write_end_statement(body_);
       }
-      push(temp_name, ykobject(dt));
+      push(temp_name, yk_object(dt));
       return;
     }
   }
   error(obj->curly_open_, "Failed to compile struct literal");
-  push("<><>", ykobject(dt_pool_));
+  push("<><>", yk_object(dt_pool_));
 }
 void to_c_compiler::visit_macro_call_expr(macro_call_expr *obj) {
   // Not supported directly by compiler

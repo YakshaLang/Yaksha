@@ -47,7 +47,7 @@ namespace yaksha {
    *    - Call pop afterwards
    */
   struct environment_stack : environment {
-    explicit environment_stack(ykdt_pool *pool);
+    explicit environment_stack(yk_datatype_pool *pool);
     ~environment_stack() override;
     /**
      * See if this variable is defined
@@ -62,20 +62,20 @@ namespace yaksha {
      * @param name name of the variable
      * @param data object
      */
-    void define(const std::string &name, ykobject data) override;
-    void define_global(const std::string &name, ykobject data);
+    void define(const std::string &name, yk_object data) override;
+    void define_global(const std::string &name, yk_object data);
     /**
      * Assign a value to a variable (only if it's declared)
      * @param name name of the variable
      * @param data object
      */
-    void assign(const std::string &name, ykobject data) override;
+    void assign(const std::string &name, yk_object data) override;
     /**
      * Get mutable data for a variable
      * @param name name of the variable
      * @return mutable object
      */
-    ykobject get(const std::string &name) override;
+    yk_object get(const std::string &name) override;
     /**
      * Go to a deeper level of scope
      */
@@ -93,7 +93,7 @@ private:
     bool has_inner_scope();
     environment &peek();
     std::vector<environment> scope_stack_{};
-    ykdt_pool *pool_;
+    yk_datatype_pool *pool_;
   };
 }// namespace yaksha
 #endif

@@ -51,7 +51,7 @@ void test_ast(const std::string &data, const std::string &file_name) {
   errors::error_printer ep{};
   gc_pool<token> token_pool{};
   tokenizer t{file_name, data, &token_pool};
-  ykdt_pool dt_pool{};
+  yk_datatype_pool dt_pool{};
   t.tokenize();
   if (!t.errors_.empty()) {
     ep.print_errors(t.errors_);

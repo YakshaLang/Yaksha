@@ -52,13 +52,13 @@ using namespace yaksha;
 // ┴ ┴┴└─┴└─┴  └─┘ ┴
 //
 struct builtin_arrput : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for arrput() builtin";
     } else if (!args[0].datatype_->is_array()) {
@@ -77,16 +77,16 @@ struct builtin_arrput : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     if (args[1].second.datatype_->const_unwrap()->is_a_string()) {
       code << "yk__arrput(" << args[0].first << ", ";
@@ -107,13 +107,13 @@ struct builtin_arrput : builtin {
 // ┴ ┴┴└─┴└─┴  └─┘┴
 //
 struct builtin_arrpop : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for arrpop() builtin";
     } else if (!args[0].datatype_->is_array()) {
@@ -122,23 +122,23 @@ struct builtin_arrpop : builtin {
                args[0].datatype_->args_[0]->is_sm_entry()) {
       o.string_val_ = "arrpop() does not work with maps";
     } else {
-      return ykobject(args[0].datatype_->args_[0]);
+      return yk_object(args[0].datatype_->args_[0]);
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
-    o = ykobject(args[0].second.datatype_->args_[0]);
+    o = yk_object(args[0].second.datatype_->args_[0]);
     code << "yk__arrpop(" << args[0].first << ")";
     return {code.str(), o};
   }
@@ -155,13 +155,13 @@ struct builtin_arrpop : builtin {
 struct builtin_arrsetlencap : builtin {
   explicit builtin_arrsetlencap(std::string function_name)
       : func_name_(std::move(function_name)) {}
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ =
           "Two arguments must be provided for " + func_name_ + "() builtin";
@@ -174,21 +174,21 @@ struct builtin_arrsetlencap : builtin {
     } else if (!(args[1].datatype_->const_unwrap()->is_an_integer())) {
       o.string_val_ = func_name_ + "Second argument to () must be an integer";
     } else {
-      return ykobject(dt_pool);// None return
+      return yk_object(dt_pool);// None return
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "yk__" + func_name_ + "(" << args[0].first << ", " << args[1].first
          << ")";
@@ -210,13 +210,13 @@ struct builtin_arrsetlencap : builtin {
 struct builtin_print : builtin {
   explicit builtin_print(std::string func_name)
       : func_name_(std::move(func_name)) {}
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for print() builtin";
     } else if (!(args[0].datatype_->const_unwrap()->is_primitive())) {
@@ -227,19 +227,19 @@ struct builtin_print : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     auto rhs = args[0];
-    ykdatatype *dt = rhs.second.datatype_->const_unwrap();
+    yk_datatype *dt = rhs.second.datatype_->const_unwrap();
     if (dt->is_a_signed_integer()) {
       code << "yk__" << func_name_ << "int((intmax_t)" << rhs.first << ")";
     } else if (dt->is_an_unsigned_integer()) {
@@ -284,13 +284,13 @@ struct builtin_print : builtin {
 // ┴─┘└─┘┘└┘
 //
 struct builtin_len : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for len() builtin";
     } else if (!args[0].datatype_->const_unwrap()->is_array() &&
@@ -298,21 +298,21 @@ struct builtin_len : builtin {
                !args[0].datatype_->const_unwrap()->is_fixed_size_array()) {
       o.string_val_ = "Argument to len() must be an Array or a string";
     } else {
-      return ykobject(dt_pool->create("int"));
+      return yk_object(dt_pool->create("int"));
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     if (args[0].second.datatype_->const_unwrap()->is_str()) {
       code << "yk__sdslen(" << args[0].first << ")";
@@ -342,7 +342,7 @@ struct builtin_len : builtin {
     } else {
       code << "yk__arrlen(" << args[0].first << ")";
     }
-    o = ykobject(dt_pool->create("int"));
+    o = yk_object(dt_pool->create("int"));
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
@@ -353,13 +353,13 @@ struct builtin_len : builtin {
 // └─┘┴ ┴┴ ┴┴└─┴ ┴ ┴
 //
 struct builtin_charat : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for charat() builtin";
     } else if (!args[0].datatype_->const_unwrap()->is_a_string()) {
@@ -367,21 +367,21 @@ struct builtin_charat : builtin {
     } else if (!(args[1].datatype_->const_unwrap()->is_an_integer())) {
       o.string_val_ = "Second argument to charat() must be an integer";
     } else {
-      return ykobject(dt_pool->create("int"));
+      return yk_object(dt_pool->create("int"));
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     if (args[0].second.datatype_->const_unwrap()->is_string_literal() ||
         args[0].second.datatype_->const_unwrap()->is_str()) {
@@ -390,7 +390,7 @@ struct builtin_charat : builtin {
       code << "(yk__bstr_get_reference(" << args[0].first << ")["
            << args[1].first << "])";
     }
-    o = ykobject(dt_pool->create("int"));
+    o = yk_object(dt_pool->create("int"));
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
@@ -401,40 +401,40 @@ struct builtin_charat : builtin {
 // └─┘└─┘ ┴ ┴└─└─┘└
 //
 struct builtin_getref : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for getref() builtin";
     } else if (!args[0].is_primitive_or_obj()) {
       o.string_val_ = "Argument to getref() must be an object or primitive";
     } else {
-      ykdatatype *dt = dt_pool->create("Ptr");
+      yk_datatype *dt = dt_pool->create("Ptr");
       dt->args_.emplace_back(args[0].datatype_);
-      return ykobject(dt);
+      return yk_object(dt);
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "(&(" << args[0].first << "))";
-    ykdatatype *dt = dt_pool->create("Ptr");
+    yk_datatype *dt = dt_pool->create("Ptr");
     dt->args_.emplace_back(args[0].second.datatype_);
-    o = ykobject(dt);
+    o = yk_object(dt);
     return {code.str(), o};
   }
   bool require_stdlib() override { return false; }
@@ -445,36 +445,36 @@ struct builtin_getref : builtin {
 // └─┘┘└┘┴└─└─┘└
 //
 struct builtin_unref : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for unref() builtin";
     } else if (!args[0].datatype_->is_ptr()) {
       o.string_val_ = "Argument to unref() must be a Ptr[?]";
     } else {
-      return ykobject(args[0].datatype_->args_[0]);
+      return yk_object(args[0].datatype_->args_[0]);
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "(*(" << args[0].first << "))";
-    o = ykobject(args[0].second.datatype_->args_[0]);
+    o = yk_object(args[0].second.datatype_->args_[0]);
     return {code.str(), o};
   }
   bool require_stdlib() override { return false; }
@@ -485,13 +485,13 @@ struct builtin_unref : builtin {
 // └─┘┴ ┴┘└┘└─┘└┴┘
 //
 struct builtin_shnew : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for shnew() builtin";
     } else if (!args[0].datatype_->is_array() ||
@@ -503,16 +503,16 @@ struct builtin_shnew : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "yk__sh_new_strdup(" << args[0].first << ")";
     return {code.str(), o};
@@ -525,13 +525,13 @@ struct builtin_shnew : builtin {
 // └─┘┴ ┴└─┘└─┘ ┴
 //
 struct builtin_shget : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for shget() builtin";
     } else if (!args[0].datatype_->is_array() ||
@@ -541,28 +541,28 @@ struct builtin_shget : builtin {
     } else if (!args[1].datatype_->const_unwrap()->is_a_string()) {
       o.string_val_ = "Second argument to shget() must be a string";
     } else {
-      return ykobject(args[0].datatype_->args_[0]->args_[0]);
+      return yk_object(args[0].datatype_->args_[0]->args_[0]);
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "yk__shget(" << args[0].first << ", ";
     dt_compiler->compile_string_assign(nullptr, code, args[1],
                                        args[1].second.datatype_->const_unwrap(),
                                        dt_pool->create("str"));
     code << ")";
-    o = ykobject(args[0].second.datatype_->args_[0]->args_[0]);
+    o = yk_object(args[0].second.datatype_->args_[0]->args_[0]);
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
@@ -573,13 +573,13 @@ struct builtin_shget : builtin {
 // └─┘┴ ┴└─┘└─┘ ┴ ┴
 //
 struct builtin_shgeti : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for shgeti() builtin";
     } else if (!args[0].datatype_->is_array() ||
@@ -589,28 +589,28 @@ struct builtin_shgeti : builtin {
     } else if (!args[1].datatype_->const_unwrap()->is_a_string()) {
       o.string_val_ = "Second argument to shgeti() must be a string";
     } else {
-      return ykobject(dt_pool->create("int"));
+      return yk_object(dt_pool->create("int"));
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "yk__shgeti(" << args[0].first << ", ";
     dt_compiler->compile_string_assign(nullptr, code, args[1],
                                        args[1].second.datatype_->const_unwrap(),
                                        dt_pool->create("str"));
     code << ")";
-    o = ykobject(dt_pool->create("int"));
+    o = yk_object(dt_pool->create("int"));
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
@@ -621,13 +621,13 @@ struct builtin_shgeti : builtin {
 // └─┘┴ ┴┴  └─┘ ┴
 //
 struct builtin_shput : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "Three arguments must be provided for shput() builtin";
     } else if (!args[0].datatype_->is_array() ||
@@ -648,16 +648,16 @@ struct builtin_shput : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "yk__shput(" << args[0].first << ", ";
     dt_compiler->compile_string_assign(nullptr, code, args[1],
@@ -674,13 +674,13 @@ struct builtin_shput : builtin {
 // └─┘┴ ┴└─┘ ┴
 //
 struct builtin_cast : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for cast() builtin";
     } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
@@ -694,28 +694,28 @@ struct builtin_cast : builtin {
         o.string_val_ = "First argument to cast() must be a string literal.";
       } else {
         auto data_type = lit->literal_token_->token_;
-        ykdatatype *parsed_dt =
+        yk_datatype *parsed_dt =
             dt_parser->parse(data_type, import_aliases, filepath);
         if (parsed_dt == nullptr) {
           o.string_val_ = "Invalid data type provided to cast()";
         } else {
-          return ykobject(parsed_dt);
+          return yk_object(parsed_dt);
         }
       }
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
     auto out_dt =
@@ -733,7 +733,7 @@ struct builtin_cast : builtin {
            << dt_compiler->convert_dt(out_dt, datatype_location::CAST, "", "")
            << ")" << args[1].first << ")";
     }
-    o = ykobject(out_dt);
+    o = yk_object(out_dt);
     return {code.str(), o};
   }
   bool require_stdlib() override { return false; }
@@ -744,13 +744,13 @@ struct builtin_cast : builtin {
 // ┴ ┴┴ ┴┘└┘└─┘└┴┘
 //
 struct builtin_hmnew : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for hmnew() builtin";
     } else if (!args[0].datatype_->is_array() ||
@@ -762,16 +762,16 @@ struct builtin_hmnew : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     return {"", o};
   }
   bool require_stdlib() override { return true; }
@@ -782,13 +782,13 @@ struct builtin_hmnew : builtin {
 // ┴ ┴┴ ┴└─┘└─┘ ┴
 //
 struct builtin_hmget : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for hmget() builtin";
     } else if (!args[0].datatype_->is_array() ||
@@ -801,7 +801,7 @@ struct builtin_hmget : builtin {
       auto rhs = args[1].datatype_->const_unwrap();
       auto matched =
           dt_slot_matcher->type_match(lhs, rhs, args[1].is_primitive_or_obj());
-      if (matched.matched_) { return ykobject(lhs_raw); }
+      if (matched.matched_) { return yk_object(lhs_raw); }
       o.string_val_ =
           "Second argument to hmget() must match with Array[MEntry[K,V]] " +
           matched.error_;
@@ -809,19 +809,19 @@ struct builtin_hmget : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "yk__hmget(" << args[0].first << ", " << args[1].first << ")";
-    o = ykobject(args[0].second.datatype_->args_[0]->args_[0]);
+    o = yk_object(args[0].second.datatype_->args_[0]->args_[0]);
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
@@ -832,13 +832,13 @@ struct builtin_hmget : builtin {
 // ┴ ┴┴ ┴└─┘└─┘ ┴ ┴
 //
 struct builtin_hmgeti : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for hmgeti() builtin";
     } else if (!args[0].datatype_->is_array() ||
@@ -849,7 +849,7 @@ struct builtin_hmgeti : builtin {
       auto matched = dt_slot_matcher->type_match(
           args[0].datatype_->args_[0]->args_[0]->const_unwrap(),
           args[1].datatype_->const_unwrap(), args[1].is_primitive_or_obj());
-      if (matched.matched_) { return ykobject(dt_pool->create("int")); }
+      if (matched.matched_) { return yk_object(dt_pool->create("int")); }
       o.string_val_ =
           "Second argument to hmgeti() must match with Array[MEntry[K,V]] " +
           matched.error_;
@@ -857,19 +857,19 @@ struct builtin_hmgeti : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "yk__hmgeti(" << args[0].first << ", " << args[1].first << ")";
-    o = ykobject(dt_pool->create("int"));
+    o = yk_object(dt_pool->create("int"));
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
@@ -880,13 +880,13 @@ struct builtin_hmgeti : builtin {
 // ┴ ┴┴ ┴┴  └─┘ ┴
 //
 struct builtin_hmput : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "Three arguments must be provided for hmput() builtin";
     } else if (!args[0].datatype_->is_array() ||
@@ -918,16 +918,16 @@ struct builtin_hmput : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "yk__hmput(" << args[0].first << ", " << args[1].first << ", "
          << args[2].first << ")";
@@ -941,13 +941,13 @@ struct builtin_hmput : builtin {
 // └─┘└└─┘└─┘┴└─ ┴
 //
 struct builtin_qsort : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     // TODO verify if we want to allow this for fixed size arrays
     // ?
     if (args.size() != 2) {
@@ -975,7 +975,7 @@ struct builtin_qsort : builtin {
       func_in->args_.emplace_back(const_arg2);
       // func -> Function[In[Const[AnyArg],Const[AnyArg]],Out[int]]
       if (dt_slot_matcher->slot_match_with_result(func, args[1]).matched_) {
-        return ykobject(dt_pool->create("bool"));
+        return yk_object(dt_pool->create("bool"));
       } else {
         o.string_val_ =
             "Comparison must match with "
@@ -985,18 +985,18 @@ struct builtin_qsort : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool->create("bool"));
+    auto o = yk_object(dt_pool->create("bool"));
     std::stringstream code{};
-    o = ykobject(args[0].second.datatype_->args_[0]);
+    o = yk_object(args[0].second.datatype_->args_[0]);
     code << "(yk__quicksort(" << args[0].first << ",sizeof("
          << dt_compiler->convert_dt(args[0].second.datatype_->args_[0],
                                     datatype_location::SIZEOF_, "", "")
@@ -1012,13 +1012,13 @@ struct builtin_qsort : builtin {
 // ┴ ┴┴└─┴└─┘└┘└─┘└┴┘
 //
 struct builtin_arrnew : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for arrnew() builtin";
     } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
@@ -1028,29 +1028,29 @@ struct builtin_arrnew : builtin {
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
       auto data_type = lit->literal_token_->token_;
-      ykdatatype *parsed_dt =
+      yk_datatype *parsed_dt =
           dt_parser->parse(data_type, import_aliases, filepath);
       if (parsed_dt == nullptr) {
         o.string_val_ = "Invalid data type provided to arrnew()";
       } else {
-        ykdatatype *array_wrapper = dt_pool->create("Array");
+        yk_datatype *array_wrapper = dt_pool->create("Array");
         array_wrapper->args_.emplace_back(parsed_dt);
-        return ykobject(array_wrapper);
+        return yk_object(array_wrapper);
       }
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
     auto element_data_type =
@@ -1070,7 +1070,7 @@ struct builtin_arrnew : builtin {
     code.str("");
     code.clear();
     code << array_var;
-    o = ykobject(array_dt);
+    o = yk_object(array_dt);
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
@@ -1081,13 +1081,13 @@ struct builtin_arrnew : builtin {
 // └  ┴ ┴ └─└─┘─┴┘┴ ┴┴└─┴└─
 //
 struct builtin_fixed_arr : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.empty()) {
       o.string_val_ = "fixedarr() builtin expects >= 1 arguments";
     } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
@@ -1095,7 +1095,7 @@ struct builtin_fixed_arr : builtin {
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
       auto data_type = lit->literal_token_->token_;
-      ykdatatype *parsed_dt =
+      yk_datatype *parsed_dt =
           dt_parser->parse(data_type, import_aliases, filepath);
       if (parsed_dt == nullptr) {
         o.string_val_ = "Invalid data type provided to fixedarr()";
@@ -1110,28 +1110,28 @@ struct builtin_fixed_arr : builtin {
             return o;
           }
         }
-        ykdatatype *array_wrapper = dt_pool->create("FixedArr");
+        yk_datatype *array_wrapper = dt_pool->create("FixedArr");
         array_wrapper->args_.emplace_back(parsed_dt);
         // Add fixed array length
         array_wrapper->args_.emplace_back(
             dt_pool->create_dimension(static_cast<int>(length) - 1));
         array_wrapper->inlinable_literal_ = true;
-        return ykobject(array_wrapper);
+        return yk_object(array_wrapper);
       }
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
     auto element_data_type =
@@ -1159,7 +1159,7 @@ struct builtin_fixed_arr : builtin {
       }
     }
     code << "}";
-    o = ykobject(array_dt);
+    o = yk_object(array_dt);
     return {code.str(), o};
   }
   bool require_stdlib() override { return false; }
@@ -1170,13 +1170,13 @@ struct builtin_fixed_arr : builtin {
 // ┴ ┴┴└─┴└─┴ ┴ ┴
 //
 struct builtin_array : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.empty()) {
       o.string_val_ = "array() builtin expects >= 1 arguments";
     } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
@@ -1184,7 +1184,7 @@ struct builtin_array : builtin {
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
       auto data_type = lit->literal_token_->token_;
-      ykdatatype *parsed_dt =
+      yk_datatype *parsed_dt =
           dt_parser->parse(data_type, import_aliases, filepath);
       if (parsed_dt == nullptr) {
         o.string_val_ = "Invalid data type provided to array()";
@@ -1199,24 +1199,24 @@ struct builtin_array : builtin {
             return o;
           }
         }
-        ykdatatype *array_wrapper = dt_pool->create("Array");
+        yk_datatype *array_wrapper = dt_pool->create("Array");
         array_wrapper->args_.emplace_back(parsed_dt);
-        return ykobject(array_wrapper);
+        return yk_object(array_wrapper);
       }
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     auto dt = dynamic_cast<literal_expr *>(arg_expressions[0]);
     auto element_data_type =
@@ -1249,7 +1249,7 @@ struct builtin_array : builtin {
       code.clear();
     }
     code << array_var;
-    o = ykobject(array_dt);
+    o = yk_object(array_dt);
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
@@ -1260,14 +1260,14 @@ struct builtin_array : builtin {
 // ┴┴└
 //
 struct builtin_iif : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     std::stringstream message{};
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = "iif() builtin expects 3 arguments";
     } else if (!(args[0].datatype_->const_unwrap()->is_bool())) {
@@ -1281,7 +1281,7 @@ struct builtin_iif : builtin {
         o.object_type_ = object_type::ERROR_DETECTED;
         return o;
       }
-      o = ykobject(args[1].datatype_);
+      o = yk_object(args[1].datatype_);
       if (args[1].datatype_->const_unwrap()->is_string_literal()) {
         o.datatype_ = dt_pool->create("sr");
       }
@@ -1302,16 +1302,16 @@ struct builtin_iif : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     if (args[1].second.datatype_->const_unwrap()->is_string_literal()) {
       o.datatype_ = dt_pool->create("sr");
@@ -1348,14 +1348,14 @@ struct builtin_functional : builtin {
   enum class fnc { FOREACH, COUNTIF, FILTER, MAP };
   explicit builtin_functional(fnc fnc_type, std::string name)
       : fnc_type_(fnc_type), name_(std::move(name)) {}
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
     // TODO what about Const[FixedArr[...]] and Const[Array[...]]
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 3) {
       o.string_val_ = name_ + "() builtin expects 3 arguments";
     } else if ((!args[0].datatype_->is_array() &&
@@ -1372,27 +1372,27 @@ struct builtin_functional : builtin {
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
     std::stringstream code{};
-    ykdatatype *dt;
-    ykdatatype *return_val_type;
+    yk_datatype *dt;
+    yk_datatype *return_val_type;
     if (args[1].second.is_a_function()) {
       dt = fnc_dt_extractor->function_to_datatype_or_null(args[1].second);
     } else {
       dt = args[1].second.datatype_;
     }
     auto fixed_array = dt->args_[0]->is_fixed_size_array();
-    ykdatatype *fn_out =
+    yk_datatype *fn_out =
         dt->args_[1]->args_[0];// Function[In[T, K], Out[O]] access O
-    ykdatatype *template_dt =
+    yk_datatype *template_dt =
         args[0].second.datatype_->args_[0];// Array[T] access T
     std::string i = st_writer->temp();
     std::string len_temp =
@@ -1403,7 +1403,7 @@ struct builtin_functional : builtin {
     std::string return_temp = st_writer->temp();
     std::string fn_out_temp = st_writer->temp();
     std::string rt_init = "NULL";
-    ykdatatype *arr1 = dt_pool->create("Array");
+    yk_datatype *arr1 = dt_pool->create("Array");
     // Copy pointer to array to a temp
     code << dt_compiler->convert_dt(args[0].second.datatype_,
                                     datatype_location::STRUCT, "", "")
@@ -1493,7 +1493,7 @@ struct builtin_functional : builtin {
     code.str("");
     code.clear();
     code << return_temp;
-    return {code.str(), ykobject(return_val_type)};
+    return {code.str(), yk_object(return_val_type)};
   }
   bool require_stdlib() override { return true; }
 
@@ -1510,23 +1510,24 @@ struct builtin_functional : builtin {
     read_stream.str("");
     read_stream.clear();
   }
-  ykobject verify_function(const ykobject &array, const ykobject &function,
-                           slot_matcher *dt_slot_matcher, ykdt_pool *dt_pool,
-                           ykdatatype *context_dt) {
-    ykdatatype *dt;
+  yk_object verify_function(const yk_object &array, const yk_object &function,
+                            slot_matcher *dt_slot_matcher,
+                            yk_datatype_pool *dt_pool,
+                            yk_datatype *context_dt) {
+    yk_datatype *dt;
     if (function.datatype_->is_function()) {
       dt = function.datatype_;
     } else {
       dt = dt_slot_matcher->function_to_datatype_or_null(function);
     }
     if (dt == nullptr) {
-      ykobject o = ykobject(dt_pool);
+      yk_object o = yk_object(dt_pool);
       o.string_val_ = "Function argument for builtin " + name_ + " if invalid";
       o.object_type_ = object_type::ERROR_DETECTED;
       return o;
     }
-    ykobject o = ykobject(dt_pool);
-    ykdatatype *template_dt = array.datatype_->args_[0];
+    yk_object o = yk_object(dt_pool);
+    yk_datatype *template_dt = array.datatype_->args_[0];
     if (dt->args_[1]->args_.size() != 1) {
       o.string_val_ = "Function argument for builtin " + name_ +
                       " () must have a return type";
@@ -1546,17 +1547,17 @@ struct builtin_functional : builtin {
                       " () must return a boolean";
     } else {
       if (fnc_type_ == fnc::FOREACH) {
-        o = ykobject(dt_pool->create("bool"));
+        o = yk_object(dt_pool->create("bool"));
       } else if (fnc_type_ == fnc::COUNTIF) {
-        o = ykobject(dt_pool->create("int"));
+        o = yk_object(dt_pool->create("int"));
       } else if (fnc_type_ == fnc::FILTER) {
-        ykdatatype *arr = dt_pool->create("Array");
+        yk_datatype *arr = dt_pool->create("Array");
         arr->args_.emplace_back(template_dt);
-        o = ykobject(arr);
+        o = yk_object(arr);
       } else {
-        ykdatatype *arr = dt_pool->create("Array");
+        yk_datatype *arr = dt_pool->create("Array");
         arr->args_.emplace_back(dt->args_[1]->args_[0]);
-        o = ykobject(arr);
+        o = yk_object(arr);
       }
       return o;
     }
@@ -1572,39 +1573,39 @@ struct builtin_functional : builtin {
 // └─┘┴┘└┘┴ ┴┴└─ ┴ ─┴┘┴ ┴ ┴ ┴ ┴
 //
 struct builtin_binarydata : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "binarydata() builtin expects 1 argument";
     } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
       o.string_val_ = "Argument to binarydata() must be a str literal";
     } else {
-      o = ykobject(
+      o = yk_object(
           dt_parser->parse("Const[Ptr[Const[u8]]]", import_aliases, filepath));
       return o;
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
     auto str_expression = dynamic_cast<literal_expr *>(arg_expressions[0]);
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::string raw_string =
         string_utils::unescape(str_expression->literal_token_->token_);
-    o = ykobject(
+    o = yk_object(
         dt_parser->parse("Const[Ptr[Const[u8]]]", import_aliases, filepath));
     return {esc->compile_binary_data(raw_string), o};
   }
@@ -1625,13 +1626,13 @@ struct builtin_binarydata : builtin {
 // Inspired by ac2pic's make builtin
 // https://github.com/ac2pic/Yaksha/blob/main/compiler/src/builtins/builtins.cpp#L1417
 struct builtin_make : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 1) {
       o.string_val_ = "One argument must be provided for make() builtin";
     } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
@@ -1639,10 +1640,10 @@ struct builtin_make : builtin {
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
       auto data_type = lit->literal_token_->token_;
-      ykdatatype *parsed_dt_original =
+      yk_datatype *parsed_dt_original =
           dt_parser->parse(data_type, import_aliases, filepath);
       if (parsed_dt_original != nullptr) {
-        ykdatatype *parsed_dt = parsed_dt_original->const_unwrap();
+        yk_datatype *parsed_dt = parsed_dt_original->const_unwrap();
         if (parsed_dt->is_function_input() || parsed_dt->is_function_output() ||
             parsed_dt->is_m_entry() || parsed_dt->is_sm_entry() ||
             parsed_dt->is_none() || parsed_dt->is_const()) {
@@ -1650,35 +1651,35 @@ struct builtin_make : builtin {
               "First argument to make() is an invalid data type " + data_type;
         } else {
           // We support things like -> i32, etc. to be created on heap as well
-          ykdatatype *dt = dt_pool->create("Ptr");
+          yk_datatype *dt = dt_pool->create("Ptr");
           dt->args_.emplace_back(parsed_dt_original);
-          return ykobject(dt);
+          return yk_object(dt);
         }
       }
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
           entry_struct_func_compiler *esc) override {
     auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
     auto data_type = lit->literal_token_->token_;
-    ykdatatype *parsed_dt =
+    yk_datatype *parsed_dt =
         dt_parser->parse(data_type, import_aliases, filepath);
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     std::stringstream code{};
     code << "calloc(1, sizeof("
          << dt_compiler->convert_dt(parsed_dt, datatype_location::STRUCT, "",
                                     "")
          << "))";
-    ykdatatype *dt = dt_pool->create("Ptr");
+    yk_datatype *dt = dt_pool->create("Ptr");
     dt->args_.emplace_back(parsed_dt);
     o.datatype_ = dt;
     return {code.str(), o};
@@ -1695,13 +1696,13 @@ struct builtin_make : builtin {
 // inlinec("None", "puts(\"hello world\\n\"))
 //
 struct builtin_inlinec : builtin {
-  ykobject
-  verify(const std::vector<ykobject> &args,
+  yk_object
+  verify(const std::vector<yk_object> &args,
          const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
-         ykdt_pool *dt_pool,
+         yk_datatype_pool *dt_pool,
          const std::unordered_map<std::string, import_stmt *> &import_aliases,
          const std::string &filepath, slot_matcher *dt_slot_matcher) override {
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     if (args.size() != 2) {
       o.string_val_ = "Two arguments must be provided for inlinec() builtin";
     } else if (!args[0].datatype_->const_unwrap()->is_string_literal()) {
@@ -1711,10 +1712,10 @@ struct builtin_inlinec : builtin {
     } else {
       auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
       auto data_type = lit->literal_token_->token_;
-      ykdatatype *parsed_dt_original =
+      yk_datatype *parsed_dt_original =
           dt_parser->parse(data_type, import_aliases, filepath);
       if (parsed_dt_original != nullptr) {
-        ykdatatype *parsed_dt = parsed_dt_original->const_unwrap();
+        yk_datatype *parsed_dt = parsed_dt_original->const_unwrap();
         if (parsed_dt->is_function_input() || parsed_dt->is_function_output() ||
             parsed_dt->is_m_entry() || parsed_dt->is_sm_entry() ||
             parsed_dt->is_const()) {
@@ -1722,18 +1723,18 @@ struct builtin_inlinec : builtin {
               "First argument to inlinec() is an invalid data type " +
               data_type;
         } else {
-          return ykobject(parsed_dt_original);
+          return yk_object(parsed_dt_original);
         }
       }
     }
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
   }
-  std::pair<std::string, ykobject>
-  compile(const std::vector<std::pair<std::string, ykobject>> &args,
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
           const std::vector<expr *> &arg_expressions,
           datatype_compiler *dt_compiler, datatype_parser *dt_parser,
-          ykdt_pool *dt_pool,
+          yk_datatype_pool *dt_pool,
           const std::unordered_map<std::string, import_stmt *> &import_aliases,
           const std::string &filepath, statement_writer *st_writer,
           function_datatype_extractor *fnc_dt_extractor,
@@ -1741,16 +1742,16 @@ struct builtin_inlinec : builtin {
     auto *lit = dynamic_cast<literal_expr *>(arg_expressions[0]);
     auto *code = dynamic_cast<literal_expr *>(arg_expressions[1]);
     auto data_type = lit->literal_token_->token_;
-    ykdatatype *parsed_dt =
+    yk_datatype *parsed_dt =
         dt_parser->parse(data_type, import_aliases, filepath);
-    auto o = ykobject(dt_pool);
+    auto o = yk_object(dt_pool);
     o.datatype_ = parsed_dt;
     return {string_utils::unescape(code->literal_token_->token_), o};
   }
   bool require_stdlib() override { return false; }
 };
 //=======================================
-builtins::builtins(ykdt_pool *dt_pool, gc_pool<token> *token_pool)
+builtins::builtins(yk_datatype_pool *dt_pool, gc_pool<token> *token_pool)
     : dt_pool_{dt_pool}, builtins_{}, token_pool_(token_pool) {
   builtins_.insert({"arrput", new builtin_arrput{}});
   builtins_.insert({"arrpop", new builtin_arrpop{}});
@@ -1797,15 +1798,15 @@ builtins::~builtins() {
 bool builtins::has_builtin(const std::string &name) {
   return builtins_.find(name) != builtins_.end();
 }
-ykobject builtins::verify(
-    const std::string &name, const std::vector<ykobject> &args,
+yk_object builtins::verify(
+    const std::string &name, const std::vector<yk_object> &args,
     const std::vector<expr *> &arg_expressions,
     const std::unordered_map<std::string, import_stmt *> &import_aliases,
     const std::string &filepath, slot_matcher *dt_slot_matcher,
     bool no_stdlib) {
   auto &builtin_object = builtins_[name];
   if (builtin_object->require_stdlib() && no_stdlib) {
-    auto o = ykobject(dt_pool_);
+    auto o = yk_object(dt_pool_);
     o.string_val_ = "Builtin '" + name + "' does not work without stdlib.";
     o.object_type_ = object_type::ERROR_DETECTED;
     return o;
@@ -1813,9 +1814,9 @@ ykobject builtins::verify(
   return builtin_object->verify(args, arg_expressions, this, dt_pool_,
                                 import_aliases, filepath, dt_slot_matcher);
 }
-std::pair<std::string, ykobject> builtins::compile(
+std::pair<std::string, yk_object> builtins::compile(
     const std::string &name,
-    const std::vector<std::pair<std::string, ykobject>> &args,
+    const std::vector<std::pair<std::string, yk_object>> &args,
     const std::vector<expr *> &arg_expressions, datatype_compiler *dt_compiler,
     const std::unordered_map<std::string, import_stmt *> &import_aliases,
     const std::string &filepath, statement_writer *st_writer,
@@ -1825,7 +1826,7 @@ std::pair<std::string, ykobject> builtins::compile(
                                   dt_pool_, import_aliases, filepath, st_writer,
                                   fnc_dt_extractor, esc);
 }
-ykdatatype *builtins::parse(
+yk_datatype *builtins::parse(
     std::string data_type_str,
     const std::unordered_map<std::string, import_stmt *> &import_aliases,
     const std::string &filepath) {
@@ -1834,7 +1835,7 @@ ykdatatype *builtins::parse(
   if (!t.errors_.empty()) { return nullptr; }
   auto p = parser{filepath, t.tokens_, dt_pool_};
   p.import_stmts_alias_ = import_aliases;
-  ykdatatype *dt;
+  yk_datatype *dt;
   try {
     dt = p.parse_datatype();
   } catch (parsing_error &ignored) {
