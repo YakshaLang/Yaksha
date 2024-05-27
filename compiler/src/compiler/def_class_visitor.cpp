@@ -51,9 +51,7 @@ void def_class_visitor::visit_break_stmt(break_stmt *obj) {}
 void def_class_visitor::visit_continue_stmt(continue_stmt *obj) {}
 void def_class_visitor::visit_def_stmt(def_stmt *obj) {
   auto name = obj->name_->token_;
-  if (is_redefined(name, obj->name_)) {
-    return;
-  }
+  if (is_redefined(name, obj->name_)) { return; }
   if (obj->annotations_.varargs_ && !obj->annotations_.native_define_) {
     error(obj->name_, "@varargs must be used with @nativedefine ");
     return;
@@ -99,9 +97,7 @@ void def_class_visitor::extract(const std::vector<stmt *> &statements) {
 }
 void def_class_visitor::visit_const_stmt(const_stmt *obj) {
   auto name = obj->name_->token_;
-  if (is_redefined(name, obj->name_)) {
-    return;
-  }
+  if (is_redefined(name, obj->name_)) { return; }
   if (obj->data_type_->args_.size() != 1) {
     error(obj->name_,
           "Should be Const[x], only single data type can be specified");
@@ -123,9 +119,7 @@ void def_class_visitor::visit_const_stmt(const_stmt *obj) {
 }
 void def_class_visitor::visit_nativeconst_stmt(nativeconst_stmt *obj) {
   auto name = obj->name_->token_;
-  if (is_redefined(name, obj->name_)) {
-    return;
-  }
+  if (is_redefined(name, obj->name_)) { return; }
   if (obj->data_type_->args_.size() != 1) {
     error(obj->name_,
           "Should be Const[x], only single data type can be specified");
@@ -166,9 +160,7 @@ void def_class_visitor::visit_class_stmt(class_stmt *obj) {
     error(obj->name_, "@nativedefine must have a valid argument");
     return;
   }
-  if (is_redefined(name, obj->name_)) {
-    return;
-  }
+  if (is_redefined(name, obj->name_)) { return; }
   class_names_.push_back(name);
   classes_.insert({name, obj});
 }
@@ -228,9 +220,7 @@ void def_class_visitor::visit_enum_stmt(enum_stmt *obj) {
     return;
   }
   auto name = obj->name_->token_;
-  if (is_redefined(name, obj->name_)) {
-    return;
-  }
+  if (is_redefined(name, obj->name_)) { return; }
   enum_names_.push_back(name);
   enums_.insert({name, obj});
 }

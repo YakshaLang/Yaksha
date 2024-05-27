@@ -96,16 +96,17 @@ namespace yaksha {
   enum class object_type {
     PRIMITIVE_OR_OBJ,
     FUNCTION,
-    ERROR_DETECTED,
-    UNKNOWN_OBJECT,
-    CLASS_ITSELF,
+    CLASS,
     BUILTIN_FUNCTION,
     MODULE,
     MODULE_CLASS,
     MODULE_FUNCTION,
     // --------------------
     // Only used for constant folding
-    CONST_FOLD_VALUE
+    CONST_FOLD_VALUE,
+    // ----
+    ERROR_DETECTED,
+    UNKNOWN_OBJECT
   };
   struct ykobject {
     ykobject();
@@ -119,14 +120,11 @@ namespace yaksha {
     explicit ykobject(ykdt_pool *pool);
     [[nodiscard]] bool is_primitive_or_obj() const;
     [[nodiscard]] bool is_a_function() const;
-    int integer_val_{0};// TODO see if this field can be removed
     std::string string_val_{};
     std::string module_file_{};
     std::string module_name_{};
     bool desugar_rewrite_needed_{false};
     std::string desugar_rewrite_{};
-    double double_val_{};// TODO see if this can be removed
-    bool bool_val_{};    // TODO see if this can be removed
     object_type object_type_{object_type::PRIMITIVE_OR_OBJ};
     ykdatatype *datatype_{nullptr};
     const_fold_context *fold_context_{nullptr};

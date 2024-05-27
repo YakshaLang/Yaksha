@@ -185,7 +185,7 @@ codefiles::import_to_optional_file_path(import_stmt *st) {
   }
   p += ".yaka"; /* add .yaka file extension */
   p = std::filesystem::absolute(p, err);
-  p = scratch_file_path(p.string()); // check for scratch files
+  p = scratch_file_path(p.string());// check for scratch files
   if (err) {
     print_file_not_found_error(p.string());
     return {};
@@ -212,28 +212,23 @@ file_data *codefiles::parse_or_null(std::filesystem::path &file_name) {
   }
   std::string data((std::istreambuf_iterator<char>(script_file)),
                    std::istreambuf_iterator<char>());
-  script_file.close(); // close the file
+  script_file.close();// close the file
   std::string fname = file_name.string();
   return parse_or_null(data, fname);
 }
-std::filesystem::path codefiles::scratch_file_path(const std::string &filename) const {
-  if (!this->use_scratch_files_) {
-    return std::filesystem::path{filename};
-  }
+std::filesystem::path
+codefiles::scratch_file_path(const std::string &filename) const {
+  if (!this->use_scratch_files_) { return std::filesystem::path{filename}; }
   std::filesystem::path f{filename};
   auto path = f.parent_path();
   auto name = f.stem();
   // Already a scratch file
-  if (name.string().find("_.") == 0) {
-    return std::filesystem::path{filename};
-  }
+  if (name.string().find("_.") == 0) { return std::filesystem::path{filename}; }
   auto ext = f.extension();
   auto scratch_path = path / ("_." + name.string() + ext.string());
   std::error_code err{};
   if (std::filesystem::exists(scratch_path, err)) {
-    if (!err) {
-      return scratch_path;
-    }
+    if (!err) { return scratch_path; }
   }
   return std::filesystem::path{filename};
 }

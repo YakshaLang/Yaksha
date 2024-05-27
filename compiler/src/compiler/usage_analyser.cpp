@@ -244,7 +244,7 @@ void usage_analyser::visit_variable_expr(variable_expr *obj) {
   auto o = ykobject();
   if (peek_file_info()->data_->dsv_->has_class(name)) {
     o.string_val_ = name;
-    o.object_type_ = object_type::CLASS_ITSELF;
+    o.object_type_ = object_type::CLASS;
     peek_file_info()->data_->dsv_->get_class(name)->accept(this);
     o.module_file_ = "!class";
   } else if (peek_file_info()->data_->dsv_->has_const(name)) {

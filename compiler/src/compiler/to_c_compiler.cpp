@@ -789,7 +789,7 @@ void to_c_compiler::visit_variable_expr(variable_expr *obj) {
     return;
   } else if (defs_classes_.has_class(obj->name_->token_)) {
     auto b = ykobject(dt_pool_);
-    b.object_type_ = object_type::CLASS_ITSELF;
+    b.object_type_ = object_type::CLASS;
     push(obj->name_->token_, b);
     return;
   }
@@ -1480,6 +1480,7 @@ void to_c_compiler::visit_get_expr(get_expr *obj) {
     bool has_const = imported->data_->dsv_->has_const(member_item->token_);
     bool has_native_const =
         imported->data_->dsv_->has_native_const(member_item->token_);
+    bool has_enum = imported->data_->dsv_->has_enum(member_item->token_);
     auto mod_obj = ykobject(dt_pool_);
     if (has_class) {
       mod_obj.object_type_ = object_type::MODULE_CLASS;

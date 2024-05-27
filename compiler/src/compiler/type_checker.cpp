@@ -244,7 +244,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
   obj->name_->accept(this);
   auto name = pop();
   // Classes
-  if (name.object_type_ == object_type::CLASS_ITSELF ||
+  if (name.object_type_ == object_type::CLASS ||
       name.object_type_ == object_type::MODULE_CLASS) {
     if (!obj->args_.empty()) {
       error(obj->paren_token_,
@@ -252,7 +252,7 @@ void type_checker::visit_fncall_expr(fncall_expr *obj) {
     }
     auto class_name = name.string_val_;
     ykobject data;
-    if (name.object_type_ == object_type::CLASS_ITSELF) {
+    if (name.object_type_ == object_type::CLASS) {
       data = ykobject(dt_pool_->create(class_name, filepath_));
     } else {
       data = ykobject(dt_pool_->create(name.string_val_, name.module_file_));
@@ -508,7 +508,7 @@ void type_checker::visit_variable_expr(variable_expr *obj) {
   auto value = scope_.get(name);
   // Preserve function name so we can access it
   if (value.object_type_ == object_type::FUNCTION ||
-      value.object_type_ == object_type::CLASS_ITSELF) {
+      value.object_type_ == object_type::CLASS) {
     value.string_val_ = name;
   }
   push(value);
@@ -713,7 +713,7 @@ void type_checker::check(const std::vector<stmt *> &statements) {
   // Define classes
   for (const auto &class_name : defs_classes_->class_names_) {
     auto class_placeholder_object = ykobject(dt_pool_);
-    class_placeholder_object.object_type_ = object_type::CLASS_ITSELF;
+    class_placeholder_object.object_type_ = object_type::CLASS;
     scope_.define_global(class_name, class_placeholder_object);
   }
   // Define global constants
@@ -1381,11 +1381,11 @@ void type_checker::visit_curly_call_expr(curly_call_expr *obj) {
   std::stringstream message{};
   obj->dt_expr_->accept(this);
   auto dt_class = pop();
-  if (dt_class.object_type_ == object_type::CLASS_ITSELF ||
+  if (dt_class.object_type_ == object_type::CLASS ||
       dt_class.object_type_ == object_type::MODULE_CLASS) {
     auto class_name = dt_class.string_val_;
     ykobject data;
-    if (dt_class.object_type_ == object_type::CLASS_ITSELF) {
+    if (dt_class.object_type_ == object_type::CLASS) {
       data = ykobject(dt_pool_->create(class_name, filepath_));
     } else {
       data = ykobject(

@@ -46,7 +46,7 @@ ykobject::ykobject(ykdt_pool *pool)
   datatype_ = pool->create("None");
 }
 ykobject::ykobject(int i, ykdt_pool *pool)
-    : object_type_(object_type::PRIMITIVE_OR_OBJ), integer_val_{i} {
+    : object_type_(object_type::PRIMITIVE_OR_OBJ) {
   datatype_ = pool->create("i32");
 }
 ykobject::ykobject(std::string str, ykdt_pool *pool)
@@ -54,15 +54,15 @@ ykobject::ykobject(std::string str, ykdt_pool *pool)
   datatype_ = pool->create(":s:");
 }
 ykobject::ykobject(double dbl, ykdt_pool *pool)
-    : double_val_{dbl}, object_type_{object_type::PRIMITIVE_OR_OBJ} {
+    : object_type_{object_type::PRIMITIVE_OR_OBJ} {
   datatype_ = pool->create("f64");
 }
 ykobject::ykobject(float float_val, ykdt_pool *pool)
-    : double_val_{float_val}, object_type_{object_type::PRIMITIVE_OR_OBJ} {
+    : object_type_{object_type::PRIMITIVE_OR_OBJ} {
   datatype_ = pool->create("f32");
 }
 ykobject::ykobject(bool i, ykdt_pool *pool)
-    : object_type_(object_type::PRIMITIVE_OR_OBJ), bool_val_(i) {
+    : object_type_(object_type::PRIMITIVE_OR_OBJ) {
   datatype_ = pool->create("bool");
 }
 bool ykobject::is_primitive_or_obj() const {
