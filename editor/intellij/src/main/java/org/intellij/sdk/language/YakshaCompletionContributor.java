@@ -140,6 +140,7 @@ public class YakshaCompletionContributor extends CompletionContributor {
                         resultSet.addElement(LookupElementBuilder.create("@onstack").withIcon(YakshaIcons.KEYWORD));
 
                         resultSet.addElement(LookupElementBuilder.create("Array").withIcon(YakshaIcons.DATA_TYPE));
+                        resultSet.addElement(LookupElementBuilder.create("FixedArr").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("Tuple").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("SMEntry").withIcon(YakshaIcons.DATA_TYPE));
                         resultSet.addElement(LookupElementBuilder.create("MEntry").withIcon(YakshaIcons.DATA_TYPE));

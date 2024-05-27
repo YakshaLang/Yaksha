@@ -8485,6 +8485,57 @@
       {
         "annotations": [
           {
+            "argument": "AutomationEvent",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": " Automation event",
+        "members": [],
+        "name": "AutomationEvent"
+      },
+      {
+        "annotations": [
+          {
+            "argument": "AutomationEventList",
+            "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
+          }
+        ],
+        "comment": " Automation event list",
+        "members": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "capacity"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "count"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "AutomationEvent"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "events"
+          }
+        ],
+        "name": "AutomationEventList"
+      },
+      {
+        "annotations": [
+          {
             "argument": "BoneInfo",
             "name": "@nativedefine"
           },
@@ -9440,6 +9491,21 @@
               "type": "Ptr"
             },
             "name": "framePoses"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                },
+                {
+                  "type": "32"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "name"
           }
         ],
         "name": "ModelAnimation"
@@ -10403,7 +10469,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Attach audio stream processor to the entire audio pipeline",
+        "comment": " Attach audio stream processor to the entire audio pipeline, receives the samples as <float>s",
         "name": "attach_audio_mixed_processor",
         "parameters": [
           {
@@ -10441,7 +10507,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Attach audio stream processor to stream",
+        "comment": " Attach audio stream processor to stream, receives the samples as <float>s",
         "name": "attach_audio_stream_processor",
         "parameters": [
           {
@@ -10521,6 +10587,44 @@
         ],
         "return_type": {
           "type": "AudioStream"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: AutomationEventList",
+        "name": "automation_event_list",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "capacity"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "count"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "AutomationEvent"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "events"
+          }
+        ],
+        "return_type": {
+          "type": "AutomationEventList"
         }
       },
       {
@@ -12504,6 +12608,39 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Draw circle outline (Vector version)",
+        "name": "draw_circle_lines_v",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "center"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "radius"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Draw a piece of a circle",
         "name": "draw_circle_sector",
         "parameters": [
@@ -13221,7 +13358,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Draw a line using cubic-bezier curves in-out",
+        "comment": " Draw line segment cubic-bezier in-out interpolation",
         "name": "draw_line_bezier",
         "parameters": [
           {
@@ -13260,103 +13397,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Draw line using cubic bezier curves with 2 control points",
-        "name": "draw_line_bezier_cubic",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "Vector2"
-            },
-            "name": "start_pos"
-          },
-          {
-            "datatype": {
-              "type": "Vector2"
-            },
-            "name": "end_pos"
-          },
-          {
-            "datatype": {
-              "type": "Vector2"
-            },
-            "name": "start_control_pos"
-          },
-          {
-            "datatype": {
-              "type": "Vector2"
-            },
-            "name": "end_control_pos"
-          },
-          {
-            "datatype": {
-              "type": "float"
-            },
-            "name": "thick"
-          },
-          {
-            "datatype": {
-              "type": "Color"
-            },
-            "name": "p_color"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@nativemacro"
-          }
-        ],
-        "comment": " Draw line using quadratic bezier curves with a control point",
-        "name": "draw_line_bezier_quad",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "Vector2"
-            },
-            "name": "start_pos"
-          },
-          {
-            "datatype": {
-              "type": "Vector2"
-            },
-            "name": "end_pos"
-          },
-          {
-            "datatype": {
-              "type": "Vector2"
-            },
-            "name": "control_pos"
-          },
-          {
-            "datatype": {
-              "type": "float"
-            },
-            "name": "thick"
-          },
-          {
-            "datatype": {
-              "type": "Color"
-            },
-            "name": "p_color"
-          }
-        ],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@nativemacro"
-          }
-        ],
-        "comment": " Draw a line defining thickness",
+        "comment": " Draw a line (using triangles/quads)",
         "name": "draw_line_ex",
         "parameters": [
           {
@@ -13395,7 +13436,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Draw lines sequence",
+        "comment": " Draw lines sequence (using gl lines)",
         "name": "draw_line_strip",
         "parameters": [
           {
@@ -13433,7 +13474,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Draw a line (Vector version)",
+        "comment": " Draw a line (using gl lines)",
         "name": "draw_line_v",
         "parameters": [
           {
@@ -14706,6 +14747,463 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Draw spline: B-Spline, minimum 4 points",
+        "name": "draw_spline_basis",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Vector2"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "points"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "point_count"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Draw spline: Cubic Bezier, minimum 4 points (2 control points): [p1, c2, c3, p4, c5, c6...]",
+        "name": "draw_spline_bezier_cubic",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Vector2"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "points"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "point_count"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Draw spline: Quadratic Bezier, minimum 3 points (1 control point): [p1, c2, p3, c4...]",
+        "name": "draw_spline_bezier_quadratic",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Vector2"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "points"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "point_count"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Draw spline: Catmull-Rom, minimum 4 points",
+        "name": "draw_spline_catmull_rom",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Vector2"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "points"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "point_count"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Draw spline: Linear, minimum 2 points",
+        "name": "draw_spline_linear",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Vector2"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "points"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "point_count"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Draw spline segment: B-Spline, 4 points",
+        "name": "draw_spline_segment_basis",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p1"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p2"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p3"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p4"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Draw spline segment: Cubic Bezier, 2 points, 2 control points",
+        "name": "draw_spline_segment_bezier_cubic",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p1"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "c2"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "c3"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p4"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Draw spline segment: Quadratic Bezier, 2 points, 1 control point",
+        "name": "draw_spline_segment_bezier_quadratic",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p1"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "c2"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p3"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Draw spline segment: Catmull-Rom, 4 points",
+        "name": "draw_spline_segment_catmull_rom",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p1"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p2"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p3"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p4"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Draw spline segment: Linear, 2 points",
+        "name": "draw_spline_segment_linear",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p1"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p2"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "thick"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "p_color"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Draw text (using default font)",
         "name": "draw_text",
         "parameters": [
@@ -14827,7 +15325,7 @@
             "datatype": {
               "type": "int"
             },
-            "name": "count"
+            "name": "codepoint_count"
           },
           {
             "datatype": {
@@ -15661,6 +16159,34 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Export automation events list as text file",
+        "name": "export_automation_event_list",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "AutomationEventList"
+            },
+            "name": "list"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "file_name"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Export data to code (.h), returns true on success",
         "name": "export_data_as_code",
         "parameters": [
@@ -15683,9 +16209,9 @@
           },
           {
             "datatype": {
-              "type": "u32"
+              "type": "int"
             },
-            "name": "size"
+            "name": "data_size"
           },
           {
             "datatype": {
@@ -15781,6 +16307,52 @@
         ],
         "return_type": {
           "type": "bool"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Export image to memory buffer",
+        "name": "export_image_to_memory",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Image"
+            },
+            "name": "p_image"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "file_type"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file_size"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "module": "libs.c",
+              "type": "CUChar"
+            }
+          ],
+          "type": "Ptr"
         }
       },
       {
@@ -16162,7 +16734,7 @@
               ],
               "type": "Ptr"
             },
-            "name": "chars"
+            "name": "glyphs"
           },
           {
             "datatype": {
@@ -16178,7 +16750,7 @@
               ],
               "type": "Ptr"
             },
-            "name": "recs"
+            "name": "glyph_recs"
           },
           {
             "datatype": {
@@ -16216,8 +16788,8 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Generate image: horizontal gradient",
-        "name": "gen_image_gradient_h",
+        "comment": " Generate image: linear gradient, direction in degrees [0..360], 0=Vertical gradient",
+        "name": "gen_image_gradient_linear",
         "parameters": [
           {
             "datatype": {
@@ -16233,15 +16805,21 @@
           },
           {
             "datatype": {
-              "type": "Color"
+              "type": "int"
             },
-            "name": "left"
+            "name": "direction"
           },
           {
             "datatype": {
               "type": "Color"
             },
-            "name": "right"
+            "name": "start"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "end"
           }
         ],
         "return_type": {
@@ -16300,8 +16878,8 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Generate image: vertical gradient",
-        "name": "gen_image_gradient_v",
+        "comment": " Generate image: square gradient",
+        "name": "gen_image_gradient_square",
         "parameters": [
           {
             "datatype": {
@@ -16317,15 +16895,21 @@
           },
           {
             "datatype": {
-              "type": "Color"
+              "type": "float"
             },
-            "name": "top"
+            "name": "density"
           },
           {
             "datatype": {
               "type": "Color"
             },
-            "name": "bottom"
+            "name": "inner"
+          },
+          {
+            "datatype": {
+              "type": "Color"
+            },
+            "name": "outer"
           }
         ],
         "return_type": {
@@ -16866,7 +17450,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Get the directory if the running application (uses static string)",
+        "comment": " Get the directory of the running application (uses static string)",
         "name": "get_application_directory",
         "parameters": [],
         "return_type": {
@@ -17639,6 +18223,20 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Get master volume (listener)",
+        "name": "get_master_volume",
+        "parameters": [],
+        "return_type": {
+          "type": "float"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Compute mesh bounding box limits",
         "name": "get_mesh_bounding_box",
         "parameters": [
@@ -17716,7 +18314,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Get the human-readable, UTF-8 encoded name of the primary monitor",
+        "comment": " Get the human-readable, UTF-8 encoded name of the specified monitor",
         "name": "get_monitor_name",
         "parameters": [
           {
@@ -18413,6 +19011,213 @@
         ],
         "return_type": {
           "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Get (evaluate) spline point: B-Spline",
+        "name": "get_spline_point_basis",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p1"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p2"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p3"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p4"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "t"
+          }
+        ],
+        "return_type": {
+          "type": "Vector2"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Get (evaluate) spline point: Cubic Bezier",
+        "name": "get_spline_point_bezier_cubic",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p1"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "c2"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "c3"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p4"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "t"
+          }
+        ],
+        "return_type": {
+          "type": "Vector2"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Get (evaluate) spline point: Quadratic Bezier",
+        "name": "get_spline_point_bezier_quad",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p1"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "c2"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p3"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "t"
+          }
+        ],
+        "return_type": {
+          "type": "Vector2"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Get (evaluate) spline point: Catmull-Rom",
+        "name": "get_spline_point_catmull_rom",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p1"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p2"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p3"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "p4"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "t"
+          }
+        ],
+        "return_type": {
+          "type": "Vector2"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Get (evaluate) spline point: Linear",
+        "name": "get_spline_point_linear",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "start_pos"
+          },
+          {
+            "datatype": {
+              "type": "Vector2"
+            },
+            "name": "end_pos"
+          },
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "t"
+          }
+        ],
+        "return_type": {
+          "type": "Vector2"
         }
       },
       {
@@ -20246,6 +21051,38 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Rotate image by input angle in degrees (-359 to 359)",
+        "name": "image_rotate",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "Image"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "p_image"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "degrees"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Rotate image counter-clockwise 90deg",
         "name": "image_rotate_ccw",
         "parameters": [
@@ -20761,7 +21598,7 @@
         "parameters": [
           {
             "datatype": {
-              "type": "int"
+              "type": "u32"
             },
             "name": "gesture"
           }
@@ -20821,6 +21658,27 @@
         ],
         "comment": " Check if a key has been pressed once",
         "name": "is_key_pressed",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "key"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Check if a key has been pressed again (Only PLATFORM_DESKTOP)",
+        "name": "is_key_pressed_repeat",
         "parameters": [
           {
             "datatype": {
@@ -21377,6 +22235,28 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Load automation events list from file, NULL for empty list, capacity = MAX_AUTOMATION_EVENTS",
+        "name": "load_automation_event_list",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "file_name"
+          }
+        ],
+        "return_type": {
+          "type": "AutomationEventList"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Load all codepoints from a UTF-8 text string, codepoints count returned by parameter",
         "name": "load_codepoints",
         "parameters": [
@@ -21503,12 +22383,12 @@
               "arguments": [
                 {
                   "module": "libs.c",
-                  "type": "CUInt"
+                  "type": "CInt"
                 }
               ],
               "type": "Ptr"
             },
-            "name": "bytes_read"
+            "name": "data_size"
           }
         ],
         "return_type": {
@@ -21615,13 +22495,13 @@
               ],
               "type": "Ptr"
             },
-            "name": "font_chars"
+            "name": "codepoints"
           },
           {
             "datatype": {
               "type": "int"
             },
-            "name": "glyph_count"
+            "name": "codepoint_count"
           },
           {
             "datatype": {
@@ -21646,7 +22526,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Load font from file with extended parameters, use NULL for fontChars and 0 for glyphCount to load the default character set",
+        "comment": " Load font from file with extended parameters, use NULL for codepoints and 0 for codepointCount to load the default character setFont",
         "name": "load_font_ex",
         "parameters": [
           {
@@ -21672,13 +22552,13 @@
               ],
               "type": "Ptr"
             },
-            "name": "font_chars"
+            "name": "codepoints"
           },
           {
             "datatype": {
               "type": "int"
             },
-            "name": "glyph_count"
+            "name": "codepoint_count"
           }
         ],
         "return_type": {
@@ -21774,13 +22654,13 @@
               ],
               "type": "Ptr"
             },
-            "name": "font_chars"
+            "name": "codepoints"
           },
           {
             "datatype": {
               "type": "int"
             },
-            "name": "glyph_count"
+            "name": "codepoint_count"
           }
         ],
         "return_type": {
@@ -22046,6 +22926,40 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Load image from SVG file data or string with specified size",
+        "name": "load_image_svg",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "file_name_or_string"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "width"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "height"
+          }
+        ],
+        "return_type": {
+          "type": "Image"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)",
         "name": "load_material_default",
         "parameters": [],
@@ -22136,7 +23050,7 @@
               "arguments": [
                 {
                   "module": "libs.c",
-                  "type": "CUInt"
+                  "type": "CInt"
                 }
               ],
               "type": "Ptr"
@@ -22248,6 +23162,45 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Load random values sequence, no values repeated",
+        "name": "load_random_sequence",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "count"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "min"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "max"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "module": "libs.c",
+              "type": "CInt"
+            }
+          ],
+          "type": "Ptr"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Load texture for rendering (framebuffer)",
         "name": "load_render_texture",
         "parameters": [
@@ -22342,6 +23295,27 @@
               "type": "CStr"
             },
             "name": "file_name"
+          }
+        ],
+        "return_type": {
+          "type": "Sound"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Create a new sound that shares the same sample data as the source sound, does not own the sound data",
+        "name": "load_sound_alias",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Sound"
+            },
+            "name": "source"
           }
         ],
         "return_type": {
@@ -23259,6 +24233,21 @@
               "type": "Ptr"
             },
             "name": "frame_poses"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CChar"
+                },
+                {
+                  "type": "32"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "name"
           }
         ],
         "return_type": {
@@ -23461,6 +24450,27 @@
               "type": "AudioStream"
             },
             "name": "stream"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Play a recorded automation event",
+        "name": "play_automation_event",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "AutomationEvent"
+            },
+            "name": "event"
           }
         ],
         "return_type": {
@@ -23835,9 +24845,9 @@
           },
           {
             "datatype": {
-              "type": "u32"
+              "type": "int"
             },
-            "name": "bytes_to_write"
+            "name": "data_size"
           }
         ],
         "return_type": {
@@ -24040,6 +25050,53 @@
               "type": "float"
             },
             "name": "volume"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Set automation event internal base frame to start recording",
+        "name": "set_automation_event_base_frame",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "frame"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Set automation event list to record to",
+        "name": "set_automation_event_list",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "AutomationEventList"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "list"
           }
         ],
         "return_type": {
@@ -24955,6 +26012,27 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Set vertical line spacing when drawing with line-breaks",
+        "name": "set_text_line_spacing",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "spacing"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Set texture scaling filter mode",
         "name": "set_texture_filter",
         "parameters": [
@@ -25030,6 +26108,20 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Set window focused (only PLATFORM_DESKTOP)",
+        "name": "set_window_focused",
+        "parameters": [],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Set icon for window (single image, RGBA 32bit, only PLATFORM_DESKTOP)",
         "name": "set_window_icon",
         "parameters": [
@@ -25083,6 +26175,33 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE)",
+        "name": "set_window_max_size",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "width"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "height"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)",
         "name": "set_window_min_size",
         "parameters": [
@@ -25110,7 +26229,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Set monitor for the current window (fullscreen mode)",
+        "comment": " Set monitor for the current window",
         "name": "set_window_monitor",
         "parameters": [
           {
@@ -25227,7 +26346,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Set title for window (only PLATFORM_DESKTOP)",
+        "comment": " Set title for window (only PLATFORM_DESKTOP and PLATFORM_WEB)",
         "name": "set_window_title",
         "parameters": [
           {
@@ -25323,6 +26442,20 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Start recording automation events (AutomationEventList must be set)",
+        "name": "start_automation_event_recording",
+        "parameters": [],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Stop audio stream",
         "name": "stop_audio_stream",
         "parameters": [
@@ -25333,6 +26466,20 @@
             "name": "stream"
           }
         ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Stop recording automation events",
+        "name": "stop_automation_event_recording",
+        "parameters": [],
         "return_type": {
           "type": "None"
         }
@@ -26013,6 +27160,20 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Toggle window state: borderless windowed (only PLATFORM_DESKTOP)",
+        "name": "toggle_borderless_windowed",
+        "parameters": [],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Toggle window state: fullscreen/windowed (only PLATFORM_DESKTOP)",
         "name": "toggle_fullscreen",
         "parameters": [],
@@ -26068,6 +27229,32 @@
               "type": "AudioStream"
             },
             "name": "stream"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Unload automation events list from file",
+        "name": "unload_automation_event_list",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "AutomationEventList"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "list"
           }
         ],
         "return_type": {
@@ -26232,7 +27419,7 @@
               ],
               "type": "Ptr"
             },
-            "name": "chars"
+            "name": "glyphs"
           },
           {
             "datatype": {
@@ -26425,9 +27612,9 @@
           },
           {
             "datatype": {
-              "type": "u32"
+              "type": "int"
             },
-            "name": "count"
+            "name": "anim_count"
           }
         ],
         "return_type": {
@@ -26449,6 +27636,33 @@
               "type": "Music"
             },
             "name": "p_music"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Unload random values sequence",
+        "name": "unload_random_sequence",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "sequence"
           }
         ],
         "return_type": {
@@ -26512,6 +27726,27 @@
               "type": "Sound"
             },
             "name": "p_sound"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Unload a sound alias (does not deallocate sample data)",
+        "name": "unload_sound_alias",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "Sound"
+            },
+            "name": "alias"
           }
         ],
         "return_type": {
@@ -27455,7 +28690,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Check if KEY_ESCAPE pressed or Close icon pressed",
+        "comment": " Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)",
         "name": "window_should_close",
         "parameters": [],
         "return_type": {
@@ -27715,6 +28950,18 @@
           "type": "Const"
         },
         "name": "CUBEMAP_LAYOUT_PANORAMA"
+      },
+      {
+        "comment": " Set to run program in borderless windowed mode",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "FLAG_BORDERLESS_WINDOWED_MODE"
       },
       {
         "comment": " Set to run program in fullscreen",
@@ -30309,6 +31556,42 @@
         "name": "PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA"
       },
       {
+        "comment": " 16 bpp (1 channel - half float)",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "PIXELFORMAT_UNCOMPRESSED_R16"
+      },
+      {
+        "comment": " 16*3 bpp (3 channels - half float)",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "PIXELFORMAT_UNCOMPRESSED_R16G16B16"
+      },
+      {
+        "comment": " 16*4 bpp (4 channels - half float)",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "PIXELFORMAT_UNCOMPRESSED_R16G16B16A16"
+      },
+      {
         "comment": " 32 bpp (1 channel - float)",
         "datatype": {
           "arguments": [
@@ -31275,6 +32558,75 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Blit active framebuffer to main framebuffer",
+        "name": "rl_blit_framebuffer",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "src_x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "src_y"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "src_width"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "src_height"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "dst_x"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "dst_y"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "dst_width"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "dst_height"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "buffer_mask"
+          }
+        ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Check and log OpenGL error codes",
         "name": "rl_check_errors",
         "parameters": [],
@@ -31851,7 +33203,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Disable wire mode",
+        "comment": " Disable wire mode ( and point ) maybe rename",
         "name": "rl_disable_wire_mode",
         "parameters": [],
         "return_type": {
@@ -32143,6 +33495,20 @@
             "name": "id"
           }
         ],
+        "return_type": {
+          "type": "None"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Enable point mode",
+        "name": "rl_enable_point_mode",
+        "parameters": [],
         "return_type": {
           "type": "None"
         }
@@ -35450,6 +36816,18 @@
         "name": "RL_OPENGL_ES_20"
       },
       {
+        "comment": " OpenGL ES 3.0 (GLSL 300 es)",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "RL_OPENGL_ES_30"
+      },
+      {
         "comment": " 8 bpp",
         "datatype": {
           "arguments": [
@@ -35604,6 +36982,42 @@
           "type": "Const"
         },
         "name": "RL_PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA"
+      },
+      {
+        "comment": " 16 bpp (1 channel - half float)",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "RL_PIXELFORMAT_UNCOMPRESSED_R16"
+      },
+      {
+        "comment": " 16*3 bpp (3 channels - half float)",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "RL_PIXELFORMAT_UNCOMPRESSED_R16G16B16"
+      },
+      {
+        "comment": " 16*4 bpp (4 channels - half float)",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "RL_PIXELFORMAT_UNCOMPRESSED_R16G16B16A16"
       },
       {
         "comment": " 32 bpp (1 channel - float)",
@@ -36271,7 +37685,7 @@
             "name": "@onstack"
           }
         ],
-        "comment": " Style property",
+        "comment": " NOTE: Used when exporting style as code for convenience",
         "members": [
           {
             "datatype": {
@@ -36290,12 +37704,69 @@
           {
             "datatype": {
               "module": "libs.c",
-              "type": "CUInt"
+              "type": "CInt"
             },
             "name": "propertyValue"
           }
         ],
         "name": "GuiStyleProp"
+      },
+      {
+        "annotations": [
+          {
+            "argument": "GuiTextStyle",
+            "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
+          }
+        ],
+        "comment": " NOTE: Text style is defined by control",
+        "members": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "size"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "charSpacing"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "lineSpacing"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "alignmentH"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "alignmentV"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CInt"
+            },
+            "name": "padding"
+          }
+        ],
+        "name": "GuiTextStyle"
       }
     ],
     "functions": [
@@ -36325,42 +37796,7 @@
           }
         ],
         "return_type": {
-          "type": "bool"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@nativemacro"
-          }
-        ],
-        "comment": " Check Box control, returns true when active",
-        "name": "gui_check_box",
-        "parameters": [
-          {
-            "datatype": {
-              "module": "raylib",
-              "type": "Rectangle"
-            },
-            "name": "bounds"
-          },
-          {
-            "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
-            },
-            "name": "text"
-          },
-          {
-            "datatype": {
-              "type": "bool"
-            },
-            "name": "checked"
-          }
-        ],
-        "return_type": {
-          "type": "bool"
+          "type": "int"
         }
       },
       {
@@ -36389,13 +37825,18 @@
           },
           {
             "datatype": {
-              "type": "float"
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "alpha"
           }
         ],
         "return_type": {
-          "type": "float"
+          "type": "int"
         }
       },
       {
@@ -36424,13 +37865,18 @@
           },
           {
             "datatype": {
-              "type": "float"
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "value"
           }
         ],
         "return_type": {
-          "type": "float"
+          "type": "int"
         }
       },
       {
@@ -36459,15 +37905,60 @@
           },
           {
             "datatype": {
-              "module": "raylib",
-              "type": "Color"
+              "arguments": [
+                {
+                  "module": "raylib",
+                  "type": "Color"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "p_color"
           }
         ],
         "return_type": {
-          "module": "raylib",
-          "type": "Color"
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Color Panel control that returns HSV color value, used by GuiColorPickerHSV()",
+        "name": "gui_color_panel_hsv",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Rectangle"
+            },
+            "name": "bounds"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "text"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "raylib",
+                  "type": "Vector3"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "color_hsv"
+          }
+        ],
+        "return_type": {
+          "type": "int"
         }
       },
       {
@@ -36496,15 +37987,60 @@
           },
           {
             "datatype": {
-              "module": "raylib",
-              "type": "Color"
+              "arguments": [
+                {
+                  "module": "raylib",
+                  "type": "Color"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "p_color"
           }
         ],
         "return_type": {
-          "module": "raylib",
-          "type": "Color"
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Color Picker control that avoids conversion to RGB on each call (multiple color controls)",
+        "name": "gui_color_picker_hsv",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Rectangle"
+            },
+            "name": "bounds"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "text"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "raylib",
+                  "type": "Vector3"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "color_hsv"
+          }
+        ],
+        "return_type": {
+          "type": "int"
         }
       },
       {
@@ -36533,7 +38069,13 @@
           },
           {
             "datatype": {
-              "type": "int"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "active"
           }
@@ -36577,7 +38119,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": "",
+        "comment": " Draw icon using pixel size at specified position",
         "name": "gui_draw_icon",
         "parameters": [
           {
@@ -36660,7 +38202,7 @@
           }
         ],
         "return_type": {
-          "type": "bool"
+          "type": "int"
         }
       },
       {
@@ -36689,7 +38231,7 @@
           }
         ],
         "return_type": {
-          "type": "None"
+          "type": "int"
         }
       },
       {
@@ -36716,27 +38258,6 @@
         "comment": " Enable gui tooltips (global state)",
         "name": "gui_enable_tooltip",
         "parameters": [],
-        "return_type": {
-          "type": "None"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@nativemacro"
-          }
-        ],
-        "comment": " Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f",
-        "name": "gui_fade",
-        "parameters": [
-          {
-            "datatype": {
-              "type": "float"
-            },
-            "name": "alpha"
-          }
-        ],
         "return_type": {
           "type": "None"
         }
@@ -36852,11 +38373,22 @@
               "type": "int"
             },
             "name": "subdivs"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "raylib",
+                  "type": "Vector2"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "mouse_cell"
           }
         ],
         "return_type": {
-          "module": "raylib",
-          "type": "Vector2"
+          "type": "int"
         }
       },
       {
@@ -36885,7 +38417,7 @@
           }
         ],
         "return_type": {
-          "type": "None"
+          "type": "int"
         }
       },
       {
@@ -36957,7 +38489,7 @@
           }
         ],
         "return_type": {
-          "type": "None"
+          "type": "int"
         }
       },
       {
@@ -36986,7 +38518,7 @@
           }
         ],
         "return_type": {
-          "type": "bool"
+          "type": "int"
         }
       },
       {
@@ -37015,7 +38547,7 @@
           }
         ],
         "return_type": {
-          "type": "None"
+          "type": "int"
         }
       },
       {
@@ -37056,7 +38588,13 @@
           },
           {
             "datatype": {
-              "type": "int"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "active"
           }
@@ -37120,7 +38658,7 @@
               ],
               "type": "Ptr"
             },
-            "name": "focus"
+            "name": "scroll_index"
           },
           {
             "datatype": {
@@ -37132,13 +38670,19 @@
               ],
               "type": "Ptr"
             },
-            "name": "scroll_index"
+            "name": "active"
           },
           {
             "datatype": {
-              "type": "int"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
             },
-            "name": "active"
+            "name": "focus"
           }
         ],
         "return_type": {
@@ -37303,7 +38847,7 @@
           }
         ],
         "return_type": {
-          "type": "None"
+          "type": "int"
         }
       },
       {
@@ -37339,7 +38883,12 @@
           },
           {
             "datatype": {
-              "type": "float"
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "value"
           },
@@ -37357,7 +38906,7 @@
           }
         ],
         "return_type": {
-          "type": "float"
+          "type": "int"
         }
       },
       {
@@ -37402,11 +38951,43 @@
               "type": "Ptr"
             },
             "name": "scroll"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "raylib",
+                  "type": "Rectangle"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "view"
           }
         ],
         "return_type": {
-          "module": "raylib",
-          "type": "Rectangle"
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f",
+        "name": "gui_set_alpha",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "float"
+            },
+            "name": "alpha"
+          }
+        ],
+        "return_type": {
+          "type": "None"
         }
       },
       {
@@ -37438,7 +39019,7 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Set icon drawing size",
+        "comment": " Set default icon drawing size",
         "name": "gui_set_icon_scale",
         "parameters": [
           {
@@ -37561,7 +39142,12 @@
           },
           {
             "datatype": {
-              "type": "float"
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "value"
           },
@@ -37579,7 +39165,7 @@
           }
         ],
         "return_type": {
-          "type": "float"
+          "type": "int"
         }
       },
       {
@@ -37615,7 +39201,12 @@
           },
           {
             "datatype": {
-              "type": "float"
+              "arguments": [
+                {
+                  "type": "float"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "value"
           },
@@ -37633,7 +39224,7 @@
           }
         ],
         "return_type": {
-          "type": "float"
+          "type": "int"
         }
       },
       {
@@ -37692,7 +39283,7 @@
           }
         ],
         "return_type": {
-          "type": "bool"
+          "type": "int"
         }
       },
       {
@@ -37721,7 +39312,7 @@
           }
         ],
         "return_type": {
-          "type": "None"
+          "type": "int"
         }
       },
       {
@@ -37748,7 +39339,7 @@
           },
           {
             "datatype": {
-              "type": "u32"
+              "type": "int"
             },
             "name": "property_value"
           }
@@ -37857,115 +39448,6 @@
           }
         ],
         "return_type": {
-          "type": "bool"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@nativemacro"
-          }
-        ],
-        "comment": " Text Box control with multiple lines",
-        "name": "gui_text_box_multi",
-        "parameters": [
-          {
-            "datatype": {
-              "module": "raylib",
-              "type": "Rectangle"
-            },
-            "name": "bounds"
-          },
-          {
-            "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
-            },
-            "name": "text"
-          },
-          {
-            "datatype": {
-              "type": "int"
-            },
-            "name": "text_size"
-          },
-          {
-            "datatype": {
-              "type": "bool"
-            },
-            "name": "edit_mode"
-          }
-        ],
-        "return_type": {
-          "type": "bool"
-        }
-      },
-      {
-        "annotations": [
-          {
-            "argument": "",
-            "name": "@nativemacro"
-          }
-        ],
-        "comment": " Text Input Box control, ask for text, supports secret",
-        "name": "gui_text_input_box",
-        "parameters": [
-          {
-            "datatype": {
-              "module": "raylib",
-              "type": "Rectangle"
-            },
-            "name": "bounds"
-          },
-          {
-            "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
-            },
-            "name": "title"
-          },
-          {
-            "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
-            },
-            "name": "message"
-          },
-          {
-            "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
-            },
-            "name": "buttons"
-          },
-          {
-            "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
-            },
-            "name": "text"
-          },
-          {
-            "datatype": {
-              "type": "int"
-            },
-            "name": "text_max_size"
-          },
-          {
-            "datatype": {
-              "arguments": [
-                {
-                  "module": "libs.c",
-                  "type": "CInt"
-                }
-              ],
-              "type": "Ptr"
-            },
-            "name": "secret_view_active"
-          }
-        ],
-        "return_type": {
           "type": "int"
         }
       },
@@ -37976,32 +39458,48 @@
             "name": "@nativemacro"
           }
         ],
-        "comment": " Toggle Button control, returns true when active",
-        "name": "gui_toggle",
+        "comment": " Factory function for: GuiTextStyle",
+        "name": "gui_text_style",
         "parameters": [
           {
             "datatype": {
-              "module": "raylib",
-              "type": "Rectangle"
+              "type": "u32"
             },
-            "name": "bounds"
+            "name": "size"
           },
           {
             "datatype": {
-              "module": "libs.c",
-              "type": "CStr"
+              "type": "int"
             },
-            "name": "text"
+            "name": "char_spacing"
           },
           {
             "datatype": {
-              "type": "bool"
+              "type": "int"
             },
-            "name": "active"
+            "name": "line_spacing"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "alignment_h"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "alignment_v"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "padding"
           }
         ],
         "return_type": {
-          "type": "bool"
+          "type": "GuiTextStyle"
         }
       },
       {
@@ -38030,7 +39528,54 @@
           },
           {
             "datatype": {
-              "type": "int"
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "active"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Toggle Slider control, returns true when clicked",
+        "name": "gui_toggle_slider",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Rectangle"
+            },
+            "name": "bounds"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "text"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                }
+              ],
+              "type": "Ptr"
             },
             "name": "active"
           }
@@ -38109,7 +39654,7 @@
           }
         ],
         "return_type": {
-          "type": "bool"
+          "type": "int"
         }
       },
       {
@@ -38138,13 +39683,13 @@
           }
         ],
         "return_type": {
-          "type": "bool"
+          "type": "int"
         }
       }
     ],
     "global_consts": [
       {
-        "comment": "",
+        "comment": " ScrollBar arrows size",
         "datatype": {
           "arguments": [
             {
@@ -38156,7 +39701,7 @@
         "name": "ARROWS_SIZE"
       },
       {
-        "comment": "",
+        "comment": " ScrollBar arrows visible",
         "datatype": {
           "arguments": [
             {
@@ -38192,7 +39737,7 @@
         "name": "BACKGROUND_COLOR"
       },
       {
-        "comment": "",
+        "comment": " Control base color in STATE_DISABLED",
         "datatype": {
           "arguments": [
             {
@@ -38204,7 +39749,7 @@
         "name": "BASE_COLOR_DISABLED"
       },
       {
-        "comment": "",
+        "comment": " Control base color in STATE_FOCUSED",
         "datatype": {
           "arguments": [
             {
@@ -38216,7 +39761,7 @@
         "name": "BASE_COLOR_FOCUSED"
       },
       {
-        "comment": "",
+        "comment": " Control base color in STATE_NORMAL",
         "datatype": {
           "arguments": [
             {
@@ -38228,7 +39773,7 @@
         "name": "BASE_COLOR_NORMAL"
       },
       {
-        "comment": "",
+        "comment": " Control base color in STATE_PRESSED",
         "datatype": {
           "arguments": [
             {
@@ -38240,7 +39785,7 @@
         "name": "BASE_COLOR_PRESSED"
       },
       {
-        "comment": "",
+        "comment": " Control border color in STATE_DISABLED",
         "datatype": {
           "arguments": [
             {
@@ -38252,7 +39797,7 @@
         "name": "BORDER_COLOR_DISABLED"
       },
       {
-        "comment": "",
+        "comment": " Control border color in STATE_FOCUSED",
         "datatype": {
           "arguments": [
             {
@@ -38264,7 +39809,7 @@
         "name": "BORDER_COLOR_FOCUSED"
       },
       {
-        "comment": "",
+        "comment": " Control border color in STATE_NORMAL",
         "datatype": {
           "arguments": [
             {
@@ -38276,7 +39821,7 @@
         "name": "BORDER_COLOR_NORMAL"
       },
       {
-        "comment": "",
+        "comment": " Control border color in STATE_PRESSED",
         "datatype": {
           "arguments": [
             {
@@ -38288,7 +39833,7 @@
         "name": "BORDER_COLOR_PRESSED"
       },
       {
-        "comment": "",
+        "comment": " Control border size, 0 for no border",
         "datatype": {
           "arguments": [
             {
@@ -38502,18 +40047,6 @@
           "type": "Const"
         },
         "name": "ICON_1UP"
-      },
-      {
-        "comment": "",
-        "datatype": {
-          "arguments": [
-            {
-              "type": "int"
-            }
-          ],
-          "type": "Const"
-        },
-        "name": "ICON_219"
       },
       {
         "comment": "",
@@ -41057,6 +42590,18 @@
           ],
           "type": "Const"
         },
+        "name": "ICON_SAND_TIMER"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
         "name": "ICON_SCALE"
       },
       {
@@ -41657,22 +43202,10 @@
           ],
           "type": "Const"
         },
-        "name": "RESERVED"
-      },
-      {
-        "comment": "",
-        "datatype": {
-          "arguments": [
-            {
-              "type": "int"
-            }
-          ],
-          "type": "Const"
-        },
         "name": "SCROLLBAR"
       },
       {
-        "comment": " ListView scrollbar side (0-left, 1-right)",
+        "comment": " ListView scrollbar side (0-SCROLLBAR_LEFT_SIDE, 1-SCROLLBAR_RIGHT_SIDE)",
         "datatype": {
           "arguments": [
             {
@@ -41696,7 +43229,7 @@
         "name": "SCROLLBAR_WIDTH"
       },
       {
-        "comment": "",
+        "comment": " ScrollBar scroll padding from arrows",
         "datatype": {
           "arguments": [
             {
@@ -41708,7 +43241,7 @@
         "name": "SCROLL_PADDING"
       },
       {
-        "comment": " (SLIDERBAR, SLIDER_PADDING)",
+        "comment": " ScrollBar slider internal padding",
         "datatype": {
           "arguments": [
             {
@@ -41720,7 +43253,7 @@
         "name": "SCROLL_SLIDER_PADDING"
       },
       {
-        "comment": "",
+        "comment": " ScrollBar slider size",
         "datatype": {
           "arguments": [
             {
@@ -41732,7 +43265,7 @@
         "name": "SCROLL_SLIDER_SIZE"
       },
       {
-        "comment": "",
+        "comment": " ScrollBar scrolling speed",
         "datatype": {
           "arguments": [
             {
@@ -41744,7 +43277,7 @@
         "name": "SCROLL_SPEED"
       },
       {
-        "comment": " Used also for: SLIDERBAR",
+        "comment": " Used also for: SLIDERBAR, TOGGLESLIDER",
         "datatype": {
           "arguments": [
             {
@@ -41888,7 +43421,7 @@
         "name": "TEXTBOX"
       },
       {
-        "comment": "",
+        "comment": " Control text horizontal alignment inside control text bound (after border and padding)",
         "datatype": {
           "arguments": [
             {
@@ -41898,6 +43431,30 @@
           "type": "Const"
         },
         "name": "TEXT_ALIGNMENT"
+      },
+      {
+        "comment": " Text vertical alignment inside text bounds (after border and padding)",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TEXT_ALIGNMENT_VERTICAL"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TEXT_ALIGN_BOTTOM"
       },
       {
         "comment": "",
@@ -41933,6 +43490,18 @@
           ],
           "type": "Const"
         },
+        "name": "TEXT_ALIGN_MIDDLE"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
         "name": "TEXT_ALIGN_RIGHT"
       },
       {
@@ -41945,10 +43514,22 @@
           ],
           "type": "Const"
         },
+        "name": "TEXT_ALIGN_TOP"
+      },
+      {
+        "comment": " Control text color in STATE_DISABLED",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
         "name": "TEXT_COLOR_DISABLED"
       },
       {
-        "comment": "",
+        "comment": " Control text color in STATE_FOCUSED",
         "datatype": {
           "arguments": [
             {
@@ -41960,7 +43541,7 @@
         "name": "TEXT_COLOR_FOCUSED"
       },
       {
-        "comment": "",
+        "comment": " Control text color in STATE_NORMAL",
         "datatype": {
           "arguments": [
             {
@@ -41972,7 +43553,7 @@
         "name": "TEXT_COLOR_NORMAL"
       },
       {
-        "comment": "",
+        "comment": " Control text color in STATE_PRESSED",
         "datatype": {
           "arguments": [
             {
@@ -41984,7 +43565,7 @@
         "name": "TEXT_COLOR_PRESSED"
       },
       {
-        "comment": " TextBox/TextBoxMulti/ValueBox/Spinner inner text padding",
+        "comment": " Text spacing between lines",
         "datatype": {
           "arguments": [
             {
@@ -41993,22 +43574,10 @@
           ],
           "type": "Const"
         },
-        "name": "TEXT_INNER_PADDING"
+        "name": "TEXT_LINE_SPACING"
       },
       {
-        "comment": " TextBoxMulti lines separation",
-        "datatype": {
-          "arguments": [
-            {
-              "type": "int"
-            }
-          ],
-          "type": "Const"
-        },
-        "name": "TEXT_LINES_SPACING"
-      },
-      {
-        "comment": "",
+        "comment": " Control text padding, not considering border",
         "datatype": {
           "arguments": [
             {
@@ -42018,6 +43587,18 @@
           "type": "Const"
         },
         "name": "TEXT_PADDING"
+      },
+      {
+        "comment": " TextBox in read-only mode: 0-text editable, 1-text no-editable",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TEXT_READONLY"
       },
       {
         "comment": " Text size (glyphs max height)",
@@ -42042,6 +43623,54 @@
           "type": "Const"
         },
         "name": "TEXT_SPACING"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TEXT_WRAP_CHAR"
+      },
+      {
+        "comment": " Text wrap-mode inside text bounds",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TEXT_WRAP_MODE"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TEXT_WRAP_NONE"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "int"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TEXT_WRAP_WORD"
       },
       {
         "comment": " Used also for: TOGGLEGROUP",
@@ -42545,13 +44174,13 @@
             "datatype": {
               "type": "f64"
             },
-            "name": "near"
+            "name": "near_plane"
           },
           {
             "datatype": {
               "type": "f64"
             },
-            "name": "far"
+            "name": "far_plane"
           }
         ],
         "return_type": {
@@ -42573,7 +44202,7 @@
             "datatype": {
               "type": "f64"
             },
-            "name": "fovy"
+            "name": "fov_y"
           },
           {
             "datatype": {
@@ -42585,13 +44214,13 @@
             "datatype": {
               "type": "f64"
             },
-            "name": "near"
+            "name": "near_plane"
           },
           {
             "datatype": {
               "type": "f64"
             },
-            "name": "far"
+            "name": "far_plane"
           }
         ],
         "return_type": {
@@ -45118,6 +46747,36 @@
           }
         ],
         "comment": "",
+        "name": "vector3_project",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Vector3"
+            },
+            "name": "v1"
+          },
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Vector3"
+            },
+            "name": "v2"
+          }
+        ],
+        "return_type": {
+          "module": "raylib",
+          "type": "Vector3"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": "",
         "name": "vector3_reflect",
         "parameters": [
           {
@@ -45169,6 +46828,36 @@
               "type": "float"
             },
             "name": "r"
+          }
+        ],
+        "return_type": {
+          "module": "raylib",
+          "type": "Vector3"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": "",
+        "name": "vector3_reject",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Vector3"
+            },
+            "name": "v1"
+          },
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Vector3"
+            },
+            "name": "v2"
           }
         ],
         "return_type": {
@@ -46467,13 +48156,18 @@
                 {
                   "arguments": [
                     {
-                      "type": "u8"
+                      "arguments": [
+                        {
+                          "type": "u8"
+                        }
+                      ],
+                      "type": "Const"
                     }
                   ],
-                  "type": "Const"
+                  "type": "Ptr"
                 }
               ],
-              "type": "Ptr"
+              "type": "Const"
             },
             "name": "text_data"
           },

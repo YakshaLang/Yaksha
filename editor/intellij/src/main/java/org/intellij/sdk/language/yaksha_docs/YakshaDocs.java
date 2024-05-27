@@ -31,6 +31,7 @@ public class YakshaDocs {
             .put("arrsetlen", BuiltinDoc.b("arrsetlen(Array[T], int) -> None", "Set array length. Each element will " +
                     "be an uninitialized element."))
             .put("array", BuiltinDoc.b("array(\"T\", T...) -> Array[T]", "Create a new array from given elements"))
+            .put("fixedarr", BuiltinDoc.b("fixedarr(\"T\", T...) -> FixedArr[T,N]", "Create a new fixed array from given elements"))
             .put("getref", BuiltinDoc.b("getref(T) -> Ptr[T]", "Get a pointer to given object"))
             .put("unref", BuiltinDoc.b("unref(Ptr[T]) -> T", "Dereference a pointer"))
             .put("charat", BuiltinDoc.b("charat(str, int) -> int", "Get a character at a specific location in string"))
