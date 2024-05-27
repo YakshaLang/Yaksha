@@ -65,6 +65,12 @@ public class YakshaOuterStatementImpl extends ASTWrapperPsiElement implements Ya
 
   @Override
   @Nullable
+  public YakshaEnumStatement getEnumStatement() {
+    return findChildByClass(YakshaEnumStatement.class);
+  }
+
+  @Override
+  @Nullable
   public YakshaImportStatement getImportStatement() {
     return findChildByClass(YakshaImportStatement.class);
   }

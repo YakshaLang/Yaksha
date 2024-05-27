@@ -1748,6 +1748,122 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // COMMENT | empty_line | enum_field
+  public static boolean enum_bits(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_bits")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, ENUM_BITS, "<enum bits>");
+    r = consumeToken(b, COMMENT);
+    if (!r) r = empty_line(b, l + 1);
+    if (!r) r = enum_field(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // enum_field_wo_indent | NL enum_bits+
+  public static boolean enum_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_block")) return false;
+    if (!nextTokenIs(b, "<enum block>", IDENTIFIER, NL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, ENUM_BLOCK, "<enum block>");
+    r = enum_field_wo_indent(b, l + 1);
+    if (!r) r = enum_block_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // NL enum_bits+
+  private static boolean enum_block_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_block_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, NL);
+    r = r && enum_block_1_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // enum_bits+
+  private static boolean enum_block_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_block_1_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = enum_bits(b, l + 1);
+    while (r) {
+      int c = current_position_(b);
+      if (!enum_bits(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "enum_block_1_1", c)) break;
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // I enum_field_wo_indent
+  public static boolean enum_field(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_field")) return false;
+    if (!nextTokenIs(b, I)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, I);
+    r = r && enum_field_wo_indent(b, l + 1);
+    exit_section_(b, m, ENUM_FIELD, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // IDENTIFIER S? NL
+  public static boolean enum_field_wo_indent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_field_wo_indent")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, IDENTIFIER);
+    r = r && enum_field_wo_indent_1(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, m, ENUM_FIELD_WO_INDENT, r);
+    return r;
+  }
+
+  // S?
+  private static boolean enum_field_wo_indent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_field_wo_indent_1")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // KW_ENUM S IDENTIFIER S? OPERATOR_COLON S? enum_block
+  public static boolean enum_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_statement")) return false;
+    if (!nextTokenIs(b, KW_ENUM)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, KW_ENUM, S, IDENTIFIER);
+    r = r && enum_statement_3(b, l + 1);
+    r = r && consumeToken(b, OPERATOR_COLON);
+    r = r && enum_statement_5(b, l + 1);
+    r = r && enum_block(b, l + 1);
+    exit_section_(b, m, ENUM_STATEMENT, r);
+    return r;
+  }
+
+  // S?
+  private static boolean enum_statement_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_statement_3")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  // S?
+  private static boolean enum_statement_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_statement_5")) return false;
+    consumeToken(b, S);
+    return true;
+  }
+
+  /* ********************************************************** */
   // S? logic_or S?
   public static boolean exp(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "exp")) return false;
@@ -2843,7 +2959,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // directive_statement | runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | macro_declaration_statement | dsl_outer_block
+  // directive_statement | runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | enum_statement | macro_declaration_statement | dsl_outer_block
   public static boolean outer_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "outer_statement")) return false;
     boolean r;
@@ -2854,6 +2970,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = const_statement(b, l + 1);
     if (!r) r = outer_statement_4(b, l + 1);
     if (!r) r = outer_statement_5(b, l + 1);
+    if (!r) r = enum_statement(b, l + 1);
     if (!r) r = macro_declaration_statement(b, l + 1);
     if (!r) r = dsl_outer_block(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -3241,7 +3358,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !('@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive')
+  // !('@' | 'class'  | 'struct' | 'enum' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive')
   static boolean top_level_recover(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "top_level_recover")) return false;
     boolean r;
@@ -3251,13 +3368,14 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive'
+  // '@' | 'class'  | 'struct' | 'enum' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive'
   private static boolean top_level_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "top_level_recover_0")) return false;
     boolean r;
     r = consumeToken(b, "@");
     if (!r) r = consumeToken(b, "class");
     if (!r) r = consumeToken(b, "struct");
+    if (!r) r = consumeToken(b, "enum");
     if (!r) r = consumeToken(b, "def");
     if (!r) r = consumeToken(b, "import");
     if (!r) r = consumeToken(b, "runtimefeature");

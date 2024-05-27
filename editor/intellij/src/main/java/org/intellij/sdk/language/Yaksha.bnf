@@ -17,13 +17,13 @@
 }
 
 yakshaFile ::= item_*  {pin=1 recoverWhile="top_level_recover" name="import, def, class"}
-private top_level_recover ::= !('@' | 'class'  | 'struct' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive')
+private top_level_recover ::= !('@' | 'class'  | 'struct' | 'enum' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive')
 
 private item_ ::= (outer_statement | COMMENT | empty_line)
 
 empty_line ::= S? NL
 
-outer_statement ::= directive_statement | runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | macro_declaration_statement | dsl_outer_block
+outer_statement ::= directive_statement | runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | enum_statement | macro_declaration_statement | dsl_outer_block
 
 runtimefeature_statement ::= KW_RUNTIMEFEATURE S STRING S? NL
 
@@ -64,6 +64,21 @@ class_field_wo_indent ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? NL {
 }
 single_line_class_bits ::= pass_statement_wo_indent | class_field_wo_indent
 class_block ::= single_line_class_bits | NL class_bits+
+
+enum_statement ::= KW_ENUM S IDENTIFIER S? OPERATOR_COLON S? enum_block {
+    mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
+    implements="org.intellij.sdk.language.psi.YakshaNamedElement"
+    methods=[getName setName getNameIdentifier getPresentation]
+}
+
+enum_bits ::= COMMENT | empty_line | enum_field
+enum_field ::= I enum_field_wo_indent {
+    methods=[getName getNameIdentifier getPresentation]
+}
+enum_field_wo_indent ::= IDENTIFIER S? NL {
+    methods=[getName getNameIdentifier getPresentation]
+}
+enum_block ::= enum_field_wo_indent | NL enum_bits+
 
 def_statement ::= KW_DEF S IDENTIFIER S? OPERATOR_OPEN_P S? def_params? S? OPERATOR_CLOSE_P S? OPERATOR_ARROW S? data_type S? OPERATOR_COLON S? def_block {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"

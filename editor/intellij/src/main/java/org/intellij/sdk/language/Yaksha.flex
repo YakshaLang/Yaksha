@@ -1,10 +1,8 @@
 package org.intellij.sdk.language;
 
-import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.tree.IElementType;
-import org.intellij.sdk.language.psi.YakshaTokenType;
-import org.intellij.sdk.language.psi.YakshaTypes;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
+import org.intellij.sdk.language.psi.YakshaTypes;
 
 %%
 
@@ -83,6 +81,7 @@ TRIPLE_APOS_LITERAL = {THREE_APOS} {APOS_STRING_CHAR}* {THREE_APOS}?
   "as"                           { return YakshaTypes.KW_AS; }
   "break"                        { return YakshaTypes.KW_BREAK; }
   "class"                        { return YakshaTypes.KW_CLASS; }
+  "enum"                         { return YakshaTypes.KW_ENUM; }
   "struct"                       { return YakshaTypes.KW_STRUCT; }
   "ccode"                        { return YakshaTypes.KW_CCODE; }
   "continue"                     { return YakshaTypes.KW_CONTINUE; }

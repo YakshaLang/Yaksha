@@ -50,6 +50,11 @@ public interface YakshaTypes {
   IElementType ELIF_STATEMENT = new YakshaElementType("ELIF_STATEMENT");
   IElementType ELSE_STATEMENT = new YakshaElementType("ELSE_STATEMENT");
   IElementType EMPTY_LINE = new YakshaElementType("EMPTY_LINE");
+  IElementType ENUM_BITS = new YakshaElementType("ENUM_BITS");
+  IElementType ENUM_BLOCK = new YakshaElementType("ENUM_BLOCK");
+  IElementType ENUM_FIELD = new YakshaElementType("ENUM_FIELD");
+  IElementType ENUM_FIELD_WO_INDENT = new YakshaElementType("ENUM_FIELD_WO_INDENT");
+  IElementType ENUM_STATEMENT = new YakshaElementType("ENUM_STATEMENT");
   IElementType EXP = new YakshaElementType("EXP");
   IElementType EXPR_STATEMENT = new YakshaElementType("EXPR_STATEMENT");
   IElementType EXPR_STATEMENT_WO_INDENT = new YakshaElementType("EXPR_STATEMENT_WO_INDENT");
@@ -99,6 +104,7 @@ public interface YakshaTypes {
   IElementType KW_DIRECTIVE = new YakshaTokenType("KW_DIRECTIVE");
   IElementType KW_ELIF = new YakshaTokenType("KW_ELIF");
   IElementType KW_ELSE = new YakshaTokenType("KW_ELSE");
+  IElementType KW_ENUM = new YakshaTokenType("KW_ENUM");
   IElementType KW_FALSE = new YakshaTokenType("KW_FALSE");
   IElementType KW_FOR = new YakshaTokenType("KW_FOR");
   IElementType KW_IF = new YakshaTokenType("KW_IF");
@@ -285,6 +291,21 @@ public interface YakshaTypes {
       }
       else if (type == EMPTY_LINE) {
         return new YakshaEmptyLineImpl(node);
+      }
+      else if (type == ENUM_BITS) {
+        return new YakshaEnumBitsImpl(node);
+      }
+      else if (type == ENUM_BLOCK) {
+        return new YakshaEnumBlockImpl(node);
+      }
+      else if (type == ENUM_FIELD) {
+        return new YakshaEnumFieldImpl(node);
+      }
+      else if (type == ENUM_FIELD_WO_INDENT) {
+        return new YakshaEnumFieldWoIndentImpl(node);
+      }
+      else if (type == ENUM_STATEMENT) {
+        return new YakshaEnumStatementImpl(node);
       }
       else if (type == EXP) {
         return new YakshaExpImpl(node);

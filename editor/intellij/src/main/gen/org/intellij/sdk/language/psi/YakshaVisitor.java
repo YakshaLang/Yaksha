@@ -175,6 +175,26 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitEnumBits(@NotNull YakshaEnumBits o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEnumBlock(@NotNull YakshaEnumBlock o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEnumField(@NotNull YakshaEnumField o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEnumFieldWoIndent(@NotNull YakshaEnumFieldWoIndent o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEnumStatement(@NotNull YakshaEnumStatement o) {
+    visitNamedElement(o);
+  }
+
   public void visitExp(@NotNull YakshaExp o) {
     visitPsiElement(o);
   }
