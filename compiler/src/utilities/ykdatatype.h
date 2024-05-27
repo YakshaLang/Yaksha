@@ -43,7 +43,7 @@
 #include <sstream>
 #include <vector>
 namespace yaksha {
-  enum class ykprimitive {
+  enum class yk_primitive {
     // Numeric > 0 && < 1000
     BOOL = 1,
     HIDDEN_I4 [[maybe_unused]] = 2,// reserved
@@ -69,18 +69,17 @@ namespace yaksha {
     // Invalid < 0
     NOT_A_PRIMITIVE = -9999,// internal use only
   };
-  enum class ykbuiltin {
+  enum class yk_builtin {
     ARRAY,
     SM_ENTRY,
     M_ENTRY,
     NOT_A_BUILTIN,
     CONSTANT,
     POINTER,
-    // TODO Rename to PTR_ANY
-    ANY_PTR,
-    // TODO Rename to PTR_CONST_ANY
-    ANY_PTR_TO_CONST,
+    PTR_TO_ANY,      // void *
+    PTR_TO_CONST_ANY,// void const *
     TUPLE,
+    ENUM_CONTAINER,// Enum[EnumClass,Value]
     // Function[In[str],Out]
     FUNCTION,
     F_IN, // ----- special metadata
@@ -139,6 +138,7 @@ namespace yaksha {
     [[nodiscard]] bool is_tuple() const;
     [[nodiscard]] bool is_fixed_size_array() const;
     [[nodiscard]] bool is_dimension() const;
+    [[nodiscard]] bool is_enum_container() const;
     // match a combination of primitives
     [[nodiscard]] bool is_a_number() const;
     [[nodiscard]] bool is_an_integer() const;
@@ -151,8 +151,8 @@ namespace yaksha {
     std::string module_{};
     std::vector<ykdatatype *> args_;
     int dimension_{-1};
-    ykprimitive primitive_type_{ykprimitive::NOT_A_PRIMITIVE};
-    ykbuiltin builtin_type_{ykbuiltin::NOT_A_BUILTIN};
+    yk_primitive primitive_type_{yk_primitive::NOT_A_PRIMITIVE};
+    yk_builtin builtin_type_{yk_builtin::NOT_A_BUILTIN};
     bool widen_rhs{false};
     bool widen_lhs{false};
     size_t hits_{0};

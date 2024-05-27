@@ -55,81 +55,83 @@ ykdatatype::ykdatatype(token *primitive_dt) {
 }
 void ykdatatype::find_builtin_or_primitive() {
   if (token_->type_ == token_type::INTEGER_DECIMAL) {
-    builtin_type_ = ykbuiltin::DIMENSION;
+    builtin_type_ = yk_builtin::DIMENSION;
   } else if (token_->token_ == "i8") {
-    primitive_type_ = ykprimitive::I8;
+    primitive_type_ = yk_primitive::I8;
   } else if (token_->token_ == "i16") {
-    primitive_type_ = ykprimitive::I16;
+    primitive_type_ = yk_primitive::I16;
   } else if (token_->token_ == "i64") {
-    primitive_type_ = ykprimitive::I64;
+    primitive_type_ = yk_primitive::I64;
   } else if (token_->token_ == "u8") {
-    primitive_type_ = ykprimitive::U8;
+    primitive_type_ = yk_primitive::U8;
   } else if (token_->token_ == "u16") {
-    primitive_type_ = ykprimitive::U16;
+    primitive_type_ = yk_primitive::U16;
   } else if (token_->token_ == "u32") {
-    primitive_type_ = ykprimitive::U32;
+    primitive_type_ = yk_primitive::U32;
   } else if (token_->token_ == "u64") {
-    primitive_type_ = ykprimitive::U64;
+    primitive_type_ = yk_primitive::U64;
   } else if (token_->token_ == "int" || token_->token_ == "i32") {
-    primitive_type_ = ykprimitive::I32;
+    primitive_type_ = yk_primitive::I32;
   } else if (token_->token_ == "float" || token_->token_ == "f32") {
-    primitive_type_ = ykprimitive::F32;
+    primitive_type_ = yk_primitive::F32;
   } else if (token_->token_ == "f64") {
-    primitive_type_ = ykprimitive::F64;
+    primitive_type_ = yk_primitive::F64;
   } else if (token_->token_ == "str") {
-    primitive_type_ = ykprimitive::STR;
+    primitive_type_ = yk_primitive::STR;
   } else if (token_->token_ == "sr") {
-    primitive_type_ = ykprimitive::SR;
+    primitive_type_ = yk_primitive::SR;
   } else if (token_->token_ == ":s:") {
-    primitive_type_ = ykprimitive::HIDDEN_STRING_LIT;
+    primitive_type_ = yk_primitive::HIDDEN_STRING_LIT;
   } else if (token_->token_ == "bool") {
-    primitive_type_ = ykprimitive::BOOL;
+    primitive_type_ = yk_primitive::BOOL;
   } else if (token_->token_ == "None") {
-    primitive_type_ = ykprimitive::NONE;
+    primitive_type_ = yk_primitive::NONE;
   } else if (token_->token_ == "Array") {
-    builtin_type_ = ykbuiltin::ARRAY;
+    builtin_type_ = yk_builtin::ARRAY;
   } else if (token_->token_ == "Const") {
-    builtin_type_ = ykbuiltin::CONSTANT;
+    builtin_type_ = yk_builtin::CONSTANT;
   } else if (token_->token_ == "Ptr") {
-    builtin_type_ = ykbuiltin::POINTER;
+    builtin_type_ = yk_builtin::POINTER;
   } else if (token_->token_ == "SMEntry") {
-    builtin_type_ = ykbuiltin::SM_ENTRY;
+    builtin_type_ = yk_builtin::SM_ENTRY;
   } else if (token_->token_ == "MEntry") {
-    builtin_type_ = ykbuiltin::M_ENTRY;
+    builtin_type_ = yk_builtin::M_ENTRY;
   } else if (token_->token_ == "Function") {
-    builtin_type_ = ykbuiltin::FUNCTION;
+    builtin_type_ = yk_builtin::FUNCTION;
   } else if (token_->token_ == "In") {
-    builtin_type_ = ykbuiltin::F_IN;
+    builtin_type_ = yk_builtin::F_IN;
   } else if (token_->token_ == "Out") {
-    builtin_type_ = ykbuiltin::F_OUT;
+    builtin_type_ = yk_builtin::F_OUT;
   } else if (token_->token_ == "AnyPtr") {
-    builtin_type_ = ykbuiltin::ANY_PTR;
+    builtin_type_ = yk_builtin::PTR_TO_ANY;
   } else if (token_->token_ == "AnyPtrToConst") {
-    builtin_type_ = ykbuiltin::ANY_PTR_TO_CONST;
+    builtin_type_ = yk_builtin::PTR_TO_CONST_ANY;
   } else if (token_->token_ == "Tuple") {
-    builtin_type_ = ykbuiltin::TUPLE;
+    builtin_type_ = yk_builtin::TUPLE;
   } else if (token_->token_ == "FixedArr") {
-    builtin_type_ = ykbuiltin::FIXED_ARRAY;
+    builtin_type_ = yk_builtin::FIXED_ARRAY;
+  } else if (token_->token_ == ":enum:") {
+    builtin_type_ = yk_builtin::ENUM_CONTAINER;
   }
 }
 ykdatatype::~ykdatatype() { delete (token_); }
-bool ykdatatype::is_i8() const { return primitive_type_ == ykprimitive::I8; }
-bool ykdatatype::is_i16() const { return primitive_type_ == ykprimitive::I16; }
-bool ykdatatype::is_i32() const { return primitive_type_ == ykprimitive::I32; }
-bool ykdatatype::is_i64() const { return primitive_type_ == ykprimitive::I64; }
-bool ykdatatype::is_u8() const { return primitive_type_ == ykprimitive::U8; }
-bool ykdatatype::is_u16() const { return primitive_type_ == ykprimitive::U16; }
-bool ykdatatype::is_u32() const { return primitive_type_ == ykprimitive::U32; }
-bool ykdatatype::is_u64() const { return primitive_type_ == ykprimitive::U64; }
-bool ykdatatype::is_str() const { return primitive_type_ == ykprimitive::STR; }
-bool ykdatatype::is_sr() const { return primitive_type_ == ykprimitive::SR; }
-bool ykdatatype::is_f32() const { return primitive_type_ == ykprimitive::F32; }
-bool ykdatatype::is_f64() const { return primitive_type_ == ykprimitive::F64; }
+bool ykdatatype::is_i8() const { return primitive_type_ == yk_primitive::I8; }
+bool ykdatatype::is_i16() const { return primitive_type_ == yk_primitive::I16; }
+bool ykdatatype::is_i32() const { return primitive_type_ == yk_primitive::I32; }
+bool ykdatatype::is_i64() const { return primitive_type_ == yk_primitive::I64; }
+bool ykdatatype::is_u8() const { return primitive_type_ == yk_primitive::U8; }
+bool ykdatatype::is_u16() const { return primitive_type_ == yk_primitive::U16; }
+bool ykdatatype::is_u32() const { return primitive_type_ == yk_primitive::U32; }
+bool ykdatatype::is_u64() const { return primitive_type_ == yk_primitive::U64; }
+bool ykdatatype::is_str() const { return primitive_type_ == yk_primitive::STR; }
+bool ykdatatype::is_sr() const { return primitive_type_ == yk_primitive::SR; }
+bool ykdatatype::is_f32() const { return primitive_type_ == yk_primitive::F32; }
+bool ykdatatype::is_f64() const { return primitive_type_ == yk_primitive::F64; }
 bool ykdatatype::is_bool() const {
-  return primitive_type_ == ykprimitive::BOOL;
+  return primitive_type_ == yk_primitive::BOOL;
 }
 bool ykdatatype::is_none() const {
-  return primitive_type_ == ykprimitive::NONE;
+  return primitive_type_ == yk_primitive::NONE;
 }
 void ykdatatype::write_to_str(std::stringstream &s, bool write_mod) const {
   std::vector<std::pair<const ykdatatype *, std::string>> stack{};
@@ -214,10 +216,10 @@ bool ykdatatype::is_an_integer() const {
          is_u32() || is_u64();
 }
 bool ykdatatype::is_array() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::ARRAY;
+  return !is_primitive() && builtin_type_ == yk_builtin::ARRAY;
 }
 bool ykdatatype::is_const() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::CONSTANT;
+  return !is_primitive() && builtin_type_ == yk_builtin::CONSTANT;
 }
 bool ykdatatype::is_a_signed_integer() const {
   return is_i8() || is_i16() || is_i32() || is_i64();
@@ -227,42 +229,42 @@ bool ykdatatype::is_an_unsigned_integer() const {
 }
 bool ykdatatype::is_a_float() const { return is_f32() || is_f64(); }
 bool ykdatatype::is_builtin_or_primitive() const {
-  return this->primitive_type_ != ykprimitive::NOT_A_PRIMITIVE ||
-         this->builtin_type_ != ykbuiltin::NOT_A_BUILTIN;
+  return this->primitive_type_ != yk_primitive::NOT_A_PRIMITIVE ||
+         this->builtin_type_ != yk_builtin::NOT_A_BUILTIN;
 }
 bool ykdatatype::is_ptr() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::POINTER;
+  return !is_primitive() && builtin_type_ == yk_builtin::POINTER;
 }
 bool ykdatatype::is_m_entry() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::M_ENTRY;
+  return !is_primitive() && builtin_type_ == yk_builtin::M_ENTRY;
 }
 bool ykdatatype::is_sm_entry() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::SM_ENTRY;
+  return !is_primitive() && builtin_type_ == yk_builtin::SM_ENTRY;
 }
 bool ykdatatype::is_function() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::FUNCTION;
+  return !is_primitive() && builtin_type_ == yk_builtin::FUNCTION;
 }
 bool ykdatatype::is_function_input() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::F_IN;
+  return !is_primitive() && builtin_type_ == yk_builtin::F_IN;
 }
 bool ykdatatype::is_function_output() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::F_OUT;
+  return !is_primitive() && builtin_type_ == yk_builtin::F_OUT;
 }
 bool ykdatatype::is_any_ptr() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::ANY_PTR;
+  return !is_primitive() && builtin_type_ == yk_builtin::PTR_TO_ANY;
 }
 bool ykdatatype::is_any_ptr_to_const() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::ANY_PTR_TO_CONST;
+  return !is_primitive() && builtin_type_ == yk_builtin::PTR_TO_CONST_ANY;
 }
 bool ykdatatype::is_tuple() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::TUPLE;
+  return !is_primitive() && builtin_type_ == yk_builtin::TUPLE;
 }
 ykdatatype *ykdatatype::const_unwrap() {
   if (is_const()) { return args_[0]; }
   return this;
 }
 bool ykdatatype::is_string_literal() const {
-  return primitive_type_ == ykprimitive::HIDDEN_STRING_LIT;
+  return primitive_type_ == yk_primitive::HIDDEN_STRING_LIT;
 }
 bool ykdatatype::is_a_string() const { return +primitive_type_ >= 1000; }
 ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, ykdt_pool *pool,
@@ -300,10 +302,13 @@ ykdatatype *ykdatatype::auto_cast(ykdatatype *rhs, ykdt_pool *pool,
   return castable;
 }
 bool ykdatatype::is_fixed_size_array() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::FIXED_ARRAY;
+  return !is_primitive() && builtin_type_ == yk_builtin::FIXED_ARRAY;
 }
 bool ykdatatype::is_dimension() const {
-  return !is_primitive() && builtin_type_ == ykbuiltin::DIMENSION;
+  return !is_primitive() && builtin_type_ == yk_builtin::DIMENSION;
+}
+bool ykdatatype::is_enum_container() const {
+  return !is_primitive() && builtin_type_ == yk_builtin::ENUM_CONTAINER;
 }
 bool yaksha::internal_is_identical_type(ykdatatype *required_datatype,
                                         ykdatatype *provided_datatype) {

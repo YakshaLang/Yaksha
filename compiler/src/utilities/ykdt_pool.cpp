@@ -59,13 +59,13 @@ ykdatatype *ykdt_pool::create_dimension(token *tok, std::string fpath) {
   auto dt = new ykdatatype(tok);
   dt->dimension_ = std::stoi(tok->token_);
   dt->module_ = std::move(fpath);
-  dt->builtin_type_ = ykbuiltin::DIMENSION;
+  dt->builtin_type_ = yk_builtin::DIMENSION;
   pool_.emplace_back(dt);
   return dt;
 }
 ykdatatype *ykdt_pool::create_dimension(int x) {
   auto dt = new ykdatatype(std::move(std::to_string(x)));
-  dt->builtin_type_ = ykbuiltin::DIMENSION;
+  dt->builtin_type_ = yk_builtin::DIMENSION;
   dt->dimension_ = x;
   dt->module_ = "";
   pool_.emplace_back(dt);
