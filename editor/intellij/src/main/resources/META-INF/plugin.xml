@@ -41,6 +41,9 @@
         <lang.psiStructureViewFactory
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaStructureViewFactory"/>
+        <lang.foldingBuilder
+                language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaFolderBuilder"/>
         <annotator
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaAnnotator"/>
