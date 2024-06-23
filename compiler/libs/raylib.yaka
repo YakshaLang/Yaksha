@@ -3864,27 +3864,27 @@ def set_audio_stream_buffer_size_default(size: int) -> None:
     ccode """SetAudioStreamBufferSizeDefault((int)nn__size)"""
 
 @nativemacro
-def set_audio_stream_callback(stream: AudioStream, callback: Function[In[AnyPtr,c.CUint],Out]) -> None:
+def set_audio_stream_callback(stream: AudioStream, callback: Function[In[AnyPtr,c.CUInt],Out]) -> None:
     # Audio thread callback to request new data
     ccode """SetAudioStreamCallback(nn__stream, nn__callback)"""
 
 @nativemacro
-def attach_audio_stream_processor(stream: AudioStream, processor: Function[In[AnyPtr,c.CUint],Out]) -> None:
+def attach_audio_stream_processor(stream: AudioStream, processor: Function[In[AnyPtr,c.CUInt],Out]) -> None:
     # Attach audio stream processor to stream, receives the samples as <float>s
     ccode """AttachAudioStreamProcessor(nn__stream, nn__processor)"""
 
 @nativemacro
-def detach_audio_stream_processor(stream: AudioStream, processor: Function[In[AnyPtr,c.CUint],Out]) -> None:
+def detach_audio_stream_processor(stream: AudioStream, processor: Function[In[AnyPtr,c.CUInt],Out]) -> None:
     # Detach audio stream processor from stream
     ccode """DetachAudioStreamProcessor(nn__stream, nn__processor)"""
 
 @nativemacro
-def attach_audio_mixed_processor(processor: Function[In[AnyPtr,c.CUint],Out]) -> None:
+def attach_audio_mixed_processor(processor: Function[In[AnyPtr,c.CUInt],Out]) -> None:
     # Attach audio stream processor to the entire audio pipeline, receives the samples as <float>s
     ccode """AttachAudioMixedProcessor(nn__processor)"""
 
 @nativemacro
-def detach_audio_mixed_processor(processor: Function[In[AnyPtr,c.CUint],Out]) -> None:
+def detach_audio_mixed_processor(processor: Function[In[AnyPtr,c.CUInt],Out]) -> None:
     # Detach audio stream processor from the entire audio pipeline
     ccode """DetachAudioMixedProcessor(nn__processor)"""
 

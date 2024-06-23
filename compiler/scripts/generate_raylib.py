@@ -184,7 +184,7 @@ F_DT = {
     "LoadFileDataCallback": {"t": "Function[In[c.CStr,Ptr[c.CUInt]],Out[c.CStr]]", "del": None, "conv": None},
     "SaveFileTextCallback": {"t": "Function[In[c.CStr,c.CStr],Out[bool]]", "del": None, "conv": None},
     "SaveFileDataCallback": {"t": "Function[In[c.CStr,AnyPtr,c.CUInt],Out[bool]]", "del": None, "conv": None},
-    "AudioCallback": {"t": "Function[In[AnyPtr,c.CUint],Out]", "del": None, "conv": None},
+    "AudioCallback": {"t": "Function[In[AnyPtr,c.CUInt],Out]", "del": None, "conv": None},
 }
 R_DT = {
     "const char *": "Ptr[Const[c.CChar]]",
