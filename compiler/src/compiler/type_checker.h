@@ -159,6 +159,7 @@ private:
     return_checker return_checker_{};
     ast_pool *ast_pool_;
     token *magic_return_token_;
+    bool safe_tuples(const yk_object &lhs, const yk_object &rhs);
   };
 }// namespace yaksha
 #endif

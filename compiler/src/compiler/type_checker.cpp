@@ -1063,6 +1063,21 @@ void type_checker::visit_assign_arr_expr(assign_arr_expr *obj) {
   auto rhs = pop();
   handle_assigns(obj->opr_, lhs, rhs);
 }
+bool type_checker::safe_tuples(const yk_object &lhs, const yk_object &rhs) {
+  if (lhs.datatype_->is_tuple() && rhs.datatype_->is_tuple()) {
+    if (lhs.datatype_->args_.size() != rhs.datatype_->args_.size()) {
+      return false;
+    }
+    bool identical = is_identical_type(lhs.datatype_, rhs.datatype_);
+    if (!identical) { return false; }
+    // see if all items are primitives
+    for (size_t i = 0; i < lhs.datatype_->args_.size(); i++) {
+      if (!lhs.datatype_->args_[i]->is_primitive()) { return false; }
+    }
+    return true;
+  }
+  return false;
+}
 void type_checker::handle_assigns(token *oper, const yk_object &lhs,
                                   const yk_object &rhs) {
   std::stringstream message{};
@@ -1078,10 +1093,11 @@ void type_checker::handle_assigns(token *oper, const yk_object &lhs,
     error(oper, message.str());
   }
   if (lhs.datatype_->const_unwrap()->is_tuple()) {
-    // TODO verify What if lhs is a tuple? We can't assign to a tuple,
-    //  but we can assign to a tuple element, so we might be able to assign between 2 tuples of exact same type?
-    //  if any element in a tuple is a const, then we cannot assign to it.?
-    //  we can either skip the const element, or error out. (TBD)
+    if (safe_tuples(lhs, rhs) and !lhs.datatype_->is_const() and
+        oper->type_ == token_type::EQ) {
+      // assigning simple tuples is allowed
+      return;
+    }
     message << "Cannot assign to a Tuple[..]. Tuple variables are not "
                "assignable. lhs: "
             << lhs.datatype_->as_string_simplified();
