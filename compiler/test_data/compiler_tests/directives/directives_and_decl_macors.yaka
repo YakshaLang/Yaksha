@@ -1,0 +1,40 @@
+# Exposing global mutable state using embedded C code using a directive ccode
+directive ccode """
+void* GLOBAL_STATE = NULL;
+
+void* get_global_state() {
+  return GLOBAL_STATE;
+}
+
+void set_global_state(void* state) {
+  GLOBAL_STATE = state;
+}
+"""
+
+decl s get_global_state()
+
+class MyState:
+    x: int
+    y: int
+
+@nativedefine("get_global_state")
+def get_global_state() -> MyState:
+    pass
+
+@nativedefine("set_global_state")
+def set_global_state(state: MyState) -> None:
+    pass
+
+def main() -> int:
+    state = MyState()
+    defer del state
+    state.x = 1
+    state.y = 2
+    set_global_state(state)
+    println(state.x)
+    println(state.y)
+    println(s.x)
+    println(s.y)
+    state.x = 5
+    println(s.x)
+    0

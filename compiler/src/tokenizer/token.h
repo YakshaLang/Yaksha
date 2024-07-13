@@ -113,6 +113,7 @@ namespace yaksha {
     KEYWORD_CCODE,
     KEYWORD_CLASS,
     KEYWORD_CONTINUE,
+    KEYWORD_DECL,
     KEYWORD_DEF,
     KEYWORD_DEFER,
     KEYWORD_DEL,
@@ -149,6 +150,7 @@ namespace yaksha {
       case token_type::KEYWORD_CCODE:
       case token_type::KEYWORD_CLASS:
       case token_type::KEYWORD_CONTINUE:
+      case token_type::KEYWORD_DECL:
       case token_type::KEYWORD_DEF:
       case token_type::KEYWORD_DEFER:
       case token_type::KEYWORD_DEL:
@@ -285,6 +287,7 @@ namespace yaksha {
     if (t == token_type::KEYWORD_CCODE) return "KEYWORD_CCODE";
     if (t == token_type::KEYWORD_CLASS) return "KEYWORD_CLASS";
     if (t == token_type::KEYWORD_CONTINUE) return "KEYWORD_CONTINUE";
+    if (t == token_type::KEYWORD_DECL) return "KEYWORD_DECL";
     if (t == token_type::KEYWORD_DEF) return "KEYWORD_DEF";
     if (t == token_type::KEYWORD_DEFER) return "KEYWORD_DEFER";
     if (t == token_type::KEYWORD_DEL) return "KEYWORD_DEL";
@@ -413,6 +416,7 @@ namespace yaksha {
     if (t == "KEYWORD_CCODE") return token_type::KEYWORD_CCODE;
     if (t == "KEYWORD_CLASS") return token_type::KEYWORD_CLASS;
     if (t == "KEYWORD_CONTINUE") return token_type::KEYWORD_CONTINUE;
+    if (t == "KEYWORD_DECL") return token_type::KEYWORD_DECL;
     if (t == "KEYWORD_DEF") return token_type::KEYWORD_DEF;
     if (t == "KEYWORD_DEFER") return token_type::KEYWORD_DEFER;
     if (t == "KEYWORD_DEL") return token_type::KEYWORD_DEL;
@@ -448,6 +452,7 @@ namespace yaksha {
     if (t == "ccode") return token_type::KEYWORD_CCODE;
     if (t == "class") return token_type::KEYWORD_CLASS;
     if (t == "continue") return token_type::KEYWORD_CONTINUE;
+    if (t == "decl") return token_type::KEYWORD_DECL;
     if (t == "def") return token_type::KEYWORD_DEF;
     if (t == "defer") return token_type::KEYWORD_DEFER;
     if (t == "del") return token_type::KEYWORD_DEL;
@@ -568,27 +573,28 @@ namespace yaksha {
     if (n == 28964) return token_type::KEYWORD_CCODE;
     if (n == 28965) return token_type::KEYWORD_CLASS;
     if (n == 28966) return token_type::KEYWORD_CONTINUE;
-    if (n == 28967) return token_type::KEYWORD_DEF;
-    if (n == 28968) return token_type::KEYWORD_DEFER;
-    if (n == 28969) return token_type::KEYWORD_DEL;
-    if (n == 28970) return token_type::KEYWORD_DIRECTIVE;
-    if (n == 28971) return token_type::KEYWORD_ELIF;
-    if (n == 28972) return token_type::KEYWORD_ELSE;
-    if (n == 28973) return token_type::KEYWORD_ENUM;
-    if (n == 28974) return token_type::KEYWORD_FOR;
-    if (n == 28975) return token_type::KEYWORD_FROM;
-    if (n == 28976) return token_type::KEYWORD_IF;
-    if (n == 28977) return token_type::KEYWORD_IMPORT;
-    if (n == 28978) return token_type::KEYWORD_IN;
-    if (n == 28979) return token_type::KEYWORD_MACROS;
-    if (n == 28980) return token_type::KEYWORD_NOT;
-    if (n == 28981) return token_type::KEYWORD_OR;
-    if (n == 28982) return token_type::KEYWORD_PASS;
-    if (n == 28983) return token_type::KEYWORD_RETURN;
-    if (n == 28984) return token_type::KEYWORD_RUNTIMEFEATURE;
-    if (n == 28985) return token_type::KEYWORD_STRUCT;
-    if (n == 28986) return token_type::KEYWORD_TRY;
-    if (n == 28987) return token_type::KEYWORD_WHILE;
+    if (n == 28967) return token_type::KEYWORD_DECL;
+    if (n == 28968) return token_type::KEYWORD_DEF;
+    if (n == 28969) return token_type::KEYWORD_DEFER;
+    if (n == 28970) return token_type::KEYWORD_DEL;
+    if (n == 28971) return token_type::KEYWORD_DIRECTIVE;
+    if (n == 28972) return token_type::KEYWORD_ELIF;
+    if (n == 28973) return token_type::KEYWORD_ELSE;
+    if (n == 28974) return token_type::KEYWORD_ENUM;
+    if (n == 28975) return token_type::KEYWORD_FOR;
+    if (n == 28976) return token_type::KEYWORD_FROM;
+    if (n == 28977) return token_type::KEYWORD_IF;
+    if (n == 28978) return token_type::KEYWORD_IMPORT;
+    if (n == 28979) return token_type::KEYWORD_IN;
+    if (n == 28980) return token_type::KEYWORD_MACROS;
+    if (n == 28981) return token_type::KEYWORD_NOT;
+    if (n == 28982) return token_type::KEYWORD_OR;
+    if (n == 28983) return token_type::KEYWORD_PASS;
+    if (n == 28984) return token_type::KEYWORD_RETURN;
+    if (n == 28985) return token_type::KEYWORD_RUNTIMEFEATURE;
+    if (n == 28986) return token_type::KEYWORD_STRUCT;
+    if (n == 28987) return token_type::KEYWORD_TRY;
+    if (n == 28988) return token_type::KEYWORD_WHILE;
     return token_type::TK_UNKNOWN_TOKEN_DETECTED;
   }
   static inline int64_t token_to_numeric_id(const token_type &t) {
@@ -688,27 +694,28 @@ namespace yaksha {
     if (t == token_type::KEYWORD_CCODE) return 28964;
     if (t == token_type::KEYWORD_CLASS) return 28965;
     if (t == token_type::KEYWORD_CONTINUE) return 28966;
-    if (t == token_type::KEYWORD_DEF) return 28967;
-    if (t == token_type::KEYWORD_DEFER) return 28968;
-    if (t == token_type::KEYWORD_DEL) return 28969;
-    if (t == token_type::KEYWORD_DIRECTIVE) return 28970;
-    if (t == token_type::KEYWORD_ELIF) return 28971;
-    if (t == token_type::KEYWORD_ELSE) return 28972;
-    if (t == token_type::KEYWORD_ENUM) return 28973;
-    if (t == token_type::KEYWORD_FOR) return 28974;
-    if (t == token_type::KEYWORD_FROM) return 28975;
-    if (t == token_type::KEYWORD_IF) return 28976;
-    if (t == token_type::KEYWORD_IMPORT) return 28977;
-    if (t == token_type::KEYWORD_IN) return 28978;
-    if (t == token_type::KEYWORD_MACROS) return 28979;
-    if (t == token_type::KEYWORD_NOT) return 28980;
-    if (t == token_type::KEYWORD_OR) return 28981;
-    if (t == token_type::KEYWORD_PASS) return 28982;
-    if (t == token_type::KEYWORD_RETURN) return 28983;
-    if (t == token_type::KEYWORD_RUNTIMEFEATURE) return 28984;
-    if (t == token_type::KEYWORD_STRUCT) return 28985;
-    if (t == token_type::KEYWORD_TRY) return 28986;
-    if (t == token_type::KEYWORD_WHILE) return 28987;
+    if (t == token_type::KEYWORD_DECL) return 28967;
+    if (t == token_type::KEYWORD_DEF) return 28968;
+    if (t == token_type::KEYWORD_DEFER) return 28969;
+    if (t == token_type::KEYWORD_DEL) return 28970;
+    if (t == token_type::KEYWORD_DIRECTIVE) return 28971;
+    if (t == token_type::KEYWORD_ELIF) return 28972;
+    if (t == token_type::KEYWORD_ELSE) return 28973;
+    if (t == token_type::KEYWORD_ENUM) return 28974;
+    if (t == token_type::KEYWORD_FOR) return 28975;
+    if (t == token_type::KEYWORD_FROM) return 28976;
+    if (t == token_type::KEYWORD_IF) return 28977;
+    if (t == token_type::KEYWORD_IMPORT) return 28978;
+    if (t == token_type::KEYWORD_IN) return 28979;
+    if (t == token_type::KEYWORD_MACROS) return 28980;
+    if (t == token_type::KEYWORD_NOT) return 28981;
+    if (t == token_type::KEYWORD_OR) return 28982;
+    if (t == token_type::KEYWORD_PASS) return 28983;
+    if (t == token_type::KEYWORD_RETURN) return 28984;
+    if (t == token_type::KEYWORD_RUNTIMEFEATURE) return 28985;
+    if (t == token_type::KEYWORD_STRUCT) return 28986;
+    if (t == token_type::KEYWORD_TRY) return 28987;
+    if (t == token_type::KEYWORD_WHILE) return 28988;
     return 0;
   }
   static inline bool is_number_token(const token_type &t) {
@@ -889,6 +896,7 @@ namespace yaksha {
     if (t == token_type::KEYWORD_CCODE) return (value == "ccode");
     if (t == token_type::KEYWORD_CLASS) return (value == "class");
     if (t == token_type::KEYWORD_CONTINUE) return (value == "continue");
+    if (t == token_type::KEYWORD_DECL) return (value == "decl");
     if (t == token_type::KEYWORD_DEF) return (value == "def");
     if (t == token_type::KEYWORD_DEFER) return (value == "defer");
     if (t == token_type::KEYWORD_DEL) return (value == "del");

@@ -54,6 +54,7 @@
     (defun ykt_keyword_ccode () (yk_create_token YK_TOKEN_KEYWORD_CCODE "ccode"))
     (defun ykt_keyword_class () (yk_create_token YK_TOKEN_KEYWORD_CLASS "class"))
     (defun ykt_keyword_continue () (yk_create_token YK_TOKEN_KEYWORD_CONTINUE "continue"))
+    (defun ykt_keyword_decl () (yk_create_token YK_TOKEN_KEYWORD_DECL "decl"))
     (defun ykt_keyword_def () (yk_create_token YK_TOKEN_KEYWORD_DEF "def"))
     (defun ykt_keyword_defer () (yk_create_token YK_TOKEN_KEYWORD_DEFER "defer"))
     (defun ykt_keyword_del () (yk_create_token YK_TOKEN_KEYWORD_DEL "del"))

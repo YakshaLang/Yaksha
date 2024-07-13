@@ -60,7 +60,10 @@ KEYWORDS = sorted(["False", "else", "import", "pass",
                    "and", "continue", "for", "try",
                    "as", "def", "from", "while",
                    "assert", "del", "not",
-                   "elif", "if", "or", "defer", "ccode", "runtimefeature", "in", "struct", "macros", "directive", "enum"])
+                   "elif", "if", "or", "defer",
+                   "ccode", "runtimefeature", "in",
+                   "struct", "macros", "directive",
+                   "enum", "decl"])
 TOKENS = sorted([
     "NAME", "AT", "DOUBLE_NUMBER", "FLOAT_NUMBER", "INDENT", "BA_INDENT", "BA_DEDENT", "NEW_LINE", "COLON", "SEMICOLON",
     "COMMENT",

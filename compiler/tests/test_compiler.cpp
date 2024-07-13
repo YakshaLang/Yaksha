@@ -399,3 +399,7 @@ TEST_CASE("compiler: enums - import and use enum") {
   test_compile_yaka_file(
       "../test_data/compiler_tests/integer_enums/sample.yaka");
 }
+TEST_CASE("compiler: decl macro - decl s get_global_state()") {
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/directives/directives_and_decl_macors.yaka");
+}

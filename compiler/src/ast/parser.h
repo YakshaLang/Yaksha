@@ -54,6 +54,7 @@ namespace yaksha {
                     yk_datatype_pool *pool);
     ~parser();
     // stepwise preprocess dsl macros
+    void step_replace_decl_alias();
     void step_1_parse_token_soup();
     void step_3_execute_macros(macro_processor *mp);
     void step_4_expand_macros(macro_processor *mp, gc_pool<token> *token_pool);

@@ -445,12 +445,14 @@ void to_json_compiler::visit_enum_stmt(enum_stmt *obj) {
   json_ << "{\n";
   write_location(obj);
   json_ << "\"type\": \"enum\",\n";
-  json_ << "\"name\": \"" << string_utils::escape_json(obj->name_->token_) << "\",\n";
+  json_ << "\"name\": \"" << string_utils::escape_json(obj->name_->token_)
+        << "\",\n";
   json_ << "\"values\": [\n";
   int index = 0;
   for (auto &value : obj->members_) {
     json_ << "{\n";
-    json_ << "\"name\": \"" << string_utils::escape_json(value.name_->token_) << "\",\n";
+    json_ << "\"name\": \"" << string_utils::escape_json(value.name_->token_)
+          << "\",\n";
     json_ << "\"value\": " << index << "\n";
     json_ << "}\n";
     if (&value != &obj->members_.back()) { json_ << ","; }

@@ -50,6 +50,7 @@
 using namespace yaksha;
 #ifdef YAKSHA_DEBUG
 #define PRINT_PREPROCESSOR_OUTPUT
+#define DUMP_TOKENS_ON_MACRO_ERROR
 #endif
 parser::parser(std::string filepath, std::vector<token *> &tokens,
                yk_datatype_pool *pool)
@@ -1157,6 +1158,42 @@ void parser::step_4_expand_macros(macro_processor *mp,
     // Validate tokens
     for (auto tk : tokens_) {
       if (!is_valid(tk->token_, tk->type_)) {
+#ifdef DUMP_TOKENS_ON_MACRO_ERROR
+        {
+          std::cerr << "// Invalid token: [[" << tk->token_
+                    << "]] type: " << token_to_str(tk->type_) << " at "
+                    << tk->file_ << ":" << tk->line_ << ":" << tk->pos_
+                    << std::endl;
+          std::cerr << "// ----------- Preprocessor output for " << filepath_
+                    << "-------------------" << std::endl;
+          std::cerr << "/* " << std::endl;
+          token *prev = nullptr;
+          for (auto ttk : tokens_) {
+            // add a space if it is not jammed
+            if (prev != nullptr && (prev->line_ == ttk->line_) &&
+                (prev->pos_ + prev->token_.size() != ttk->pos_)) {
+              std::cerr << " ";
+            }
+            if (ttk->type_ == token_type::NEW_LINE) {
+              std::cerr << " [NL]" << std::endl;
+            } else if (ttk->type_ == token_type::BA_INDENT) {
+              std::cerr << "`{" << std::endl;
+            } else if (ttk->type_ == token_type::BA_DEDENT) {
+              std::cerr << "}`" << std::endl;
+            } else if (ttk->type_ == token_type::END_OF_FILE) {
+              std::cerr << "[EOF]" << std::endl;
+            } else if (ttk->type_ == token_type::STRING) {
+              std::cerr << "\"" << ttk->token_ << "\"";
+            } else {
+              std::cerr << ttk->token_;
+            }
+            prev = ttk;
+          }
+          std::cerr << "*/" << std::endl;
+          std::cerr << "// ---------------- end ------------------ "
+                    << std::endl;
+        }
+#endif
         throw error(tk, "Invalid token");
       }
     }
@@ -1164,6 +1201,12 @@ void parser::step_4_expand_macros(macro_processor *mp,
   } catch (parsing_error &err) {
     errors_.emplace_back(err.message_, err.tok_.file_, err.tok_.line_,
                          err.tok_.pos_);
+  }
+  // Execute replace decl after macro expansion for second time
+  if (!errors_.empty()) { return; }
+  step_replace_decl_alias();
+  if (tokens_.empty() || tokens_.back()->type_ != token_type::END_OF_FILE) {
+    tokens_.emplace_back(original_tokens_.back());
   }
 }
 void parser::step_3_execute_macros(macro_processor *mp) {
@@ -1183,6 +1226,11 @@ void parser::step_3_execute_macros(macro_processor *mp) {
   }
 }
 void parser::step_1_parse_token_soup() {
+  step_replace_decl_alias();
+  if (tokens_.empty() || tokens_.back()->type_ != token_type::END_OF_FILE) {
+    tokens_.emplace_back(original_tokens_.back());
+  }
+  if (!errors_.empty()) { return; }
   try {
     std::vector<token *> tokens_buffer{};
     parse_token_soup(soup_statements_, tokens_buffer);
@@ -1392,5 +1440,77 @@ std::vector<parameter> parser::parse_enum_members(token *name_token) {
   }
   consume(token_type::BA_DEDENT, "Expected dedent");
   return values;
+}
+void parser::step_replace_decl_alias() {
+  // TODO verify that alias start in an empty line
+  try {
+    // -------- Parse all the DECL statements ---------
+    std::vector<stmt *> decl_soup{};
+    std::vector<token *> tokens_buffer{};
+    tokens_buffer.reserve(30);
+    std::unordered_map<std::string, decl_stmt *> decls{};
+    std::vector<token *> new_tokens{};
+    new_tokens.reserve(tokens_.size());
+    while (!is_at_end_of_stream()) {
+      // decl          red      console.red
+      // decl_keyword  alias    replacement_tokens
+      if (match({token_type::KEYWORD_DECL})) {
+        if (!tokens_buffer.empty()) {
+          decl_soup.emplace_back(pool_.c_token_soup_stmt(tokens_buffer));
+          tokens_buffer.clear();
+        }
+        auto decl_kw = previous();
+        auto alias = consume(token_type::NAME, "Alias must be present");
+        // get all tokens until newline for replacement
+        while (!check(token_type::NEW_LINE)) {
+          tokens_buffer.emplace_back(advance());
+        }
+        consume(token_type::NEW_LINE, "Expect new line after replacement");
+        // note we are copying vector, so not a ref
+        decls[alias->token_] = dynamic_cast<decl_stmt *>(
+            pool_.c_decl_stmt(decl_kw, alias, tokens_buffer));
+        tokens_buffer.clear();
+      } else {
+        tokens_buffer.emplace_back(advance());
+      }
+    }
+    if (!tokens_buffer.empty()) {
+      decl_soup.emplace_back(pool_.c_token_soup_stmt(tokens_buffer));
+      tokens_buffer.clear();
+    }
+    // --------------- Replace all names that matches with alias ------------
+    if (decls.empty()) {
+      // No decl statements, so no need to replace anything
+      current_ = 0;
+      return;
+    }
+    for (stmt *soup : decl_soup) {
+      if (soup->get_type() == ast_type::STMT_TOKEN_SOUP) {
+        auto tokens = dynamic_cast<token_soup_stmt *>(soup);
+        for (token *tk : tokens->soup_) {
+          if (tk->type_ == token_type::NAME) {
+            auto decl = decls.find(tk->token_);
+            if (decl != decls.end()) {
+              auto replacement = decl->second->replacement_;
+              for (token *rt : replacement) {
+                rt->line_ = tk->line_;
+                rt->pos_ = tk->pos_;
+                new_tokens.emplace_back(rt);
+              }
+            } else {
+              new_tokens.emplace_back(tk);
+            }
+          } else {
+            new_tokens.emplace_back(tk);
+          }
+        }
+      }
+    }
+    current_ = 0;
+    tokens_ = new_tokens;
+  } catch (parsing_error &err) {
+    errors_.emplace_back(err.message_, err.tok_.file_, err.tok_.line_,
+                         err.tok_.pos_);
+  }
 }
 #pragma clang diagnostic pop

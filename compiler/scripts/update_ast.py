@@ -70,7 +70,7 @@ EXPRS = sorted([
     # Assign to a variable
     # We can promote an assignment to a let statement, if so promoted is set to true
     ("assign", (("token*", "name"), ("token*", "opr"), ("expr*", "right"), ("bool", "promoted"),
-                ("ykdatatype*", "promoted_data_type"))),
+                ("yk_datatype*", "promoted_data_type"))),
     # Assign to a member
     ("assign_member", (("expr*", "set_oper"), ("token*", "opr"), ("expr*", "right"))),
     # Assign to array object
@@ -138,14 +138,18 @@ STMT_LOCATIONS = {
     "import": "import_token_",
     "runtimefeature": "runtimefeature_token_",
     "compins": "name_",
+    "decl": "name_",
 }
-IGNORE_VISITS_STMT = {"elif", "macros", "token_soup", "dsl_macro"}
+IGNORE_VISITS_STMT = {"elif", "macros", "token_soup", "dsl_macro", "decl"}
 # Different kinds of statements
 STMTS = sorted([
     # Directives
     # directive (os="windows|linux")? (defines="X=Y|A=B")? (no_runtime|no_main|c_include_path|c_link_path|c_link|c_file|ccode) ("STR")?
     ("directive", (("token*", "directive_token"), ("std::vector<parameter>", "values"), ("token*", "directive_type"),
                    ("token*", "directive_val"))),
+    # Declare
+    # decl red console.red
+    ("decl", (("token*", "decl_token"), ("token*", "name"), ("std::vector<token*>", "replacement"),)),
     # Define macros in current file.
     # Parser should check that for a single invoke of parse(), there must be only one, macros section.
     # -- macros code will be validated and parsed same way.
@@ -161,7 +165,7 @@ STMTS = sorted([
     # Why?
     # this allows us to store arbitrary tokens in order in statement list
     ("token_soup", (("std::vector<token*>", "soup"),)),
-    ("return", (("token*", "return_keyword"), ("expr*", "expression"), ("ykdatatype*", "result_type"))),
+    ("return", (("token*", "return_keyword"), ("expr*", "expression"), ("yk_datatype*", "result_type"))),
     # defer statement works just like how we use string, deletions.
     ("defer", (("token*", "defer_keyword"), ("expr*", "expression"), ("stmt*", "del_statement"))),
     # del statement
@@ -183,9 +187,9 @@ STMTS = sorted([
     # ## or
     # for x in expr:
     #     println(x)
-    ("foreach", (("token*", "for_keyword"), ("token*", "name"), ("ykdatatype*", "data_type"),
+    ("foreach", (("token*", "for_keyword"), ("token*", "name"), ("yk_datatype*", "data_type"),
                  ("token*", "in_keyword"), ("expr*", "expression"), ("stmt*", "for_body"),
-                 ("ykdatatype*", "expr_datatype"),)),
+                 ("yk_datatype*", "expr_datatype"),)),
     # For loop - endless loop
     # for:
     #     println("endless")
@@ -209,17 +213,17 @@ STMTS = sorted([
     ("continue", (("token*", "continue_token"),)),
     ("break", (("token*", "break_token"),)),
     # Let statements
-    ("let", (("token*", "name"), ("ykdatatype*", "data_type"), ("expr*", "expression"))),
-    ("const", (("token*", "name"), ("ykdatatype*", "data_type"), ("expr*", "expression"), ("bool", "is_global"))),
+    ("let", (("token*", "name"), ("yk_datatype*", "data_type"), ("expr*", "expression"))),
+    ("const", (("token*", "name"), ("yk_datatype*", "data_type"), ("expr*", "expression"), ("bool", "is_global"))),
     # Native constant statement
     # `ITEM: Const[int] = ccode """1 + 1"""`
-    ("nativeconst", (("token*", "name"), ("ykdatatype*", "data_type"),
+    ("nativeconst", (("token*", "name"), ("yk_datatype*", "data_type"),
                      ("token*", "ccode_keyword"), ("token*", "code_str"), ("bool", "is_global"))),
     # Function declarations
     # Make sure we always say the return type
     # `def abc(a: int) -> None:`
     ("def", (("token*", "name"), ("std::vector<parameter>", "params"),
-             ("stmt*", "function_body"), ("ykdatatype*", "return_type"), ("annotations", "annotations"))),
+             ("stmt*", "function_body"), ("yk_datatype*", "return_type"), ("annotations", "annotations"))),
     ("class", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
     ("enum", (("token*", "name"), ("std::vector<parameter>", "members"), ("annotations", "annotations"))),
     # import io [as io]
@@ -230,7 +234,7 @@ STMTS = sorted([
     ("runtimefeature", (("token*", "runtimefeature_token"), ("token*", "feature"))),
     # ------------ Hidden special instructions for compiler --------------
     ("compins", (
-        ("token*", "name"), ("ykdatatype*", "data_type"), ("token*", "meta1"), ("ykdatatype*", "meta2"),
+        ("token*", "name"), ("yk_datatype*", "data_type"), ("token*", "meta1"), ("yk_datatype*", "meta2"),
         ("void*", "meta3"))
      )
 ], key=lambda x: x[0])
@@ -364,7 +368,7 @@ $AST_POOL$
 */
 struct parameter {
     token* name_;
-    ykdatatype* data_type_;
+    yk_datatype* data_type_;
     token* enum_val_override_;
 };
 /**
