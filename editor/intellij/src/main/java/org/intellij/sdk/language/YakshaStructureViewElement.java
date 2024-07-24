@@ -81,6 +81,16 @@ public class YakshaStructureViewElement implements StructureViewTreeElement, Sor
                 treeElements.add(new YakshaStructureViewElement((YakshaDefStatementImpl) def));
             }
 
+            List<YakshaEnumStatement> enums = ExtractUtils.getChildrenOfTypeAsList(myElement, YakshaEnumStatement.class);
+            for (YakshaEnumStatement en : enums) {
+                treeElements.add(new YakshaStructureViewElement((YakshaEnumStatementImpl) en));
+            }
+
+            List<YakshaDeclStatement> decls = ExtractUtils.getChildrenOfTypeAsList(myElement, YakshaDeclStatement.class);
+            for (YakshaDeclStatement decl : decls) {
+                treeElements.add(new YakshaStructureViewElement((YakshaDeclStatementImpl) decl));
+            }
+
             return treeElements.toArray(new TreeElement[0]);
         }
         if (myElement instanceof YakshaClassStatement) {
@@ -98,6 +108,20 @@ public class YakshaStructureViewElement implements StructureViewTreeElement, Sor
             @Nullable YakshaSingleLineClassBits possibleSingl = st.getClassBlock().getSingleLineClassBits();
             if (possibleSingl != null && possibleSingl.getClassFieldWoIndent() != null) {
                 treeElements.add(new YakshaStructureViewElement((YakshaClassFieldWoIndentImpl) possibleSingl.getClassFieldWoIndent()));
+            }
+            return treeElements.toArray(new TreeElement[0]);
+        }
+        if (myElement instanceof YakshaEnumStatement) {
+            List<TreeElement> treeElements = new ArrayList<>();
+            YakshaEnumStatement st = (YakshaEnumStatement) myElement;
+            List<YakshaEnumBits> bitList = st.getEnumBlock().getEnumBitsList();
+            if (!(bitList == null || bitList.isEmpty())) {
+                for (YakshaEnumBits bit : bitList) {
+                    final YakshaEnumField field = bit.getEnumField();
+                    if (field != null) {
+                        treeElements.add(new YakshaStructureViewElement((YakshaEnumFieldImpl) field));
+                    }
+                }
             }
             return treeElements.toArray(new TreeElement[0]);
         }

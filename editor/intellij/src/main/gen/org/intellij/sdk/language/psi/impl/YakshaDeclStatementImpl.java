@@ -10,16 +10,15 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
-import com.intellij.navigation.ItemPresentation;
 
-public class YakshaEnumFieldImpl extends ASTWrapperPsiElement implements YakshaEnumField {
+public class YakshaDeclStatementImpl extends ASTWrapperPsiElement implements YakshaDeclStatement {
 
-  public YakshaEnumFieldImpl(@NotNull ASTNode node) {
+  public YakshaDeclStatementImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YakshaVisitor visitor) {
-    visitor.visitEnumField(this);
+    visitor.visitDeclStatement(this);
   }
 
   @Override
@@ -30,23 +29,8 @@ public class YakshaEnumFieldImpl extends ASTWrapperPsiElement implements YakshaE
 
   @Override
   @NotNull
-  public YakshaEnumFieldWoIndent getEnumFieldWoIndent() {
-    return findNotNullChildByClass(YakshaEnumFieldWoIndent.class);
-  }
-
-  @Override
-  public String getName() {
-    return YakshaPsiImplUtil.getName(this);
-  }
-
-  @Override
-  public PsiElement getNameIdentifier() {
-    return YakshaPsiImplUtil.getNameIdentifier(this);
-  }
-
-  @Override
-  public ItemPresentation getPresentation() {
-    return YakshaPsiImplUtil.getPresentation(this);
+  public List<YakshaAllAllowedSymbols> getAllAllowedSymbolsList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YakshaAllAllowedSymbols.class);
   }
 
 }

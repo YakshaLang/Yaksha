@@ -17,6 +17,9 @@ public interface YakshaOuterStatement extends PsiElement {
   YakshaConstStatement getConstStatement();
 
   @Nullable
+  YakshaDeclStatement getDeclStatement();
+
+  @Nullable
   YakshaDefStatement getDefStatement();
 
   @Nullable

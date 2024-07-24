@@ -17,4 +17,6 @@ public class YakshaIcons {
     public static final Icon DEF = IconLoader.getIcon("/icons/D.svg", YakshaIcons.class);
     public static final Icon IMPORT = IconLoader.getIcon("/icons/I.svg", YakshaIcons.class);
     public static final Icon MACRO = IconLoader.getIcon("/icons/J.svg", YakshaIcons.class);
+    public static final Icon ENUM_FIELD = IconLoader.getIcon("/icons/K.svg", YakshaIcons.class);
+    public static final Icon ENUM = IconLoader.getIcon("/icons/L.svg", YakshaIcons.class);
 }

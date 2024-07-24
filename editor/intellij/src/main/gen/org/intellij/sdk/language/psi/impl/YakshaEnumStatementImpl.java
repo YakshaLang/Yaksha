@@ -2,9 +2,6 @@
 package org.intellij.sdk.language.psi.impl;
 
 import java.util.List;
-
-import com.intellij.openapi.util.NlsSafe;
-import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -12,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import org.intellij.sdk.language.psi.*;
+import com.intellij.navigation.ItemPresentation;
 
 public class YakshaEnumStatementImpl extends YakshaNamedElementImpl implements YakshaEnumStatement {
 
@@ -36,7 +34,23 @@ public class YakshaEnumStatementImpl extends YakshaNamedElementImpl implements Y
   }
 
   @Override
-  public PsiElement setName(@NlsSafe @NotNull String name) throws IncorrectOperationException {
-    return null;
+  public String getName() {
+    return YakshaPsiImplUtil.getName(this);
   }
+
+  @Override
+  public PsiElement setName(String newName) {
+    return YakshaPsiImplUtil.setName(this, newName);
+  }
+
+  @Override
+  public PsiElement getNameIdentifier() {
+    return YakshaPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
+  public ItemPresentation getPresentation() {
+    return YakshaPsiImplUtil.getPresentation(this);
+  }
+
 }

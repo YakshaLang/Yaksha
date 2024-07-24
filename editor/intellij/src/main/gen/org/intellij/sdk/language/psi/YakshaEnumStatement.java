@@ -4,26 +4,19 @@ package org.intellij.sdk.language.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.intellij.navigation.ItemPresentation;
 
 public interface YakshaEnumStatement extends YakshaNamedElement {
 
   @NotNull
   YakshaEnumBlock getEnumBlock();
 
-  //WARNING: getName(...) is skipped
-  //matching getName(YakshaEnumStatement, ...)
-  //methods are not found in YakshaPsiImplUtil
+  String getName();
 
-  //WARNING: setName(...) is skipped
-  //matching setName(YakshaEnumStatement, ...)
-  //methods are not found in YakshaPsiImplUtil
+  PsiElement setName(String newName);
 
-  //WARNING: getNameIdentifier(...) is skipped
-  //matching getNameIdentifier(YakshaEnumStatement, ...)
-  //methods are not found in YakshaPsiImplUtil
+  PsiElement getNameIdentifier();
 
-  //WARNING: getPresentation(...) is skipped
-  //matching getPresentation(YakshaEnumStatement, ...)
-  //methods are not found in YakshaPsiImplUtil
+  ItemPresentation getPresentation();
 
 }

@@ -118,6 +118,7 @@ public class YakshaSyntaxHighlighter extends SyntaxHighlighterBase {
             .add(YakshaTypes.KW_MACROS)
             .add(YakshaTypes.KW_DIRECTIVE)
             .add(YakshaTypes.KW_ENUM)
+            .add(YakshaTypes.KW_DECL)
             .build();
 
     @NotNull

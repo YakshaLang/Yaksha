@@ -35,6 +35,7 @@ public interface YakshaTypes {
   IElementType DATA_TYPE_ARG_BITS = new YakshaElementType("DATA_TYPE_ARG_BITS");
   IElementType DATA_TYPE_BIT = new YakshaElementType("DATA_TYPE_BIT");
   IElementType DATA_TYPE_IDENTIFIER = new YakshaElementType("DATA_TYPE_IDENTIFIER");
+  IElementType DECL_STATEMENT = new YakshaElementType("DECL_STATEMENT");
   IElementType DEFER_STATEMENT = new YakshaElementType("DEFER_STATEMENT");
   IElementType DEFER_STATEMENT_WO_INDENT = new YakshaElementType("DEFER_STATEMENT_WO_INDENT");
   IElementType DEF_BITS = new YakshaElementType("DEF_BITS");
@@ -98,6 +99,7 @@ public interface YakshaTypes {
   IElementType KW_CCODE = new YakshaTokenType("KW_CCODE");
   IElementType KW_CLASS = new YakshaTokenType("KW_CLASS");
   IElementType KW_CONTINUE = new YakshaTokenType("KW_CONTINUE");
+  IElementType KW_DECL = new YakshaTokenType("KW_DECL");
   IElementType KW_DEF = new YakshaTokenType("KW_DEF");
   IElementType KW_DEFER = new YakshaTokenType("KW_DEFER");
   IElementType KW_DEL = new YakshaTokenType("KW_DEL");
@@ -246,6 +248,9 @@ public interface YakshaTypes {
       }
       else if (type == DATA_TYPE_IDENTIFIER) {
         return new YakshaDataTypeIdentifierImpl(node);
+      }
+      else if (type == DECL_STATEMENT) {
+        return new YakshaDeclStatementImpl(node);
       }
       else if (type == DEFER_STATEMENT) {
         return new YakshaDeferStatementImpl(node);

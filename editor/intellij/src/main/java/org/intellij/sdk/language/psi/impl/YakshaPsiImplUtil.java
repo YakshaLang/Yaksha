@@ -200,6 +200,117 @@ public class YakshaPsiImplUtil {
     }
 
     /* ============================================================== */
+    // Enums
+    /* ============================================================== */
+
+    public static String getName(final YakshaEnumStatement statement) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+            return nameNode.getText();
+        }
+        return null;
+    }
+
+    public static PsiElement setName(final YakshaEnumStatement statement, String newName) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+
+        }
+        return statement;
+    }
+
+
+    public static ItemPresentation getPresentation(final YakshaEnumStatement element) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return element.getName();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                PsiFile containingFile = element.getContainingFile();
+                return containingFile == null ? null : containingFile.getName();
+            }
+
+            @Override
+            public Icon getIcon(boolean unused) {
+                return YakshaIcons.ENUM;
+            }
+        };
+    }
+
+    public static PsiElement getNameIdentifier(final YakshaEnumStatement statement) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+            return nameNode.getPsi();
+        }
+        return null;
+    }
+
+    /* ============================================================== */
+    // enum fields
+    /* ============================================================== */
+
+
+    public static String getName(final YakshaEnumField statement) {
+        return getName(statement.getEnumFieldWoIndent());
+    }
+
+
+    public static ItemPresentation getPresentation(final YakshaEnumField element) {
+        return getPresentation(element.getEnumFieldWoIndent());
+    }
+
+    public static PsiElement getNameIdentifier(final YakshaEnumField statement) {
+        return getNameIdentifier(statement.getEnumFieldWoIndent());
+    }
+
+    public static String getName(final YakshaEnumFieldWoIndent statement) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+            return nameNode.getText();
+        }
+        return null;
+    }
+
+    public static ItemPresentation getPresentation(final YakshaEnumFieldWoIndent element) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                ASTNode nameNode = element.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+                if (nameNode != null && nameNode.getText() != null) {
+                    return nameNode.getText();
+                }
+                return "-";
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                PsiFile containingFile = element.getContainingFile();
+                return containingFile == null ? null : containingFile.getName();
+            }
+
+            @Override
+            public Icon getIcon(boolean unused) {
+                return YakshaIcons.ENUM_FIELD;
+            }
+        };
+    }
+
+    public static PsiElement getNameIdentifier(final YakshaEnumFieldWoIndent statement) {
+        ASTNode nameNode = statement.getNode().findChildByType(YakshaTypes.IDENTIFIER);
+        if (nameNode != null) {
+            return nameNode.getPsi();
+        }
+        return null;
+    }
+
+    /* ============================================================== */
     // function call
     /* ============================================================== */
 

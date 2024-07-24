@@ -17,18 +17,18 @@
 }
 
 yakshaFile ::= item_*  {pin=1 recoverWhile="top_level_recover" name="import, def, class"}
-private top_level_recover ::= !('@' | 'class'  | 'struct' | 'enum' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive')
+private top_level_recover ::= !('@' | 'class'  | 'struct' | 'enum' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive' | 'decl')
 
 private item_ ::= (outer_statement | COMMENT | empty_line)
 
 empty_line ::= S? NL
 
-outer_statement ::= directive_statement | runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | enum_statement | macro_declaration_statement | dsl_outer_block
+outer_statement ::= directive_statement | decl_statement | runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | enum_statement | macro_declaration_statement | dsl_outer_block
 
 runtimefeature_statement ::= KW_RUNTIMEFEATURE S STRING S? NL
 
 directive_statement ::= KW_DIRECTIVE (S IDENTIFIER S? OPERATOR_EQ S? STRING)* S (IDENTIFIER | KW_CCODE) (S STRING)? NL
-
+decl_statement ::= KW_DECL S IDENTIFIER S all_allowed_symbols+ NL
 macro_declaration_statement ::= KW_MACROS OPERATOR_NOT_SYMBOL any_ws? OPERATOR_CURLY_OPEN any_ws? lisp_body any_ws? OPERATOR_CURLY_CLOSE NL
 lisp_body ::= (lsp_expr | any_ws)+
 lsp_expr ::= all_allowed_symbols | lsp_s_expr | lsp_q_expr

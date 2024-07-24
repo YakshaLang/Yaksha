@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.sdk.language.psi.YakshaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
+import com.intellij.navigation.ItemPresentation;
 
 public class YakshaEnumFieldWoIndentImpl extends ASTWrapperPsiElement implements YakshaEnumFieldWoIndent {
 
@@ -25,6 +26,21 @@ public class YakshaEnumFieldWoIndentImpl extends ASTWrapperPsiElement implements
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof YakshaVisitor) accept((YakshaVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  public String getName() {
+    return YakshaPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public PsiElement getNameIdentifier() {
+    return YakshaPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
+  public ItemPresentation getPresentation() {
+    return YakshaPsiImplUtil.getPresentation(this);
   }
 
 }

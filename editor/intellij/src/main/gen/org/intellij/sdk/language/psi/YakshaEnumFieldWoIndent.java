@@ -4,19 +4,14 @@ package org.intellij.sdk.language.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.intellij.navigation.ItemPresentation;
 
 public interface YakshaEnumFieldWoIndent extends PsiElement {
 
-  //WARNING: getName(...) is skipped
-  //matching getName(YakshaEnumFieldWoIndent, ...)
-  //methods are not found in YakshaPsiImplUtil
+  String getName();
 
-  //WARNING: getNameIdentifier(...) is skipped
-  //matching getNameIdentifier(YakshaEnumFieldWoIndent, ...)
-  //methods are not found in YakshaPsiImplUtil
+  PsiElement getNameIdentifier();
 
-  //WARNING: getPresentation(...) is skipped
-  //matching getPresentation(YakshaEnumFieldWoIndent, ...)
-  //methods are not found in YakshaPsiImplUtil
+  ItemPresentation getPresentation();
 
 }

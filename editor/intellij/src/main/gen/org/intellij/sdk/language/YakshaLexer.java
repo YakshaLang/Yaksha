@@ -110,15 +110,16 @@ class YakshaLexer implements FlexLexer {
     "\1\21\2\0\1\21\3\0\1\46\1\47\3\27\1\50"+
     "\1\27\1\51\16\27\1\52\1\53\1\27\1\54\2\27"+
     "\1\55\5\27\1\56\1\2\3\5\1\21\1\0\3\21"+
-    "\3\0\1\57\1\60\3\27\1\61\5\27\1\62\1\63"+
+    "\3\0\1\57\1\60\3\27\1\61\6\27\1\62\1\63"+
     "\5\27\1\64\2\27\1\65\3\27\1\52\1\27\1\66"+
-    "\4\0\1\27\1\67\1\70\6\27\1\71\1\72\1\73"+
-    "\3\27\1\74\4\27\2\0\1\75\1\76\1\77\1\100"+
-    "\1\27\1\101\6\27\1\102\2\27\1\103\1\104\1\105"+
-    "\1\27\1\106\3\27\1\107\2\27\1\110\5\27\1\111";
+    "\4\0\1\27\1\67\1\70\4\27\1\71\2\27\1\72"+
+    "\1\73\1\74\3\27\1\75\4\27\2\0\1\76\1\77"+
+    "\1\100\1\101\1\27\1\102\6\27\1\103\2\27\1\104"+
+    "\1\105\1\106\1\27\1\107\3\27\1\110\2\27\1\111"+
+    "\5\27\1\112";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[213];
+    int [] result = new int[215];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -160,19 +161,19 @@ class YakshaLexer implements FlexLexer {
     "\0\u17a0\0\110\0\u17e8\0\110\0\u1830\0\u1878\0\u18c0\0\u1908"+
     "\0\u1950\0\u1998\0\u19e0\0\u1a28\0\u1a70\0\u1ab8\0\110\0\110"+
     "\0\u1b00\0\u1b48\0\u1b90\0\u05a0\0\u1bd8\0\u1c20\0\u1c68\0\u1cb0"+
-    "\0\u1cf8\0\u1d40\0\u05a0\0\u1d88\0\u1dd0\0\u1e18\0\u1e60\0\u1ea8"+
-    "\0\u05a0\0\u1ef0\0\u1f38\0\u05a0\0\u1f80\0\u1fc8\0\u2010\0\u2058"+
-    "\0\u20a0\0\u20e8\0\u2130\0\u2178\0\u21c0\0\u2208\0\u2250\0\u05a0"+
-    "\0\u05a0\0\u2298\0\u22e0\0\u2328\0\u2370\0\u23b8\0\u2400\0\u05a0"+
-    "\0\u05a0\0\u05a0\0\u15a8\0\u2448\0\u2490\0\u05a0\0\u24d8\0\u2520"+
-    "\0\u2568\0\u25b0\0\u25f8\0\u2640\0\u05a0\0\u05a0\0\u05a0\0\u05a0"+
-    "\0\u2688\0\u05a0\0\u26d0\0\u2718\0\u2760\0\u27a8\0\u27f0\0\u2838"+
-    "\0\u05a0\0\u2880\0\u28c8\0\u05a0\0\u05a0\0\u05a0\0\u2910\0\u05a0"+
-    "\0\u2958\0\u29a0\0\u29e8\0\u05a0\0\u2a30\0\u2a78\0\u05a0\0\u2ac0"+
-    "\0\u2b08\0\u2b50\0\u2b98\0\u2be0\0\u05a0";
+    "\0\u1cf8\0\u1d40\0\u1d88\0\u05a0\0\u1dd0\0\u1e18\0\u1e60\0\u1ea8"+
+    "\0\u1ef0\0\u05a0\0\u1f38\0\u1f80\0\u05a0\0\u1fc8\0\u2010\0\u2058"+
+    "\0\u20a0\0\u20e8\0\u2130\0\u2178\0\u21c0\0\u2208\0\u2250\0\u2298"+
+    "\0\u05a0\0\u05a0\0\u22e0\0\u2328\0\u2370\0\u23b8\0\u05a0\0\u2400"+
+    "\0\u2448\0\u05a0\0\u05a0\0\u05a0\0\u15a8\0\u2490\0\u24d8\0\u05a0"+
+    "\0\u2520\0\u2568\0\u25b0\0\u25f8\0\u2640\0\u2688\0\u05a0\0\u05a0"+
+    "\0\u05a0\0\u05a0\0\u26d0\0\u05a0\0\u2718\0\u2760\0\u27a8\0\u27f0"+
+    "\0\u2838\0\u2880\0\u05a0\0\u28c8\0\u2910\0\u05a0\0\u05a0\0\u05a0"+
+    "\0\u2958\0\u05a0\0\u29a0\0\u29e8\0\u2a30\0\u05a0\0\u2a78\0\u2ac0"+
+    "\0\u05a0\0\u2b08\0\u2b50\0\u2b98\0\u2be0\0\u2c28\0\u05a0";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[213];
+    int [] result = new int[215];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -257,92 +258,93 @@ class YakshaLexer implements FlexLexer {
     "\27\0\11\35\6\0\11\35\4\0\15\35\1\207\7\35"+
     "\27\0\11\35\6\0\11\35\4\0\1\35\1\210\23\35"+
     "\27\0\11\35\6\0\11\35\4\0\14\35\1\211\10\35"+
-    "\27\0\11\35\6\0\11\35\4\0\6\35\1\212\3\35"+
-    "\1\213\12\35\27\0\11\35\6\0\11\35\4\0\17\35"+
-    "\1\214\5\35\27\0\11\35\6\0\11\35\4\0\10\35"+
-    "\1\215\7\35\1\216\4\35\27\0\11\35\6\0\11\35"+
-    "\4\0\22\35\1\217\2\35\27\0\2\35\1\146\6\35"+
-    "\6\0\11\35\4\0\25\35\27\0\4\35\1\146\4\35"+
-    "\6\0\11\35\4\0\25\35\27\0\11\35\6\0\11\35"+
-    "\4\0\15\35\1\220\7\35\27\0\11\35\6\0\11\35"+
-    "\4\0\17\35\1\221\5\35\27\0\6\35\1\146\2\35"+
-    "\6\0\11\35\4\0\25\35\27\0\11\35\6\0\11\35"+
-    "\4\0\16\35\1\222\6\35\27\0\11\35\6\0\11\35"+
-    "\4\0\21\35\1\146\3\35\27\0\11\35\6\0\11\35"+
-    "\4\0\3\35\1\223\21\35\27\0\11\35\6\0\11\35"+
-    "\4\0\21\35\1\224\3\35\27\0\11\35\6\0\11\35"+
-    "\4\0\20\35\1\225\4\35\27\0\11\35\6\0\11\35"+
-    "\4\0\21\35\1\226\3\35\27\0\11\35\6\0\11\35"+
-    "\4\0\14\35\1\227\10\35\27\0\11\35\6\0\11\35"+
-    "\4\0\17\35\1\230\5\35\27\0\11\35\6\0\11\35"+
-    "\4\0\10\35\1\231\14\35\5\0\1\3\2\0\1\232"+
-    "\2\0\1\11\100\0\6\165\1\233\45\165\1\234\33\165"+
-    "\12\166\1\235\41\166\1\236\33\166\23\0\2\167\42\0"+
-    "\1\117\11\0\1\117\31\0\11\171\77\0\11\171\11\0"+
-    "\1\114\17\0\1\114\45\0\7\172\35\0\1\117\11\0"+
-    "\1\117\31\0\11\173\6\0\4\173\12\0\6\173\1\0"+
-    "\1\117\11\0\1\117\37\0\1\114\103\0\1\114\111\0"+
-    "\1\114\103\0\11\35\6\0\11\35\4\0\20\35\1\237"+
-    "\4\35\27\0\11\35\6\0\11\35\4\0\5\35\1\240"+
-    "\17\35\27\0\11\35\6\0\11\35\4\0\5\35\1\241"+
-    "\17\35\27\0\11\35\6\0\11\35\4\0\12\35\1\146"+
-    "\12\35\27\0\11\35\6\0\11\35\4\0\1\35\1\242"+
-    "\23\35\27\0\11\35\6\0\11\35\4\0\4\35\1\243"+
-    "\20\35\27\0\11\35\6\0\11\35\4\0\20\35\1\244"+
-    "\4\35\27\0\11\35\6\0\11\35\4\0\21\35\1\245"+
-    "\3\35\27\0\11\35\6\0\11\35\4\0\5\35\1\246"+
-    "\17\35\27\0\11\35\6\0\11\35\4\0\5\35\1\247"+
-    "\17\35\27\0\11\35\6\0\11\35\4\0\6\35\1\250"+
-    "\16\35\27\0\11\35\6\0\11\35\4\0\5\35\1\251"+
-    "\17\35\27\0\11\35\6\0\11\35\4\0\13\35\1\252"+
-    "\11\35\27\0\11\35\6\0\11\35\4\0\1\35\1\253"+
-    "\23\35\27\0\11\35\6\0\11\35\4\0\15\35\1\254"+
-    "\7\35\27\0\11\35\6\0\11\35\4\0\17\35\1\255"+
-    "\5\35\27\0\11\35\6\0\11\35\4\0\20\35\1\256"+
-    "\4\35\27\0\11\35\6\0\11\35\4\0\22\35\1\257"+
-    "\2\35\27\0\11\35\6\0\11\35\4\0\21\35\1\260"+
-    "\3\35\27\0\11\35\6\0\11\35\4\0\22\35\1\261"+
-    "\2\35\27\0\11\35\6\0\11\35\4\0\12\35\1\262"+
-    "\12\35\5\0\1\3\2\0\1\6\2\0\1\11\100\0"+
-    "\6\165\1\263\45\165\1\234\143\165\12\166\1\264\41\166"+
-    "\1\236\143\166\23\0\11\35\6\0\11\35\4\0\5\35"+
-    "\1\265\17\35\27\0\11\35\6\0\11\35\4\0\11\35"+
-    "\1\266\13\35\27\0\11\35\6\0\11\35\4\0\5\35"+
-    "\1\267\17\35\27\0\11\35\6\0\11\35\4\0\20\35"+
-    "\1\270\4\35\27\0\11\35\6\0\11\35\4\0\10\35"+
-    "\1\271\14\35\27\0\11\35\6\0\11\35\4\0\17\35"+
-    "\1\272\5\35\27\0\11\35\6\0\11\35\4\0\3\35"+
-    "\1\273\21\35\27\0\11\35\6\0\11\35\4\0\17\35"+
-    "\1\274\5\35\27\0\11\35\6\0\11\35\4\0\15\35"+
-    "\1\275\7\35\27\0\11\35\6\0\11\35\4\0\17\35"+
-    "\1\276\5\35\27\0\11\35\6\0\11\35\4\0\10\35"+
-    "\1\277\14\35\27\0\11\35\6\0\11\35\4\0\3\35"+
-    "\1\300\21\35\27\0\11\35\6\0\11\35\4\0\5\35"+
-    "\1\301\17\35\4\0\6\165\1\164\45\165\1\234\33\165"+
-    "\12\166\1\164\41\166\1\236\33\166\23\0\11\35\6\0"+
-    "\11\35\4\0\14\35\1\302\10\35\27\0\11\35\6\0"+
-    "\11\35\4\0\21\35\1\303\3\35\27\0\11\35\6\0"+
-    "\11\35\4\0\21\35\1\304\3\35\27\0\11\35\6\0"+
-    "\11\35\4\0\20\35\1\305\4\35\27\0\11\35\6\0"+
-    "\11\35\4\0\14\35\1\306\10\35\27\0\11\35\6\0"+
-    "\11\35\4\0\13\35\1\307\11\35\27\0\11\35\6\0"+
-    "\11\35\4\0\21\35\1\310\3\35\27\0\11\35\6\0"+
-    "\11\35\4\0\22\35\1\311\2\35\27\0\11\35\6\0"+
-    "\11\35\4\0\10\35\1\312\14\35\27\0\11\35\6\0"+
-    "\11\35\4\0\5\35\1\313\17\35\27\0\11\35\6\0"+
-    "\11\35\4\0\5\35\1\314\17\35\27\0\11\35\6\0"+
-    "\11\35\4\0\23\35\1\315\1\35\27\0\11\35\6\0"+
-    "\11\35\4\0\6\35\1\316\16\35\27\0\11\35\6\0"+
-    "\11\35\4\0\5\35\1\317\17\35\27\0\11\35\6\0"+
-    "\11\35\4\0\5\35\1\320\17\35\27\0\11\35\6\0"+
-    "\11\35\4\0\1\35\1\321\23\35\27\0\11\35\6\0"+
-    "\11\35\4\0\21\35\1\322\3\35\27\0\11\35\6\0"+
-    "\11\35\4\0\22\35\1\323\2\35\27\0\11\35\6\0"+
-    "\11\35\4\0\17\35\1\324\5\35\27\0\11\35\6\0"+
-    "\11\35\4\0\5\35\1\325\17\35\4\0";
+    "\27\0\11\35\6\0\11\35\4\0\3\35\1\212\2\35"+
+    "\1\213\3\35\1\214\12\35\27\0\11\35\6\0\11\35"+
+    "\4\0\17\35\1\215\5\35\27\0\11\35\6\0\11\35"+
+    "\4\0\10\35\1\216\7\35\1\217\4\35\27\0\11\35"+
+    "\6\0\11\35\4\0\22\35\1\220\2\35\27\0\2\35"+
+    "\1\146\6\35\6\0\11\35\4\0\25\35\27\0\4\35"+
+    "\1\146\4\35\6\0\11\35\4\0\25\35\27\0\11\35"+
+    "\6\0\11\35\4\0\15\35\1\221\7\35\27\0\11\35"+
+    "\6\0\11\35\4\0\17\35\1\222\5\35\27\0\6\35"+
+    "\1\146\2\35\6\0\11\35\4\0\25\35\27\0\11\35"+
+    "\6\0\11\35\4\0\16\35\1\223\6\35\27\0\11\35"+
+    "\6\0\11\35\4\0\21\35\1\146\3\35\27\0\11\35"+
+    "\6\0\11\35\4\0\3\35\1\224\21\35\27\0\11\35"+
+    "\6\0\11\35\4\0\21\35\1\225\3\35\27\0\11\35"+
+    "\6\0\11\35\4\0\20\35\1\226\4\35\27\0\11\35"+
+    "\6\0\11\35\4\0\21\35\1\227\3\35\27\0\11\35"+
+    "\6\0\11\35\4\0\14\35\1\230\10\35\27\0\11\35"+
+    "\6\0\11\35\4\0\17\35\1\231\5\35\27\0\11\35"+
+    "\6\0\11\35\4\0\10\35\1\232\14\35\5\0\1\3"+
+    "\2\0\1\233\2\0\1\11\100\0\6\165\1\234\45\165"+
+    "\1\235\33\165\12\166\1\236\41\166\1\237\33\166\23\0"+
+    "\2\167\42\0\1\117\11\0\1\117\31\0\11\171\77\0"+
+    "\11\171\11\0\1\114\17\0\1\114\45\0\7\172\35\0"+
+    "\1\117\11\0\1\117\31\0\11\173\6\0\4\173\12\0"+
+    "\6\173\1\0\1\117\11\0\1\117\37\0\1\114\103\0"+
+    "\1\114\111\0\1\114\103\0\11\35\6\0\11\35\4\0"+
+    "\20\35\1\240\4\35\27\0\11\35\6\0\11\35\4\0"+
+    "\5\35\1\241\17\35\27\0\11\35\6\0\11\35\4\0"+
+    "\5\35\1\242\17\35\27\0\11\35\6\0\11\35\4\0"+
+    "\12\35\1\146\12\35\27\0\11\35\6\0\11\35\4\0"+
+    "\1\35\1\243\23\35\27\0\11\35\6\0\11\35\4\0"+
+    "\4\35\1\244\20\35\27\0\11\35\6\0\11\35\4\0"+
+    "\20\35\1\245\4\35\27\0\11\35\6\0\11\35\4\0"+
+    "\21\35\1\246\3\35\27\0\11\35\6\0\11\35\4\0"+
+    "\12\35\1\247\12\35\27\0\11\35\6\0\11\35\4\0"+
+    "\5\35\1\250\17\35\27\0\11\35\6\0\11\35\4\0"+
+    "\5\35\1\251\17\35\27\0\11\35\6\0\11\35\4\0"+
+    "\6\35\1\252\16\35\27\0\11\35\6\0\11\35\4\0"+
+    "\5\35\1\253\17\35\27\0\11\35\6\0\11\35\4\0"+
+    "\13\35\1\254\11\35\27\0\11\35\6\0\11\35\4\0"+
+    "\1\35\1\255\23\35\27\0\11\35\6\0\11\35\4\0"+
+    "\15\35\1\256\7\35\27\0\11\35\6\0\11\35\4\0"+
+    "\17\35\1\257\5\35\27\0\11\35\6\0\11\35\4\0"+
+    "\20\35\1\260\4\35\27\0\11\35\6\0\11\35\4\0"+
+    "\22\35\1\261\2\35\27\0\11\35\6\0\11\35\4\0"+
+    "\21\35\1\262\3\35\27\0\11\35\6\0\11\35\4\0"+
+    "\22\35\1\263\2\35\27\0\11\35\6\0\11\35\4\0"+
+    "\12\35\1\264\12\35\5\0\1\3\2\0\1\6\2\0"+
+    "\1\11\100\0\6\165\1\265\45\165\1\235\143\165\12\166"+
+    "\1\266\41\166\1\237\143\166\23\0\11\35\6\0\11\35"+
+    "\4\0\5\35\1\267\17\35\27\0\11\35\6\0\11\35"+
+    "\4\0\11\35\1\270\13\35\27\0\11\35\6\0\11\35"+
+    "\4\0\5\35\1\271\17\35\27\0\11\35\6\0\11\35"+
+    "\4\0\20\35\1\272\4\35\27\0\11\35\6\0\11\35"+
+    "\4\0\10\35\1\273\14\35\27\0\11\35\6\0\11\35"+
+    "\4\0\17\35\1\274\5\35\27\0\11\35\6\0\11\35"+
+    "\4\0\3\35\1\275\21\35\27\0\11\35\6\0\11\35"+
+    "\4\0\17\35\1\276\5\35\27\0\11\35\6\0\11\35"+
+    "\4\0\15\35\1\277\7\35\27\0\11\35\6\0\11\35"+
+    "\4\0\17\35\1\300\5\35\27\0\11\35\6\0\11\35"+
+    "\4\0\10\35\1\301\14\35\27\0\11\35\6\0\11\35"+
+    "\4\0\3\35\1\302\21\35\27\0\11\35\6\0\11\35"+
+    "\4\0\5\35\1\303\17\35\4\0\6\165\1\164\45\165"+
+    "\1\235\33\165\12\166\1\164\41\166\1\237\33\166\23\0"+
+    "\11\35\6\0\11\35\4\0\14\35\1\304\10\35\27\0"+
+    "\11\35\6\0\11\35\4\0\21\35\1\305\3\35\27\0"+
+    "\11\35\6\0\11\35\4\0\21\35\1\306\3\35\27\0"+
+    "\11\35\6\0\11\35\4\0\20\35\1\307\4\35\27\0"+
+    "\11\35\6\0\11\35\4\0\14\35\1\310\10\35\27\0"+
+    "\11\35\6\0\11\35\4\0\13\35\1\311\11\35\27\0"+
+    "\11\35\6\0\11\35\4\0\21\35\1\312\3\35\27\0"+
+    "\11\35\6\0\11\35\4\0\22\35\1\313\2\35\27\0"+
+    "\11\35\6\0\11\35\4\0\10\35\1\314\14\35\27\0"+
+    "\11\35\6\0\11\35\4\0\5\35\1\315\17\35\27\0"+
+    "\11\35\6\0\11\35\4\0\5\35\1\316\17\35\27\0"+
+    "\11\35\6\0\11\35\4\0\23\35\1\317\1\35\27\0"+
+    "\11\35\6\0\11\35\4\0\6\35\1\320\16\35\27\0"+
+    "\11\35\6\0\11\35\4\0\5\35\1\321\17\35\27\0"+
+    "\11\35\6\0\11\35\4\0\5\35\1\322\17\35\27\0"+
+    "\11\35\6\0\11\35\4\0\1\35\1\323\23\35\27\0"+
+    "\11\35\6\0\11\35\4\0\21\35\1\324\3\35\27\0"+
+    "\11\35\6\0\11\35\4\0\22\35\1\325\2\35\27\0"+
+    "\11\35\6\0\11\35\4\0\17\35\1\326\5\35\27\0"+
+    "\11\35\6\0\11\35\4\0\5\35\1\327\17\35\4\0";
 
   private static int [] zzUnpacktrans() {
-    int [] result = new int[11304];
+    int [] result = new int[11376];
     int offset = 0;
     offset = zzUnpacktrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -385,10 +387,10 @@ class YakshaLexer implements FlexLexer {
     "\1\1\2\11\1\1\1\11\3\1\1\11\1\1\2\11"+
     "\3\1\4\11\1\1\1\11\1\1\2\0\1\11\3\0"+
     "\5\1\1\11\34\1\1\11\1\1\1\11\3\1\1\0"+
-    "\3\1\3\0\2\11\32\1\4\0\24\1\2\0\41\1";
+    "\3\1\3\0\2\11\33\1\4\0\25\1\2\0\41\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[213];
+    int [] result = new int[215];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -701,367 +703,372 @@ class YakshaLexer implements FlexLexer {
             { return TokenType.BAD_CHARACTER;
             }
           // fall through
-          case 74: break;
+          case 75: break;
           case 2:
             { return YakshaTypes.S;
             }
           // fall through
-          case 75: break;
+          case 76: break;
           case 3:
             { return YakshaTypes.NL;
             }
           // fall through
-          case 76: break;
+          case 77: break;
           case 4:
             { return YakshaTypes.OPERATOR_NOT_SYMBOL;
             }
           // fall through
-          case 77: break;
+          case 78: break;
           case 5:
             { return YakshaTypes.STRING;
             }
           // fall through
-          case 78: break;
+          case 79: break;
           case 6:
             { return YakshaTypes.COMMENT;
             }
           // fall through
-          case 79: break;
+          case 80: break;
           case 7:
             { return YakshaTypes.OPERATOR_REMAINDER;
             }
           // fall through
-          case 80: break;
+          case 81: break;
           case 8:
             { return YakshaTypes.OPERATOR_B_AND;
             }
           // fall through
-          case 81: break;
+          case 82: break;
           case 9:
             { return YakshaTypes.OPERATOR_OPEN_P;
             }
           // fall through
-          case 82: break;
+          case 83: break;
           case 10:
             { return YakshaTypes.OPERATOR_CLOSE_P;
             }
           // fall through
-          case 83: break;
+          case 84: break;
           case 11:
             { return YakshaTypes.OPERATOR_MUL;
             }
           // fall through
-          case 84: break;
+          case 85: break;
           case 12:
             { return YakshaTypes.OPERATOR_PLUS;
             }
           // fall through
-          case 85: break;
+          case 86: break;
           case 13:
             { return YakshaTypes.OPERATOR_COMMA;
             }
           // fall through
-          case 86: break;
+          case 87: break;
           case 14:
             { return YakshaTypes.OPERATOR_MINUS;
             }
           // fall through
-          case 87: break;
+          case 88: break;
           case 15:
             { return YakshaTypes.OPERATOR_DOT;
             }
           // fall through
-          case 88: break;
+          case 89: break;
           case 16:
             { return YakshaTypes.OPERATOR_DIV;
             }
           // fall through
-          case 89: break;
+          case 90: break;
           case 17:
             { return YakshaTypes.NUMBER;
             }
           // fall through
-          case 90: break;
+          case 91: break;
           case 18:
             { return YakshaTypes.OPERATOR_COLON;
             }
           // fall through
-          case 91: break;
+          case 92: break;
           case 19:
             { return YakshaTypes.OPERATOR_SEMICOLON;
             }
           // fall through
-          case 92: break;
+          case 93: break;
           case 20:
             { return YakshaTypes.OPERATOR_COMPARISON;
             }
           // fall through
-          case 93: break;
+          case 94: break;
           case 21:
             { return YakshaTypes.OPERATOR_EQ;
             }
           // fall through
-          case 94: break;
+          case 95: break;
           case 22:
             { return YakshaTypes.OPERATOR_AT;
             }
           // fall through
-          case 95: break;
+          case 96: break;
           case 23:
             { return YakshaTypes.IDENTIFIER;
             }
           // fall through
-          case 96: break;
+          case 97: break;
           case 24:
             { return YakshaTypes.OPERATOR_OPEN_SQB;
             }
           // fall through
-          case 97: break;
+          case 98: break;
           case 25:
             { return YakshaTypes.OPERATOR_CLOSE_SQB;
             }
           // fall through
-          case 98: break;
+          case 99: break;
           case 26:
             { return YakshaTypes.OPERATOR_B_XOR;
             }
           // fall through
-          case 99: break;
+          case 100: break;
           case 27:
             { return YakshaTypes.OPERATOR_CURLY_OPEN;
             }
           // fall through
-          case 100: break;
+          case 101: break;
           case 28:
             { return YakshaTypes.OPERATOR_B_OR;
             }
           // fall through
-          case 101: break;
+          case 102: break;
           case 29:
             { return YakshaTypes.OPERATOR_CURLY_CLOSE;
             }
           // fall through
-          case 102: break;
+          case 103: break;
           case 30:
             { return YakshaTypes.OPERATOR_B_NOT;
             }
           // fall through
-          case 103: break;
+          case 104: break;
           case 31:
             { return YakshaTypes.OPERATOR_REMAINDER_EQ;
             }
           // fall through
-          case 104: break;
+          case 105: break;
           case 32:
             { return YakshaTypes.OPERATOR_B_AND_EQ;
             }
           // fall through
-          case 105: break;
+          case 106: break;
           case 33:
             { return YakshaTypes.OPERATOR_MUL_EQ;
             }
           // fall through
-          case 106: break;
+          case 107: break;
           case 34:
             { return YakshaTypes.OPERATOR_PLUS_EQ;
             }
           // fall through
-          case 107: break;
+          case 108: break;
           case 35:
             { return YakshaTypes.OPERATOR_MINUS_EQ;
             }
           // fall through
-          case 108: break;
+          case 109: break;
           case 36:
             { return YakshaTypes.OPERATOR_ARROW;
             }
           // fall through
-          case 109: break;
+          case 110: break;
           case 37:
             { return YakshaTypes.OPERATOR_DIV_EQ;
             }
           // fall through
-          case 110: break;
+          case 111: break;
           case 38:
             { return YakshaTypes.OPERATOR_SHL;
             }
           // fall through
-          case 111: break;
+          case 112: break;
           case 39:
             { return YakshaTypes.OPERATOR_SHR;
             }
           // fall through
-          case 112: break;
+          case 113: break;
           case 40:
             { return YakshaTypes.OPERATOR_B_XOR_EQ;
             }
           // fall through
-          case 113: break;
+          case 114: break;
           case 41:
             { return YakshaTypes.KW_AS;
             }
           // fall through
-          case 114: break;
+          case 115: break;
           case 42:
             { return YakshaTypes.PRIMITIVE_DATA_TYPE;
             }
           // fall through
-          case 115: break;
+          case 116: break;
           case 43:
             { return YakshaTypes.KW_IF;
             }
           // fall through
-          case 116: break;
+          case 117: break;
           case 44:
             { return YakshaTypes.KW_IN;
             }
           // fall through
-          case 117: break;
+          case 118: break;
           case 45:
             { return YakshaTypes.OPERATOR_OR;
             }
           // fall through
-          case 118: break;
+          case 119: break;
           case 46:
             { return YakshaTypes.OPERATOR_B_OR_EQ;
             }
           // fall through
-          case 119: break;
+          case 120: break;
           case 47:
             { return YakshaTypes.OPERATOR_SHL_EQ;
             }
           // fall through
-          case 120: break;
+          case 121: break;
           case 48:
             { return YakshaTypes.OPERATOR_SHR_EQ;
             }
           // fall through
-          case 121: break;
+          case 122: break;
           case 49:
             { return YakshaTypes.OPERATOR_AND;
             }
           // fall through
-          case 122: break;
+          case 123: break;
           case 50:
             { return YakshaTypes.KW_DEF;
             }
           // fall through
-          case 123: break;
+          case 124: break;
           case 51:
             { return YakshaTypes.KW_DEL;
             }
           // fall through
-          case 124: break;
+          case 125: break;
           case 52:
             { return YakshaTypes.KW_FOR;
             }
           // fall through
-          case 125: break;
+          case 126: break;
           case 53:
             { return YakshaTypes.OPERATOR_NOT;
             }
           // fall through
-          case 126: break;
+          case 127: break;
           case 54:
             { return YakshaTypes.I;
             }
           // fall through
-          case 127: break;
+          case 128: break;
           case 55:
             { return YakshaTypes.KW_NONE;
             }
           // fall through
-          case 128: break;
+          case 129: break;
           case 56:
             { return YakshaTypes.KW_TRUE;
             }
           // fall through
-          case 129: break;
-          case 57:
-            { return YakshaTypes.KW_ELIF;
-            }
-          // fall through
           case 130: break;
-          case 58:
-            { return YakshaTypes.KW_ELSE;
+          case 57:
+            { return YakshaTypes.KW_DECL;
             }
           // fall through
           case 131: break;
-          case 59:
-            { return YakshaTypes.KW_ENUM;
+          case 58:
+            { return YakshaTypes.KW_ELIF;
             }
           // fall through
           case 132: break;
-          case 60:
-            { return YakshaTypes.KW_PASS;
+          case 59:
+            { return YakshaTypes.KW_ELSE;
             }
           // fall through
           case 133: break;
-          case 61:
-            { return YakshaTypes.KW_FALSE;
+          case 60:
+            { return YakshaTypes.KW_ENUM;
             }
           // fall through
           case 134: break;
-          case 62:
-            { return YakshaTypes.KW_BREAK;
+          case 61:
+            { return YakshaTypes.KW_PASS;
             }
           // fall through
           case 135: break;
-          case 63:
-            { return YakshaTypes.KW_CCODE;
+          case 62:
+            { return YakshaTypes.KW_FALSE;
             }
           // fall through
           case 136: break;
-          case 64:
-            { return YakshaTypes.KW_CLASS;
+          case 63:
+            { return YakshaTypes.KW_BREAK;
             }
           // fall through
           case 137: break;
-          case 65:
-            { return YakshaTypes.KW_DEFER;
+          case 64:
+            { return YakshaTypes.KW_CCODE;
             }
           // fall through
           case 138: break;
-          case 66:
-            { return YakshaTypes.KW_WHILE;
+          case 65:
+            { return YakshaTypes.KW_CLASS;
             }
           // fall through
           case 139: break;
-          case 67:
-            { return YakshaTypes.KW_IMPORT;
+          case 66:
+            { return YakshaTypes.KW_DEFER;
             }
           // fall through
           case 140: break;
-          case 68:
-            { return YakshaTypes.KW_MACROS;
+          case 67:
+            { return YakshaTypes.KW_WHILE;
             }
           // fall through
           case 141: break;
-          case 69:
-            { return YakshaTypes.KW_RETURN;
+          case 68:
+            { return YakshaTypes.KW_IMPORT;
             }
           // fall through
           case 142: break;
-          case 70:
-            { return YakshaTypes.KW_STRUCT;
+          case 69:
+            { return YakshaTypes.KW_MACROS;
             }
           // fall through
           case 143: break;
-          case 71:
-            { return YakshaTypes.KW_CONTINUE;
+          case 70:
+            { return YakshaTypes.KW_RETURN;
             }
           // fall through
           case 144: break;
-          case 72:
-            { return YakshaTypes.KW_DIRECTIVE;
+          case 71:
+            { return YakshaTypes.KW_STRUCT;
             }
           // fall through
           case 145: break;
-          case 73:
-            { return YakshaTypes.KW_RUNTIMEFEATURE;
+          case 72:
+            { return YakshaTypes.KW_CONTINUE;
             }
           // fall through
           case 146: break;
+          case 73:
+            { return YakshaTypes.KW_DIRECTIVE;
+            }
+          // fall through
+          case 147: break;
+          case 74:
+            { return YakshaTypes.KW_RUNTIMEFEATURE;
+            }
+          // fall through
+          case 148: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

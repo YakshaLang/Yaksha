@@ -5,10 +5,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.intellij.sdk.language.psi.YakshaClassStatement;
-import org.intellij.sdk.language.psi.YakshaConstStatement;
-import org.intellij.sdk.language.psi.YakshaDefStatement;
-import org.intellij.sdk.language.psi.YakshaFile;
+import org.intellij.sdk.language.psi.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +42,40 @@ public class YakshaUtil {
                 YakshaClassStatement[] statements = ExtractUtils.getChildrenOfType(yakaFile, YakshaClassStatement.class);
                 if (statements != null) {
                     Collections.addAll(result, statements);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<YakshaEnumStatement> findEnums(Project project) {
+        List<YakshaEnumStatement> result = new ArrayList<>();
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(YakaFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        for (VirtualFile virtualFile: virtualFiles) {
+            YakshaFile yakaFile = (YakshaFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (yakaFile != null) {
+                YakshaEnumStatement[] statements = ExtractUtils.getChildrenOfType(yakaFile, YakshaEnumStatement.class);
+                if (statements != null) {
+                    Collections.addAll(result, statements);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<YakshaEnumStatement> findEnums(Project project, String key) {
+        List<YakshaEnumStatement> result = new ArrayList<>();
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(YakaFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        for (VirtualFile virtualFile: virtualFiles) {
+            YakshaFile yakaFile = (YakshaFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (yakaFile != null) {
+                YakshaEnumStatement[] statements = ExtractUtils.getChildrenOfType(yakaFile, YakshaEnumStatement.class);
+                if (statements != null) {
+                    for (YakshaEnumStatement statement : statements) {
+                        if (key.equals(statement.getName())) {
+                            result.add(statement);
+                        }
+                    }
                 }
             }
         }

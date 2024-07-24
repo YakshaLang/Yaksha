@@ -1078,6 +1078,35 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // KW_DECL S IDENTIFIER S all_allowed_symbols+ NL
+  public static boolean decl_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decl_statement")) return false;
+    if (!nextTokenIs(b, KW_DECL)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, KW_DECL, S, IDENTIFIER, S);
+    r = r && decl_statement_4(b, l + 1);
+    r = r && consumeToken(b, NL);
+    exit_section_(b, m, DECL_STATEMENT, r);
+    return r;
+  }
+
+  // all_allowed_symbols+
+  private static boolean decl_statement_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decl_statement_4")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = all_allowed_symbols(b, l + 1);
+    while (r) {
+      int c = current_position_(b);
+      if (!all_allowed_symbols(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "decl_statement_4", c)) break;
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // pass_statement | ccode_statement | if_statement | elif_statement | else_statement | while_statement | foreach_statement
   //   | forendless_statement | cfor_statement | del_statement | defer_statement | return_statement | expr_statement | assignment_statement
   //   | let_statement | empty_line | continue_statement | break_statement | dsl_inner_block | COMMENT
@@ -2959,17 +2988,18 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // directive_statement | runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | enum_statement | macro_declaration_statement | dsl_outer_block
+  // directive_statement | decl_statement | runtimefeature_statement | import_statement | const_statement | annotation* class_statement | annotation* def_statement | enum_statement | macro_declaration_statement | dsl_outer_block
   public static boolean outer_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "outer_statement")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, OUTER_STATEMENT, "<outer statement>");
     r = directive_statement(b, l + 1);
+    if (!r) r = decl_statement(b, l + 1);
     if (!r) r = runtimefeature_statement(b, l + 1);
     if (!r) r = import_statement(b, l + 1);
     if (!r) r = const_statement(b, l + 1);
-    if (!r) r = outer_statement_4(b, l + 1);
     if (!r) r = outer_statement_5(b, l + 1);
+    if (!r) r = outer_statement_6(b, l + 1);
     if (!r) r = enum_statement(b, l + 1);
     if (!r) r = macro_declaration_statement(b, l + 1);
     if (!r) r = dsl_outer_block(b, l + 1);
@@ -2978,34 +3008,12 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   // annotation* class_statement
-  private static boolean outer_statement_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "outer_statement_4")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = outer_statement_4_0(b, l + 1);
-    r = r && class_statement(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // annotation*
-  private static boolean outer_statement_4_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "outer_statement_4_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!annotation(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "outer_statement_4_0", c)) break;
-    }
-    return true;
-  }
-
-  // annotation* def_statement
   private static boolean outer_statement_5(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "outer_statement_5")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = outer_statement_5_0(b, l + 1);
-    r = r && def_statement(b, l + 1);
+    r = r && class_statement(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3017,6 +3025,28 @@ public class YakshaParser implements PsiParser, LightPsiParser {
       int c = current_position_(b);
       if (!annotation(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "outer_statement_5_0", c)) break;
+    }
+    return true;
+  }
+
+  // annotation* def_statement
+  private static boolean outer_statement_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "outer_statement_6")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = outer_statement_6_0(b, l + 1);
+    r = r && def_statement(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // annotation*
+  private static boolean outer_statement_6_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "outer_statement_6_0")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!annotation(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "outer_statement_6_0", c)) break;
     }
     return true;
   }
@@ -3358,7 +3388,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !('@' | 'class'  | 'struct' | 'enum' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive')
+  // !('@' | 'class'  | 'struct' | 'enum' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive' | 'decl')
   static boolean top_level_recover(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "top_level_recover")) return false;
     boolean r;
@@ -3368,7 +3398,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '@' | 'class'  | 'struct' | 'enum' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive'
+  // '@' | 'class'  | 'struct' | 'enum' | 'def' | 'import' | 'runtimefeature' | 'macros' | 'directive' | 'decl'
   private static boolean top_level_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "top_level_recover_0")) return false;
     boolean r;
@@ -3381,6 +3411,7 @@ public class YakshaParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, "runtimefeature");
     if (!r) r = consumeToken(b, "macros");
     if (!r) r = consumeToken(b, "directive");
+    if (!r) r = consumeToken(b, "decl");
     return r;
   }
 

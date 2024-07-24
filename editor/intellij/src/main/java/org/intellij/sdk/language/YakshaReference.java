@@ -16,6 +16,7 @@ import com.intellij.util.ReflectionUtil;
 import org.intellij.sdk.language.psi.YakshaClassStatement;
 import org.intellij.sdk.language.psi.YakshaConstStatement;
 import org.intellij.sdk.language.psi.YakshaDefStatement;
+import org.intellij.sdk.language.psi.YakshaEnumStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -110,6 +111,16 @@ public class YakshaReference extends PsiReferenceBase<PsiElement> implements Psi
             }
         }
 
+        // Enums
+        List<YakshaEnumStatement> enums = YakshaUtil.findEnums(project);
+        for (final YakshaEnumStatement st : enums) {
+            if (st.getName() != null && st.getName().length() > 0) {
+                variants.add(LookupElementBuilder
+                        .create(st).withIcon(YakshaIcons.CLASS)
+                        .withTypeText(st.getContainingFile().getName())
+                );
+            }
+        }
 
         return variants.toArray();
     }

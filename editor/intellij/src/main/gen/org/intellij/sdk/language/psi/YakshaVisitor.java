@@ -115,6 +115,10 @@ public class YakshaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitDeclStatement(@NotNull YakshaDeclStatement o) {
+    visitPsiElement(o);
+  }
+
   public void visitDefBits(@NotNull YakshaDefBits o) {
     visitPsiElement(o);
   }
