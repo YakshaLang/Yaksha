@@ -101,6 +101,61 @@ struct builtin_arrput : builtin {
   }
   bool require_stdlib() override { return true; }
 };
+struct builtin_arrins : builtin {
+  yk_object
+  verify(const std::vector<yk_object> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         yk_datatype_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = yk_object(dt_pool);
+    if (args.size() != 3) {
+      o.string_val_ = "Three arguments must be provided for arrins() builtin";
+    } else if (!args[0].datatype_->is_array() ||
+               args[0].datatype_->args_[0]->is_sm_entry()) {
+      o.string_val_ =
+          "First argument to arrins() must be an Array[?]";
+    } else if (!args[1].datatype_->const_unwrap()->is_an_integer()) {
+      o.string_val_ = "Second argument to arrins() must be an integer";
+    } else {
+      // Given arrins(Array[T], int, V)
+      // ---
+      // LHS -> Array[T] -> T
+      auto lhs = args[0].datatype_->args_[0]->const_unwrap();
+      // RHS -> V
+      auto rhs = args[2].datatype_->const_unwrap();
+      // T == V
+      auto matched =
+          dt_slot_matcher->type_match(lhs, rhs, args[2].is_primitive_or_obj());
+      if (matched.matched_) {
+        return o;
+      }
+      o.string_val_ =
+          "Third argument to arrins() must match provided array " + matched.error_;
+    }
+    o.object_type_ = object_type::ERROR_DETECTED;
+    return o;
+  }
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          yk_datatype_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
+    auto o = yk_object(dt_pool);
+    std::stringstream code{};
+    code << "yk__arrins(" << args[0].first << ", ";
+    dt_compiler->compile_string_assign(nullptr, code, args[1],
+                                       args[1].second.datatype_->const_unwrap(),
+                                       dt_pool->create("str"));
+    code << ", " << args[2].first << ")";
+    return {code.str(), o};
+  }
+  bool require_stdlib() override { return true; }
+};
 //
 // ┌─┐┬─┐┬─┐┌─┐┌─┐┌─┐
 // ├─┤├┬┘├┬┘├─┘│ │├─┘
@@ -148,10 +203,14 @@ struct builtin_arrpop : builtin {
 // ┌─┐┬─┐┬─┐┌─┐┌─┐┌┬┐┌─┐┌─┐┌─┐
 // ├─┤├┬┘├┬┘└─┐├┤  │ │  ├─┤├─┘
 // ┴ ┴┴└─┴└─└─┘└─┘ ┴ └─┘┴ ┴┴
+//
 // ┌─┐┬─┐┬─┐┌─┐┌─┐┌┬┐┬  ┌─┐┌┐┌
 // ├─┤├┬┘├┬┘└─┐├┤  │ │  ├┤ │││
 // ┴ ┴┴└─┴└─└─┘└─┘ ┴ ┴─┘└─┘┘└┘
 //
+// ┌─┐┬─┐┬─┐┌┬┐┌─┐┬
+// ├─┤├┬┘├┬┘ ││├┤ │
+// ┴ ┴┴└─┴└──┴┘└─┘┴─┘
 struct builtin_arrsetlencap : builtin {
   explicit builtin_arrsetlencap(std::string function_name)
       : func_name_(std::move(function_name)) {}
@@ -567,6 +626,50 @@ struct builtin_shget : builtin {
   }
   bool require_stdlib() override { return true; }
 };
+struct builtin_shdel : builtin {
+  yk_object
+  verify(const std::vector<yk_object> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         yk_datatype_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = yk_object(dt_pool);
+    if (args.size() != 2) {
+      o.string_val_ = "Two arguments must be provided for shdel() builtin";
+    } else if (!args[0].datatype_->is_array() ||
+               !args[0].datatype_->args_[0]->is_sm_entry()) {
+      o.string_val_ =
+          "First argument to shdel() must match with Array[SMEntry[?]]";
+    } else if (!args[1].datatype_->const_unwrap()->is_a_string()) {
+      o.string_val_ = "Second argument to shdel() must be a string";
+    } else {
+      // All good
+      return yk_object(dt_pool->create("bool"));
+    }
+    o.object_type_ = object_type::ERROR_DETECTED;
+    return o;
+  }
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          yk_datatype_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
+    auto o = yk_object(dt_pool);
+    std::stringstream code{};
+    code << "(yk__shdel(" << args[0].first << ", ";
+    dt_compiler->compile_string_assign(nullptr, code, args[1],
+                                       args[1].second.datatype_->const_unwrap(),
+                                       dt_pool->create("str"));
+    code << ") == 1)";
+    o = yk_object(dt_pool->create("bool"));
+    return {code.str(), o};
+  }
+  bool require_stdlib() override { return true; }
+};
 //
 // ┌─┐┬ ┬┌─┐┌─┐┌┬┐┬
 // └─┐├─┤│ ┬├┤  │ │
@@ -822,6 +925,51 @@ struct builtin_hmget : builtin {
     std::stringstream code{};
     code << "yk__hmget(" << args[0].first << ", " << args[1].first << ")";
     o = yk_object(args[0].second.datatype_->args_[0]->args_[0]);
+    return {code.str(), o};
+  }
+  bool require_stdlib() override { return true; }
+};
+struct builtin_hmdel : builtin {
+  yk_object
+  verify(const std::vector<yk_object> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         yk_datatype_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = yk_object(dt_pool);
+    if (args.size() != 2) {
+      o.string_val_ = "Two arguments must be provided for hmdel() builtin";
+    } else if (!args[0].datatype_->is_array() ||
+               !args[0].datatype_->args_[0]->is_m_entry()) {
+      o.string_val_ =
+          "First argument to hmdel() must match with Array[MEntry[K,V]]";
+    } else {
+      auto lhs_raw = args[0].datatype_->args_[0]->args_[1];
+      auto lhs = lhs_raw->const_unwrap();
+      auto rhs = args[1].datatype_->const_unwrap();
+      auto matched =
+          dt_slot_matcher->type_match(lhs, rhs, args[1].is_primitive_or_obj());
+      if (matched.matched_) { return yk_object(dt_pool->create("bool")); }
+      o.string_val_ =
+          "Second argument to hmdel() must match with Array[MEntry[K,V]] " +
+          matched.error_;
+    }
+    o.object_type_ = object_type::ERROR_DETECTED;
+    return o;
+  }
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          yk_datatype_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
+    auto o = yk_object(dt_pool);
+    std::stringstream code{};
+    code << "(yk__hmdel(" << args[0].first << ", " << args[1].first << ") == 1)";
+    o = yk_object(dt_pool->create("bool"));
     return {code.str(), o};
   }
   bool require_stdlib() override { return true; }
@@ -1758,6 +1906,9 @@ builtins::builtins(yk_datatype_pool *dt_pool, gc_pool<token> *token_pool)
   builtins_.insert({"arrnew", new builtin_arrnew{}});
   builtins_.insert({"arrsetcap", new builtin_arrsetlencap{"arrsetcap"}});
   builtins_.insert({"arrsetlen", new builtin_arrsetlencap{"arrsetlen"}});
+  builtins_.insert({"arrdel", new builtin_arrsetlencap{"arrdel"}});
+  builtins_.insert({"arrdelswap", new builtin_arrsetlencap{"arrdelswap"}});
+  builtins_.insert({"arrins", new builtin_arrins{}});
   builtins_.insert({"array", new builtin_array{}});
   builtins_.insert({"fixedarr", new builtin_fixed_arr{}});
   builtins_.insert({"print", new builtin_print{"print"}});
@@ -1768,11 +1919,13 @@ builtins::builtins(yk_datatype_pool *dt_pool, gc_pool<token> *token_pool)
   builtins_.insert({"unref", new builtin_unref{}});
   builtins_.insert({"shnew", new builtin_shnew{}});
   builtins_.insert({"shget", new builtin_shget{}});
+  builtins_.insert({"shdel", new builtin_shdel{}});
   builtins_.insert({"shgeti", new builtin_shgeti{}});
   builtins_.insert({"shput", new builtin_shput{}});
   builtins_.insert({"cast", new builtin_cast{}});
   builtins_.insert({"hmnew", new builtin_hmnew{}});
   builtins_.insert({"hmget", new builtin_hmget{}});
+  builtins_.insert({"hmdel", new builtin_hmdel{}});
   builtins_.insert({"hmgeti", new builtin_hmgeti{}});
   builtins_.insert({"hmput", new builtin_hmput{}});
   builtins_.insert({"qsort", new builtin_qsort{}});
