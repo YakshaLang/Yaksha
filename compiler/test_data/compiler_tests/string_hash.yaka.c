@@ -1,11 +1,11 @@
 // YK
 #include "yk__lib.h"
-struct yt_pair_str_float { yk__sds key; float value; };
-struct yt_pair_str_int { yk__sds key; int32_t value; };
+struct yt_pair_str_f32 { yk__sds key; float value; };
+struct yt_pair_str_i32 { yk__sds key; int32_t value; };
 int32_t yy__main();
 int32_t yy__main() 
 {
-    struct yt_pair_str_int* yy__m = NULL;
+    struct yt_pair_str_i32* yy__m = NULL;
     yk__sh_new_strdup(yy__m);
     yk__shput(yy__m, yk__sdsnewlen("hello", 5), INT32_C(42));
     yk__shput(yy__m, yk__sdsnewlen("world", 5), INT32_C(10000));
@@ -18,12 +18,12 @@ int32_t yy__main()
     yk__printstr("\"unknown\" is located at = ");
     yk__printlnint((intmax_t)yk__shgeti(yy__m, yk__sdsnewlen("unknown", 7)));
     yk__shfree(yy__m);
-    struct yt_pair_str_float* yy__m2 = NULL;
+    struct yt_pair_str_f32* yy__m2 = NULL;
     yk__sh_new_strdup(yy__m2);
     yk__shput(yy__m2, yk__sdsnewlen("hello", 5), 42.0f);
     yk__printstr("hello in m2 = ");
     yk__printlndbl(yk__shget(yy__m2, yk__sdsnewlen("hello", 5)));
-    struct yt_pair_str_float* yy__m3 = NULL;
+    struct yt_pair_str_f32* yy__m3 = NULL;
     yk__sh_new_strdup(yy__m3);
     yk__shput(yy__m3, yk__sdsnewlen("hello", 5), 123.0f);
     yk__printstr("hello in m3 = ");

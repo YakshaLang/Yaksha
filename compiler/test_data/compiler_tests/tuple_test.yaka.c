@@ -1,12 +1,12 @@
 // YK
 #include "yk__lib.h"
-struct yt_tuple_int_int_int { int32_t e1; int32_t e2; int32_t e3; };
+struct yt_tuple_i32_i32_i32 { int32_t e1; int32_t e2; int32_t e3; };
 struct yt_tuple_str { yk__sds e1; };
 int32_t yy__main();
 int32_t yy__main() 
 {
-    struct yt_tuple_int_int_int yy__a;
-    struct yt_tuple_int_int_int yy__b;
+    struct yt_tuple_i32_i32_i32 yy__a;
+    struct yt_tuple_i32_i32_i32 yy__b;
     yy__a.e2 = INT32_C(1);
     yy__a.e2 = INT32_C(2);
     yy__a.e3 = INT32_C(3);

@@ -51,7 +51,7 @@ struct yy__pool_ThreadPool;
 struct yy__raylib_support_BuildData;
 struct yy__raylib_support_CObject;
 typedef void (*yt_fn_in_any_ptr_out)(void*);
-typedef int32_t (*yt_fn_in_any_ptr_out_int)(void*);
+typedef int32_t (*yt_fn_in_any_ptr_out_i32)(void*);
 struct yt_tuple_fn_in_any_ptr_out_any_ptr { yt_fn_in_any_ptr_out e1; void* e2; };
 struct yy__building_BObject {
     yk__sds* yy__building_args;
@@ -155,7 +155,7 @@ void yy__condition_destroy(yy__condition_Condition*);
 int32_t yy__condition_signal(yy__condition_Condition*);
 int32_t yy__condition_broadcast(yy__condition_Condition*);
 int32_t yy__condition_wait(yy__condition_Condition*, yy__mutex_Mutex*);
-int32_t yy__thread_create_with_data(yy__thread_Thread*, yt_fn_in_any_ptr_out_int, void*);
+int32_t yy__thread_create_with_data(yy__thread_Thread*, yt_fn_in_any_ptr_out_i32, void*);
 void yy__thread_exit(int32_t);
 int32_t yy__thread_join(yy__thread_Thread);
 struct yy__pool_ThreadPool* yy__pool_create(uint8_t, uint32_t);
@@ -723,7 +723,7 @@ void yy__condition_destroy(yy__condition_Condition* nn__cnd) { cnd_destroy(nn__c
 int32_t yy__condition_signal(yy__condition_Condition* nn__cnd) { return cnd_signal(nn__cnd); }
 int32_t yy__condition_broadcast(yy__condition_Condition* nn__cnd) { return cnd_broadcast(nn__cnd); }
 int32_t yy__condition_wait(yy__condition_Condition* nn__cnd, yy__mutex_Mutex* nn__mtx) { return cnd_wait(nn__cnd, nn__mtx); }
-int32_t yy__thread_create_with_data(yy__thread_Thread* nn__thr, yt_fn_in_any_ptr_out_int nn__func, void* nn__data) { return thrd_create(nn__thr, nn__func, nn__data); }
+int32_t yy__thread_create_with_data(yy__thread_Thread* nn__thr, yt_fn_in_any_ptr_out_i32 nn__func, void* nn__data) { return thrd_create(nn__thr, nn__func, nn__data); }
 void yy__thread_exit(int32_t nn__res) { thrd_exit(nn__res); }
 int32_t yy__thread_join(yy__thread_Thread nn__thr) 
 {

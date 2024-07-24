@@ -150,7 +150,7 @@ TEST_CASE("type checker: Second argument must be int for arrnew()") {
 TEST_CASE("type checker: Must assign to proper data structure for arrnew()") {
   test_typechecker_snippet("a: Array[str] = arrnew(\"int\", 10)",
                            "Cannot assign between 2 different data types. lhs: "
-                           "Array[str], rhs: Array[int]");
+                           "Array[str], rhs: Array[i32]");
 }
 TEST_CASE("type checker: Builtin array() invalid arg count") {
   test_typechecker_snippet("a: Array[int] = array()",
@@ -179,12 +179,12 @@ TEST_CASE("type checker: Second argument must be int for array()") {
 TEST_CASE("type checker: Must assign to proper data structure for array()") {
   test_typechecker_snippet("a: Array[str] = array(\"int\", 10)",
                            "Cannot assign between 2 different data types. lhs: "
-                           "Array[str], rhs: Array[int]");
+                           "Array[str], rhs: Array[i32]");
 }
 TEST_CASE("type checker: Different type assignment using iif") {
   test_typechecker_snippet("a: bool = iif(True, False, 1)",
                            "Second and third arguments to iif() data type "
-                           "mismatch. Expected: bool, Provided: int");
+                           "mismatch. Expected: bool, Provided: i32");
 }
 TEST_CASE(
     "type checker: Different type assignment using iif bigger type on lhs") {
@@ -200,7 +200,7 @@ TEST_CASE("type checker: Different type func assignment using iif") {
       "    a: Function[In[int],Out] = iif(True, f1, f2)\n"
       "    return 0",
       "Second and third arguments to iif() data type mismatch. Expected: "
-      "Function[In[int], Out], Provided: Function[In[int, int], Out]");
+      "Function[In[i32], Out], Provided: Function[In[i32, i32], Out]");
 }
 TEST_CASE("type checker: iif using 4 args") {
   test_typechecker_snippet("a: bool = iif(True, False, True, 2)",
@@ -368,14 +368,14 @@ TEST_CASE("type checker: different type of numbers used in operators bitwise") {
   test_typechecker_snippet(
       "a: int = 1\n"
       "    b: i8 = a & 1i8\n",
-      "Cannot assign between 2 different data types. lhs: i8, rhs: int");
+      "Cannot assign between 2 different data types. lhs: i8, rhs: i32");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators mul/div/rem") {
   test_typechecker_snippet(
       "a: int = 1\n"
       "    b: i8 = a * 1i8\n",
-      "Cannot assign between 2 different data types. lhs: i8, rhs: int");
+      "Cannot assign between 2 different data types. lhs: i8, rhs: i32");
 }
 TEST_CASE(
     "type checker: different type of numbers used in operators comparison") {
@@ -492,14 +492,14 @@ TEST_CASE("type checker: func call parameter and argument mismatches") {
       "def main() -> int:\n"
       "    fnc(1i32, False)\n"
       "    return 0",
-      "Parameter & argument 1 mismatches. Expected: i8 Provided: int");
+      "Parameter & argument 1 mismatches. Expected: i8 Provided: i32");
   test_typechecker_snippet_full(
       "def fnc(a: int, b: i8) -> None:\n"
       "    pass\n"
       "def main() -> int:\n"
       "    fnc(1i32, 10)\n"
       "    return 0",
-      "Parameter & argument 2 mismatches. Expected: i8 Provided: int");
+      "Parameter & argument 2 mismatches. Expected: i8 Provided: i32");
 }
 TEST_CASE("type checker: func call parameter and argument mismatches first "
           "argument") {
@@ -514,7 +514,7 @@ TEST_CASE("type checker: func call parameter and argument mismatches first "
       "def main() -> int:\n"
       "    fnc(1340, 3)\n"
       "    return 0",
-      "Parameter & argument 1 mismatches. Expected: i8 Provided: int");
+      "Parameter & argument 1 mismatches. Expected: i8 Provided: i32");
 }
 TEST_CASE(
     "type checker: func call parameter and argument mismatches for varargs") {
@@ -533,7 +533,7 @@ TEST_CASE(
       "def main() -> int:\n"
       "    fnc(1, 3, 2, 3, 12i64)\n"
       "    return 0",
-      "Variable argument: 5 mismatches. Expected: int Provided: i64");
+      "Variable argument: 5 mismatches. Expected: i32 Provided: i64");
 }
 TEST_CASE("type checker: pass in a non constant structure to a const") {
   test_typechecker_snippet_full_ok("class A:\n"
@@ -571,8 +571,8 @@ TEST_CASE("type checker: func ptr call parameter and argument mismatches") {
       "    f1: Function[In[int,int],Out] = fnc\n"
       "    f1(1, 2)\n"
       "    return 0",
-      "You can only assign a matching function. lhs: Function[In[int, int], "
-      "Out], rhs: Function[In[int, i8], Out]");
+      "You can only assign a matching function. lhs: Function[In[i32, i32], "
+      "Out], rhs: Function[In[i32, i8], Out]");
 }
 TEST_CASE("type checker: do not allow to return a constant as a non constant") {
   test_typechecker_snippet_full(
@@ -618,7 +618,7 @@ TEST_CASE("type checker: func ptr call parameter and argument mismatches first "
                                 "    f1(1000, 1)\n"
                                 "    return 0",
                                 "Function[] call parameter & argument 1 "
-                                "mismatches. Expected: i8, Provided: int");
+                                "mismatches. Expected: i8, Provided: i32");
 }
 TEST_CASE("type checker: func ptr call too much arguments") {
   test_typechecker_snippet_full("def fnc(a: int, b: int) -> None:\n"
@@ -648,7 +648,7 @@ TEST_CASE("type checker: func ptr call output type mismatches") {
       "    f1: Function[In[int,int],Out[int]] = fnc\n"
       "    a: bool = f1(1, 2)\n"
       "    return 0",
-      "Cannot assign between 2 different data types. lhs: bool, rhs: int");
+      "Cannot assign between 2 different data types. lhs: bool, rhs: i32");
 }
 TEST_CASE("type checker: calling a non callable") {
   test_typechecker_snippet_full(
@@ -662,22 +662,22 @@ TEST_CASE("type checker: calling a non callable") {
 TEST_CASE("type checker: logical or needs two booleans") {
   test_typechecker_snippet("a: bool = False or 1\n",
                            "Both LHS and RHS of logical operator need to be "
-                           "boolean. LHS: bool, RHS: int");
+                           "boolean. LHS: bool, RHS: i32");
 }
 TEST_CASE("type checker: logical or needs two booleans swapped") {
   test_typechecker_snippet("a: bool = 1 or False\n",
                            "Both LHS and RHS of logical operator need to be "
-                           "boolean. LHS: int, RHS: bool");
+                           "boolean. LHS: i32, RHS: bool");
 }
 TEST_CASE("type checker: logical and needs two booleans") {
   test_typechecker_snippet("a: bool = True and 1\n",
                            "Both LHS and RHS of logical operator need to be "
-                           "boolean. LHS: bool, RHS: int");
+                           "boolean. LHS: bool, RHS: i32");
 }
 TEST_CASE("type checker: not must follow a boolean") {
   test_typechecker_snippet("a: bool = not 1\n",
                            "Invalid unary operation. Not operator must follow "
-                           "a boolean. Provided: int");
+                           "a boolean. Provided: i32");
 }
 TEST_CASE("type checker: not must follow a boolean (str used)") {
   test_typechecker_snippet(
@@ -875,7 +875,7 @@ TEST_CASE("type checker: Const assignment should work as expected") {
 TEST_CASE("type checker: Test multiple assignment failure") {
   test_typechecker_yaka_file(
       "../test_data/compiler_tests/multi_assign.yaka",
-      "Cannot assign between 2 different data types. lhs: sr, rhs: int");
+      "Cannot assign between 2 different data types. lhs: sr, rhs: i32");
 }
 TEST_CASE("type checker: Import shadows a foreach variable") {
   test_typechecker_yaka_file(

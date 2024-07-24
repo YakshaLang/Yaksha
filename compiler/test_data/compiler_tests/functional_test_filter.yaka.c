@@ -1,7 +1,7 @@
 // YK
 #include "yk__lib.h"
-typedef bool (*yt_fn_in_int_int_out_bool)(int32_t, int32_t);
-typedef bool (*yt_fn_in_str_int_out_bool)(yk__sds, int32_t);
+typedef bool (*yt_fn_in_i32_i32_out_bool)(int32_t, int32_t);
+typedef bool (*yt_fn_in_str_i32_out_bool)(yk__sds, int32_t);
 bool yy__keep_len_n(yk__sds, int32_t);
 bool yy__keep_all(yk__sds, int32_t);
 bool yy__keep_upto(int32_t, int32_t);
@@ -47,7 +47,7 @@ bool yy__print_int(int32_t yy__a, int32_t yy__ignored)
 int32_t yy__main() 
 {
     yk__printlnstr(">> filter str test <<");
-    yt_fn_in_str_int_out_bool yy__f = yy__keep_len_n;
+    yt_fn_in_str_i32_out_bool yy__f = yy__keep_len_n;
     yk__sds* t__2 = NULL;
     yk__arrsetcap(t__2, 5);
     yk__arrput(t__2, yk__sdsnewlen("Hello", 5));
@@ -109,7 +109,7 @@ int32_t yy__main()
     }
     t__36;
     yk__printlnstr(">> filter int test <<");
-    yt_fn_in_int_int_out_bool yy__fi = yy__keep_upto;
+    yt_fn_in_i32_i32_out_bool yy__fi = yy__keep_upto;
     int32_t* t__38 = NULL;
     yk__arrsetcap(t__38, 10);
     yk__arrput(t__38, INT32_C(1));

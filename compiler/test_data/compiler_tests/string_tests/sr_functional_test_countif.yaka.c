@@ -1,6 +1,6 @@
 // YK
 #include "yk__lib.h"
-typedef bool (*yt_fn_in_sr_int_out_bool)(struct yk__bstr, int32_t);
+typedef bool (*yt_fn_in_sr_i32_out_bool)(struct yk__bstr, int32_t);
 bool yy__keep_len_n(struct yk__bstr, int32_t);
 bool yy__keep_upto_n(int32_t, int32_t);
 int32_t yy__main();
@@ -23,7 +23,7 @@ bool yy__keep_upto_n(int32_t yy__a, int32_t yy__n)
 int32_t yy__main() 
 {
     yk__printlnstr(">> countif sr test <<");
-    yt_fn_in_sr_int_out_bool yy__f = yy__keep_len_n;
+    yt_fn_in_sr_i32_out_bool yy__f = yy__keep_len_n;
     struct yk__bstr* t__0 = NULL;
     yk__arrsetcap(t__0, 5);
     yk__arrput(t__0, yk__bstr_s("Hello", 5));

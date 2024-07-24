@@ -2,27 +2,27 @@
 #include "yk__lib.h"
 struct yy__A;
 struct yy__B;
-typedef int32_t yt_arr_int_2[2];
-typedef yt_arr_int_2 yt_arr_arr_int_2_2[2];
-typedef int32_t* const  yt_arr_const_ptr_int_2[2];
-typedef int32_t (*yt_fn_in_int_out_int)(int32_t);
-typedef yt_fn_in_int_out_int yt_arr_fn_in_int_out_int_2[2];
-typedef int32_t yt_arr_int_3[3];
-typedef int32_t* yt_arr_ptr_int_2[2];
-typedef int32_t** yt_arr_ptr_ptr_int_2[2];
+typedef int32_t yt_arr_i32_2[2];
+typedef yt_arr_i32_2 yt_arr_arr_i32_2_2[2];
+typedef int32_t* const  yt_arr_const_ptr_i32_2[2];
+typedef int32_t (*yt_fn_in_i32_out_i32)(int32_t);
+typedef yt_fn_in_i32_out_i32 yt_arr_fn_in_i32_out_i32_2[2];
+typedef int32_t yt_arr_i32_3[3];
+typedef int32_t* yt_arr_ptr_i32_2[2];
+typedef int32_t** yt_arr_ptr_ptr_i32_2[2];
 struct yy__A {
     int32_t yy__a;
-    yt_arr_int_3 yy__b;
-    yt_arr_int_3 yy__c;
+    yt_arr_i32_3 yy__b;
+    yt_arr_i32_3 yy__c;
 };
 struct yy__B {
-    yt_arr_arr_int_2_2 yy__nested;
-    yt_arr_int_2* yy__ptr_nested;
-    yt_arr_ptr_int_2 yy__nested_ptr;
-    yt_arr_ptr_int_2* yy__ptr_nested_ptr;
-    yt_arr_ptr_ptr_int_2 yy__nested_ptr_ptr;
-    yt_arr_fn_in_int_out_int_2 yy__nested_func;
-    yt_arr_const_ptr_int_2 yy__nested_const_ptr;
+    yt_arr_arr_i32_2_2 yy__nested;
+    yt_arr_i32_2* yy__ptr_nested;
+    yt_arr_ptr_i32_2 yy__nested_ptr;
+    yt_arr_ptr_i32_2* yy__ptr_nested_ptr;
+    yt_arr_ptr_ptr_i32_2 yy__nested_ptr_ptr;
+    yt_arr_fn_in_i32_out_i32_2 yy__nested_func;
+    yt_arr_const_ptr_i32_2 yy__nested_const_ptr;
 };
 int32_t yy__main();
 int32_t yy__main() 

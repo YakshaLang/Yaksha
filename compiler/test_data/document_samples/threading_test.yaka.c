@@ -18,7 +18,7 @@ int32_t const  yy__pool_SUCCESS = INT32_C(0);
 int32_t const  yy__thread_SUCCESS = INT32_C(1);
 struct yy__pool_ThreadPool;
 typedef void (*yt_fn_in_any_ptr_out)(void*);
-typedef int32_t (*yt_fn_in_any_ptr_out_int)(void*);
+typedef int32_t (*yt_fn_in_any_ptr_out_i32)(void*);
 struct yt_tuple_fn_in_any_ptr_out_any_ptr { yt_fn_in_any_ptr_out e1; void* e2; };
 struct yy__pool_ThreadPool {
     yy__mutex_Mutex yy__pool_lock;
@@ -47,8 +47,8 @@ int32_t yy__pool_add(struct yy__pool_ThreadPool*, yt_fn_in_any_ptr_out, void*);
 int32_t yy__pool_destroy(struct yy__pool_ThreadPool*, bool);
 int32_t yy__pool_internal_del_pool(struct yy__pool_ThreadPool*);
 int32_t yy__pool_internal_tpool_work(void*);
-int32_t yy__thread_create_with_data(yy__thread_Thread*, yt_fn_in_any_ptr_out_int, void*);
-int32_t yy__thread_create(yy__thread_Thread*, yt_fn_in_any_ptr_out_int);
+int32_t yy__thread_create_with_data(yy__thread_Thread*, yt_fn_in_any_ptr_out_i32, void*);
+int32_t yy__thread_create(yy__thread_Thread*, yt_fn_in_any_ptr_out_i32);
 void yy__thread_exit(int32_t);
 int32_t yy__thread_join(yy__thread_Thread);
 int32_t yy__thread_sleep(int32_t);
@@ -261,8 +261,8 @@ int32_t yy__pool_internal_tpool_work(void* yy__pool_tpool_obj)
     yy__thread_exit(INT32_C(0));
     return INT32_C(0);
 }
-int32_t yy__thread_create_with_data(yy__thread_Thread* nn__thr, yt_fn_in_any_ptr_out_int nn__func, void* nn__data) { return thrd_create(nn__thr, nn__func, nn__data); }
-int32_t yy__thread_create(yy__thread_Thread* nn__thr, yt_fn_in_any_ptr_out_int nn__func) 
+int32_t yy__thread_create_with_data(yy__thread_Thread* nn__thr, yt_fn_in_any_ptr_out_i32 nn__func, void* nn__data) { return thrd_create(nn__thr, nn__func, nn__data); }
+int32_t yy__thread_create(yy__thread_Thread* nn__thr, yt_fn_in_any_ptr_out_i32 nn__func) 
 {
     return thrd_create(nn__thr, nn__func, NULL);
 }

@@ -1093,7 +1093,7 @@ void type_checker::handle_assigns(token *oper, const yk_object &lhs,
     error(oper, message.str());
   }
   if (lhs.datatype_->const_unwrap()->is_tuple()) {
-    if (safe_tuples(lhs, rhs) and !lhs.datatype_->is_const() and
+    if (safe_tuples(lhs, rhs) && !lhs.datatype_->is_const() &&
         oper->type_ == token_type::EQ) {
       // assigning simple tuples is allowed
       return;

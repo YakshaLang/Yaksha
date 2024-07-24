@@ -166,7 +166,15 @@ void yk_datatype::write_to_str(std::stringstream &s, bool write_mod) const {
     if (!dt->module_.empty() && write_mod && !dt->is_dimension()) {
       s << dt->module_ << ":::";
     }
-    s << dt->token_->token_;
+    // i32 == int, f32 == float.
+    // so avoid writing the token for these 2 types
+    if (dt->is_i32()) {
+      s << "i32";
+    } else if (dt->is_f32()) {
+      s << "f32";
+    } else {
+      s << dt->token_->token_;
+    }
     // arguments
     if (!dt->args_.empty()) {
       stack.emplace_back(
