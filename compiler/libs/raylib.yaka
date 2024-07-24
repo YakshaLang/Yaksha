@@ -611,6 +611,22 @@ class RAudioBufferPtr:
 class RAudioProcessorPtr:
     pass
 
+@nativedefine("rlVertexBuffer")
+class RLVertexBuffer:
+    pass
+
+@nativedefine("Matrix[RL_MAX_MATRIX_STACK_SIZE]")
+class RMatrix:
+    pass
+
+@nativedefine("int[[RL_DEFAULT_BATCH_MAX_TEXTURE_UNITS]")
+class IntBatchMaxTextureUnits:
+    pass
+
+@nativedefine("rlglData")
+class RLGLData:
+    pass
+
 @nativedefine("Vector2")
 struct Vector2:
     # Vector2, 2 components
@@ -1060,9 +1076,16 @@ def file_path_list(capacity: u32, count: u32, paths: Ptr[Ptr[c.CChar]]) -> FileP
     ccode """(FilePathList){(unsigned int)nn__capacity, (unsigned int)nn__count, nn__paths}"""
 
 @nativedefine("AutomationEvent")
-class AutomationEvent:
+struct AutomationEvent:
     # Automation event
-    pass
+    frame: c.CUInt
+    type: c.CUInt
+    params: FixedArr[c.CInt,4]
+
+@nativemacro
+def automation_event(frame: u32, type: u32, params: FixedArr[c.CInt,4]) -> AutomationEvent:
+    # Factory function for: AutomationEvent
+    ccode """(AutomationEvent){(unsigned int)nn__frame, (unsigned int)nn__type, nn__params}"""
 
 @nativedefine("AutomationEventList")
 struct AutomationEventList:

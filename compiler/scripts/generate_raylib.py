@@ -81,6 +81,22 @@ class RAudioBufferPtr:
 @nativedefine("rAudioProcessor *")
 class RAudioProcessorPtr:
     pass
+
+@nativedefine("rlVertexBuffer")
+class RLVertexBuffer:
+    pass
+
+@nativedefine("Matrix[RL_MAX_MATRIX_STACK_SIZE]")
+class RMatrix:
+    pass
+
+@nativedefine("int[[RL_DEFAULT_BATCH_MAX_TEXTURE_UNITS]")
+class IntBatchMaxTextureUnits:
+    pass
+
+@nativedefine("rlglData")
+class RLGLData:
+    pass
 """.strip() + "\n\n"
 
 
@@ -166,6 +182,7 @@ F_DT = {
     "float *": {"t": "Ptr[float]", "del": None, "conv": None},
     "const float *": {"t": "Ptr[Const[float]]", "del": None, "conv": None},
     "int *": {"t": "Ptr[c.CInt]", "del": None, "conv": None},
+    "int[4]": {"t": "FixedArr[c.CInt,4]", "del": None, "conv": None},
     "float[4]": {"t": "FixedArr[f32,4]", "del": None, "conv": None},
     "float[2]": {"t": "FixedArr[f32,2]", "del": None, "conv": None},
     "float[3]": {"t": "FixedArr[f32,3]", "del": None, "conv": None},
@@ -185,6 +202,10 @@ F_DT = {
     "SaveFileTextCallback": {"t": "Function[In[c.CStr,c.CStr],Out[bool]]", "del": None, "conv": None},
     "SaveFileDataCallback": {"t": "Function[In[c.CStr,AnyPtr,c.CUInt],Out[bool]]", "del": None, "conv": None},
     "AudioCallback": {"t": "Function[In[AnyPtr,c.CUInt],Out]", "del": None, "conv": None},
+    "rlVertexBuffer": {"t": "RLVertexBuffer", "del": None, "conv": None},
+    "Matrix[RL_MAX_MATRIX_STACK_SIZE]": {"t": "RMatrix", "del": None, "conv": None},
+    "int[[RL_DEFAULT_BATCH_MAX_TEXTURE_UNITS]": {"t": "IntBatchMaxTextureUnits", "del": None, "conv": None},
+    "rlglData": {"t": "RLGLData", "del": None, "conv": None},
 }
 R_DT = {
     "const char *": "Ptr[Const[c.CChar]]",
@@ -201,6 +222,7 @@ S_DT = {
     "unsigned short": "c.CUShort",
     "void *": "AnyPtr",
     "char *": "c.CStr",
+    "bool *": "Ptr[bool]",
     "char **": "Ptr[Ptr[c.CChar]]",
     "const char **": "Ptr[Ptr[Const[c.CChar]]]",
     "bool": "bool",
@@ -219,9 +241,14 @@ S_DT = {
     "float[16]": "FixedArr[f32,16]",
     "float[2]": "FixedArr[f32,2]",
     "char[32]": "FixedArr[c.CChar,32]",
+    "int[4]": "FixedArr[c.CInt,4]",
     "Matrix[2]": "FixedArr[f32,2]",
     "rAudioBuffer *": "RAudioBufferPtr",
     "rAudioProcessor *": "RAudioProcessorPtr",
+    "rlVertexBuffer": "RLVertexBuffer",
+    "Matrix[RL_MAX_MATRIX_STACK_SIZE]": "RMatrix",
+    "int[[RL_DEFAULT_BATCH_MAX_TEXTURE_UNITS]": "IntBatchMaxTextureUnits",
+    "rlglData": "RLGLData",
     "double": "f64",
 }
 S_DT_MUST_PREFIX = {"RAudioBufferPtr", "RAudioProcessorPtr"}

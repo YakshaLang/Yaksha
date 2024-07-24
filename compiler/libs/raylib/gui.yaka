@@ -573,6 +573,11 @@ def gui_label_button(bounds: rl.Rectangle, text: c.CStr) -> int:
     ccode """GuiLabelButton(nn__bounds, nn__text)"""
 
 @nativemacro
+def gui_toggle(bounds: rl.Rectangle, text: c.CStr, active: Ptr[bool]) -> int:
+    # Toggle Button control, returns true when active
+    ccode """GuiToggle(nn__bounds, nn__text, nn__active)"""
+
+@nativemacro
 def gui_toggle_group(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) -> int:
     # Toggle Group control, returns active toggle index
     ccode """GuiToggleGroup(nn__bounds, nn__text, nn__active)"""
@@ -581,6 +586,11 @@ def gui_toggle_group(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) ->
 def gui_toggle_slider(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) -> int:
     # Toggle Slider control, returns true when clicked
     ccode """GuiToggleSlider(nn__bounds, nn__text, nn__active)"""
+
+@nativemacro
+def gui_check_box(bounds: rl.Rectangle, text: c.CStr, checked: Ptr[bool]) -> int:
+    # Check Box control, returns true when active
+    ccode """GuiCheckBox(nn__bounds, nn__text, nn__checked)"""
 
 @nativemacro
 def gui_combo_box(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) -> int:
@@ -651,6 +661,11 @@ def gui_list_view_ex(bounds: rl.Rectangle, text: Ptr[Ptr[Const[c.CChar]]], count
 def gui_message_box(bounds: rl.Rectangle, title: c.CStr, message: c.CStr, buttons: c.CStr) -> int:
     # Message Box control, displays a message
     ccode """GuiMessageBox(nn__bounds, nn__title, nn__message, nn__buttons)"""
+
+@nativemacro
+def gui_text_input_box(bounds: rl.Rectangle, title: c.CStr, message: c.CStr, buttons: c.CStr, text: c.CStr, text_max_size: int, secret_view_active: Ptr[bool]) -> int:
+    # Text Input Box control, ask for text, supports secret
+    ccode """GuiTextInputBox(nn__bounds, nn__title, nn__message, nn__buttons, nn__text, (int)nn__text_max_size, nn__secret_view_active)"""
 
 @nativemacro
 def gui_color_picker(bounds: rl.Rectangle, text: c.CStr, p_color: Ptr[rl.Color]) -> int:
