@@ -43,7 +43,7 @@ import_statement ::= KW_IMPORT S IDENTIFIER (OPERATOR_DOT IDENTIFIER)* (S KW_AS 
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
     methods=[getImportPath getName setName getNameIdentifier getPresentation]
 }
-const_statement ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? (KW_CCODE? S? STRING| literal) S? NL {
+const_statement ::= IDENTIFIER S? OPERATOR_COLON S? data_type S? OPERATOR_EQ S? (KW_CCODE? S? STRING| OPERATOR_MINUS? literal) S? NL {
     mixin="org.intellij.sdk.language.psi.impl.YakshaNamedElementImpl"
     implements="org.intellij.sdk.language.psi.YakshaNamedElement"
     methods=[getName setName getNameIdentifier getPresentation]
