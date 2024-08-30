@@ -264,7 +264,7 @@ void yy__printkv(yk__sds, yk__sds);
 void yy__print_config(struct yy__configuration_Config*);
 int32_t yy__build_from_config(struct yy__configuration_Config*, bool, bool);
 int32_t yy__perform_build();
-int32_t yy__perform_mini_build(yk__sds, bool, bool, bool, yk__sds, yk__sds, bool, bool, bool, bool);
+int32_t yy__perform_mini_build(yk__sds, bool, bool, bool, yk__sds, yk__sds, bool, bool, bool, bool, int32_t);
 int32_t yy__handle_args(yy__os_Arguments);
 int32_t yy__main();
 struct yy__raylib_support_CObject* yy__raylib_support_fill_arguments(yk__sds yy__raylib_support_src_path, struct yy__raylib_support_CObject* yy__raylib_support_c, bool yy__raylib_support_dll) 
@@ -469,19 +469,17 @@ yk__sds* yy__raylib_support_get_external_libs()
         if (yy__os_is_macos())
         {
             yk__sds* t__26 = NULL;
-            yk__arrsetcap(t__26, 12);
+            yk__arrsetcap(t__26, 10);
             yk__arrput(t__26, yk__sdsnewlen("-framework", 10));
             yk__arrput(t__26, yk__sdsnewlen("Foundation", 10));
             yk__arrput(t__26, yk__sdsnewlen("-framework", 10));
-            yk__arrput(t__26, yk__sdsnewlen("OpenGL", 6));
+            yk__arrput(t__26, yk__sdsnewlen("CoreServices", 12));
             yk__arrput(t__26, yk__sdsnewlen("-framework", 10));
-            yk__arrput(t__26, yk__sdsnewlen("OpenAL", 6));
+            yk__arrput(t__26, yk__sdsnewlen("CoreGraphics", 12));
+            yk__arrput(t__26, yk__sdsnewlen("-framework", 10));
+            yk__arrput(t__26, yk__sdsnewlen("AppKit", 6));
             yk__arrput(t__26, yk__sdsnewlen("-framework", 10));
             yk__arrput(t__26, yk__sdsnewlen("IOKit", 5));
-            yk__arrput(t__26, yk__sdsnewlen("-framework", 10));
-            yk__arrput(t__26, yk__sdsnewlen("CoreVideo", 9));
-            yk__arrput(t__26, yk__sdsnewlen("-framework", 10));
-            yk__arrput(t__26, yk__sdsnewlen("Cocoa", 5));
             yy__raylib_support_external_libs = t__26;
         }
         else
@@ -3834,12 +3832,47 @@ int32_t yy__perform_build()
     yy__configuration_del_config(yy__config);
     return t__5;
 }
-int32_t yy__perform_mini_build(yk__sds yy__filename, bool yy__use_raylib, bool yy__use_web, bool yy__wasm4, yk__sds yy__web_shell, yk__sds yy__asset_path, bool yy__silent, bool yy__actually_run, bool yy__crdll, bool yy__no_parallel) 
+int32_t yy__perform_mini_build(yk__sds yy__filename, bool yy__use_raylib, bool yy__use_web, bool yy__wasm4, yk__sds yy__web_shell, yk__sds yy__asset_path, bool yy__silent, bool yy__actually_run, bool yy__crdll, bool yy__no_parallel, int32_t yy__comp) 
 {
     yk__sds t__6 = yy__path_basename(yk__sdsdup(yy__filename));
     yk__sds t__7 = yy__path_remove_extension(yk__sdsdup(t__6));
     yk__sds yy__name = yk__sdsdup(t__7);
     struct yy__configuration_Config* yy__config = yy__configuration_create_adhoc_config(yk__sdsdup(yy__name), yk__sdsdup(yy__filename), yy__use_raylib, yy__use_web, yy__wasm4, yk__sdsdup(yy__web_shell), yk__sdsdup(yy__asset_path), yy__crdll, yy__no_parallel);
+    if (yy__comp == 0)
+    {
+        yy__config->yy__configuration_use_alt_compiler = true;
+        yy__config->yy__configuration_alt_compiler = yy__configuration_GCC;
+        if (yk__cmp_sds_lit(yy__config->yy__configuration_gcc_compiler_path, "<not found>", 11) == 0)
+        {
+            yk__printlnstr("GCC compiler not found.");
+            yk__sdsfree(yy__name);
+            yk__sdsfree(t__7);
+            yk__sdsfree(t__6);
+            yk__sdsfree(yy__asset_path);
+            yk__sdsfree(yy__web_shell);
+            yk__sdsfree(yy__filename);
+            return INT32_C(-1);
+        }
+    }
+    else
+    {
+        if (yy__comp == 1)
+        {
+            yy__config->yy__configuration_use_alt_compiler = true;
+            yy__config->yy__configuration_alt_compiler = yy__configuration_CLANG;
+            if (yk__cmp_sds_lit(yy__config->yy__configuration_clang_compiler_path, "<not found>", 11) == 0)
+            {
+                yk__printlnstr("Clang compiler not found.");
+                yk__sdsfree(yy__name);
+                yk__sdsfree(t__7);
+                yk__sdsfree(t__6);
+                yk__sdsfree(yy__asset_path);
+                yk__sdsfree(yy__web_shell);
+                yk__sdsfree(yy__filename);
+                return INT32_C(-1);
+            }
+        }
+    }
     if (yk__arrlen(yy__config->yy__configuration_errors) > INT32_C(0))
     {
         yy__print_errors(yy__config->yy__configuration_errors);
@@ -3976,6 +4009,9 @@ int32_t yy__handle_args(yy__os_Arguments yy__args)
     int32_t yy__wasm4 = INT32_C(0);
     int32_t yy__silent_mode = INT32_C(0);
     int32_t yy__no_parallel = INT32_C(0);
+    int32_t yy__use_gcc = INT32_C(0);
+    int32_t yy__use_clang = INT32_C(0);
+    int32_t yy__use_zig = INT32_C(0);
     yy__c_CStr yy__file_path = yy__strings_null_cstr();
     yy__c_CStr yy__assets_path = yy__strings_null_cstr();
     yk__sds yy__web_shell = yk__sdsnewlen("" , 0);
@@ -3991,6 +4027,9 @@ int32_t yy__handle_args(yy__os_Arguments yy__args)
     yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsnewlen("4", 1), yk__sdsnewlen("wasm4", 5), (&(yy__wasm4)), yk__sdsnewlen("wasm4 build", 11)));
     yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsnewlen("S", 1), yk__sdsnewlen("silent", 6), (&(yy__silent_mode)), yk__sdsnewlen("do not print anything except errors", 35)));
     yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsnewlen("N", 1), yk__sdsnewlen("nothread", 8), (&(yy__no_parallel)), yk__sdsnewlen("no parallel build & disable optimization (for debugging)", 56)));
+    yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsnewlen("\0", 1), yk__sdsnewlen("gcc", 3), (&(yy__use_gcc)), yk__sdsnewlen("use gcc", 7)));
+    yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsnewlen("\0", 1), yk__sdsnewlen("clang", 5), (&(yy__use_clang)), yk__sdsnewlen("use clang", 9)));
+    yk__arrput(yy__options, yy__argparse_opt_boolean(yk__sdsnewlen("\0", 1), yk__sdsnewlen("zig", 3), (&(yy__use_zig)), yk__sdsnewlen("use zig (this is the default behavior)", 38)));
     yk__arrput(yy__options, yy__argparse_opt_end());
     yy__argparse_ArgParseWrapper yy__a = yy__argparse_new(yy__options, yy__usages);
     yy__argparse_ArgParseRemainder yy__remainder = yy__argparse_parse(yy__a->state, yy__arguments);
@@ -4025,6 +4064,32 @@ int32_t yy__handle_args(yy__os_Arguments yy__args)
         return INT32_C(1);
     }
     yk__sds yy__single_file = yk__sdsdup(yy__remainder->remainder[INT32_C(0)]);
+    if ((((yy__use_zig + yy__use_clang) + yy__use_gcc)) > INT32_C(1))
+    {
+        yk__printlnstr("Multiple compilers selected. Please select only one.");
+        yy__strings_del_cstr(yy__file_path);
+        yy__argparse_del_remainder(yy__remainder);
+        yy__argparse_del_argparse(yy__a);
+        yy__array_del_str_array(yy__usages);
+        yk__arrfree(yy__options);
+        yy__array_del_str_array(yy__arguments);
+        yk__sdsfree(yy__single_file);
+        yk__sdsfree(yy__assets_path_s);
+        yk__sdsfree(yy__web_shell);
+        return INT32_C(1);
+    }
+    int32_t yy__comp = 2;
+    if (yy__use_clang == INT32_C(1))
+    {
+        yy__comp = 1;
+    }
+    else
+    {
+        if (yy__use_gcc == INT32_C(1))
+        {
+            yy__comp = 0;
+        }
+    }
     if ((yy__wasm4 == INT32_C(1)) && (((yy__raylib == INT32_C(1)) || (yy__web == INT32_C(1)))))
     {
         yk__printlnstr("Wasm4 is not compatible with raylib/web");
@@ -4115,7 +4180,7 @@ int32_t yy__handle_args(yy__os_Arguments yy__args)
             yk__printlnstr(yy__assets_path_s);
             yk__sdsfree(t__21);
         }
-        int32_t t__22 = yy__perform_mini_build(yk__sdsdup(yy__single_file), (yy__raylib == INT32_C(1)), (yy__web == INT32_C(1)), (yy__wasm4 == INT32_C(1)), yk__sdsdup(yy__web_shell), yk__sdsdup(yy__assets_path_s), (yy__silent_mode == INT32_C(1)), (yy__run == INT32_C(1)), (yy__crdll == INT32_C(1)), (yy__no_parallel == INT32_C(1)));
+        int32_t t__22 = yy__perform_mini_build(yk__sdsdup(yy__single_file), (yy__raylib == INT32_C(1)), (yy__web == INT32_C(1)), (yy__wasm4 == INT32_C(1)), yk__sdsdup(yy__web_shell), yk__sdsdup(yy__assets_path_s), (yy__silent_mode == INT32_C(1)), (yy__run == INT32_C(1)), (yy__crdll == INT32_C(1)), (yy__no_parallel == INT32_C(1)), yy__comp);
         yy__strings_del_cstr(yy__file_path);
         yy__argparse_del_remainder(yy__remainder);
         yy__argparse_del_argparse(yy__a);

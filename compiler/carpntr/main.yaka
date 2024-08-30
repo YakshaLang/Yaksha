@@ -5,36 +5,36 @@
 # Note: libs - MIT license, runtime/3rd - various
 # ==============================================================================================
 # GPLv3:
-# 
+#
 # Yaksha - Programming Language.
 # Copyright (C) 2020 - 2024 Bhathiya Perera
-# 
+#
 # This program is free software: you can redistribute it and/or modify it under the terms
 # of the GNU General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see https://www.gnu.org/licenses/.
-# 
+#
 # ==============================================================================================
 # Additional Terms:
-# 
+#
 # Please note that any commercial use of the programming language's compiler source code
 # (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
 # with author of the language (Bhathiya Perera).
-# 
+#
 # If you are using it for an open source project, please give credits.
 # Your own project must use GPLv3 license with these additional terms.
-# 
+#
 # You may use programs written in Yaksha/YakshaLisp for any legal purpose
 # (commercial, open-source, closed-source, etc) as long as it agrees
 # to the licenses of linked runtime libraries (see compiler/runtime/README.md).
-# 
+#
 # ==============================================================================================
 import libs
 import libs.os
@@ -48,6 +48,11 @@ import libs.strings.array as sarr
 import libs.argparse
 import configuration as carp
 import building
+
+enum Comp:
+    GCC
+    CLANG
+    ZIG
 
 def print_banner() -> None:
     # This just print a banner
@@ -146,10 +151,23 @@ def perform_build() -> int:
     ret: int = build_from_config(config, False, False)
     return ret
 
-def perform_mini_build(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str, asset_path: str, silent: bool, actually_run: bool, crdll: bool, no_parallel: bool) -> int:
+def perform_mini_build(filename: str, use_raylib: bool, use_web: bool, wasm4: bool, web_shell: str, asset_path: str, silent: bool, actually_run: bool, crdll: bool, no_parallel: bool, comp: Comp) -> int:
     # Perform single file project build and execute binary
     name: str = path.remove_extension(path.basename(filename))
     config: carp.Config = carp.create_adhoc_config(name, filename, use_raylib, use_web, wasm4, web_shell, asset_path, crdll, no_parallel)
+    # Pick compiler based on the input argument
+    if comp == Comp.GCC:
+        config.use_alt_compiler = True
+        config.alt_compiler = carp.GCC
+        if config.gcc_compiler_path == "<not found>":
+            println("GCC compiler not found.")
+            return -1
+    elif comp == Comp.CLANG:
+        config.use_alt_compiler = True
+        config.alt_compiler = carp.CLANG
+        if config.clang_compiler_path == "<not found>":
+            println("Clang compiler not found.")
+            return -1
     defer carp.del_config(config)
     if len(config.errors) > 0:
         print_errors(config.errors)
@@ -207,6 +225,9 @@ def handle_args(args: os.Arguments) -> int:
     wasm4: int = 0
     silent_mode: int = 0
     no_parallel: int = 0
+    use_gcc: int = 0
+    use_clang: int = 0
+    use_zig: int = 0
     file_path: c.CStr = strings.null_cstr()
     assets_path: c.CStr = strings.null_cstr()
     web_shell: str = ""
@@ -222,6 +243,9 @@ def handle_args(args: os.Arguments) -> int:
     arrput(options, argparse.opt_boolean("4", "wasm4", getref(wasm4), "wasm4 build"))
     arrput(options, argparse.opt_boolean("S", "silent", getref(silent_mode), "do not print anything except errors"))
     arrput(options, argparse.opt_boolean("N", "nothread", getref(no_parallel), "no parallel build & disable optimization (for debugging)"))
+    arrput(options, argparse.opt_boolean("\0", "gcc", getref(use_gcc), "use gcc"))
+    arrput(options, argparse.opt_boolean("\0", "clang", getref(use_clang), "use clang"))
+    arrput(options, argparse.opt_boolean("\0", "zig", getref(use_zig), "use zig (this is the default behavior)"))
     arrput(options, argparse.opt_end())
 
     a: argparse.ArgParseWrapper = argparse.new(options, usages)
@@ -243,6 +267,14 @@ def handle_args(args: os.Arguments) -> int:
         return 1
     single_file: str = remainder.remainder[0]
 
+    if (use_zig + use_clang + use_gcc) > 1:
+        println("Multiple compilers selected. Please select only one.")
+        return 1
+    comp: Comp = Comp.ZIG
+    if use_clang == 1:
+        comp = Comp.CLANG
+    elif use_gcc == 1:
+        comp = Comp.GCC
     if wasm4 == 1 and (raylib == 1 or web == 1):
         println("Wasm4 is not compatible with raylib/web")
         return 1
@@ -267,7 +299,7 @@ def handle_args(args: os.Arguments) -> int:
             assets_path_s = strings.from_cstr(assets_path)
             print("Using asset-path:")
             println(assets_path_s)
-        return perform_mini_build(single_file, raylib == 1, web == 1, wasm4 == 1, web_shell, assets_path_s, silent_mode == 1, run == 1, crdll == 1, no_parallel == 1)
+        return perform_mini_build(single_file, raylib == 1, web == 1, wasm4 == 1, web_shell, assets_path_s, silent_mode == 1, run == 1, crdll == 1, no_parallel == 1, comp)
     console.red("Invalid usage. Please use '-R' option if you want to run a program. Try 'carpntr --help' for more information.\n")
     return 0
 
