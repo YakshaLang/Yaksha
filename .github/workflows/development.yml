@@ -68,7 +68,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-11]
+        os: [macos-12]
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v4
