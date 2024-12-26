@@ -4,6 +4,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import org.intellij.sdk.language.YakshaIcons;
 import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -102,6 +103,19 @@ public class YakshaToolWindow {
     }
 
     private void onSelectFileButtonClicked(ExecutableFileStateService service) {
+        final var fileChooser = getExePicker();
+        int returnValue = fileChooser.showOpenDialog(myToolWindowContent);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String filePath = selectedFile.getAbsolutePath();
+            assert service.getState() != null;
+            service.getState().setExecutableFilePath(filePath);
+            YAKSHA_EXE_PATH = filePath;
+            Messages.showMessageDialog("Set compiler path: " + filePath, "Information", Messages.getInformationIcon());
+        }
+    }
+
+    private static @NotNull JFileChooser getExePicker() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select Executable File");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -116,16 +130,7 @@ public class YakshaToolWindow {
                 return "Yaksha executable";
             }
         });
-
-        int returnValue = fileChooser.showOpenDialog(myToolWindowContent);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            String filePath = selectedFile.getAbsolutePath();
-            assert service.getState() != null;
-            service.getState().setExecutableFilePath(filePath);
-            YAKSHA_EXE_PATH = filePath;
-            Messages.showMessageDialog("Set compiler path: " + filePath, "Information", Messages.getInformationIcon());
-        }
+        return fileChooser;
     }
 
 

@@ -6,7 +6,6 @@ import com.google.gson.JsonSyntaxException;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.lang.annotation.HighlightSeverity;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Pair;
@@ -15,6 +14,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.intellij.sdk.language.tw.YakshaToolWindow;
+import org.intellij.sdk.language.utilities.FileLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,16 +27,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiFile>, List<YakshaCompilerAnnotator.CompilerError>> {
 
-    private static final Logger LOGGER = Logger.getInstance(YakshaCompilerAnnotator.class);
+    private static final FileLogger LOGGER = FileLogger.getInstance();
     public static final int MAX_DEPTH = 5;
+    private final ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
+    private final YakshaService service = new YakshaService(queue);
 
-    private static void log(final String s) {
-//        System.out.println(s);
-        LOGGER.info(s);
+    public YakshaCompilerAnnotator() {
+        super();
     }
 
     @Override
@@ -58,13 +60,13 @@ public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiF
         final File directory = f.getParentFile();
 
         if (f.getName().startsWith("_.")) {
-            log("You are editing a scratch file: " + f.getPath());
+            LOGGER.info("You are editing a scratch file: " + f.getPath());
             return List.of();
         }
 
         if (f.getName().equals("main.yaka")) {
             final var scratch = Paths.get(directory.getAbsolutePath(), "_.main.yaka");
-            log("Wrote scratch file:" + scratch);
+            LOGGER.info("Wrote scratch file:" + scratch);
             final var temp = createSyncedFile(editor.getDocument(), scratch);
             if (temp == null) {
                 f = Paths.get(directory.getAbsolutePath(), "_.main.yaka").toFile();
@@ -77,7 +79,7 @@ public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiF
             final var scratch = Paths.get(f.getAbsoluteFile().getParent(), name);
             cleanup = scratch.toFile();
             createSyncedFile(editor.getDocument(), scratch);
-            log("Wrote scratch file:" + scratch);
+            LOGGER.info("Wrote scratch file:" + scratch);
             f = findMainFile(new File(directory.getPath()));
             if (f == null) {
                 deleteScratch(cleanup);
@@ -93,9 +95,9 @@ public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiF
     private static void deleteScratch(@NotNull File f) {
         try {
             final var success = f.delete();
-            log("Deleted " + f.getPath() + " success = " + success);
+            LOGGER.info("Deleted " + f.getPath() + " success = " + success);
         } catch (Exception ignored) {
-            log("Failed to delete " + f.getPath());
+            LOGGER.info("Failed to delete " + f.getPath());
         }
     }
 
@@ -144,6 +146,11 @@ public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiF
         }
     }
 
+    @SuppressWarnings("unused")
+    public YakshaService getService() {
+        return service;
+    }
+
     public static class CompilerError {
         final String file;
         final String message;
@@ -177,11 +184,11 @@ public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiF
         final List<CompilerError> errors = new ArrayList<>();
         final var compiler = YakshaToolWindow.YAKSHA_EXE_PATH;
         if (compiler.isBlank()) {
-            log("------ yaksha compiler path is not set -----");
+            LOGGER.error("Yaksha compiler path is not set");
             return errors;
         }
 
-        log("----- yaksha compiler: " + compiler);
+        LOGGER.info("Yaksha compiler: " + compiler);
 
         final List<String> command = List.of(compiler, "compile", "-d", "-e", mainFile.getAbsolutePath());
 
@@ -192,10 +199,13 @@ public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiF
 
             String output = new String(process.getInputStream().readAllBytes());
             final var result = parseCompilerErrors(output, mainFile.getAbsolutePath());
-            log("Found errors " + result.size());
+            LOGGER.info("Found errors " + result.size());
             errors.addAll(result);
-        } catch (IOException | InterruptedException ignored) {
-            log("-------------- error ");
+            if (result.isEmpty()) {
+                queue.add(mainFile.getAbsolutePath());
+            }
+        } catch (IOException | InterruptedException ex) {
+            LOGGER.error("Error when executing yaksha compile ", ex.getLocalizedMessage());
         }
 
         return errors;
