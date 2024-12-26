@@ -21,6 +21,7 @@ public class YakshaFolderBuilder extends FoldingBuilderEx implements DumbAware {
         return SyntaxTraverser.psiTraverser(root)
                 .filter(i -> (i instanceof YakshaClassBlock || i instanceof YakshaDefBlock || i instanceof YakshaEnumBlock || i instanceof YakshaDslOuterBlock))
                 .map(i -> new YakshaFoldingDesc(i, getRange(i)))
+                .filter(x -> x.getRange().getLength() > 0)
                 .toList().toArray(new FoldingDescriptor[0]);
     }
 
