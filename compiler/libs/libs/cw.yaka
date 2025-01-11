@@ -1,0 +1,136 @@
+import libs.c
+
+CW_VERSION_MAJOR: Const[int] = ccode "CIVETWEB_VERSION_MAJOR"
+CW_VERSION_MINOR: Const[int] = ccode "CIVETWEB_VERSION_MINOR"
+CW_VERSION_PATCH: Const[int] = ccode "CIVETWEB_VERSION_PATCH"
+
+MG_FEATURES_DEFAULT: Const[int] = 0x0
+MG_FEATURES_FILES: Const[int] = 0x1
+# Support files from local directories
+# Will only work, if NO_FILES is not set.
+MG_FEATURES_TLS: Const[int] = 0x2
+# Support transport layer security (TLS).
+# SSL is still often used synonymously for TLS.
+# Will only work, if NO_SSL is not set.
+MG_FEATURES_SSL: Const[int] = 0x2
+# Support transport layer security (TLS).
+# SSL is still often used synonymously for TLS.
+# Will only work, if NO_SSL is not set.
+MG_FEATURES_CGI: Const[int] = 0x4
+# Support common gateway interface (CGI).
+MG_FEATURES_IPV6: Const[int] = 0x8
+# Support IPv6
+# Will only work, if USE_IPV6 is set.
+MG_FEATURES_WEBSOCKET: Const[int] = 0x10
+# Support WebSocket protocol
+# Will only work, if USE_WEBSOCKET is set.
+MG_FEATURES_LUA: Const[int] = 0x20
+# Support server side Lua scripting
+# Will only work, if USE_LUA is set.
+MG_FEATURES_SSJS: Const[int] = 0x40
+# Support server side JavaScript scripting
+# Will only work, if USE_DUKTAPE is set.
+MG_FEATURES_CACHE: Const[int] = 0x80
+# Provide data required for caching files
+# Will only work, if NO_CACHING is not set.
+MG_FEATURES_STATS: Const[int] = 0x100
+# Collect server status information
+# Will only work, if USE_SERVER_STATS is set.
+MG_FEATURES_COMPRESSION: Const[int] = 0x200
+# Support on-the-fly compression
+# Will only work, if USE_ZLIB is set.
+MG_FEATURES_HTTP2: Const[int] = 0x400
+# HTTP/2 support
+MG_FEATURES_X_DOMAIN_SOCKET: Const[int] = 0x800
+# Support unix domain sockets
+MG_FEATURES_ALL: Const[int] = 0xFFFF
+# Bit mask for all feature defines
+
+MAX_HEADERS: Const[int] = 64
+
+@nativedefine("mg_init_library")
+def init_library(features: int) -> int:
+    # Initialize this library. This should be called once before any other
+    # function from this library. This function is not guaranteed to be
+    # thread safe.
+    # 0 is returned on error. else the initialized features
+    pass
+
+@nativedefine("mg_exit_library")
+def exit_library() -> int:
+    # Un-initialize this library.
+    # 0 is returned on error.
+    pass
+
+@nativedefine("struct mg_header")
+struct Header:
+    name: c.CStr
+    value: c.CStr
+
+@nativedefine("struct mg_request_info")
+struct RequestInfo:
+    request_method: c.CStr
+    # "GET", "POST", etc
+    request_uri: c.CStr
+    # URL-decoded URI (absolute or relative, as in the request)
+    local_uri_raw: c.CStr
+    # URL-decoded URI (relative). Can be NULL if the request_uri does not address a resource at the server host.
+    local_uri: c.CStr
+    # Same as local_uri_raw, however, cleaned so a path like allowed_dir/../forbidden_file is not possible.
+    http_version: c.CStr
+    # E.g. "1.0", "1.1"
+    query_string: c.CStr
+    # URL part after '?', not including '?', or NULL
+    remote_user: c.CStr
+    # Authenticated user, or NULL if no auth used
+    remote_addr: FixedArr[u8,48]
+    # Client's IP address as a string.
+    content_length: int
+    # Length (in bytes) of the request body, can be -1 if no length was given.
+    remote_port: int
+    # Port at client side
+    server_port: int
+    # Port at server side (one of the listening ports)
+    is_ssl: int
+    # 1 if SSL/TLS used, 0 if not
+    user_data: AnyPtr
+    # User data tagged to request
+    conn_data: AnyPtr
+    # Connection-specific user data
+    num_headers: int
+    # Number of HTTP headers
+    http_headers: FixedArr[Header, 64]
+    # HTTP headers fixed size array
+    client_cert: Ptr[ClientCert]
+    # Client certificate information
+    acceptedWebSocketSubprotocol: c.CStr
+    # websocket subprotocol, accepted during handshake
+
+@nativedefine("struct mg_response_info")
+struct ResponseInfo:
+    status_code: int
+    # Status code - E.g. 200
+    status_text: c.CStr
+    # Status text - E.g. "OK"
+    http_version: c.CStr
+    # HTTP version - E.g. "1.0", "1.1"
+    content_length: i64
+    # Length (in bytes) of the request body, can be -1 if no length was given.
+    num_headers: int
+    # Number of HTTP headers
+    http_headers: FixedArr[Header, 64]
+    # HTTP headers fixed size array
+
+@nativedefine("struct mg_client_cert")
+struct ClientCert:
+    peer_cert: AnyPtr
+    subject: c.CStr
+    issuer: c.CStr
+    serial: c.CStr
+    finger: c.CStr
+
+@nativedefine("struct mg_callbacks")
+struct Callbacks:
+    pass
+
+# --
