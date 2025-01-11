@@ -15,14 +15,23 @@ import org.intellij.sdk.language.psi.YakshaEnumBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Optional;
+
 public class YakshaFolderBuilder extends FoldingBuilderEx implements DumbAware {
     @Override
-    public FoldingDescriptor @NotNull [] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
-        return SyntaxTraverser.psiTraverser(root)
-                .filter(i -> (i instanceof YakshaClassBlock || i instanceof YakshaDefBlock || i instanceof YakshaEnumBlock || i instanceof YakshaDslOuterBlock))
-                .map(i -> new YakshaFoldingDesc(i, getRange(i)))
-                .filter(x -> x.getRange().getLength() > 0)
-                .toList().toArray(new FoldingDescriptor[0]);
+    public FoldingDescriptor @NotNull [] buildFoldRegions(
+            @NotNull PsiElement root, @NotNull Document document, boolean quick) {
+        final List<Optional<FoldingDescriptor>> items = SyntaxTraverser.psiTraverser(root)
+                .filter(i ->
+                        (i instanceof YakshaClassBlock ||
+                                i instanceof YakshaDefBlock ||
+                                i instanceof YakshaEnumBlock ||
+                                i instanceof YakshaDslOuterBlock)
+                )
+                .map(YakshaFolderBuilder::makeFold).toList();
+        return items.stream().filter(Optional::isPresent).map(Optional::get)
+                .toArray(FoldingDescriptor[]::new);
     }
 
     @Override
@@ -50,6 +59,14 @@ public class YakshaFolderBuilder extends FoldingBuilderEx implements DumbAware {
             }
         }
         return range;
+    }
+
+    private static Optional<FoldingDescriptor> makeFold(PsiElement elm) {
+        try {
+            return Optional.of(new YakshaFoldingDesc(elm, getRange(elm)));
+        } catch (AssertionError ignored) {
+        }
+        return Optional.empty();
     }
 
     public static class YakshaFoldingDesc extends FoldingDescriptor {
