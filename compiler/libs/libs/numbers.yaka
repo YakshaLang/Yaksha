@@ -19,7 +19,6 @@ def d2cdbl(a: f64) -> c.CDouble:
     # f64 (double precision) to c.CDouble
     ccode """n__a"""
 
-
 @nativemacro
 def d2i(a: f64) -> int:
     # f64 (double precision) to int/i32
@@ -88,6 +87,34 @@ def uu2f(a: u64) -> float:
 @nativemacro
 def i2s(a: int) -> str:
     ccode """(yk__sdsfromlonglong(nn__a))"""
+
+@native
+def copy_from_f32(a: f32) -> u32:
+    # Get memory representation of a float (platform dependent)
+    ccode """uint32_t nn__r = 0;
+    memcpy(&nn__r, &nn__a, sizeof(float));
+    return nn__r"""
+
+@native
+def copy_from_f64(a: f64) -> u64:
+    # Get memory representation of a double (platform dependent)
+    ccode """uint64_t nn__r = 0;
+    memcpy(&nn__r, &nn__a, sizeof(double));
+    return nn__r"""
+
+@native
+def copy_to_f32(a: u32) -> f32:
+    # Get float from memory representation (platform dependent)
+    ccode """float nn__r = 0;
+    memcpy(&nn__r, &nn__a, sizeof(float));
+    return nn__r"""
+
+@native
+def copy_to_f64(a: u64) -> f64:
+    # Get double from memory representation (platform dependent)
+    ccode """double nn__r = 0;
+    memcpy(&nn__r, &nn__a, sizeof(double));
+    return nn__r"""
 
 @nativemacro
 def to_le16(a: u16) -> u16:

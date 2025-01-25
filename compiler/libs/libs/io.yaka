@@ -1,4 +1,5 @@
 import libs.c
+import libs.numbers as num
 
 PROT_NONE: Const[int] = ccode "PROT_NONE"
 PROT_READ: Const[int] = ccode "PROT_READ"
@@ -160,3 +161,204 @@ def open(path: sr, mode: int) -> c.CInt:
 @nativedefine("yk__io_close")
 def close(file: c.CInt) -> bool:
     pass
+
+# --------------------------------------------------------------------------------------------------
+# Reading / Writing utilities
+# --------------------------------------------------------------------------------------------------
+
+def file_write_u8(file: Ptr[File], value: u8) -> bool:
+    buffer = cast("AnyPtr", getref(value))
+    size = cast("c.Size", 1)
+    count = cast("c.Size", 1)
+    return fwrite(buffer, size, count, file) == count
+
+def file_write_i8(file: Ptr[File], value: i8) -> bool:
+    return file_write_u8(file, cast("u8", value))
+
+def file_write_u16be(file: Ptr[File], value: u16) -> bool:
+    big_endian_int = num.to_be16(value)
+    buffer = cast("AnyPtr", getref(big_endian_int))
+    size = cast("c.Size", 2)
+    count = cast("c.Size", 1)
+    return fwrite(buffer, size, count, file) == count
+
+def file_write_i16be(file: Ptr[File], value: i16) -> bool:
+    return file_write_u16be(file, cast("u16", value))
+
+def file_write_u16le(file: Ptr[File], value: u16) -> bool:
+    little_endian_int = num.to_le16(value)
+    buffer = cast("AnyPtr", getref(little_endian_int))
+    size = cast("c.Size", 2)
+    count = cast("c.Size", 1)
+    return fwrite(buffer, size, count, file) == count
+
+def file_write_i16le(file: Ptr[File], value: i16) -> bool:
+    return file_write_u16le(file, cast("u16", value))
+
+def file_write_u32be(file: Ptr[File], value: u32) -> bool:
+    big_endian_int = num.to_be32(value)
+    buffer = cast("AnyPtr", getref(big_endian_int))
+    size = cast("c.Size", 4)
+    count = cast("c.Size", 1)
+    return fwrite(buffer, size, count, file) == count
+
+def file_write_i32be(file: Ptr[File], value: i32) -> bool:
+    return file_write_u32be(file, cast("u32", value))
+
+def file_write_u32le(file: Ptr[File], value: u32) -> bool:
+    little_endian_int = num.to_le32(value)
+    buffer = cast("AnyPtr", getref(little_endian_int))
+    size = cast("c.Size", 4)
+    count = cast("c.Size", 1)
+    return fwrite(buffer, size, count, file) == count
+
+def file_write_i32le(file: Ptr[File], value: i32) -> bool:
+    return file_write_u32le(file, cast("u32", value))
+
+def file_write_u64be(file: Ptr[File], value: u64) -> bool:
+    big_endian_int = num.to_be64(value)
+    buffer = cast("AnyPtr", getref(big_endian_int))
+    size = cast("c.Size", 8)
+    count = cast("c.Size", 1)
+    return fwrite(buffer, size, count, file) == count
+
+def file_write_i64be(file: Ptr[File], value: i64) -> bool:
+    return file_write_u64be(file, cast("u64", value))
+
+def file_write_u64le(file: Ptr[File], value: u64) -> bool:
+    little_endian_int = num.to_le64(value)
+    buffer = cast("AnyPtr", getref(little_endian_int))
+    size = cast("c.Size", 8)
+    count = cast("c.Size", 1)
+    return fwrite(buffer, size, count, file) == count
+
+def file_write_i64le(file: Ptr[File], value: i64) -> bool:
+    return file_write_u64le(file, cast("u64", value))
+
+# Reading from file
+
+def file_read_u8(file: Ptr[File]) -> Tuple[u8, bool]:
+    val: u8 = 0u8
+    buffer = cast("AnyPtr", getref(val))
+    size = cast("c.Size", 1)
+    count = cast("c.Size", 1)
+    success: bool = fread(buffer, size, count, file) == count
+    result: Tuple[u8, bool]
+    result[0] = val
+    result[1] = success
+    return result
+
+def file_read_i8(file: Ptr[File]) -> Tuple[i8, bool]:
+    u8_result = file_read_u8(file)
+    result: Tuple[i8, bool]
+    result[0] = cast("i8", u8_result[0])
+    result[1] = u8_result[1]
+    return result
+
+def file_read_u16be(file: Ptr[File]) -> Tuple[u16, bool]:
+    val: u16 = 0u16
+    buffer = cast("AnyPtr", getref(val))
+    size = cast("c.Size", 2)
+    count = cast("c.Size", 1)
+    success: bool = fread(buffer, size, count, file) == count
+    result: Tuple[u16, bool]
+    result[0] = num.from_be16(val)
+    result[1] = success
+    return result
+
+def file_read_i16be(file: Ptr[File]) -> Tuple[i16, bool]:
+    u16_result = file_read_u16be(file)
+    result: Tuple[i16, bool]
+    result[0] = cast("i16", u16_result[0])
+    result[1] = u16_result[1]
+    return result
+
+def file_read_u16le(file: Ptr[File]) -> Tuple[u16, bool]:
+    val: u16 = 0u16
+    buffer = cast("AnyPtr", getref(val))
+    size = cast("c.Size", 2)
+    count = cast("c.Size", 1)
+    success: bool = fread(buffer, size, count, file) == count
+    result: Tuple[u16, bool]
+    result[0] = num.from_le16(val)
+    result[1] = success
+    return result
+
+def file_read_i16le(file: Ptr[File]) -> Tuple[i16, bool]:
+    u16_result = file_read_u16le(file)
+    result: Tuple[i16, bool]
+    result[0] = cast("i16", u16_result[0])
+    result[1] = u16_result[1]
+    return result
+
+def file_read_u32be(file: Ptr[File]) -> Tuple[u32, bool]:
+    val: u32 = 0u32
+    buffer = cast("AnyPtr", getref(val))
+    size = cast("c.Size", 4)
+    count = cast("c.Size", 1)
+    success: bool = fread(buffer, size, count, file) == count
+    result: Tuple[u32, bool]
+    result[0] = num.from_be32(val)
+    result[1] = success
+    return result
+
+def file_read_i32be(file: Ptr[File]) -> Tuple[i32, bool]:
+    u32_result = file_read_u32be(file)
+    result: Tuple[i32, bool]
+    result[0] = cast("i32", u32_result[0])
+    result[1] = u32_result[1]
+    return result
+
+def file_read_u32le(file: Ptr[File]) -> Tuple[u32, bool]:
+    val: u32 = 0u32
+    buffer = cast("AnyPtr", getref(val))
+    size = cast("c.Size", 4)
+    count = cast("c.Size", 1)
+    success: bool = fread(buffer, size, count, file) == count
+    result: Tuple[u32, bool]
+    result[0] = num.from_le32(val)
+    result[1] = success
+    return result
+
+def file_read_i32le(file: Ptr[File]) -> Tuple[i32, bool]:
+    u32_result = file_read_u32le(file)
+    result: Tuple[i32, bool]
+    result[0] = cast("i32", u32_result[0])
+    result[1] = u32_result[1]
+    return result
+
+def file_read_u64be(file: Ptr[File]) -> Tuple[u64, bool]:
+    val: u64 = 0u64
+    buffer = cast("AnyPtr", getref(val))
+    size = cast("c.Size", 8)
+    count = cast("c.Size", 1)
+    success: bool = fread(buffer, size, count, file) == count
+    result: Tuple[u64, bool]
+    result[0] = num.from_be64(val)
+    result[1] = success
+    return result
+
+def file_read_i64be(file: Ptr[File]) -> Tuple[i64, bool]:
+    u64_result = file_read_u64be(file)
+    result: Tuple[i64, bool]
+    result[0] = cast("i64", u64_result[0])
+    result[1] = u64_result[1]
+    return result
+
+def file_read_u64le(file: Ptr[File]) -> Tuple[u64, bool]:
+    val: u64 = 0u64
+    buffer = cast("AnyPtr", getref(val))
+    size = cast("c.Size", 8)
+    count = cast("c.Size", 1)
+    success: bool = fread(buffer, size, count, file) == count
+    result: Tuple[u64, bool]
+    result[0] = num.from_le64(val)
+    result[1] = success
+    return result
+
+def file_read_i64le(file: Ptr[File]) -> Tuple[i64, bool]:
+    u64_result = file_read_u64le(file)
+    result: Tuple[i64, bool]
+    result[0] = cast("i64", u64_result[0])
+    result[1] = u64_result[1]
+    return result

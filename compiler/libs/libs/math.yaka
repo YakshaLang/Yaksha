@@ -1,0 +1,298 @@
+PI: Const[f64] = 3.141592653589793
+PIf: Const[f32] = 3.141592653589793f
+E: Const[f64] = 2.718281828459045
+E: Const[f32] = 2.718281828459045f
+TAU: Const[f64] = 6.283185307179586
+TAUf: Const[f32] = 6.283185307179586f
+
+@nativedefine("sin")
+def sin(x: f64) -> f64:
+    pass
+
+@nativedefine("sinf")
+def sinf(x: f32) -> f32:
+    pass
+
+@nativedefine("cos")
+def cos(x: f64) -> f64:
+    pass
+
+@nativedefine("cosf")
+def cosf(x: f32) -> f32:
+    pass
+
+@nativedefine("tan")
+def tan(x: f64) -> f64:
+    pass
+
+@nativedefine("tanf")
+def tanf(x: f32) -> f32:
+    pass
+
+@nativedefine("asin")
+def asin(x: f64) -> f64:
+    pass
+
+@nativedefine("asinf")
+def asinf(x: f32) -> f32:
+    pass
+
+@nativedefine("acos")
+def acos(x: f64) -> f64:
+    pass
+
+@nativedefine("acosf")
+def acosf(x: f32) -> f32:
+    pass
+
+@nativedefine("atan")
+def atan(x: f64) -> f64:
+    pass
+
+@nativedefine("atanf")
+def atanf(x: f32) -> f32:
+    pass
+
+@nativedefine("atan2")
+def atan2(x: f64, y: f64) -> f64:
+    pass
+
+@nativedefine("atan2f")
+def atan2f(x: f32, y: f32) -> f32:
+    pass
+
+@nativedefine("fma")
+def fma(x: f64, y: f64, z: f64) -> f64:
+    pass
+
+@nativedefine("fmaf")
+def fmaf(x: f32, y: f32, z: f32) -> f32:
+    pass
+
+@nativedefine("exp")
+def exp(x: f64) -> f64:
+    pass
+
+@nativedefine("expf")
+def expf(x: f32) -> f32:
+    pass
+
+@nativedefine("exp2")
+def exp2(x: f64) -> f64:
+    pass
+
+@nativedefine("exp2f")
+def exp2f(x: f32) -> f32:
+    pass
+
+@nativedefine("expm1")
+def expm1(x: f64) -> f64:
+    pass
+
+@nativedefine("expm1f")
+def expm1f(x: f32) -> f32:
+    pass
+
+@nativedefine("log")
+def log(x: f64) -> f64:
+    pass
+
+@nativedefine("logf")
+def logf(x: f32) -> f32:
+    pass
+
+@nativedefine("log2")
+def log2(x: f64) -> f64:
+    pass
+
+@nativedefine("log2f")
+def log2f(x: f32) -> f32:
+    pass
+
+@nativedefine("log10")
+def log10(x: f64) -> f64:
+    pass
+
+@nativedefine("log10f")
+def log10f(x: f32) -> f32:
+    pass
+
+@nativedefine("log1p")
+def log1p(x: f64) -> f64:
+    pass
+
+@nativedefine("log1pf")
+def log1pf(x: f32) -> f32:
+    pass
+
+@nativedefine("pow")
+def pow(x: f64, y: f64) -> f64:
+    pass
+
+@nativedefine("powf")
+def powf(x: f32, y: f32) -> f32:
+    pass
+
+@nativedefine("sqrt")
+def sqrt(x: f64) -> f64:
+    pass
+
+@nativedefine("sqrtf")
+def sqrtf(x: f32) -> f32:
+    pass
+
+@nativedefine("cbrt")
+def cbrt(x: f64) -> f64:
+    pass
+
+@nativedefine("cbrtf")
+def cbrtf(x: f32) -> f32:
+    pass
+
+@nativedefine("hypot")
+def hypot(x: f64, y: f64) -> f64:
+    pass
+
+@nativedefine("hypotf")
+def hypotf(x: f32, y: f32) -> f32:
+    pass
+
+@nativedefine("sinh")
+def sinh(x: f64) -> f64:
+    pass
+
+@nativedefine("sinhf")
+def sinhf(x: f32) -> f32:
+    pass
+
+@nativedefine("cosh")
+def cosh(x: f64) -> f64:
+    pass
+
+@nativedefine("coshf")
+def coshf(x: f32) -> f32:
+    pass
+
+@nativedefine("tanh")
+def tanh(x: f64) -> f64:
+    pass
+
+@nativedefine("tanhf")
+def tanhf(x: f32) -> f32:
+    pass
+
+@nativedefine("asinh")
+def asinh(x: f64) -> f64:
+    pass
+
+@nativedefine("asinhf")
+def asinhf(x: f32) -> f32:
+    pass
+
+@nativedefine("acosh")
+def acosh(x: f64) -> f64:
+    pass
+
+@nativedefine("acoshf")
+def acoshf(x: f32) -> f32:
+    pass
+
+@nativedefine("atanh")
+def atanh(x: f64) -> f64:
+    pass
+
+@nativedefine("atanhf")
+def atanhf(x: f32) -> f32:
+    pass
+
+@nativedefine("isfinite")
+def isfinite(x: f64) -> int:
+    pass
+
+@nativedefine("isinf")
+def isinf(x: f64) -> int:
+    pass
+
+@nativedefine("isnan")
+def isnan(x: f64) -> int:
+    pass
+
+@nativedefine("isnormal")
+def isnormal(x: f64) -> int:
+    pass
+
+@nativedefine("signbit")
+def signbit(x: f64) -> int:
+    pass
+
+@nativedefine("isgreater")
+def isgreater(x: f64, y: f64) -> int:
+    pass
+
+@nativedefine("isgreaterequal")
+def isgreaterequal(x: f64, y: f64) -> int:
+    pass
+
+@nativedefine("isless")
+def isless(x: f64, y: f64) -> int:
+    pass
+
+@nativedefine("islessequal")
+def islessequal(x: f64, y: f64) -> int:
+    pass
+
+@nativedefine("islessgreater")
+def islessgreater(x: f64, y: f64) -> int:
+    pass
+
+@nativedefine("isunordered")
+def isunordered(x: f64, y: f64) -> int:
+    pass
+
+@nativedefine("trunc")
+def trunc(x: f64) -> f64:
+    pass
+
+@nativedefine("truncf")
+def truncf(x: f32) -> f32:
+    pass
+
+@nativedefine("round")
+def round(x: f64) -> f64:
+    pass
+
+@nativedefine("roundf")
+def roundf(x: f32) -> f32:
+    pass
+
+@nativedefine("floor")
+def floor(x: f64) -> f64:
+    pass
+
+@nativedefine("floorf")
+def floorf(x: f32) -> f32:
+    pass
+
+@nativedefine("ceil")
+def ceil(x: f64) -> f64:
+    pass
+
+@nativedefine("ceilf")
+def ceilf(x: f32) -> f32:
+    pass
+
+@nativedefine("fabs")
+def fabs(x: f64) -> f64:
+    pass
+
+@nativedefine("fabsf")
+def fabsf(x: f32) -> f32:
+    pass
+
+@nativedefine("copysign")
+def copysign(x: f64, y: f64) -> f64:
+    pass
+
+@nativedefine("copysignf")
+def copysignf(x: f32, y: f32) -> f32:
+    pass
