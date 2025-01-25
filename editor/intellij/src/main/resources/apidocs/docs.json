@@ -2733,6 +2733,790 @@
         }
       },
       {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_i16be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "i16"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_i16le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "i16"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_i32be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "i32"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_i32le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "i32"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_i64be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "i64"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_i64le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "i64"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_i8",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "i8"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_u16be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "u16"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_u16le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "u16"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_u32be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "u32"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_u32le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "u32"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_u64be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "u64"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_u64le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "u64"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_read_u8",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          }
+        ],
+        "return_type": {
+          "arguments": [
+            {
+              "type": "u8"
+            },
+            {
+              "type": "bool"
+            }
+          ],
+          "type": "Tuple"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_i16be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "i16"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_i16le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "i16"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_i32be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "i32"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_i32le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "i32"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_i64be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "i64"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_i64le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "i64"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_i8",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "i8"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_u16be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "u16"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_u16le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "u16"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_u32be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_u32le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_u64be",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "u64"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_u64le",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "u64"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
+        "annotations": [],
+        "comment": "",
+        "name": "file_write_u8",
+        "parameters": [
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "File"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "file"
+          },
+          {
+            "datatype": {
+              "type": "u8"
+            },
+            "name": "value"
+          }
+        ],
+        "return_type": {
+          "type": "bool"
+        }
+      },
+      {
         "annotations": [
           {
             "argument": "yk__io_fopen",
@@ -3732,8 +4516,1737 @@
           "libs",
           "c"
         ]
+      },
+      {
+        "alias": "num",
+        "path": [
+          "libs",
+          "numbers"
+        ]
       }
     ],
+    "macros": []
+  },
+  "libs.math": {
+    "classes": [],
+    "functions": [
+      {
+        "annotations": [
+          {
+            "argument": "acos",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "acos",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "acosf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "acosf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "acosh",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "acosh",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "acoshf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "acoshf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "asin",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "asin",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "asinf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "asinf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "asinh",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "asinh",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "asinhf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "asinhf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "atan",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "atan",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "atan2",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "atan2",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "atan2f",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "atan2f",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "atanf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "atanf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "atanh",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "atanh",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "atanhf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "atanhf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cbrt",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "cbrt",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cbrtf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "cbrtf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "ceil",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "ceil",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "ceilf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "ceilf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "copysign",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "copysign",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "copysignf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "copysignf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cos",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "cos",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cosf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "cosf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "cosh",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "cosh",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "coshf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "coshf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "exp",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "exp",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "exp2",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "exp2",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "exp2f",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "exp2f",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "expf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "expf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "expm1",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "expm1",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "expm1f",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "expm1f",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "fabs",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "fabs",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "fabsf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "fabsf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "floor",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "floor",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "floorf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "floorf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "fma",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "fma",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "z"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "fmaf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "fmaf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "y"
+          },
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "z"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "hypot",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "hypot",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "hypotf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "hypotf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "isfinite",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "isfinite",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "isgreater",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "isgreater",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "isgreaterequal",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "isgreaterequal",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "isinf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "isinf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "isless",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "isless",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "islessequal",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "islessequal",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "islessgreater",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "islessgreater",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "isnan",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "isnan",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "isnormal",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "isnormal",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "isunordered",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "isunordered",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "log",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "log",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "log10",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "log10",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "log10f",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "log10f",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "log1p",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "log1p",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "log1pf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "log1pf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "log2",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "log2",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "log2f",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "log2f",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "logf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "logf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "pow",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "pow",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "powf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "powf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          },
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "y"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "round",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "round",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "roundf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "roundf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "signbit",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "signbit",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "sin",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "sin",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "sinf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "sinf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "sinh",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "sinh",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "sinhf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "sinhf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "sqrt",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "sqrt",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "sqrtf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "sqrtf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "tan",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "tan",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "tanf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "tanf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "tanh",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "tanh",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "tanhf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "tanhf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "trunc",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "trunc",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "truncf",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "name": "truncf",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "x"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      }
+    ],
+    "global_consts": [
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "f64"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "E"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "f32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "Ef"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "f64"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "PI"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "f32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "PIf"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "f64"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TAU"
+      },
+      {
+        "comment": "",
+        "datatype": {
+          "arguments": [
+            {
+              "type": "f32"
+            }
+          ],
+          "type": "Const"
+        },
+        "name": "TAUf"
+      }
+    ],
+    "imports": [],
     "macros": []
   },
   "libs.numbers": {
@@ -3753,6 +6266,90 @@
             "datatype": {
               "module": "libs.c",
               "type": "CDouble"
+            },
+            "name": "a"
+          }
+        ],
+        "return_type": {
+          "type": "f64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": " Get memory representation of a float (platform dependent)",
+        "name": "copy_from_f32",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f32"
+            },
+            "name": "a"
+          }
+        ],
+        "return_type": {
+          "type": "u32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": " Get memory representation of a double (platform dependent)",
+        "name": "copy_from_f64",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "f64"
+            },
+            "name": "a"
+          }
+        ],
+        "return_type": {
+          "type": "u64"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": " Get float from memory representation (platform dependent)",
+        "name": "copy_to_f32",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "a"
+          }
+        ],
+        "return_type": {
+          "type": "f32"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@native"
+          }
+        ],
+        "comment": " Get double from memory representation (platform dependent)",
+        "name": "copy_to_f64",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u64"
             },
             "name": "a"
           }
@@ -8487,10 +11084,43 @@
           {
             "argument": "AutomationEvent",
             "name": "@nativedefine"
+          },
+          {
+            "name": "@onstack"
           }
         ],
         "comment": " Automation event",
-        "members": [],
+        "members": [
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "frame"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CUInt"
+            },
+            "name": "type"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                },
+                {
+                  "type": "4"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "params"
+          }
+        ],
         "name": "AutomationEvent"
       },
       {
@@ -8978,6 +11608,17 @@
           }
         ],
         "name": "Image"
+      },
+      {
+        "annotations": [
+          {
+            "argument": "int[[RL_DEFAULT_BATCH_MAX_TEXTURE_UNITS]",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "members": [],
+        "name": "IntBatchMaxTextureUnits"
       },
       {
         "annotations": [
@@ -9673,6 +12314,39 @@
         "comment": "",
         "members": [],
         "name": "RAudioProcessorPtr"
+      },
+      {
+        "annotations": [
+          {
+            "argument": "rlglData",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "members": [],
+        "name": "RLGLData"
+      },
+      {
+        "annotations": [
+          {
+            "argument": "rlVertexBuffer",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "members": [],
+        "name": "RLVertexBuffer"
+      },
+      {
+        "annotations": [
+          {
+            "argument": "Matrix[RL_MAX_MATRIX_STACK_SIZE]",
+            "name": "@nativedefine"
+          }
+        ],
+        "comment": "",
+        "members": [],
+        "name": "RMatrix"
       },
       {
         "annotations": [
@@ -10482,7 +13156,7 @@
                     },
                     {
                       "module": "libs.c",
-                      "type": "CUint"
+                      "type": "CUInt"
                     }
                   ],
                   "type": "In"
@@ -10526,7 +13200,7 @@
                     },
                     {
                       "module": "libs.c",
-                      "type": "CUint"
+                      "type": "CUInt"
                     }
                   ],
                   "type": "In"
@@ -10587,6 +13261,48 @@
         ],
         "return_type": {
           "type": "AudioStream"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Factory function for: AutomationEvent",
+        "name": "automation_event",
+        "parameters": [
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "frame"
+          },
+          {
+            "datatype": {
+              "type": "u32"
+            },
+            "name": "type"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "module": "libs.c",
+                  "type": "CInt"
+                },
+                {
+                  "type": "4"
+                }
+              ],
+              "type": "FixedArr"
+            },
+            "name": "params"
+          }
+        ],
+        "return_type": {
+          "type": "AutomationEvent"
         }
       },
       {
@@ -12027,7 +14743,7 @@
                     },
                     {
                       "module": "libs.c",
-                      "type": "CUint"
+                      "type": "CUInt"
                     }
                   ],
                   "type": "In"
@@ -12071,7 +14787,7 @@
                     },
                     {
                       "module": "libs.c",
-                      "type": "CUint"
+                      "type": "CUInt"
                     }
                   ],
                   "type": "In"
@@ -24957,7 +27673,7 @@
                     },
                     {
                       "module": "libs.c",
-                      "type": "CUint"
+                      "type": "CUInt"
                     }
                   ],
                   "type": "In"
@@ -37806,6 +40522,46 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Check Box control, returns true when active",
+        "name": "gui_check_box",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Rectangle"
+            },
+            "name": "bounds"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "text"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "bool"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "checked"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Color Bar Alpha control",
         "name": "gui_color_bar_alpha",
         "parameters": [
@@ -39458,6 +42214,73 @@
             "name": "@nativemacro"
           }
         ],
+        "comment": " Text Input Box control, ask for text, supports secret",
+        "name": "gui_text_input_box",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Rectangle"
+            },
+            "name": "bounds"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "title"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "message"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "buttons"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "text"
+          },
+          {
+            "datatype": {
+              "type": "int"
+            },
+            "name": "text_max_size"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "bool"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "secret_view_active"
+          }
+        ],
+        "return_type": {
+          "type": "int"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
         "comment": " Factory function for: GuiTextStyle",
         "name": "gui_text_style",
         "parameters": [
@@ -39500,6 +42323,46 @@
         ],
         "return_type": {
           "type": "GuiTextStyle"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "argument": "",
+            "name": "@nativemacro"
+          }
+        ],
+        "comment": " Toggle Button control, returns true when active",
+        "name": "gui_toggle",
+        "parameters": [
+          {
+            "datatype": {
+              "module": "raylib",
+              "type": "Rectangle"
+            },
+            "name": "bounds"
+          },
+          {
+            "datatype": {
+              "module": "libs.c",
+              "type": "CStr"
+            },
+            "name": "text"
+          },
+          {
+            "datatype": {
+              "arguments": [
+                {
+                  "type": "bool"
+                }
+              ],
+              "type": "Ptr"
+            },
+            "name": "active"
+          }
+        ],
+        "return_type": {
+          "type": "int"
         }
       },
       {
