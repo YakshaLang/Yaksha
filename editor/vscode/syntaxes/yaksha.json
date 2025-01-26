@@ -69,7 +69,7 @@
 		},
 		{
 			"name": "support.function.yaksha",
-			"match": "\\b(print|println|len|arrput|arrpop|arrnew|array|getref|unref|charat|shnew|shput|shget|shgeti|hmnew|hmput|hmget|hmgeti|cast|qsort|iif|foreach|countif|filter|map|binarydata|arrsetlen|arrsetcap|fixedarr)\\b"
+			"match": "\\b(print|println|len|arrput|arrpop|arrnew|array|getref|unref|setref|charat|shnew|shput|shget|shgeti|hmnew|hmput|hmget|hmgeti|cast|qsort|iif|foreach|countif|filter|map|binarydata|arrsetlen|arrsetcap|fixedarr)\\b"
 		},
 		{
 			"name": "keyword.decorator.yaksha",

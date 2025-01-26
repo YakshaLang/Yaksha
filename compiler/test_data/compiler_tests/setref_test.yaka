@@ -1,0 +1,5 @@
+def main() -> int:
+    a: int = 0
+    b: Ptr[int] = getref(a)
+    setref(b, 42)
+    return a

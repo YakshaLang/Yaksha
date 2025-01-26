@@ -538,7 +538,48 @@ struct builtin_unref : builtin {
   }
   bool require_stdlib() override { return false; }
 };
-//
+// ┌─┐┌─┐┌┬┐┬─┐┌─┐┌─┐
+// └─┐├┤  │ ├┬┘├┤ ├┤
+// └─┘└─┘ ┴ ┴└─└─┘└
+struct builtin_setref : builtin {
+  yk_object
+  verify(const std::vector<yk_object> &args,
+         const std::vector<expr *> &arg_expressions, datatype_parser *dt_parser,
+         yk_datatype_pool *dt_pool,
+         const std::unordered_map<std::string, import_stmt *> &import_aliases,
+         const std::string &filepath, slot_matcher *dt_slot_matcher) override {
+    auto o = yk_object(dt_pool);
+    if (args.size() != 2) {
+      o.string_val_ = "Two arguments must be provided for setref() builtin";
+    } else if (!args[0].datatype_->is_ptr()) {
+      o.string_val_ = "First argument to setref() must be a Ptr[?]";
+    } else {
+      auto matched = dt_slot_matcher->type_match(
+          args[0].datatype_->args_[0], args[1].datatype_->const_unwrap(),
+          args[1].is_primitive_or_obj());
+      if (matched.matched_) { return o; }
+      o.string_val_ = "Argument to setref() does not match the pointer type " +
+                      matched.error_;
+    }
+    o.object_type_ = object_type::ERROR_DETECTED;
+    return o;
+  }
+  std::pair<std::string, yk_object>
+  compile(const std::vector<std::pair<std::string, yk_object>> &args,
+          const std::vector<expr *> &arg_expressions,
+          datatype_compiler *dt_compiler, datatype_parser *dt_parser,
+          yk_datatype_pool *dt_pool,
+          const std::unordered_map<std::string, import_stmt *> &import_aliases,
+          const std::string &filepath, statement_writer *st_writer,
+          function_datatype_extractor *fnc_dt_extractor,
+          entry_struct_func_compiler *esc) override {
+    auto o = yk_object(dt_pool);
+    std::stringstream code{};
+    code << "*(" << args[0].first << ") = " << args[1].first;
+    return {code.str(), o};
+  }
+  bool require_stdlib() override { return false; }
+};
 // ┌─┐┬ ┬┌┐┌┌─┐┬ ┬
 // └─┐├─┤│││├┤ │││
 // └─┘┴ ┴┘└┘└─┘└┴┘
@@ -1917,6 +1958,7 @@ builtins::builtins(yk_datatype_pool *dt_pool, gc_pool<token> *token_pool)
   builtins_.insert({"charat", new builtin_charat{}});
   builtins_.insert({"getref", new builtin_getref{}});
   builtins_.insert({"unref", new builtin_unref{}});
+  builtins_.insert({"setref", new builtin_setref{}});
   builtins_.insert({"shnew", new builtin_shnew{}});
   builtins_.insert({"shget", new builtin_shget{}});
   builtins_.insert({"shdel", new builtin_shdel{}});

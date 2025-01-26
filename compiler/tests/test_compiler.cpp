@@ -403,3 +403,7 @@ TEST_CASE("compiler: decl macro - decl s get_global_state()") {
   test_compile_yaka_file(
       "../test_data/compiler_tests/directives/directives_and_decl_macors.yaka");
 }
+TEST_CASE("compiler: setref usage") {
+  test_compile_yaka_file(
+      "../test_data/compiler_tests/setref_test.yaka");
+}
