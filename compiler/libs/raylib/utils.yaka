@@ -2,6 +2,24 @@ runtimefeature "raylib"
 
 import raylib as rl
 
+macros!{
+    (defun hex_color (rgb)
+       # rgb is in format "#RRGGBB", break it down to r, g, b variables.
+       # Example: a: rl.Color = utils.hex_color!{"#aabbcc"}
+        (= tmp (explode_string rgb::value))
+        (= r (+ "0x" (index tmp 1) (index tmp 2)))
+        (= g (+ "0x" (index tmp 3) (index tmp 4)))
+        (= b (+ "0x" (index tmp 5) (index tmp 6)))
+        # CODE: { rl.color ( r , g , b , a ) }
+        (list (yk_create_token YK_TOKEN_NAME "rl") (ykt_dot) (yk_create_token YK_TOKEN_NAME "color")
+            (ykt_paren_open)
+            (yk_create_token YK_TOKEN_INTEGER_HEX r) (ykt_comma)
+            (yk_create_token YK_TOKEN_INTEGER_HEX g) (ykt_comma)
+            (yk_create_token YK_TOKEN_INTEGER_HEX b) (ykt_comma)
+            (ykt_integer_decimal 255) (ykt_paren_close)))
+    (yk_register {dsl hex_color hex_color})
+}
+
 def remap(x: float, a: float, b: float, c: float, d: float) -> float:
     # Map x to be from 'a to b' range to 'c to d' range
     if a == b:
