@@ -84,8 +84,36 @@ def in_future_ex(seconds: int, nanoseconds: i64) -> TimeSpec:
 
 @native
 def get_seconds(t: TimeSpec) -> int:
+    # Get seconds portion of timespec
     ccode """return nn__t.tv_sec"""
 
 @native
 def get_nanoseconds(t: TimeSpec) -> i64:
+    # get nanosecond portion of timespec
     ccode """return nn__t.tv_nsec"""
+
+@native
+def as_millis(t: TimeSpec) -> i64:
+    # Convert a TimeSpec to total milliseconds
+    ccode """return ((int64_t) nn__t.tv_sec) * 1000 + ((int64_t) nn__t.tv_nsec) / 1000000"""
+
+@native
+def millis() -> i64:
+    # Get unix timestamp as milliseconds
+    ccode """struct timespec now;
+    timespec_get(&now, TIME_UTC);
+    return ((int64_t) now.tv_sec) * 1000 + ((int64_t) now.tv_nsec) / 1000000"""
+
+@native
+def micros() -> i64:
+    # Get unix timestamp as microseconds
+    ccode """struct timespec now;
+    timespec_get(&now, TIME_UTC);
+    return ((int64_t) now.tv_sec) * 1000000 + ((int64_t) now.tv_nsec) / 1000"""
+
+@native
+def nanos() -> i64:
+    # Get unix timestamp as nanoseconds
+    ccode """struct timespec now;
+    timespec_get(&now, TIME_UTC);
+    return ((int64_t) now.tv_sec) * 1000000000 + ((int64_t) now.tv_nsec)"""
