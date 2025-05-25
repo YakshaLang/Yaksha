@@ -31,8 +31,7 @@ DROPDOWNBOX: Const[int] = 8
 TEXTBOX: Const[int] = 9
 # Used also for: TEXTBOXMULTI
 VALUEBOX: Const[int] = 10
-SPINNER: Const[int] = 11
-# Uses: BUTTON, VALUEBOX
+CONTROL11: Const[int] = 11
 LISTVIEW: Const[int] = 12
 COLORPICKER: Const[int] = 13
 SCROLLBAR: Const[int] = 14
@@ -111,11 +110,15 @@ ARROW_PADDING: Const[int] = 16
 # DropdownBox arrow separation from border and items
 DROPDOWN_ITEMS_SPACING: Const[int] = 17
 # DropdownBox items separation
+DROPDOWN_ARROW_HIDDEN: Const[int] = 18
+# DropdownBox arrow hidden
+DROPDOWN_ROLL_UP: Const[int] = 19
+# DropdownBox roll up flag (default rolls down)
 TEXT_READONLY: Const[int] = 16
 # TextBox in read-only mode: 0-text editable, 1-text no-editable
-SPIN_BUTTON_WIDTH: Const[int] = 16
+SPINNER_BUTTON_WIDTH: Const[int] = 16
 # Spinner left/right buttons width
-SPIN_BUTTON_SPACING: Const[int] = 17
+SPINNER_BUTTON_SPACING: Const[int] = 17
 # Spinner buttons separation
 LIST_ITEMS_HEIGHT: Const[int] = 16
 # ListView items height
@@ -125,6 +128,10 @@ SCROLLBAR_WIDTH: Const[int] = 18
 # ListView scrollbar size (usually width)
 SCROLLBAR_SIDE: Const[int] = 19
 # ListView scrollbar side (0-SCROLLBAR_LEFT_SIDE, 1-SCROLLBAR_RIGHT_SIDE)
+LIST_ITEMS_BORDER_NORMAL: Const[int] = 20
+# ListView items border enabled in normal state
+LIST_ITEMS_BORDER_WIDTH: Const[int] = 21
+# ListView items border width
 COLOR_SELECTOR_SIZE: Const[int] = 16
 HUEBAR_WIDTH: Const[int] = 17
 # ColorPicker right hue bar width
@@ -354,20 +361,20 @@ ICON_REG_EXP: Const[int] = 216
 ICON_FOLDER: Const[int] = 217
 ICON_FILE: Const[int] = 218
 ICON_SAND_TIMER: Const[int] = 219
-ICON_220: Const[int] = 220
-ICON_221: Const[int] = 221
-ICON_222: Const[int] = 222
-ICON_223: Const[int] = 223
-ICON_224: Const[int] = 224
-ICON_225: Const[int] = 225
-ICON_226: Const[int] = 226
-ICON_227: Const[int] = 227
-ICON_228: Const[int] = 228
-ICON_229: Const[int] = 229
-ICON_230: Const[int] = 230
-ICON_231: Const[int] = 231
-ICON_232: Const[int] = 232
-ICON_233: Const[int] = 233
+ICON_WARNING: Const[int] = 220
+ICON_HELP_BOX: Const[int] = 221
+ICON_INFO_BOX: Const[int] = 222
+ICON_PRIORITY: Const[int] = 223
+ICON_LAYERS_ISO: Const[int] = 224
+ICON_LAYERS2: Const[int] = 225
+ICON_MLAYERS: Const[int] = 226
+ICON_MAPS: Const[int] = 227
+ICON_HOT: Const[int] = 228
+ICON_LABEL: Const[int] = 229
+ICON_NAME_ID: Const[int] = 230
+ICON_SLICING: Const[int] = 231
+ICON_MANUAL_CONTROL: Const[int] = 232
+ICON_COLLISION: Const[int] = 233
 ICON_234: Const[int] = 234
 ICON_235: Const[int] = 235
 ICON_236: Const[int] = 236
@@ -559,7 +566,7 @@ def gui_scroll_panel(bounds: rl.Rectangle, text: c.CStr, content: rl.Rectangle, 
 
 @nativemacro
 def gui_label(bounds: rl.Rectangle, text: c.CStr) -> int:
-    # Label control, shows text
+    # Label control
     ccode """GuiLabel(nn__bounds, nn__text)"""
 
 @nativemacro
@@ -569,22 +576,22 @@ def gui_button(bounds: rl.Rectangle, text: c.CStr) -> int:
 
 @nativemacro
 def gui_label_button(bounds: rl.Rectangle, text: c.CStr) -> int:
-    # Label button control, show true when clicked
+    # Label button control, returns true when clicked
     ccode """GuiLabelButton(nn__bounds, nn__text)"""
 
 @nativemacro
 def gui_toggle(bounds: rl.Rectangle, text: c.CStr, active: Ptr[bool]) -> int:
-    # Toggle Button control, returns true when active
+    # Toggle Button control
     ccode """GuiToggle(nn__bounds, nn__text, nn__active)"""
 
 @nativemacro
 def gui_toggle_group(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) -> int:
-    # Toggle Group control, returns active toggle index
+    # Toggle Group control
     ccode """GuiToggleGroup(nn__bounds, nn__text, nn__active)"""
 
 @nativemacro
 def gui_toggle_slider(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) -> int:
-    # Toggle Slider control, returns true when clicked
+    # Toggle Slider control
     ccode """GuiToggleSlider(nn__bounds, nn__text, nn__active)"""
 
 @nativemacro
@@ -594,17 +601,17 @@ def gui_check_box(bounds: rl.Rectangle, text: c.CStr, checked: Ptr[bool]) -> int
 
 @nativemacro
 def gui_combo_box(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt]) -> int:
-    # Combo Box control, returns selected item index
+    # Combo Box control
     ccode """GuiComboBox(nn__bounds, nn__text, nn__active)"""
 
 @nativemacro
 def gui_dropdown_box(bounds: rl.Rectangle, text: c.CStr, active: Ptr[c.CInt], edit_mode: bool) -> int:
-    # Dropdown Box control, returns selected item
+    # Dropdown Box control
     ccode """GuiDropdownBox(nn__bounds, nn__text, nn__active, nn__edit_mode)"""
 
 @nativemacro
 def gui_spinner(bounds: rl.Rectangle, text: c.CStr, value: Ptr[c.CInt], min_value: int, max_value: int, edit_mode: bool) -> int:
-    # Spinner control, returns selected value
+    # Spinner control
     ccode """GuiSpinner(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode)"""
 
 @nativemacro
@@ -613,23 +620,28 @@ def gui_value_box(bounds: rl.Rectangle, text: c.CStr, value: Ptr[c.CInt], min_va
     ccode """GuiValueBox(nn__bounds, nn__text, nn__value, (int)nn__min_value, (int)nn__max_value, nn__edit_mode)"""
 
 @nativemacro
+def gui_value_box_float(bounds: rl.Rectangle, text: c.CStr, text_value: c.CStr, value: Ptr[float], edit_mode: bool) -> int:
+    # Value box control for float values
+    ccode """GuiValueBoxFloat(nn__bounds, nn__text, nn__text_value, nn__value, nn__edit_mode)"""
+
+@nativemacro
 def gui_text_box(bounds: rl.Rectangle, text: c.CStr, text_size: int, edit_mode: bool) -> int:
     # Text Box control, updates input text
     ccode """GuiTextBox(nn__bounds, nn__text, (int)nn__text_size, nn__edit_mode)"""
 
 @nativemacro
 def gui_slider(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: Ptr[float], min_value: float, max_value: float) -> int:
-    # Slider control, returns selected value
+    # Slider control
     ccode """GuiSlider(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
 
 @nativemacro
 def gui_slider_bar(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: Ptr[float], min_value: float, max_value: float) -> int:
-    # Slider Bar control, returns selected value
+    # Slider Bar control
     ccode """GuiSliderBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
 
 @nativemacro
 def gui_progress_bar(bounds: rl.Rectangle, text_left: c.CStr, text_right: c.CStr, value: Ptr[float], min_value: float, max_value: float) -> int:
-    # Progress Bar control, shows current progress value
+    # Progress Bar control
     ccode """GuiProgressBar(nn__bounds, nn__text_left, nn__text_right, nn__value, nn__min_value, nn__max_value)"""
 
 @nativemacro
@@ -644,12 +656,12 @@ def gui_dummy_rec(bounds: rl.Rectangle, text: c.CStr) -> int:
 
 @nativemacro
 def gui_grid(bounds: rl.Rectangle, text: c.CStr, spacing: float, subdivs: int, mouse_cell: Ptr[rl.Vector2]) -> int:
-    # Grid control, returns mouse cell position
+    # Grid control
     ccode """GuiGrid(nn__bounds, nn__text, nn__spacing, (int)nn__subdivs, nn__mouse_cell)"""
 
 @nativemacro
 def gui_list_view(bounds: rl.Rectangle, text: c.CStr, scroll_index: Ptr[c.CInt], active: Ptr[c.CInt]) -> int:
-    # List View control, returns selected list item index
+    # List View control
     ccode """GuiListView(nn__bounds, nn__text, nn__scroll_index, nn__active)"""
 
 @nativemacro
@@ -694,6 +706,6 @@ def gui_color_picker_hsv(bounds: rl.Rectangle, text: c.CStr, color_hsv: Ptr[rl.V
 
 @nativemacro
 def gui_color_panel_hsv(bounds: rl.Rectangle, text: c.CStr, color_hsv: Ptr[rl.Vector3]) -> int:
-    # Color Panel control that returns HSV color value, used by GuiColorPickerHSV()
+    # Color Panel control that updates Hue-Saturation-Value color value, used by GuiColorPickerHSV()
     ccode """GuiColorPanelHSV(nn__bounds, nn__text, nn__color_hsv)"""
 

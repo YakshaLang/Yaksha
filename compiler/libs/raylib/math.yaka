@@ -83,6 +83,10 @@ def vector2_dot_product(v1: rl.Vector2, v2: rl.Vector2) -> float:
     ccode """Vector2DotProduct(nn__v1, nn__v2)"""
 
 @nativemacro
+def vector2_cross_product(v1: rl.Vector2, v2: rl.Vector2) -> float:
+    ccode """Vector2CrossProduct(nn__v1, nn__v2)"""
+
+@nativemacro
 def vector2_distance(v1: rl.Vector2, v2: rl.Vector2) -> float:
     ccode """Vector2Distance(nn__v1, nn__v2)"""
 
@@ -131,6 +135,14 @@ def vector2_reflect(v: rl.Vector2, normal: rl.Vector2) -> rl.Vector2:
     ccode """Vector2Reflect(nn__v, nn__normal)"""
 
 @nativemacro
+def vector2_min(v1: rl.Vector2, v2: rl.Vector2) -> rl.Vector2:
+    ccode """Vector2Min(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector2_max(v1: rl.Vector2, v2: rl.Vector2) -> rl.Vector2:
+    ccode """Vector2Max(nn__v1, nn__v2)"""
+
+@nativemacro
 def vector2_rotate(v: rl.Vector2, angle: float) -> rl.Vector2:
     ccode """Vector2Rotate(nn__v, nn__angle)"""
 
@@ -153,6 +165,10 @@ def vector2_clamp_value(v: rl.Vector2, min: float, max: float) -> rl.Vector2:
 @nativemacro
 def vector2_equals(p: rl.Vector2, q: rl.Vector2) -> int:
     ccode """Vector2Equals(nn__p, nn__q)"""
+
+@nativemacro
+def vector2_refract(v: rl.Vector2, n: rl.Vector2, r: float) -> rl.Vector2:
+    ccode """Vector2Refract(nn__v, nn__n, nn__r)"""
 
 @nativemacro
 def vector3_zero() -> rl.Vector3:
@@ -255,8 +271,16 @@ def vector3_rotate_by_axis_angle(v: rl.Vector3, axis: rl.Vector3, angle: float) 
     ccode """Vector3RotateByAxisAngle(nn__v, nn__axis, nn__angle)"""
 
 @nativemacro
+def vector3_move_towards(v: rl.Vector3, target: rl.Vector3, max_distance: float) -> rl.Vector3:
+    ccode """Vector3MoveTowards(nn__v, nn__target, nn__max_distance)"""
+
+@nativemacro
 def vector3_lerp(v1: rl.Vector3, v2: rl.Vector3, amount: float) -> rl.Vector3:
     ccode """Vector3Lerp(nn__v1, nn__v2, nn__amount)"""
+
+@nativemacro
+def vector3_cubic_hermite(v1: rl.Vector3, tangent1: rl.Vector3, v2: rl.Vector3, tangent2: rl.Vector3, amount: float) -> rl.Vector3:
+    ccode """Vector3CubicHermite(nn__v1, nn__tangent1, nn__v2, nn__tangent2, nn__amount)"""
 
 @nativemacro
 def vector3_reflect(v: rl.Vector3, normal: rl.Vector3) -> rl.Vector3:
@@ -301,6 +325,94 @@ def vector3_equals(p: rl.Vector3, q: rl.Vector3) -> int:
 @nativemacro
 def vector3_refract(v: rl.Vector3, n: rl.Vector3, r: float) -> rl.Vector3:
     ccode """Vector3Refract(nn__v, nn__n, nn__r)"""
+
+@nativemacro
+def vector4_zero() -> rl.Vector4:
+    ccode """Vector4Zero()"""
+
+@nativemacro
+def vector4_one() -> rl.Vector4:
+    ccode """Vector4One()"""
+
+@nativemacro
+def vector4_add(v1: rl.Vector4, v2: rl.Vector4) -> rl.Vector4:
+    ccode """Vector4Add(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector4_add_value(v: rl.Vector4, add: float) -> rl.Vector4:
+    ccode """Vector4AddValue(nn__v, nn__add)"""
+
+@nativemacro
+def vector4_subtract(v1: rl.Vector4, v2: rl.Vector4) -> rl.Vector4:
+    ccode """Vector4Subtract(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector4_subtract_value(v: rl.Vector4, add: float) -> rl.Vector4:
+    ccode """Vector4SubtractValue(nn__v, nn__add)"""
+
+@nativemacro
+def vector4_length(v: rl.Vector4) -> float:
+    ccode """Vector4Length(nn__v)"""
+
+@nativemacro
+def vector4_length_sqr(v: rl.Vector4) -> float:
+    ccode """Vector4LengthSqr(nn__v)"""
+
+@nativemacro
+def vector4_dot_product(v1: rl.Vector4, v2: rl.Vector4) -> float:
+    ccode """Vector4DotProduct(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector4_distance(v1: rl.Vector4, v2: rl.Vector4) -> float:
+    ccode """Vector4Distance(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector4_distance_sqr(v1: rl.Vector4, v2: rl.Vector4) -> float:
+    ccode """Vector4DistanceSqr(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector4_scale(v: rl.Vector4, scale: float) -> rl.Vector4:
+    ccode """Vector4Scale(nn__v, nn__scale)"""
+
+@nativemacro
+def vector4_multiply(v1: rl.Vector4, v2: rl.Vector4) -> rl.Vector4:
+    ccode """Vector4Multiply(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector4_negate(v: rl.Vector4) -> rl.Vector4:
+    ccode """Vector4Negate(nn__v)"""
+
+@nativemacro
+def vector4_divide(v1: rl.Vector4, v2: rl.Vector4) -> rl.Vector4:
+    ccode """Vector4Divide(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector4_normalize(v: rl.Vector4) -> rl.Vector4:
+    ccode """Vector4Normalize(nn__v)"""
+
+@nativemacro
+def vector4_min(v1: rl.Vector4, v2: rl.Vector4) -> rl.Vector4:
+    ccode """Vector4Min(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector4_max(v1: rl.Vector4, v2: rl.Vector4) -> rl.Vector4:
+    ccode """Vector4Max(nn__v1, nn__v2)"""
+
+@nativemacro
+def vector4_lerp(v1: rl.Vector4, v2: rl.Vector4, amount: float) -> rl.Vector4:
+    ccode """Vector4Lerp(nn__v1, nn__v2, nn__amount)"""
+
+@nativemacro
+def vector4_move_towards(v: rl.Vector4, target: rl.Vector4, max_distance: float) -> rl.Vector4:
+    ccode """Vector4MoveTowards(nn__v, nn__target, nn__max_distance)"""
+
+@nativemacro
+def vector4_invert(v: rl.Vector4) -> rl.Vector4:
+    ccode """Vector4Invert(nn__v)"""
+
+@nativemacro
+def vector4_equals(p: rl.Vector4, q: rl.Vector4) -> int:
+    ccode """Vector4Equals(nn__p, nn__q)"""
 
 @nativemacro
 def matrix_determinant(mat: rl.Matrix) -> float:
@@ -367,8 +479,8 @@ def matrix_scale(x: float, y: float, z: float) -> rl.Matrix:
     ccode """MatrixScale(nn__x, nn__y, nn__z)"""
 
 @nativemacro
-def matrix_frustum(left: f64, right: f64, bottom: f64, top: f64, near: f64, far: f64) -> rl.Matrix:
-    ccode """MatrixFrustum(nn__left, nn__right, nn__bottom, nn__top, nn__near, nn__far)"""
+def matrix_frustum(left: f64, right: f64, bottom: f64, top: f64, near_plane: f64, far_plane: f64) -> rl.Matrix:
+    ccode """MatrixFrustum(nn__left, nn__right, nn__bottom, nn__top, nn__near_plane, nn__far_plane)"""
 
 @nativemacro
 def matrix_perspective(fov_y: f64, aspect: f64, near_plane: f64, far_plane: f64) -> rl.Matrix:
@@ -443,6 +555,10 @@ def quaternion_slerp(q1: rl.Quaternion, q2: rl.Quaternion, amount: float) -> rl.
     ccode """QuaternionSlerp(nn__q1, nn__q2, nn__amount)"""
 
 @nativemacro
+def quaternion_cubic_hermite_spline(q1: rl.Quaternion, out_tangent1: rl.Quaternion, q2: rl.Quaternion, in_tangent2: rl.Quaternion, t: float) -> rl.Quaternion:
+    ccode """QuaternionCubicHermiteSpline(nn__q1, nn__out_tangent1, nn__q2, nn__in_tangent2, nn__t)"""
+
+@nativemacro
 def quaternion_from_vector3_to_vector3(p_from: rl.Vector3, to: rl.Vector3) -> rl.Quaternion:
     ccode """QuaternionFromVector3ToVector3(nn__p_from, nn__to)"""
 
@@ -477,4 +593,8 @@ def quaternion_transform(q: rl.Quaternion, mat: rl.Matrix) -> rl.Quaternion:
 @nativemacro
 def quaternion_equals(p: rl.Quaternion, q: rl.Quaternion) -> int:
     ccode """QuaternionEquals(nn__p, nn__q)"""
+
+@nativemacro
+def matrix_decompose(mat: rl.Matrix, translation: Ptr[rl.Vector3], rotation: Ptr[rl.Quaternion], scale: Ptr[rl.Vector3]) -> None:
+    ccode """MatrixDecompose(nn__mat, nn__translation, nn__rotation, nn__scale)"""
 

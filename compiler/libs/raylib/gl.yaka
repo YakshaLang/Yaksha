@@ -175,7 +175,15 @@ RL_SHADER_UNIFORM_IVEC3: Const[int] = 6
 # Shader uniform type: ivec3 (3 int)
 RL_SHADER_UNIFORM_IVEC4: Const[int] = 7
 # Shader uniform type: ivec4 (4 int)
-RL_SHADER_UNIFORM_SAMPLER2D: Const[int] = 8
+RL_SHADER_UNIFORM_UINT: Const[int] = 8
+# Shader uniform type: unsigned int
+RL_SHADER_UNIFORM_UIVEC2: Const[int] = 9
+# Shader uniform type: uivec2 (2 unsigned int)
+RL_SHADER_UNIFORM_UIVEC3: Const[int] = 10
+# Shader uniform type: uivec3 (3 unsigned int)
+RL_SHADER_UNIFORM_UIVEC4: Const[int] = 11
+# Shader uniform type: uivec4 (4 unsigned int)
+RL_SHADER_UNIFORM_SAMPLER2D: Const[int] = 12
 # Shader uniform type: sampler2d
 RL_SHADER_ATTRIB_FLOAT: Const[int] = 0
 # Shader attribute type: float
@@ -260,6 +268,16 @@ def rl_render_batch(buffer_count: int, current_buffer: int, vertex_buffer: Ptr[r
 class rlglData:
     pass
 
+@nativedefine("rl_float16")
+struct rl_float16:
+    # Auxiliar matrix math functions
+    v: FixedArr[f32,16]
+
+@nativemacro
+def create_rl_float16(v: FixedArr[f32,16]) -> rl_float16:
+    # Factory function for: rl_float16
+    ccode """(rl_float16){nn__v}"""
+
 @nativemacro
 def rl_matrix_mode(mode: int) -> None:
     # Choose the current matrix to be transformed
@@ -312,6 +330,21 @@ def rl_ortho(left: f64, right: f64, bottom: f64, top: f64, znear: f64, zfar: f64
 def rl_viewport(x: int, y: int, width: int, height: int) -> None:
     # Set the viewport area
     ccode """rlViewport((int)nn__x, (int)nn__y, (int)nn__width, (int)nn__height)"""
+
+@nativemacro
+def rl_set_clip_planes(near_plane: f64, far_plane: f64) -> None:
+    # Set clip planes distances
+    ccode """rlSetClipPlanes(nn__near_plane, nn__far_plane)"""
+
+@nativemacro
+def rl_get_cull_distance_near() -> f64:
+    # Get cull plane distance near
+    ccode """rlGetCullDistanceNear()"""
+
+@nativemacro
+def rl_get_cull_distance_far() -> f64:
+    # Get cull plane distance far
+    ccode """rlGetCullDistanceFar()"""
 
 @nativemacro
 def rl_begin(mode: int) -> None:
@@ -469,6 +502,11 @@ def rl_disable_framebuffer() -> None:
     ccode """rlDisableFramebuffer()"""
 
 @nativemacro
+def rl_get_active_framebuffer() -> u32:
+    # Get the currently active render texture (fbo), 0 for default framebuffer
+    ccode """rlGetActiveFramebuffer()"""
+
+@nativemacro
 def rl_active_draw_buffers(count: int) -> None:
     # Activate multiple draw color buffers
     ccode """rlActiveDrawBuffers((int)nn__count)"""
@@ -477,6 +515,11 @@ def rl_active_draw_buffers(count: int) -> None:
 def rl_blit_framebuffer(src_x: int, src_y: int, src_width: int, src_height: int, dst_x: int, dst_y: int, dst_width: int, dst_height: int, buffer_mask: int) -> None:
     # Blit active framebuffer to main framebuffer
     ccode """rlBlitFramebuffer((int)nn__src_x, (int)nn__src_y, (int)nn__src_width, (int)nn__src_height, (int)nn__dst_x, (int)nn__dst_y, (int)nn__dst_width, (int)nn__dst_height, (int)nn__buffer_mask)"""
+
+@nativemacro
+def rl_bind_framebuffer(target: u32, framebuffer: u32) -> None:
+    # Bind framebuffer (FBO)
+    ccode """rlBindFramebuffer((unsigned int)nn__target, (unsigned int)nn__framebuffer)"""
 
 @nativemacro
 def rl_enable_color_blend() -> None:
@@ -519,6 +562,11 @@ def rl_disable_backface_culling() -> None:
     ccode """rlDisableBackfaceCulling()"""
 
 @nativemacro
+def rl_color_mask(r: bool, g: bool, b: bool, a: bool) -> None:
+    # Color mask control
+    ccode """rlColorMask(nn__r, nn__g, nn__b, nn__a)"""
+
+@nativemacro
 def rl_set_cull_face(mode: int) -> None:
     # Set face culling mode
     ccode """rlSetCullFace((int)nn__mode)"""
@@ -539,18 +587,23 @@ def rl_scissor(x: int, y: int, width: int, height: int) -> None:
     ccode """rlScissor((int)nn__x, (int)nn__y, (int)nn__width, (int)nn__height)"""
 
 @nativemacro
-def rl_enable_wire_mode() -> None:
-    # Enable wire mode
-    ccode """rlEnableWireMode()"""
-
-@nativemacro
 def rl_enable_point_mode() -> None:
     # Enable point mode
     ccode """rlEnablePointMode()"""
 
 @nativemacro
+def rl_disable_point_mode() -> None:
+    # Disable point mode
+    ccode """rlDisablePointMode()"""
+
+@nativemacro
+def rl_enable_wire_mode() -> None:
+    # Enable wire mode
+    ccode """rlEnableWireMode()"""
+
+@nativemacro
 def rl_disable_wire_mode() -> None:
-    # Disable wire mode ( and point ) maybe rename
+    # Disable wire mode
     ccode """rlDisableWireMode()"""
 
 @nativemacro
@@ -715,64 +768,72 @@ def rl_load_vertex_array() -> u32:
 
 @nativemacro
 def rl_load_vertex_buffer(buffer: AnyPtrToConst, size: int, dynamic: bool) -> u32:
-    # Load a vertex buffer attribute
+    # Load a vertex buffer object
     ccode """rlLoadVertexBuffer(nn__buffer, (int)nn__size, nn__dynamic)"""
 
 @nativemacro
 def rl_load_vertex_buffer_element(buffer: AnyPtrToConst, size: int, dynamic: bool) -> u32:
-    # Load a new attributes element buffer
+    # Load vertex buffer elements object
     ccode """rlLoadVertexBufferElement(nn__buffer, (int)nn__size, nn__dynamic)"""
 
 @nativemacro
 def rl_update_vertex_buffer(buffer_id: u32, data: AnyPtrToConst, data_size: int, offset: int) -> None:
-    # Update GPU buffer with new data
+    # Update vertex buffer object data on GPU buffer
     ccode """rlUpdateVertexBuffer((unsigned int)nn__buffer_id, nn__data, (int)nn__data_size, (int)nn__offset)"""
 
 @nativemacro
 def rl_update_vertex_buffer_elements(id: u32, data: AnyPtrToConst, data_size: int, offset: int) -> None:
-    # Update vertex buffer elements with new data
+    # Update vertex buffer elements data on GPU buffer
     ccode """rlUpdateVertexBufferElements((unsigned int)nn__id, nn__data, (int)nn__data_size, (int)nn__offset)"""
 
 @nativemacro
 def rl_unload_vertex_array(vao_id: u32) -> None:
+    # Unload vertex array (vao)
     ccode """rlUnloadVertexArray((unsigned int)nn__vao_id)"""
 
 @nativemacro
 def rl_unload_vertex_buffer(vbo_id: u32) -> None:
+    # Unload vertex buffer object
     ccode """rlUnloadVertexBuffer((unsigned int)nn__vbo_id)"""
 
 @nativemacro
-def rl_set_vertex_attribute(index: u32, comp_size: int, type: int, normalized: bool, stride: int, pointer: AnyPtrToConst) -> None:
-    ccode """rlSetVertexAttribute((unsigned int)nn__index, (int)nn__comp_size, (int)nn__type, nn__normalized, (int)nn__stride, nn__pointer)"""
+def rl_set_vertex_attribute(index: u32, comp_size: int, type: int, normalized: bool, stride: int, offset: int) -> None:
+    # Set vertex attribute data configuration
+    ccode """rlSetVertexAttribute((unsigned int)nn__index, (int)nn__comp_size, (int)nn__type, nn__normalized, (int)nn__stride, (int)nn__offset)"""
 
 @nativemacro
 def rl_set_vertex_attribute_divisor(index: u32, divisor: int) -> None:
+    # Set vertex attribute data divisor
     ccode """rlSetVertexAttributeDivisor((unsigned int)nn__index, (int)nn__divisor)"""
 
 @nativemacro
 def rl_set_vertex_attribute_default(loc_index: int, value: AnyPtrToConst, attrib_type: int, count: int) -> None:
-    # Set vertex attribute default value
+    # Set vertex attribute default value, when attribute to provided
     ccode """rlSetVertexAttributeDefault((int)nn__loc_index, nn__value, (int)nn__attrib_type, (int)nn__count)"""
 
 @nativemacro
 def rl_draw_vertex_array(offset: int, count: int) -> None:
+    # Draw vertex array (currently active vao)
     ccode """rlDrawVertexArray((int)nn__offset, (int)nn__count)"""
 
 @nativemacro
 def rl_draw_vertex_array_elements(offset: int, count: int, buffer: AnyPtrToConst) -> None:
+    # Draw vertex array elements
     ccode """rlDrawVertexArrayElements((int)nn__offset, (int)nn__count, nn__buffer)"""
 
 @nativemacro
 def rl_draw_vertex_array_instanced(offset: int, count: int, instances: int) -> None:
+    # Draw vertex array (currently active vao) with instancing
     ccode """rlDrawVertexArrayInstanced((int)nn__offset, (int)nn__count, (int)nn__instances)"""
 
 @nativemacro
 def rl_draw_vertex_array_elements_instanced(offset: int, count: int, buffer: AnyPtrToConst, instances: int) -> None:
+    # Draw vertex array elements with instancing
     ccode """rlDrawVertexArrayElementsInstanced((int)nn__offset, (int)nn__count, nn__buffer, (int)nn__instances)"""
 
 @nativemacro
 def rl_load_texture(data: AnyPtrToConst, width: int, height: int, format: int, mipmap_count: int) -> u32:
-    # Load texture in GPU
+    # Load texture data
     ccode """rlLoadTexture(nn__data, (int)nn__width, (int)nn__height, (int)nn__format, (int)nn__mipmap_count)"""
 
 @nativemacro
@@ -781,13 +842,13 @@ def rl_load_texture_depth(width: int, height: int, use_render_buffer: bool) -> u
     ccode """rlLoadTextureDepth((int)nn__width, (int)nn__height, nn__use_render_buffer)"""
 
 @nativemacro
-def rl_load_texture_cubemap(data: AnyPtrToConst, size: int, format: int) -> u32:
-    # Load texture cubemap
-    ccode """rlLoadTextureCubemap(nn__data, (int)nn__size, (int)nn__format)"""
+def rl_load_texture_cubemap(data: AnyPtrToConst, size: int, format: int, mipmap_count: int) -> u32:
+    # Load texture cubemap data
+    ccode """rlLoadTextureCubemap(nn__data, (int)nn__size, (int)nn__format, (int)nn__mipmap_count)"""
 
 @nativemacro
 def rl_update_texture(id: u32, offset_x: int, offset_y: int, width: int, height: int, format: int, data: AnyPtrToConst) -> None:
-    # Update GPU texture with new data
+    # Update texture with new data on GPU
     ccode """rlUpdateTexture((unsigned int)nn__id, (int)nn__offset_x, (int)nn__offset_y, (int)nn__width, (int)nn__height, (int)nn__format, nn__data)"""
 
 @nativemacro
@@ -821,9 +882,9 @@ def rl_read_screen_pixels(width: int, height: int) -> Ptr[c.CUChar]:
     ccode """rlReadScreenPixels((int)nn__width, (int)nn__height)"""
 
 @nativemacro
-def rl_load_framebuffer(width: int, height: int) -> u32:
+def rl_load_framebuffer() -> u32:
     # Load an empty framebuffer
-    ccode """rlLoadFramebuffer((int)nn__width, (int)nn__height)"""
+    ccode """rlLoadFramebuffer()"""
 
 @nativemacro
 def rl_framebuffer_attach(fbo_id: u32, tex_id: u32, attach_type: int, tex_type: int, mip_level: int) -> None:
@@ -879,6 +940,11 @@ def rl_set_uniform(loc_index: int, value: AnyPtrToConst, uniform_type: int, coun
 def rl_set_uniform_matrix(loc_index: int, mat: rl.Matrix) -> None:
     # Set shader value matrix
     ccode """rlSetUniformMatrix((int)nn__loc_index, nn__mat)"""
+
+@nativemacro
+def rl_set_uniform_matrices(loc_index: int, mat: Ptr[Const[rl.Matrix]], count: int) -> None:
+    # Set shader value matrices
+    ccode """rlSetUniformMatrices((int)nn__loc_index, nn__mat, (int)nn__count)"""
 
 @nativemacro
 def rl_set_uniform_sampler(loc_index: int, texture_id: u32) -> None:
