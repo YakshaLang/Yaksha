@@ -131,7 +131,7 @@ def main() -> int:
 
 ## Getting Started
 
-To explore the language and its capabilities, refer to the [Yaksha Documentation](https://yakshalang.github.io/documentation). This comprehensive guide covers the philosophy, syntax, and features of Yaksha.
+To explore the language and its capabilities, refer to the [Yaksha Documentation](https://yakshalang.github.io/docs/). This comprehensive guide covers the philosophy, syntax, and features of Yaksha.
 
 ## Demos
 
