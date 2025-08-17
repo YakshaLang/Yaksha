@@ -321,10 +321,10 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     if target == "wasm4":
         arrput(args, "-target")
         arrput(args, "wasm32-wasi-musl")
-    # m1/m2/etc must not build for native, instead build for "aarch64-macos-gnu"
+    # m1/m2/etc must not build for native, instead build for "aarch64-macos-none"
     if native and is_arm64_cpu() and is_target_macos(target) and not c.use_alt_compiler:
         arrput(args, "-target")
-        arrput(args, "aarch64-macos-gnu")
+        arrput(args, "aarch64-macos-none")
     # runtime c codes
     length = len(c.c_code.runtime_feature_c_code)
     x = 0
