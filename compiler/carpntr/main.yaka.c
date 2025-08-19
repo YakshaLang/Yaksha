@@ -1481,7 +1481,7 @@ yk__sds* yy__building_create_args(struct yy__configuration_Config* yy__building_
     if (((yy__building_native && yy__building_is_arm64_cpu()) && yy__building_is_target_macos(yk__sdsdup(yy__building_target))) && (!(yy__building_c->yy__configuration_use_alt_compiler)))
     {
         yk__arrput(yy__building_args, yk__sdsnewlen("-target", 7));
-        yk__arrput(yy__building_args, yk__sdsnewlen("aarch64-macos-gnu", 17));
+        yk__arrput(yy__building_args, yk__sdsnewlen("aarch64-macos-none", 17));
     }
     yy__building_length = yk__arrlen(yy__building_c->yy__configuration_c_code->yy__configuration_runtime_feature_c_code);
     yy__building_x = INT32_C(0);
