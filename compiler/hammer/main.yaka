@@ -131,10 +131,10 @@ def get_base_args(c: conf.HammerConfig, target: str, cpp: bool) -> Array[str]:
     if not (target == "native"):
         arrput(args, "-target")
         arrput(args, target)
-    # m1/m2/etc must not build for native, instead build for "aarch64-macos-gnu"
+    # m1/m2/etc must not build for native, instead build for "aarch64-macos-none"
     if target == "native" and is_arm64_cpu() and is_target_macos(target):
         arrput(args, "-target")
-        arrput(args, "aarch64-macos-gnu")
+        arrput(args, "aarch64-macos-none")
     args = sarr.extend(args, c.args_c_or_cpp)
     if cpp:
         args = sarr.extend(args, c.args_cpp)
