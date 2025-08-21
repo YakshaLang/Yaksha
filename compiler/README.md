@@ -2,7 +2,7 @@
 
 ---------
 
-![https://yakshalang.github.io/](https://yakshalang.github.io/imgs/yk-banner1.png)
+![Yaksha Language Banner](https://yakshalang.github.io/imgs/yk-banner1.png)
 
 ---------
 ```text
@@ -33,7 +33,8 @@
  Additional Terms:
 
  Please note that any commercial use of the programming language's compiler source code
- (everything except compiler/runtime, compiler/libs and compiler/3rd) require a written agreement
+ (everything except files in compiler/runtime, compiler/libs, and compiler/3rd)
+ require a written agreement
  with author of the language (Bhathiya Perera).
 
  If you are using it for an open source project, please give credits.
