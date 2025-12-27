@@ -74,6 +74,10 @@ add_executable(yakshavz src/viz_main.cpp runtime/whereami.c)
 target_link_libraries(yakshavz PUBLIC ${YAKSHA_COMMON_LIBS})
 target_compile_features(yakshavz PRIVATE cxx_std_17)
 
+# -- yakshalisp - visualizer --
+add_executable(yakshalisp src/lisp_main.cpp runtime/whereami.c)
+target_link_libraries(yakshalisp PUBLIC ${YAKSHA_COMMON_LIBS})
+target_compile_features(yakshalisp PRIVATE cxx_std_17)
 
 # -- yakshadmp - syntax extractor --
 add_executable(yakshadmp src/dump.cpp runtime/whereami.c)

@@ -22,6 +22,7 @@ bin/Yaksha
 bin/yakshac
 bin/yakshadmp
 bin/yakshavz
+bin/yakshalisp
 bin/YakshaFuzz
 bin/YakshaTests
 /bin/ykreload

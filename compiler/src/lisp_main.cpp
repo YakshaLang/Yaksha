@@ -38,6 +38,7 @@
 // ==============================================================================================
 #include "utilities/cpp_util.h"
 #include "yaksha_lisp/yaksha_lisp.h"
+#include "utilities/error_printer.h"
 #include <iostream>
 int lisp_repl();
 int lisp_execute_file(char *file_path);
