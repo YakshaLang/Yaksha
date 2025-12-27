@@ -42,6 +42,8 @@
 #include <fstream>
 #include <iostream>
 #include <unordered_set>
+
+#include "utilities/colours.h"
 using namespace yaksha;
 // TODO make the code here nicer, too much copy pasta
 static bool yaksha_macro_print_allowed = false;
@@ -1521,7 +1523,9 @@ yaksha_lisp_builtins::repr_(const std::vector<yaksha_lisp_value *> &args,
   std::stringstream ss{};
   auto e_args = eval_args(args, env);
   auto arg = e_args[0];
+  colours::disable();
   ss << arg;
+  colours::enable();
   auto result = env->create_val();
   result->type_ = yaksha_lisp_value_type::STRING;
   result->str_ = ss.str();

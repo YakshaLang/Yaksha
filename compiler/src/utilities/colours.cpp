@@ -78,6 +78,7 @@ void yaksha::colour_print(colour c, const std::string &content,
 #include <unistd.h>
 #define ISATTY isatty
 #define FILENO fileno
+static bool enable_colour_print = true;
 void yaksha::colour_print(colour c, const std::string &content,
                           std::ostream &outs) {
   std::string col{};
@@ -109,10 +110,23 @@ bool yaksha::is_stdout_a_terminal() {
 }
 std::ostream &yaksha::operator<<(std::ostream &outs,
                                  const coloured_content &p) {
+  if (!enable_colour_print) {
+    outs << p.line_;
+    return outs;
+  }
+
   if (is_stdout_a_terminal()) {
     colour_print(p.c_, p.line_, outs);
   } else {
     outs << p.line_;
   }
   return outs;
+}
+
+void colours::enable() {
+  enable_colour_print = true;
+}
+
+void colours::disable() {
+  enable_colour_print = false;
 }

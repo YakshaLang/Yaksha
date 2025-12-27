@@ -67,6 +67,8 @@ private:
   };
   std::ostream &operator<<(std::ostream &outs, const coloured_content &p);
   namespace colours {
+    void enable();
+    void disable();
     static inline coloured_content red(const std::string &content) {
       return {colour::RED, content};
     }
