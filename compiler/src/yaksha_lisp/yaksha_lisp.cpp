@@ -923,6 +923,8 @@ void yaksha_envmap::setup_builtins() {
       create_builtin(this, "is_truthy", yaksha_lisp_builtins::is_truthy_));
   set("is_callable",
       create_builtin(this, "is_callable", yaksha_lisp_builtins::is_callable_));
+  set("is_builtin",
+      create_builtin(this, "is_builtin", yaksha_lisp_builtins::is_builtin_));
   set("is_nil", create_builtin(this, "is_nil", yaksha_lisp_builtins::is_nil_));
   set("filter", create_builtin(this, "filter", yaksha_lisp_builtins::filter_));
   set("map", create_builtin(this, "map", yaksha_lisp_builtins::map_));

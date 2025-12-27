@@ -887,6 +887,16 @@ yaksha_lisp_builtins::is_callable_(const std::vector<yaksha_lisp_value *> &args,
                             arg->type_ == yaksha_lisp_value_type::BUILTIN);
 }
 yaksha_lisp_value *
+yaksha_lisp_builtins::is_builtin_(const std::vector<yaksha_lisp_value *> &args,
+                                   yaksha_envmap *env) {
+  if (args.size() != 1) {
+    throw parsing_error{"is_builtin takes 1 argument", "", 0, 0};
+  }
+  auto e_args = eval_args(args, env);
+  auto arg = e_args[0];
+  return env->create_number(arg->type_ == yaksha_lisp_value_type::BUILTIN);
+}
+yaksha_lisp_value *
 yaksha_lisp_builtins::is_nil_(const std::vector<yaksha_lisp_value *> &args,
                               yaksha_envmap *env) {
   if (args.size() != 1) {

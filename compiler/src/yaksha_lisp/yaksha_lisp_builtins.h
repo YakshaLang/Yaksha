@@ -165,6 +165,9 @@ namespace yaksha {
     is_callable_(const std::vector<yaksha_lisp_value *> &args,
                  yaksha_envmap *env);
     static yaksha_lisp_value *
+    is_builtin_(const std::vector<yaksha_lisp_value *> &args,
+                 yaksha_envmap *env);
+    static yaksha_lisp_value *
     is_nil_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
     static yaksha_lisp_value *
     filter_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
