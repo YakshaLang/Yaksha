@@ -898,6 +898,7 @@ void yaksha_envmap::setup_builtins() {
   set("list", create_builtin(this, "list", yaksha_lisp_builtins::list_));
   set("head", create_builtin(this, "head", yaksha_lisp_builtins::head_));
   set("tail", create_builtin(this, "tail", yaksha_lisp_builtins::tail_));
+  set("dir", create_builtin(this, "dir", yaksha_lisp_builtins::dir_));
   set("cons", create_builtin(this, "cons", yaksha_lisp_builtins::cons_));
   set("len", create_builtin(this, "len", yaksha_lisp_builtins::len_));
   set("push", create_builtin(this, "push", yaksha_lisp_builtins::push_));

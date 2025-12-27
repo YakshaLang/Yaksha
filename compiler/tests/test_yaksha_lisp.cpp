@@ -239,6 +239,11 @@ TEST_CASE("yaksha_lisp: tail of a list") {
     (if (== 2 (head (tail l))) (= success 1))
     )");
 }
+TEST_CASE("yaksha_lisp: dir") {
+  test_snippet_execute(R"(
+    (if (> (len (dir)) 1) (= success 1))
+    )");
+}
 TEST_CASE("yaksha_lisp: use setq to change a value") {
   test_snippet_execute(R"(
     (def a 1)

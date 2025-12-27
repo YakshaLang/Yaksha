@@ -129,6 +129,8 @@ namespace yaksha {
     // new list without first value
     static yaksha_lisp_value *
     tail_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
+    static yaksha_lisp_value *
+    dir_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
     // prepend first value to list
     static yaksha_lisp_value *
     cons_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);

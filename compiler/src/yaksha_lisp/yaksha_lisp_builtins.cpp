@@ -699,6 +699,30 @@ yaksha_lisp_builtins::tail_(const std::vector<yaksha_lisp_value *> &args,
   return r;
 }
 yaksha_lisp_value *
+yaksha_lisp_builtins::dir_(const std::vector<yaksha_lisp_value *> &args,
+                            yaksha_envmap *env) {
+  if (!args.empty()) {
+    throw parsing_error{"dir does not take arguments", "", 0, 0};
+  }
+  auto r = env->create_val();
+  r->type_ = yaksha_lisp_value_type::LIST;
+  std::vector<yaksha_envmap*> environments{};
+  environments.push_back(env);
+  while (!environments.empty()) {
+    yaksha_envmap* e = environments.back();
+    environments.pop_back();
+    if (e->parent_ != nullptr) {
+      environments.push_back(e->parent_);
+    }
+    auto dir_data = e->get_symbols();
+    for (const auto& kv: dir_data) {
+      r->list_.push_back(kv.second);
+    }
+  }
+
+  return r;
+}
+yaksha_lisp_value *
 yaksha_lisp_builtins::cons_(const std::vector<yaksha_lisp_value *> &args,
                             yaksha_envmap *env) {
   if (args.size() != 2) {
