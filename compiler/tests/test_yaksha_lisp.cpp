@@ -557,6 +557,18 @@ TEST_CASE("yaksha_lisp: test eval") {
         (if (== (eval (parse "1")) 1) (= success 1))
         )");
 }
+TEST_CASE("yaksha_lisp: test tokenize") {
+  test_snippet_execute(R"(
+        (def x (tokenize "file" "1"))
+        (if (== (len x) 1) (= success 1))
+        )");
+}
+TEST_CASE("yaksha_lisp: test tokenize with string") {
+  test_snippet_execute(R"(
+        (def x (tokenize "file" "\"1\""))
+        (if (== (len x) 1) (= success 1))
+        )");
+}
 TEST_CASE("yaksha_lisp: test bitwise_and") {
   test_snippet_execute(R"(
     (if (== (bitwise_and 1 1) 1) (= success 1))

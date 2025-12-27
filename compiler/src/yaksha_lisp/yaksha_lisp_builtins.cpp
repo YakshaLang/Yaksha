@@ -1173,6 +1173,61 @@ yaksha_lisp_builtins::parse_(const std::vector<yaksha_lisp_value *> &args,
   return result;
 }
 yaksha_lisp_value *
+yaksha_lisp_builtins::tokenize_(const std::vector<yaksha_lisp_value *> &args,
+                             yaksha_envmap *env) {
+  if (args.size() != 2) {
+    throw parsing_error{"tokenize takes 2 arguments", "", 0, 0};
+  }
+  auto e_args = eval_args(args, env);
+  auto filename = e_args[0];
+  auto code = e_args[1];
+  if (filename->type_ != yaksha_lisp_value_type::STRING) {
+    throw parsing_error{"tokenize takes a string as first argument", "", 0, 0};
+  }
+
+  if (code->type_ != yaksha_lisp_value_type::STRING) {
+    throw parsing_error{"tokenize takes a string as second argument", "", 0, 0};
+  }
+
+  auto tokenizer = env->get_memory_manager()->create_tokenizer();
+  tokenizer->tokenize_dumb(filename->str_, code->str_,
+                      env->get_memory_manager()->get_yk_token_pool());
+  if (!tokenizer->errors_.empty()) {
+    parsing_error error = tokenizer->errors_.front();
+    throw parsing_error{error.message_, "", 0, 0};
+  }
+
+  auto result = env->create_val();
+  result->type_ = yaksha_lisp_value_type::LIST;
+  for (auto expr : tokenizer->tokens_) {
+    if (expr->type_ == yaksha_lisp_token_type::YAKSHA_LISP_EOF) {
+      continue;
+    }
+    auto data = env->create_val();
+    data->type_ = yaksha_lisp_value_type::STRING;
+    data->str_ = expr->token_;
+
+    auto line_ = env->create_val();
+    line_->type_ = yaksha_lisp_value_type::NUMBER;
+    line_->num_ = expr->line_;
+
+    auto position_ = env->create_val();
+    position_->type_ = yaksha_lisp_value_type::NUMBER;
+    position_->num_ = expr->pos_;
+
+    auto token_value = env->create_val();
+    token_value->type_ = yaksha_lisp_value_type::LIST;
+
+    token_value->list_.push_back(filename);
+    token_value->list_.push_back(line_);
+    token_value->list_.push_back(position_);
+    token_value->list_.push_back(data);
+
+    result->list_.push_back(token_value);
+  }
+  return result;
+}
+yaksha_lisp_value *
 yaksha_lisp_builtins::bitwise_and_(const std::vector<yaksha_lisp_value *> &args,
                                    yaksha_envmap *env) {
   if (args.size() != 2) {

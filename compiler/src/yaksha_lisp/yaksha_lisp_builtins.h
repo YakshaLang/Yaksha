@@ -196,6 +196,8 @@ namespace yaksha {
     static yaksha_lisp_value *
     parse_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
     static yaksha_lisp_value *
+    tokenize_(const std::vector<yaksha_lisp_value *> &args, yaksha_envmap *env);
+    static yaksha_lisp_value *
     bitwise_and_(const std::vector<yaksha_lisp_value *> &args,
                  yaksha_envmap *env);
     static yaksha_lisp_value *

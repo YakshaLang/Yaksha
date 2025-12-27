@@ -136,6 +136,8 @@ namespace yaksha {
     void tokenize(std::string file, std::string code,
                   gc_pool<token> *token_pool);
     void tokenize(std::string file, std::vector<token *> &tokens);
+    void tokenize_dumb(std::string file, std::string code,
+                  gc_pool<token> *token_pool);
     std::vector<yaksha_lisp_token *> tokens_;
     std::vector<parsing_error> errors_;
     std::string file_;
@@ -152,6 +154,7 @@ private:
     void handle_numbers(yaksha_lisp_token *dt);
     void process_yk_tokens(tokenizer &tok);
     bool consider_token(token *t);
+    bool consider_token_dumb(token *t);
     void inject_eof();
     void convert_tokens(std::vector<token *> &tokens);
   };

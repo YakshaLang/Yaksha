@@ -48,6 +48,8 @@
 #include <queue>
 #include <regex>
 #include <utility>
+
+#include "utilities/colours.h"
 #ifdef YAKSHA_DEBUG
 #define YAKSHA_LISP_EVAL_DEBUG_IS_PRINTED
 #endif
@@ -67,6 +69,20 @@ void yaksha_lisp_tokenizer::tokenize(std::string file, std::string code,
     return;
   }
   process_yk_tokens(tok);
+}
+void yaksha_lisp_tokenizer::tokenize_dumb(std::string file, std::string code,
+                                     gc_pool<token> *token_pool) {
+  file_ = file;
+  auto tok = tokenizer{std::move(file), std::move(code), token_pool};
+  tok.tokenize();
+  if (!tok.errors_.empty()) {
+    for (auto &e : tok.errors_) { errors_.emplace_back(e); }
+    return;
+  }
+  for (auto t : tok.tokens_) {
+    if (!consider_token_dumb(t)) { break; }
+  }
+  inject_eof();
 }
 void yaksha_lisp_tokenizer::tokenize(std::string file,
                                      std::vector<token *> &tokens) {
@@ -89,6 +105,21 @@ void yaksha_lisp_tokenizer::inject_eof() {
     eof_token->type_ = yaksha_lisp_token_type::YAKSHA_LISP_EOF;
     tokens_.emplace_back(eof_token);
   }
+}
+bool yaksha_lisp_tokenizer::consider_token_dumb(token *t) {
+  if (t->type_ == token_type::NEW_LINE || t->type_ == token_type::INDENT ||
+      t->type_ == token_type::COMMENT || t->type_ == token_type::BA_INDENT ||
+      t->type_ == token_type::BA_DEDENT || t->type_ == token_type::END_OF_FILE) {
+    return true;
+  }
+  auto dt = mm_->create_token();
+  dt->file_ = t->file_;
+  dt->line_ = t->line_;
+  dt->pos_ = t->pos_;
+  dt->token_ = t->token_;
+  dt->type_ = yaksha_lisp_token_type::INVALID; // this is not important for dumb mode
+  tokens_.emplace_back(dt);
+  return true;
 }
 bool yaksha_lisp_tokenizer::consider_token(token *t) {
   // Discard whitespace, comments and newlines
@@ -908,6 +939,7 @@ void yaksha_envmap::setup_builtins() {
   set("insert", create_builtin(this, "insert", yaksha_lisp_builtins::insert_));
   set("remove", create_builtin(this, "remove", yaksha_lisp_builtins::remove_));
   set("parse", create_builtin(this, "parse", yaksha_lisp_builtins::parse_));
+  set("tokenize", create_builtin(this, "tokenize", yaksha_lisp_builtins::tokenize_));
   set("sorted", create_builtin(this, "sorted", yaksha_lisp_builtins::sorted_));
   set("reversed",
       create_builtin(this, "reversed", yaksha_lisp_builtins::reversed_));
@@ -1182,7 +1214,11 @@ std::ostream &yaksha::operator<<(std::ostream &outs, yaksha_lisp_token *p) {
   outs << "`";
 #endif
   if (p->type_ == yaksha_lisp_token_type::STRING) {
-    outs << "\"" << string_utils::escape(p->token_) << "\"";
+    outs << colours::yellow("\"") << colours::yellow(string_utils::escape(p->token_)) << colours::yellow("\"");
+  } else if (p->type_ == yaksha_lisp_token_type::PAREN_OPEN || p->type_ == yaksha_lisp_token_type::PAREN_CLOSE) {
+    outs << colours::cyan(p->token_);
+  } else if (p->type_ == yaksha_lisp_token_type::NUMBER) {
+    outs << colours::magenta(p->token_);
   } else {
     outs << p->token_;
   }
@@ -1209,28 +1245,31 @@ std::ostream &yaksha::operator<<(std::ostream &outs, yaksha_lisp_value *p) {
 #ifdef YASKSHA_LISP_PRINT_TYPE
   outs << "<";
 #endif
+
   if (p->type_ == yaksha_lisp_value_type::NUMBER) {
-    outs << p->num_;
+    std::stringstream ss;
+    ss << p->num_;
+    outs << colours::magenta(ss.str());
   } else if (p->type_ == yaksha_lisp_value_type::STRING) {
-    outs << "\"" << string_utils::escape(p->str_) << "\"";
+    outs << colours::yellow("\"") << colours::yellow(string_utils::escape(p->str_)) << colours::yellow("\"");
   } else if (p->type_ == yaksha_lisp_value_type::LIST) {
-    outs << "{" << p->list_ << "}";
+    outs << colours::red("{") << p->list_ << colours::red("}");
   } else if (p->type_ == yaksha_lisp_value_type::EXPR) {
     outs << p->expr_;
   } else if (p->type_ == yaksha_lisp_value_type::BUILTIN) {
-    outs << "(builtin " << p->str_ << ")";
+    outs << colours::cyan("(builtin ") << p->str_ << colours::cyan(")");
   } else if (p->type_ == yaksha_lisp_value_type::LAMBDA) {
     if (p->str_.empty()) {
-      outs << "(lambda " << p->list_ << ")";
+      outs << colours::cyan("(lambda ") << p->list_ << colours::cyan(")");
     } else {
-      outs << "(defun " << p->str_ << " " << p->list_ << ")";
+      outs << colours::cyan("(defun ") << p->str_ << " " << p->list_ << colours::cyan(")");
     }
   } else if (p->type_ == yaksha_lisp_value_type::METAMACRO) {
-    outs << "(metamacro " << p->str_ << " " << p->list_ << ")";
+    outs << colours::cyan("(metamacro ") << p->str_ << " " << p->list_ << colours::cyan(")");
   } else if (p->type_ == yaksha_lisp_value_type::MODULE) {
-    outs << "(module " << p->str_ << ")";
+    outs << colours::cyan("(module ") << p->str_ << colours::cyan(")");
   } else if (p->type_ == yaksha_lisp_value_type::MAP) {
-    outs << "@{";
+    outs << colours::green("@{");
     bool first = true;
     for (auto &i : p->closure_->symbols_) {
       if (first) {
@@ -1240,7 +1279,7 @@ std::ostream &yaksha::operator<<(std::ostream &outs, yaksha_lisp_value *p) {
       }
       outs << i.first << ": " << i.second;
     }
-    outs << "}";
+    outs << colours::green("}");
   }
 #ifdef YASKSHA_LISP_PRINT_TYPE
   outs << ">";
