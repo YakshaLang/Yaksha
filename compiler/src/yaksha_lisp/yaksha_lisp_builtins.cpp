@@ -94,6 +94,11 @@ eq_operator(yaksha_envmap *env,
   }
   return result;
 }
+
+void yaksha_lisp_builtins::enable_print() {
+  yaksha_macro_print_allowed = true;
+}
+
 yaksha_lisp_value *
 yaksha_lisp_builtins::add_(const std::vector<yaksha_lisp_value *> &args,
                            yaksha_envmap *env) {

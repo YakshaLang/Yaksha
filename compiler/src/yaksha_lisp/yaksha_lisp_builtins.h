@@ -44,6 +44,7 @@ namespace yaksha {
   struct yaksha_envmap;
   struct yaksha_lisp_value;
   struct yaksha_lisp_builtins {
+    static void enable_print();
     static yaksha_lisp_value *add_(const std::vector<yaksha_lisp_value *> &args,
                                    yaksha_envmap *env);
     static yaksha_lisp_value *sub_(const std::vector<yaksha_lisp_value *> &args,

@@ -69,3 +69,4 @@ test_data/document_samples/gui_window
 !test_data/document_samples/notes.yaka.c
 !test_data/document_samples/snake_w4.yaka.c
 !test_data/document_samples/threading_test.yaka.c
+/lisp_testing/

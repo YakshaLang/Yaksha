@@ -40,6 +40,9 @@
 #include "yaksha_lisp/yaksha_lisp.h"
 #include "utilities/error_printer.h"
 #include <iostream>
+
+#include "yaksha_lisp/yaksha_lisp_builtins.h"
+
 int lisp_repl();
 int lisp_execute_file(char *file_path);
 #ifndef PROGRAM_NAME
@@ -84,6 +87,7 @@ int lisp_execute_file(char *file_path) {
   std::unordered_map<std::string, import_stmt *> no_imports{};
   mm.init_env(f_path, no_imports);
   yaksha_envmap *environment = mm.validate_and_get_environment_root(f_path);
+  yaksha_lisp_builtins::enable_print();
   try {
     environment->eval(parser->exprs_);
   } catch (parsing_error &ex) {
