@@ -40,6 +40,7 @@
 #include "colours.h"
 using namespace yaksha;
 #include <iostream>
+static bool enable_colour_print = true;
 #if defined(_WIN32) || defined(_WIN64)
 #include <cstdio>
 #include <io.h>
@@ -78,7 +79,6 @@ void yaksha::colour_print(colour c, const std::string &content,
 #include <unistd.h>
 #define ISATTY isatty
 #define FILENO fileno
-static bool enable_colour_print = true;
 void yaksha::colour_print(colour c, const std::string &content,
                           std::ostream &outs) {
   std::string col{};
