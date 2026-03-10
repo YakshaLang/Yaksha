@@ -197,7 +197,7 @@ def fabs(x: CDouble) -> CDouble:
 def floor(x: CDouble) -> CDouble:
     pass
 
-@nativedefine("pow")
+@nativedefine("fmod")
 def fmod(x: CDouble, y: CDouble) -> CDouble:
     pass
 
