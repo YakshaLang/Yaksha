@@ -983,5 +983,90 @@ namespace yaksha {
     file_data *data_{nullptr};
     scanning_step step_{scanning_step::NOTHING_DONE};
   };
+
+  /** Helper functions for formatting/contextualizing errors */
+  // Used for string tokens
+  static inline bool is_string_token(token_type t) {
+    return t == token_type::STRING || t == token_type::THREE_QUOTE_STRING;
+  }
+
+  // True for trivia tokens
+  static inline bool is_layout_token(token_type t) {
+    return t == token_type::NEW_LINE || t == token_type::BA_INDENT ||
+          t == token_type::BA_DEDENT || t == token_type::INDENT;
+  }
+
+  // True for malformed numeric literal token categories
+  static inline bool is_unknown_numeric_token(token_type t) {
+    return t == token_type::UNKNOWN_BIN ||
+          t == token_type::UNKNOWN_DECIMAL ||
+          t == token_type::UNKNOWN_HEX ||
+          t == token_type::UNKNOWN_OCT;
+  }
+
+  // readable base of unknown numeric categories
+  static inline const char* unknown_numeric_base(token_type t) {
+    switch (t) {
+      case token_type::UNKNOWN_BIN:     return "binary";
+      case token_type::UNKNOWN_DECIMAL: return "decimal";
+      case token_type::UNKNOWN_HEX:     return "hex";
+      case token_type::UNKNOWN_OCT:     return "octal";
+      default:                          return "numeric";
+    }
+  }
+
+  // Truncates long lexemes for error messages.
+  static inline std::string safe_lexeme(const token& tk, size_t max_len = 48) {
+    std::string s = tk.original_.empty() ? tk.token_ : tk.original_;
+    if (s.size() > max_len) {
+      if (max_len <= 3) {
+        return s.substr(0, max_len);
+      }
+      s.resize(max_len - 3);
+      s.append("...");
+    }
+    return s;
+  }
+
+  // readable token description used for detailing errors.
+  static inline std::string describe_token(const token& tk) {
+    const token_type tt = tk.type_;
+    if (tt == token_type::END_OF_FILE) return "end of input";
+    if (is_layout_token(tt)) {
+      switch (tt) {
+        case token_type::NEW_LINE:   return "newline";
+        case token_type::BA_INDENT:
+        case token_type::INDENT:     return "block indent";
+        case token_type::BA_DEDENT:  return "block dedent";
+        default: break;
+      }
+    }
+    if (tt == token_type::COMMENT) return "comment";
+    if (tt == token_type::NAME) {
+      const std::string s = safe_lexeme(tk);
+      return s.empty() ? "identifier" : "identifier '" + s + "'";
+    }
+    if (is_string_token(tt)) {
+      const std::string s = safe_lexeme(tk);
+      return s.empty() ? "string literal" : "string literal \"" + s + "\"";
+    }
+    if (is_keyword(tt)) {
+      const std::string s = safe_lexeme(tk);
+      if (!s.empty()) return "'" + s + "' keyword";
+      return std::string("'") + token_to_str(tt) + "' keyword";
+    }
+    if (is_unknown_numeric_token(tt)) {
+      const std::string s = safe_lexeme(tk);
+      return std::string("malformed ") + unknown_numeric_base(tt) +
+            " numeric literal" + (s.empty() ? "" : " '" + s + "'");
+    }
+    if (is_number_token(tt)) {
+      const std::string s = safe_lexeme(tk);
+      return s.empty() ? "numeric literal" : "numeric literal '" + s + "'";
+    }
+    std::string sym = safe_lexeme(tk);
+    if (!sym.empty()) return "'" + sym + "'";
+    return token_to_str(tt);
+  }
 }// namespace yaksha
 #endif
