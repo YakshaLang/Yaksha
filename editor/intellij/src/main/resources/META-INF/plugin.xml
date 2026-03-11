@@ -51,7 +51,11 @@
                 language="Yaksha"
                 implementationClass="org.intellij.sdk.language.YakshaDocumentationProvider"/>
         <lang.braceMatcher language="Yaksha" implementationClass="org.intellij.sdk.language.YakshaBraceMatcher"/>
-        <toolWindow id="Yaksha" secondary="true" icon="org.intellij.sdk.language.YakshaIcons.FILE" anchor="right"
+        <codeInsight.inlayProvider language="Yaksha"
+                implementationClass="org.intellij.sdk.language.YakshaParameterHintsProvider"/>
+
+        <enterHandlerDelegate implementation="org.intellij.sdk.language.YakshaEnterHandler"/>
+<toolWindow id="Yaksha" secondary="true" icon="org.intellij.sdk.language.YakshaIcons.FILE" anchor="right"
                     factoryClass="org.intellij.sdk.language.tw.YakshaToolWindowFactory" canCloseContents="false"/>
     </extensions>
 

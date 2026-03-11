@@ -32,13 +32,34 @@ import java.util.concurrent.TimeUnit;
 
 public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiFile>, List<YakshaCompilerAnnotator.CompilerError>> {
 
-    private static final FileLogger LOGGER = FileLogger.getInstance();
     public static final int MAX_DEPTH = 5;
+    private static final FileLogger LOGGER = FileLogger.getInstance();
     private final ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
     private final YakshaService service = new YakshaService(queue);
 
     public YakshaCompilerAnnotator() {
         super();
+    }
+
+    private static void deleteScratch(@NotNull File f) {
+        try {
+            final var success = f.delete();
+            LOGGER.info("Deleted " + f.getPath() + " success = " + success);
+        } catch (Exception ignored) {
+            LOGGER.info("Failed to delete " + f.getPath());
+        }
+    }
+
+    private static VirtualFile createSyncedFile(Document doc, Path tmp) {
+        try {
+            try (BufferedWriter out = Files.newBufferedWriter(tmp, StandardCharsets.UTF_8)) {
+                out.write(doc.getText());
+            }
+            File f = tmp.toFile();
+            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(f);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
@@ -92,27 +113,6 @@ public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiF
         return result;
     }
 
-    private static void deleteScratch(@NotNull File f) {
-        try {
-            final var success = f.delete();
-            LOGGER.info("Deleted " + f.getPath() + " success = " + success);
-        } catch (Exception ignored) {
-            LOGGER.info("Failed to delete " + f.getPath());
-        }
-    }
-
-    private static VirtualFile createSyncedFile(Document doc, Path tmp) {
-        try {
-            try (BufferedWriter out = Files.newBufferedWriter(tmp, StandardCharsets.UTF_8)) {
-                out.write(doc.getText());
-            }
-            File f = tmp.toFile();
-            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(f);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
     @Override
     public void apply(@NotNull PsiFile file, List<CompilerError> annotationResult, @NotNull AnnotationHolder holder) {
         if (annotationResult == null || annotationResult.isEmpty()) {
@@ -149,22 +149,6 @@ public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiF
     @SuppressWarnings("unused")
     public YakshaService getService() {
         return service;
-    }
-
-    public static class CompilerError {
-        final String file;
-        final String message;
-        final int line;
-        final int column;
-        final int length;
-
-        private CompilerError(final String file, final String message, final int line, final int column, final int length) {
-            this.file = file;
-            this.message = message;
-            this.line = line;
-            this.column = column;
-            this.length = length;
-        }
     }
 
     private File findMainFile(final File dir) {
@@ -234,5 +218,21 @@ public class YakshaCompilerAnnotator extends ExternalAnnotator<Pair<Editor, PsiF
         }
 
         return errors;
+    }
+
+    public static class CompilerError {
+        final String file;
+        final String message;
+        final int line;
+        final int column;
+        final int length;
+
+        private CompilerError(final String file, final String message, final int line, final int column, final int length) {
+            this.file = file;
+            this.message = message;
+            this.line = line;
+            this.column = column;
+            this.length = length;
+        }
     }
 }

@@ -139,6 +139,24 @@ public class YakshaDocs {
         this.doc = doc;
     }
 
+    private static boolean keepOut(final String filter, final String haystack, final String haystack2) {
+        if (filter == null || filter.isBlank()) {
+            return false;
+        }
+        return !((!haystack.isBlank() && haystack.toLowerCase(Locale.ENGLISH).contains(filter))
+                || (!haystack2.isBlank() && haystack2.toLowerCase(Locale.ENGLISH).contains(filter)));
+    }
+
+    private static void addComments(String allComments, DefaultMutableTreeNode node) {
+        if (allComments.isBlank()) {
+            return;
+        }
+        String[] comments = allComments.split("\\n");
+        for (final String commentLine : comments) {
+            node.add(new DefaultMutableTreeNode(DocWithIcon.dwi(commentLine, YakshaIcons.COMMENT)));
+        }
+    }
+
     public boolean fillTo(CompletionResultSet resultSet, String importPath) {
         Doc documentation = doc.get(importPath);
         if (documentation == null) {
@@ -169,6 +187,34 @@ public class YakshaDocs {
         return true;
     }
 
+    public boolean fillToWithAlias(CompletionResultSet resultSet, String alias, String importPath) {
+        Doc documentation = doc.get(importPath);
+        if (documentation == null) return false;
+        String prefix = alias + ".";
+        for (GlobalConstant c : documentation.global_consts) {
+            resultSet.addElement(LookupElementBuilder.create(prefix + c.name)
+                    .withIcon(YakshaIcons.CONSTANT)
+                    .withTypeText(c.getTypeText())
+                    .withPresentableText(prefix + c.getRepr())
+            );
+        }
+        for (Fn f : documentation.functions) {
+            resultSet.addElement(LookupElementBuilder.create(prefix + f.name)
+                    .withIcon(YakshaIcons.DEF)
+                    .withTypeText(f.getTypeText())
+                    .withPresentableText(prefix + f.getRepr())
+            );
+        }
+        for (Cls cl : documentation.classes) {
+            resultSet.addElement(LookupElementBuilder.create(prefix + cl.name)
+                    .withIcon(YakshaIcons.CLASS)
+                    .withTypeText(cl.getTypeText())
+                    .withPresentableText(prefix + cl.getRepr())
+            );
+        }
+        return true;
+    }
+
     public String generateDoc(String importPath, String name) {
         Doc documentation = doc.get(importPath);
         if (documentation == null) {
@@ -191,20 +237,12 @@ public class YakshaDocs {
                 return cl.genDoc(importPath);
             }
         }
-        for (YakshaMacro y: documentation.macros) {
+        for (YakshaMacro y : documentation.macros) {
             if (y.name.equals(name)) {
                 return y.genDoc(importPath);
             }
         }
         return "";
-    }
-
-    private static boolean keepOut(final String filter, final String haystack, final String haystack2) {
-        if (filter == null || filter.isBlank()) {
-            return false;
-        }
-        return !((!haystack.isBlank() && haystack.toLowerCase(Locale.ENGLISH).contains(filter))
-                || (!haystack2.isBlank() && haystack2.toLowerCase(Locale.ENGLISH).contains(filter)));
     }
 
     public void fillTo(DefaultMutableTreeNode root, final String filter) {
@@ -228,16 +266,6 @@ public class YakshaDocs {
                 root.add(lib);
             }
         });
-    }
-
-    private static void addComments(String allComments, DefaultMutableTreeNode node) {
-        if (allComments.isBlank()) {
-            return;
-        }
-        String[] comments = allComments.split("\\n");
-        for (final String commentLine : comments) {
-            node.add(new DefaultMutableTreeNode(DocWithIcon.dwi(commentLine, YakshaIcons.COMMENT)));
-        }
     }
 
     public static class Doc {
@@ -316,6 +344,7 @@ public class YakshaDocs {
             return b.build();
         }
     }
+
     public static class YakshaMacro {
         public String name;
         public String comment;

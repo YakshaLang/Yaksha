@@ -1,12 +1,16 @@
 package org.intellij.sdk.language;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.intellij.sdk.language.psi.*;
+import org.intellij.sdk.language.tw.YakshaToolWindow;
+import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,7 +55,7 @@ public class YakshaUtil {
     public static List<YakshaEnumStatement> findEnums(Project project) {
         List<YakshaEnumStatement> result = new ArrayList<>();
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(YakaFileType.INSTANCE, GlobalSearchScope.allScope(project));
-        for (VirtualFile virtualFile: virtualFiles) {
+        for (VirtualFile virtualFile : virtualFiles) {
             YakshaFile yakaFile = (YakshaFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (yakaFile != null) {
                 YakshaEnumStatement[] statements = ExtractUtils.getChildrenOfType(yakaFile, YakshaEnumStatement.class);
@@ -66,7 +70,7 @@ public class YakshaUtil {
     public static List<YakshaEnumStatement> findEnums(Project project, String key) {
         List<YakshaEnumStatement> result = new ArrayList<>();
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(YakaFileType.INSTANCE, GlobalSearchScope.allScope(project));
-        for (VirtualFile virtualFile: virtualFiles) {
+        for (VirtualFile virtualFile : virtualFiles) {
             YakshaFile yakaFile = (YakshaFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (yakaFile != null) {
                 YakshaEnumStatement[] statements = ExtractUtils.getChildrenOfType(yakaFile, YakshaEnumStatement.class);
@@ -149,6 +153,40 @@ public class YakshaUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns the root directory where yaksha standard library .yaka files live,
+     * derived from the configured yaksha binary path (binary_dir/../libs).
+     * Returns null if the binary path is not configured.
+     */
+    @Nullable
+    public static java.nio.file.Path getLibsRoot() {
+        String exe = YakshaToolWindow.YAKSHA_EXE_PATH;
+        if (exe == null || exe.isBlank()) return null;
+        try {
+            java.nio.file.Path binDir = Paths.get(exe).getParent();
+            if (binDir == null) return null;
+            return binDir.resolve("../libs").normalize();
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Finds a .yaka file in the yaksha standard library directory for a dotted import path.
+     * E.g. "libs.strings" -> <libs_root>/libs/strings.yaka
+     */
+    @Nullable
+    public static VirtualFile findLibsFile(String importPath) {
+        java.nio.file.Path libsRoot = getLibsRoot();
+        if (libsRoot == null || importPath == null || importPath.isEmpty()) return null;
+        try {
+            java.nio.file.Path yakaPath = libsRoot.resolve(importPath.replace(".", "/") + ".yaka");
+            return LocalFileSystem.getInstance().findFileByNioFile(yakaPath);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
 //    public static @NotNull String findDocumentationComment(SimpleProperty property) {

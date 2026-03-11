@@ -35,7 +35,7 @@ public class YakshaStructureViewModel extends StructureViewModelBase implements
                 || element.getValue() instanceof YakshaConstStatement
                 || element.getValue() instanceof YakshaImportStatement
                 || element.getValue() instanceof YakshaEnumField
-                || element.getValue() instanceof  YakshaDeclStatement
+                || element.getValue() instanceof YakshaDeclStatement
                 ;
     }
 

@@ -6,7 +6,6 @@ import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.presentation.java.SymbolPresentationUtil;
 import org.intellij.sdk.language.psi.*;
-import org.intellij.sdk.language.psi.impl.YakshaClassFieldWoIndentImpl;
 import org.intellij.sdk.language.yaksha_docs.YakshaDocs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +31,25 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
             }
         }
         return sb.toString();
+    }
+
+    private static String getImportedDoc(PsiElement element, String ident, String name) {
+        String documentation = null;
+        final String importingName = ident.split("\\.")[0];
+        YakshaImportStatement whichImport = null;
+        List<YakshaImportStatement> imps = ExtractUtils.getChildrenOfTypeAsList(element.getContainingFile(), YakshaImportStatement.class);
+        for (YakshaImportStatement i : imps) {
+            if (importingName.equals(i.getName())) {
+                // Found the import
+                whichImport = i;
+                break;
+            }
+        }
+        if (whichImport != null && name != null) {
+            final String importPath = whichImport.getImportPath();
+            documentation = YakshaDocs.INSTANCE.generateDoc(importPath, name);
+        }
+        return documentation;
     }
 
     @Override
@@ -128,26 +146,6 @@ public class YakshaDocumentationProvider extends AbstractDocumentationProvider {
 
         return null;
     }
-
-    private static String getImportedDoc(PsiElement element, String ident, String name) {
-        String documentation = null;
-        final String importingName = ident.split("\\.")[0];
-        YakshaImportStatement whichImport = null;
-        List<YakshaImportStatement> imps = ExtractUtils.getChildrenOfTypeAsList(element.getContainingFile(), YakshaImportStatement.class);
-        for (YakshaImportStatement i : imps) {
-            if (importingName.equals(i.getName())) {
-                // Found the import
-                whichImport = i;
-                break;
-            }
-        }
-        if (whichImport != null && name != null) {
-            final String importPath = whichImport.getImportPath();
-            documentation = YakshaDocs.INSTANCE.generateDoc(importPath, name);
-        }
-        return documentation;
-    }
-
 
     @Override
     public @Nullable String generateHoverDoc(@NotNull PsiElement element, @Nullable PsiElement originalElement) {

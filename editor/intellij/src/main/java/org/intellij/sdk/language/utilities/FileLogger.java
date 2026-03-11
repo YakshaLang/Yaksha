@@ -12,10 +12,6 @@ public enum FileLogger {
 
     private final OutputStream outputStream;
 
-    public static FileLogger getInstance() {
-        return INSTANCE;
-    }
-
     FileLogger() {
         String HOME_DIRECTORY = System.getProperty("user.home");
         String LOG_FILENAME = "yaksha.intellij.log.txt";
@@ -27,6 +23,10 @@ public enum FileLogger {
         } catch (Exception e) {
             throw new RuntimeException("Failed to open log file", e);
         }
+    }
+
+    public static FileLogger getInstance() {
+        return INSTANCE;
     }
 
     public void error(String... messages) {

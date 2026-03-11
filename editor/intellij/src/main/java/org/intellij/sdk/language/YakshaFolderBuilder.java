@@ -19,31 +19,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class YakshaFolderBuilder extends FoldingBuilderEx implements DumbAware {
-    @Override
-    public FoldingDescriptor @NotNull [] buildFoldRegions(
-            @NotNull PsiElement root, @NotNull Document document, boolean quick) {
-        final List<Optional<FoldingDescriptor>> items = SyntaxTraverser.psiTraverser(root)
-                .filter(i ->
-                        (i instanceof YakshaClassBlock ||
-                                i instanceof YakshaDefBlock ||
-                                i instanceof YakshaEnumBlock ||
-                                i instanceof YakshaDslOuterBlock)
-                )
-                .map(YakshaFolderBuilder::makeFold).toList();
-        return items.stream().filter(Optional::isPresent).map(Optional::get)
-                .toArray(FoldingDescriptor[]::new);
-    }
-
-    @Override
-    public @Nullable String getPlaceholderText(@NotNull ASTNode node) {
-        return "...";
-    }
-
-    @Override
-    public boolean isCollapsedByDefault(@NotNull ASTNode node) {
-        return false;
-    }
-
     private static TextRange getRange(PsiElement elm) {
         TextRange range = elm.getTextRange();
         final String text = elm.getText();
@@ -67,6 +42,31 @@ public class YakshaFolderBuilder extends FoldingBuilderEx implements DumbAware {
         } catch (AssertionError ignored) {
         }
         return Optional.empty();
+    }
+
+    @Override
+    public FoldingDescriptor @NotNull [] buildFoldRegions(
+            @NotNull PsiElement root, @NotNull Document document, boolean quick) {
+        final List<Optional<FoldingDescriptor>> items = SyntaxTraverser.psiTraverser(root)
+                .filter(i ->
+                        (i instanceof YakshaClassBlock ||
+                                i instanceof YakshaDefBlock ||
+                                i instanceof YakshaEnumBlock ||
+                                i instanceof YakshaDslOuterBlock)
+                )
+                .map(YakshaFolderBuilder::makeFold).toList();
+        return items.stream().filter(Optional::isPresent).map(Optional::get)
+                .toArray(FoldingDescriptor[]::new);
+    }
+
+    @Override
+    public @Nullable String getPlaceholderText(@NotNull ASTNode node) {
+        return "...";
+    }
+
+    @Override
+    public boolean isCollapsedByDefault(@NotNull ASTNode node) {
+        return false;
     }
 
     public static class YakshaFoldingDesc extends FoldingDescriptor {

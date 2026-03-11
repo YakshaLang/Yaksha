@@ -2,17 +2,9 @@ package org.intellij.sdk.language;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.PsiReferenceContributor;
-import com.intellij.psi.PsiReferenceProvider;
-import com.intellij.psi.PsiReferenceRegistrar;
+import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
-import org.intellij.sdk.language.psi.YakshaClassStatement;
-import org.intellij.sdk.language.psi.YakshaConstStatement;
-import org.intellij.sdk.language.psi.YakshaDefStatement;
-import org.intellij.sdk.language.psi.YakshaImportStatement;
-import org.intellij.sdk.language.psi.YakshaTypes;
+import org.intellij.sdk.language.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 public class YakshaReferenceContributor extends PsiReferenceContributor {

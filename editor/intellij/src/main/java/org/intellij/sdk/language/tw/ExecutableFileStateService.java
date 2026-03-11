@@ -17,6 +17,10 @@ public final class ExecutableFileStateService implements PersistentStateComponen
 
     private ExecutableFileState state = new ExecutableFileState();
 
+    public static ExecutableFileStateService getInstance(Project project) {
+        return project.getService(ExecutableFileStateService.class);
+    }
+
     @Nullable
     @Override
     public ExecutableFileState getState() {
@@ -26,9 +30,5 @@ public final class ExecutableFileStateService implements PersistentStateComponen
     @Override
     public void loadState(@NotNull ExecutableFileState state) {
         this.state = state;
-    }
-
-    public static ExecutableFileStateService getInstance(Project project) {
-        return project.getService(ExecutableFileStateService.class);
     }
 }

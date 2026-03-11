@@ -141,7 +141,7 @@ public class YakshaPsiImplUtil {
     /* ============================================================== */
 
     public static String getName(final YakshaClassField statement) {
-       return getName(statement.getClassFieldWoIndent());
+        return getName(statement.getClassFieldWoIndent());
     }
 
 
