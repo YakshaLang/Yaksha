@@ -394,13 +394,13 @@ def compile_carpntr():
     # carpntr fails to build as native on Mac (M2 in my case)
     # so this fixes it in case that has happened
     if MAC_OS and not os.path.exists(os.path.join(carpntr_build_path, "bootstrapped-carpntr")):
-        shutil.copyfile(os.path.join(carpntr_build_path, f"bootstrapped-carpntr-{ARCH}-macos-gnu"),
+        shutil.copyfile(os.path.join(carpntr_build_path, f"bootstrapped-carpntr-{ARCH}-macos-none"),
                         os.path.join(carpntr_build_path, "bootstrapped-carpntr"))
         execute(["chmod", "+x", os.path.join(carpntr_build_path, "bootstrapped-carpntr")])
         with navigate(carpntr_path):
             with updated_path():
                 execute(["build/bootstrapped-carpntr"])
-        shutil.copyfile(os.path.join(carpntr_build_path, f"carpntr-{ARCH}-macos-gnu"),
+        shutil.copyfile(os.path.join(carpntr_build_path, f"carpntr-{ARCH}-macos-none"),
                         os.path.join(carpntr_build_path, "carpntr"))
         execute(["chmod", "+x", os.path.join(carpntr_build_path, "carpntr")])
     global PATHS
@@ -416,7 +416,7 @@ def compile_hammer():
             execute(["carpntr"])
     # Workaround for native build issue on Mac M2 CPU
     if MAC_OS and not os.path.exists(os.path.join(hammer_build_path, "hammer")):
-        shutil.copyfile(os.path.join(hammer_build_path, f"hammer-{ARCH}-macos-gnu"),
+        shutil.copyfile(os.path.join(hammer_build_path, f"hammer-{ARCH}-macos-none"),
                         os.path.join(hammer_build_path, "hammer"))
         execute(["chmod", "+x", os.path.join(hammer_build_path, "hammer")])
     global PATHS
