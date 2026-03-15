@@ -52,6 +52,9 @@ using namespace yaksha;
 #define PRINT_PREPROCESSOR_OUTPUT
 #define DUMP_TOKENS_ON_MACRO_ERROR
 #endif
+static constexpr int kHistoryLookback = 15;
+static constexpr int kContextWindow = 2;
+static constexpr int kRecentNewlineWindow = 3;
 parser::parser(std::string filepath, std::vector<token *> &tokens,
                yk_datatype_pool *pool)
     : pool_{}, original_tokens_{tokens}, current_{0}, control_flow_{0},
@@ -326,7 +329,75 @@ expr *parser::primary() {
     consume(token_type::PAREN_CLOSE, "Expect ')' after expression");
     return pool_.c_grouping_expr(ex);
   }
-  throw error(peek(), "Expected expression!");
+  token *current_token = peek();
+  std::string error_message = "Expected expression";
+  bool found_assignment_pattern,found_colon_pattern,has_recent_newline,has_recent_dedent = false;
+  {
+    const int start = std::max(0, static_cast<int>(current_) - kHistoryLookback);
+    for (int i = start; i < static_cast<int>(current_); ++i) {
+      if (i < static_cast<int>(tokens_.size())) {
+        token_type type = tokens_[i]->type_;
+        if (type == token_type::EQ) found_assignment_pattern = true;
+        if (type == token_type::COLON) found_colon_pattern = true;
+        if (type == token_type::NEW_LINE &&
+            i >= static_cast<int>(current_) - kRecentNewlineWindow) {
+          has_recent_newline = true;
+        }
+        if (type == token_type::BA_DEDENT) has_recent_dedent = true;
+      }
+    }
+  }
+  std::string context,current_token_desc;
+  {
+    const int last  = static_cast<int>(tokens_.size()) - 1;
+    const int start = std::max(0, static_cast<int>(current_) - kContextWindow);
+    const int end   = std::min(last, static_cast<int>(current_ + kContextWindow));
+    for (int i = start; i <= end; ++i) {
+      if (i < 0 || i >= static_cast<int>(tokens_.size())) continue;
+      token *tok = tokens_[i];
+      if (i == static_cast<int>(current_)) {
+        current_token_desc = describe_token(*tok); // uses helpers from token.h
+      } else {
+        if (tok->type_ == token_type::NEW_LINE) {
+          context += "'\\n'";
+        } else if (tok->type_ == token_type::BA_DEDENT || tok->type_ == token_type::BA_INDENT) {
+          continue;
+        } else {
+          context += (!tok->token_.empty() ? tok->token_ : token_to_str(tok->type_));
+        }
+        if (i < end &&
+            i + 1 < static_cast<int>(tokens_.size()) &&
+            tokens_[i + 1]->type_ != token_type::DOT &&
+            tok->type_ != token_type::DOT) {
+          context += " ";
+        }
+      }
+    }
+  }
+  if (current_token_desc.empty()) {
+    current_token_desc = "unknown token";
+  }
+  auto expected_primary_desc = [&](const token& tok) -> std::string {
+    // primary() accepts identifier, literal, or '(' expression ')'
+    return " Expected one of: identifier, literal (number/string/boolean/None), or '('; "
+           "instead found: " + describe_token(tok) + ".";
+  };
+  auto build_error_suffix = [&](const token& tok) -> std::string {
+    const std::string expected = expected_primary_desc(tok);
+    switch (tok.type_) {
+      case token_type::BA_DEDENT:
+        return ", but found block dedent. Check ':' and indentation." + expected;
+      case token_type::NEW_LINE:
+        return ", but found newline. The previous line may be incomplete." + expected;
+      default:
+        return ", but found " + current_token_desc + "." + expected;
+    }
+  };
+  error_message += build_error_suffix(*current_token);
+  if (!context.empty()) {
+    error_message += " Near: '" + context + "'";
+  }
+  throw error(peek(), error_message);
 }
 token *parser::consume(token_type t, const std::string &message) {
   if (check(t)) return advance();
