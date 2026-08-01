@@ -5,9 +5,11 @@ def cstr2i(a: c.CStr) -> int:
     # Convert a c-string to an integer
     pass
 
+@native
 def s2i(s: str) -> int:
-    # Convert a str to integer
-    return cstr2i(cast("c.CStr", s))
+    ccode """
+    return (int32_t)atoi(yk__bstr_get_reference(nn__s));
+    """
 
 @nativemacro
 def cdbl2d(a: c.CDouble) -> f64:
@@ -87,6 +89,24 @@ def uu2f(a: u64) -> float:
 @nativemacro
 def i2s(a: int) -> str:
     ccode """(yk__sdsfromlonglong(nn__a))"""
+
+@native
+def f2s(v: float) -> str:
+    ccode """
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%.6f", nn__v);
+    return yk__sdsnew(buf);
+    """
+
+@native
+def cstr2f(s: c.CStr) -> float:
+    ccode """return (float)atof(nn__s);"""
+
+@native
+def s2f(s: sr) -> float:
+    ccode """
+    return (float)atof(yk__bstr_get_reference(nn__s));
+    """
 
 @native
 def copy_from_f32(a: f32) -> u32:
