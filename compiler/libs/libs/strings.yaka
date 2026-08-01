@@ -18,7 +18,6 @@ def set_cstr(s: c.CStr, pos: int, v: int) -> None:
 def get(s: sr, pos: int) -> int:
     # Get a single byte from given string and position
     # Warning: Does not do a length check
-    # Warning: This copies the string to just get a single byte
     ccode """int32_t x = (int32_t)(yk__bstr_get_reference(nn__s))[nn__pos];
     return x"""
 
