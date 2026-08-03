@@ -18,7 +18,7 @@ Bunch of `C` code that standard library depend on.
 | `wasm4.h`             | Bruno Garcia                        | wasm4 fantasy console C header     | [wasm4](https://github.com/aduros/wasm4)                   | ISC                                                                                    |
 | `cr.h`                | Danny Angelo Carminati Grein        | hot reloading capabilities         | [cr.h](https://github.com/fungos/cr)                       | MIT                                                                                    |
 | `endianness.h`        | rofl0r                              | endian conversion                  | [endianness.h](https://github.com/rofl0r/endianness.h)     | MIT/PublicDomain                                                                       |
-| `_include_mman_win.*` | various                             | memory map for windows             | [mman-win32](https://code.google.com/archive/p/mman-win32) | MIT                                                                                    |
+| `_include_mman_win.*` | various                             | memory mapped files for windows    | [mman-win32](https://code.google.com/archive/p/mman-win32) | MIT                                                                                    |
 
 
 * Warn! net libraries need to be wrapped. They are not used yet.
