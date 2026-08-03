@@ -44,6 +44,109 @@ import libs.os.path
 import libs.io
 import libs.console
 
+struct ZigVersion:
+    major: int
+    minor: int
+    patch: int
+
+def zig_version_at_least(v: ZigVersion, major: int, minor: int) -> bool:
+    if v.major > major:
+        return True
+    if v.major < major:
+        return False
+    return v.minor >= minor
+
+def default_zig_version() -> ZigVersion:
+    return ZigVersion{major: 0, minor: 9, patch: 1}
+
+@native
+def atoi_component(s: sr) -> int:
+    ccode """return (int32_t)atoi(yk__bstr_get_reference(nn__s));"""
+
+def parse_zig_version_line(line: str) -> ZigVersion:
+    v: ZigVersion = ZigVersion{major: 0, minor: 0, patch: 0}
+    parts: Array[str] = strings.split(line, ".")
+    defer sarr.del_str_array(parts)
+    if len(parts) >= 1:
+        v.major = atoi_component(parts[0])
+    if len(parts) >= 2:
+        v.minor = atoi_component(parts[1])
+    if len(parts) >= 3:
+        v.patch = atoi_component(parts[2])
+    return v
+
+def query_zig_version(zig_path: str) -> ZigVersion:
+    args: Array[str] = array("str", zig_path, "version")
+    defer sarr.del_str_array(args)
+    pr: os.ProcessResult = os.run(args)
+    defer os.del_process_result(pr)
+    if not pr.ok or len(pr.output) == 0:
+        console.yellow("warning: failed to query zig version, assuming 0.9.1\n")
+        return default_zig_version()
+    output: str = pr.output
+    nl: int = strings.find_char(output, strings.ord("\n"))
+    if nl >= 0:
+        output = strings.mid(output, 0, nl)
+    return parse_zig_version_line(output)
+
+def macos_abi_for_zig(v: ZigVersion) -> str:
+    if zig_version_at_least(v, 0, 10):
+        return "none"
+    return "gnu"
+
+@native
+def host_cpu_arch() -> str:
+    ccode """
+    #if defined(__aarch64__) || defined(__arm64__) || defined(__arm64__)
+        return yk__sdsnew("aarch64");
+    #elif defined(__i386__) || defined(__i686__)
+        return yk__sdsnew("i386");
+    #else
+        return yk__sdsnew("x86_64");
+    #endif
+    """
+
+@native
+def host_uses_musl() -> bool:
+    ccode """
+    #if defined(__linux__) && !defined(__GLIBC__) && !defined(__gnu_linux__)
+        return true;
+    #else
+        return false;
+    #endif
+    """
+
+def resolve_native_triple(zig_path: sr) -> str:
+    arch: str = host_cpu_arch()
+    ver: ZigVersion = query_zig_version(zig_path)
+    if os.is_macos():
+        abi: str = macos_abi_for_zig(ver)
+        return arch + "-macos-" + abi
+    if os.is_windows():
+        return arch + "-windows-gnu"
+    libc: str = "gnu"
+    if host_uses_musl():
+        libc = "musl"
+    return arch + "-linux-" + libc
+
+def normalize_zig_triple(triple: sr, zig_path: sr) -> str:
+    ver: ZigVersion = query_zig_version(zig_path)
+    abi: str = macos_abi_for_zig(ver)
+    gnu_suffix: str = "-macos-gnu"
+    none_suffix: str = "-macos-none"
+    if abi == "none" and strings.endswith(triple, gnu_suffix):
+        base: str = strings.mid(triple, 0, len(triple) - len(gnu_suffix))
+        return base + none_suffix
+    if abi == "gnu" and strings.endswith(triple, none_suffix):
+        base: str = strings.mid(triple, 0, len(triple) - len(none_suffix))
+        return base + gnu_suffix
+    return triple
+
+def effective_zig_target(config_target: str, zig_path: sr) -> str:
+    if config_target == "native":
+        return resolve_native_triple(zig_path)
+    return normalize_zig_triple(config_target, zig_path)
+
 class Binary:
     # Single binary that we need to build
     main_file: str
