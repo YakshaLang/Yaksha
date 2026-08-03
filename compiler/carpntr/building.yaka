@@ -231,6 +231,12 @@ def keep_ray_objects(element: str, negate: bool) -> bool:
         return not obj
     return obj
 
+def keep_ray_include_args(element: str, negate: bool) -> bool:
+    inc: bool = strings.startswith(element, "-I")
+    if negate:
+        return not inc
+    return inc
+
 @native
 def is_arm64_cpu() -> bool:
     # way to detect if we are running m1/m2/etc macos
@@ -242,11 +248,6 @@ def is_arm64_cpu() -> bool:
     #endif
     """
 
-def get_alt_compiler(c: carp.Config) -> str:
-    if c.alt_compiler == carp.GCC:
-        return c.gcc_compiler_path
-    return c.clang_compiler_path
-
 def create_args(c: carp.Config, code_path: str, build_path: str, target: str, raylib_args: Array[str]) -> Array[str]:
     # Create arguments for compilation on to a string array
     # This string array need to be deleted
@@ -256,11 +257,15 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
     buildable_objects: Array[BObject]
     ray_objects: Array[str] = filter(raylib_args, keep_ray_objects, False)
     ray_other_args: Array[str] = filter(raylib_args, keep_ray_objects, True)
+    ray_include_args: Array[str] = filter(ray_other_args, keep_ray_include_args, False)
+    ray_link_args: Array[str] = filter(ray_other_args, keep_ray_include_args, True)
     alt_compiler: str = ""
     if c.use_alt_compiler:
-        alt_compiler = get_alt_compiler(c)
+        alt_compiler = carp.alt_compiler_path(c)
     defer sarr.del_str_array(ray_objects)
     defer sarr.del_str_array(ray_other_args)
+    defer sarr.del_str_array(ray_include_args)
+    defer sarr.del_str_array(ray_link_args)
     if c.compilation.wasm4:
         # We cannot use alt compiler for wasm4
         args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Wno-newline-eof", "-Wno-parentheses-equality", "-MMD", "-MP", "-Oz")
@@ -285,11 +290,14 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
             args = array("str", c.zig_compiler_path, "cc", "-std=c99", "-Oz", "-pedantic", "-Wall", "-Wno-newline-eof", "-fPIC", "-Wno-parentheses-equality")
     # If not macos do link time optimization
     # If we are hot reloading, do not waste time with actually doing link time optimization and wasting time
-    if not is_target_macos(target) and not c.compilation.raylib_hot_reloading_dll and not c.compilation.disable_parallel_build:
+    if not is_target_macos(target) and not is_target_windows(target) and not c.compilation.raylib_hot_reloading_dll and not c.compilation.disable_parallel_build:
         arrput(args, "-flto=full")
     if c.compilation.raylib_hot_reloading_dll:
         arrput(args, "-DYK__CR_DLL")
-    args = sarr.extend(args, ray_other_args)
+    # zig 0.16+ enables UBSan in some modes; macOS raylib links with clang without sanitizer runtime
+    if not c.use_alt_compiler and not c.compilation.web and not c.compilation.wasm4:
+        arrput(args, "-fno-sanitize=undefined")
+    args = sarr.extend(args, ray_include_args)
     # --
     length: int = 0
     x: int = 0
@@ -314,17 +322,14 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         cdefine: str = "-D" + c.c_code.compiler_defines[x]
         arrput(args, cdefine)
         x = x + 1
-    # add target architecture
-    if not native and target != "web" and target != "wasm4":
-        arrput(args, "-target")
-        arrput(args, target)
-    if target == "wasm4":
-        arrput(args, "-target")
-        arrput(args, "wasm32-wasi-musl")
-    # m1/m2/etc must not build for native, instead build for "aarch64-macos-none"
-    if native and is_arm64_cpu() and is_target_macos(target) and not c.use_alt_compiler:
-        arrput(args, "-target")
-        arrput(args, "aarch64-macos-none")
+    if not c.use_alt_compiler and target != "web":
+        if target == "wasm4":
+            arrput(args, "-target")
+            arrput(args, "wasm32-wasi-musl")
+        else:
+            zig_target: str = carp.effective_zig_target(target, c.zig_compiler_path)
+            arrput(args, "-target")
+            arrput(args, zig_target)
     # runtime c codes
     length = len(c.c_code.runtime_feature_c_code)
     x = 0
@@ -355,6 +360,25 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         build_objects(buildable_objects)
     # Clean up excess data
     cleanup_buildables(buildable_objects)
+    # macOS raylib: zig linker cannot handle ObjC GLFW objects; use clang to link
+    if c.compilation.raylib and is_target_macos(target) and not c.compilation.web and target != "wasm4":
+        clang_path: str = os.which("clang")
+        if len(clang_path) > 0:
+            sarr.del_str_array(args)
+            opt_level: str = "-O0"
+            if not c.compilation.disable_parallel_build:
+                opt_level = "-Oz"
+            args = array("str", clang_path, opt_level, "-fPIC", "-ObjC")
+            args = sarr.extend(args, ray_link_args)
+            length = len(c.c_code.include_paths)
+            x = 0
+            while x < length:
+                arrput(args, "-I" + c.c_code.include_paths[x])
+                x = x + 1
+            sdk: str = os.getenv("SDKROOT")
+            if len(sdk) > 0:
+                arrput(args, "-isysroot")
+                arrput(args, sdk)
     # add objects to the args to link it
     if c.compilation.wasm4:
         # Change args for link time for wasm4
@@ -362,6 +386,8 @@ def create_args(c: carp.Config, code_path: str, build_path: str, target: str, ra
         args = array("str", c.zig_compiler_path, "build-lib", "-dynamic", "-flto", "-mexec-model=reactor", "-O", "ReleaseSmall", "-target", "wasm32-wasi-musl", "--strip", "--stack", "50784", "--global-base=6560", "--import-memory", "--initial-memory=65536", "--max-memory=65536", "-ofmt=wasm", "--export=start", "--export=update")
     args = sarr.extend(args, objects)
     args = sarr.extend(args, ray_objects)
+    if not (c.compilation.raylib and is_target_macos(target) and not c.compilation.web and target != "wasm4" and len(os.which("clang")) > 0):
+        args = sarr.extend(args, ray_link_args)
     sarr.del_str_array(objects)
     # Add shell file
     if c.compilation.web and len(c.compilation.web_shell) > 0:

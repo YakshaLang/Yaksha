@@ -41,6 +41,7 @@
 import libs.os
 import libs.os.path
 import libs.console
+import libs.strings
 import libs.strings.array as sarr
 import libs.thread.pool
 import libs.os.cpu
@@ -79,11 +80,11 @@ def fill_arguments(src_path: str, c: CObject, dll: bool) -> CObject:
     if os.is_windows():
         arrput(args, "-I" + path.join(path.join(glfw, "deps"), "mingw"))
 
-    if os.is_macos() and c.base_name == "rglfw":
+    if os.is_macos() and strings.endswith(c.base_name, "rglfw"):
         arrput(args, "-ObjC")
 
-    # Enable link time optimization
-    if not os.is_macos() and not dll:
+    # Enable link time optimization (linux only; macOS/windows skip LTO like building.yaka)
+    if not os.is_macos() and not os.is_windows() and not dll:
         arrput(args, "-flto=full")
 
 
@@ -175,6 +176,29 @@ def get_web_args() -> Array[str]:
     web_args: Array[str] = array("str", "-s", "USE_GLFW=3", "-s", "ASYNCIFY", "-DPLATFORM_WEB")
     return web_args
 
+def raylib_compile_cmd(conf: carp.Config) -> Array[str]:
+    # Compiler prefix for raylib .c -> .o; optimization flags live in c.args from fill_arguments
+    if conf.compilation.web:
+        return array("str", conf.emcc_compiler_path, "-c")
+    if conf.use_alt_compiler:
+        return array("str", carp.alt_compiler_path(conf), "-c")
+    # zig cc cannot compile Cocoa/GLFW on macOS reliably; use host clang when available
+    if os.is_macos():
+        clang: str = os.which("clang")
+        if len(clang) > 0:
+            return array("str", clang, "-c")
+    cmd: Array[str] = array("str", conf.zig_compiler_path, "cc", "-c")
+    zig_target: str = carp.resolve_native_triple(conf.zig_compiler_path)
+    arrput(cmd, "-target")
+    arrput(cmd, zig_target)
+    arrput(cmd, "-fno-sanitize=undefined")
+    if os.is_macos():
+        sdk: str = os.getenv("SDKROOT")
+        if len(sdk) > 0:
+            arrput(cmd, "-isysroot")
+            arrput(cmd, sdk)
+    return cmd
+
 def produce_object(c: CObject, conf: carp.Config, print_info: bool) -> bool:
     # Creates a new .o file for a raylib source
     # If raylib object already exists do not bother building it again
@@ -189,11 +213,7 @@ def produce_object(c: CObject, conf: carp.Config, print_info: bool) -> bool:
             console.green("ok.\n")
         return True
 
-    cmd: Array[str]
-    if conf.compilation.web:
-        cmd = array("str", conf.emcc_compiler_path, "-c", "-Oz")
-    else:
-        cmd = array("str", conf.zig_compiler_path, "cc", "-c", "-Oz")
+    cmd: Array[str] = raylib_compile_cmd(conf)
     cmd = sarr.extend(cmd, c.args)
     defer sarr.del_str_array(cmd)
     pr: os.ProcessResult = os.run(cmd)

@@ -43,6 +43,7 @@ import ast
 import configparser
 import os
 import os.path as paths
+import platform
 import shutil
 import subprocess
 import sys
@@ -69,6 +70,111 @@ DEFAULT_c_code = ["whereami.c", "yk__system.c", "utf8proc.c", "toml.c",
                   "yk__graphic_utils.c", "argparse.c", "yk__argparse.c", "tinycthread.c", "yk__cpu.c"]
 DEFAULT_c_code = [paths.join(RUNTIME_DIR, x) for x in DEFAULT_c_code]
 DEFAULT_include_paths = [RUNTIME_DIR, "build"]
+
+
+class ZigVersion:
+    major: int
+    minor: int
+    patch: int
+
+    def __init__(self, major: int, minor: int, patch: int):
+        self.major = major
+        self.minor = minor
+        self.patch = patch
+
+
+def zig_version_at_least(v: ZigVersion, major: int, minor: int) -> bool:
+    if v.major > major:
+        return True
+    if v.major < major:
+        return False
+    return v.minor >= minor
+
+
+def default_zig_version() -> ZigVersion:
+    return ZigVersion(0, 9, 1)
+
+
+def parse_zig_version_line(line: str) -> ZigVersion:
+    parts = line.strip().split(".")
+    major = int(parts[0]) if len(parts) >= 1 and parts[0] else 0
+    minor = int(parts[1]) if len(parts) >= 2 and parts[1] else 0
+    patch = int(parts[2]) if len(parts) >= 3 and parts[2] else 0
+    return ZigVersion(major, minor, patch)
+
+
+def query_zig_version(zig_path: str) -> ZigVersion:
+    try:
+        result = subprocess.run(
+            [zig_path, "version"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+        if result.returncode != 0 or not result.stdout.strip():
+            print("warning: failed to query zig version, assuming 0.9.1")
+            return default_zig_version()
+        return parse_zig_version_line(result.stdout.strip().splitlines()[0])
+    except (subprocess.TimeoutExpired, OSError, ValueError):
+        print("warning: failed to query zig version, assuming 0.9.1")
+        return default_zig_version()
+
+
+def macos_abi_for_zig(v: ZigVersion) -> str:
+    if zig_version_at_least(v, 0, 10):
+        return "none"
+    return "gnu"
+
+
+def host_cpu_arch() -> str:
+    machine = platform.machine().lower()
+    if machine in ("arm64", "aarch64"):
+        return "aarch64"
+    if machine in ("i386", "i686"):
+        return "i386"
+    return "x86_64"
+
+
+def host_uses_musl() -> bool:
+    if sys.platform != "linux":
+        return False
+    try:
+        with open("/etc/os-release", encoding="utf-8") as f:
+            return "alpine" in f.read().lower()
+    except OSError:
+        return False
+
+
+def resolve_native_triple(zig_path: str) -> str:
+    arch = host_cpu_arch()
+    ver = query_zig_version(zig_path)
+    if sys.platform == "darwin":
+        return f"{arch}-macos-{macos_abi_for_zig(ver)}"
+    if sys.platform == "win32":
+        return f"{arch}-windows-gnu"
+    libc = "musl" if host_uses_musl() else "gnu"
+    return f"{arch}-linux-{libc}"
+
+
+def normalize_zig_triple(triple: str, zig_path: str) -> str:
+    ver = query_zig_version(zig_path)
+    abi = macos_abi_for_zig(ver)
+    gnu_suffix = "-macos-gnu"
+    none_suffix = "-macos-none"
+    if abi == "none" and triple.endswith(gnu_suffix):
+        return triple[: -len(gnu_suffix)] + none_suffix
+    if abi == "gnu" and triple.endswith(none_suffix):
+        return triple[: -len(none_suffix)] + gnu_suffix
+    return triple
+
+
+def find_zig() -> str:
+    zig = shutil.which("zig")
+    if zig:
+        return zig
+    panic("Failed to find zig in PATH")
+    return None
 
 
 class CCode:
@@ -176,7 +282,29 @@ def panic(message: str):
     sys.exit(-1)
 
 
+def should_use_lto(target: str) -> bool:
+    return "macos" not in target and "windows" not in target
+
+
+def ensure_native_binary(conf: Config, zig_path: str, native_binary: str) -> None:
+    native_path = paths.join("build", native_binary)
+    if paths.isfile(native_path) and paths.getsize(native_path) > 0:
+        return
+    if sys.platform != "darwin":
+        return
+    host_triple = resolve_native_triple(zig_path)
+    fallback = paths.join("build", f"{conf.project.name}-{host_triple}")
+    if not paths.isfile(fallback):
+        return
+    print(f"native build missing, using {fallback} as {native_path}")
+    shutil.copy2(fallback, native_path)
+
+
 def compile_(conf: Config):
+    zig_path = find_zig()
+    zig_ver = query_zig_version(zig_path)
+    print(f"zig := {zig_path} ({zig_ver.major}.{zig_ver.minor}.{zig_ver.patch})")
+    native_triple = resolve_native_triple(zig_path)
     try:
         os.mkdir("build")
     except:
@@ -212,28 +340,34 @@ def compile_(conf: Config):
     ccodes = " ".join(conf.ccode.c_code)
     comp_defines = "".join(["-D " + x for x in conf.ccode.compiler_defines])
     c_args = ARGS
-    if sys.platform != "darwin":
+    if should_use_lto(native_triple):
         c_args = c_args + " -flto=full"
     binary_main = paths.join(RUNTIME_DIR, "yk__main.c")
-    print("----- building target = native -------")
-    cmd = "{} {} {} {} {} build/program_code.c runtime/yk__main.c -o build/{}".format(
-        C_COMPILER, c_args, " ".join(includes), comp_defines, ccodes, native_binary) \
+    print(f"----- building target = native ({native_triple}) -------")
+    cmd = "{} {} -target {} {} {} {} build/program_code.c runtime/yk__main.c -o build/{}".format(
+        C_COMPILER, c_args, native_triple, " ".join(includes), comp_defines, ccodes, native_binary) \
         .replace("runtime/yk__main.c", binary_main)
-    os.system(cmd)
+    native_ret = os.system(cmd)
+    if native_ret != 0:
+        print(f"warning: native build failed (exit {native_ret})")
     if C_COMPILER != "clang":
         for target in conf.compilation.targets:
-            if "windows" in target:
-                name = conf.project.name + "-" + target + ".exe"
+            effective_target = normalize_zig_triple(target, zig_path)
+            if effective_target != target:
+                print(f"----- normalized {target} -> {effective_target} -------")
+            if "windows" in effective_target:
+                name = conf.project.name + "-" + effective_target + ".exe"
             else:
-                name = conf.project.name + "-" + target
+                name = conf.project.name + "-" + effective_target
             c_args = ARGS
-            if "macos" not in target:
+            if should_use_lto(effective_target):
                 c_args = c_args + " -flto=full"
-            print("----- building target =", target, "-------")
-            cmd = "{} {} {} {} {} build/program_code.c runtime/yk__main.c -o build/{} -target {}".format(
-                C_COMPILER, c_args, " ".join(includes), comp_defines, ccodes, name, target) \
+            print("----- building target =", effective_target, "-------")
+            cmd = "{} {} -target {} {} {} {} build/program_code.c runtime/yk__main.c -o build/{}".format(
+                C_COMPILER, c_args, effective_target, " ".join(includes), comp_defines, ccodes, name) \
                 .replace("runtime/yk__main.c", binary_main)
             os.system(cmd)
+    ensure_native_binary(conf, zig_path, native_binary)
     cmd = paths.join("build", native_binary)
     print("-- end of bootstrap --")
     # backup program code
