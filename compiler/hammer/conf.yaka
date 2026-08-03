@@ -147,6 +147,12 @@ def effective_zig_target(config_target: str, zig_path: sr) -> str:
         return resolve_native_triple(zig_path)
     return normalize_zig_triple(config_target, zig_path)
 
+def needs_dynamic_linking(config_target: str, zig_path: sr) -> bool:
+    zig_target: str = effective_zig_target(config_target, zig_path)
+    if strings.contains(zig_target, "macos"):
+        return True
+    return strings.endswith(zig_target, "-linux-gnu")
+
 class Binary:
     # Single binary that we need to build
     main_file: str
