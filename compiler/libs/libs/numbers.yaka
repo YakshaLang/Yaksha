@@ -6,7 +6,7 @@ def cstr2i(a: c.CStr) -> int:
     pass
 
 @native
-def s2i(s: str) -> int:
+def s2i(s: sr) -> int:
     ccode """
     return (int32_t)atoi(yk__bstr_get_reference(nn__s));
     """
